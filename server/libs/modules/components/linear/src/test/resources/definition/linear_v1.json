@@ -388,7 +388,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Issue",
     "workflowNodeDescription": null
   }, {
@@ -804,7 +803,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Issue",
     "workflowNodeDescription": null
   }, {
@@ -1189,7 +1187,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Project",
     "workflowNodeDescription": null
   }, {
@@ -1574,7 +1571,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Project",
     "workflowNodeDescription": null
   }, {
@@ -1964,7 +1960,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Comment",
     "workflowNodeDescription": null
   }, {
@@ -2113,7 +2108,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Raw Graphql Query",
     "workflowNodeDescription": null
   } ],

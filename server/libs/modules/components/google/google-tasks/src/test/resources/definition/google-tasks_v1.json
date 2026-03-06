@@ -1215,7 +1215,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   }, {
@@ -2429,7 +2428,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Tasks",
     "workflowNodeDescription": null
   }, {
@@ -3672,7 +3670,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Task",
     "workflowNodeDescription": null
   } ],

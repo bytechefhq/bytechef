@@ -403,7 +403,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "GET",
     "workflowNodeDescription": null
   }, {
@@ -1457,7 +1456,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "POST",
     "workflowNodeDescription": null
   }, {
@@ -2511,7 +2509,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "PUT",
     "workflowNodeDescription": null
   }, {
@@ -3565,7 +3562,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "PATCH",
     "workflowNodeDescription": null
   }, {
@@ -3972,7 +3968,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "DELETE",
     "workflowNodeDescription": null
   }, {
@@ -4379,7 +4374,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "HEAD",
     "workflowNodeDescription": null
   } ],

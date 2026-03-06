@@ -250,7 +250,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Record",
     "workflowNodeDescription": null
   }, {
@@ -316,7 +315,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Record",
     "workflowNodeDescription": null
   }, {
@@ -360,7 +358,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "SOQL Query",
     "workflowNodeDescription": null
   }, {
@@ -547,7 +544,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Record",
     "workflowNodeDescription": null
   } ],

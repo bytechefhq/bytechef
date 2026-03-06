@@ -1170,7 +1170,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Feature Request",
     "workflowNodeDescription": null
   }, {
@@ -2099,7 +2098,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Post",
     "workflowNodeDescription": null
   }, {
@@ -2208,7 +2206,6 @@
     "processErrorResponse": null,
     "properties": null,
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Feed",
     "workflowNodeDescription": null
   }, {
@@ -2782,7 +2779,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "New Comment",
     "workflowNodeDescription": null
   }, {
@@ -3293,7 +3289,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "New Vote",
     "workflowNodeDescription": null
   } ],

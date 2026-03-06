@@ -282,7 +282,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Response to Webhook Request",
     "workflowNodeDescription": null
   } ],

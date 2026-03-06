@@ -83,7 +83,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Subscriber",
     "workflowNodeDescription": null
   }, {
@@ -147,7 +146,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Subscriber",
     "workflowNodeDescription": null
   }, {
@@ -359,7 +357,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Subscriber List",
     "workflowNodeDescription": null
   }, {
@@ -399,7 +396,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Subscriber List",
     "workflowNodeDescription": null
   } ],

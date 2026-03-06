@@ -114,7 +114,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Addition",
     "workflowNodeDescription": null
   }, {
@@ -232,7 +231,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Division",
     "workflowNodeDescription": null
   }, {
@@ -350,7 +348,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Modulo",
     "workflowNodeDescription": null
   }, {
@@ -468,7 +465,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Multiplication",
     "workflowNodeDescription": null
   }, {
@@ -586,7 +582,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Subtraction",
     "workflowNodeDescription": null
   } ],

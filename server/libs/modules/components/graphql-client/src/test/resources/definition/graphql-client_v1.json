@@ -276,7 +276,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Raw Query",
     "workflowNodeDescription": null
   } ],

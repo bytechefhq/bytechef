@@ -68,7 +68,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Tag",
     "workflowNodeDescription": null
   }, {
@@ -488,7 +487,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Email Template",
     "workflowNodeDescription": null
   }, {
@@ -1115,7 +1113,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create People",
     "workflowNodeDescription": null
   } ],

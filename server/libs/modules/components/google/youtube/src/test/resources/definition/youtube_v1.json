@@ -1365,7 +1365,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload Video",
     "workflowNodeDescription": null
   } ],

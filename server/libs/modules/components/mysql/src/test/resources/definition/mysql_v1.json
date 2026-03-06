@@ -144,7 +144,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Query",
     "workflowNodeDescription": null
   }, {
@@ -343,7 +342,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Insert",
     "workflowNodeDescription": null
   }, {
@@ -563,7 +561,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update",
     "workflowNodeDescription": null
   }, {
@@ -649,7 +646,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete",
     "workflowNodeDescription": null
   }, {
@@ -1031,7 +1027,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Execute",
     "workflowNodeDescription": null
   } ],

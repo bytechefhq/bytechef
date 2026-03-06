@@ -832,7 +832,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
@@ -962,7 +961,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Group",
     "workflowNodeDescription": null
   }, {
@@ -1819,7 +1817,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Contact",
     "workflowNodeDescription": null
   }, {
@@ -2748,7 +2745,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Contacts",
     "workflowNodeDescription": null
   } ],

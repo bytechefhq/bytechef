@@ -833,7 +833,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Subscriber to Group",
     "workflowNodeDescription": null
   }, {
@@ -1553,7 +1552,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create or Update Subscriber",
     "workflowNodeDescription": null
   }, {
@@ -1619,7 +1617,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Remove Subscriber from Group",
     "workflowNodeDescription": null
   } ],

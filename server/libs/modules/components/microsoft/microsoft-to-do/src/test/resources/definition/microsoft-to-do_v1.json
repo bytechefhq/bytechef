@@ -797,7 +797,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   }, {
@@ -1191,7 +1190,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Task List",
     "workflowNodeDescription": null
   }, {
@@ -1938,7 +1936,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Task",
     "workflowNodeDescription": null
   } ],

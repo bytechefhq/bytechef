@@ -641,7 +641,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract",
     "workflowNodeDescription": null
   }, {
@@ -1382,7 +1381,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search",
     "workflowNodeDescription": null
   } ],

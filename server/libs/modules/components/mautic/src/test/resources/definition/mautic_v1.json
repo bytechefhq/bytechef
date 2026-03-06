@@ -495,7 +495,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Company",
     "workflowNodeDescription": null
   }, {
@@ -1365,7 +1364,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
@@ -1816,7 +1814,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Company",
     "workflowNodeDescription": null
   }, {
@@ -2623,7 +2620,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Contact",
     "workflowNodeDescription": null
   } ],

@@ -440,7 +440,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Project",
     "workflowNodeDescription": null
   }, {
@@ -837,7 +836,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   }, {
@@ -884,7 +882,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Mark Task as Completed",
     "workflowNodeDescription": null
   } ],

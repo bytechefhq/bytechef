@@ -80,7 +80,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Row",
     "workflowNodeDescription": null
   }, {
@@ -139,7 +138,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Row",
     "workflowNodeDescription": null
   }, {
@@ -227,7 +225,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Row",
     "workflowNodeDescription": null
   }, {
@@ -336,7 +333,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Rows",
     "workflowNodeDescription": null
   }, {
@@ -439,7 +435,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Row",
     "workflowNodeDescription": null
   } ],

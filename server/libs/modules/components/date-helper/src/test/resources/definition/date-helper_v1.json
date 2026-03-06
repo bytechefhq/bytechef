@@ -288,7 +288,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Time",
     "workflowNodeDescription": null
   }, {
@@ -486,7 +485,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Compare Dates",
     "workflowNodeDescription": null
   }, {
@@ -639,7 +637,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Compare Times",
     "workflowNodeDescription": null
   }, {
@@ -762,7 +759,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Convert Date Timestamp",
     "workflowNodeDescription": null
   }, {
@@ -915,7 +911,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Date Difference",
     "workflowNodeDescription": null
   }, {
@@ -1098,7 +1093,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Date Is in the Last",
     "workflowNodeDescription": null
   }, {
@@ -1202,7 +1196,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract Date Units",
     "workflowNodeDescription": null
   }, {
@@ -1378,7 +1371,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Format Date",
     "workflowNodeDescription": null
   }, {
@@ -1563,7 +1555,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Current Date",
     "workflowNodeDescription": null
   }, {
@@ -1665,7 +1656,6 @@
       "type": "DATE_TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Days Between",
     "workflowNodeDescription": null
   }, {
@@ -1801,7 +1791,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Duration",
     "workflowNodeDescription": null
   }, {
@@ -2133,7 +2122,6 @@
       "type": "DATE_TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Time Between",
     "workflowNodeDescription": null
   }, {
@@ -2222,7 +2210,6 @@
       "type": "DATE_TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Time From Now",
     "workflowNodeDescription": null
   }, {
@@ -2420,7 +2407,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Between Dates?",
     "workflowNodeDescription": null
   }, {
@@ -2597,7 +2583,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Between Times?",
     "workflowNodeDescription": null
   }, {
@@ -2844,7 +2829,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Business Hours?",
     "workflowNodeDescription": null
   }, {
@@ -2963,7 +2947,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Weekend?",
     "workflowNodeDescription": null
   }, {
@@ -3247,7 +3230,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Subtract Time",
     "workflowNodeDescription": null
   } ],

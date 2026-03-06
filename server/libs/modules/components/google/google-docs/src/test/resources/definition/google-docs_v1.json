@@ -922,7 +922,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Document",
     "workflowNodeDescription": null
   }, {
@@ -1945,7 +1944,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Document From Template",
     "workflowNodeDescription": null
   }, {
@@ -2853,7 +2851,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Document",
     "workflowNodeDescription": null
   } ],

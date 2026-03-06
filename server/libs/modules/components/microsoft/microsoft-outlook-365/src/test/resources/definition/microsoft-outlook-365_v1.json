@@ -704,7 +704,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Event",
     "workflowNodeDescription": null
   }, {
@@ -773,7 +772,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Event",
     "workflowNodeDescription": null
   }, {
@@ -852,7 +850,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Email",
     "workflowNodeDescription": null
   }, {
@@ -1458,7 +1455,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Events",
     "workflowNodeDescription": null
   }, {
@@ -1716,7 +1712,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Free Time Slots",
     "workflowNodeDescription": null
   }, {
@@ -1790,7 +1785,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Move Email",
     "workflowNodeDescription": null
   }, {
@@ -2111,7 +2105,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Reply to Email",
     "workflowNodeDescription": null
   }, {
@@ -2253,7 +2246,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Email",
     "workflowNodeDescription": null
   }, {
@@ -2675,7 +2667,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Email",
     "workflowNodeDescription": null
   } ],

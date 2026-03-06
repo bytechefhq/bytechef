@@ -953,7 +953,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Bill",
     "workflowNodeDescription": null
   }, {
@@ -2478,7 +2477,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
@@ -3430,7 +3428,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Invoice",
     "workflowNodeDescription": null
   }, {
@@ -4822,7 +4819,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Quote",
     "workflowNodeDescription": null
   } ],

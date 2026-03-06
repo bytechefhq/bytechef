@@ -418,7 +418,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
@@ -743,7 +742,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Product",
     "workflowNodeDescription": null
   }, {
@@ -1576,7 +1574,6 @@
     "processErrorResponse": null,
     "properties": null,
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Me",
     "workflowNodeDescription": null
   } ],

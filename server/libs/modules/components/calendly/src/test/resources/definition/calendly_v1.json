@@ -347,7 +347,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Cancel Event",
     "workflowNodeDescription": null
   } ],

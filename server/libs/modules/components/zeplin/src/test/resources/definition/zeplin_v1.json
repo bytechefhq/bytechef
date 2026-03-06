@@ -91,7 +91,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Project",
     "workflowNodeDescription": null
   } ],

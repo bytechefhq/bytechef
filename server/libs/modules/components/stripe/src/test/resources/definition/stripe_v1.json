@@ -820,7 +820,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Customer",
     "workflowNodeDescription": null
   }, {
@@ -1142,7 +1141,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Invoice",
     "workflowNodeDescription": null
   } ],

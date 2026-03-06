@@ -1663,7 +1663,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Attendees to Event",
     "workflowNodeDescription": null
   }, {
@@ -3800,7 +3799,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Event",
     "workflowNodeDescription": null
   }, {
@@ -5455,7 +5453,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Quick Event",
     "workflowNodeDescription": null
   }, {
@@ -5521,7 +5518,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Event",
     "workflowNodeDescription": null
   }, {
@@ -7312,7 +7308,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Events",
     "workflowNodeDescription": null
   }, {
@@ -7567,7 +7562,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Free Time Slots",
     "workflowNodeDescription": null
   }, {
@@ -9368,7 +9362,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Event",
     "workflowNodeDescription": null
   } ],

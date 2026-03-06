@@ -164,7 +164,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
@@ -248,7 +247,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Contact",
     "workflowNodeDescription": null
   }, {
@@ -608,7 +606,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Transactional Email",
     "workflowNodeDescription": null
   } ],

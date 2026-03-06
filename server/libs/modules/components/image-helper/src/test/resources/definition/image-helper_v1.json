@@ -369,7 +369,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Compress Image",
     "workflowNodeDescription": null
   }, {
@@ -796,7 +795,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Crop Image",
     "workflowNodeDescription": null
   }, {
@@ -943,7 +941,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Image Metadata",
     "workflowNodeDescription": null
   }, {
@@ -1115,7 +1112,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Image to Base64",
     "workflowNodeDescription": null
   }, {
@@ -1504,7 +1500,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Resize Image",
     "workflowNodeDescription": null
   }, {
@@ -1886,7 +1881,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Rotate Image",
     "workflowNodeDescription": null
   } ],

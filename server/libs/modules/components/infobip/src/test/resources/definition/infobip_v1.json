@@ -717,7 +717,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send SMS",
     "workflowNodeDescription": null
   }, {
@@ -1353,7 +1352,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Whatsapp Template Message",
     "workflowNodeDescription": null
   }, {
@@ -1889,7 +1887,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send WhatsApp Text Message",
     "workflowNodeDescription": null
   } ],

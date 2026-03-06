@@ -1691,7 +1691,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Lists",
     "workflowNodeDescription": null
   }, {
@@ -1804,7 +1803,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Subscribe Profiles",
     "workflowNodeDescription": null
   }, {
@@ -6469,7 +6467,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Profile",
     "workflowNodeDescription": null
   } ],
