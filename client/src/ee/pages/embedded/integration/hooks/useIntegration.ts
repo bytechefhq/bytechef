@@ -9,7 +9,6 @@ import {IntegrationKeys, useGetIntegrationsQuery} from '@/ee/shared/queries/embe
 import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
-import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -40,8 +39,7 @@ export const useIntegration = () => {
     );
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
-    const setLeftSidebarOpen = useIntegrationsLeftSidebarStore((state) => state.setLeftSidebarOpen);
-    const setRightSidebarOpen = useRightSidebarStore((state) => state.setRightSidebarOpen);
+    const leftSidebarOpen = useIntegrationsLeftSidebarStore((state) => state.leftSidebarOpen);
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore(
         useShallow((state) => ({
             setShowBottomPanelOpen: state.setShowBottomPanelOpen,
@@ -51,7 +49,6 @@ export const useIntegration = () => {
     const setWorkflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.setWorkflowNodeDetailsPanelOpen
     );
-    const leftSidebarOpen = useIntegrationsLeftSidebarStore((state) => state.leftSidebarOpen);
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
@@ -190,14 +187,6 @@ export const useIntegration = () => {
         useWorkflowNodeDetailsPanelStore.getState().reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [integrationWorkflowId]);
-
-    useEffect(() => {
-        return () => {
-            setLeftSidebarOpen(false);
-
-            setRightSidebarOpen(false);
-        };
-    }, [setLeftSidebarOpen, setRightSidebarOpen]);
 
     useEffect(() => {
         if (leftSidebarOpen && !sidebarLoadedRef.current) {

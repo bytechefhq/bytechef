@@ -3,7 +3,6 @@ import {Type} from '@/pages/automation/projects/Projects';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
-import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -42,13 +41,7 @@ export const useProject = () => {
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore(
-        useShallow((state) => ({
-            projectLeftSidebarOpen: state.projectLeftSidebarOpen,
-            setProjectLeftSidebarOpen: state.setProjectLeftSidebarOpen,
-        }))
-    );
-    const setRightSidebarOpen = useRightSidebarStore((state) => state.setRightSidebarOpen);
+    const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore(
         useShallow((state) => ({
             setShowBottomPanelOpen: state.setShowBottomPanelOpen,
@@ -218,14 +211,6 @@ export const useProject = () => {
         useWorkflowNodeDetailsPanelStore.getState().reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectWorkflowId]);
-
-    useEffect(() => {
-        return () => {
-            setProjectLeftSidebarOpen(false);
-
-            setRightSidebarOpen(false);
-        };
-    }, [setProjectLeftSidebarOpen, setRightSidebarOpen]);
 
     useEffect(() => {
         if (projectLeftSidebarOpen && !sidebarLoadedRef.current) {
