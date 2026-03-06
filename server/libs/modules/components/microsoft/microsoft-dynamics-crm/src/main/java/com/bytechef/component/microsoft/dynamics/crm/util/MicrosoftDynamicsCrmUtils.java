@@ -31,7 +31,7 @@ import static com.bytechef.component.microsoft.dynamics.crm.constant.EntityAttri
 import static com.bytechef.component.microsoft.dynamics.crm.constant.EntityAttributeType.VIRTUAL;
 import static com.bytechef.component.microsoft.dynamics.crm.constant.EntityAttributeType.getEntityAttributeType;
 import static com.bytechef.component.microsoft.dynamics.crm.constant.MicrosoftDynamicsCrmConstants.ENTITY_TYPE;
-import static com.bytechef.microsoft.commons.MicrosoftUtils.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.VALUE;
 
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.Context;

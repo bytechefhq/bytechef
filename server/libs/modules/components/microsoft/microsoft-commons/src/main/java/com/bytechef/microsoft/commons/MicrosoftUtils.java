@@ -17,6 +17,11 @@
 package com.bytechef.microsoft.commons;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.FILE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ODATA_NEXT_LINK;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.VALUE;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -32,12 +37,6 @@ import java.util.Map;
  * @author Monika Kušter
  */
 public class MicrosoftUtils {
-
-    public static final String FILE = "file";
-    public static final String ID = "id";
-    public static final String NAME = "name";
-    public static final String ODATA_NEXT_LINK = "@odata.nextLink";
-    public static final String VALUE = "value";
 
     public static List<Option<String>> getFileIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,

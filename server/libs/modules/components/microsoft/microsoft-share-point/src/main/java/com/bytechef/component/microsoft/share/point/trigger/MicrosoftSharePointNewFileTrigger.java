@@ -14,56 +14,58 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.microsoft.one.drive.trigger;
+package com.bytechef.component.microsoft.share.point.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE_OUTPUT_PROPERTY;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
-import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 import com.bytechef.microsoft.commons.MicrosoftTriggerUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-public class MicrosoftOneDriveNewFileTrigger {
+public class MicrosoftSharePointNewFileTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newFile")
         .title("New File")
         .description("Triggers when file is uploaded to folder.")
         .type(TriggerType.POLLING)
-        .help("", "https://docs.bytechef.io/reference/components/microsoft-one-drive_v1#new-file")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#new-file")
         .properties(
-            string(PARENT_ID)
+            string(SITE_ID)
+                .label("Site ID")
+                .description("The ID of the SharePoint site.")
+                .options((OptionsFunction<String>) MicrosoftSharePointUtils::getSiteOptions)
+                .required(true),
+            string(PARENT_FOLDER)
                 .label("Parent Folder ID")
-                .description(
-                    "ID of the folder to watch for new files. If no folder is specified, the root folder will be used.")
-                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
+                .description("If no folder is selected, root folder will be monitored for new file.")
+                .optionsLookupDependsOn(SITE_ID)
+                .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
                 .required(false))
-        .output(outputSchema(FILE_OUTPUT_PROPERTY))
-        .poll(MicrosoftOneDriveNewFileTrigger::poll)
+        .output()
+        .poll(MicrosoftSharePointNewFileTrigger::poll)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
-    protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
-
-    private MicrosoftOneDriveNewFileTrigger() {
+    private MicrosoftSharePointNewFileTrigger() {
     }
 
     protected static PollOutput poll(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        String url = "/me/drive/items/%s/children".formatted(getFolderId(inputParameters.getString(PARENT_ID)));
+        String url = "/sites/%s/drive/items/%s/children".formatted(
+            inputParameters.getRequiredString(SITE_ID), inputParameters.getString(PARENT_FOLDER, "root"));
 
         return MicrosoftTriggerUtils.poll(url, "file", closureParameters, context);
     }
