@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.map;
+package com.bytechef.platform.workflow.task.dispatcher.map;
 
-import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import java.util.Optional;
-import org.junit.jupiter.api.Test;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
-public class MapTaskDispatcherDefinitionFactoryTest {
+public interface MapDataSource {
 
-    @Test
-    public void testGetTaskDispatcherDefinition() {
-        MapDataSource stubDataSource = (workflowId, lastTaskName, lastTaskType, environmentId) -> null;
+    String ENVIRONMENT_ID = "__environmentId";
+    String WORKFLOW_ID = "__workflowId";
 
-        JsonFileAssert.assertEquals(
-            "definition/map_v1.json",
-            new MapTaskDispatcherDefinitionFactory(Optional.of(stubDataSource)).getDefinition());
-    }
+    @Nullable
+    OutputResponse getLastIterateeTaskOutput(
+        String workflowId, String lastTaskName, String lastTaskType, long environmentId);
 }
