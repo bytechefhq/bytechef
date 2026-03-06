@@ -97,6 +97,27 @@ export default function handleDeleteTask({
 
             return parentLoopTask;
         }) as Array<WorkflowTaskType>;
+    } else if (data.mapData) {
+        const parentMapTask = TASK_DISPATCHER_CONFIG.map.getTask({
+            taskDispatcherId: data.mapData.mapId,
+            tasks: workflowTasks,
+        });
+
+        if (!parentMapTask?.parameters) {
+            return;
+        }
+
+        parentMapTask.parameters.iteratee = (parentMapTask.parameters.iteratee as Array<WorkflowTask>).filter(
+            (childTask) => childTask.name !== data.name
+        );
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentMapTask.name) {
+                return task;
+            }
+
+            return parentMapTask;
+        }) as Array<WorkflowTaskType>;
     } else if (data.branchData) {
         const parentBranchTask = TASK_DISPATCHER_CONFIG.branch.getTask({
             taskDispatcherId: data.branchData.branchId,

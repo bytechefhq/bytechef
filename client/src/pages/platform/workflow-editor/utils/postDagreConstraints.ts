@@ -25,6 +25,7 @@ function getParentDispatcherId(nodeData: NodeDataType): string | undefined {
     return (
         nodeData.conditionData?.conditionId ||
         nodeData.loopData?.loopId ||
+        nodeData.mapData?.mapId ||
         nodeData.branchData?.branchId ||
         nodeData.parallelData?.parallelId ||
         nodeData.eachData?.eachId ||
@@ -73,6 +74,7 @@ function collectNestedDispatcherNodes(dispatcherId: string, allNodes: Node[], co
             data.taskDispatcherId === dispatcherId ||
             data.conditionData?.conditionId === dispatcherId ||
             data.loopData?.loopId === dispatcherId ||
+            data.mapData?.mapId === dispatcherId ||
             data.branchData?.branchId === dispatcherId ||
             data.eachData?.eachId === dispatcherId ||
             data.parallelData?.parallelId === dispatcherId ||

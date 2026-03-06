@@ -9,10 +9,6 @@
  *
  * The guard is scoped per workflow ID so that an in-flight mutation on one
  * workflow does not block saves for unrelated workflows.
- *
- * Every workflow save utility must call `isWorkflowMutating(workflowId)` before
- * calling `mutation.mutate()`, and wrap the call with
- * `setWorkflowMutating(workflowId, true/false)`.
  */
 
 const mutatingWorkflows = new Set<string>();
@@ -34,8 +30,8 @@ export function setWorkflowMutating(workflowId: string, value: boolean): void {
 }
 
 /**
- * Clears all mutation flags. Useful for cleanup when a workflow editor unmounts
- * to prevent stale flags from blocking future saves.
+ * Clears all mutation flags. Useful for cleanup when a workflow editor
+ * unmounts to prevent stale flags from blocking future saves.
  */
 export function clearAllWorkflowMutations(): void {
     mutatingWorkflows.clear();
