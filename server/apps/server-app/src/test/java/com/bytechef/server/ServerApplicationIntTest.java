@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ScriptTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
@@ -75,6 +76,7 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeanNamesForType(TaskDispatcherTools.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(ProjectToolsImpl.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(ProjectWorkflowToolsImpl.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(ScriptTools.class)).isEmpty();
     }
 
     @Test
