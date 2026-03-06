@@ -19,6 +19,10 @@ package com.bytechef.component.ai.agent.chat.memory.memory;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.agent.chat.memory.memory.action.InMemoryChatMemoryAddMessagesAction;
+import com.bytechef.component.ai.agent.chat.memory.memory.action.InMemoryChatMemoryDeleteAction;
+import com.bytechef.component.ai.agent.chat.memory.memory.action.InMemoryChatMemoryGetMessagesAction;
+import com.bytechef.component.ai.agent.chat.memory.memory.action.InMemoryChatMemoryListConversationsAction;
 import com.bytechef.component.ai.agent.chat.memory.memory.cluster.InMemoryChatMemory;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -35,6 +39,11 @@ public class InMemoryChatMemoryComponentHandler implements ComponentHandler {
         .description("In Memory Chat Memory.")
         .icon("path:assets/in-memory-chat-memory.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+        .actions(
+            InMemoryChatMemoryAddMessagesAction.ACTION_DEFINITION,
+            InMemoryChatMemoryGetMessagesAction.ACTION_DEFINITION,
+            InMemoryChatMemoryDeleteAction.ACTION_DEFINITION,
+            InMemoryChatMemoryListConversationsAction.ACTION_DEFINITION)
         .clusterElements(InMemoryChatMemory.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
