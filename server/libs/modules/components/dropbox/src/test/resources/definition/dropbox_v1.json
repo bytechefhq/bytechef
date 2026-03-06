@@ -6886,7 +6886,7 @@
       "description": null,
       "detectOn": null,
       "name": "oauth2_authorization_code",
-      "oauth2AuthorizationExtraQueryParameters": null,
+      "oauth2AuthorizationExtraQueryParameters": { },
       "pkce": null,
       "properties": [ {
         "advancedOption": null,
