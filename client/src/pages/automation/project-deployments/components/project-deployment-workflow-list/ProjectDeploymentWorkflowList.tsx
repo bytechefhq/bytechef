@@ -156,14 +156,14 @@ const ProjectDeploymentWorkflowList = ({
             )}
 
             {disabledWorkflows.length > 0 && (
-                <Collapsible className="group p-2">
+                <Collapsible className="group">
                     <CollapsibleTrigger className="flex w-full items-center space-x-2 rounded-md p-2 hover:bg-surface-neutral-primary-hover [&[data-state=open]>svg]:rotate-180">
-                        <h3 className="flex justify-start pl-2 text-sm text-muted-foreground">Disabled Workflows</h3>
+                        <h3 className="flex justify-start text-sm text-muted-foreground">Disabled Workflows</h3>
 
                         <ChevronDownIcon className="size-4 shrink-0 transition-transform duration-300" />
                     </CollapsibleTrigger>
 
-                    <CollapsibleContent className="p-2">
+                    <CollapsibleContent>
                         <ul className="divide-y divide-gray-100">
                             {disabledWorkflows.map(({projectDeploymentWorkflow, workflow}) => {
                                 const componentNames = [
