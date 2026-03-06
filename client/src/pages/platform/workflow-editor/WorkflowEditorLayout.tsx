@@ -1,7 +1,5 @@
 import {ReactFlowProvider} from '@xyflow/react';
 
-import '@xyflow/react/dist/base.css';
-
 import './WorkflowEditorLayout.css';
 
 import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';

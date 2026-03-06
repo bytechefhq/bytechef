@@ -1,3 +1,4 @@
+import '@xyflow/react/dist/base.css';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {CANVAS_BACKGROUND_COLOR} from '@/shared/constants';
 import {
