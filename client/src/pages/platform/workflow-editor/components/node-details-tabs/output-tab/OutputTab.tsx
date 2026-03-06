@@ -79,49 +79,49 @@ const OutputTab = ({
 
     return (
         <div className="h-full p-4">
-            {!testing && (
+            {!testing && outputSchema && (
                 <div className="h-full">
-                    {outputSchema && (
-                        <OutputSchemaDisplay
-                            clusterElementType={clusterElementType}
-                            connectionMissing={connectionMissing}
-                            copiedValue={copiedValue}
-                            copyToClipboard={copyToClipboard}
-                            currentNode={currentNode}
-                            currentOperationProperties={currentOperationProperties}
-                            handleClusterElementTestSubmit={handleClusterElementTestSubmit}
-                            handlePredefinedOutputSchemaClick={handlePredefinedOutputSchemaClick}
-                            handleTestOperationClick={handleTestOperationClick}
-                            isClusterElement={!!clusterElementType}
-                            outputSchema={outputSchema}
-                            sampleOutput={sampleOutput}
-                            saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
-                            saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
-                            setShowUploadDialog={setShowUploadDialog}
-                            showClusterElementTestButton={hasClusterElementProperties}
-                            variablePropertiesDefined={variablePropertiesDefined}
-                        />
-                    )}
+                    <OutputSchemaDisplay
+                        clusterElementType={clusterElementType}
+                        connectionMissing={connectionMissing}
+                        copiedValue={copiedValue}
+                        copyToClipboard={copyToClipboard}
+                        currentNode={currentNode}
+                        currentOperationProperties={currentOperationProperties}
+                        handleClusterElementTestSubmit={handleClusterElementTestSubmit}
+                        handlePredefinedOutputSchemaClick={handlePredefinedOutputSchemaClick}
+                        handleTestOperationClick={handleTestOperationClick}
+                        isClusterElement={!!clusterElementType}
+                        outputSchema={outputSchema}
+                        sampleOutput={sampleOutput}
+                        saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
+                        saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
+                        setShowUploadDialog={setShowUploadDialog}
+                        showClusterElementTestButton={hasClusterElementProperties}
+                        variablePropertiesDefined={variablePropertiesDefined}
+                    />
+                </div>
+            )}
 
-                    {!outputSchema && (
-                        <OutputSchemaCreationControls
-                            clusterElementType={clusterElementType}
-                            connectionMissing={connectionMissing}
-                            currentNode={currentNode}
-                            currentOperationProperties={currentOperationProperties}
-                            handleClusterElementTestSubmit={handleClusterElementTestSubmit}
-                            handleTestOperationClick={handleTestOperationClick}
-                            outputDefined={outputDefined}
-                            saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
-                            saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutationPending}
-                            setShowUploadDialog={setShowUploadDialog}
-                            showClusterElementTestButton={hasClusterElementProperties}
-                            showUploadSampleOutputButton={outputDefined}
-                            trigger={currentNode.trigger}
-                            uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutationPending}
-                            variablePropertiesDefined={variablePropertiesDefined}
-                        />
-                    )}
+            {!testing && !outputSchema && (
+                <div className="absolute inset-0 flex items-center justify-center px-4">
+                    <OutputSchemaCreationControls
+                        clusterElementType={clusterElementType}
+                        connectionMissing={connectionMissing}
+                        currentNode={currentNode}
+                        currentOperationProperties={currentOperationProperties}
+                        handleClusterElementTestSubmit={handleClusterElementTestSubmit}
+                        handleTestOperationClick={handleTestOperationClick}
+                        outputDefined={outputDefined}
+                        saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
+                        saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutationPending}
+                        setShowUploadDialog={setShowUploadDialog}
+                        showClusterElementTestButton={hasClusterElementProperties}
+                        showUploadSampleOutputButton={outputDefined}
+                        trigger={currentNode.trigger}
+                        uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutationPending}
+                        variablePropertiesDefined={variablePropertiesDefined}
+                    />
                 </div>
             )}
 
@@ -135,11 +135,12 @@ const OutputTab = ({
                         </div>
                     }
                 >
-                    <div className="flex size-full flex-col items-center justify-center gap-6">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-4">
                         <div
                             className={twMerge(
                                 'flex',
-                                currentNode.triggerType !== TriggerType.Polling &&
+                                currentNode.trigger &&
+                                    currentNode.triggerType !== TriggerType.Polling &&
                                     currentNode.triggerType !== TriggerType.Hybrid &&
                                     'w-full justify-between pl-2',
                                 (currentNode.triggerType === TriggerType.Polling ||
@@ -147,12 +148,7 @@ const OutputTab = ({
                                     'flex-col gap-2'
                             )}
                         >
-                            <div
-                                className={twMerge(
-                                    'mt-1 flex items-center justify-center',
-                                    !currentNode.trigger && 'w-full'
-                                )}
-                            >
+                            <div className="mt-1 flex items-center justify-center">
                                 <LoadingIcon />
 
                                 <span className="text-lg">{`Testing ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}</span>

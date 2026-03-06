@@ -63,11 +63,11 @@ const OutputSchemaCreationControls = ({
                         </p>
                     </div>
                 ) : (
-                    <div className="flex w-full flex-col gap-1">
-                        <div className="self-center">Output Test</div>
+                    <div className="flex w-full flex-col gap-1 text-center">
+                        <div className="self-center">Action Test</div>
 
                         <p className="text-sm text-muted-foreground">
-                            {`Test the ${operationLabel.toLowerCase()} to see the expected behaviour.`}
+                            {`Test the ${operationLabel.toLowerCase()} to see the expected behaviour as this ${operationLabel.toLowerCase()} does not define the output.`}
                         </p>
                     </div>
                 )}
