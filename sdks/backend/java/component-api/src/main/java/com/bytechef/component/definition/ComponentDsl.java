@@ -293,7 +293,6 @@ public final class ComponentDsl {
         private ProcessErrorResponseFunction processErrorResponseFunction;
         private List<? extends Property> properties;
         private ResumePerformFunction resumePerformFunction;
-        private SuspendPerformFunction suspendPerformFunction;
         private String title;
         private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
@@ -472,12 +471,6 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableActionDefinition suspendPerform(SuspendPerformFunction suspendPerform) {
-            this.suspendPerformFunction = suspendPerform;
-
-            return this;
-        }
-
         public ModifiableActionDefinition title(String title) {
             this.title = title;
 
@@ -585,11 +578,6 @@ public final class ComponentDsl {
         @Override
         public Optional<ResumePerformFunction> getResumePerform() {
             return Optional.ofNullable(resumePerformFunction);
-        }
-
-        @Override
-        public Optional<SuspendPerformFunction> getSuspendPerform() {
-            return Optional.ofNullable(suspendPerformFunction);
         }
 
         @Override
@@ -4071,6 +4059,11 @@ public final class ComponentDsl {
         @Override
         public <R> R outputSchema(ContextFunction<OutputSchema, R> outputSchemaFunction) {
             return context.outputSchema(outputSchemaFunction);
+        }
+
+        @Override
+        public void suspend(Suspend suspend) {
+            throw new UnsupportedOperationException();
         }
 
         @Override

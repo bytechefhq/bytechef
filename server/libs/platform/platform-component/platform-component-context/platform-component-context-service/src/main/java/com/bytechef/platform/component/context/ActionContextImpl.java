@@ -56,6 +56,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable Long jobPrincipalWorkflowId;
     private final @Nullable Long jobId;
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
+    private @Nullable Suspend suspend;
     private final @Nullable PlatformType type;
     private final @Nullable String publicUrl;
     private final long taskExecutionId;
@@ -260,6 +261,17 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Override
     public String getActionName() {
         return actionName;
+    }
+
+    @Override
+    @Nullable
+    public Suspend getSuspend() {
+        return suspend;
+    }
+
+    @Override
+    public void suspend(Suspend suspend) {
+        this.suspend = suspend;
     }
 
     @Override

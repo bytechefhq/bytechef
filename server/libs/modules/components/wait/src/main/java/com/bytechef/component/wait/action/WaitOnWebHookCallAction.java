@@ -26,7 +26,7 @@ import static com.bytechef.component.wait.constant.WaitConstants.SERVICE_URL;
 import static com.bytechef.component.wait.constant.WaitConstants.UNIT;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.Suspend;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.time.Instant;
@@ -74,12 +74,12 @@ public class WaitOnWebHookCallAction {
                         option("Minutes", "MINUTES"),
                         option("Hours", "HOURS"),
                         option("Days", "DAYS")))
-            .suspendPerform(waitOnWebHookCallAction::suspendPerform)
+            .perform(waitOnWebHookCallAction::perform)
             .beforeSuspend(waitOnWebHookCallAction::beforeSuspend)
             .resumePerform(waitOnWebHookCallAction::resumePerform);
     }
 
-    protected Suspend suspendPerform(
+    protected Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String csrfToken = inputParameters.getRequiredString(CSRF_TOKEN);
@@ -91,9 +91,11 @@ public class WaitOnWebHookCallAction {
         Instant expiresAt = Instant.now()
             .plus(amount, chronoUnit);
 
-        return new Suspend(
+        context.suspend(new Suspend(
             Map.of("csrfToken", csrfToken, "expiresAt", expiresAt.toEpochMilli(), "amount", amount, "unit", unit),
-            expiresAt);
+            expiresAt));
+
+        return null;
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")

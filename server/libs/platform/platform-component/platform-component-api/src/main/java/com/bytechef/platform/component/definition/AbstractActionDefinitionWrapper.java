@@ -45,7 +45,6 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     protected final BasePerformFunction performFunction;
     protected final List<? extends Property> properties;
     protected final ResumePerformFunction resumePerformFunction;
-    protected final SuspendPerformFunction suspendPerformFunction;
     protected final String title;
     protected final WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
@@ -67,8 +66,6 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
         this.performFunction = OptionalUtils.orElse(actionDefinition.getPerform(), null);
         this.properties = OptionalUtils.orElse(actionDefinition.getProperties(), null);
         this.resumePerformFunction = actionDefinition.getResumePerform()
-            .orElse(null);
-        this.suspendPerformFunction = actionDefinition.getSuspendPerform()
             .orElse(null);
         this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
         this.workflowNodeDescriptionFunction =
@@ -143,11 +140,6 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     @Override
     public Optional<ResumePerformFunction> getResumePerform() {
         return Optional.ofNullable(resumePerformFunction);
-    }
-
-    @Override
-    public Optional<SuspendPerformFunction> getSuspendPerform() {
-        return Optional.ofNullable(suspendPerformFunction);
     }
 
     @Override
