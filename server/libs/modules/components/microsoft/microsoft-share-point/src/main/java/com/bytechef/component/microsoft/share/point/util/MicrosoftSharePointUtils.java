@@ -43,6 +43,7 @@ import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -199,7 +200,7 @@ public class MicrosoftSharePointUtils {
 
     public static List<Option<String>> getFolderIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> body = context.http(
             http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/root/children"))
@@ -213,7 +214,7 @@ public class MicrosoftSharePointUtils {
 
     public static List<Option<String>> getListIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> body =
             context.http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
@@ -226,7 +227,7 @@ public class MicrosoftSharePointUtils {
 
     public static List<Option<String>> getSiteOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> body = context.http(http -> http.get("/sites"))
             .queryParameter("search", "*")

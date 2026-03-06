@@ -20,7 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
-import static com.bytechef.microsoft.commons.MicrosoftUtils.ODATA_NEXT_LINK;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ODATA_NEXT_LINK;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.Context;
