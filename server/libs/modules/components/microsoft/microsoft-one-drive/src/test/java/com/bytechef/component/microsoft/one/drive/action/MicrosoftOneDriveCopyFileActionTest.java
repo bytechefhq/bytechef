@@ -21,7 +21,6 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -84,7 +83,7 @@ class MicrosoftOneDriveCopyFileActionTest {
 
         Object result = MicrosoftOneDriveCopyFileAction.perform(mockedParameters, null, mockedContext);
 
-        assertNull(result);
+        assertEquals(Map.of("status", "completed"), result);
 
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
@@ -135,7 +134,8 @@ class MicrosoftOneDriveCopyFileActionTest {
 
         Object result = MicrosoftOneDriveCopyFileAction.perform(mockedParameters, null, mockedContext);
 
-        assertNull(result);
+        assertNotNull(result);
+        assertEquals(Map.of("status", "completed"), result);
 
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
