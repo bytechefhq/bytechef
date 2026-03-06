@@ -101,6 +101,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-commons")
     implementation("org.springframework.ai:spring-ai-pgvector-store")
     implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")
+    implementation("org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-jackson")
     implementation("org.springframework.ai:spring-ai-advisors-vector-store")
