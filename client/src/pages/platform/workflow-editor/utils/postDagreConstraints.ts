@@ -205,7 +205,7 @@ export function alignBranchCaseChildren(
 
         const targetNode = allNodes.find((node) => node.id === edge.target);
 
-        if (!targetNode || targetNode.type === 'placeholder') {
+        if (!targetNode || (targetNode.type === 'placeholder' && !isMiddleCase)) {
             return;
         }
 
