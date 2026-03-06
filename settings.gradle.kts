@@ -217,6 +217,7 @@ include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-cosmosd
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-in-memory")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-mongodb")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-neo4j")
+include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-redis")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-vectorstore")
 include("server:libs:modules:components:ai:agent:guardrails")
 include("server:libs:modules:components:ai:agent:rag:rag-modular")
