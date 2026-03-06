@@ -284,7 +284,7 @@ public class CopilotConfiguration {
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectToolsImpl,
-        ProjectWorkflowToolsImpl ProjectWorkflowToolsImpl,
+        ProjectWorkflowToolsImpl projectWorkflowToolsImpl,
         TaskTools taskTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
@@ -297,7 +297,7 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
             .state(state)
-            .tools(List.of(projectToolsImpl, ProjectWorkflowToolsImpl, taskTools))
+            .tools(List.of(projectToolsImpl, projectWorkflowToolsImpl, taskTools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();
