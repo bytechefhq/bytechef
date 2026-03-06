@@ -47,9 +47,11 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -551,8 +553,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
         if (taskDispatcherOutput == null || taskDispatcherOutput) {
+            Map<String, Object> outputInputParameters = new HashMap<>(inputParameters);
+
+            outputInputParameters.put(MapDataSource.WORKFLOW_ID, workflowId);
+            outputInputParameters.put(MapDataSource.ENVIRONMENT_ID, environmentId);
+
             outputResponse = taskDispatcherDefinitionService.executeOutput(
-                workflowNodeType.name(), workflowNodeType.version(), inputParameters);
+                workflowNodeType.name(), workflowNodeType.version(), outputInputParameters);
 
             if (outputResponse != null && outputResponse.outputSchema() instanceof ObjectProperty objectProperty) {
                 List<? extends Property> properties = objectProperty.getProperties();
