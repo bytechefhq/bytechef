@@ -55,7 +55,11 @@ export default function useMcpProjectWorkflowPropertiesPopover(
             }
         }
 
-        const savedParameters = (mcpProjectWorkflow.parameters as Record<string, unknown>) ?? {};
+        const rawParameters = mcpProjectWorkflow.parameters;
+        const savedParameters =
+            rawParameters && typeof rawParameters === 'object' && !Array.isArray(rawParameters)
+                ? (rawParameters as Record<string, unknown>)
+                : {};
 
         return {...propertyDefaults, ...savedParameters};
     }, [mcpProjectWorkflow.parameters, properties]);
@@ -71,20 +75,29 @@ export default function useMcpProjectWorkflowPropertiesPopover(
     const {control, formState, handleSubmit} = form;
 
     const handleFormSubmit = (values: Record<string, unknown>) => {
-        const sanitize = (record: Record<string, unknown>): Record<string, unknown> =>
-            Object.fromEntries(
+        function sanitizeValue(value: unknown): unknown {
+            if (value === '') {
+                return null;
+            }
+
+            if (Array.isArray(value)) {
+                return value.map((item) => sanitizeValue(item));
+            }
+
+            if (value && typeof value === 'object') {
+                return sanitize(value as Record<string, unknown>);
+            }
+
+            return value;
+        }
+
+        function sanitize(record: Record<string, unknown>): Record<string, unknown> {
+            return Object.fromEntries(
                 Object.entries(record).map(([key, value]) => {
-                    if (value === '') {
-                        return [key, null];
-                    }
-
-                    if (value && typeof value === 'object' && !Array.isArray(value)) {
-                        return [key, sanitize(value as Record<string, unknown>)];
-                    }
-
-                    return [key, value];
+                    return [key, sanitizeValue(value)];
                 })
             );
+        }
 
         updateMcpProjectWorkflowMutation.mutate({
             id: mcpProjectWorkflow.id,

@@ -33,7 +33,12 @@ const McpProjectWorkflowPropertiesPopover = ({
                     <p className="text-xs text-muted-foreground">Configure property values for this workflow tool.</p>
                 </div>
 
-                <button className="text-muted-foreground hover:text-foreground" onClick={onClose} type="button">
+                <button
+                    aria-label="Close"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={onClose}
+                    type="button"
+                >
                     <XIcon className="size-4" />
                 </button>
             </div>

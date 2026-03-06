@@ -22,7 +22,12 @@ const useMcpProjectListItemDropdownMenu = (mcpProjectId: string) => {
         });
     };
 
-    return {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog};
+    return {
+        handleConfirmDelete,
+        isDeletePending: deleteMcpProjectMutation.isPending,
+        setShowDeleteDialog,
+        showDeleteDialog,
+    };
 };
 
 export default useMcpProjectListItemDropdownMenu;

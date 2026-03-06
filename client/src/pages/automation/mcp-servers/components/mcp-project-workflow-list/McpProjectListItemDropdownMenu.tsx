@@ -23,9 +23,8 @@ const McpProjectListItemDropdownMenu = ({
     onEditWorkflowsClick,
     onUpdateProjectVersionClick,
 }: McpProjectListItemDropdownMenuProps) => {
-    const {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog} = useMcpProjectListItemDropdownMenu(
-        mcpProject.id.toString()
-    );
+    const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
+        useMcpProjectListItemDropdownMenu(mcpProject.id.toString());
 
     return (
         <>
@@ -41,7 +40,11 @@ const McpProjectListItemDropdownMenu = ({
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
+                    <DropdownMenuItem
+                        className="text-destructive"
+                        disabled={isDeletePending}
+                        onClick={() => setShowDeleteDialog(true)}
+                    >
                         <span className="w-full">Delete</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
