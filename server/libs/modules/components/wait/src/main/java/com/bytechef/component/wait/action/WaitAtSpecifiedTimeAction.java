@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.wait.constant.WaitConstants.DATE_TIME;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.Suspend;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.time.Instant;
@@ -45,11 +45,11 @@ public class WaitAtSpecifiedTimeAction {
                     .label("Date and Time")
                     .description("The date and time to wait until before resuming workflow execution.")
                     .required(true))
-            .suspendPerform(waitAtSpecifiedTimeAction::suspendPerform)
+            .perform(waitAtSpecifiedTimeAction::perform)
             .resumePerform(waitAtSpecifiedTimeAction::resumePerform);
     }
 
-    protected Suspend suspendPerform(
+    protected Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         LocalDateTime localDateTime = inputParameters.getRequiredLocalDateTime(DATE_TIME);
@@ -57,7 +57,9 @@ public class WaitAtSpecifiedTimeAction {
         Instant expiresAt = localDateTime.atZone(ZoneId.systemDefault())
             .toInstant();
 
-        return new Suspend(Map.of("expiresAt", expiresAt.toEpochMilli()), expiresAt);
+        context.suspend(new Suspend(Map.of("expiresAt", expiresAt.toEpochMilli()), expiresAt));
+
+        return null;
     }
 
     protected Object resumePerform(

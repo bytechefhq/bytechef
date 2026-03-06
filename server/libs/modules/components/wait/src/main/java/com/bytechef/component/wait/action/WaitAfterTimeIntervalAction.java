@@ -24,7 +24,7 @@ import static com.bytechef.component.wait.constant.WaitConstants.AMOUNT;
 import static com.bytechef.component.wait.constant.WaitConstants.UNIT;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.Suspend;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.time.Instant;
@@ -58,11 +58,11 @@ public class WaitAfterTimeIntervalAction {
                         option("Minutes", "MINUTES"),
                         option("Hours", "HOURS"),
                         option("Days", "DAYS")))
-            .suspendPerform(waitAfterTimeIntervalAction::suspendPerform)
+            .perform(waitAfterTimeIntervalAction::perform)
             .resumePerform(waitAfterTimeIntervalAction::resumePerform);
     }
 
-    protected Suspend suspendPerform(
+    protected Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         int amount = inputParameters.getRequiredInteger(AMOUNT);
@@ -73,8 +73,10 @@ public class WaitAfterTimeIntervalAction {
         Instant expiresAt = Instant.now()
             .plus(amount, chronoUnit);
 
-        return new Suspend(
-            Map.of("expiresAt", expiresAt.toEpochMilli(), "amount", amount, "unit", unit), expiresAt);
+        context.suspend(
+            new Suspend(Map.of("expiresAt", expiresAt.toEpochMilli(), "amount", amount, "unit", unit), expiresAt));
+
+        return null;
     }
 
     protected Object resumePerform(

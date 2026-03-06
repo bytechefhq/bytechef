@@ -17,6 +17,8 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.ActionContext.Approval.Links;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -42,6 +44,14 @@ public interface ActionContext extends Context {
      * @param eventConsumer
      */
     void event(Consumer<Event> eventConsumer);
+
+    /**
+     * Suspends the current action execution. When called during a perform method, the framework will detect the
+     * suspension after perform completes and handle it accordingly, regardless of what perform returns.
+     *
+     * @param suspend the suspension details including continuation parameters and expiration time
+     */
+    void suspend(Suspend suspend);
 
     /**
      *
@@ -123,5 +133,16 @@ public interface ActionContext extends Context {
          * @param key
          */
         Void remove(Data.Scope scope, String key);
+    }
+
+    /**
+     * Represents a suspend state as part of an action execution. It indicates a temporary suspension with accompanying
+     * parameters and expiration details.
+     *
+     * @param continueParameters a map containing parameters required to continue the suspended action
+     * @param expiresAt          the timestamp indicating when the suspension expires
+     */
+    @SuppressFBWarnings("EI")
+    record Suspend(Map<String, ?> continueParameters, Instant expiresAt) {
     }
 }
