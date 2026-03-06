@@ -7,6 +7,7 @@ import {
     adjustBottomGhostForMovedChildren,
     alignBranchCaseChildren,
     alignChainNodesCrossAxis,
+    alignConditionCaseChildren,
     alignDispatcherGhostsCrossAxis,
     alignTrailingPlaceholder,
     applySavedPositions,
@@ -4232,5 +4233,378 @@ describe('centerDispatcherPlaceholdersOnMainAxis', () => {
         centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, 'y');
 
         expect(workflowNode.position.y).toBe(600);
+    });
+});
+
+describe('alignConditionCaseChildren', () => {
+    const CONDITION_CASE_OFFSET = 145;
+
+    function makeConditionWithSingleNodeBranches(conditionX: number, leftNodeX: number, rightNodeX: number) {
+        const conditionNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: conditionX, y: 100},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: conditionX, y: 150},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: conditionX, y: 400},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const leftNode: Node = {
+            data: {componentName: 'activeCampaign'},
+            id: 'activeCampaign_1',
+            position: {x: leftNodeX, y: 250},
+            type: 'workflow',
+        };
+        const rightNode: Node = {
+            data: {componentName: 'logger'},
+            id: 'logger_1',
+            position: {x: rightNodeX, y: 250},
+            type: 'workflow',
+        };
+
+        const allNodes = [conditionNode, topGhost, bottomGhost, leftNode, rightNode];
+        const edges: Edge[] = [
+            {
+                id: 'cond=>topGhost',
+                source: 'condition_1',
+                target: 'condition_1-condition-top-ghost',
+            },
+            {
+                id: 'topGhost=>left',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-left',
+                target: 'activeCampaign_1',
+            },
+            {
+                id: 'topGhost=>right',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-right',
+                target: 'logger_1',
+            },
+            {
+                id: 'left=>bottomGhost',
+                source: 'activeCampaign_1',
+                target: 'condition_1-condition-bottom-ghost',
+                targetHandle: 'condition_1-condition-bottom-ghost-left',
+            },
+            {
+                id: 'right=>bottomGhost',
+                source: 'logger_1',
+                target: 'condition_1-condition-bottom-ghost',
+                targetHandle: 'condition_1-condition-bottom-ghost-right',
+            },
+        ];
+
+        return {allNodes, bottomGhost, conditionNode, edges, leftNode, rightNode, topGhost};
+    }
+
+    it('should pull single-node branch children inward when placed too far from center (TB mode)', () => {
+        const {allNodes, edges, leftNode, rightNode} = makeConditionWithSingleNodeBranches(500, 100, 900);
+
+        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+
+        expect(leftNode.position.x).toBe(500 - CONDITION_CASE_OFFSET);
+        expect(rightNode.position.x).toBe(500 + CONDITION_CASE_OFFSET);
+    });
+
+    it('should not push nodes outward when already closer than conditionCaseOffset', () => {
+        const expectedLeft = 500 - 50;
+        const expectedRight = 500 + 50;
+
+        const {allNodes, edges, leftNode, rightNode} = makeConditionWithSingleNodeBranches(
+            500,
+            expectedLeft,
+            expectedRight
+        );
+
+        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+
+        expect(leftNode.position.x).toBe(expectedLeft);
+        expect(rightNode.position.x).toBe(expectedRight);
+    });
+
+    it('should align multi-node simple branches and chain-align subsequent nodes', () => {
+        const conditionNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 500, y: 100},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: 500, y: 150},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 500, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const scriptNode: Node = {
+            data: {componentName: 'script'},
+            id: 'script_1',
+            position: {x: 100, y: 250},
+            type: 'workflow',
+        };
+        const loggerLeft: Node = {
+            data: {componentName: 'logger'},
+            id: 'logger_left',
+            position: {x: 100, y: 350},
+            type: 'workflow',
+        };
+        const rightNode: Node = {
+            data: {componentName: 'logger'},
+            id: 'logger_1',
+            position: {x: 900, y: 250},
+            type: 'workflow',
+        };
+
+        const allNodes = [conditionNode, topGhost, bottomGhost, scriptNode, loggerLeft, rightNode];
+        const edges: Edge[] = [
+            {
+                id: 'topGhost=>script',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-left',
+                target: 'script_1',
+            },
+            {
+                id: 'script=>loggerLeft',
+                source: 'script_1',
+                target: 'logger_left',
+            },
+            {
+                id: 'loggerLeft=>bottomGhost',
+                source: 'logger_left',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+            {
+                id: 'topGhost=>right',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-right',
+                target: 'logger_1',
+            },
+            {
+                id: 'right=>bottomGhost',
+                source: 'logger_1',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+        ];
+
+        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+
+        const expectedLeft = 500 - CONDITION_CASE_OFFSET;
+
+        expect(scriptNode.position.x).toBe(expectedLeft);
+        expect(loggerLeft.position.x).toBe(expectedLeft);
+        expect(rightNode.position.x).toBe(500 + CONDITION_CASE_OFFSET);
+    });
+
+    it('should skip conditions where a branch contains a task dispatcher', () => {
+        const conditionNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 500, y: 100},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: 500, y: 150},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 500, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const scriptNode: Node = {
+            data: {componentName: 'script'},
+            id: 'script_1',
+            position: {x: 100, y: 250},
+            type: 'workflow',
+        };
+        const loopNode: Node = {
+            data: {componentName: 'loop', taskDispatcher: true, taskDispatcherId: 'loop_1'},
+            id: 'loop_1',
+            position: {x: 100, y: 350},
+            type: 'workflow',
+        };
+        const rightNode: Node = {
+            data: {componentName: 'logger'},
+            id: 'logger_1',
+            position: {x: 900, y: 250},
+            type: 'workflow',
+        };
+
+        const allNodes = [conditionNode, topGhost, bottomGhost, scriptNode, loopNode, rightNode];
+        const edges: Edge[] = [
+            {
+                id: 'topGhost=>script',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-left',
+                target: 'script_1',
+            },
+            {
+                id: 'script=>loop',
+                source: 'script_1',
+                target: 'loop_1',
+            },
+            {
+                id: 'topGhost=>right',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-right',
+                target: 'logger_1',
+            },
+            {
+                id: 'right=>bottomGhost',
+                source: 'logger_1',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+        ];
+
+        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+
+        expect(scriptNode.position.x).toBe(100);
+        expect(rightNode.position.x).toBe(900);
+    });
+
+    it('should skip condition when one branch starts with a task dispatcher', () => {
+        const conditionNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 500, y: 100},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: 500, y: 150},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 500, y: 400},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const loopNode: Node = {
+            data: {componentName: 'loop', taskDispatcher: true, taskDispatcherId: 'loop_1'},
+            id: 'loop_1',
+            position: {x: 100, y: 250},
+            type: 'workflow',
+        };
+        const rightNode: Node = {
+            data: {componentName: 'logger'},
+            id: 'logger_1',
+            position: {x: 900, y: 250},
+            type: 'workflow',
+        };
+
+        const allNodes = [conditionNode, topGhost, bottomGhost, loopNode, rightNode];
+        const edges: Edge[] = [
+            {
+                id: 'topGhost=>loop',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-left',
+                target: 'loop_1',
+            },
+            {
+                id: 'loop=>bottomGhost',
+                source: 'loop_1',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+            {
+                id: 'topGhost=>right',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-right',
+                target: 'logger_1',
+            },
+            {
+                id: 'right=>bottomGhost',
+                source: 'logger_1',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+        ];
+
+        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+
+        expect(loopNode.position.x).toBe(100);
+        expect(rightNode.position.x).toBe(900);
+    });
+
+    it('should work in LR mode (y-axis)', () => {
+        const conditionNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 100, y: 500},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: 150, y: 500},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 400, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const leftNode: Node = {
+            data: {componentName: 'activeCampaign'},
+            id: 'activeCampaign_1',
+            position: {x: 250, y: 100},
+            type: 'workflow',
+        };
+        const rightNode: Node = {
+            data: {componentName: 'logger'},
+            id: 'logger_1',
+            position: {x: 250, y: 900},
+            type: 'workflow',
+        };
+
+        const allNodes = [conditionNode, topGhost, bottomGhost, leftNode, rightNode];
+        const edges: Edge[] = [
+            {
+                id: 'topGhost=>left',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-left',
+                target: 'activeCampaign_1',
+            },
+            {
+                id: 'topGhost=>right',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-right',
+                target: 'logger_1',
+            },
+            {
+                id: 'left=>bottomGhost',
+                source: 'activeCampaign_1',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+            {
+                id: 'right=>bottomGhost',
+                source: 'logger_1',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+        ];
+
+        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'y'});
+
+        expect(leftNode.position.y).toBe(500 - CONDITION_CASE_OFFSET);
+        expect(rightNode.position.y).toBe(500 + CONDITION_CASE_OFFSET);
     });
 });
