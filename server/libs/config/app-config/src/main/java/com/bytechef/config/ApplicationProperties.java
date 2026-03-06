@@ -708,6 +708,8 @@ public class ApplicationProperties {
             /** Vector store configuration for Copilot context */
             private Vectorstore vectorstore = new Vectorstore();
 
+            private Memory memory = new Memory();
+
             public boolean isEnabled() {
                 return enabled;
             }
@@ -732,6 +734,14 @@ public class ApplicationProperties {
                 this.vectorstore = vectorstore;
             }
 
+            public Memory getMemory() {
+                return memory;
+            }
+
+            public void setMemory(Memory memory) {
+                this.memory = memory;
+            }
+
             /**
              * Vector store configuration for Copilot.
              */
@@ -745,6 +755,25 @@ public class ApplicationProperties {
                 }
 
                 public void setProvider(Ai.Vectorstore.Provider provider) {
+                    this.provider = provider;
+                }
+            }
+
+            public static class Memory {
+
+                public enum Provider {
+                    IN_MEMORY,
+                    JDBC,
+                    AWS_S3
+                }
+
+                private Provider provider = Provider.IN_MEMORY;
+
+                public Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Provider provider) {
                     this.provider = provider;
                 }
             }
