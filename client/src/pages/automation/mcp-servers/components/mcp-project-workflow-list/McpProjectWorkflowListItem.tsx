@@ -40,6 +40,7 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
 
                         <span className="ml-auto flex shrink-0 items-center gap-0.5">
                             <button
+                                aria-label="Configure"
                                 className="rounded p-0.5 hover:bg-foreground/10"
                                 onClick={() => openPopover(popoverId)}
                                 title="Configure"
@@ -49,6 +50,7 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                             </button>
 
                             <button
+                                aria-label="Edit"
                                 className="rounded p-0.5 hover:bg-foreground/10"
                                 onClick={() => setShowEditWorkflowDialog(true)}
                                 title="Edit"
@@ -58,6 +60,7 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                             </button>
 
                             <button
+                                aria-label="Delete"
                                 className="rounded p-0.5 hover:bg-destructive/10 hover:text-destructive"
                                 onClick={() => setShowDeleteDialog(true)}
                                 title="Delete"
