@@ -319,7 +319,7 @@ function App() {
 
                     {ai.copilot.enabled && (
                         <aside className="h-full shrink-0">
-                            <Suspense>
+                            <Suspense fallback={null}>
                                 <CopilotPanel open={copilotPanelOpen} />
                             </Suspense>
                         </aside>
