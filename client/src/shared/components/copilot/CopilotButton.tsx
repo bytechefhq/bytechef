@@ -26,10 +26,7 @@ const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     const handleClick = () => {
-        const {context: currentContext, generateConversationId, resetMessages} = useCopilotStore.getState();
-
-        resetMessages();
-        generateConversationId();
+        const {context: currentContext} = useCopilotStore.getState();
 
         setContext({
             ...currentContext,
