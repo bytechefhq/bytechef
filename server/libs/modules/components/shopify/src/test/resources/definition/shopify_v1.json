@@ -566,7 +566,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Cancel Order",
     "workflowNodeDescription": null
   }, {
@@ -1162,7 +1161,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Close Order",
     "workflowNodeDescription": null
   }, {
@@ -1890,7 +1888,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Order",
     "workflowNodeDescription": null
   }, {
@@ -2793,7 +2790,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Product",
     "workflowNodeDescription": null
   }, {
@@ -3095,7 +3091,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Order",
     "workflowNodeDescription": null
   }, {
@@ -3541,7 +3536,6 @@
     "processErrorResponse": null,
     "properties": null,
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Abandoned Carts",
     "workflowNodeDescription": null
   }, {
@@ -4213,7 +4207,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Order",
     "workflowNodeDescription": null
   }, {
@@ -4807,7 +4800,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Order",
     "workflowNodeDescription": null
   } ],

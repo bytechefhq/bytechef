@@ -353,7 +353,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Meeting Space",
     "workflowNodeDescription": null
   }, {
@@ -694,7 +693,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Meeting Space",
     "workflowNodeDescription": null
   }, {
@@ -996,7 +994,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Participants",
     "workflowNodeDescription": null
   } ],

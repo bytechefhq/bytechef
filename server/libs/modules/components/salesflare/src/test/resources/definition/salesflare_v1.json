@@ -180,7 +180,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Account",
     "workflowNodeDescription": null
   }, {
@@ -574,7 +573,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contacts",
     "workflowNodeDescription": null
   }, {
@@ -817,7 +815,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Tasks",
     "workflowNodeDescription": null
   } ],

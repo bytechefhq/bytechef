@@ -82,7 +82,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Record",
     "workflowNodeDescription": null
   }, {
@@ -259,7 +258,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Find Records",
     "workflowNodeDescription": null
   }, {
@@ -366,7 +364,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Record",
     "workflowNodeDescription": null
   } ],

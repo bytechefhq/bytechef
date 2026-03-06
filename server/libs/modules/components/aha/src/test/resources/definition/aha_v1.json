@@ -1272,7 +1272,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Feature",
     "workflowNodeDescription": null
   }, {
@@ -3341,7 +3340,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Idea",
     "workflowNodeDescription": null
   } ],

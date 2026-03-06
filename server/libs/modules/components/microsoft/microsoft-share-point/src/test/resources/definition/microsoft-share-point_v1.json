@@ -1064,7 +1064,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Folder",
     "workflowNodeDescription": null
   }, {
@@ -1859,7 +1858,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create List",
     "workflowNodeDescription": null
   }, {
@@ -1945,7 +1943,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create List Item",
     "workflowNodeDescription": null
   }, {
@@ -3010,7 +3007,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   } ],

@@ -1449,7 +1449,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Address",
     "workflowNodeDescription": null
   }, {
@@ -2879,7 +2878,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Geolocation",
     "workflowNodeDescription": null
   }, {
@@ -14231,7 +14229,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Route",
     "workflowNodeDescription": null
   }, {
@@ -14339,7 +14336,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Nearby Search",
     "workflowNodeDescription": null
   } ],

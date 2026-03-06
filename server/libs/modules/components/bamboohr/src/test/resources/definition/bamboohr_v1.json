@@ -299,7 +299,6 @@
       "type": "DATE"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Employee",
     "workflowNodeDescription": null
   }, {
@@ -472,7 +471,6 @@
       "type": "DATE"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Employee",
     "workflowNodeDescription": null
   }, {
@@ -564,7 +562,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Employee",
     "workflowNodeDescription": null
   }, {
@@ -696,7 +693,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Employee File",
     "workflowNodeDescription": null
   } ],

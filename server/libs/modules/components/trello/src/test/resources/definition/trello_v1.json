@@ -56,7 +56,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Board",
     "workflowNodeDescription": null
   }, {
@@ -423,7 +422,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Card",
     "workflowNodeDescription": null
   }, {
@@ -748,7 +746,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Card",
     "workflowNodeDescription": null
   } ],

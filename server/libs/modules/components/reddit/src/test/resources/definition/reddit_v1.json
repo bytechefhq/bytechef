@@ -195,7 +195,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Comment",
     "workflowNodeDescription": null
   }, {
@@ -465,7 +464,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Post",
     "workflowNodeDescription": null
   } ],

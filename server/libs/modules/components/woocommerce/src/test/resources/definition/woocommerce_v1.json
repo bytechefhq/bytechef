@@ -2127,7 +2127,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Coupon",
     "workflowNodeDescription": null
   }, {
@@ -4677,7 +4676,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Customer",
     "workflowNodeDescription": null
   }, {
@@ -10553,7 +10551,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Order",
     "workflowNodeDescription": null
   }, {
@@ -15847,7 +15844,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Product",
     "workflowNodeDescription": null
   } ],

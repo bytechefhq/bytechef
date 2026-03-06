@@ -518,7 +518,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ask",
     "workflowNodeDescription": null
   } ],

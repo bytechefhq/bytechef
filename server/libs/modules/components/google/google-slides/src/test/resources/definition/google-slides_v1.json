@@ -135,7 +135,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Presentation From Template",
     "workflowNodeDescription": null
   }, {
@@ -185,7 +184,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Presentation",
     "workflowNodeDescription": null
   } ],

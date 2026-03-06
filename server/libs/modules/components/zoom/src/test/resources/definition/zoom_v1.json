@@ -1077,7 +1077,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Meeting Registrant",
     "workflowNodeDescription": null
   }, {
@@ -3567,7 +3566,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Meeting",
     "workflowNodeDescription": null
   } ],

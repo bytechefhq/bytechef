@@ -253,7 +253,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "JavaScript",
     "workflowNodeDescription": null
   }, {
@@ -510,7 +509,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Python",
     "workflowNodeDescription": null
   }, {
@@ -767,7 +765,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ruby",
     "workflowNodeDescription": null
   } ],

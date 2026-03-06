@@ -3889,7 +3889,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Incident",
     "workflowNodeDescription": null
   }, {
@@ -4688,7 +4687,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Incident Note",
     "workflowNodeDescription": null
   }, {
@@ -8589,7 +8587,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Incident",
     "workflowNodeDescription": null
   } ],

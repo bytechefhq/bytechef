@@ -43,7 +43,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Site",
     "workflowNodeDescription": null
   }, {
@@ -93,7 +92,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Site",
     "workflowNodeDescription": null
   }, {
@@ -326,7 +324,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Site",
     "workflowNodeDescription": null
   }, {
@@ -615,7 +612,6 @@
     "processErrorResponse": null,
     "properties": [ ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Sites",
     "workflowNodeDescription": null
   }, {
@@ -1608,7 +1604,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Analytics",
     "workflowNodeDescription": null
   } ],

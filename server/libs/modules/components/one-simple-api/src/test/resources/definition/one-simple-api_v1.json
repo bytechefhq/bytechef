@@ -542,7 +542,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Screenshot",
     "workflowNodeDescription": null
   }, {
@@ -2168,7 +2167,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Currency Converter",
     "workflowNodeDescription": null
   }, {
@@ -2469,7 +2467,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "URL Shortener",
     "workflowNodeDescription": null
   }, {
@@ -3142,7 +3139,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Web Page Information",
     "workflowNodeDescription": null
   } ],

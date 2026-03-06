@@ -406,7 +406,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Notification",
     "workflowNodeDescription": null
   } ],

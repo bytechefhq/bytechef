@@ -97,7 +97,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Record",
     "workflowNodeDescription": null
   }, {
@@ -345,7 +344,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Record",
     "workflowNodeDescription": null
   }, {
@@ -453,7 +451,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Record",
     "workflowNodeDescription": null
   }, {
@@ -580,7 +577,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Record",
     "workflowNodeDescription": null
   } ],

@@ -65,7 +65,6 @@
     "processErrorResponse": null,
     "properties": null,
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Temp Directory",
     "workflowNodeDescription": null
   }, {
@@ -155,7 +154,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create",
     "workflowNodeDescription": null
   }, {
@@ -245,7 +243,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Parent Folder",
     "workflowNodeDescription": null
   }, {
@@ -521,7 +518,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List",
     "workflowNodeDescription": null
   }, {
@@ -769,7 +765,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Read File",
     "workflowNodeDescription": null
   }, {
@@ -865,7 +860,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Remove",
     "workflowNodeDescription": null
   }, {
@@ -1095,7 +1089,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Write to File",
     "workflowNodeDescription": null
   } ],

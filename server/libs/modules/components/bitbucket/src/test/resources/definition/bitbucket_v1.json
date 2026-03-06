@@ -277,7 +277,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Project",
     "workflowNodeDescription": null
   }, {
@@ -2781,7 +2780,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Repository",
     "workflowNodeDescription": null
   }, {
@@ -3658,7 +3656,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Projects",
     "workflowNodeDescription": null
   }, {
@@ -5961,7 +5958,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Repositories",
     "workflowNodeDescription": null
   } ],

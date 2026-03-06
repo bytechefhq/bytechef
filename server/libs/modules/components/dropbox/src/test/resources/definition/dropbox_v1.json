@@ -334,7 +334,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Copy",
     "workflowNodeDescription": null
   }, {
@@ -630,7 +629,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create New Folder",
     "workflowNodeDescription": null
   }, {
@@ -1128,7 +1126,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create New Paper File",
     "workflowNodeDescription": null
   }, {
@@ -1445,7 +1442,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete",
     "workflowNodeDescription": null
   }, {
@@ -1804,7 +1800,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get File Link",
     "workflowNodeDescription": null
   }, {
@@ -2142,7 +2137,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Folder",
     "workflowNodeDescription": null
   }, {
@@ -2480,7 +2474,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Move",
     "workflowNodeDescription": null
   }, {
@@ -2858,7 +2851,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search",
     "workflowNodeDescription": null
   }, {
@@ -3435,7 +3427,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   } ],

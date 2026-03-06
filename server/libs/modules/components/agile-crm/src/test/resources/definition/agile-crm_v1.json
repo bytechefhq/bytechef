@@ -2606,7 +2606,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
@@ -4725,7 +4724,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Deal",
     "workflowNodeDescription": null
   }, {
@@ -6198,7 +6196,6 @@
       "type": "DATE_TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   } ],

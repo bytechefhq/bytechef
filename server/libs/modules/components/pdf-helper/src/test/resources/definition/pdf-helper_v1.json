@@ -389,7 +389,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Convert to Image",
     "workflowNodeDescription": null
   }, {
@@ -561,7 +560,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract Text",
     "workflowNodeDescription": null
   }, {
@@ -933,7 +931,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Image to PDF",
     "workflowNodeDescription": null
   }, {
@@ -1205,7 +1202,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Text to PDF",
     "workflowNodeDescription": null
   } ],
