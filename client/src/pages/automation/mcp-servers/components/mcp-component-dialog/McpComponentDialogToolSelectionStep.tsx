@@ -1,22 +1,12 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Connection} from '@/shared/middleware/automation/configuration';
-import {McpComponent, McpTool, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
-import {ClusterElementDefinitionBasic, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useEffect, useMemo, useRef} from 'react';
+import {McpComponent, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 
-interface SelectedToolI {
-    name: string;
-    componentName: string;
-    componentVersion: number;
-    title?: string;
-    description?: string;
-}
+import useMcpComponentDialogToolSelectionStep, {SelectedToolI} from './hooks/useMcpComponentDialogToolSelectionStep';
 
 interface ToolSelectionStepProps {
     open: boolean;
@@ -39,117 +29,24 @@ const McpComponentDialogToolSelectionStep = ({
     selectedConnection,
     selectedTools,
 }: ToolSelectionStepProps) => {
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-
-    const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
-
-    const {data: componentDefinition, isLoading: isLoadingComponentDefinition} = useGetComponentDefinitionQuery(
-        {
-            componentName: selectedComponent?.name || '',
-            componentVersion: selectedComponent?.version || 1,
-        },
-        !!selectedComponent
-    );
-
-    const {data: connections = [], isLoading: isLoadingConnections} = useGetWorkspaceConnectionsQuery(
-        {
-            componentName: selectedComponent?.name,
-            connectionVersion: selectedComponent?.version,
-            environmentId: currentEnvironmentId,
-            id: currentWorkspaceId!,
-        },
-        open
-    );
-
-    const toolElements = useMemo(
-        () => componentDefinition?.clusterElements?.filter((element) => element.type === 'TOOLS') || [],
-        [componentDefinition?.clusterElements]
-    );
-
-    const handleToolToggle = (tool: ClusterElementDefinitionBasic, checked: boolean) => {
-        if (checked) {
-            onToolsChange([
-                ...selectedTools,
-                {
-                    componentName: tool.componentName,
-                    componentVersion: tool.componentVersion,
-                    description: tool.description,
-                    name: tool.name,
-                    title: tool.title,
-                },
-            ]);
-        } else {
-            onToolsChange(selectedTools.filter((t) => t.name !== tool.name));
-        }
-    };
-
-    const handleSelectAllTools = (checked: boolean) => {
-        if (checked) {
-            const allTools = toolElements.map((tool) => ({
-                componentName: tool.componentName,
-                componentVersion: tool.componentVersion,
-                description: tool.description,
-                name: tool.name,
-                title: tool.title,
-            }));
-            onToolsChange(allTools);
-        } else {
-            onToolsChange([]);
-        }
-    };
-
-    const allToolsSelected = toolElements.length > 0 && selectedTools.length === toolElements.length;
-    const someToolsSelected = selectedTools.length > 0 && selectedTools.length < toolElements.length;
-
-    useEffect(() => {
-        if (selectAllCheckboxRef.current) {
-            const checkboxElement = selectAllCheckboxRef.current.querySelector(
-                'input[type="checkbox"]'
-            ) as HTMLInputElement;
-
-            if (checkboxElement) {
-                checkboxElement.indeterminate = someToolsSelected;
-            }
-        }
-    }, [someToolsSelected]);
-
-    useEffect(() => {
-        if (
-            existingTools?.mcpToolsByComponentId &&
-            existingTools?.mcpToolsByComponentId?.length > 0 &&
-            toolElements.length > 0
-        ) {
-            const preSelectedTools = existingTools.mcpToolsByComponentId
-                .map((existingTool: McpTool | null) => {
-                    const toolElement = toolElements.find((tool) => tool.name === existingTool!.name);
-                    if (toolElement) {
-                        return {
-                            componentName: toolElement.componentName,
-                            componentVersion: toolElement.componentVersion,
-                            description: toolElement.description,
-                            name: existingTool!.name,
-                            title: toolElement.title,
-                        };
-                    }
-                    return null;
-                })
-                .filter(Boolean) as SelectedToolI[];
-
-            onToolsChange(preSelectedTools);
-        }
-    }, [existingTools, toolElements, onToolsChange]);
-
-    useEffect(() => {
-        if (mcpComponent && connections.length > 0) {
-            const existingConnection = connections.find(
-                (conn) => conn.id?.toString() === mcpComponent.connectionId?.toString()
-            );
-            if (existingConnection) {
-                onConnectionChange(existingConnection);
-            }
-        }
-    }, [mcpComponent, connections, onConnectionChange]);
+    const {
+        allToolsSelected,
+        connections,
+        handleSelectAllTools,
+        handleToolToggle,
+        isLoadingComponentDefinition,
+        isLoadingConnections,
+        selectAllCheckboxRef,
+        toolElements,
+    } = useMcpComponentDialogToolSelectionStep({
+        existingTools,
+        mcpComponent,
+        onConnectionChange,
+        onToolsChange,
+        open,
+        selectedComponent,
+        selectedTools,
+    });
 
     return (
         <div className="space-y-4 py-4">
@@ -192,7 +89,9 @@ const McpComponentDialogToolSelectionStep = ({
             </div>
 
             {isLoadingComponentDefinition ? (
-                <div className="py-8 text-center">Loading tools...</div>
+                <div className="flex items-center justify-center py-8">
+                    <LoadingIcon className="size-6" />
+                </div>
             ) : toolElements.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">No tools available for this component.</div>
             ) : (
@@ -214,7 +113,7 @@ const McpComponentDialogToolSelectionStep = ({
                         {toolElements.map((tool) => (
                             <div className="flex items-center space-x-3 py-3 hover:bg-gray-50" key={tool.name}>
                                 <Checkbox
-                                    checked={selectedTools.some((t) => t.name === tool.name)}
+                                    checked={selectedTools.some((selectedTool) => selectedTool.name === tool.name)}
                                     id={tool.name}
                                     onCheckedChange={(checked) => handleToolToggle(tool, checked as boolean)}
                                 />
