@@ -86,7 +86,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Execute",
     "workflowNodeDescription": null
   } ],

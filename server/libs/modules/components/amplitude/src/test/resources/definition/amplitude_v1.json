@@ -263,7 +263,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Attribution Event",
     "workflowNodeDescription": null
   }, {
@@ -654,7 +653,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create or Update User",
     "workflowNodeDescription": null
   } ],

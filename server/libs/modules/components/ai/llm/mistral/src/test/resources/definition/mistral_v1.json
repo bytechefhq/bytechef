@@ -722,7 +722,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ask",
     "workflowNodeDescription": null
   }, {
@@ -1656,7 +1655,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Document OCR",
     "workflowNodeDescription": null
   }, {
@@ -2306,7 +2304,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   } ],

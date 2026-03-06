@@ -2533,7 +2533,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send message",
     "workflowNodeDescription": null
   } ],

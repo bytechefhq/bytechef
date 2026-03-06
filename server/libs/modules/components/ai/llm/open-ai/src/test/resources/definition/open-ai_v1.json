@@ -853,7 +853,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ask",
     "workflowNodeDescription": null
   }, {
@@ -1756,7 +1755,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ask (stream)",
     "workflowNodeDescription": null
   }, {
@@ -2188,7 +2186,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Image",
     "workflowNodeDescription": null
   }, {
@@ -2601,7 +2598,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Text-To-Speech",
     "workflowNodeDescription": null
   }, {
@@ -3082,7 +3078,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Transcriptions",
     "workflowNodeDescription": null
   } ],

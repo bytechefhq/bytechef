@@ -666,7 +666,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Envelope",
     "workflowNodeDescription": null
   }, {
@@ -958,7 +957,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Download Envelope Document",
     "workflowNodeDescription": null
   } ],

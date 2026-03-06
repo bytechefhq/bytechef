@@ -253,7 +253,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Row",
     "workflowNodeDescription": null
   }, {
@@ -1195,7 +1194,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Insert Row",
     "workflowNodeDescription": null
   }, {
@@ -1448,7 +1446,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Row",
     "workflowNodeDescription": null
   } ],

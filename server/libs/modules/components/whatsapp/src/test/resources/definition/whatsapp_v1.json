@@ -353,7 +353,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Message",
     "workflowNodeDescription": null
   } ],

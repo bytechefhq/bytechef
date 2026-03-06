@@ -346,7 +346,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Reaction",
     "workflowNodeDescription": null
   }, {
@@ -1051,7 +1050,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Approval Message",
     "workflowNodeDescription": null
   }, {
@@ -1773,7 +1771,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Channel Message",
     "workflowNodeDescription": null
   }, {
@@ -2495,7 +2492,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Direct Message",
     "workflowNodeDescription": null
   } ],

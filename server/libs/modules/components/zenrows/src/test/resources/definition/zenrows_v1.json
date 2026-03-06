@@ -134,7 +134,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Scrape URL",
     "workflowNodeDescription": null
   }, {
@@ -272,7 +271,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Scrape URL Autoparse",
     "workflowNodeDescription": null
   }, {
@@ -445,7 +443,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Scrape URL With CSS Selectors",
     "workflowNodeDescription": null
   } ],

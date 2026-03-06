@@ -400,7 +400,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Folder",
     "workflowNodeDescription": null
   }, {
@@ -675,7 +674,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Download File",
     "workflowNodeDescription": null
   }, {
@@ -1240,7 +1238,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   } ],

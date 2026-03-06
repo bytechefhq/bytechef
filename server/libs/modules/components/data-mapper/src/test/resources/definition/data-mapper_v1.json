@@ -151,7 +151,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Map Objects to Array",
     "workflowNodeDescription": null
   }, {
@@ -443,7 +442,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Map Objects to Object",
     "workflowNodeDescription": null
   }, {
@@ -549,7 +547,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Merge and Pivot Properties by Key",
     "workflowNodeDescription": null
   }, {
@@ -675,7 +672,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Rename Keys",
     "workflowNodeDescription": null
   }, {
@@ -1570,7 +1566,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Replace All Specified Values",
     "workflowNodeDescription": null
   }, {
@@ -1716,7 +1711,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Replace Multiple Values by Key",
     "workflowNodeDescription": null
   }, {
@@ -3085,7 +3079,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Replace Value",
     "workflowNodeDescription": null
   } ],

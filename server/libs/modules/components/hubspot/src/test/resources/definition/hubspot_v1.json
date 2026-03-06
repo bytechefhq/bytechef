@@ -560,7 +560,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
@@ -1124,7 +1123,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Deal",
     "workflowNodeDescription": null
   }, {
@@ -1171,7 +1169,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Contact",
     "workflowNodeDescription": null
   }, {
@@ -1611,7 +1608,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Contact",
     "workflowNodeDescription": null
   }, {
@@ -2051,7 +2047,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Ticket",
     "workflowNodeDescription": null
   }, {
@@ -2641,7 +2636,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Contact",
     "workflowNodeDescription": null
   } ],

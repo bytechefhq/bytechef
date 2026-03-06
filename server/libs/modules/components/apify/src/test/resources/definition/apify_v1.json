@@ -186,7 +186,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Last Run",
     "workflowNodeDescription": null
   }, {
@@ -254,7 +253,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Start Actor",
     "workflowNodeDescription": null
   } ],

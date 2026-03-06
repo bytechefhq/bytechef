@@ -185,7 +185,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Opportunity",
     "workflowNodeDescription": null
   }, {
@@ -439,7 +438,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Organization",
     "workflowNodeDescription": null
   }, {
@@ -823,7 +821,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Person",
     "workflowNodeDescription": null
   } ],

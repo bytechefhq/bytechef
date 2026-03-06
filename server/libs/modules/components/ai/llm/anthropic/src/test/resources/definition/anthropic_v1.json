@@ -690,7 +690,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ask",
     "workflowNodeDescription": null
   }, {
@@ -1384,7 +1383,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ask (stream)",
     "workflowNodeDescription": null
   } ],

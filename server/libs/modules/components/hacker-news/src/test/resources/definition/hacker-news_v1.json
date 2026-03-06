@@ -527,7 +527,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Fetch Top Stories",
     "workflowNodeDescription": null
   } ],

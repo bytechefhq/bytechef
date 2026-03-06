@@ -201,7 +201,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Generate Video From Template",
     "workflowNodeDescription": null
   }, {
@@ -400,7 +399,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Translate Video",
     "workflowNodeDescription": null
   }, {
@@ -899,7 +897,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload Asset",
     "workflowNodeDescription": null
   } ],

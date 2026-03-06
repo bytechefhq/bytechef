@@ -1303,7 +1303,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Combined Enrichment",
     "workflowNodeDescription": null
   }, {
@@ -1986,7 +1985,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Company Enrichment",
     "workflowNodeDescription": null
   }, {
@@ -2642,7 +2640,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Lead",
     "workflowNodeDescription": null
   }, {
@@ -3493,7 +3490,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Email Enrichment",
     "workflowNodeDescription": null
   } ],

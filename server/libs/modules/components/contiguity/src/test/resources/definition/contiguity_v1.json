@@ -537,7 +537,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Email",
     "workflowNodeDescription": null
   }, {
@@ -993,7 +992,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send SMS",
     "workflowNodeDescription": null
   } ],

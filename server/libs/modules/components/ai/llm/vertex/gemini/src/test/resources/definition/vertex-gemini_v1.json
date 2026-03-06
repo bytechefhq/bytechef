@@ -685,7 +685,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ask Gemini",
     "workflowNodeDescription": null
   } ],

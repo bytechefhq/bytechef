@@ -364,7 +364,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Generate Image",
     "workflowNodeDescription": null
   } ],

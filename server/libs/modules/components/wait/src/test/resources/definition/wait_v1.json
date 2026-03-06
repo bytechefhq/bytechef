@@ -10,7 +10,7 @@
     "metadata": null,
     "name": "afterTimeInterval",
     "outputDefinition": null,
-    "perform": null,
+    "perform": { },
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
@@ -70,7 +70,6 @@
       "type": "STRING"
     } ],
     "resumePerform": { },
-    "suspendPerform": { },
     "title": "After Time Interval",
     "workflowNodeDescription": null
   }, {
@@ -84,7 +83,7 @@
     "metadata": null,
     "name": "atSpecifiedTime",
     "outputDefinition": null,
-    "perform": null,
+    "perform": { },
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
@@ -105,7 +104,6 @@
       "type": "DATE_TIME"
     } ],
     "resumePerform": { },
-    "suspendPerform": { },
     "title": "At Specified Time",
     "workflowNodeDescription": null
   }, {
@@ -119,7 +117,7 @@
     "metadata": null,
     "name": "onWebhookCall",
     "outputDefinition": null,
-    "perform": null,
+    "perform": { },
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
@@ -221,7 +219,6 @@
       "type": "STRING"
     } ],
     "resumePerform": { },
-    "suspendPerform": { },
     "title": "On Webhook Call",
     "workflowNodeDescription": null
   } ],

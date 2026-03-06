@@ -300,7 +300,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Labels",
     "workflowNodeDescription": null
   }, {
@@ -559,7 +558,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Archive Email",
     "workflowNodeDescription": null
   }, {
@@ -818,7 +816,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Label",
     "workflowNodeDescription": null
   }, {
@@ -860,7 +857,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Email",
     "workflowNodeDescription": null
   }, {
@@ -990,7 +986,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Email",
     "workflowNodeDescription": null
   }, {
@@ -1120,7 +1115,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Thread",
     "workflowNodeDescription": null
   }, {
@@ -1442,7 +1436,6 @@
     "processErrorResponse": null,
     "properties": null,
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Labels",
     "workflowNodeDescription": null
   }, {
@@ -1746,7 +1739,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Remove Labels",
     "workflowNodeDescription": null
   }, {
@@ -2323,7 +2315,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Reply to Email",
     "workflowNodeDescription": null
   }, {
@@ -2869,7 +2860,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Email",
     "workflowNodeDescription": null
   }, {
@@ -3488,7 +3478,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Email",
     "workflowNodeDescription": null
   } ],

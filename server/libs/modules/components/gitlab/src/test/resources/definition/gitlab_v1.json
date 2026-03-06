@@ -232,7 +232,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Comment on Issue",
     "workflowNodeDescription": null
   }, {
@@ -627,7 +626,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Issue",
     "workflowNodeDescription": null
   } ],

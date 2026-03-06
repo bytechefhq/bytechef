@@ -906,7 +906,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Assignee to Issue",
     "workflowNodeDescription": null
   }, {
@@ -1276,7 +1275,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Labels to Issue",
     "workflowNodeDescription": null
   }, {
@@ -2180,7 +2178,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Comment on Issue",
     "workflowNodeDescription": null
   }, {
@@ -3115,7 +3112,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Fork",
     "workflowNodeDescription": null
   }, {
@@ -4016,7 +4012,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Issue",
     "workflowNodeDescription": null
   }, {
@@ -5635,7 +5630,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Pull Request",
     "workflowNodeDescription": null
   }, {
@@ -6518,7 +6512,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Issue",
     "workflowNodeDescription": null
   }, {
@@ -6650,7 +6643,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Repository Content",
     "workflowNodeDescription": null
   }, {
@@ -7587,7 +7579,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Issues",
     "workflowNodeDescription": null
   }, {
@@ -8488,7 +8479,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Repository Issues",
     "workflowNodeDescription": null
   }, {
@@ -8548,7 +8538,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Star Repository",
     "workflowNodeDescription": null
   } ],

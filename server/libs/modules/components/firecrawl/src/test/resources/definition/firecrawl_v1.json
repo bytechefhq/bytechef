@@ -1300,7 +1300,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Crawl",
     "workflowNodeDescription": null
   }, {
@@ -2379,7 +2378,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Crawl Status",
     "workflowNodeDescription": null
   }, {
@@ -2973,7 +2971,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Map",
     "workflowNodeDescription": null
   }, {
@@ -4462,7 +4459,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Scrape URL",
     "workflowNodeDescription": null
   }, {
@@ -6912,7 +6908,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search",
     "workflowNodeDescription": null
   } ],

@@ -254,7 +254,6 @@
       "type": "TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Set Value",
     "workflowNodeDescription": null
   } ],

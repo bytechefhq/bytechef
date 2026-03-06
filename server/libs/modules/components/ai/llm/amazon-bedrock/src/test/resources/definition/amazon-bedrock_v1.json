@@ -460,7 +460,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Ask",
     "workflowNodeDescription": null
   } ],

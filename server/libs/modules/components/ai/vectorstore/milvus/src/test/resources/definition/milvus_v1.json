@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -44,7 +44,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Data",
     "workflowNodeDescription": null
   }, {
@@ -62,7 +61,6 @@
     "processErrorResponse": null,
     "properties": [ ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Load Data",
     "workflowNodeDescription": null
   } ],

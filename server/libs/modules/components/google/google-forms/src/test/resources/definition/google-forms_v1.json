@@ -46,7 +46,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get All Responses",
     "workflowNodeDescription": null
   }, {
@@ -96,7 +95,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Form",
     "workflowNodeDescription": null
   }, {
@@ -170,7 +168,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Response",
     "workflowNodeDescription": null
   } ],

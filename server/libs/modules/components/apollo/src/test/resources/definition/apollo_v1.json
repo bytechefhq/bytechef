@@ -729,7 +729,6 @@
       "type": "DATE"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Deal",
     "workflowNodeDescription": null
   }, {
@@ -1418,7 +1417,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Enrich Company",
     "workflowNodeDescription": null
   }, {
@@ -2287,7 +2285,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Enrich Person",
     "workflowNodeDescription": null
   }, {
@@ -3020,7 +3017,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Deal",
     "workflowNodeDescription": null
   } ],

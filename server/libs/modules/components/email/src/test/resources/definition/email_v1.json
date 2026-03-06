@@ -385,7 +385,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send",
     "workflowNodeDescription": null
   }, {
@@ -842,7 +841,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Mail",
     "workflowNodeDescription": null
   } ],

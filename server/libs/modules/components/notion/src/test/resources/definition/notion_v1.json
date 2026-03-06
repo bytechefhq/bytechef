@@ -970,7 +970,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Block to Page",
     "workflowNodeDescription": null
   }, {
@@ -1053,7 +1052,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Database Item",
     "workflowNodeDescription": null
   }, {
@@ -2619,7 +2617,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Page",
     "workflowNodeDescription": null
   }, {
@@ -3752,7 +3749,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Database",
     "workflowNodeDescription": null
   }, {
@@ -5297,7 +5293,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Page",
     "workflowNodeDescription": null
   }, {
@@ -5341,7 +5336,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Page or Block Children",
     "workflowNodeDescription": null
   }, {
@@ -5441,7 +5435,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Database Items",
     "workflowNodeDescription": null
   }, {
@@ -5524,7 +5517,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Database Item",
     "workflowNodeDescription": null
   } ],

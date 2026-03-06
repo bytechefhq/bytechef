@@ -2497,7 +2497,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Query",
     "workflowNodeDescription": null
   } ],

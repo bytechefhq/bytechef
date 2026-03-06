@@ -251,7 +251,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Enrich Company",
     "workflowNodeDescription": null
   }, {
@@ -525,7 +524,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Enrich Contact",
     "workflowNodeDescription": null
   }, {
@@ -1329,7 +1327,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Company",
     "workflowNodeDescription": null
   }, {
@@ -3005,7 +3002,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Contact",
     "workflowNodeDescription": null
   } ],

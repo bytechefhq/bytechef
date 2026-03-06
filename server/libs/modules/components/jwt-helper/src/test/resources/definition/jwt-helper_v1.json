@@ -169,7 +169,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Sign",
     "workflowNodeDescription": null
   }, {
@@ -234,7 +233,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Verify",
     "workflowNodeDescription": null
   } ],

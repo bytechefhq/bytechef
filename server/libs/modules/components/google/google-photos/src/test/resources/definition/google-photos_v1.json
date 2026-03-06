@@ -791,7 +791,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Album",
     "workflowNodeDescription": null
   }, {
@@ -1589,7 +1588,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Album",
     "workflowNodeDescription": null
   }, {
@@ -3255,7 +3253,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload Media",
     "workflowNodeDescription": null
   } ],
