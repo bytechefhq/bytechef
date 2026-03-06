@@ -672,6 +672,145 @@ export function centerNodesAfterBottomGhost(
     });
 }
 
+interface ConditionCaseChildrenI {
+    conditionCaseOffset: number;
+    crossAxis: 'x' | 'y';
+}
+
+/**
+ * Checks whether a condition branch contains only simple (non-task-dispatcher)
+ * nodes by walking from the first node to the bottom ghost.
+ */
+function isBranchSimple(firstNodeId: string, bottomGhostId: string, allNodes: Node[], edges: Edge[]): boolean {
+    let currentNodeId = firstNodeId;
+
+    while (currentNodeId) {
+        const currentNode = allNodes.find((node) => node.id === currentNodeId);
+
+        if (!currentNode) {
+            return false;
+        }
+
+        if (currentNode.type === 'placeholder') {
+            return false;
+        }
+
+        const currentData = currentNode.data as NodeDataType;
+
+        if (currentData.taskDispatcher) {
+            return false;
+        }
+
+        const nextEdge = edges.find((edge) => edge.source === currentNodeId);
+
+        if (!nextEdge) {
+            return false;
+        }
+
+        if (nextEdge.target === bottomGhostId) {
+            return true;
+        }
+
+        currentNodeId = nextEdge.target;
+    }
+
+    return false;
+}
+
+/**
+ * Pulls condition branch children inward toward conditionCaseOffset when dagre
+ * placed them farther from center than necessary. Only applies to conditions
+ * where BOTH branches contain only simple (non-task-dispatcher) nodes, since
+ * branches with nested dispatchers need their dagre-assigned space.
+ * Only pulls inward, never pushes outward.
+ */
+export function alignConditionCaseChildren(allNodes: Node[], edges: Edge[], options: ConditionCaseChildrenI): void {
+    const {conditionCaseOffset, crossAxis} = options;
+
+    const simpleConditions = new Set<string>();
+
+    allNodes.forEach((conditionNode) => {
+        const conditionData = conditionNode.data as NodeDataType;
+
+        if (conditionData.componentName !== 'condition') {
+            return;
+        }
+
+        const conditionId = conditionNode.id;
+        const topGhostId = `${conditionId}-condition-top-ghost`;
+        const bottomGhostId = `${conditionId}-condition-bottom-ghost`;
+
+        const branchStartEdges = edges.filter(
+            (edge) =>
+                edge.source === topGhostId &&
+                edge.sourceHandle &&
+                (edge.sourceHandle.endsWith('-left') || edge.sourceHandle.endsWith('-right'))
+        );
+
+        const allBranchesSimple = branchStartEdges.every((startEdge) =>
+            isBranchSimple(startEdge.target, bottomGhostId, allNodes, edges)
+        );
+
+        if (allBranchesSimple && branchStartEdges.length === 2) {
+            simpleConditions.add(conditionId);
+        }
+    });
+
+    edges.forEach((edge) => {
+        if (!edge.sourceHandle) {
+            return;
+        }
+
+        const isLeftCase = edge.sourceHandle.endsWith('-left');
+        const isRightCase = edge.sourceHandle.endsWith('-right');
+
+        if (!isLeftCase && !isRightCase) {
+            return;
+        }
+
+        const sourceNode = allNodes.find((node) => node.id === edge.source);
+
+        if (!sourceNode || sourceNode.type !== 'taskDispatcherTopGhostNode') {
+            return;
+        }
+
+        const sourceData = sourceNode.data as NodeDataType;
+
+        if (!sourceData.conditionId || !simpleConditions.has(sourceData.conditionId)) {
+            return;
+        }
+
+        const targetNode = allNodes.find((node) => node.id === edge.target);
+
+        if (!targetNode || targetNode.type === 'placeholder') {
+            return;
+        }
+
+        const conditionNode = allNodes.find((node) => node.id === sourceData.conditionId);
+
+        if (!conditionNode) {
+            return;
+        }
+
+        const conditionCross = conditionNode.position[crossAxis];
+        const expectedCross = isLeftCase ? conditionCross - conditionCaseOffset : conditionCross + conditionCaseOffset;
+        const currentCross = targetNode.position[crossAxis];
+
+        const isFartherThanExpected = isLeftCase ? currentCross < expectedCross : currentCross > expectedCross;
+
+        if (!isFartherThanExpected) {
+            return;
+        }
+
+        targetNode.position = {
+            ...targetNode.position,
+            [crossAxis]: expectedCross,
+        };
+
+        alignCaseChainNodes(allNodes, edges, targetNode, expectedCross, crossAxis);
+    });
+}
+
 interface ConditionPlaceholderI {
     conditionCaseOffset: number;
     crossAxis: 'x' | 'y';
