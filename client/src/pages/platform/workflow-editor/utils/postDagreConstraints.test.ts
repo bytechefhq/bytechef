@@ -238,7 +238,13 @@ describe('alignBranchCaseChildren', () => {
         expect(childNode.position.x).toBe(500);
     });
 
-    it('should skip placeholder targets', () => {
+    it('should skip side-case placeholder targets', () => {
+        const branchNode: Node = {
+            data: {componentName: 'branch', taskDispatcher: true, taskDispatcherId: 'branch_1'},
+            id: 'branch_1',
+            position: {x: 200, y: 100},
+            type: 'workflow',
+        };
         const topGhost: Node = {
             data: {branchId: 'branch_1', taskDispatcherId: 'branch_1'},
             id: 'branch_1-top-ghost',
@@ -251,12 +257,12 @@ describe('alignBranchCaseChildren', () => {
             position: {x: 500, y: 200},
             type: 'placeholder',
         };
-        const allNodes = [topGhost, placeholder];
+        const allNodes = [branchNode, topGhost, placeholder];
         const edges = [
             {
                 id: 'branch_1-top-ghost=>branch_1-placeholder',
                 source: 'branch_1-top-ghost',
-                sourceHandle: 'branch_1-top-ghost-bottom',
+                sourceHandle: 'branch_1-top-ghost-left',
                 target: 'branch_1-placeholder',
                 type: 'workflow',
             },
@@ -265,6 +271,42 @@ describe('alignBranchCaseChildren', () => {
         alignBranchCaseChildren(allNodes, edges, 'x', NODE_WIDTH);
 
         expect(placeholder.position.x).toBe(500);
+    });
+
+    it('should align middle-case placeholder to branch center', () => {
+        const branchNode: Node = {
+            data: {componentName: 'branch', taskDispatcher: true, taskDispatcherId: 'branch_1'},
+            id: 'branch_1',
+            position: {x: 200, y: 100},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {branchId: 'branch_1', taskDispatcherId: 'branch_1'},
+            id: 'branch_1-top-ghost',
+            position: {x: 200, y: 150},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const middlePlaceholder: Node = {
+            data: {branchId: 'branch_1', caseKey: 'case_0', taskDispatcherId: 'branch_1'},
+            id: 'branch_1-branch-case_0-placeholder-0',
+            position: {x: 500, y: 250},
+            type: 'placeholder',
+        };
+        const allNodes = [branchNode, topGhost, middlePlaceholder];
+        const edges = [
+            {
+                id: 'branch_1-top-ghost=>branch_1-branch-case_0-placeholder-0',
+                source: 'branch_1-top-ghost',
+                sourceHandle: 'branch_1-top-ghost-bottom',
+                target: 'branch_1-branch-case_0-placeholder-0',
+                type: 'labeledBranchCase',
+            },
+        ];
+
+        alignBranchCaseChildren(allNodes, edges, 'x', NODE_WIDTH);
+
+        // Branch center cross = 200 + 240/2 = 320, target = 320 - 240/2 = 200
+        expect(middlePlaceholder.position.x).toBe(200);
     });
 
     it('should align side-case child that is close to branch center', () => {
