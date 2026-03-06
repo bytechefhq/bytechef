@@ -1,5 +1,9 @@
+import Button from '@/components/Button/Button';
+import EmptyList from '@/components/EmptyList';
 import {Skeleton} from '@/components/ui/skeleton';
+import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/McpProjectWorkflowDialog';
 import {McpServer} from '@/shared/middleware/graphql';
+import {WorkflowIcon} from 'lucide-react';
 import {Fragment} from 'react';
 
 import McpProjectListItem from './McpProjectListItem';
@@ -39,15 +43,31 @@ const McpProjectList = ({mcpServer}: McpProjectListProps) => {
 
     return (
         <div className="py-1 pl-4">
-            {mcpProjects?.map((mcpProject) => (
-                <Fragment key={mcpProject.id}>
-                    <McpProjectListItem mcpProject={mcpProject} />
+            {mcpProjects && mcpProjects.length > 0 ? (
+                mcpProjects.map((mcpProject) => (
+                    <Fragment key={mcpProject.id}>
+                        <McpProjectListItem mcpProject={mcpProject} />
 
-                    <div className="pl-6">
-                        <McpProjectWorkflowList mcpProjectWorkflows={mcpProject.mcpProjectWorkflows} />
-                    </div>
-                </Fragment>
-            ))}
+                        <div className="pl-6">
+                            <McpProjectWorkflowList mcpProjectWorkflows={mcpProject.mcpProjectWorkflows} />
+                        </div>
+                    </Fragment>
+                ))
+            ) : (
+                <div className="flex justify-center py-8">
+                    <EmptyList
+                        button={
+                            <McpProjectWorkflowDialog
+                                mcpServer={mcpServer}
+                                triggerNode={<Button label="Add Workflows" />}
+                            />
+                        }
+                        icon={<WorkflowIcon className="size-24 text-gray-300" />}
+                        message="No MCP projects found for this server."
+                        title="No MCP Projects"
+                    />
+                </div>
+            )}
         </div>
     );
 };
