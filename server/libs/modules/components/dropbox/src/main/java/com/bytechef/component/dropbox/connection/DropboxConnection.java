@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import java.util.Map;
 
 /**
  * Provides the component connection definition.
@@ -43,6 +44,7 @@ public final class DropboxConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://www.dropbox.com/oauth2/authorize")
+                .oAuth2AuthorizationExtraQueryParameters(Map.of("token_access_type", "offline"))
                 .tokenUrl((connection, context) -> "https://api.dropboxapi.com/oauth2/token")
                 .refreshUrl((connection, context) -> "https://api.dropboxapi.com/oauth2/token"));
 
