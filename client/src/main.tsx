@@ -44,15 +44,9 @@ async function renderApp() {
 
     const isEmbeddedWorkflowBuilder = window.location.pathname.includes('/embedded/workflow-builder');
 
-    let router;
-
-    if (isEmbeddedWorkflowBuilder) {
-        const {getRouter: getEmbeddedRouter} = await import('@/embeddedWorkflowBuilderRoutes');
-
-        router = getEmbeddedRouter();
-    } else {
-        router = getMainRouter(queryClient);
-    }
+    const router = isEmbeddedWorkflowBuilder
+        ? (await import('@/embeddedWorkflowBuilderRoutes')).getRouter()
+        : getMainRouter(queryClient);
 
     await applicationInfoStore.getState().getApplicationInfo();
 
