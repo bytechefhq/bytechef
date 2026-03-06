@@ -26,6 +26,7 @@ import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCr
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCreateListItemAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointUploadFileAction;
 import com.bytechef.component.microsoft.share.point.connection.MicrosoftSharePointConnection;
+import com.bytechef.component.microsoft.share.point.trigger.MicrosoftSharePointNewFileTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -47,7 +48,8 @@ public class MicrosoftSharePointComponentHandler implements ComponentHandler {
             MicrosoftSharePointCreateFolderAction.ACTION_DEFINITION,
             MicrosoftSharePointCreateListAction.ACTION_DEFINITION,
             MicrosoftSharePointCreateListItemAction.ACTION_DEFINITION,
-            MicrosoftSharePointUploadFileAction.ACTION_DEFINITION);
+            MicrosoftSharePointUploadFileAction.ACTION_DEFINITION)
+        .triggers(MicrosoftSharePointNewFileTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -50,6 +50,7 @@ public class MicrosoftSharePointConstants {
 
     public static final ModifiableStringProperty SITE_ID_PROPERTY = string(SITE_ID)
         .label("Site ID")
+        .description("The ID of the SharePoint site.")
         .options((OptionsFunction<String>) MicrosoftSharePointUtils::getSiteOptions)
         .required(true);
 
