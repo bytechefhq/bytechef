@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.ActionDefinition.WebhookResponse
 
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -132,8 +131,6 @@ public interface ActionDefinition {
     Optional<List<? extends Property>> getProperties();
 
     Optional<ResumePerformFunction> getResumePerform();
-
-    Optional<SuspendPerformFunction> getSuspendPerform();
 
     /**
      *
@@ -494,29 +491,6 @@ public interface ActionDefinition {
     }
 
     /**
-     * Represents a specialized functional interface within the ActionDefinition framework, used for defining
-     * suspendable action implementations. This interface extends {@link BasePerformFunction} and provides a mechanism
-     * for suspending actions during their execution.
-     */
-    @FunctionalInterface
-    interface SuspendPerformFunction {
-
-        /**
-         * Applies the specified input parameters, connection parameters, and action context to perform an operation
-         * that results in a suspendable state.
-         *
-         * @param inputParameters      the parameters provided as input for the operation
-         * @param connectionParameters the parameters required to establish a connection or interaction
-         * @param context              the context in which the action is executed, providing runtime information
-         * @return a {@link Suspend} object representing the suspendable state, including continuation parameters and
-         *         expiration details
-         * @throws Exception if an error occurs during the execution of the operation
-         */
-        Suspend apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-            throws Exception;
-    }
-
-    /**
      * A functional interface that extends PerformFunction. Represents a specific type of function designed to handle
      * callable workflow responses. This interface defines a single abstract method that takes input parameters,
      * connection parameters, and an action context to produce a CallableResponse to be returned to the calling
@@ -580,17 +554,6 @@ public interface ActionDefinition {
      * @param output the output value to return to the calling workflow
      */
     record CallableResponse(Object output) {
-    }
-
-    /**
-     * Represents a suspend state as part of an action definition. It indicates a temporary suspension with accompanying
-     * parameters and expiration details.
-     *
-     * @param continueParameters a map containing parameters required to continue the suspended action
-     * @param expiresAt          the timestamp indicating when the suspension expires
-     */
-    @SuppressFBWarnings("EI")
-    record Suspend(Map<String, ?> continueParameters, Instant expiresAt) {
     }
 
     /**

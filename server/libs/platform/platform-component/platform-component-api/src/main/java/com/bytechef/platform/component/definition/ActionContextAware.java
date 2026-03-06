@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.PlatformType;
@@ -46,6 +47,15 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
      */
     @Nullable
     Long getEnvironmentId();
+
+    /**
+     * Retrieves the suspend state if the action called {@link ActionContext#suspend(Suspend)} during execution.
+     *
+     * @return the {@link Suspend} instance if the action requested suspension, or {@code null} if no suspension was
+     *         requested
+     */
+    @Nullable
+    Suspend getSuspend();
 
     /**
      * Retrieves the unique identifier associated with the job principal.
