@@ -91,9 +91,40 @@ Name: copyFile
 
 #### Output
 
-This action does not produce any output.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| @odata.context | STRING |  |
+| id | STRING | ID of the copied file. |
+| createdDateTime | STRING | The date and time when the copied file was created. |
+| lastActionDateTime | STRING |  |
+| percentageComplete | INTEGER | Percentage completion of the copy operation. |
+| resourceId | STRING |  |
+| resourceLocation | STRING |  |
+| status | STRING | Status of the copy operation. |
+
+
+
+
+#### Output Example
+```json
+{
+  "@odata.context" : "",
+  "id" : "",
+  "createdDateTime" : "",
+  "lastActionDateTime" : "",
+  "percentageComplete" : 1,
+  "resourceId" : "",
+  "resourceLocation" : "",
+  "status" : ""
+}
+```
 
 #### Find File ID
 
