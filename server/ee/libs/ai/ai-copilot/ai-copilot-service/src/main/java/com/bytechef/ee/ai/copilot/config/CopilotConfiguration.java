@@ -169,7 +169,8 @@ public class CopilotConfiguration {
     }
 
     @Bean
-    ChatMemory chatMemory() {
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.memory", name = "provider", havingValue = "in_memory")
+    ChatMemory inMemoryChatMemory() {
         return MessageWindowChatMemory.builder()
             .chatMemoryRepository(new InMemoryChatMemoryRepository())
             .maxMessages(500)
