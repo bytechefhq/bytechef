@@ -17,6 +17,10 @@
 package com.bytechef.ee.ai.copilot.config;
 
 import io.micrometer.observation.ObservationRegistry;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -28,8 +32,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 @Configuration
 @EnableJdbcRepositories(
@@ -61,6 +67,27 @@ public class CopilotPgVectorConfiguration {
             .customObservationConvention(customObservationConvention.getIfAvailable(() -> null))
             .batchingStrategy(batchingStrategy)
             .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
+            .build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.memory", name = "provider", havingValue = "jdbc")
+    ChatMemory jdbcChatMemory(@Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate) {
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
+            new ClassPathResource(
+                "org/springframework/ai/chat/memory/repository/jdbc/schema-postgresql.sql"));
+
+        populator.setContinueOnError(true);
+        populator.execute(pgVectorJdbcTemplate.getDataSource());
+
+        return MessageWindowChatMemory.builder()
+            .chatMemoryRepository(JdbcChatMemoryRepository
+                .builder()
+                .jdbcTemplate(pgVectorJdbcTemplate)
+                .dialect(JdbcChatMemoryRepositoryDialect.from(pgVectorJdbcTemplate.getDataSource()))
+                .dataSource(pgVectorJdbcTemplate.getDataSource())
+                .build())
+            .maxMessages(500)
             .build();
     }
 }
