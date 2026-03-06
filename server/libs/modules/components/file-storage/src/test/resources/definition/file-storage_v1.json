@@ -165,7 +165,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Read from File as String",
     "workflowNodeDescription": null
   }, {
@@ -434,7 +433,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Write to File",
     "workflowNodeDescription": null
   }, {
@@ -703,7 +701,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Download File",
     "workflowNodeDescription": null
   } ],

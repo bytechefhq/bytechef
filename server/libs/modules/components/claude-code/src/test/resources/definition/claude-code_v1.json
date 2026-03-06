@@ -86,7 +86,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Initialize Claude Code",
     "workflowNodeDescription": null
   }, {
@@ -332,7 +331,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add MCP Server",
     "workflowNodeDescription": null
   }, {
@@ -422,7 +420,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Chat",
     "workflowNodeDescription": null
   } ],

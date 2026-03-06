@@ -3650,7 +3650,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Page",
     "workflowNodeDescription": null
   }, {
@@ -7529,7 +7528,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Post",
     "workflowNodeDescription": null
   }, {
@@ -10922,7 +10920,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Post",
     "workflowNodeDescription": null
   }, {
@@ -15820,7 +15817,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Post",
     "workflowNodeDescription": null
   } ],

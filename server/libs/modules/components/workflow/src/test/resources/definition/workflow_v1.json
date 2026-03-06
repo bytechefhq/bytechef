@@ -55,7 +55,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Response to Workflow Call",
     "workflowNodeDescription": null
   }, {
@@ -114,7 +113,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Response to AI Model Call",
     "workflowNodeDescription": null
   } ],

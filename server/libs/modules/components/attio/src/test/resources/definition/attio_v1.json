@@ -1154,7 +1154,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Record",
     "workflowNodeDescription": null
   }, {
@@ -2211,7 +2210,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   }, {
@@ -3393,7 +3391,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Record",
     "workflowNodeDescription": null
   } ],

@@ -359,7 +359,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Folder",
     "workflowNodeDescription": null
   }, {
@@ -870,7 +869,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create List",
     "workflowNodeDescription": null
   }, {
@@ -1594,7 +1592,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   } ],

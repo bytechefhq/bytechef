@@ -250,7 +250,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Read from File",
     "workflowNodeDescription": null
   }, {
@@ -712,7 +711,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Write to File",
     "workflowNodeDescription": null
   } ],

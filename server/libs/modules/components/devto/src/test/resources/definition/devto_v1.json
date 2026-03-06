@@ -1258,7 +1258,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Article",
     "workflowNodeDescription": null
   }, {
@@ -2433,7 +2432,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Article",
     "workflowNodeDescription": null
   }, {
@@ -3719,7 +3717,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Article",
     "workflowNodeDescription": null
   } ],

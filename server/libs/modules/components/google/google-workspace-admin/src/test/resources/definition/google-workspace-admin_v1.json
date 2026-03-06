@@ -6385,7 +6385,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create User",
     "workflowNodeDescription": null
   }, {
@@ -6878,7 +6877,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Assign Role To User",
     "workflowNodeDescription": null
   }, {
@@ -7344,7 +7342,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Assign License",
     "workflowNodeDescription": null
   }, {
@@ -13607,7 +13604,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Suspend User",
     "workflowNodeDescription": null
   } ],

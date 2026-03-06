@@ -17735,7 +17735,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Result",
     "workflowNodeDescription": null
   }, {
@@ -18089,7 +18088,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Scan",
     "workflowNodeDescription": null
   }, {
@@ -18352,7 +18350,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Screenshot",
     "workflowNodeDescription": null
   } ],

@@ -106,7 +106,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Append Row",
     "workflowNodeDescription": null
   }, {
@@ -196,7 +195,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Clear Worksheet",
     "workflowNodeDescription": null
   }, {
@@ -281,7 +279,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Row",
     "workflowNodeDescription": null
   }, {
@@ -395,7 +392,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Find Row by Number",
     "workflowNodeDescription": null
   }, {
@@ -548,7 +544,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Row",
     "workflowNodeDescription": null
   } ],

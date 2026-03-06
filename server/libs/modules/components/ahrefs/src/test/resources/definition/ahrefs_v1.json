@@ -610,7 +610,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Metrics",
     "workflowNodeDescription": null
   }, {
@@ -986,7 +985,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Page Content",
     "workflowNodeDescription": null
   }, {
@@ -1384,7 +1382,6 @@
     "processErrorResponse": null,
     "properties": [ ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Subscription Information",
     "workflowNodeDescription": null
   } ],

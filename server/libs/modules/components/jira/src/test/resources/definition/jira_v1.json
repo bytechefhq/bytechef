@@ -89,7 +89,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Assign Issue",
     "workflowNodeDescription": null
   }, {
@@ -447,7 +446,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Issue",
     "workflowNodeDescription": null
   }, {
@@ -2358,7 +2356,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Issue Comment",
     "workflowNodeDescription": null
   }, {
@@ -2553,7 +2550,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Edit Issue",
     "workflowNodeDescription": null
   }, {
@@ -3375,7 +3371,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Issue",
     "workflowNodeDescription": null
   }, {
@@ -4489,7 +4484,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Issue Comments",
     "workflowNodeDescription": null
   }, {
@@ -4664,7 +4658,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Issues",
     "workflowNodeDescription": null
   }, {
@@ -4757,7 +4750,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Transition Issue",
     "workflowNodeDescription": null
   } ],

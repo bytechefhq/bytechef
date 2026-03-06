@@ -35,7 +35,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Debug",
     "workflowNodeDescription": null
   }, {
@@ -74,7 +73,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Error",
     "workflowNodeDescription": null
   }, {
@@ -113,7 +111,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Info",
     "workflowNodeDescription": null
   }, {
@@ -152,7 +149,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Warn",
     "workflowNodeDescription": null
   } ],

@@ -659,8 +659,8 @@
       "advancedOption": null,
       "controlType": "OBJECT_BUILDER",
       "defaultValue": {
-        "key2": "value2",
-        "key1": "value1"
+        "key1": "value1",
+        "key2": "value2"
       },
       "description": "Default value is { key1 : value1, key2: value2 }",
       "displayCondition": null,
@@ -1025,7 +1025,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Testing",
     "workflowNodeDescription": null
   } ],

@@ -65,7 +65,6 @@
     "processErrorResponse": null,
     "properties": [ ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Title",
     "workflowNodeDescription": null
   } ],

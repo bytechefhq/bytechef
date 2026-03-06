@@ -215,7 +215,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Fulfill Order",
     "workflowNodeDescription": null
   }, {
@@ -540,7 +539,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Collection Item",
     "workflowNodeDescription": null
   } ],

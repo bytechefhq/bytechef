@@ -86,7 +86,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Contact To List",
     "workflowNodeDescription": null
   }, {
@@ -202,7 +201,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Contact",
     "workflowNodeDescription": null
   }, {
@@ -485,7 +483,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Email Marketing Campaign",
     "workflowNodeDescription": null
   }, {
@@ -566,7 +563,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Tag To Contact",
     "workflowNodeDescription": null
   }, {
@@ -815,7 +811,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Email List",
     "workflowNodeDescription": null
   }, {
@@ -911,7 +906,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Social Media Message",
     "workflowNodeDescription": null
   } ],

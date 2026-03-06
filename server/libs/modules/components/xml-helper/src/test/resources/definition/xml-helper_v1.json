@@ -40,7 +40,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Convert from XML String",
     "workflowNodeDescription": null
   }, {
@@ -179,7 +178,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Convert to XML String",
     "workflowNodeDescription": null
   } ],

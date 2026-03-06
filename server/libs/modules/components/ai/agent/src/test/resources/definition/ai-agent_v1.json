@@ -519,7 +519,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Chat",
     "workflowNodeDescription": null
   }, {
@@ -1041,7 +1040,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Chat (stream)",
     "workflowNodeDescription": null
   } ],

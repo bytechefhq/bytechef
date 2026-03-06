@@ -603,7 +603,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Post",
     "workflowNodeDescription": null
   }, {
@@ -642,7 +641,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Post",
     "workflowNodeDescription": null
   } ],

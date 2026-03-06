@@ -214,7 +214,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Items to a Playlist",
     "workflowNodeDescription": null
   }, {
@@ -356,7 +355,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Play/Resume Playback",
     "workflowNodeDescription": null
   }, {
@@ -1154,7 +1152,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Playlist",
     "workflowNodeDescription": null
   } ],
