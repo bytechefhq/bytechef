@@ -1,0 +1,21 @@
+---
+label: "Hello Slow"
+inputs:
+- name: "yourName"
+  label: "Your Name"
+  type: "string"
+  required: true
+tasks:
+- label: "Print a greeting"
+  type: "io/print"
+  parameters:
+    text: "Hello ${yourName}"
+- label: "Wait for 5 minutes"
+  type: "wait/v1/afterTimeInterval"
+  parameters:
+    amount: 5
+    unit: "MINUTES"
+- label: "Print a farewell"
+  type: "io/print"
+  parameters:
+    text: "Goodbye ${yourName}"
