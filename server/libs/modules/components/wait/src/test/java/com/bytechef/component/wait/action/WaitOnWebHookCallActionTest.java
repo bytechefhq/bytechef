@@ -16,17 +16,20 @@
 
 package com.bytechef.component.wait.action;
 
+import static com.bytechef.component.wait.constant.WaitConstants.AMOUNT;
 import static com.bytechef.component.wait.constant.WaitConstants.CSRF_TOKEN;
+import static com.bytechef.component.wait.constant.WaitConstants.UNIT;
 import static org.mockito.ArgumentMatchers.eq;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.Suspend;
-import com.bytechef.component.definition.ActionDefinition.SuspendPerformFunction;
+import com.bytechef.component.definition.ActionContext.Suspend;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 /**
@@ -36,20 +39,31 @@ import org.mockito.Mockito;
 public class WaitOnWebHookCallActionTest {
 
     @Test
-    public void testSuspendPerform() throws Exception {
+    public void testPerformCallsSuspend() throws Exception {
         Parameters inputParameters = Mockito.mock(Parameters.class);
         Parameters connectionParameters = Mockito.mock(Parameters.class);
         ActionContext context = Mockito.mock(ActionContext.class);
 
         Mockito.when(inputParameters.getRequiredString(eq(CSRF_TOKEN)))
             .thenReturn("test-token-123");
+        Mockito.when(inputParameters.getRequiredInteger(eq(AMOUNT)))
+            .thenReturn(30);
+        Mockito.when(inputParameters.getRequiredString(eq(UNIT)))
+            .thenReturn("DAYS");
 
         ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.of();
 
-        SuspendPerformFunction suspendPerformFunction = actionDefinition.getSuspendPerform()
+        PerformFunction performFunction = (PerformFunction) actionDefinition.getPerform()
             .orElseThrow();
 
-        Suspend suspend = suspendPerformFunction.apply(inputParameters, connectionParameters, context);
+        performFunction.apply(inputParameters, connectionParameters, context);
+
+        ArgumentCaptor<Suspend> suspendCaptor = ArgumentCaptor.forClass(Suspend.class);
+
+        Mockito.verify(context)
+            .suspend(suspendCaptor.capture());
+
+        Suspend suspend = suspendCaptor.getValue();
 
         Assertions.assertNotNull(suspend);
         Assertions.assertNotNull(suspend.expiresAt());

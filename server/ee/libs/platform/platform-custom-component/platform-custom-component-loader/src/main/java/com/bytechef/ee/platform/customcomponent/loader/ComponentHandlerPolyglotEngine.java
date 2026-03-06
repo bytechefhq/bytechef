@@ -192,11 +192,6 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<SuspendPerformFunction> getSuspendPerform() {
-            return Optional.empty();
-        }
-
-        @Override
         public Optional<String> getTitle() {
             return Optional.ofNullable(title);
         }
