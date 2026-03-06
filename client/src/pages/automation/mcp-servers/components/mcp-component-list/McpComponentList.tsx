@@ -1,11 +1,18 @@
+import Button from '@/components/Button/Button';
+import EmptyList from '@/components/EmptyList';
 import {Skeleton} from '@/components/ui/skeleton';
 import McpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItem';
 import McpComponentToolList from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolList';
 import useMcpComponentList from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
 import {McpServer} from '@/shared/middleware/graphql';
-import {Fragment} from 'react';
+import {ComponentIcon} from 'lucide-react';
+import {Fragment, useState} from 'react';
+
+import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 
 const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
+    const [showAddDialog, setShowAddDialog] = useState(false);
+
     const {data, isMcpComponentsLoading} = useMcpComponentList(mcpServer.id!);
 
     if (isMcpComponentsLoading) {
@@ -38,28 +45,42 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
 
     return (
         <div className="py-1 pl-4">
-            {data.mcpComponentsByServerId
-                .sort((a, b) => a!.componentName.localeCompare(b!.componentName))
-                .map((mcpComponent) => (
-                    <Fragment key={mcpComponent!.id}>
-                        <McpComponentListItem
-                            key={mcpComponent?.id}
-                            mcpComponent={mcpComponent!}
-                            mcpServer={mcpServer}
-                        />
+            {data.mcpComponentsByServerId.length > 0 ? (
+                data.mcpComponentsByServerId
+                    .sort((a, b) => a!.componentName.localeCompare(b!.componentName))
+                    .map((mcpComponent) => (
+                        <Fragment key={mcpComponent!.id}>
+                            <McpComponentListItem mcpComponent={mcpComponent!} mcpServer={mcpServer} />
 
-                        <div className="pl-6">
-                            <McpComponentToolList
-                                componentName={mcpComponent!.componentName}
-                                componentVersion={mcpComponent!.componentVersion}
-                                connectionId={mcpComponent!.connectionId}
-                                mcpComponent={mcpComponent!}
-                                mcpServerId={mcpServer.id!}
-                                mcpTools={mcpComponent!.mcpTools}
-                            />
-                        </div>
-                    </Fragment>
-                ))}
+                            <div className="pl-6">
+                                <McpComponentToolList
+                                    componentName={mcpComponent!.componentName}
+                                    componentVersion={mcpComponent!.componentVersion}
+                                    connectionId={mcpComponent!.connectionId}
+                                    mcpComponent={mcpComponent!}
+                                    mcpServerId={mcpServer.id!}
+                                    mcpTools={mcpComponent!.mcpTools}
+                                />
+                            </div>
+                        </Fragment>
+                    ))
+            ) : (
+                <div className="flex justify-center py-8">
+                    <EmptyList
+                        button={<Button label="Add Component" onClick={() => setShowAddDialog(true)} />}
+                        icon={<ComponentIcon className="size-24 text-gray-300" />}
+                        message="Get started by creating a new component."
+                        title="No Components"
+                    />
+
+                    <McpComponentDialog
+                        mcpComponent={undefined}
+                        mcpServerId={mcpServer.id!}
+                        onOpenChange={setShowAddDialog}
+                        open={showAddDialog}
+                    />
+                </div>
+            )}
         </div>
     );
 };

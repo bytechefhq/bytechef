@@ -18,7 +18,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
     return (
         <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
             <div className="flex flex-1 items-center py-1">
-                <div className="flex flex-1 cursor-pointer items-center">
+                <div className="flex flex-1 cursor-pointer items-center" onClick={() => setShowEditDialog(true)}>
                     <div className="flex flex-1 items-center gap-x-2">
                         {componentDefinition?.icon ? (
                             <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
