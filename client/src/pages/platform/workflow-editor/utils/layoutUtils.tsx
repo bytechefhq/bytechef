@@ -40,6 +40,7 @@ import {
     adjustBottomGhostForMovedChildren,
     alignBranchCaseChildren,
     alignChainNodesCrossAxis,
+    alignConditionCaseChildren,
     alignDispatcherGhostsCrossAxis,
     alignTrailingPlaceholder,
     applySavedPositions,
@@ -542,6 +543,7 @@ export const getLayoutElements = async ({
     centerNodesAfterBottomGhost(allNodes, edges, {crossAxis, crossAxisSize, direction});
     alignDispatcherGhostsCrossAxis(allNodes, crossAxis);
     separateOverlappingConditionChildren(allNodes, edges, crossAxis);
+    alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset, crossAxis});
     positionConditionCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
     shiftConditionBranchContent(allNodes, {crossAxis, nodesep});
     constrainLeftGhostPositions(allNodes, {conditionCaseOffset, crossAxis, direction});
