@@ -17,6 +17,9 @@
 package com.bytechef.component.microsoft.one.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
@@ -29,7 +32,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
@@ -61,7 +63,24 @@ public class MicrosoftOneDriveCopyFileAction {
                         "will be used.")
                 .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
-        .perform(MicrosoftOneDriveCopyFileAction::perform);
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("@odata.context"),
+                        string(ID)
+                            .description("ID of the copied file."),
+                        string("createdDateTime")
+                            .description("The date and time when the copied file was created."),
+                        string("lastActionDateTime"),
+                        integer("percentageComplete")
+                            .description("Percentage completion of the copy operation."),
+                        string("resourceId"),
+                        string("resourceLocation"),
+                        string("status")
+                            .description("Status of the copy operation."))))
+        .perform(MicrosoftOneDriveCopyFileAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOneDriveCopyFileAction() {
     }
@@ -76,35 +95,29 @@ public class MicrosoftOneDriveCopyFileAction {
                     "parentReference", Map.of(ID, getFolderId(inputParameters.getString(PARENT_ID)))))
             .execute();
 
-        int statusCode = response.getStatusCode();
-
-        if (statusCode == 202) {
+        if (response.getStatusCode() == 202) {
             String location = response.getFirstHeader("location");
+            String status;
 
-            Http.Response response1 = context
-                .http(http -> http.get(location))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute();
+            do {
+                Http.Response statusResponse = context
+                    .http(http -> http.get(location))
+                    .configuration(Http.responseType(Http.ResponseType.JSON))
+                    .execute();
 
-            Map<String, Object> body = response1.getBody(new TypeReference<>() {});
+                Map<String, Object> body = statusResponse.getBody(new TypeReference<>() {});
 
-            String status = (String) body.get("status");
+                status = (String) body.get("status");
 
-            if (status.equals("completed")) {
-                return null;
-            } else {
-                if (body.get("error") instanceof Map<?, ?> map) {
-                    throw new ProviderException(response1.getStatusCode(), (String) map.get("message"));
-                } else {
-                    throw new ProviderException("Failed to copy file. Status code: " + response1.getStatusCode());
+                if (status.equals("completed")) {
+                    return body;
+                } else if (status.equals("failed")) {
+                    throw MicrosoftUtils.processErrorResponse(
+                        statusResponse.getStatusCode(), body, statusResponse.getHeaders(), context);
                 }
-            }
-        } else {
-            Map<String, Map<String, Object>> body = response.getBody(new TypeReference<>() {});
-
-            Map<String, Object> error = body.get("error");
-
-            throw new ProviderException(statusCode, (String) error.get("message"));
+            } while (status.equals("inProgress"));
         }
+
+        return null;
     }
 }
