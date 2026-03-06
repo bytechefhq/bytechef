@@ -1,3 +1,4 @@
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
@@ -5,20 +6,12 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/McpProjectWorkflowDialog';
 import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
 import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
-import McpServerListItemAlertDialog from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemAlertDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
 import TagList from '@/shared/components/TagList';
-import {
-    McpProjectWorkflow,
-    McpServer,
-    Tag,
-    useDeleteWorkspaceMcpServerMutation,
-    useUpdateMcpServerMutation,
-    useUpdateMcpServerTagsMutation,
-} from '@/shared/middleware/graphql';
-import {useQueryClient} from '@tanstack/react-query';
+import {McpProjectWorkflow, McpServer, Tag} from '@/shared/middleware/graphql';
 import {ChevronDown, ServerIcon} from 'lucide-react';
-import {useState} from 'react';
+
+import useMcpServerListItem from './hooks/useMcpServerListItem';
 
 interface McpServerListItemProps {
     mcpServer: McpServer;
@@ -27,61 +20,21 @@ interface McpServerListItemProps {
 }
 
 const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerListItemProps) => {
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [showEditDialog, setShowEditDialog] = useState(false);
-    const [showMcpComponentDialog, setShowMcpComponentDialog] = useState(false);
-    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
-    const [isPending, setIsPending] = useState(false);
-    const [isEnablePending, setIsEnablePending] = useState(false);
-
-    const mcpServerTagIds = mcpServer.tags?.map((tag) => tag?.id);
-
-    const queryClient = useQueryClient();
-
-    const updateMcpServerMutation = useUpdateMcpServerMutation();
-    const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
-    const updateMcpServerTagsMutation = useUpdateMcpServerTagsMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['mcpServers']});
-            queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
-            queryClient.invalidateQueries({queryKey: ['mcpServerTags']});
-        },
-    });
-
-    const handleOnCheckedChange = async (value: boolean) => {
-        setIsEnablePending(true);
-
-        updateMcpServerMutation.mutate(
-            {
-                id: mcpServer.id,
-                input: {
-                    enabled: value,
-                },
-            },
-            {
-                onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
-                    setIsEnablePending(false);
-                },
-            }
-        );
-    };
-
-    const handleDeleteClick = async () => {
-        setIsPending(true);
-
-        deleteWorkspaceMcpServerMutation.mutate(
-            {
-                id: mcpServer.id,
-            },
-            {
-                onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
-                    setShowDeleteDialog(false);
-                },
-            }
-        );
-    };
+    const {
+        handleDeleteClick,
+        handleOnCheckedChange,
+        isEnablePending,
+        mcpServerTagIds,
+        setShowDeleteDialog,
+        setShowEditDialog,
+        setShowMcpComponentDialog,
+        setShowWorkflowDialog,
+        showDeleteDialog,
+        showEditDialog,
+        showMcpComponentDialog,
+        showWorkflowDialog,
+        updateMcpServerTagsMutation,
+    } = useMcpServerListItem(mcpServer);
 
     return (
         <>
@@ -178,13 +131,11 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                 </div>
             </div>
 
-            {showDeleteDialog && (
-                <McpServerListItemAlertDialog
-                    isPending={isPending}
-                    onCancelClick={() => setShowDeleteDialog(false)}
-                    onDeleteClick={handleDeleteClick}
-                />
-            )}
+            <DeleteAlertDialog
+                onCancel={() => setShowDeleteDialog(false)}
+                onDelete={handleDeleteClick}
+                open={showDeleteDialog}
+            />
 
             {showEditDialog && (
                 <McpServerDialog
