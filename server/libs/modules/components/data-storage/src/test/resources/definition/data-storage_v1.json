@@ -1418,12 +1418,7 @@
     "help": null,
     "metadata": null,
     "name": "setValue",
-    "outputDefinition": {
-      "output": { },
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
+    "outputDefinition": null,
     "perform": { },
     "processErrorResponse": null,
     "properties": [ {
