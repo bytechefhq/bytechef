@@ -6,6 +6,26 @@ import {useEffect, useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
+const TOAST_COOLDOWN_MS = 10_000;
+const recentToastIds = new Map<string, number>();
+
+export function clearRecentToasts() {
+    recentToastIds.clear();
+}
+
+function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
+    const now = Date.now();
+    const lastShown = recentToastIds.get(toastId);
+
+    if (lastShown && now - lastShown < TOAST_COOLDOWN_MS) {
+        return;
+    }
+
+    recentToastIds.set(toastId, now);
+
+    toast.error(title, {...options, id: toastId});
+}
+
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
     const clearCurrentWorkspaceId = useWorkspaceStore((state) => state.clearCurrentWorkspaceId);
@@ -73,14 +93,14 @@ export default function useFetchInterceptor() {
                                     ...new Set(data.errors.map((error) => error.message || 'Unknown error')),
                                 ].join('\n');
 
-                                toast.error('Error', {description: errorMessage, id: toastId});
+                                showErrorToast(toastId, 'Error', {description: errorMessage});
                             } else if (response.status < 200 || response.status > 299) {
-                                toast.error(`Request failed with status ${response.status}`, {id: toastId});
+                                showErrorToast(toastId, `Request failed with status ${response.status}`);
                             }
                         })
                         .catch(() => {
                             if (response.status < 200 || response.status > 299) {
-                                toast.error(`Request failed with status ${response.status}`, {id: toastId});
+                                showErrorToast(toastId, `Request failed with status ${response.status}`);
                             }
                         });
                 } else if (response.status < 200 || response.status > 299) {
@@ -93,10 +113,10 @@ export default function useFetchInterceptor() {
                                 return;
                             }
 
-                            toast.error(data.title, {description: data.detail, id: toastId});
+                            showErrorToast(toastId, data.title || 'Error', {description: data.detail});
                         })
                         .catch(() => {
-                            toast.error(`Request failed with status ${response.status}`, {id: toastId});
+                            showErrorToast(toastId, `Request failed with status ${response.status}`);
                         });
                 }
 
