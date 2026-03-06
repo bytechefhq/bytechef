@@ -729,7 +729,12 @@ export default function useWorkflowNodeDetailsPanel({
             }
 
             const branchCases: BranchCaseType[] = [
-                {key: 'default', tasks: parentBranchTask.parameters.default || []},
+                {
+                    key: 'default',
+                    tasks: Array.isArray(parentBranchTask.parameters.default)
+                        ? parentBranchTask.parameters.default
+                        : [],
+                },
                 ...(Array.isArray(parentBranchTask.parameters.cases) ? parentBranchTask.parameters.cases : []),
             ];
 
@@ -740,7 +745,9 @@ export default function useWorkflowNodeDetailsPanel({
 
             const otherCasesNodeNames = branchCases
                 .filter((caseItem) => otherCaseKeys.includes(caseItem.key))
-                .flatMap((caseItem) => (caseItem.tasks || []).map((task: WorkflowTask) => task.name));
+                .flatMap((caseItem) =>
+                    (Array.isArray(caseItem.tasks) ? caseItem.tasks : []).map((task: WorkflowTask) => task.name)
+                );
 
             return nodeNames.filter((nodeName) => !otherCasesNodeNames.includes(nodeName));
         },
