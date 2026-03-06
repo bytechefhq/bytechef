@@ -5,6 +5,22 @@ import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
 import {toast} from 'sonner';
 
+const TOAST_COOLDOWN_MS = 10_000;
+const recentToastIds = new Map<string, number>();
+
+function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
+    const now = Date.now();
+    const lastShown = recentToastIds.get(toastId);
+
+    if (lastShown && now - lastShown < TOAST_COOLDOWN_MS) {
+        return;
+    }
+
+    recentToastIds.set(toastId, now);
+
+    toast.error(title, {...options, id: toastId});
+}
+
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
     const clearCurrentEnvironmentId = useEnvironmentStore((state) => state.clearCurrentEnvironmentId);
@@ -73,10 +89,10 @@ export default function useFetchInterceptor() {
                                 return;
                             }
 
-                            toast.error(data.title, {description: data.detail, id: toastId});
+                            showErrorToast(toastId, data.title || 'Error', {description: data.detail});
                         })
                         .catch(() => {
-                            toast.error(`Request failed with status ${response.status}`, {id: toastId});
+                            showErrorToast(toastId, `Request failed with status ${response.status}`);
                         });
                 }
 
