@@ -299,6 +299,7 @@ const WorkflowEditor = ({
                 onDrop={onDrop}
                 onEdgesChange={onEdgesChange}
                 onNodesChange={onNodesChange}
+                panActivationKeyCode={null}
                 panOnDrag
                 panOnScroll
                 proOptions={{hideAttribution: true}}
