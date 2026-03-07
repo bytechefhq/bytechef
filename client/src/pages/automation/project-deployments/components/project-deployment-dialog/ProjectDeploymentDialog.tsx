@@ -157,7 +157,11 @@ const ProjectDeploymentDialog = ({
         closeDialog();
         setActiveStepIndex(0);
 
-        if (!location.pathname.includes('deployments') && !location.pathname.includes('api-platform')) {
+        if (
+            !location.pathname.includes('deployments') &&
+            !location.pathname.includes('api-platform') &&
+            !location.pathname.includes('mcp')
+        ) {
             navigate('/automation/deployments');
         }
     };
