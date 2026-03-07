@@ -129,7 +129,9 @@ const ProjectDeployments = () => {
                                 />
                             </div>
                         ) : (
-                            <EnvironmentSelect />
+                            !(projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading) && (
+                                <EnvironmentSelect />
+                            )
                         )
                     }
                     title={
