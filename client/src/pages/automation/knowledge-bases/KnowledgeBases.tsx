@@ -35,7 +35,7 @@ const KnowledgeBases = () => {
                                 />
                             </div>
                         ) : (
-                            <EnvironmentSelect />
+                            !isLoading && <EnvironmentSelect />
                         )
                     }
                     title={
