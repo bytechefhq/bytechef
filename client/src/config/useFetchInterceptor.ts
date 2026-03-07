@@ -15,9 +15,16 @@ export function clearRecentToasts() {
 
 function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
     const now = Date.now();
+
+    for (const [id, timestamp] of recentToastIds) {
+        if (now - timestamp >= TOAST_COOLDOWN_MS) {
+            recentToastIds.delete(id);
+        }
+    }
+
     const lastShown = recentToastIds.get(toastId);
 
-    if (lastShown && now - lastShown < TOAST_COOLDOWN_MS) {
+    if (lastShown !== undefined && now - lastShown < TOAST_COOLDOWN_MS) {
         return;
     }
 
@@ -80,7 +87,7 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
-                const toastId = `${response.url}-${response.status}`;
+                const toastId = `${new URL(response.url).pathname}-${response.status}`;
 
                 if (response.url.includes('/graphql')) {
                     const clonedResponse = response.clone();

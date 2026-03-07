@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useFetchInterceptor from '../useFetchInterceptor';
+import useFetchInterceptor, {clearRecentToasts} from '../useFetchInterceptor';
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -70,6 +70,7 @@ function createMockResponse(overrides: Record<string, unknown> = {}) {
 describe('useFetchInterceptor (embedded)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        clearRecentToasts();
         hoisted.registeredHandlers = null;
         import.meta.env.VITE_API_BASE_PATH = '';
     });
@@ -166,7 +167,7 @@ describe('useFetchInterceptor (embedded)', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something went wrong',
-                id: 'http://localhost/internal/api/test-500',
+                id: '/internal/api/test-500',
             });
         });
 
@@ -187,6 +188,32 @@ describe('useFetchInterceptor (embedded)', () => {
             expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
+        it('suppresses duplicate error toasts within cooldown period', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const createResponse = () =>
+                createMockResponse({
+                    jsonData: {detail: 'Something went wrong', title: 'Error'},
+                    status: 500,
+                });
+
+            hoisted.registeredHandlers!.response(createResponse());
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledTimes(1);
+
+            hoisted.registeredHandlers!.response(createResponse());
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledTimes(1);
+        });
+
         it('shows fallback error toast when response body is not JSON', async () => {
             renderHook(() => useFetchInterceptor());
 
@@ -202,7 +229,7 @@ describe('useFetchInterceptor (embedded)', () => {
             });
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 502', {
-                id: 'http://localhost/internal/api/test-502',
+                id: '/internal/api/test-502',
             });
         });
     });
