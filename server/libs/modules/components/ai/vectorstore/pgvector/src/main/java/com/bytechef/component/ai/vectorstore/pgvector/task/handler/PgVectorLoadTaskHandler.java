@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.pgvector.task.handler;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.PGVECTOR;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.PGVECTOR;
+import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
@@ -26,10 +26,10 @@ import org.springframework.stereotype.Component;
 /**
  * @author Marko Krišković
  */
-@Component(PGVECTOR + "/v1/" + QUERY)
-public class PGVectorSearchTaskHandler extends AbstractTaskHandler {
+@Component(PGVECTOR + "/v1/" + LOAD)
+public class PgVectorLoadTaskHandler extends AbstractTaskHandler {
 
-    public PGVectorSearchTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(PGVECTOR, 1, QUERY, actionDefinitionFacade);
+    public PgVectorLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
+        super(PGVECTOR, 1, LOAD, actionDefinitionFacade);
     }
 }

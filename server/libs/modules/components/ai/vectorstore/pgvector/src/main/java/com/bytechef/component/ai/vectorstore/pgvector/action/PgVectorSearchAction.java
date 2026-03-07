@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.pgvector.action;
 
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.PGVECTOR;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.PGVECTOR;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
 import com.bytechef.component.definition.ActionDefinition;
@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * @author Marko Krišković
  */
-public class PGVectorSearchAction {
+public class PgVectorSearchAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
         return AbstractSearchAction.of(

@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author vector_store
  */
-class PGVectorComponentHandlerTest {
+class PgVectorComponentHandlerTest {
 
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/pgVector_v1.json", new PGVectorComponentHandler(null).getDefinition());
+            "definition/pgVector_v1.json", new PgVectorComponentHandler(null).getDefinition());
     }
 }

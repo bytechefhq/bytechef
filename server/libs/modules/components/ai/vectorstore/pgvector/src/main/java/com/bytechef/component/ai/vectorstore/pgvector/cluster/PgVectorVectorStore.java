@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.vectorstore.pgvector.action;
+package com.bytechef.component.ai.vectorstore.pgvector.cluster;
 
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.PGVECTOR;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
-import com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants;
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import java.util.List;
 
 /**
  * @author Marko Krišković
  */
-public class PGVectorLoadAction {
+public class PgVectorVectorStore {
 
-    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(
-            PGVECTOR, PGVectorConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ClusterElementDefinition<VectorStoreFunction> of(
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        return AbstractVectorStore.of(
+            "PGVector", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

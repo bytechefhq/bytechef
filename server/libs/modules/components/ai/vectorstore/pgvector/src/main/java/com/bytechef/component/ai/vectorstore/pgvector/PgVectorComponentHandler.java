@@ -16,14 +16,14 @@
 
 package com.bytechef.component.ai.vectorstore.pgvector;
 
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.PGVECTOR;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.PGVECTOR;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.ai.vectorstore.pgvector.action.PGVectorLoadAction;
-import com.bytechef.component.ai.vectorstore.pgvector.action.PGVectorSearchAction;
-import com.bytechef.component.ai.vectorstore.pgvector.cluster.PGVectorVectorStore;
-import com.bytechef.component.ai.vectorstore.pgvector.connection.PGVectorConnection;
+import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorLoadAction;
+import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorSearchAction;
+import com.bytechef.component.ai.vectorstore.pgvector.cluster.PgVectorVectorStore;
+import com.bytechef.component.ai.vectorstore.pgvector.connection.PgVectorConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
@@ -35,22 +35,22 @@ import org.springframework.stereotype.Component;
  * @author Marko Krišković
  */
 @Component(PGVECTOR + "_v1_ComponentHandler")
-public class PGVectorComponentHandler implements ComponentHandler {
+public class PgVectorComponentHandler implements ComponentHandler {
 
     private final VectorStoreComponentDefinition componentDefinition;
 
-    public PGVectorComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public PgVectorComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new PGVectorComponentDefinitionImpl(component(PGVECTOR)
             .title("PGVector")
             .description(
                 "PGVector is an open-source PostgreSQL extension for vector similarity search.")
             .icon("path:assets/pgvector.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-            .connection(PGVectorConnection.CONNECTION_DEFINITION)
+            .connection(PgVectorConnection.CONNECTION_DEFINITION)
             .actions(
-                PGVectorSearchAction.of(clusterElementDefinitionService),
-                PGVectorLoadAction.of(clusterElementDefinitionService))
-            .clusterElements(PGVectorVectorStore.of(clusterElementDefinitionService)));
+                PgVectorSearchAction.of(clusterElementDefinitionService),
+                PgVectorLoadAction.of(clusterElementDefinitionService))
+            .clusterElements(PgVectorVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override
