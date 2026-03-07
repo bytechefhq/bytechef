@@ -16,14 +16,14 @@
 
 package com.bytechef.component.ai.vectorstore.oracle;
 
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.ORACLE_VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.ORACLE_VECTOR_STORE;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.ai.vectorstore.oracle.action.OracleVectorStoreLoadAction;
-import com.bytechef.component.ai.vectorstore.oracle.action.OracleVectorStoreSearchAction;
-import com.bytechef.component.ai.vectorstore.oracle.cluster.OracleVectorStoreClusterElement;
-import com.bytechef.component.ai.vectorstore.oracle.connection.OracleVectorStoreConnection;
+import com.bytechef.component.ai.vectorstore.oracle.action.OracleLoadAction;
+import com.bytechef.component.ai.vectorstore.oracle.action.OracleSearchAction;
+import com.bytechef.component.ai.vectorstore.oracle.cluster.OracleVectorStore;
+import com.bytechef.component.ai.vectorstore.oracle.connection.OracleConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
@@ -35,25 +35,25 @@ import org.springframework.stereotype.Component;
  * @author Marko Krišković
  */
 @Component(ORACLE_VECTOR_STORE + "_v1_ComponentHandler")
-public class OracleVectorStoreComponentHandler implements ComponentHandler {
+public class OracleComponentHandler implements ComponentHandler {
 
     private final VectorStoreComponentDefinition componentDefinition;
 
-    public OracleVectorStoreComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public OracleComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new OracleVectorStoreComponentDefinitionImpl(
             component(ORACLE_VECTOR_STORE)
                 .title("Oracle Vector Store")
                 .description(
                     "Oracle Vector Store uses Oracle Database 23ai's native vector storage and similarity search " +
                         "capabilities to store and query document embeddings.")
-                .icon("path:assets/oracle-vector-store.svg")
-                .connection(OracleVectorStoreConnection.CONNECTION_DEFINITION)
+                .icon("path:assets/oracle.svg")
+                .connection(OracleConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    OracleVectorStoreLoadAction.of(clusterElementDefinitionService),
-                    OracleVectorStoreSearchAction.of(clusterElementDefinitionService))
+                    OracleLoadAction.of(clusterElementDefinitionService),
+                    OracleSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(
-                    OracleVectorStoreClusterElement.of(clusterElementDefinitionService)));
+                    OracleVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

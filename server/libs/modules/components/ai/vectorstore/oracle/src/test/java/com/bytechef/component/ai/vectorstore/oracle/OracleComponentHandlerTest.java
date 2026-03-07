@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Marko Krišković
  */
-class OracleVectorStoreComponentHandlerTest {
+class OracleComponentHandlerTest {
 
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/oracleVectorStore_v1.json", new OracleVectorStoreComponentHandler(null).getDefinition());
+            "definition/oracle_v1.json", new OracleComponentHandler(null).getDefinition());
     }
 }

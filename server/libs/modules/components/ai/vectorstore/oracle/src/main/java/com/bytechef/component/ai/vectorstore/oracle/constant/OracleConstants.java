@@ -28,7 +28,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 /**
  * @author Marko Krišković
  */
-public class OracleVectorStoreConstants {
+public class OracleConstants {
 
     public static final String DIMENSIONS = "dimensions";
     public static final String DISTANCE_TYPE = "distanceType";
@@ -73,6 +73,6 @@ public class OracleVectorStoreConstants {
         return new JdbcTemplate(dataSource);
     }
 
-    private OracleVectorStoreConstants() {
+    private OracleConstants() {
     }
 }
