@@ -29,7 +29,7 @@ const McpComponentToolList = ({
     const tools = mcpTools?.filter((tool): tool is McpTool => tool !== null && tool.name !== null) || [];
 
     return tools.length > 0 ? (
-        <div className="flex flex-wrap gap-2 py-2">
+        <div className="flex flex-wrap gap-2 py-2 pl-6">
             {tools.map((tool) => (
                 <McpComponentToolListItem
                     componentName={componentName}
@@ -41,7 +41,7 @@ const McpComponentToolList = ({
             ))}
         </div>
     ) : (
-        <div className="flex justify-center py-4">
+        <div className="flex justify-center py-4 pl-6">
             <EmptyList
                 button={<Button label="Edit Tools" onClick={() => setShowEditDialog(true)} />}
                 icon={<ComponentIcon className="size-12 text-gray-300" />}
