@@ -52,7 +52,7 @@ const useMcpComponentDialogToolSelectionStep = ({
             environmentId: currentEnvironmentId,
             id: currentWorkspaceId!,
         },
-        open
+        open && !!currentWorkspaceId && !!selectedComponent
     );
 
     const toolElements = useMemo(
@@ -115,15 +115,16 @@ const useMcpComponentDialogToolSelectionStep = ({
             toolElements.length > 0
         ) {
             const preSelectedTools = existingTools.mcpToolsByComponentId
-                .map((existingTool: McpTool | null) => {
-                    const toolElement = toolElements.find((tool) => tool.name === existingTool!.name);
+                .filter((existingTool): existingTool is McpTool => existingTool !== null)
+                .map((existingTool) => {
+                    const toolElement = toolElements.find((tool) => tool.name === existingTool.name);
 
                     if (toolElement) {
                         return {
                             componentName: toolElement.componentName,
                             componentVersion: toolElement.componentVersion,
                             description: toolElement.description,
-                            name: existingTool!.name,
+                            name: existingTool.name,
                             title: toolElement.title,
                         };
                     }
