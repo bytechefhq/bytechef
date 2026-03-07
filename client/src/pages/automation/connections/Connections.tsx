@@ -95,7 +95,12 @@ export const Connections = () => {
                                 />
                             </div>
                         ) : (
-                            <EnvironmentSelect />
+                            !(
+                                allConnectionsIsLoading ||
+                                componentsLoading ||
+                                connectionsIsLoading ||
+                                tagsIsLoading
+                            ) && <EnvironmentSelect />
                         )
                     }
                     title={
