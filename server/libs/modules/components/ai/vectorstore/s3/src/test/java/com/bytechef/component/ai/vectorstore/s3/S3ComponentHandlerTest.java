@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Marko Krišković
  */
-class S3VectorStoreComponentHandlerTest {
+class S3ComponentHandlerTest {
 
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/s3VectorStore_v1.json", new S3VectorStoreComponentHandler(null).getDefinition());
+            "definition/s3_v1.json", new S3ComponentHandler(null).getDefinition());
     }
 }
