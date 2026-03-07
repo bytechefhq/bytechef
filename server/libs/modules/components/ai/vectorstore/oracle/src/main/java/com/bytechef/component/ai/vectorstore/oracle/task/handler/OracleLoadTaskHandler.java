@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.oracle.task.handler;
 
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.ORACLE_VECTOR_STORE;
-import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.ORACLE_VECTOR_STORE;
+import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
@@ -26,10 +26,10 @@ import org.springframework.stereotype.Component;
 /**
  * @author Marko Krišković
  */
-@Component(ORACLE_VECTOR_STORE + "/v1/" + SEARCH)
-public class OracleVectorStoreSearchTaskHandler extends AbstractTaskHandler {
+@Component(ORACLE_VECTOR_STORE + "/v1/" + LOAD)
+public class OracleLoadTaskHandler extends AbstractTaskHandler {
 
-    public OracleVectorStoreSearchTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(ORACLE_VECTOR_STORE, 1, SEARCH, actionDefinitionFacade);
+    public OracleLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
+        super(ORACLE_VECTOR_STORE, 1, LOAD, actionDefinitionFacade);
     }
 }
