@@ -41,9 +41,13 @@ const McpComponentToolPropertiesPopover = ({
                     <p className="text-xs text-muted-foreground">Configure property values for this tool.</p>
                 </div>
 
-                <button className="text-muted-foreground hover:text-foreground" onClick={onClose} type="button">
-                    <XIcon className="size-4" />
-                </button>
+                <Button
+                    className="text-muted-foreground hover:text-foreground"
+                    icon={<XIcon className="size-4" />}
+                    onClick={onClose}
+                    size="iconXs"
+                    variant="ghost"
+                />
             </div>
 
             <Form {...form}>
