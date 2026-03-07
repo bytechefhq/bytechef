@@ -203,7 +203,7 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something went wrong',
-                id: 'http://localhost/internal/api/test-500',
+                id: '/internal/api/test-500',
             });
         });
 
@@ -265,7 +265,7 @@ describe('useFetchInterceptor', () => {
             });
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 502', {
-                id: 'http://localhost/internal/api/test-502',
+                id: '/internal/api/test-502',
             });
         });
     });
@@ -288,7 +288,7 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Field not found\nPermission denied',
-                id: 'http://localhost/graphql-200',
+                id: '/graphql-200',
             });
         });
 
@@ -345,7 +345,7 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Unknown error\nValid error',
-                id: 'http://localhost/graphql-200',
+                id: '/graphql-200',
             });
         });
 
@@ -365,7 +365,7 @@ describe('useFetchInterceptor', () => {
             });
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 500', {
-                id: 'http://localhost/graphql-500',
+                id: '/graphql-500',
             });
         });
 
