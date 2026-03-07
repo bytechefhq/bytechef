@@ -16,11 +16,11 @@
 
 package com.bytechef.component.ai.vectorstore.s3.connection;
 
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.ACCESS_KEY_ID;
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.BUCKET_NAME;
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.KEY;
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.REGION;
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.SECRET_ACCESS_KEY;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.ACCESS_KEY_ID;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.BUCKET_NAME;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.KEY;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.REGION;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
@@ -32,7 +32,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 /**
  * @author Marko Krišković
  */
-public class S3VectorStoreConnection {
+public class S3Connection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
@@ -91,6 +91,6 @@ public class S3VectorStoreConnection {
                         .defaultValue("vector-store.json")
                         .required(true)));
 
-    private S3VectorStoreConnection() {
+    private S3Connection() {
     }
 }

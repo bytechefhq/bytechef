@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.vectorstore.s3.action;
+package com.bytechef.component.ai.vectorstore.s3.cluster;
 
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.S3_VECTOR_STORE;
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import java.util.List;
 
 /**
  * @author Marko Krišković
  */
-public class S3VectorStoreSearchAction {
+public class S3VectorStore {
 
-    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractSearchAction.of(S3_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    private S3VectorStore() {
+    }
+
+    public static ClusterElementDefinition<VectorStoreFunction> of(
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        return AbstractVectorStore.of("S3", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

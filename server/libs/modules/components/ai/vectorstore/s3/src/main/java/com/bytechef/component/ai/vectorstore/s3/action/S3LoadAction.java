@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.s3.action;
 
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.S3_VECTOR_STORE;
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.S3_VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.definition.ActionDefinition;
@@ -27,7 +27,10 @@ import java.util.List;
 /**
  * @author Marko Krišković
  */
-public class S3VectorStoreLoadAction {
+public class S3LoadAction {
+
+    private S3LoadAction() {
+    }
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
         return AbstractLoadAction.of(S3_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
