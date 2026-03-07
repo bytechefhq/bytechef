@@ -43,6 +43,7 @@ class GithubListRepositoryIssuesActionTest {
 
     @Test
     void testPerform() {
+
         try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
             githubUtilsMockedStatic.when(() -> GithubUtils.getRepositoryIssues(
                 parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))

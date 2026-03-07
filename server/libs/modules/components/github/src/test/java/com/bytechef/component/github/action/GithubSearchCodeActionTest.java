@@ -17,8 +17,14 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.HttpStatus.OK;
-import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
+import static com.bytechef.component.github.constant.GithubConstants.EXTENSION;
+import static com.bytechef.component.github.constant.GithubConstants.FILENAME;
+import static com.bytechef.component.github.constant.GithubConstants.IN;
 import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.PAGE;
+import static com.bytechef.component.github.constant.GithubConstants.PATH;
+import static com.bytechef.component.github.constant.GithubConstants.PER_PAGE;
+import static com.bytechef.component.github.constant.GithubConstants.QUERY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,21 +42,32 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Luka Ljubic
- * @author Monika Kušter
+ * @author Ivona Pavela
  */
 @ExtendWith(MockContextSetupExtension.class)
-class GithubGetIssueActionTest {
+class GithubSearchCodeActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(OWNER, "testOwner", REPOSITORY, "testRepo", ISSUE, "123"));
+        Map.of(
+            OWNER, "testOwner",
+            REPOSITORY, "testRepo",
+            QUERY, "testQuery",
+            EXTENSION, "testExtension",
+            FILENAME, "testFileName",
+            PATH, "testPath",
+            IN, "file",
+            PAGE, 1,
+            PER_PAGE, 20));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
 
     @Test
     void testPerform(
@@ -60,10 +77,12 @@ class GithubGetIssueActionTest {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(OK, true));
 
-        Object result = GithubGetIssueAction.perform(mockedParameters, null, mockedContext);
+        Object result = GithubSearchCodeAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(OK, true), result);
 
@@ -76,6 +95,18 @@ class GithubGetIssueActionTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/repos/testOwner/testRepo/issues/123", stringArgumentCaptor.getValue());
+        assertEquals("/search/code", stringArgumentCaptor.getValue());
+
+        Object[] queryObject = queryArgumentCaptor.getValue();
+        List<Object> queryList = Arrays.asList(queryObject);
+
+        String query =
+            "testQuery repo:testOwner/testRepo extension:testExtension filename:testFileName path:testPath in:file";
+        List<Object> expectedQueryList = Arrays.asList(
+            "q", query,
+            PAGE, 1,
+            PER_PAGE, 20);
+
+        assertEquals(expectedQueryList, queryList);
     }
 }

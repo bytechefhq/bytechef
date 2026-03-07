@@ -45,6 +45,7 @@ public class GithubCreateIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
         .title("Create Issue")
         .description("Create Issue in GitHub Repository")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#create-issue")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)

@@ -47,6 +47,7 @@ class GithubListIssuesActionTest {
 
     @Test
     void testPerform() {
+
         try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
             githubUtilsMockedStatic
                 .when(() -> GithubUtils.getItems(
@@ -58,6 +59,7 @@ class GithubListIssuesActionTest {
             List<Map<String, ?>> result = GithubListIssuesAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(List.of(), result);
+
             assertEquals(List.of("/issues", FILTER, "all", STATE, "all"), stringArgumentCaptor.getAllValues());
             assertFalse(booleanArgumentCaptor.getValue());
         }
