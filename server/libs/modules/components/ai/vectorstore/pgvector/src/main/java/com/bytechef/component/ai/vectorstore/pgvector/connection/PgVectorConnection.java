@@ -16,14 +16,14 @@
 
 package com.bytechef.component.ai.vectorstore.pgvector.connection;
 
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.DIMENSIONS;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.DISTANCE_TYPE;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.INDEX_TYPE;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.INITIALIZE_SCHEMA;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.MAX_DOCUMENT_BATCH_SIZE;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.SCHEMA_NAME;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.TABLE_NAME;
-import static com.bytechef.component.ai.vectorstore.pgvector.constant.PGVectorConstants.URL;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.DIMENSIONS;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.DISTANCE_TYPE;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.INDEX_TYPE;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.INITIALIZE_SCHEMA;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.MAX_DOCUMENT_BATCH_SIZE;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.SCHEMA_NAME;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.TABLE_NAME;
+import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
@@ -39,7 +39,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 /**
  * @author Marko Krišković
  */
-public class PGVectorConnection {
+public class PgVectorConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
@@ -104,6 +104,6 @@ public class PGVectorConnection {
                         .defaultValue(10000)
                         .required(true)));
 
-    private PGVectorConnection() {
+    private PgVectorConnection() {
     }
 }

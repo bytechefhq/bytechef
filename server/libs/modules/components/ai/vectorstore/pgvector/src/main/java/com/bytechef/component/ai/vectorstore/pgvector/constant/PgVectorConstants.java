@@ -27,7 +27,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 /**
  * @author Marko Krišković
  */
-public class PGVectorConstants {
+public class PgVectorConstants {
 
     public static final String DIMENSIONS = "dimensions";
     public static final String DISTANCE_TYPE = "distanceType";
@@ -60,6 +60,6 @@ public class PGVectorConstants {
             .build();
     };
 
-    private PGVectorConstants() {
+    private PgVectorConstants() {
     }
 }
