@@ -40,15 +40,21 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
                 },
             },
             {
+                onSettled: () => {
+                    setIsEnablePending(false);
+                },
                 onSuccess: () => {
                     queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
-                    setIsEnablePending(false);
                 },
             }
         );
     };
 
     const handleDeleteClick = async () => {
+        if (isPending) {
+            return;
+        }
+
         setIsPending(true);
 
         deleteWorkspaceMcpServerMutation.mutate(
@@ -56,6 +62,9 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
                 id: mcpServer.id,
             },
             {
+                onSettled: () => {
+                    setIsPending(false);
+                },
                 onSuccess: () => {
                     queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                     setShowDeleteDialog(false);

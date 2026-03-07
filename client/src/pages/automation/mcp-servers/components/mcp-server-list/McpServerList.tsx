@@ -5,6 +5,7 @@ import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConf
 import {McpProjectWorkflow, McpServer, Tag, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import McpServerListItem from 'pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
+import {useMemo} from 'react';
 
 import McpServerToolsContent from './McpServerToolsContent';
 import useMcpServerList from './hooks/useMcpServerList';
@@ -31,13 +32,11 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
 const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
     const {createHandleRefresh, sortedMcpServers} = useMcpServerList(mcpServers);
 
+    const workflowReadOnlyValue = useMemo(() => ({useGetComponentDefinitionsQuery}), []);
+
     return (
         <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
-            <WorkflowReadOnlyProvider
-                value={{
-                    useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                }}
-            >
+            <WorkflowReadOnlyProvider value={workflowReadOnlyValue}>
                 {sortedMcpServers.map((mcpServer) => {
                     const handleRefresh = createHandleRefresh(mcpServer.id!);
 
