@@ -464,7 +464,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add User",
     "workflowNodeDescription": null
   }, {
@@ -1243,7 +1242,6 @@
     "processErrorResponse": null,
     "properties": null,
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Organization",
     "workflowNodeDescription": null
   }, {
@@ -2119,7 +2117,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Users",
     "workflowNodeDescription": null
   } ],

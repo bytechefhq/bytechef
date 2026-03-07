@@ -40,7 +40,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Convert from JSON String",
     "workflowNodeDescription": null
   }, {
@@ -133,7 +132,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Convert to JSON String",
     "workflowNodeDescription": null
   } ],

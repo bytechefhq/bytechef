@@ -318,7 +318,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Project",
     "workflowNodeDescription": null
   }, {
@@ -779,7 +778,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Status",
     "workflowNodeDescription": null
   }, {
@@ -1178,7 +1176,6 @@
       "type": "DATE_TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   }, {
@@ -1452,7 +1449,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Task",
     "workflowNodeDescription": null
   }, {
@@ -2068,7 +2064,6 @@
       "type": "DATE_TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Tracked Time Report",
     "workflowNodeDescription": null
   } ],

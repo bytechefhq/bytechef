@@ -21,6 +21,8 @@ import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDisp
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.task;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource.ENVIRONMENT_ID;
+import static com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource.WORKFLOW_ID;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEMS;
@@ -35,35 +37,80 @@ import com.bytechef.platform.workflow.task.dispatcher.definition.Property.Object
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
+import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
  */
 @Component
 public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(MAP)
-        .title("Map")
-        .description(
-            "Produces a new collection of values by mapping each value in list through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source list.")
-        .icon("path:assets/map.svg")
-        .properties(
-            array(ITEMS)
-                .label("List of items")
-                .description("List of items to iterate over."))
-        .output(MapTaskDispatcherDefinitionFactory::output)
-        .taskProperties(task(ITERATEE))
-        .variableProperties(MapTaskDispatcherDefinitionFactory::variableProperties);
+
+    private final TaskDispatcherDefinition taskDispatcherDefinition;
+
+    public MapTaskDispatcherDefinitionFactory(Optional<MapDataSource> mapDataSource) {
+        this.taskDispatcherDefinition = taskDispatcher(MAP)
+            .title("Map")
+            .description(
+                "Produces a new collection of values by mapping each value in list through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source list.")
+            .icon("path:assets/map.svg")
+            .properties(
+                array(ITEMS)
+                    .label("List of items")
+                    .description("List of items to iterate over."))
+            .output(inputParameters -> mapDataSource
+                .map(dataSource -> output(inputParameters, dataSource))
+                .orElse(null))
+            .taskProperties(task(ITERATEE))
+            .variableProperties(MapTaskDispatcherDefinitionFactory::variableProperties);
+    }
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
-        return TASK_DISPATCHER_DEFINITION;
+        return taskDispatcherDefinition;
     }
 
-    protected static OutputResponse output(Map<String, ?> inputParameters) {
-        return null;
+    protected static OutputResponse output(Map<String, ?> inputParameters, MapDataSource mapDataSource) {
+        String workflowId = MapUtils.getString(inputParameters, WORKFLOW_ID);
+        long environmentId = MapUtils.getLong(inputParameters, ENVIRONMENT_ID, 0L);
+
+        List<Map<String, ?>> iterateeTasks = MapUtils.getList(
+            inputParameters, ITERATEE, new TypeReference<Map<String, ?>>() {}, List.of());
+
+        if (iterateeTasks.isEmpty()) {
+            return null;
+        }
+
+        Map<String, ?> lastTask = iterateeTasks.getLast();
+
+        String lastTaskName = MapUtils.getString(lastTask, "name");
+        String lastTaskType = MapUtils.getString(lastTask, "type");
+
+        if (lastTaskType == null) {
+            return null;
+        }
+
+        OutputResponse lastTaskOutput = mapDataSource.getLastIterateeTaskOutput(
+            workflowId, lastTaskName, lastTaskType, environmentId);
+
+        if (lastTaskOutput == null) {
+            return null;
+        }
+
+        ModifiableValueProperty<?, ?> lastTaskSchema =
+            (ModifiableValueProperty<?, ?>) lastTaskOutput.getOutputSchema();
+
+        Object lastTaskSampleOutput = lastTaskOutput.getSampleOutput();
+
+        if (lastTaskSampleOutput != null) {
+            return OutputResponse.of(array().items(lastTaskSchema), List.of(lastTaskSampleOutput));
+        }
+
+        return OutputResponse.of(array().items(lastTaskSchema));
     }
 
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {

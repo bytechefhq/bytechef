@@ -317,7 +317,6 @@
       "type": "TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Value to the Object by Key",
     "workflowNodeDescription": null
   }, {
@@ -872,7 +871,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Key-Value Pairs",
     "workflowNodeDescription": null
   }, {
@@ -991,7 +989,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Contains",
     "workflowNodeDescription": null
   }, {
@@ -1058,7 +1055,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Key-Value Pair",
     "workflowNodeDescription": null
   }, {
@@ -1176,7 +1172,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Equals",
     "workflowNodeDescription": null
   }, {
@@ -1242,7 +1237,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Merge Two Objects",
     "workflowNodeDescription": null
   } ],

@@ -71,7 +71,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Response to API Request",
     "workflowNodeDescription": null
   } ],

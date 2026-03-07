@@ -513,7 +513,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get SmartCrawler Status",
     "workflowNodeDescription": null
   }, {
@@ -828,7 +827,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Markdownify",
     "workflowNodeDescription": null
   }, {
@@ -1225,7 +1223,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Scraper",
     "workflowNodeDescription": null
   }, {
@@ -1603,7 +1600,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Smart Scraper",
     "workflowNodeDescription": null
   }, {
@@ -2186,7 +2182,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Start SmartCrawler",
     "workflowNodeDescription": null
   } ],

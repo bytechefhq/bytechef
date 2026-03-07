@@ -413,7 +413,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Post",
     "workflowNodeDescription": null
   }, {
@@ -589,7 +588,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Post",
     "workflowNodeDescription": null
   }, {
@@ -765,7 +763,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Like Post",
     "workflowNodeDescription": null
   }, {
@@ -983,7 +980,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Repost Post",
     "workflowNodeDescription": null
   }, {
@@ -1337,7 +1333,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Direct Message",
     "workflowNodeDescription": null
   } ],

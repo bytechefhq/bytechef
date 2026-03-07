@@ -300,7 +300,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Copy File",
     "workflowNodeDescription": null
   }, {
@@ -423,9 +422,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema": {
@@ -534,9 +533,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "perform": { },
@@ -588,7 +587,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create New Folder",
     "workflowNodeDescription": null
   }, {
@@ -711,9 +709,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema": {
@@ -822,9 +820,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "perform": { },
@@ -930,7 +928,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create New Text File",
     "workflowNodeDescription": null
   }, {
@@ -972,7 +969,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete File",
     "workflowNodeDescription": null
   }, {
@@ -1223,7 +1219,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Download File",
     "workflowNodeDescription": null
   }, {
@@ -1482,7 +1477,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get File",
     "workflowNodeDescription": null
   }, {
@@ -1783,7 +1777,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Files",
     "workflowNodeDescription": null
   }, {
@@ -2084,7 +2077,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Folders",
     "workflowNodeDescription": null
   }, {
@@ -2207,9 +2199,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema": {
@@ -2318,9 +2310,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "perform": { },
@@ -2451,7 +2443,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   } ],
@@ -2873,9 +2864,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema": {
@@ -2984,9 +2975,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "processErrorResponse": null,
@@ -3160,9 +3151,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema": {
@@ -3271,9 +3262,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "processErrorResponse": null,
@@ -4650,9 +4641,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema": {
@@ -4761,9 +4752,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "processErrorResponse": null,

@@ -350,7 +350,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Append Value to List",
     "workflowNodeDescription": null
   }, {
@@ -492,7 +491,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Atomic Increment",
     "workflowNodeDescription": null
   }, {
@@ -846,7 +844,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Await Get Value",
     "workflowNodeDescription": null
   }, {
@@ -922,7 +919,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Value",
     "workflowNodeDescription": null
   }, {
@@ -1017,7 +1013,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Value from List",
     "workflowNodeDescription": null
   }, {
@@ -1077,7 +1072,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get All Entries(Keys and Values)",
     "workflowNodeDescription": null
   }, {
@@ -1412,7 +1406,6 @@
       "type": "TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Value",
     "workflowNodeDescription": null
   }, {
@@ -1425,12 +1418,7 @@
     "help": null,
     "metadata": null,
     "name": "setValue",
-    "outputDefinition": {
-      "output": { },
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
+    "outputDefinition": null,
     "perform": { },
     "processErrorResponse": null,
     "properties": [ {
@@ -1747,7 +1735,6 @@
       "type": "TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Set Value",
     "workflowNodeDescription": null
   }, {
@@ -2096,7 +2083,6 @@
       "type": "TIME"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Set Value in List",
     "workflowNodeDescription": null
   } ],

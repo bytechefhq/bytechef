@@ -122,7 +122,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Hash",
     "workflowNodeDescription": null
   }, {
@@ -269,7 +268,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Hmac",
     "workflowNodeDescription": null
   }, {
@@ -641,7 +639,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "PGP Decrypt",
     "workflowNodeDescription": null
   }, {
@@ -992,7 +989,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "PGP Encrypt",
     "workflowNodeDescription": null
   }, {
@@ -1343,7 +1339,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "RSA Decrypt",
     "workflowNodeDescription": null
   }, {
@@ -1694,7 +1689,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "RSA Encrypt",
     "workflowNodeDescription": null
   }, {
@@ -2045,7 +2039,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Sign",
     "workflowNodeDescription": null
   }, {
@@ -2344,7 +2337,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Verify",
     "workflowNodeDescription": null
   } ],

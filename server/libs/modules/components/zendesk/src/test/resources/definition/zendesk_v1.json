@@ -2484,7 +2484,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Comment to Ticket",
     "workflowNodeDescription": null
   }, {
@@ -3330,7 +3329,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Organization",
     "workflowNodeDescription": null
   }, {
@@ -5936,7 +5934,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Ticket",
     "workflowNodeDescription": null
   } ],

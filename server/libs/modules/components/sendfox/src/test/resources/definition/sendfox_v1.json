@@ -1312,7 +1312,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Contact",
     "workflowNodeDescription": null
   }, {
@@ -1539,7 +1538,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create List",
     "workflowNodeDescription": null
   }, {
@@ -2765,7 +2763,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Unsubscribe Contact",
     "workflowNodeDescription": null
   } ],

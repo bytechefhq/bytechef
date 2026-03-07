@@ -135,6 +135,11 @@ public class AiAgentChatTool {
         }
 
         @Override
+        public void suspend(Suspend suspend) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
             return context.xml(xmlFunction);
         }

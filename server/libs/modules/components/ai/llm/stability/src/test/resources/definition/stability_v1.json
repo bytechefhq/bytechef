@@ -532,7 +532,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Image",
     "workflowNodeDescription": null
   } ],

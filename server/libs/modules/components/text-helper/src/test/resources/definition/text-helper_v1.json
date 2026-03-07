@@ -118,7 +118,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Base64 Encode/Decode",
     "workflowNodeDescription": null
   }, {
@@ -213,7 +212,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Change Type",
     "workflowNodeDescription": null
   }, {
@@ -348,7 +346,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Concatenate",
     "workflowNodeDescription": null
   }, {
@@ -468,7 +465,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Contains",
     "workflowNodeDescription": null
   }, {
@@ -603,7 +599,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Escape Characters",
     "workflowNodeDescription": null
   }, {
@@ -759,7 +754,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract All by Regular Expression",
     "workflowNodeDescription": null
   }, {
@@ -905,7 +899,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract Content from HTML",
     "workflowNodeDescription": null
   }, {
@@ -1060,7 +1053,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract Key by Regular Expression",
     "workflowNodeDescription": null
   }, {
@@ -1174,7 +1166,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract by Regular Expression",
     "workflowNodeDescription": null
   }, {
@@ -1309,7 +1300,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract URLs",
     "workflowNodeDescription": null
   }, {
@@ -2417,7 +2407,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Format Currency",
     "workflowNodeDescription": null
   }, {
@@ -2510,7 +2499,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Domain From Email Address",
     "workflowNodeDescription": null
   }, {
@@ -2603,7 +2591,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Domain From URL",
     "workflowNodeDescription": null
   }, {
@@ -2844,7 +2831,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get First Middle and Last Name",
     "workflowNodeDescription": null
   }, {
@@ -2977,7 +2963,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Text After",
     "workflowNodeDescription": null
   }, {
@@ -3110,7 +3095,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Text Before",
     "workflowNodeDescription": null
   }, {
@@ -3245,7 +3229,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Text Between",
     "workflowNodeDescription": null
   }, {
@@ -3334,7 +3317,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Text Length",
     "workflowNodeDescription": null
   }, {
@@ -3456,7 +3438,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Hex Encode/Decode",
     "workflowNodeDescription": null
   }, {
@@ -3549,7 +3530,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "HTML to Markdown",
     "workflowNodeDescription": null
   }, {
@@ -3648,7 +3628,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Domain?",
     "workflowNodeDescription": null
   }, {
@@ -3747,7 +3726,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Email?",
     "workflowNodeDescription": null
   }, {
@@ -3846,7 +3824,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Numeric?",
     "workflowNodeDescription": null
   }, {
@@ -4041,7 +4018,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is URL?",
     "workflowNodeDescription": null
   }, {
@@ -4134,7 +4110,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Lower Case",
     "workflowNodeDescription": null
   }, {
@@ -4227,7 +4202,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Markdown to HTML",
     "workflowNodeDescription": null
   }, {
@@ -4383,7 +4357,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Match",
     "workflowNodeDescription": null
   }, {
@@ -4642,7 +4615,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Parse Email",
     "workflowNodeDescription": null
   }, {
@@ -4964,7 +4936,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Parse Email List",
     "workflowNodeDescription": null
   }, {
@@ -5641,7 +5612,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Parse URL",
     "workflowNodeDescription": null
   }, {
@@ -5734,7 +5704,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Proper Case",
     "workflowNodeDescription": null
   }, {
@@ -5926,7 +5895,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Regular Expression Match Test",
     "workflowNodeDescription": null
   }, {
@@ -6040,7 +6008,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Remove Characters",
     "workflowNodeDescription": null
   }, {
@@ -6133,7 +6100,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Remove Special Characters",
     "workflowNodeDescription": null
   }, {
@@ -6292,7 +6258,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Replace",
     "workflowNodeDescription": null
   }, {
@@ -6404,7 +6369,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Select First N Characters",
     "workflowNodeDescription": null
   }, {
@@ -6516,7 +6480,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Select Last N Characters",
     "workflowNodeDescription": null
   }, {
@@ -6609,7 +6572,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Sentence Case",
     "workflowNodeDescription": null
   }, {
@@ -6721,7 +6683,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Shorten",
     "workflowNodeDescription": null
   }, {
@@ -6877,7 +6838,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Split",
     "workflowNodeDescription": null
   }, {
@@ -6970,7 +6930,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Strip HTML Tags",
     "workflowNodeDescription": null
   }, {
@@ -7063,7 +7022,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Trim Whitespace",
     "workflowNodeDescription": null
   }, {
@@ -7156,7 +7114,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Underscore",
     "workflowNodeDescription": null
   }, {
@@ -7249,7 +7206,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upper Case",
     "workflowNodeDescription": null
   }, {
@@ -7371,7 +7327,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "URL Encode/Decode",
     "workflowNodeDescription": null
   }, {
@@ -7555,7 +7510,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "URL Encode/Decode Key/Value Pair",
     "workflowNodeDescription": null
   } ],

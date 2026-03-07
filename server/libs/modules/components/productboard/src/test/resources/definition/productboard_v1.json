@@ -288,7 +288,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Note",
     "workflowNodeDescription": null
   }, {
@@ -335,7 +334,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Note",
     "workflowNodeDescription": null
   }, {
@@ -1541,7 +1539,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Feature",
     "workflowNodeDescription": null
   }, {
@@ -3123,7 +3120,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Note",
     "workflowNodeDescription": null
   }, {
@@ -3563,7 +3559,6 @@
       "type": "OBJECT"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Update Note",
     "workflowNodeDescription": null
   }, {
@@ -5108,7 +5103,6 @@
     "processErrorResponse": null,
     "properties": [ ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List All Notes",
     "workflowNodeDescription": null
   } ],

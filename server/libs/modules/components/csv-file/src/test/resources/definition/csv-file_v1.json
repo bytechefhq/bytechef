@@ -271,7 +271,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Read from File",
     "workflowNodeDescription": null
   }, {
@@ -644,7 +643,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Write to CSV File",
     "workflowNodeDescription": null
   }, {
@@ -1096,7 +1094,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Append to CSV File",
     "workflowNodeDescription": null
   } ],

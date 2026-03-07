@@ -1020,7 +1020,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Deal",
     "workflowNodeDescription": null
   }, {
@@ -1687,7 +1686,6 @@
       "type": "DATE"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Lead",
     "workflowNodeDescription": null
   }, {
@@ -2136,7 +2134,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Organization",
     "workflowNodeDescription": null
   }, {
@@ -3445,7 +3442,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Person",
     "workflowNodeDescription": null
   }, {
@@ -3627,7 +3623,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Deal",
     "workflowNodeDescription": null
   }, {
@@ -3815,7 +3810,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Lead",
     "workflowNodeDescription": null
   }, {
@@ -3997,7 +3991,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Organization",
     "workflowNodeDescription": null
   }, {
@@ -4179,7 +4172,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Person",
     "workflowNodeDescription": null
   }, {
@@ -4931,7 +4923,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Details of Deal",
     "workflowNodeDescription": null
   }, {
@@ -5839,7 +5830,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Deals",
     "workflowNodeDescription": null
   }, {
@@ -6299,7 +6289,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Lead Details",
     "workflowNodeDescription": null
   }, {
@@ -6965,7 +6954,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Leads",
     "workflowNodeDescription": null
   }, {
@@ -7389,7 +7377,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Details of Organization",
     "workflowNodeDescription": null
   }, {
@@ -7925,7 +7912,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get All Organizations",
     "workflowNodeDescription": null
   }, {
@@ -8939,7 +8925,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Details of Person",
     "workflowNodeDescription": null
   }, {
@@ -10065,7 +10050,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Persons",
     "workflowNodeDescription": null
   }, {
@@ -11115,7 +11099,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Deals",
     "workflowNodeDescription": null
   }, {
@@ -11790,7 +11773,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Leads",
     "workflowNodeDescription": null
   }, {
@@ -12360,7 +12342,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Organizations",
     "workflowNodeDescription": null
   }, {
@@ -13548,7 +13529,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Persons",
     "workflowNodeDescription": null
   } ],

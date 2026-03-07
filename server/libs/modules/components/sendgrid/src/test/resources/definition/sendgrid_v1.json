@@ -311,7 +311,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Email",
     "workflowNodeDescription": null
   } ],

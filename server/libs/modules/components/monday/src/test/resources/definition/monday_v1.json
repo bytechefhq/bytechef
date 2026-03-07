@@ -262,7 +262,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Board",
     "workflowNodeDescription": null
   }, {
@@ -699,7 +698,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Column",
     "workflowNodeDescription": null
   }, {
@@ -959,7 +957,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Group",
     "workflowNodeDescription": null
   }, {
@@ -1258,7 +1255,6 @@
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Item",
     "workflowNodeDescription": null
   }, {
@@ -1348,7 +1344,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Item",
     "workflowNodeDescription": null
   } ],

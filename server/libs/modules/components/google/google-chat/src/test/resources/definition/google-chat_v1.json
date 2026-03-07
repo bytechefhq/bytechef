@@ -629,7 +629,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Space",
     "workflowNodeDescription": null
   }, {
@@ -1242,7 +1241,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Space Message",
     "workflowNodeDescription": null
   } ],

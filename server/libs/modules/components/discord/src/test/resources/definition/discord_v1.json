@@ -858,7 +858,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Channel",
     "workflowNodeDescription": null
   }, {
@@ -2379,7 +2378,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Channel Message",
     "workflowNodeDescription": null
   }, {
@@ -3879,7 +3877,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Send Direct Message",
     "workflowNodeDescription": null
   } ],

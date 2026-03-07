@@ -300,7 +300,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Classify Text",
     "workflowNodeDescription": null
   }, {
@@ -521,7 +520,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Sentiment Analysis",
     "workflowNodeDescription": null
   }, {
@@ -826,7 +824,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Score",
     "workflowNodeDescription": null
   }, {
@@ -1109,7 +1106,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Summarize Text",
     "workflowNodeDescription": null
   }, {
@@ -1343,7 +1339,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Similarity Search",
     "workflowNodeDescription": null
   }, {
@@ -1564,7 +1559,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Text Generation",
     "workflowNodeDescription": null
   } ],

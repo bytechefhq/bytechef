@@ -16,8 +16,10 @@
 
 package com.bytechef.component.map;
 
+import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcherDefinitionFactory;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,6 +29,10 @@ public class MapTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/map_v1.json", new MapTaskDispatcherDefinitionFactory().getDefinition());
+        MapDataSource stubDataSource = (workflowId, lastTaskName, lastTaskType, environmentId) -> null;
+
+        JsonFileAssert.assertEquals(
+            "definition/map_v1.json",
+            new MapTaskDispatcherDefinitionFactory(Optional.of(stubDataSource)).getDefinition());
     }
 }

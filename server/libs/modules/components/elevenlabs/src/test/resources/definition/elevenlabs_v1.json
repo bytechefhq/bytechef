@@ -244,7 +244,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Sound Effect",
     "workflowNodeDescription": null
   }, {
@@ -516,7 +515,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Speech",
     "workflowNodeDescription": null
   }, {
@@ -1262,7 +1260,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Speech With Timing",
     "workflowNodeDescription": null
   }, {
@@ -1832,7 +1829,6 @@
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Create Transcript",
     "workflowNodeDescription": null
   } ],
