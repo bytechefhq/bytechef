@@ -6,7 +6,7 @@ import McpComponentToolList from '@/pages/automation/mcp-servers/components/mcp-
 import useMcpComponentList from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
 import {McpServer} from '@/shared/middleware/graphql';
 import {ComponentIcon} from 'lucide-react';
-import {Fragment, useState} from 'react';
+import {Fragment, useMemo, useState} from 'react';
 
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 
@@ -14,6 +14,14 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     const [showAddDialog, setShowAddDialog] = useState(false);
 
     const {data, isMcpComponentsLoading} = useMcpComponentList(mcpServer.id!);
+
+    const sortedComponents = useMemo(
+        () =>
+            data?.mcpComponentsByServerId
+                ? [...data.mcpComponentsByServerId].sort((a, b) => a!.componentName.localeCompare(b!.componentName))
+                : [],
+        [data?.mcpComponentsByServerId]
+    );
 
     if (isMcpComponentsLoading) {
         return (
@@ -45,25 +53,21 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
 
     return (
         <div className="py-1 pl-4">
-            {data.mcpComponentsByServerId.length > 0 ? (
-                data.mcpComponentsByServerId
-                    .sort((a, b) => a!.componentName.localeCompare(b!.componentName))
-                    .map((mcpComponent) => (
-                        <Fragment key={mcpComponent!.id}>
-                            <McpComponentListItem mcpComponent={mcpComponent!} mcpServer={mcpServer} />
+            {sortedComponents.length > 0 ? (
+                sortedComponents.map((mcpComponent) => (
+                    <Fragment key={mcpComponent!.id}>
+                        <McpComponentListItem mcpComponent={mcpComponent!} mcpServer={mcpServer} />
 
-                            <div className="pl-6">
-                                <McpComponentToolList
-                                    componentName={mcpComponent!.componentName}
-                                    componentVersion={mcpComponent!.componentVersion}
-                                    connectionId={mcpComponent!.connectionId}
-                                    mcpComponent={mcpComponent!}
-                                    mcpServerId={mcpServer.id!}
-                                    mcpTools={mcpComponent!.mcpTools}
-                                />
-                            </div>
-                        </Fragment>
-                    ))
+                        <McpComponentToolList
+                            componentName={mcpComponent!.componentName}
+                            componentVersion={mcpComponent!.componentVersion}
+                            connectionId={mcpComponent!.connectionId}
+                            mcpComponent={mcpComponent!}
+                            mcpServerId={mcpServer.id!}
+                            mcpTools={mcpComponent!.mcpTools}
+                        />
+                    </Fragment>
+                ))
             ) : (
                 <div className="flex justify-center py-8">
                     <EmptyList
