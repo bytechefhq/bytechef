@@ -25,6 +25,9 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
 import com.bytechef.component.script.action.ScriptRubyAction;
+import com.bytechef.component.script.cluster.tool.ScriptJavaScriptTool;
+import com.bytechef.component.script.cluster.tool.ScriptPythonTool;
+import com.bytechef.component.script.cluster.tool.ScriptRubyTool;
 import com.bytechef.component.script.datastream.ScriptJavaScriptItemProcessor;
 import com.bytechef.component.script.datastream.ScriptPythonItemProcessor;
 import com.bytechef.component.script.datastream.ScriptRubyItemProcessor;
@@ -69,6 +72,9 @@ public class ScriptComponentHandler implements ComponentHandler {
 //                        ScriptJavaAction.of(polyglotEngine),
                         ScriptRubyAction.of(polyglotEngine))
                     .clusterElements(
+                        ScriptJavaScriptTool.of(polyglotEngine),
+                        ScriptPythonTool.of(polyglotEngine),
+                        ScriptRubyTool.of(polyglotEngine),
 //                        ScriptJavaItemProcessor.of(polyglotEngine),
 //                        ScriptRAction.of(polyglotEngine),
                         ScriptJavaScriptItemProcessor.of(polyglotEngine),
