@@ -5,6 +5,33 @@ import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
 import {toast} from 'sonner';
 
+const TOAST_COOLDOWN_MS = 10_000;
+const recentToastIds = new Map<string, number>();
+
+export function clearRecentToasts() {
+    recentToastIds.clear();
+}
+
+function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
+    const now = Date.now();
+
+    for (const [id, timestamp] of recentToastIds) {
+        if (now - timestamp >= TOAST_COOLDOWN_MS) {
+            recentToastIds.delete(id);
+        }
+    }
+
+    const lastShown = recentToastIds.get(toastId);
+
+    if (lastShown !== undefined && now - lastShown < TOAST_COOLDOWN_MS) {
+        return;
+    }
+
+    recentToastIds.set(toastId, now);
+
+    toast.error(title, {...options, id: toastId});
+}
+
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
     const clearCurrentEnvironmentId = useEnvironmentStore((state) => state.clearCurrentEnvironmentId);
@@ -61,7 +88,7 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
-                const toastId = `${response.url}-${response.status}`;
+                const toastId = `${new URL(response.url).pathname}-${response.status}`;
 
                 if (response.status < 200 || response.status > 299) {
                     const clonedResponse = response.clone();
@@ -73,10 +100,10 @@ export default function useFetchInterceptor() {
                                 return;
                             }
 
-                            toast.error(data.title, {description: data.detail, id: toastId});
+                            showErrorToast(toastId, data.title || 'Error', {description: data.detail});
                         })
                         .catch(() => {
-                            toast.error(`Request failed with status ${response.status}`, {id: toastId});
+                            showErrorToast(toastId, `Request failed with status ${response.status}`);
                         });
                 }
 
