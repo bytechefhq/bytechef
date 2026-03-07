@@ -48,20 +48,18 @@ const useMcpComponentDialog = ({
 
     const queryClient = useQueryClient();
 
+    const invalidateMcpQueries = () => {
+        queryClient.invalidateQueries({queryKey: ['mcpComponentsByServerId']});
+        queryClient.invalidateQueries({queryKey: ['mcpComponents']});
+        queryClient.invalidateQueries({queryKey: ['mcpServers']});
+    };
+
     const createMcpComponentWithToolsMutation = useCreateMcpComponentWithToolsMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
-        },
+        onSuccess: invalidateMcpQueries,
     });
 
     const updateMcpComponentWithToolsMutation = useUpdateMcpComponentWithToolsMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
-        },
+        onSuccess: invalidateMcpQueries,
     });
 
     const handleComponentSelect = (component: ComponentDefinitionBasic) => {
@@ -98,47 +96,7 @@ const useMcpComponentDialog = ({
             return;
         }
 
-        try {
-            if (mcpComponent?.id) {
-                updateMcpComponentWithToolsMutation.mutate({
-                    id: mcpComponent.id.toString(),
-                    input: {
-                        componentName: selectedComponent.name,
-                        componentVersion: selectedComponent.version,
-                        connectionId: selectedConnection?.id?.toString() || undefined,
-                        mcpServerId,
-                        tools: selectedTools.map((tool) => ({
-                            name: tool.name,
-                            parameters: {},
-                        })),
-                        version: mcpComponent.version,
-                    },
-                });
-            } else {
-                createMcpComponentWithToolsMutation.mutate({
-                    input: {
-                        componentName: selectedComponent.name,
-                        componentVersion: selectedComponent.version,
-                        connectionId: selectedConnection?.id?.toString() || undefined,
-                        mcpServerId,
-                        tools: selectedTools.map((tool) => ({
-                            name: tool.name,
-                            parameters: {},
-                        })),
-                    },
-                });
-            }
-
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponents'],
-            });
-            queryClient.invalidateQueries({
-                queryKey: ['mcpServers'],
-            });
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
-
+        const onMutationSuccess = () => {
             if (onOpenChange) {
                 onOpenChange(false);
             }
@@ -151,8 +109,42 @@ const useMcpComponentDialog = ({
 
             setSelectedTools([]);
             setSelectedConnection(null);
-        } catch (error) {
-            console.error('Error saving MCP component and tools:', error);
+        };
+
+        if (mcpComponent?.id) {
+            updateMcpComponentWithToolsMutation.mutate(
+                {
+                    id: mcpComponent.id.toString(),
+                    input: {
+                        componentName: selectedComponent.name,
+                        componentVersion: selectedComponent.version,
+                        connectionId: selectedConnection?.id?.toString() || undefined,
+                        mcpServerId,
+                        tools: selectedTools.map((tool) => ({
+                            name: tool.name,
+                            parameters: {},
+                        })),
+                        version: mcpComponent.version,
+                    },
+                },
+                {onSuccess: onMutationSuccess}
+            );
+        } else {
+            createMcpComponentWithToolsMutation.mutate(
+                {
+                    input: {
+                        componentName: selectedComponent.name,
+                        componentVersion: selectedComponent.version,
+                        connectionId: selectedConnection?.id?.toString() || undefined,
+                        mcpServerId,
+                        tools: selectedTools.map((tool) => ({
+                            name: tool.name,
+                            parameters: {},
+                        })),
+                    },
+                },
+                {onSuccess: onMutationSuccess}
+            );
         }
     };
 
