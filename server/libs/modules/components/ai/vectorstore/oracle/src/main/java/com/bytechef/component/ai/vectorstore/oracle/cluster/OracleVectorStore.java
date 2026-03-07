@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.vectorstore.oracle.action;
+package com.bytechef.component.ai.vectorstore.oracle.cluster;
 
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.ORACLE_VECTOR_STORE;
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import java.util.List;
 
 /**
  * @author Marko Krišković
  */
-public class OracleVectorStoreSearchAction {
+public class OracleVectorStore {
 
-    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractSearchAction.of(ORACLE_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+    public static ClusterElementDefinition<VectorStoreFunction> of(
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        return AbstractVectorStore.of("Oracle", VECTOR_STORE, clusterElementDefinitionService);
     }
 }
