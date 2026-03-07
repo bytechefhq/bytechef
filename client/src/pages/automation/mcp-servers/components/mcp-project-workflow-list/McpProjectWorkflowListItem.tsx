@@ -1,4 +1,5 @@
 import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
@@ -39,35 +40,35 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                         <span className="truncate text-sm">{workflowLabel}</span>
 
                         <span className="ml-auto flex shrink-0 items-center gap-0.5">
-                            <button
+                            <Button
                                 aria-label="Configure"
                                 className="rounded p-0.5 hover:bg-foreground/10"
+                                icon={<BoltIcon className="size-3" />}
                                 onClick={() => openPopover(popoverId)}
+                                size="iconXxs"
                                 title="Configure"
-                                type="button"
-                            >
-                                <BoltIcon className="size-3" />
-                            </button>
+                                variant="ghost"
+                            />
 
-                            <button
+                            <Button
                                 aria-label="Edit"
                                 className="rounded p-0.5 hover:bg-foreground/10"
+                                icon={<PencilIcon className="size-3" />}
                                 onClick={() => setShowEditWorkflowDialog(true)}
+                                size="iconXxs"
                                 title="Edit"
-                                type="button"
-                            >
-                                <PencilIcon className="size-3" />
-                            </button>
+                                variant="ghost"
+                            />
 
-                            <button
+                            <Button
                                 aria-label="Delete"
                                 className="rounded p-0.5 hover:bg-destructive/10 hover:text-destructive"
+                                icon={<XIcon className="size-3" />}
                                 onClick={() => setShowDeleteDialog(true)}
+                                size="iconXxs"
                                 title="Delete"
-                                type="button"
-                            >
-                                <XIcon className="size-3" />
-                            </button>
+                                variant="ghost"
+                            />
                         </span>
                     </Badge>
                 </PopoverAnchor>
