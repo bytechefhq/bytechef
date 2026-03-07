@@ -16,10 +16,10 @@
 
 package com.bytechef.component.ai.vectorstore.oracle.action;
 
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.ORACLE_VECTOR_STORE;
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.ORACLE_VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
+import com.bytechef.component.ai.vectorstore.action.AbstractSearchAction;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
@@ -27,9 +27,9 @@ import java.util.List;
 /**
  * @author Marko Krišković
  */
-public class OracleVectorStoreLoadAction {
+public class OracleSearchAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(ORACLE_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractSearchAction.of(ORACLE_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

@@ -16,12 +16,12 @@
 
 package com.bytechef.component.ai.vectorstore.oracle.connection;
 
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.DIMENSIONS;
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.DISTANCE_TYPE;
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.INDEX_TYPE;
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.INITIALIZE_SCHEMA;
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.TABLE_NAME;
-import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleVectorStoreConstants.URL;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.DIMENSIONS;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.DISTANCE_TYPE;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.INDEX_TYPE;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.INITIALIZE_SCHEMA;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.TABLE_NAME;
+import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
@@ -38,7 +38,7 @@ import org.springframework.ai.vectorstore.oracle.OracleVectorStore;
 /**
  * @author Marko Krišković
  */
-public class OracleVectorStoreConnection {
+public class OracleConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
@@ -97,6 +97,6 @@ public class OracleVectorStoreConnection {
                         .defaultValue(false)
                         .required(false)));
 
-    private OracleVectorStoreConnection() {
+    private OracleConnection() {
     }
 }
