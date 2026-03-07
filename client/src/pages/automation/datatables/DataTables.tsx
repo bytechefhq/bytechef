@@ -28,7 +28,7 @@ const DataTables = () => {
                                 <CreateDataTableDialog trigger={<Button>New Table</Button>} />
                             </div>
                         ) : (
-                            <EnvironmentSelect />
+                            !isLoading && <EnvironmentSelect />
                         )
                     }
                     title={
