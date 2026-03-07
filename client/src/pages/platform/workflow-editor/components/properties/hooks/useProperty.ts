@@ -737,7 +737,7 @@ export const useProperty = ({
             setMentionInputValue(typeof value === 'number' ? String(value) : value);
 
             const stringValue = typeof value === 'string' ? value : '';
-            const isExpression = typeof value === 'string' && (value.startsWith('=') || value.startsWith('${'));
+            const isExpression = typeof value === 'string' && (value.startsWith('=') || value.includes('${'));
 
             if (!stringValue || isExpression) {
                 setHasError(false);
@@ -888,9 +888,9 @@ export const useProperty = ({
 
             let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
 
-            if (type === 'INTEGER' && typeof mentionInputValue === 'string' && !mentionInputValue.startsWith('${')) {
+            if (type === 'INTEGER' && typeof mentionInputValue === 'string' && !mentionInputValue.includes('${')) {
                 actualValue = parseInt(value);
-            } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
+            } else if (type === 'NUMBER' && !mentionInputValue.includes('${')) {
                 actualValue = parseFloat(value);
             }
 
@@ -904,10 +904,10 @@ export const useProperty = ({
                     if (
                         type === 'INTEGER' &&
                         typeof mentionInputValue === 'string' &&
-                        !mentionInputValue.startsWith('${')
+                        !mentionInputValue.includes('${')
                     ) {
                         actualValue = parseInt(defaultValueString);
-                    } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
+                    } else if (type === 'NUMBER' && !mentionInputValue.includes('${')) {
                         actualValue = parseFloat(defaultValueString);
                     }
 
@@ -1221,7 +1221,7 @@ export const useProperty = ({
 
         const isExpression =
             typeof mentionInputValue === 'string' &&
-            (mentionInputValue.startsWith('=') || mentionInputValue.startsWith('${'));
+            (mentionInputValue.startsWith('=') || mentionInputValue.includes('${'));
 
         if (!stringValue || isExpression) {
             setHasError(false);
