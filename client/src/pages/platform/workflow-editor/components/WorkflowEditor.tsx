@@ -85,6 +85,7 @@ const WorkflowEditor = ({
                 onNodeDragStart={handleNodeDragStart}
                 onNodeDragStop={handleNodeDragStop}
                 onNodesChange={handleNodesChange}
+                panActivationKeyCode={null}
                 panOnDrag
                 panOnScroll
                 proOptions={{hideAttribution: true}}
