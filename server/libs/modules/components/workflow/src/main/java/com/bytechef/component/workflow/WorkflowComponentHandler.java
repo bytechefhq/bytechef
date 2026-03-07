@@ -24,30 +24,37 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.workflow.action.WorkflowResponseToAiModelCallAction;
 import com.bytechef.component.workflow.action.WorkflowResponseToWorkflowCallAction;
+import com.bytechef.component.workflow.cluster.WorkflowCallWorkflowTool;
 import com.bytechef.component.workflow.trigger.WorkflowNewAiModelCallTrigger;
 import com.bytechef.component.workflow.trigger.WorkflowNewWorkflowCallTrigger;
-import com.google.auto.service.AutoService;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component(WORKFLOW + "_v1_ComponentHandler")
 public class WorkflowComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(WORKFLOW)
-        .title("Workflow")
-        .description("Triggers and actions for workflow-to-workflow communication.")
-        .icon("path:assets/workflow.svg")
-        .categories(ComponentCategory.HELPERS)
-        .triggers(
-            WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION,
-            WorkflowNewAiModelCallTrigger.TRIGGER_DEFINITION)
-        .actions(
-            WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION,
-            WorkflowResponseToAiModelCallAction.ACTION_DEFINITION);
+    private final ComponentDefinition componentDefinition;
+
+    public WorkflowComponentHandler(SubflowDataSource subflowDataSource) {
+        this.componentDefinition = component(WORKFLOW)
+            .title("Workflow")
+            .description("Triggers and actions for workflow-to-workflow communication.")
+            .icon("path:assets/workflow.svg")
+            .categories(ComponentCategory.HELPERS)
+            .triggers(
+                WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION,
+                WorkflowNewAiModelCallTrigger.TRIGGER_DEFINITION)
+            .actions(
+                WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION,
+                WorkflowResponseToAiModelCallAction.ACTION_DEFINITION)
+            .clusterElements(WorkflowCallWorkflowTool.of(subflowDataSource));
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
 }
