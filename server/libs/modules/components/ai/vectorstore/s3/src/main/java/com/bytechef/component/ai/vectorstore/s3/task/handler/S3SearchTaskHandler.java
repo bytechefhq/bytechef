@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.s3.task.handler;
 
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.S3_VECTOR_STORE;
-import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.S3_VECTOR_STORE;
+import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
@@ -26,10 +26,10 @@ import org.springframework.stereotype.Component;
 /**
  * @author Marko Krišković
  */
-@Component(S3_VECTOR_STORE + "/v1/" + LOAD)
-public class S3VectorStoreLoadTaskHandler extends AbstractTaskHandler {
+@Component(S3_VECTOR_STORE + "/v1/" + SEARCH)
+public class S3SearchTaskHandler extends AbstractTaskHandler {
 
-    public S3VectorStoreLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(S3_VECTOR_STORE, 1, LOAD, actionDefinitionFacade);
+    public S3SearchTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
+        super(S3_VECTOR_STORE, 1, SEARCH, actionDefinitionFacade);
     }
 }

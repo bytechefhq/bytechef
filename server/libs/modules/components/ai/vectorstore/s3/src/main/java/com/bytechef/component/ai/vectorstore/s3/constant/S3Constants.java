@@ -42,9 +42,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 /**
  * @author Marko Krišković
  */
-public class S3VectorStoreConstants {
+public class S3Constants {
 
-    private static final Logger logger = LoggerFactory.getLogger(S3VectorStoreConstants.class);
+    private static final Logger logger = LoggerFactory.getLogger(S3Constants.class);
 
     public static final String ACCESS_KEY_ID = "accessKeyId";
     public static final String BUCKET_NAME = "bucketName";
@@ -160,6 +160,6 @@ public class S3VectorStoreConstants {
         }
     };
 
-    private S3VectorStoreConstants() {
+    private S3Constants() {
     }
 }

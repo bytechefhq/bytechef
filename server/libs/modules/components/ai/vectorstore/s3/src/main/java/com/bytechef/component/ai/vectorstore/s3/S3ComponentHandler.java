@@ -16,14 +16,14 @@
 
 package com.bytechef.component.ai.vectorstore.s3;
 
-import static com.bytechef.component.ai.vectorstore.s3.constant.S3VectorStoreConstants.S3_VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.S3_VECTOR_STORE;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.ai.vectorstore.s3.action.S3VectorStoreLoadAction;
-import com.bytechef.component.ai.vectorstore.s3.action.S3VectorStoreSearchAction;
-import com.bytechef.component.ai.vectorstore.s3.cluster.S3VectorStoreClusterElement;
-import com.bytechef.component.ai.vectorstore.s3.connection.S3VectorStoreConnection;
+import com.bytechef.component.ai.vectorstore.s3.action.S3LoadAction;
+import com.bytechef.component.ai.vectorstore.s3.action.S3SearchAction;
+import com.bytechef.component.ai.vectorstore.s3.cluster.S3VectorStore;
+import com.bytechef.component.ai.vectorstore.s3.connection.S3Connection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
@@ -35,25 +35,25 @@ import org.springframework.stereotype.Component;
  * @author Marko Krišković
  */
 @Component(S3_VECTOR_STORE + "_v1_ComponentHandler")
-public class S3VectorStoreComponentHandler implements ComponentHandler {
+public class S3ComponentHandler implements ComponentHandler {
 
     private final VectorStoreComponentDefinition componentDefinition;
 
-    public S3VectorStoreComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public S3ComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new S3VectorStoreComponentDefinitionImpl(
             component(S3_VECTOR_STORE)
                 .title("S3 Vector Store")
                 .description(
                     "Amazon S3 Vector Store uses AWS S3 as a persistent storage backend for vector embeddings, " +
                         "enabling scalable and durable similarity search.")
-                .icon("path:assets/s3-vector-store.svg")
-                .connection(S3VectorStoreConnection.CONNECTION_DEFINITION)
+                .icon("path:assets/s3.svg")
+                .connection(S3Connection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    S3VectorStoreLoadAction.of(clusterElementDefinitionService),
-                    S3VectorStoreSearchAction.of(clusterElementDefinitionService))
+                    S3LoadAction.of(clusterElementDefinitionService),
+                    S3SearchAction.of(clusterElementDefinitionService))
                 .clusterElements(
-                    S3VectorStoreClusterElement.of(clusterElementDefinitionService)));
+                    S3VectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override
