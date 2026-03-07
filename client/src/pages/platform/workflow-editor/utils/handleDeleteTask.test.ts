@@ -361,6 +361,37 @@ describe('handleDeleteTask', () => {
         expect(updatedDefinition.tasks[0].parameters.branches[0][0].name).toBe('branch_b_1');
     });
 
+    it('should delete a task from map iteratee', () => {
+        const mapTask = makeTask('map_1', {
+            iteratee: [makeTask('child_1'), makeTask('child_2'), makeTask('child_3')],
+        });
+        const workflow = makeWorkflow([mapTask]);
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            data: {
+                componentName: 'test',
+                mapData: {index: 1, mapId: 'map_1'},
+                name: 'child_2',
+            } as unknown as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        expect(mutation.mutate).toHaveBeenCalledOnce();
+
+        const mutationArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
+        const updatedDefinition = JSON.parse(mutationArgs.workflow.definition);
+
+        expect(updatedDefinition.tasks[0].parameters.iteratee).toHaveLength(2);
+        expect(updatedDefinition.tasks[0].parameters.iteratee.map((task: WorkflowTask) => task.name)).toEqual([
+            'child_1',
+            'child_3',
+        ]);
+    });
+
     it('should not mutate when workflow is already mutating', () => {
         const tasks = [makeTask('task_1')];
         const workflow = makeWorkflow(tasks);
