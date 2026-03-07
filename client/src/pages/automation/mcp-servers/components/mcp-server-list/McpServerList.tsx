@@ -1,18 +1,14 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
-import {
-    McpProjectWorkflow,
-    McpServer,
-    Tag,
-    useMcpProjectsByServerIdQuery,
-    useUpdateMcpServerUrlMutation,
-} from '@/shared/middleware/graphql';
-import {useQueryClient} from '@tanstack/react-query';
+import {McpProjectWorkflow, McpServer, Tag, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import McpServerListItem from 'pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
+import {useMemo} from 'react';
 
-import McpComponentList from '../mcp-component-list/McpComponentList';
-import McpProjectList from '../mcp-project-workflow-list/McpProjectList';
+import McpServerToolsContent from './McpServerToolsContent';
+import useMcpServerList from './hooks/useMcpServerList';
 
 interface McpServerListProps {
     mcpServers: McpServer[];
@@ -34,60 +30,44 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
 };
 
 const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
-    const updateMcpServerUrlMutation = useUpdateMcpServerUrlMutation({});
+    const {createHandleRefresh, sortedMcpServers} = useMcpServerList(mcpServers);
 
-    const queryClient = useQueryClient();
-
-    const sortedMcpServers = [...mcpServers].sort((previousMcpServer, currentMcpServer) =>
-        previousMcpServer.name.localeCompare(currentMcpServer.name)
-    );
+    const workflowReadOnlyValue = useMemo(() => ({useGetComponentDefinitionsQuery}), []);
 
     return (
         <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
-            {sortedMcpServers.map((mcpServer) => {
-                const handleRefresh = () => {
-                    updateMcpServerUrlMutation.mutate(
-                        {
-                            id: mcpServer.id,
-                        },
-                        {
-                            onSuccess: () => {
-                                queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
-                            },
-                        }
+            <WorkflowReadOnlyProvider value={workflowReadOnlyValue}>
+                {sortedMcpServers.map((mcpServer) => {
+                    const handleRefresh = createHandleRefresh(mcpServer.id!);
+
+                    return (
+                        <Collapsible className="group" key={mcpServer.id}>
+                            <McpServerListItemWithWorkflows key={mcpServer.id} mcpServer={mcpServer} tags={tags} />
+
+                            <CollapsibleContent className="mt-1">
+                                <Tabs defaultValue="tools">
+                                    <TabsList>
+                                        <TabsTrigger value="tools">Tools</TabsTrigger>
+
+                                        <TabsTrigger value="connect">Connect</TabsTrigger>
+                                    </TabsList>
+
+                                    <TabsContent value="tools">
+                                        <McpServerToolsContent mcpServer={mcpServer} />
+                                    </TabsContent>
+
+                                    <TabsContent className="max-w-screen-lg py-3" value="connect">
+                                        <McpServerConfiguration
+                                            mcpServerUrl={mcpServer.url}
+                                            onRefresh={handleRefresh}
+                                        />
+                                    </TabsContent>
+                                </Tabs>
+                            </CollapsibleContent>
+                        </Collapsible>
                     );
-                };
-
-                return (
-                    <Collapsible className="group" key={mcpServer.id}>
-                        <McpServerListItemWithWorkflows key={mcpServer.id} mcpServer={mcpServer} tags={tags} />
-
-                        <CollapsibleContent className="mt-1">
-                            <Tabs defaultValue="components">
-                                <TabsList>
-                                    <TabsTrigger value="components">Components</TabsTrigger>
-
-                                    <TabsTrigger value="workflows">Workflows</TabsTrigger>
-
-                                    <TabsTrigger value="connect">Connect</TabsTrigger>
-                                </TabsList>
-
-                                <TabsContent value="components">
-                                    <McpComponentList mcpServer={mcpServer} />
-                                </TabsContent>
-
-                                <TabsContent value="workflows">
-                                    <McpProjectList mcpServer={mcpServer} />
-                                </TabsContent>
-
-                                <TabsContent className="max-w-screen-lg py-5" value="connect">
-                                    <McpServerConfiguration mcpServerUrl={mcpServer.url} onRefresh={handleRefresh} />
-                                </TabsContent>
-                            </Tabs>
-                        </CollapsibleContent>
-                    </Collapsible>
-                );
-            })}
+                })}
+            </WorkflowReadOnlyProvider>
         </div>
     );
 };
