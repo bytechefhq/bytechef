@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.datastream.definition;
+package com.bytechef.component.script.cluster.definition;
 
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +28,7 @@ import static org.mockito.Mockito.withSettings;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import java.util.Map;

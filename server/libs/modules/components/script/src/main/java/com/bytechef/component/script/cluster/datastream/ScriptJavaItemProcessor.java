@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.datastream;
+package com.bytechef.component.script.cluster.datastream;
 
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -22,31 +22,32 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 import static com.bytechef.platform.component.definition.datastream.ItemProcessor.PROCESSOR;
 
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.script.datastream.definition.ScriptClusterElementDefinition;
+import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 
 /**
  * @author Ivica Cardic
  */
-public class ScriptPythonItemProcessor {
+public class ScriptJavaItemProcessor {
 
     public static ScriptClusterElementDefinition of(PolyglotEngine polyglotEngine) {
         return new ScriptClusterElementDefinition(
-            clusterElement("python")
-                .title("Python")
-                .description("Transforms data stream items using custom Python code.")
+            clusterElement("java")
+                .title("Java")
+                .description("Transforms data stream items using custom Java code.")
                 .type(PROCESSOR)
                 .properties(
                     string(SCRIPT)
-                        .label("Python Code")
-                        .description("Custom Python code to process items. The item is available as 'item' parameter.")
+                        .label("Java Code")
+                        .description("Custom Java code to process items. The item is available as 'item' parameter.")
                         .controlType(Property.ControlType.CODE_EDITOR)
-                        .languageId("python")
-                        .defaultValue("def perform(input, context):\n\treturn null")
+                        .languageId("java")
+                        .defaultValue(
+                            "public static Object perform(Map<String, ?> input, Context context) {\n\treturn null;\n}")
                         .required(true)),
-            "python", polyglotEngine);
+            "java", polyglotEngine);
     }
 
-    private ScriptPythonItemProcessor() {
+    private ScriptJavaItemProcessor() {
     }
 }

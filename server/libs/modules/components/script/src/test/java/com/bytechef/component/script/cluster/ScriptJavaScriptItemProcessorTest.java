@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.datastream;
+package com.bytechef.component.script.cluster;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.script.datastream.definition.ScriptClusterElementDefinition;
+import com.bytechef.component.script.cluster.datastream.ScriptJavaScriptItemProcessor;
+import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.datastream.ItemProcessor;
 import org.junit.jupiter.api.Test;
@@ -27,18 +28,18 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-class ScriptRubyItemProcessorTest {
+class ScriptJavaScriptItemProcessorTest {
 
     @Test
     void testOfCreatesValidDefinition() {
         PolyglotEngine polyglotEngine = mock(PolyglotEngine.class);
 
-        ScriptClusterElementDefinition definition = ScriptRubyItemProcessor.of(polyglotEngine);
+        ScriptClusterElementDefinition definition = ScriptJavaScriptItemProcessor.of(polyglotEngine);
 
         assertThat(definition).isNotNull();
-        assertThat(definition.getName()).isEqualTo("ruby");
-        assertThat(definition.getTitle()).contains("Ruby");
-        assertThat(definition.getDescription()).contains("Transforms data stream items using custom Ruby code.");
+        assertThat(definition.getName()).isEqualTo("javaScript");
+        assertThat(definition.getTitle()).contains("JavaScript");
+        assertThat(definition.getDescription()).contains("Transforms data stream items using custom JavaScript code.");
         assertThat(definition.getType()).isEqualTo(ItemProcessor.PROCESSOR);
     }
 
@@ -46,7 +47,7 @@ class ScriptRubyItemProcessorTest {
     void testOfReturnsDefinitionWithProperties() {
         PolyglotEngine polyglotEngine = mock(PolyglotEngine.class);
 
-        ScriptClusterElementDefinition definition = ScriptRubyItemProcessor.of(polyglotEngine);
+        ScriptClusterElementDefinition definition = ScriptJavaScriptItemProcessor.of(polyglotEngine);
 
         assertThat(definition.getProperties()).isPresent();
         assertThat(definition.getProperties()
@@ -61,7 +62,7 @@ class ScriptRubyItemProcessorTest {
     void testOfDefinitionHasScriptProperty() {
         PolyglotEngine polyglotEngine = mock(PolyglotEngine.class);
 
-        ScriptClusterElementDefinition definition = ScriptRubyItemProcessor.of(polyglotEngine);
+        ScriptClusterElementDefinition definition = ScriptJavaScriptItemProcessor.of(polyglotEngine);
 
         assertThat(definition.getProperties()).isPresent();
         assertThat(definition.getProperties()

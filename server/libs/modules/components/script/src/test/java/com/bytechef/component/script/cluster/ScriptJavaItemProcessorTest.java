@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.datastream;
+package com.bytechef.component.script.cluster;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.script.datastream.definition.ScriptClusterElementDefinition;
+import com.bytechef.component.script.cluster.datastream.ScriptJavaItemProcessor;
+import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.datastream.ItemProcessor;
 import org.junit.jupiter.api.Test;
