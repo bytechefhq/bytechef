@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.datastream;
+package com.bytechef.component.script.cluster.datastream;
 
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -22,32 +22,31 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 import static com.bytechef.platform.component.definition.datastream.ItemProcessor.PROCESSOR;
 
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.script.datastream.definition.ScriptClusterElementDefinition;
+import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 
 /**
  * @author Ivica Cardic
  */
-public class ScriptJavaItemProcessor {
+public class ScriptRubyItemProcessor {
 
     public static ScriptClusterElementDefinition of(PolyglotEngine polyglotEngine) {
         return new ScriptClusterElementDefinition(
-            clusterElement("java")
-                .title("Java")
-                .description("Transforms data stream items using custom Java code.")
+            clusterElement("ruby")
+                .title("Ruby")
+                .description("Transforms data stream items using custom Ruby code.")
                 .type(PROCESSOR)
                 .properties(
                     string(SCRIPT)
-                        .label("Java Code")
-                        .description("Custom Java code to process items. The item is available as 'item' parameter.")
+                        .label("Ruby Code")
+                        .description("Custom Ruby code to process items. The item is available as 'item' parameter.")
                         .controlType(Property.ControlType.CODE_EDITOR)
-                        .languageId("java")
-                        .defaultValue(
-                            "public static Object perform(Map<String, ?> input, Context context) {\n\treturn null;\n}")
+                        .languageId("ruby")
+                        .defaultValue("def perform(input, context)\n\treturn null;\nend")
                         .required(true)),
-            "java", polyglotEngine);
+            "ruby", polyglotEngine);
     }
 
-    private ScriptJavaItemProcessor() {
+    private ScriptRubyItemProcessor() {
     }
 }
