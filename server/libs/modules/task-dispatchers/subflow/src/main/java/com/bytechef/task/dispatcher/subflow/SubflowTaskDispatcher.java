@@ -18,6 +18,7 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
+import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants.SUBFLOW;
 import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants.WORKFLOW_UUID;
 
@@ -70,7 +71,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         boolean editorEnvironment = MapUtils.getBoolean(job.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false);
         String workflowUuid = MapUtils.getRequiredString(taskExecution.getParameters(), WORKFLOW_UUID);
 
-        Subflow subflow = subflowResolver.resolveSubflow(workflowUuid, editorEnvironment);
+        Subflow subflow = subflowResolver.resolveSubflow(workflowUuid, NEW_WORKFLOW_CALL, editorEnvironment);
 
         String workflowId = subflow.workflowId();
 

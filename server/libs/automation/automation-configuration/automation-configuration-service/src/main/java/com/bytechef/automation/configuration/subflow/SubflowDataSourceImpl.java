@@ -65,7 +65,11 @@ class SubflowDataSourceImpl implements SubflowDataSource {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTrigger callableTrigger = getCallableTrigger(workflow);
+        WorkflowTrigger callableTrigger = getCallableTrigger(workflow, WorkflowConstants.NEW_WORKFLOW_CALL);
+
+        if (callableTrigger == null) {
+            callableTrigger = getCallableTrigger(workflow, WorkflowConstants.NEW_AI_MODEL_CALL);
+        }
 
         if (callableTrigger == null) {
             return null;
@@ -116,7 +120,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
     }
 
     @Override
-    public List<SubflowEntry> getSubWorkflows(PlatformType platformType, String search) {
+    public List<SubflowEntry> getSubWorkflows(PlatformType platformType, String triggerName, String search) {
         List<SubflowEntry> subWorkflowEntries = new ArrayList<>();
 
         String lowerCaseSearch = (search == null) ? null : search.toLowerCase();
@@ -126,7 +130,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
         for (ProjectWorkflow projectWorkflow : projectWorkflows) {
             Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
-            if (getCallableTrigger(workflow) != null) {
+            if (getCallableTrigger(workflow, triggerName) != null) {
                 Project project = projectService.getProject(projectWorkflow.getProjectId());
 
                 String workflowLabel = workflow.getLabel() == null ? "Unnamed Workflow" : workflow.getLabel();
@@ -160,14 +164,14 @@ class SubflowDataSourceImpl implements SubflowDataSource {
         return null;
     }
 
-    private @Nullable WorkflowTrigger getCallableTrigger(Workflow workflow) {
+    private @Nullable WorkflowTrigger getCallableTrigger(Workflow workflow, String triggerName) {
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_WORKFLOW_CALL)) {
+                Objects.equals(workflowNodeType.operation(), triggerName)) {
 
                 return workflowTrigger;
             }
