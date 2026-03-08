@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.milvus.action.MilvusLoadAction;
 import com.bytechef.component.ai.vectorstore.milvus.action.MilvusSearchAction;
+import com.bytechef.component.ai.vectorstore.milvus.cluster.MilvusSearchTool;
 import com.bytechef.component.ai.vectorstore.milvus.cluster.MilvusVectorStore;
 import com.bytechef.component.ai.vectorstore.milvus.connection.MilvusConnection;
 import com.bytechef.component.definition.ComponentCategory;
@@ -51,7 +52,9 @@ public class MilvusComponentHandler implements ComponentHandler {
             .actions(
                 MilvusSearchAction.of(clusterElementDefinitionService),
                 MilvusLoadAction.of(clusterElementDefinitionService))
-            .clusterElements(MilvusVectorStore.of(clusterElementDefinitionService)));
+            .clusterElements(
+                MilvusSearchTool.of(clusterElementDefinitionService),
+                MilvusVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override
