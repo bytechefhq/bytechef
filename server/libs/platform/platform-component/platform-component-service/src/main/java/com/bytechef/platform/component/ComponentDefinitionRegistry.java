@@ -258,6 +258,24 @@ public class ComponentDefinitionRegistry {
                         componentName, clusterElementName)));
     }
 
+    public ClusterElementDefinition<?> getClusterElementDefinition(
+        String componentName, int componentVersion, String clusterElementName,
+        ClusterElementDefinition.ClusterElementType clusterElementType) {
+
+        ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
+
+        return componentDefinition.getClusterElements()
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(clusterElementDefinition -> clusterElementName.equalsIgnoreCase(clusterElementDefinition.getName()))
+            .filter(clusterElementDefinition -> clusterElementType.equals(clusterElementDefinition.getType()))
+            .findFirst()
+            .orElseThrow(
+                () -> new IllegalArgumentException(
+                    "The component '%s' does not contain the '%s' cluster element with type '%s'.".formatted(
+                        componentName, clusterElementName, clusterElementType.name())));
+    }
+
     public Property getClusterElementProperty(
         String componentName, int componentVersion, String clusterElementName, String propertyName,
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,

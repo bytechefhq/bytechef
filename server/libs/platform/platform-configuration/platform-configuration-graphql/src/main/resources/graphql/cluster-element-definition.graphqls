@@ -1,5 +1,5 @@
 extend type Query {
-    clusterElementDefinition(componentName: String!, componentVersion: Int!, clusterElementName: String!): ClusterElementDefinition!
+    clusterElementDefinition(componentName: String!, componentVersion: Int!, clusterElementName: String!, clusterElementType: String): ClusterElementDefinition!
     clusterElementDefinitions(rootComponentName: String!, rootComponentVersion: Int!, clusterElementType: String!): [ClusterElementDefinition!]!
     clusterElementDynamicProperties(
         componentName: String!

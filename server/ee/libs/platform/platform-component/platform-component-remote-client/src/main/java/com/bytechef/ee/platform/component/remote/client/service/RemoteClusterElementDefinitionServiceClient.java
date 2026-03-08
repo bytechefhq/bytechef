@@ -97,6 +97,13 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
+    public ClusterElementDefinition getClusterElementDefinition(
+        String componentName, int componentVersion, String clusterElementName, String clusterElementTypeName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ClusterElementDefinition> getClusterElementDefinitions(
         ClusterElementType clusterElementType) {
 

@@ -207,6 +207,34 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     @Override
+    public ClusterElementDefinition getClusterElementDefinition(
+        String componentName, int componentVersion, String clusterElementName, String clusterElementTypeName) {
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
+        List<com.bytechef.component.definition.ClusterElementDefinition<?>> clusterElementDefinitions =
+            componentDefinition.getClusterElements()
+                .orElse(List.of());
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> matchedDefinition =
+            clusterElementDefinitions.stream()
+                .filter(clusterElementDefinition -> {
+                    ClusterElementType type = clusterElementDefinition.getType();
+
+                    return clusterElementName.equals(clusterElementDefinition.getName()) &&
+                        clusterElementTypeName.equalsIgnoreCase(type.name());
+                })
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Cluster element definition " + clusterElementName + " with type " + clusterElementTypeName +
+                        " not found in component " + componentName));
+
+        return new ClusterElementDefinition(
+            matchedDefinition, componentDefinition.getName(), componentVersion, getIcon(componentDefinition));
+    }
+
+    @Override
     public List<ClusterElementDefinition> getClusterElementDefinitions(ClusterElementType clusterElementType) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
