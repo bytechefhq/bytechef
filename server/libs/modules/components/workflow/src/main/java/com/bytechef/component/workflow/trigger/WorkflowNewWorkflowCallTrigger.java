@@ -23,11 +23,8 @@ import static com.bytechef.platform.component.constant.WorkflowConstants.INPUT_S
 import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.component.workflow.util.WorkflowResponseUtils;
 
 /**
  * @author Ivica Cardic
@@ -46,22 +43,5 @@ public class WorkflowNewWorkflowCallTrigger {
                 .placeholder("Edit Inputs schema")
                 .description("The schema definition for the input data this workflow expects from callers.")
                 .controlType(JSON_SCHEMA_BUILDER))
-        .output(WorkflowNewWorkflowCallTrigger::output);
-
-    protected static OutputResponse output(
-        Parameters inputParameters, Parameters connectionParameters, TriggerContext context) {
-
-        String inputSchema = inputParameters.getString(INPUT_SCHEMA);
-
-        if (inputSchema != null) {
-            ModifiableValueProperty<?, ?> input = (ModifiableValueProperty<?, ?>) context.outputSchema(
-                outputSchema -> outputSchema.getOutputSchema(INPUT_SCHEMA, inputSchema));
-
-            if (input != null) {
-                return OutputResponse.of(input);
-            }
-        }
-
-        return null;
-    }
+        .output(WorkflowResponseUtils::triggerOutput);
 }
