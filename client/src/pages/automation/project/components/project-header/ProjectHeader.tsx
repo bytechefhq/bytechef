@@ -1,6 +1,5 @@
 import {Separator} from '@/components/ui/separator';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
-import LoaderNotification from '@/pages/automation/project/components/project-header/components/LoaderNotification';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
 import ProjectBreadcrumb from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumb';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
@@ -11,6 +10,7 @@ import {useProjectHeader} from '@/pages/automation/project/components/project-he
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {RefObject} from 'react';
@@ -92,7 +92,7 @@ const ProjectHeader = ({
             </div>
 
             <div className="flex items-center space-x-2">
-                <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
+                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
                 <SettingsMenu project={project} updateWorkflowMutation={updateWorkflowMutation} workflow={workflow} />
 

@@ -1,12 +1,12 @@
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
-import LoaderNotification from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/LoaderNotification';
 import OutputPanelButton from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/PublishPopover';
 import WorkflowActionsButton from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/WorkflowActionsButton';
 import {useWorkflowBuilderHeader} from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/hooks/useWorkflowBuilderHeader';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
@@ -74,7 +74,7 @@ const WorkflowBuilderHeader = ({
             </div>
 
             <div className="flex items-center space-x-2">
-                <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
+                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
                 <Button
                     className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
