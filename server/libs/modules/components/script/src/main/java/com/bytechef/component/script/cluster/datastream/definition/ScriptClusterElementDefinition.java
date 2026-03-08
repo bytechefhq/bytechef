@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.datastream.definition;
+package com.bytechef.component.script.cluster.datastream.definition;
 
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 

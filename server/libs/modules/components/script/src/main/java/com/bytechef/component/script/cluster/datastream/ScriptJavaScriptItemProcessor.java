@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.datastream;
+package com.bytechef.component.script.cluster.datastream;
 
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -22,7 +22,7 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 import static com.bytechef.platform.component.definition.datastream.ItemProcessor.PROCESSOR;
 
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.script.datastream.definition.ScriptClusterElementDefinition;
+import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 
 /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.datastream;
+package com.bytechef.component.script.cluster.datastream;
 
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -22,31 +22,31 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 import static com.bytechef.platform.component.definition.datastream.ItemProcessor.PROCESSOR;
 
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.script.datastream.definition.ScriptClusterElementDefinition;
+import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 
 /**
  * @author Ivica Cardic
  */
-public class ScriptRubyItemProcessor {
+public class ScriptPythonItemProcessor {
 
     public static ScriptClusterElementDefinition of(PolyglotEngine polyglotEngine) {
         return new ScriptClusterElementDefinition(
-            clusterElement("ruby")
-                .title("Ruby")
-                .description("Transforms data stream items using custom Ruby code.")
+            clusterElement("python")
+                .title("Python")
+                .description("Transforms data stream items using custom Python code.")
                 .type(PROCESSOR)
                 .properties(
                     string(SCRIPT)
-                        .label("Ruby Code")
-                        .description("Custom Ruby code to process items. The item is available as 'item' parameter.")
+                        .label("Python Code")
+                        .description("Custom Python code to process items. The item is available as 'item' parameter.")
                         .controlType(Property.ControlType.CODE_EDITOR)
-                        .languageId("ruby")
-                        .defaultValue("def perform(input, context)\n\treturn null;\nend")
+                        .languageId("python")
+                        .defaultValue("def perform(input, context):\n\treturn null")
                         .required(true)),
-            "ruby", polyglotEngine);
+            "python", polyglotEngine);
     }
 
-    private ScriptRubyItemProcessor() {
+    private ScriptPythonItemProcessor() {
     }
 }
