@@ -22,6 +22,8 @@ import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
+import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -198,7 +200,7 @@ public abstract class AbstractAiAgentChatAction {
             return toolCallbacks;
         }
 
-        AtomicReference<AgentThinking> thinkingReference = new AtomicReference<>();
+        AtomicReference<@Nullable AgentThinking> thinkingReference = new AtomicReference<>();
 
         List<ToolCallback> observableToolCallbacks = toolCallbacks.stream()
             .map(
@@ -218,7 +220,7 @@ public abstract class AbstractAiAgentChatAction {
     }
 
     private static ToolCallback createObservableToolCallback(
-        ToolCallback delegate, AtomicReference<AgentThinking> thinkingReference,
+        ToolCallback delegate, AtomicReference<@Nullable AgentThinking> thinkingReference,
         ToolExecutionListener toolExecutionListener, ActionContext context) {
 
         return new ToolCallback() {

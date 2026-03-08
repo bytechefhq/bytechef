@@ -17,8 +17,10 @@
 package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PROPERTIES;
+import static com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
+import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -37,6 +39,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Flow;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -88,8 +91,8 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
         Parameters extensions, ActionContext context) throws Exception {
 
-        AtomicReference<SseEmitterHandler.SseEmitter> emitterReference = new AtomicReference<>();
-        Queue<Map<String, Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
+        AtomicReference<@Nullable SseEmitter> emitterReference = new AtomicReference<>();
+        Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
             context.log(log -> log.info(
@@ -97,7 +100,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                 toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
                 toolExecutionEvent.inputs()));
 
-            Map<String, Object> eventData = new LinkedHashMap<>();
+            Map<String, @Nullable Object> eventData = new LinkedHashMap<>();
 
             eventData.put("__eventType", "tool_execution");
             eventData.put("confidence", toolExecutionEvent.confidence());
@@ -106,7 +109,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             eventData.put("reasoning", toolExecutionEvent.reasoning());
             eventData.put("toolName", toolExecutionEvent.toolName());
 
-            SseEmitterHandler.SseEmitter sseEmitter = emitterReference.get();
+            SseEmitter sseEmitter = emitterReference.get();
 
             if (sseEmitter == null) {
                 bufferedEvents.add(eventData);
@@ -161,7 +164,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         return emitter -> {
             emitterReference.set(emitter);
 
-            Map<String, Object> bufferedEvent;
+            Map<String, @Nullable Object> bufferedEvent;
 
             while ((bufferedEvent = bufferedEvents.poll()) != null) {
                 try {
@@ -175,7 +178,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             effectivePublisher.subscribe(
                 new Flow.Subscriber<Object>() {
 
-                    private Flow.Subscription subscription;
+                    private Flow.@Nullable Subscription subscription;
 
                     @Override
                     public void onSubscribe(Flow.Subscription subscription) {
@@ -193,7 +196,9 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                         } catch (Exception exception) {
                             context.log(log -> log.trace(exception.getMessage(), exception));
 
-                            subscription.cancel();
+                            if (subscription != null) {
+                                subscription.cancel();
+                            }
                         }
                     }
 
