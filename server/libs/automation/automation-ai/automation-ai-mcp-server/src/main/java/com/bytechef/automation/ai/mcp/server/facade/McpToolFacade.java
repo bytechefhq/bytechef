@@ -118,7 +118,9 @@ public class McpToolFacade extends AbstractToolFacade {
 
         FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
             .builder(
-                getToolName(clusterElementDefinition.getComponentName(), clusterElementDefinition.getName()),
+                getToolName(
+                    clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(),
+                    mcpTool.getParameters()),
                 getClusterElementToolCallbackFunction(
                     clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
                     clusterElementDefinition.getName(), mcpTool.getParameters(), mcpComponent.getConnectionId(),

@@ -157,7 +157,17 @@ public abstract class AbstractToolFacade {
         return toolDescription;
     }
 
-    protected String getToolName(String componentName, String clusterElementName) {
+    protected String getToolName(
+        String componentName, String clusterElementName, Map<String, ?> inputParameters) {
+
+        if (inputParameters != null) {
+            Object toolName = inputParameters.get(ToolConstants.TOOL_NAME);
+
+            if (toolName instanceof String string && !string.isBlank()) {
+                return string;
+            }
+        }
+
         StringBuilder sb = new StringBuilder();
 
         sb.append(componentName.toUpperCase());
