@@ -68,6 +68,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -446,7 +447,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     List.of(
                         Authorization.BEARER + " " + MapUtils.getString(connectionParameters, Authorization.TOKEN))));
             case CUSTOM -> (Parameters connectionParameters, Context context) -> null;
-            case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
+            case OAUTH2_CLIENT_CREDENTIALS -> getDefaultOAuth2ClientCredentialsApplyFunction();
+            case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
                     Parameters connectionParameters, Context context) -> ApplyResponse.ofHeaders(
                         Map.of(
@@ -457,6 +459,63 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                                     Authorization.BEARER) +
                                     " " +
                                     MapUtils.getRequiredString(connectionParameters, Authorization.ACCESS_TOKEN))));
+        };
+    }
+
+    private static ApplyFunction getDefaultOAuth2ClientCredentialsApplyFunction() {
+        return (Parameters connectionParameters, Context context) -> {
+            Map<String, String> formParameters = new LinkedHashMap<>();
+
+            formParameters.put("grant_type", "client_credentials");
+
+            String scopes = MapUtils.getString(connectionParameters, Authorization.SCOPES);
+
+            if (scopes != null && !scopes.isBlank()) {
+                scopes = scopes.replace(",", " ");
+
+                formParameters.put("scope", scopes.trim());
+            }
+
+            String base64Credentials = context.encoder(
+                encoder -> encoder.base64Encode(
+                    MapUtils.getString(connectionParameters, Authorization.CLIENT_ID), ":",
+                    MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET)));
+
+            String accessToken = context.http(http -> {
+                Context.Http.Response tokenResponse =
+                    http.post(MapUtils.getRequiredString(connectionParameters, Authorization.TOKEN_URL))
+                        .body(Context.Http.Body.of(formParameters, Context.Http.BodyContentType.FORM_URL_ENCODED))
+                        .header("Authorization", "Basic " + base64Credentials)
+                        .configuration(
+                            Context.Http.responseType(Context.Http.ResponseType.JSON)
+                                .disableAuthorization(true))
+                        .execute();
+
+                if (tokenResponse.getStatusCode() == 200) {
+                    Map<String, Object> responseBody = tokenResponse.getBody(Map.class);
+
+                    return (String) responseBody.get(Authorization.ACCESS_TOKEN);
+                }
+
+                context.log(log -> log.debug(
+                    "Access token request failed with status code: {}",
+                    tokenResponse.getStatusCode()));
+
+                if (Objects.nonNull(tokenResponse.getBody())) {
+                    context.log(log -> log.trace("Response body: {}", tokenResponse.getBody()));
+                }
+
+                throw new RuntimeException("OAuth provider rejected access token request");
+            });
+
+            return ApplyResponse.ofHeaders(
+                Map.of(
+                    Authorization.AUTHORIZATION,
+                    List.of(
+                        MapUtils.getString(
+                            connectionParameters, Authorization.HEADER_PREFIX,
+                            Authorization.BEARER) +
+                            " " + accessToken)));
         };
     }
 
