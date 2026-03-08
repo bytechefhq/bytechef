@@ -939,7 +939,7 @@
       }, {
         "description": "Returns only email message ID, labels, and email headers.",
         "label": "Metadata",
-        "value": "metadata"
+        "value": "METADATA"
       } ],
       "optionsDataSource": null,
       "placeholder": null,
@@ -1069,7 +1069,7 @@
       }, {
         "description": "Returns only email message ID, labels, and email headers.",
         "label": "Metadata",
-        "value": "metadata"
+        "value": "METADATA"
       } ],
       "optionsDataSource": null,
       "placeholder": null,
@@ -4407,7 +4407,7 @@
       }, {
         "description": "Returns only email message ID, labels, and email headers.",
         "label": "Metadata",
-        "value": "metadata"
+        "value": "METADATA"
       } ],
       "optionsDataSource": null,
       "placeholder": null,
@@ -4533,7 +4533,7 @@
       }, {
         "description": "Returns only email message ID, labels, and email headers.",
         "label": "Metadata",
-        "value": "metadata"
+        "value": "METADATA"
       } ],
       "optionsDataSource": null,
       "placeholder": null,
@@ -7109,7 +7109,7 @@
       }, {
         "description": "Returns only email message ID, labels, and email headers.",
         "label": "Metadata",
-        "value": "metadata"
+        "value": "METADATA"
       } ],
       "optionsDataSource": null,
       "placeholder": null,
@@ -7182,7 +7182,7 @@
       }, {
         "description": "Returns only email message ID, labels, and email headers.",
         "label": "Metadata",
-        "value": "metadata"
+        "value": "METADATA"
       } ],
       "optionsDataSource": null,
       "placeholder": null,
