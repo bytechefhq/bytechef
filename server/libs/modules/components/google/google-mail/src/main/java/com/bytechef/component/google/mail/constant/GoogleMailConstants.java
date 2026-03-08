@@ -110,7 +110,7 @@ public class GoogleMailConstants {
                 "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
             option("Raw", Format.RAW.name(),
                 "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
-            option("Metadata", "metadata", "Returns only email message ID, labels, and email headers."))
+            option("Metadata", Format.METADATA.name(), "Returns only email message ID, labels, and email headers."))
         .defaultValue(SIMPLE.name())
         .required(false);
 
