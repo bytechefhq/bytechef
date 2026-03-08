@@ -1,0 +1,49 @@
+# Startup Analysis Profile - Use to identify slow beans and configuration
+#
+# HOW TO USE:
+# 1. Set Active profiles to: dev,local,startup-analysis
+# 2. Add VM option: -Dspring.context.debug=true
+# 3. Run and check console for timing information
+#
+# The output will show:
+# - Bean creation times
+# - Auto-configuration processing times
+# - Condition evaluation report
+
+spring:
+  main:
+    # Keep warm to show ApplicationStartup data
+    lazy-initialization: false
+
+  # Enable startup metrics
+  jmx:
+    enabled: true
+
+# Enable detailed startup logging
+logging:
+  level:
+    ROOT: INFO
+    # Show auto-configuration decisions
+    org.springframework.boot.autoconfigure: DEBUG
+    # Show bean creation
+    org.springframework.beans.factory: DEBUG
+    # Show context initialization
+    org.springframework.context: DEBUG
+    # Show condition evaluation
+    org.springframework.boot.autoconfigure.condition: DEBUG
+    # Show Liquibase timing
+    liquibase: INFO
+    # Show HikariCP pool initialization
+    com.zaxxer.hikari: DEBUG
+
+# Expose startup endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: startup,health,conditions
+  endpoint:
+    startup:
+      enabled: true
+    conditions:
+      enabled: true
