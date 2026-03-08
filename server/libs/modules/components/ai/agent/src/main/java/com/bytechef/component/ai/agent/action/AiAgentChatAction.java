@@ -20,6 +20,8 @@ import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT;
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PROPERTIES;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
+import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
+import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -36,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 
@@ -79,6 +82,7 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         }
     }
 
+    @Nullable
     protected Object perform(
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
         ActionContext context) throws Exception {
@@ -107,13 +111,13 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         Object chatResponse = ModelUtils.getChatResponse(call, inputParameters, context);
 
         if (context.isEditorEnvironment() && !toolExecutionEvents.isEmpty()) {
-            Map<String, Object> response = new LinkedHashMap<>();
+            Map<String, @Nullable Object> response = new LinkedHashMap<>();
 
             response.put("response", chatResponse);
 
             List<Map<String, Object>> toolExecutions = toolExecutionEvents.stream()
                 .map(toolExecutionEvent -> {
-                    Map<String, Object> eventData = new LinkedHashMap<>();
+                    Map<String, @Nullable Object> eventData = new LinkedHashMap<>();
 
                     eventData.put("confidence", toolExecutionEvent.confidence());
                     eventData.put("inputs", toolExecutionEvent.inputs());
