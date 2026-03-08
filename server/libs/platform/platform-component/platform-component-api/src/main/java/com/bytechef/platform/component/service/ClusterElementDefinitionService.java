@@ -65,6 +65,9 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
     ClusterElementDefinition getClusterElementDefinition(
         String componentName, int componentVersion, String clusterElementName);
 
+    ClusterElementDefinition getClusterElementDefinition(
+        String componentName, int componentVersion, String clusterElementName, String clusterElementTypeName);
+
     List<ClusterElementDefinition> getClusterElementDefinitions(ClusterElementType clusterElementType);
 
     List<ClusterElementDefinition> getClusterElementDefinitions(

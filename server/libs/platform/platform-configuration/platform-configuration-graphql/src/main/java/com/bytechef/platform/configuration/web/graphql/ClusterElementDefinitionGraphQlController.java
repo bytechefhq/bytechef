@@ -41,7 +41,13 @@ public class ClusterElementDefinitionGraphQlController {
 
     @QueryMapping
     public ClusterElementDefinition clusterElementDefinition(
-        @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName) {
+        @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
+        @Argument String clusterElementType) {
+
+        if (clusterElementType != null && !clusterElementType.isBlank()) {
+            return clusterElementDefinitionService.getClusterElementDefinition(
+                componentName, componentVersion, clusterElementName, clusterElementType);
+        }
 
         return clusterElementDefinitionService.getClusterElementDefinition(
             componentName, componentVersion, clusterElementName);
