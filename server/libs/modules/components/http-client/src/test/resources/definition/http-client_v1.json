@@ -4925,7 +4925,7 @@
       "type": "OAUTH2_IMPLICIT_CODE"
     }, {
       "acquire": null,
-      "apply": { },
+      "apply": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
