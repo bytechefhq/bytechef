@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ClusterElementDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ClusterElementDefinitionModel;
@@ -46,13 +47,20 @@ public class ClusterElementDefinitionApiController implements ClusterElementDefi
 
     @Override
     public ResponseEntity<ClusterElementDefinitionModel> getComponentClusterElementDefinition(
-        String componentName, Integer componentVersion, String clusterElementName) {
+        String componentName, Integer componentVersion, String clusterElementName, String clusterElementType) {
+
+        ClusterElementDefinition clusterElementDefinition;
+
+        if (clusterElementType != null && !clusterElementType.isBlank()) {
+            clusterElementDefinition = clusterElementDefinitionService.getClusterElementDefinition(
+                componentName, componentVersion, clusterElementName, clusterElementType);
+        } else {
+            clusterElementDefinition = clusterElementDefinitionService.getClusterElementDefinition(
+                componentName, componentVersion, clusterElementName);
+        }
 
         return ResponseEntity.ok(
-            conversionService.convert(
-                clusterElementDefinitionService.getClusterElementDefinition(
-                    componentName, componentVersion, clusterElementName),
-                ClusterElementDefinitionModel.class));
+            conversionService.convert(clusterElementDefinition, ClusterElementDefinitionModel.class));
     }
 
     @Override

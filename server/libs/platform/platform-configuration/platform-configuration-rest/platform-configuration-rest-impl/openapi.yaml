@@ -281,6 +281,12 @@ paths:
           in: "path"
           schema:
             type: "string"
+        - name: "clusterElementType"
+          description: "The type of the cluster element (e.g. PROCESSOR, TOOLS, SOURCE, DESTINATION)."
+          required: false
+          in: "query"
+          schema:
+            type: "string"
       responses:
         "200":
           description: "Successful operation."

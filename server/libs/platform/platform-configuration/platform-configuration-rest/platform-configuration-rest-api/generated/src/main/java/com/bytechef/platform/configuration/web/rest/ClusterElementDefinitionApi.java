@@ -51,6 +51,7 @@ public interface ClusterElementDefinitionApi {
      * @param componentName The name of a component. (required)
      * @param componentVersion The version of a component. (required)
      * @param clusterElementName The name of a cluster element to get. (required)
+     * @param clusterElementType The type of the cluster element (e.g. PROCESSOR, TOOLS, SOURCE, DESTINATION). (optional)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -72,7 +73,8 @@ public interface ClusterElementDefinitionApi {
     default ResponseEntity<ClusterElementDefinitionModel> getComponentClusterElementDefinition(
         @NotNull @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @NotNull @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
-        @NotNull @Parameter(name = "clusterElementName", description = "The name of a cluster element to get.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementName") String clusterElementName
+        @NotNull @Parameter(name = "clusterElementName", description = "The name of a cluster element to get.", required = true, in = ParameterIn.PATH) @PathVariable("clusterElementName") String clusterElementName,
+        @Parameter(name = "clusterElementType", description = "The type of the cluster element (e.g. PROCESSOR, TOOLS, SOURCE, DESTINATION).", in = ParameterIn.QUERY) @Valid @RequestParam(value = "clusterElementType", required = false) String clusterElementType
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
