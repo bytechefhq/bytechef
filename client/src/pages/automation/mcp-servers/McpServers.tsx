@@ -1,76 +1,39 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {
-    McpServer,
-    PlatformType,
-    Tag,
-    useMcpServerTagsQuery,
-    useWorkspaceMcpServersQuery,
-} from '@/shared/middleware/graphql';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {McpServer} from '@/shared/middleware/graphql';
 import {ServerIcon} from 'lucide-react';
-import {useSearchParams} from 'react-router-dom';
 
 import McpServerDialog from './components/McpServerDialog';
 import McpServersFilterTitle from './components/McpServersFilterTitle';
 import McpServersLeftSidebarNav from './components/McpServersLeftSidebarNav';
 import McpServerList from './components/mcp-server-list/McpServerList';
+import useMcpServers from './hooks/useMcpServers';
+
+export enum Type {
+    Component,
+    Project,
+    Tag,
+}
 
 const McpServers = () => {
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-
-    const [searchParams] = useSearchParams();
-
-    const tagId = searchParams.get('tagId');
-
-    const filterData = {
-        id: tagId ? tagId : undefined,
-        type: Type.Tag,
-    };
-
     const {
-        data,
-        error: mcpServersError,
-        isLoading: mcpServersIsLoading,
-    } = useWorkspaceMcpServersQuery({workspaceId: currentWorkspaceId + ''});
-
-    const {
-        data: tagsData,
-        error: tagsError,
-        isLoading: tagsIsLoading,
-    } = useMcpServerTagsQuery({type: PlatformType.Automation});
-
-    if (!data || !data.workspaceMcpServers) {
-        return <></>;
-    }
-
-    const validMcpServers = data.workspaceMcpServers.filter((server) => server !== null);
-    const tags = tagsData?.mcpServerTags as Tag[] | undefined;
-
-    // Filter servers based on environment and/or tagId
-    const filteredMcpServers = validMcpServers.filter((server) => {
-        // Filter by environment if specified
-        if (+server.environmentId !== currentEnvironmentId) {
-            return false;
-        }
-
-        // Filter by tagId if specified
-        if (tagId && server.tags) {
-            const hasMatchingTag = server.tags.some((tag) => tag?.id === tagId);
-            if (!hasMatchingTag) {
-                return false;
-            }
-        }
-
-        return true;
-    });
+        allComponentNames,
+        componentDefinitions,
+        filterData,
+        filteredMcpServers,
+        mcpServersError,
+        mcpServersIsLoading,
+        tags,
+        tagsError,
+        tagsIsLoading,
+        uniqueProjects,
+        validMcpServerIds,
+        validMcpServers,
+    } = useMcpServers();
 
     return (
         <LayoutContainer
@@ -89,15 +52,26 @@ const McpServers = () => {
                                 />
                             </div>
                         ) : (
-                            <EnvironmentSelect />
+                            !(mcpServersIsLoading || tagsIsLoading) && <EnvironmentSelect />
                         )
                     }
                     title={
-                        validMcpServers.length > 0 ? <McpServersFilterTitle filterData={filterData} tags={tags} /> : ''
+                        validMcpServers.length > 0 ? (
+                            <McpServersFilterTitle
+                                componentDefinitions={componentDefinitions}
+                                filterData={filterData}
+                                tags={tags}
+                                uniqueProjects={uniqueProjects}
+                            />
+                        ) : (
+                            ''
+                        )
                     }
                 />
             }
-            leftSidebarBody={<McpServersLeftSidebarNav />}
+            leftSidebarBody={
+                <McpServersLeftSidebarNav allComponentNames={allComponentNames} validMcpServerIds={validMcpServerIds} />
+            }
             leftSidebarHeader={<Header position="sidebar" title="MCP Servers" />}
             leftSidebarWidth="64"
         >
