@@ -19,6 +19,7 @@ package com.bytechef.component.ai.vectorstore.reader;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.reader.cluster.HtmlJsoupDocumentReader;
 import com.bytechef.component.ai.vectorstore.reader.cluster.JsonDocumentReader;
 import com.bytechef.component.ai.vectorstore.reader.cluster.MarkdownDocumentReader;
 import com.bytechef.component.ai.vectorstore.reader.cluster.PagePdfDocumentReader;
@@ -40,6 +41,7 @@ public class DocumentReaderComponentHandler implements ComponentHandler {
         .icon("path:assets/document-reader.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .clusterElements(
+            HtmlJsoupDocumentReader.CLUSTER_ELEMENT_DEFINITION,
             JsonDocumentReader.CLUSTER_ELEMENT_DEFINITION,
             MarkdownDocumentReader.CLUSTER_ELEMENT_DEFINITION,
             PagePdfDocumentReader.CLUSTER_ELEMENT_DEFINITION,
