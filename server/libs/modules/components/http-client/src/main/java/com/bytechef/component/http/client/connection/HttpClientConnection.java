@@ -16,9 +16,7 @@
 
 package com.bytechef.component.http.client.connection;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.ADD_TO;
-import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION_URL;
 import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
@@ -35,22 +33,12 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
-import static com.bytechef.component.definition.Context.Http.BodyContentType.FORM_URL_ENCODED;
-import static com.bytechef.component.definition.Context.Http.ResponseType.JSON;
-import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApiTokenLocation;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class HttpClientConnection {
 
@@ -160,55 +148,5 @@ public class HttpClientConnection {
                     string(SCOPES)
                         .label("Scopes")
                         .description("Optional comma-delimited list of scopes")
-                        .controlType(ControlType.TEXT_AREA))
-                .apply((Parameters connectionParameters, Context context) -> {
-                    Map<String, String> formParameters = new LinkedHashMap<>();
-
-                    formParameters.put("grant_type", "client_credentials");
-
-                    String scopes = connectionParameters.getString(SCOPES);
-
-                    if (scopes != null && !scopes.isBlank()) {
-                        scopes = scopes.replace(",", " ");
-
-                        formParameters.put("scope", scopes.trim());
-                    }
-
-                    String base64Credentials = context.encoder(
-                        encoder -> encoder.base64Encode(
-                            connectionParameters.getString(CLIENT_ID), ":",
-                            connectionParameters.getString(CLIENT_SECRET)));
-
-                    String accessToken = context.http(http -> {
-                        Context.Http.Response tokenResponse =
-                            http.post(connectionParameters.getRequiredString(TOKEN_URL))
-                                .body(Body.of(formParameters, FORM_URL_ENCODED))
-                                .header("Authorization", "Basic " + base64Credentials)
-                                .configuration(
-                                    responseType(JSON)
-                                        .disableAuthorization(true))
-                                .execute();
-
-                        if (tokenResponse.getStatusCode() == 200) {
-                            Map<String, Object> responseBody = tokenResponse.getBody(Map.class);
-
-                            return (String) responseBody.get(ACCESS_TOKEN);
-                        }
-
-                        context.log(log -> log.debug(
-                            "Access token request failed with status code: {}",
-                            tokenResponse.getStatusCode()));
-
-                        if (Objects.nonNull(tokenResponse.getBody())) {
-                            context.log(log -> log.trace("Response body: {}", tokenResponse.getBody()));
-                        }
-
-                        throw new RuntimeException("OAuth provider rejected access token request");
-
-                    });
-
-                    return Authorization.ApplyResponse.ofHeaders(
-                        Map.of(AUTHORIZATION, List.of(
-                            connectionParameters.getString(HEADER_PREFIX, Authorization.BEARER) + " " + accessToken)));
-                }));
+                        .controlType(ControlType.TEXT_AREA)));
 }
