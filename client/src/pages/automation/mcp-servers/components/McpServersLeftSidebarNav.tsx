@@ -1,34 +1,113 @@
-import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
+import {Type} from '@/pages/automation/mcp-servers/McpServers';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {PlatformType, useMcpServerTagsQuery} from '@/shared/middleware/graphql';
+import {McpProject, PlatformType, useMcpProjectsQuery, useMcpServerTagsQuery} from '@/shared/middleware/graphql';
+import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
-const McpServersLeftSidebarNav = () => {
+interface McpServersLeftSidebarNavProps {
+    validMcpServerIds: Set<string>;
+    allComponentNames: string[];
+}
+
+const McpServersLeftSidebarNav = ({allComponentNames, validMcpServerIds}: McpServersLeftSidebarNavProps) => {
     const [searchParams] = useSearchParams();
 
+    const componentName = searchParams.get('componentName');
     const projectId = searchParams.get('projectId');
     const tagId = searchParams.get('tagId');
 
     const filterData = {
-        id: projectId ? projectId : tagId ? tagId : undefined,
-        type: tagId ? Type.Tag : Type.Project,
+        id: componentName ? componentName : projectId ? projectId : tagId ? tagId : undefined,
+        type: componentName ? Type.Component : projectId ? Type.Project : Type.Tag,
     };
 
-    const {data, isLoading: tagsIsLoading} = useMcpServerTagsQuery({type: PlatformType.Automation});
+    const {data: componentDefinitions, isLoading: componentDefinitionsIsLoading} = useGetComponentDefinitionsQuery({});
 
-    if (!data || !data?.mcpServerTags) {
-        return <></>;
-    }
+    const {data: mcpProjectsData, isLoading: mcpProjectsIsLoading} = useMcpProjectsQuery();
+
+    const {data: tagsData, isLoading: tagsIsLoading} = useMcpServerTagsQuery({type: PlatformType.Automation});
+
+    const tags = tagsData?.mcpServerTags;
+
+    const mcpProjects =
+        mcpProjectsData?.mcpProjects?.filter((project): project is McpProject => project !== null) || [];
+
+    const workspaceMcpProjects = mcpProjects.filter((project) => validMcpServerIds.has(project.mcpServerId));
+
+    const uniqueProjects = Array.from(
+        new Map(
+            workspaceMcpProjects
+                .filter((project) => project.project?.id && project.project?.name)
+                .map((project) => [project.project!.id, {id: project.project!.id, name: project.project!.name}])
+        ).values()
+    );
 
     return (
         <>
             <LeftSidebarNav
                 body={
                     <>
+                        <LeftSidebarNavItem
+                            item={{
+                                current: !filterData?.id && filterData.type === Type.Component,
+                                name: 'All Components',
+                            }}
+                            toLink=""
+                        />
+
+                        {!componentDefinitionsIsLoading &&
+                            componentDefinitions
+                                ?.filter((componentDefinition: ComponentDefinitionBasic) =>
+                                    allComponentNames.includes(componentDefinition.name)
+                                )
+                                ?.map((item: ComponentDefinitionBasic) => (
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current: filterData?.id === item.name && filterData.type === Type.Component,
+                                            id: item.name!,
+                                            name: item.title!,
+                                        }}
+                                        key={item.name}
+                                        toLink={`?componentName=${item.name}`}
+                                    />
+                                ))}
+                    </>
+                }
+                title="Components"
+            />
+
+            <LeftSidebarNav
+                body={
+                    <>
+                        {!mcpProjectsIsLoading &&
+                            (uniqueProjects.length > 0 ? (
+                                uniqueProjects.map((project) => (
+                                    <LeftSidebarNavItem
+                                        item={{
+                                            current: filterData?.id === project.id && filterData.type === Type.Project,
+                                            id: project.id!,
+                                            name: project.name,
+                                        }}
+                                        key={project.id}
+                                        toLink={`?projectId=${project.id}`}
+                                    />
+                                ))
+                            ) : (
+                                <span className="px-3 text-xs">No projects.</span>
+                            ))}
+                    </>
+                }
+                title="Projects"
+            />
+
+            <LeftSidebarNav
+                body={
+                    <>
                         {!tagsIsLoading &&
-                            (data.mcpServerTags.length ? (
-                                data.mcpServerTags.map((item) => (
+                            (tags?.length ? (
+                                tags.map((item) => (
                                     <LeftSidebarNavItem
                                         icon={<TagIcon className="mr-1 size-4" />}
                                         item={{
