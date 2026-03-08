@@ -1,12 +1,13 @@
 import {useAiAgentTestingChatStore} from '@/pages/platform/cluster-element-editor/ai-agent-editor/stores';
 import {useTestingModeStore} from '@/pages/platform/cluster-element-editor/ai-agent-editor/stores/useTestingModeStore';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {NodeDataType} from '@/shared/types';
 import {useCallback, useEffect, useMemo} from 'react';
 
 interface UseClusterElementsCanvasDialogProps {
@@ -34,32 +35,45 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
 
     const copilotEnabled = ai.copilot.enabled && ff_1570;
 
+    const workflow = useWorkflowDataStore((state) => state.workflow);
+
     const isDataStreamSimpleModeAvailable = useMemo(() => {
-        if (!isDataStreamClusterRoot) {
+        if (!isDataStreamClusterRoot || !workflowNodeName) {
             return true;
         }
 
-        const clusterElements = rootClusterElementNodeData?.clusterElements;
-
-        if (!clusterElements || Array.isArray(clusterElements)) {
+        if (!workflow.definition) {
             return true;
         }
 
-        const processorValue = clusterElements['processor'];
+        let definition;
+
+        try {
+            definition = JSON.parse(workflow.definition);
+        } catch {
+            return true;
+        }
+
+        const rootTask = getTask({tasks: definition.tasks ?? [], workflowNodeName});
+
+        if (!rootTask?.clusterElements) {
+            return true;
+        }
+
+        const processorValue = rootTask.clusterElements['processor'];
 
         if (!processorValue) {
             return true;
         }
 
-        const processorElement = (Array.isArray(processorValue) ? processorValue[0] : processorValue) as NodeDataType;
+        const processorElement = Array.isArray(processorValue) ? processorValue[0] : processorValue;
 
-        const typeSegments = processorElement?.type?.split('/') || [];
+        const typeSegments = processorElement?.type?.split('/') ?? [];
+        const componentName = typeSegments[0] ?? '';
+        const operationName = typeSegments[2] ?? '';
 
-        const componentName = (processorElement as NodeDataType)?.componentName || typeSegments[0] || '';
-        const clusterElementName = typeSegments[2] || '';
-
-        return componentName === 'dataStreamProcessor' && clusterElementName === 'fieldMapper';
-    }, [isDataStreamClusterRoot, rootClusterElementNodeData?.clusterElements]);
+        return componentName === 'dataStreamProcessor' && operationName === 'fieldMapper';
+    }, [isDataStreamClusterRoot, workflowNodeName, workflow.definition]);
 
     useEffect(() => {
         if (isAiAgentClusterRoot && workflowNodeName) {
