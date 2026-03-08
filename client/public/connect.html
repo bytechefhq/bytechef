@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Integration - ByteChef</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 32px;
+            margin: 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            padding: 32px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .status {
+            text-align: center;
+            padding: 16px;
+        }
+
+        .status .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .component-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .component-icon {
+            width: 40px;
+            height: 40px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .component-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .component-info p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .form-group input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-primary:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .success-container {
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 48px;
+            height: 48px;
+            background: #dcfce7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+        }
+
+        .success-container h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .success-container p {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .expired-container {
+            text-align: center;
+        }
+
+        .expired-icon {
+            width: 48px;
+            height: 48px;
+            background: #fef3c7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+        }
+
+        .expired-container h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #92400e;
+        }
+
+        .expired-container p {
+            font-size: 14px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="logo">
+                <h1>ByteChef</h1>
+            </div>
+
+            <div id="loading" class="status">
+                <div class="spinner"></div>
+                <div class="status-text">Loading connection details...</div>
+            </div>
+
+            <div id="expired" class="expired-container" style="display:none">
+                <div class="expired-icon">&#9888;</div>
+                <h2>Link Expired</h2>
+                <p>This connection link has expired or is invalid. Please request a new link from your MCP client.</p>
+            </div>
+
+            <div id="connect-form" style="display:none">
+                <div class="component-header">
+                    <div class="component-icon" id="component-icon">&#128279;</div>
+                    <div class="component-info">
+                        <h2 id="component-title"></h2>
+                        <p>Connect your account to use this integration</p>
+                    </div>
+                </div>
+
+                <div id="error-container" class="error-message" style="display:none"></div>
+
+                <div id="parameters-container"></div>
+
+                <button class="btn btn-primary" id="connect-btn">
+                    Connect
+                </button>
+            </div>
+
+            <div id="success" class="success-container" style="display:none">
+                <div class="success-icon">&#10003;</div>
+                <h2>Connected!</h2>
+                <p>Your account has been connected. You can close this window and return to your MCP client to retry the tool.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var tokenData = null;
+        var connectionDefinition = null;
+
+        function init() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var token = urlParams.get('token');
+
+            if (!token) {
+                showExpired();
+
+                return;
+            }
+
+            fetch('/api/embedded/connect/' + encodeURIComponent(token))
+                .then(function(response) {
+                    if (!response.ok) {
+                        showExpired();
+
+                        throw new Error('Token invalid');
+                    }
+
+                    return response.json();
+                })
+                .then(function(data) {
+                    tokenData = data;
+
+                    return loadConnectionDefinition(data.componentName);
+                })
+                .catch(function(error) {
+                    if (error.message !== 'Token invalid') {
+                        console.error('Failed to resolve token:', error);
+
+                        showExpired();
+                    }
+                });
+        }
+
+        function loadConnectionDefinition(componentName) {
+            return fetch(
+                '/api/platform/internal/connection-definitions/' +
+                encodeURIComponent(componentName) +
+                '/1')
+                .then(function(response) {
+                    if (!response.ok) {
+                        showError('Failed to load connection details for ' + componentName);
+
+                        throw new Error('Failed to load connection definition');
+                    }
+
+                    return response.json();
+                })
+                .then(function(data) {
+                    connectionDefinition = data;
+
+                    renderForm();
+                })
+                .catch(function(error) {
+                    console.error('Failed to load connection definition:', error);
+
+                    showError('Failed to load connection details');
+                });
+        }
+
+        function renderForm() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('connect-form').style.display = 'block';
+
+            var componentTitle = connectionDefinition.componentTitle || tokenData.componentName;
+
+            document.getElementById('component-title').textContent = componentTitle;
+
+            var parametersContainer = document.getElementById('parameters-container');
+
+            // Clear container safely
+            while (parametersContainer.firstChild) {
+                parametersContainer.removeChild(parametersContainer.firstChild);
+            }
+
+            // Add name field first
+            parametersContainer.appendChild(
+                createFormField({
+                    name: 'connection-name',
+                    label: 'Connection Name',
+                    controlType: 'TEXT',
+                    required: true,
+                    placeholder: ''
+                }, '', componentTitle + ' Connection'));
+
+            // Render connection properties
+            if (connectionDefinition.properties && connectionDefinition.properties.length > 0) {
+                connectionDefinition.properties.forEach(function(property) {
+                    parametersContainer.appendChild(createFormField(property, 'conn_', ''));
+                });
+            }
+
+            // Render authorization properties (first authorization type)
+            if (connectionDefinition.authorizations && connectionDefinition.authorizations.length > 0) {
+                var authorization = connectionDefinition.authorizations[0];
+
+                if (authorization.properties && authorization.properties.length > 0) {
+                    authorization.properties.forEach(function(property) {
+                        parametersContainer.appendChild(createFormField(property, 'auth_', ''));
+                    });
+                }
+            }
+        }
+
+        function createFormField(property, prefix, defaultValue) {
+            var group = document.createElement('div');
+
+            group.className = 'form-group';
+
+            var label = document.createElement('label');
+            var fieldId = prefix + property.name;
+
+            label.setAttribute('for', fieldId);
+            label.textContent = (property.label || property.name) + (property.required ? ' *' : '');
+
+            var input = document.createElement('input');
+            var inputType = property.controlType === 'PASSWORD' ? 'password' : 'text';
+
+            input.type = inputType;
+            input.id = fieldId;
+
+            if (property.placeholder) {
+                input.placeholder = property.placeholder;
+            }
+
+            if (property.required) {
+                input.required = true;
+            }
+
+            if (defaultValue) {
+                input.value = defaultValue;
+            }
+
+            group.appendChild(label);
+            group.appendChild(input);
+
+            return group;
+        }
+
+        function handleConnect() {
+            var connectBtn = document.getElementById('connect-btn');
+
+            connectBtn.disabled = true;
+            connectBtn.textContent = 'Connecting...';
+
+            hideError();
+
+            var parameters = {};
+
+            // Gather connection properties
+            if (connectionDefinition.properties) {
+                connectionDefinition.properties.forEach(function(property) {
+                    var input = document.getElementById('conn_' + property.name);
+
+                    if (input && input.value) {
+                        parameters[property.name] = input.value;
+                    }
+                });
+            }
+
+            // Gather authorization properties
+            if (connectionDefinition.authorizations && connectionDefinition.authorizations.length > 0) {
+                var authorization = connectionDefinition.authorizations[0];
+
+                if (authorization.properties) {
+                    authorization.properties.forEach(function(property) {
+                        var input = document.getElementById('auth_' + property.name);
+
+                        if (input && input.value) {
+                            parameters[property.name] = input.value;
+                        }
+                    });
+                }
+            }
+
+            var connectionName = document.getElementById('connection-name').value;
+
+            var authorizationType =
+                connectionDefinition.authorizations && connectionDefinition.authorizations.length > 0
+                    ? connectionDefinition.authorizations[0].type
+                    : undefined;
+
+            var connectionPayload = {
+                authorizationType: authorizationType,
+                componentName: tokenData.componentName,
+                connectionVersion: 1,
+                name: connectionName,
+                parameters: parameters,
+                tags: []
+            };
+
+            fetch('/api/embedded/internal/connections', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(connectionPayload)
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    return response.text().then(function(errorText) {
+                        throw new Error(errorText || 'Failed to create connection');
+                    });
+                }
+
+                showSuccess();
+            })
+            .catch(function(error) {
+                console.error('Connection failed:', error);
+
+                showError(error.message || 'Failed to create connection. Please try again.');
+
+                connectBtn.disabled = false;
+                connectBtn.textContent = 'Connect';
+            });
+        }
+
+        function showExpired() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('expired').style.display = 'block';
+        }
+
+        function showSuccess() {
+            document.getElementById('connect-form').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+        }
+
+        function showError(message) {
+            var errorContainer = document.getElementById('error-container');
+
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error-container').style.display = 'none';
+        }
+
+        // Bind connect button click handler
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('connect-btn').addEventListener('click', handleConnect);
+
+            init();
+        });
+    </script>
+</body>
+</html>
