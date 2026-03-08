@@ -28,6 +28,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
@@ -81,12 +82,12 @@ class SubflowTaskDispatcherTest {
         job.setMetadata(Map.of());
 
         when(jobService.getJob(1L)).thenReturn(job);
-        when(subflowResolver.resolveSubflow(WORKFLOW_UUID, false))
+        when(subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, false))
             .thenReturn(new Subflow(RESOLVED_WORKFLOW_ID, INPUTS_NAME));
 
         subflowTaskDispatcher.dispatch(taskExecution);
 
-        verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, false);
+        verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, false);
         verify(childJobPrincipalFactory).createChildJob(anyLong(), any(JobParametersDTO.class));
     }
 
@@ -104,12 +105,12 @@ class SubflowTaskDispatcherTest {
         job.setMetadata(Map.of(MetadataConstants.EDITOR_ENVIRONMENT, true));
 
         when(jobService.getJob(1L)).thenReturn(job);
-        when(subflowResolver.resolveSubflow(WORKFLOW_UUID, true))
+        when(subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, true))
             .thenReturn(new Subflow(RESOLVED_WORKFLOW_ID, INPUTS_NAME));
 
         subflowTaskDispatcher.dispatch(taskExecution);
 
-        verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, true);
+        verify(subflowResolver).resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, true);
         verify(childJobPrincipalFactory).createChildJob(anyLong(), any(JobParametersDTO.class));
     }
 
@@ -127,7 +128,8 @@ class SubflowTaskDispatcherTest {
         job.setMetadata(Map.of());
 
         when(jobService.getJob(1L)).thenReturn(job);
-        when(subflowResolver.resolveSubflow(WORKFLOW_UUID, false)).thenReturn(new Subflow("", INPUTS_NAME));
+        when(subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, false))
+            .thenReturn(new Subflow("", INPUTS_NAME));
 
         assertThrows(IllegalStateException.class, () -> subflowTaskDispatcher.dispatch(taskExecution));
     }

@@ -31,5 +31,5 @@ public interface SubflowResolver {
         }
     }
 
-    Subflow resolveSubflow(String workflowUuid, boolean editorEnvironment);
+    Subflow resolveSubflow(String workflowUuid, String triggerName, boolean editorEnvironment);
 }

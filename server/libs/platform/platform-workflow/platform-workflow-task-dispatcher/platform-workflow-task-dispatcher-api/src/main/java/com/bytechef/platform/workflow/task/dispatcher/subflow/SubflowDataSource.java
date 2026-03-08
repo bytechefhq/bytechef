@@ -33,5 +33,5 @@ public interface SubflowDataSource {
     @Nullable
     OutputResponse getSubWorkflowOutputSchema(String workflowUuid);
 
-    List<SubflowEntry> getSubWorkflows(PlatformType platformType, String search);
+    List<SubflowEntry> getSubWorkflows(PlatformType platformType, String triggerName, String search);
 }

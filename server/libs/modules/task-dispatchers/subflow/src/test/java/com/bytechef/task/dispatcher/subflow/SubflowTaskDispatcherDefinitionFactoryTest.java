@@ -75,7 +75,7 @@ class SubflowTaskDispatcherDefinitionFactoryTest {
             }
 
             @Override
-            public List<SubflowEntry> getSubWorkflows(PlatformType platformType, String search) {
+            public List<SubflowEntry> getSubWorkflows(PlatformType platformType, String triggerName, String search) {
                 return List.of();
             }
         };
