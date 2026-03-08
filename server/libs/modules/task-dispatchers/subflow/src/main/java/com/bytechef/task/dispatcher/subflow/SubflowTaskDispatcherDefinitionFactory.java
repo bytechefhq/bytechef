@@ -17,6 +17,7 @@
 package com.bytechef.task.dispatcher.subflow;
 
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.INPUTS;
+import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.dynamicProperties;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.option;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string;
@@ -54,14 +55,7 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
                 string(WORKFLOW_UUID)
                     .label("Workflow")
                     .description("The sub-workflow to execute.")
-                    .optionsFunction(
-                        search -> subflowDataSource
-                            .getSubWorkflows(PlatformType.AUTOMATION, search)
-                            .stream()
-                            .map(
-                                subWorkflowEntry -> option(
-                                    subWorkflowEntry.name(), subWorkflowEntry.workflowUuid()))
-                            .toList()),
+                    .optionsFunction(getWorkflowOptionsFunction(subflowDataSource)),
                 dynamicProperties(INPUTS)
                     .description("The input parameters for the sub-workflow.")
                     .propertiesLookupDependsOn(WORKFLOW_UUID)
@@ -72,6 +66,16 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return taskDispatcherDefinition;
+    }
+
+    private static TaskDispatcherDefinition.OptionsFunction getWorkflowOptionsFunction(
+        SubflowDataSource subflowDataSource) {
+
+        return search -> subflowDataSource
+            .getSubWorkflows(PlatformType.AUTOMATION, NEW_WORKFLOW_CALL, search)
+            .stream()
+            .map(subWorkflowEntry -> option(subWorkflowEntry.name(), subWorkflowEntry.workflowUuid()))
+            .toList();
     }
 
     private static List<? extends Property> inputs(

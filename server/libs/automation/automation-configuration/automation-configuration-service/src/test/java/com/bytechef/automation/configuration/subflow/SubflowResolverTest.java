@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import java.util.List;
@@ -79,7 +80,7 @@ class SubflowResolverTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of(callableTrigger));
 
-            Subflow result = subflowResolver.resolveSubflow(WORKFLOW_UUID, true);
+            Subflow result = subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, true);
 
             assertEquals(DRAFT_WORKFLOW_ID, result.workflowId());
             assertEquals(TRIGGER_NAME, result.inputsName());
@@ -107,7 +108,7 @@ class SubflowResolverTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of(callableTrigger));
 
-            Subflow result = subflowResolver.resolveSubflow(WORKFLOW_UUID, false);
+            Subflow result = subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, false);
 
             assertEquals(PUBLISHED_WORKFLOW_ID, result.workflowId());
             assertEquals(TRIGGER_NAME, result.inputsName());
@@ -124,7 +125,7 @@ class SubflowResolverTest {
 
         assertThrows(
             IllegalArgumentException.class,
-            () -> subflowResolver.resolveSubflow(WORKFLOW_UUID, false));
+            () -> subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, false));
 
         verify(projectWorkflowService, never()).getLastWorkflowId(WORKFLOW_UUID);
     }

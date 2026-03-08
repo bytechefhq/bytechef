@@ -121,7 +121,16 @@
     "description": "Calls another workflow as an AI agent tool.",
     "element": null,
     "help": null,
-    "outputDefinition": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": null,
+        "placeholder": null,
+        "sampleOutput": { }
+      },
+      "outputSchema": null,
+      "sampleOutput": { }
+    },
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
@@ -179,7 +188,7 @@
       "maxLength": null,
       "metadata": { },
       "minLength": null,
-      "name": "workflowId",
+      "name": "workflowUuid",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -189,6 +198,21 @@
       "regex": null,
       "required": true,
       "type": "STRING"
+    }, {
+      "name": "inputs",
+      "advancedOption": null,
+      "description": "The input parameters for the sub-workflow.",
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "workflowUuid" ]
+      },
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Call Workflow",
     "type": {

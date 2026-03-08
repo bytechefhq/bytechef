@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class RemoteSubflowResolverClient implements SubflowResolver {
 
     @Override
-    public Subflow resolveSubflow(String workflowUuid, boolean editorEnvironment) {
+    public Subflow resolveSubflow(String workflowUuid, String triggerName, boolean editorEnvironment) {
         throw new UnsupportedOperationException();
     }
 }

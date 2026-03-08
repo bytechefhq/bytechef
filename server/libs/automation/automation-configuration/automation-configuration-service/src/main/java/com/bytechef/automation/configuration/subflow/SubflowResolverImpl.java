@@ -42,24 +42,24 @@ class SubflowResolverImpl implements SubflowResolver {
     }
 
     @Override
-    public Subflow resolveSubflow(String workflowUuid, boolean editorEnvironment) {
+    public Subflow resolveSubflow(String workflowUuid, String triggerName, boolean editorEnvironment) {
         String workflowId = resolveWorkflowId(workflowUuid, editorEnvironment);
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        String inputsName = getCallableTriggerName(workflow);
+        String inputsName = getCallableTriggerName(workflow, triggerName);
 
         return new Subflow(workflowId, inputsName);
     }
 
-    private String getCallableTriggerName(Workflow workflow) {
+    private String getCallableTriggerName(Workflow workflow, String triggerName) {
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_WORKFLOW_CALL)) {
+                Objects.equals(workflowNodeType.operation(), triggerName)) {
 
                 return workflowTrigger.getName();
             }

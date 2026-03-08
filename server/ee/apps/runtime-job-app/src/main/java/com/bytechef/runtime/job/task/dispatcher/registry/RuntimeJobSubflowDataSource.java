@@ -34,7 +34,7 @@ class RuntimeJobSubflowDataSource implements SubflowDataSource {
     }
 
     @Override
-    public List<SubflowEntry> getSubWorkflows(PlatformType platformType, String search) {
+    public List<SubflowEntry> getSubWorkflows(PlatformType platformType, String triggerName, String search) {
         throw new UnsupportedOperationException();
     }
 }

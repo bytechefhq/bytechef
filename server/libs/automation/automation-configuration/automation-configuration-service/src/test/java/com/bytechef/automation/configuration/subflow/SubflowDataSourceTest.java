@@ -160,7 +160,8 @@ class SubflowDataSourceTest {
     void testGetSubWorkflowsReturnsEmptyWhenNoCallableWorkflows() {
         when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of());
 
-        List<SubflowEntry> result = subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, null);
+        List<SubflowEntry> result =
+            subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
 
         assertTrue(result.isEmpty());
     }
@@ -193,7 +194,8 @@ class SubflowDataSourceTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of(callableTrigger));
 
-            List<SubflowEntry> result = subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, null);
+            List<SubflowEntry> result =
+                subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
 
             assertEquals(1, result.size());
             assertEquals(WORKFLOW_UUID, result.getFirst()
@@ -246,7 +248,8 @@ class SubflowDataSourceTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(nonCallableWorkflow))
                 .thenReturn(List.of(nonCallableTrigger));
 
-            List<SubflowEntry> result = subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, null);
+            List<SubflowEntry> result =
+                subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
 
             assertEquals(1, result.size());
             assertEquals("callable-uuid", result.getFirst()
@@ -305,7 +308,8 @@ class SubflowDataSourceTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow2))
                 .thenReturn(List.of(trigger2));
 
-            List<SubflowEntry> result = subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, "invoice");
+            List<SubflowEntry> result = subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION,
+                WorkflowConstants.NEW_WORKFLOW_CALL, "invoice");
 
             assertEquals(1, result.size());
             assertEquals("Finance > Invoice Processing", result.getFirst()
@@ -341,7 +345,8 @@ class SubflowDataSourceTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of(callableTrigger));
 
-            List<SubflowEntry> result = subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, null);
+            List<SubflowEntry> result =
+                subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
 
             assertEquals(1, result.size());
             assertEquals("My Project > Unnamed Workflow", result.getFirst()
@@ -377,7 +382,8 @@ class SubflowDataSourceTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of(callableTrigger));
 
-            List<SubflowEntry> result = subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, "");
+            List<SubflowEntry> result =
+                subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, "");
 
             assertEquals(1, result.size());
             assertNotNull(result.getFirst());
