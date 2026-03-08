@@ -27,6 +27,7 @@ import com.bytechef.component.http.client.action.HttpClientHeadAction;
 import com.bytechef.component.http.client.action.HttpClientPatchAction;
 import com.bytechef.component.http.client.action.HttpClientPostAction;
 import com.bytechef.component.http.client.action.HttpClientPutAction;
+import com.bytechef.component.http.client.cluster.HttpClientTool;
 import com.bytechef.component.http.client.connection.HttpClientConnection;
 import com.google.auto.service.AutoService;
 
@@ -48,7 +49,14 @@ public class HttpClientComponentHandler implements ComponentHandler {
             HttpClientPutAction.ACTION_DEFINITION,
             HttpClientPatchAction.ACTION_DEFINITION,
             HttpClientDeleteAction.ACTION_DEFINITION,
-            HttpClientHeadAction.ACTION_DEFINITION);
+            HttpClientHeadAction.ACTION_DEFINITION)
+        .clusterElements(
+            HttpClientTool.of(HttpClientDeleteAction.ACTION_DEFINITION),
+            HttpClientTool.of(HttpClientGetAction.ACTION_DEFINITION),
+            HttpClientTool.of(HttpClientHeadAction.ACTION_DEFINITION),
+            HttpClientTool.of(HttpClientPatchAction.ACTION_DEFINITION),
+            HttpClientTool.of(HttpClientPostAction.ACTION_DEFINITION),
+            HttpClientTool.of(HttpClientPutAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
