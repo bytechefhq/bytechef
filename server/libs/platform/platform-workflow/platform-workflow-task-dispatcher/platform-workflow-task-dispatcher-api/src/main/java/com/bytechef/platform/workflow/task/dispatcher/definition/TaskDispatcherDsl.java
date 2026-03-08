@@ -535,7 +535,6 @@ public final class TaskDispatcherDsl {
 
         private String description;
         private String header;
-        private String label;
         private List<String> propertiesLookupDependsOn;
         private TaskDispatcherDefinition.PropertiesFunction propertiesFunction;
 
@@ -555,12 +554,6 @@ public final class TaskDispatcherDsl {
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty label(String label) {
-            this.label = label;
-
-            return this;
-        }
-
         public ModifiableDynamicPropertiesProperty propertiesLookupDependsOn(String... propertiesLookupDependsOn) {
             if (propertiesLookupDependsOn != null) {
                 this.propertiesLookupDependsOn = List.of(propertiesLookupDependsOn);
@@ -569,7 +562,7 @@ public final class TaskDispatcherDsl {
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty propertiesFunction(
+        public ModifiableDynamicPropertiesProperty properties(
             TaskDispatcherDefinition.PropertiesFunction propertiesFunction) {
 
             this.propertiesFunction = propertiesFunction;
@@ -585,10 +578,6 @@ public final class TaskDispatcherDsl {
         @Override
         public Optional<String> getHeader() {
             return Optional.ofNullable(header);
-        }
-
-        public Optional<String> getLabel() {
-            return Optional.ofNullable(label);
         }
 
         @Override

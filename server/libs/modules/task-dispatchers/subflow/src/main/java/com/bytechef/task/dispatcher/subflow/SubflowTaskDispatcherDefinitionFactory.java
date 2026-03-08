@@ -63,10 +63,9 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
                                     subWorkflowEntry.name(), subWorkflowEntry.workflowUuid()))
                             .toList()),
                 dynamicProperties(INPUTS)
-                    .label("Inputs")
                     .description("The input parameters for the sub-workflow.")
                     .propertiesLookupDependsOn(WORKFLOW_UUID)
-                    .propertiesFunction(inputParameters -> inputs(inputParameters, subflowDataSource)))
+                    .properties(inputParameters -> inputs(inputParameters, subflowDataSource)))
             .output(inputParameters -> output(inputParameters, subflowDataSource));
     }
 
