@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.action;
+package com.bytechef.component.ai.agent.action.event;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Listener interface for observing tool execution events. Implementations receive a {@link ToolExecutionEvent} after
- * each tool call completes.
+ * Captures the details of a single tool execution, including the tool name, input parameters, output result, and
+ * optional reasoning and confidence metadata from the AI agent.
  *
  * @author Ivica Cardic
  */
-@FunctionalInterface
-interface ToolExecutionListener {
-
-    void onToolExecution(ToolExecutionEvent toolExecutionEvent);
-
+@SuppressFBWarnings("EI")
+public record ToolExecutionEvent(
+    String toolName, Map<String, Object> inputs, @Nullable Object output, @Nullable String reasoning,
+    @Nullable String confidence) {
 }
