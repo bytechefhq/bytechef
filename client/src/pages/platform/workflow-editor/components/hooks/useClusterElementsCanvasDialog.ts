@@ -75,31 +75,33 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         return componentName === 'dataStreamProcessor' && operationName === 'fieldMapper';
     }, [isDataStreamClusterRoot, workflowNodeName, workflow.definition]);
 
+    const preferenceKey = workflow.id && workflowNodeName ? `${workflow.id}:${workflowNodeName}` : undefined;
+
     useEffect(() => {
-        if (isAiAgentClusterRoot && workflowNodeName) {
-            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName];
+        if (isAiAgentClusterRoot && preferenceKey) {
+            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[preferenceKey];
 
             const showAiAgent = preference ?? true;
 
             setShowAiAgentEditor(showAiAgent);
         }
-    }, [isAiAgentClusterRoot, workflowNodeName, setShowAiAgentEditor]);
+    }, [isAiAgentClusterRoot, preferenceKey, setShowAiAgentEditor]);
 
     useEffect(() => {
-        if (isDataStreamClusterRoot && workflowNodeName) {
+        if (isDataStreamClusterRoot && preferenceKey) {
             if (!isDataStreamSimpleModeAvailable) {
                 setShowDataStreamEditor(false);
 
                 return;
             }
 
-            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName];
+            const preference = useClusterElementsCanvasDialogStore.getState().editorPreferences[preferenceKey];
 
             const showDataStream = preference ?? true;
 
             setShowDataStreamEditor(showDataStream);
         }
-    }, [isDataStreamClusterRoot, isDataStreamSimpleModeAvailable, workflowNodeName, setShowDataStreamEditor]);
+    }, [isDataStreamClusterRoot, isDataStreamSimpleModeAvailable, preferenceKey, setShowDataStreamEditor]);
 
     const handleToggleEditor = useCallback(
         (showSimpleEditor: boolean) => {
@@ -134,12 +136,12 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
                 }
             }
 
-            if (workflowNodeName) {
-                setEditorPreference(workflowNodeName, showSimpleEditor);
+            if (preferenceKey) {
+                setEditorPreference(preferenceKey, showSimpleEditor);
             }
         },
         [
-            workflowNodeName,
+            preferenceKey,
             isAiAgentClusterRoot,
             isDataStreamClusterRoot,
             rootClusterElementNodeData,
@@ -209,26 +211,31 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     }, [handleOpenChange]);
 
     useEffect(() => {
-        if (isAiAgentClusterRoot && workflowNodeName) {
-            const showAiAgent =
-                useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName] ?? true;
+        if (isAiAgentClusterRoot && preferenceKey) {
+            const showAiAgent = useClusterElementsCanvasDialogStore.getState().editorPreferences[preferenceKey] ?? true;
 
             setShowAiAgentEditor(showAiAgent);
         } else {
             setShowAiAgentEditor(false);
         }
-    }, [workflowNodeName, isAiAgentClusterRoot, setShowAiAgentEditor]);
+    }, [preferenceKey, isAiAgentClusterRoot, setShowAiAgentEditor]);
 
     useEffect(() => {
-        if (isDataStreamClusterRoot && workflowNodeName) {
+        if (isDataStreamClusterRoot && preferenceKey) {
+            if (!isDataStreamSimpleModeAvailable) {
+                setShowDataStreamEditor(false);
+
+                return;
+            }
+
             const showDataStream =
-                useClusterElementsCanvasDialogStore.getState().editorPreferences[workflowNodeName] ?? true;
+                useClusterElementsCanvasDialogStore.getState().editorPreferences[preferenceKey] ?? true;
 
             setShowDataStreamEditor(showDataStream);
         } else {
             setShowDataStreamEditor(false);
         }
-    }, [workflowNodeName, isDataStreamClusterRoot, setShowDataStreamEditor]);
+    }, [preferenceKey, isDataStreamClusterRoot, isDataStreamSimpleModeAvailable, setShowDataStreamEditor]);
 
     return {
         copilotEnabled,
