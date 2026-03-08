@@ -119,7 +119,10 @@ const ClusterElementsCanvasDialog = ({
             <DialogContent className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0">
                 {isDataStreamClusterRoot && showDataStreamEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
-                        <DataStreamEditor onClose={handleClose} onToggleEditor={handleToggleEditor} />
+                        <DataStreamEditor
+                            onClose={handleClose}
+                            onToggleEditor={isDataStreamSimpleModeAvailable ? handleToggleEditor : undefined}
+                        />
                     </div>
                 ) : showAiAgentEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
