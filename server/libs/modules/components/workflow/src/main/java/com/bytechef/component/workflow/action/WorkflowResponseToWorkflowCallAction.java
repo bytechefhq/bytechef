@@ -20,20 +20,12 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
-import static com.bytechef.component.workflow.util.WorkflowConstants.RESPONSE;
+import static com.bytechef.component.workflow.constant.WorkflowConstants.RESPONSE;
 import static com.bytechef.platform.component.constant.WorkflowConstants.OUTPUT_SCHEMA;
 import static com.bytechef.platform.component.constant.WorkflowConstants.RESPONSE_TO_WORKFLOW_CALL;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.CallableResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ValueProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import java.util.List;
-import java.util.Map;
+import com.bytechef.component.workflow.util.WorkflowResponseUtils;
 
 /**
  * @author Ivica Cardic
@@ -53,51 +45,8 @@ public class WorkflowResponseToWorkflowCallAction {
             dynamicProperties(RESPONSE)
                 .description("The response data to send back to the calling workflow.")
                 .propertiesLookupDependsOn(OUTPUT_SCHEMA)
-                .properties(WorkflowResponseToWorkflowCallAction::responseProperties)
+                .properties(WorkflowResponseUtils::responseProperties)
                 .required(true))
-        .output(WorkflowResponseToWorkflowCallAction::output)
-        .perform(WorkflowResponseToWorkflowCallAction::perform);
-
-    protected static OutputResponse output(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        Map<String, ?> response = inputParameters.getMap(RESPONSE, Map.of());
-
-        if (response.isEmpty()) {
-            return null;
-        }
-
-        return OutputResponse.of(response);
-    }
-
-    protected static CallableResponse perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return new CallableResponse(inputParameters.getMap(RESPONSE, Map.of()));
-    }
-
-    protected static List<? extends ValueProperty<?>> responseProperties(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        ActionContext actionContext) {
-
-        String outputSchema = inputParameters.getString(OUTPUT_SCHEMA);
-
-        if (outputSchema == null) {
-            return List.of();
-        }
-
-        ModifiableValueProperty<?, ?> property = (ModifiableValueProperty<?, ?>) actionContext.outputSchema(
-            outputSchemaFunction -> outputSchemaFunction.getOutputSchema(OUTPUT_SCHEMA, outputSchema));
-
-        if (property == null) {
-            return List.of();
-        }
-
-        if (property instanceof ModifiableObjectProperty objectProperty) {
-            return objectProperty.getProperties()
-                .orElse(List.of());
-        }
-
-        return List.of(property);
-    }
+        .output(WorkflowResponseUtils::actionOutput)
+        .perform(WorkflowResponseUtils::perform);
 }
