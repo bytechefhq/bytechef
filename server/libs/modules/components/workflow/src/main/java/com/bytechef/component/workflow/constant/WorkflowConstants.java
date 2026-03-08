@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.workflow.util;
+package com.bytechef.component.workflow.constant;
 
 /**
  * @author Ivica Cardic
