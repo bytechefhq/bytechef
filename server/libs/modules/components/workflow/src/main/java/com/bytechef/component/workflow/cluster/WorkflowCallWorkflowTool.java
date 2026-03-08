@@ -34,7 +34,7 @@ import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
  */
 public class WorkflowCallWorkflowTool {
 
-    public static final String WORKFLOW_ID = "workflowId";
+    public static final String WORKFLOW_UUID = "workflowUuid";
 
     public static ClusterElementDefinition<ToolFunction> of(SubflowDataSource subflowDataSource) {
         return ComponentDsl.<ToolFunction>clusterElement("callWorkflow")
@@ -53,7 +53,7 @@ public class WorkflowCallWorkflowTool {
                     .controlType(TEXT_AREA)
                     .expressionEnabled(false)
                     .required(true),
-                string(WORKFLOW_ID)
+                string(WORKFLOW_UUID)
                     .label("Workflow")
                     .description("The workflow to call when this tool is invoked.")
                     .options(
