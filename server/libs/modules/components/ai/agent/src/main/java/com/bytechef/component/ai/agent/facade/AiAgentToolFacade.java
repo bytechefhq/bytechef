@@ -65,7 +65,8 @@ public class AiAgentToolFacade extends AbstractToolFacade {
         List<FromAiResult> fromAiResults = extractFromAiResults(toolParameters);
 
         FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
-            getToolName(clusterElementDefinition.getComponentName(), clusterElementDefinition.getName()),
+            getToolName(clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(),
+                toolParameters),
             getFromAiToolCallbackFunction(
                 clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                 clusterElementDefinition.getName(), toolParameters, componentConnection, editorEnvironment))
