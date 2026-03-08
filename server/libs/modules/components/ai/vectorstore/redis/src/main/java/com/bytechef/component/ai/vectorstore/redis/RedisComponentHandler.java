@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.redis.action.RedisLoadAction;
 import com.bytechef.component.ai.vectorstore.redis.action.RedisSearchAction;
+import com.bytechef.component.ai.vectorstore.redis.cluster.RedisSearchTool;
 import com.bytechef.component.ai.vectorstore.redis.cluster.RedisVectorStore;
 import com.bytechef.component.ai.vectorstore.redis.connection.RedisConnection;
 import com.bytechef.component.definition.ComponentCategory;
@@ -52,7 +53,9 @@ public class RedisComponentHandler implements ComponentHandler {
             .actions(
                 RedisSearchAction.of(clusterElementDefinitionService),
                 RedisLoadAction.of(clusterElementDefinitionService))
-            .clusterElements(RedisVectorStore.of(clusterElementDefinitionService)));
+            .clusterElements(
+                RedisSearchTool.of(clusterElementDefinitionService),
+                RedisVectorStore.of(clusterElementDefinitionService)));
     }
 
     @Override

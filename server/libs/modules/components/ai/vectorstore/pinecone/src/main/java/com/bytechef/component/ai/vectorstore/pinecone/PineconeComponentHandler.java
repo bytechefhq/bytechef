@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.pinecone.action.PineconeLoadAction;
 import com.bytechef.component.ai.vectorstore.pinecone.action.PineconeSearchAction;
+import com.bytechef.component.ai.vectorstore.pinecone.cluster.PineconeSearchTool;
 import com.bytechef.component.ai.vectorstore.pinecone.cluster.PineconeVectorStore;
 import com.bytechef.component.ai.vectorstore.pinecone.connection.PineconeConnection;
 import com.bytechef.component.definition.ComponentCategory;
@@ -53,6 +54,7 @@ public class PineconeComponentHandler implements ComponentHandler {
                     PineconeLoadAction.of(clusterElementDefinitionService),
                     PineconeSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(
+                    PineconeSearchTool.of(clusterElementDefinitionService),
                     PineconeVectorStore.of(clusterElementDefinitionService)));
     }
 
