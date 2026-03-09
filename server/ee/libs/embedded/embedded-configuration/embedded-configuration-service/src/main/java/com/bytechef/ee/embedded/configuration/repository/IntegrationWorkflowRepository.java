@@ -26,6 +26,8 @@ public interface IntegrationWorkflowRepository extends ListCrudRepository<Integr
 
     List<IntegrationWorkflow> findAllByIntegrationId(long integrationId);
 
+    List<IntegrationWorkflow> findAllByIntegrationIdIn(List<Long> integrationIds);
+
     List<IntegrationWorkflow> findAllByIntegrationIdAndIntegrationVersion(long integrationId, int integrationVersion);
 
     Optional<IntegrationWorkflow> findByIntegrationIdAndIntegrationVersionAndWorkflowId(

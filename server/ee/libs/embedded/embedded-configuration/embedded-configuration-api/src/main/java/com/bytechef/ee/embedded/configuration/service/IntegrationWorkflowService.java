@@ -32,6 +32,8 @@ public interface IntegrationWorkflowService {
 
     List<IntegrationWorkflow> getIntegrationWorkflows(long integrationId);
 
+    List<IntegrationWorkflow> getIntegrationWorkflows(List<Long> integrationIds);
+
     List<IntegrationWorkflow> getIntegrationWorkflows(long integrationId, int integrationVersion);
 
     String getLastWorkflowId(String workflowUuid);
