@@ -50,6 +50,7 @@ interface DialogProps {
     integration?: IntegrationType;
     isOAuth2?: boolean;
     isOpen: boolean;
+    loading?: boolean;
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
     mergedWorkflows: MergedWorkflowType[];
@@ -65,6 +66,7 @@ const ConnectDialog = ({
     integration,
     isOAuth2 = false,
     isOpen,
+    loading = false,
     properties,
     registerFormSubmit,
     mergedWorkflows,
@@ -94,7 +96,11 @@ const ConnectDialog = ({
             <div className={styles.dialogContainer} onClick={(event) => event.stopPropagation()}>
                 <DialogHeader closeDialog={closeDialog} integration={integration} />
 
-                {integration ? (
+                {loading ? (
+                    <main className={styles.dialogContentFallback}>
+                        <p>Loading...</p>
+                    </main>
+                ) : integration ? (
                     <DialogContent
                         closeDialog={closeDialog}
                         workflowsView={workflowsView}
@@ -118,7 +124,7 @@ const ConnectDialog = ({
                     </main>
                 )}
 
-                {integration && (
+                {integration && !loading && (
                     <DialogFooter workflowsView={workflowsView} handleClick={handleClick} isOAuth2={isOAuth2} />
                 )}
 
