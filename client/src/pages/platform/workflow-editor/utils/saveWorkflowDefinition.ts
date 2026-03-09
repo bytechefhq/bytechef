@@ -221,12 +221,7 @@ export default async function saveWorkflowDefinition({
                     tasks: updatedWorkflowDefinitionTasks,
                 });
             } else if (nodeIndex !== undefined && nodeIndex > -1) {
-                const tasksAfterCurrent = updatedWorkflowDefinitionTasks.slice(nodeIndex);
-
-                updatedWorkflowDefinitionTasks = [
-                    ...updatedWorkflowDefinitionTasks.slice(0, nodeIndex),
-                    ...tasksAfterCurrent,
-                ];
+                updatedWorkflowDefinitionTasks = [...updatedWorkflowDefinitionTasks];
 
                 updatedWorkflowDefinitionTasks.splice(nodeIndex, 0, newTask);
             } else {
