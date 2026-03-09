@@ -97,10 +97,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const savingRef = useRef<Promise<void> | null>(null);
         const pendingValueRef = useRef<string | number | null | undefined>(undefined);
         const editorValueRef = useRef(editorValue);
+        const isFocusedRef = useRef(false);
 
         editorValueRef.current = editorValue;
-
-        const isFocusedRef = useRef(false);
 
         const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
