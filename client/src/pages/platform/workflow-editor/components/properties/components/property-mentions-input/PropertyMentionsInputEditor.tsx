@@ -139,6 +139,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
                 FormulaMode.configure({
+                    initialFormulaMode: isFormulaMode ?? false,
                     saveNullValue: () => {
                         if (
                             !workflow.id ||
@@ -221,6 +222,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             return extensions;
+            // eslint-disable-next-line react-hooks/exhaustive-deps -- isFormulaMode intentionally omitted to avoid editor recreation on toggle
         }, [
             controlType,
             getComponentIcon,
@@ -613,14 +615,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
         }, [editor, memoizedContent, isLocalUpdate]);
 
-        // Set formula mode based on value and sync with editor storage
+        // Sync formula mode state with editor storage
         useEffect(() => {
             if (!editor) {
                 return;
-            }
-
-            if (typeof value === 'string' && value.startsWith('=') && setIsFormulaMode) {
-                setIsFormulaMode(true);
             }
 
             if (isFormulaMode !== undefined) {
@@ -628,7 +626,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 editor.storage.FormulaMode.isFormulaMode = isFormulaMode;
             }
-        }, [editor, value, isFormulaMode, setIsFormulaMode]);
+        }, [editor, isFormulaMode]);
 
         // Set editable based on isFromAi
         useEffect(() => {
