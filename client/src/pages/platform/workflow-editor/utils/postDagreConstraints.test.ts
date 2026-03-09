@@ -7,7 +7,6 @@ import {
     adjustBottomGhostForMovedChildren,
     alignBranchCaseChildren,
     alignChainNodesCrossAxis,
-    alignConditionCaseChildren,
     alignDispatcherGhostsCrossAxis,
     alignTrailingPlaceholder,
     applySavedPositions,
@@ -18,6 +17,7 @@ import {
     constrainConditionGhostsCrossAxis,
     constrainLeftGhostPositions,
     positionConditionCasePlaceholders,
+    pullSimpleConditionChildrenInward,
     separateOverlappingConditionChildren,
     shiftConditionBranchContent,
 } from './postDagreConstraints';
@@ -4310,7 +4310,10 @@ describe('alignConditionCaseChildren', () => {
     it('should pull single-node branch children inward when placed too far from center (TB mode)', () => {
         const {allNodes, edges, leftNode, rightNode} = makeConditionWithSingleNodeBranches(500, 100, 900);
 
-        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'x',
+        });
 
         expect(leftNode.position.x).toBe(500 - CONDITION_CASE_OFFSET);
         expect(rightNode.position.x).toBe(500 + CONDITION_CASE_OFFSET);
@@ -4326,7 +4329,10 @@ describe('alignConditionCaseChildren', () => {
             expectedRight
         );
 
-        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'x',
+        });
 
         expect(leftNode.position.x).toBe(expectedLeft);
         expect(rightNode.position.x).toBe(expectedRight);
@@ -4401,7 +4407,10 @@ describe('alignConditionCaseChildren', () => {
             },
         ];
 
-        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'x',
+        });
 
         const expectedLeft = 500 - CONDITION_CASE_OFFSET;
 
@@ -4474,7 +4483,10 @@ describe('alignConditionCaseChildren', () => {
             },
         ];
 
-        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'x',
+        });
 
         expect(scriptNode.position.x).toBe(100);
         expect(rightNode.position.x).toBe(900);
@@ -4538,7 +4550,10 @@ describe('alignConditionCaseChildren', () => {
             },
         ];
 
-        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'x'});
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'x',
+        });
 
         expect(loopNode.position.x).toBe(100);
         expect(rightNode.position.x).toBe(900);
@@ -4602,7 +4617,10 @@ describe('alignConditionCaseChildren', () => {
             },
         ];
 
-        alignConditionCaseChildren(allNodes, edges, {conditionCaseOffset: CONDITION_CASE_OFFSET, crossAxis: 'y'});
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'y',
+        });
 
         expect(leftNode.position.y).toBe(500 - CONDITION_CASE_OFFSET);
         expect(rightNode.position.y).toBe(500 + CONDITION_CASE_OFFSET);
