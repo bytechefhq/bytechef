@@ -52,7 +52,11 @@ interface WorkflowDataStateI {
 
     workflow: Workflow & WorkflowDataType;
     setWorkflow: (workflow: Workflow) => void;
-    updateWorkflowNodeParameters: (workflowNodeName: string, parameters: Record<string, object>, version?: number) => void;
+    updateWorkflowNodeParameters: (
+        workflowNodeName: string,
+        parameters: Record<string, object>,
+        version?: number
+    ) => void;
 }
 
 function updateTaskParametersInTasks(
@@ -162,7 +166,15 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                         return state;
                     }
 
-                    const definition = JSON.parse(workflow.definition);
+                    let definition;
+
+                    try {
+                        definition = JSON.parse(workflow.definition);
+                    } catch (error) {
+                        console.error('Failed to parse workflow definition:', error);
+
+                        return state;
+                    }
 
                     if (definition.tasks) {
                         updateTaskParametersInTasks(definition.tasks, workflowNodeName, parameters);

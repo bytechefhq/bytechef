@@ -37,7 +37,15 @@ export default async function saveWorkflowDefinition({
 }: SaveWorkflowDefinitionProps) {
     const {workflow} = useWorkflowDataStore.getState();
 
-    const workflowDefinition = JSON.parse(workflow.definition!);
+    let workflowDefinition: WorkflowDefinitionType;
+
+    try {
+        workflowDefinition = JSON.parse(workflow.definition!);
+    } catch (error) {
+        console.error('Failed to parse workflow definition:', error);
+
+        return;
+    }
 
     const workflowTasks: Array<WorkflowTask> = workflow.tasks ?? [];
     const workflowDefinitionTasks: Array<WorkflowTask> = workflowDefinition.tasks ?? [];
