@@ -1,6 +1,7 @@
 import {Extension} from '@tiptap/core';
 
 export interface FormulaModeOptionsI {
+    initialFormulaMode?: boolean;
     saveNullValue?: () => void;
     setIsFormulaMode: (value: boolean) => void;
 }
@@ -33,7 +34,9 @@ export const FormulaMode = Extension.create<FormulaModeOptionsI>({
     addKeyboardShortcuts() {
         return {
             Backspace: () => {
-                if (this.editor.isEmpty && this.storage.isFormulaMode) {
+                const hasNoContent = this.editor.state.doc.textContent.trim() === '';
+
+                if (hasNoContent && this.storage.isFormulaMode) {
                     this.options.setIsFormulaMode(false);
 
                     this.storage.isFormulaMode = false;
@@ -49,6 +52,7 @@ export const FormulaMode = Extension.create<FormulaModeOptionsI>({
     },
     addOptions() {
         return {
+            initialFormulaMode: false,
             saveNullValue: undefined,
             setIsFormulaMode: () => {},
         };
@@ -59,4 +63,7 @@ export const FormulaMode = Extension.create<FormulaModeOptionsI>({
         };
     },
     name: 'FormulaMode',
+    onCreate() {
+        this.storage.isFormulaMode = this.options.initialFormulaMode ?? false;
+    },
 });
