@@ -6,6 +6,7 @@ import {
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UseMutationResult} from '@tanstack/react-query';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {decodePath} from './encodingUtils';
@@ -76,6 +77,12 @@ export default function deleteProperty(
                             metadata: response.metadata,
                             parameters: response.parameters,
                         });
+
+                        if (response.parameters) {
+                            useWorkflowDataStore
+                                .getState()
+                                .updateWorkflowNodeParameters(clusterElementWorkflowNodeName, response.parameters);
+                        }
                     },
                 }
             )
@@ -83,6 +90,8 @@ export default function deleteProperty(
 
         return;
     }
+
+    const nodeWorkflowNodeName = rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '';
 
     enqueueWorkflowMutation(() =>
         deleteWorkflowNodeParameterMutation.mutateAsync(
@@ -92,7 +101,7 @@ export default function deleteProperty(
                 },
                 environmentId: environmentStore.getState().currentEnvironmentId,
                 id: workflowId,
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '',
+                workflowNodeName: nodeWorkflowNodeName,
             },
             {
                 onSuccess: (response) => {
@@ -112,6 +121,12 @@ export default function deleteProperty(
                             metadata: response.metadata,
                             parameters: response.parameters,
                         });
+                    }
+
+                    if (response.parameters) {
+                        useWorkflowDataStore
+                            .getState()
+                            .updateWorkflowNodeParameters(nodeWorkflowNodeName, response.parameters);
                     }
                 },
             }

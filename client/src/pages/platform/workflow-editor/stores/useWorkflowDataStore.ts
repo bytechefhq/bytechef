@@ -52,6 +52,34 @@ interface WorkflowDataStateI {
 
     workflow: Workflow & WorkflowDataType;
     setWorkflow: (workflow: Workflow) => void;
+    updateWorkflowNodeParameters: (workflowNodeName: string, parameters: Record<string, object>) => void;
+}
+
+function updateTaskParametersInTasks(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    tasks: any[],
+    workflowNodeName: string,
+    parameters: Record<string, object>
+): boolean {
+    for (const task of tasks) {
+        if (task.name === workflowNodeName) {
+            task.parameters = parameters;
+
+            return true;
+        }
+
+        if (task.parameters) {
+            for (const parameterValue of Object.values(task.parameters)) {
+                if (Array.isArray(parameterValue) && parameterValue.length > 0 && parameterValue[0]?.name) {
+                    if (updateTaskParametersInTasks(parameterValue, workflowNodeName, parameters)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 const useWorkflowDataStore = create<WorkflowDataStateI>()(
@@ -126,6 +154,34 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             workflow: {
                 nodeNames: ['trigger_1'],
             },
+            updateWorkflowNodeParameters: (workflowNodeName, parameters) =>
+                set((state) => {
+                    const workflow = state.workflow;
+
+                    if (!workflow.definition) {
+                        return state;
+                    }
+
+                    const definition = JSON.parse(workflow.definition);
+
+                    if (definition.tasks) {
+                        updateTaskParametersInTasks(definition.tasks, workflowNodeName, parameters);
+                    }
+
+                    const updatedTasks = workflow.tasks?.map((task) =>
+                        task.name === workflowNodeName ? {...task, parameters} : task
+                    );
+
+                    return {
+                        ...state,
+                        workflow: {
+                            ...workflow,
+                            definition: JSON.stringify(definition, null, 4),
+                            tasks: updatedTasks,
+                            version: (workflow.version || 0) + 1,
+                        },
+                    };
+                }),
             setWorkflow: (workflow) =>
                 set((state) => {
                     const workflowNodes: Array<{name: string; type: string}> = [
