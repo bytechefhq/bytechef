@@ -232,6 +232,7 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
 
             const getClusterElementDefinitionRequest = {
                 clusterElementName: operationName,
+                clusterElementType: elementType.toUpperCase(),
                 componentName,
                 componentVersion: version,
             };
@@ -368,11 +369,13 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
                     queryFn: () =>
                         new ClusterElementDefinitionApi().getComponentClusterElementDefinition({
                             clusterElementName,
+                            clusterElementType: elementType.toUpperCase(),
                             componentName: elementItem.componentName,
                             componentVersion: componentVersion,
                         }),
                     queryKey: ClusterElementDefinitionKeys.clusterElementDefinition({
                         clusterElementName,
+                        clusterElementType: elementType.toUpperCase(),
                         componentName: elementItem.componentName,
                         componentVersion: componentVersion,
                     }),
@@ -388,7 +391,7 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
 
         fetchProperties();
         setupNodeDetailsPanel(elementItem);
-    }, [elementItem, queryClient, setupNodeDetailsPanel]);
+    }, [elementItem, elementType, queryClient, setupNodeDetailsPanel]);
 
     return {
         componentConnections,
