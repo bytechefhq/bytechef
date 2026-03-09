@@ -1,0 +1,10 @@
+query mcpComponentDefinitions {
+    mcpComponentDefinitions {
+        clusterElementsCount
+        description
+        icon
+        name
+        title
+        version
+    }
+}

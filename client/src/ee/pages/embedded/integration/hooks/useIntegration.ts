@@ -5,7 +5,7 @@ import {
     IntegrationWorkflowKeys,
     useGetIntegrationWorkflowQuery,
 } from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys, useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -72,8 +72,6 @@ export const useIntegration = () => {
             enabled
         );
     };
-
-    const {data: integrations} = useGetIntegrationsQuery();
 
     const queryClient = useQueryClient();
 
@@ -219,7 +217,6 @@ export const useIntegration = () => {
         handleWorkflowExecutionsTestOutputCloseClick,
         integrationId: parseInt(integrationId!),
         integrationWorkflowId: parseInt(integrationWorkflowId!),
-        integrations,
         invalidateWorkflowQueries,
         leftSidebarOpen,
         sidebarLoaded,
