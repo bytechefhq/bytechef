@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {DEFAULT_CANVAS_WIDTH} from '@/shared/constants';
+import {DEFAULT_CANVAS_WIDTH, SPACE} from '@/shared/constants';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType, WorkflowNodeType} from '@/shared/types';
 import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from '@xyflow/react';
@@ -7,6 +7,7 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 import {createDefaultEdges, createDefaultNodes} from '../utils/layoutUtils';
+import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 
 export type WorkflowDataType = {
     actionNames?: Array<string>;
@@ -73,12 +74,16 @@ function updateTaskParametersInTasks(
         }
 
         if (task.parameters) {
-            for (const parameterValue of Object.values(task.parameters)) {
-                if (Array.isArray(parameterValue) && parameterValue.length > 0 && parameterValue[0]?.name) {
-                    if (updateTaskParametersInTasks(parameterValue, workflowNodeName, parameters)) {
-                        return true;
-                    }
+            let found = false;
+
+            forEachNestedTaskGroup(task.parameters as Record<string, unknown>, (subtasks) => {
+                if (!found && updateTaskParametersInTasks(subtasks, workflowNodeName, parameters)) {
+                    found = true;
                 }
+            });
+
+            if (found) {
+                return true;
             }
         }
     }
@@ -188,7 +193,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                         ...state,
                         workflow: {
                             ...workflow,
-                            definition: JSON.stringify(definition, null, 4),
+                            definition: JSON.stringify(definition, null, SPACE),
                             tasks: updatedTasks,
                             version: version ?? workflow.version,
                         },
