@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -720,7 +721,7 @@ public class WorkflowNodeParameterFacadeTest {
         Map<String, Object> outputs = Map.of();
         String displayCondition = "body.bodyContentType == 'JSON'";
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenReturn(Map.of("body", Map.of("bodyContentType", "JSON")))
             .thenReturn(Map.of("displayCondition", true));
 
@@ -729,7 +730,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         // Then
         assertTrue(result);
-        verify(evaluator, times(2)).evaluate(any(Map.class), any(Map.class));
+        verify(evaluator, times(2)).evaluate(any(Map.class), any(Map.class), eq(true));
     }
 
     @Test
@@ -942,7 +943,7 @@ public class WorkflowNodeParameterFacadeTest {
         Map<String, Object> outputs = Map.of();
         String displayCondition = "body.bodyContentType == 'JSON'";
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenThrow(new RuntimeException("Evaluator error"))
             .thenReturn(Map.of("displayCondition", false));
 
@@ -951,7 +952,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         // Then
         assertFalse(result);
-        verify(evaluator, times(2)).evaluate(any(Map.class), any(Map.class));
+        verify(evaluator, times(2)).evaluate(any(Map.class), any(Map.class), eq(true));
     }
 
     @Test
@@ -1560,7 +1561,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(anyString(), anyString(), anyLong()))
             .thenReturn(Map.of());
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenReturn(Map.of("displayCondition", false));
 
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
@@ -2026,7 +2027,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenAnswer(invocation -> {
                 Map<String, Object> map = invocation.getArgument(0);
 
@@ -2162,7 +2163,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenAnswer(invocation -> {
                 Map<String, Object> map = invocation.getArgument(0);
 
@@ -2306,7 +2307,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenAnswer(invocation -> {
                 Map<String, Object> map = invocation.getArgument(0);
 
@@ -2477,7 +2478,7 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(Map.of());
         when(workflowTask.getName()).thenReturn(workflowNodeName);
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenAnswer(invocation -> {
                 Map<String, Object> map = invocation.getArgument(0);
 
@@ -2650,7 +2651,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenAnswer(invocation -> {
                 Map<String, Object> map = invocation.getArgument(0);
 
@@ -3112,7 +3113,7 @@ public class WorkflowNodeParameterFacadeTest {
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
             .thenReturn(Map.of());
 
-        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+        when(evaluator.evaluate(any(Map.class), any(Map.class), eq(true)))
             .thenAnswer(invocation -> {
                 Map<String, Object> map = invocation.getArgument(0);
 
