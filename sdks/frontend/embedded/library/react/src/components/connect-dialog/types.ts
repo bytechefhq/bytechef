@@ -5,7 +5,7 @@ export interface IntegrationType {
         inputs?: PropertyType[];
         oauth2?: {
             authorizationUrl: string;
-            scopes: string[];
+            scopes: Record<string, string> | string[] | string;
             redirectUri: string;
             clientId: string;
         };
