@@ -378,6 +378,97 @@ describe('saveWorkflowDefinition', () => {
         });
     });
 
+    describe('optimistic update', () => {
+        it('should update the store with new definition before calling mutate', async () => {
+            mockWorkflowState = makeWorkflowState();
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            // setWorkflow should be called before mutate (optimistic update)
+            expect(mockWorkflowState.setWorkflow).toHaveBeenCalledOnce();
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            expect(optimisticWorkflow.definition).toContain('httpClient_1');
+        });
+
+        it('should rollback to previous workflow on mutation error', async () => {
+            mockWorkflowState = makeWorkflowState();
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            // Reset the mock to track the rollback call separately
+            mockWorkflowState.setWorkflow.mockClear();
+
+            const callbacks = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][1];
+
+            callbacks.onError(new Error('version conflict'));
+
+            expect(mockWorkflowState.setWorkflow).toHaveBeenCalledOnce();
+
+            const rolledBackWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            // Rolled-back workflow should NOT contain the new task
+            expect(rolledBackWorkflow.definition).not.toContain('httpClient_1');
+            expect(rolledBackWorkflow.id).toBe('workflow-1');
+        });
+
+        it('should update store with server response on mutation success', async () => {
+            mockWorkflowState = makeWorkflowState();
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            mockWorkflowState.setWorkflow.mockClear();
+
+            const callbacks = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][1];
+            const serverResponse = {
+                id: 'workflow-1',
+                tasks: [{name: 'httpClient_1', parameters: {}, type: 'httpClient/v1/get'}],
+                version: 5,
+            };
+
+            callbacks.onSuccess(serverResponse);
+
+            expect(mockWorkflowState.setWorkflow).toHaveBeenCalledOnce();
+
+            const updatedWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            // Should use the server's version
+            expect(updatedWorkflow.version).toBe(5);
+            // Should use the server's tasks
+            expect(updatedWorkflow.tasks).toEqual(serverResponse.tasks);
+            // But should keep the local definition (not the server's)
+            expect(updatedWorkflow.definition).toContain('httpClient_1');
+        });
+    });
+
     describe('decorative flag', () => {
         it('should save when decorative is true even without other changes', async () => {
             const existingTask = {
