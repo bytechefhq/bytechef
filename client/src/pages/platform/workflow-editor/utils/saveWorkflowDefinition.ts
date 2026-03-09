@@ -288,7 +288,9 @@ function executeWorkflowMutation({
             },
         },
         {
-            onError: () => {
+            onError: (error) => {
+                console.error('Failed to save workflow definition:', error);
+
                 useWorkflowDataStore.getState().setWorkflow(previousWorkflow);
             },
             onSettled: () => {

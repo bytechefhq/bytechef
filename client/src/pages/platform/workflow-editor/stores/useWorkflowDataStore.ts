@@ -52,7 +52,7 @@ interface WorkflowDataStateI {
 
     workflow: Workflow & WorkflowDataType;
     setWorkflow: (workflow: Workflow) => void;
-    updateWorkflowNodeParameters: (workflowNodeName: string, parameters: Record<string, object>) => void;
+    updateWorkflowNodeParameters: (workflowNodeName: string, parameters: Record<string, object>, version?: number) => void;
 }
 
 function updateTaskParametersInTasks(
@@ -154,7 +154,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             workflow: {
                 nodeNames: ['trigger_1'],
             },
-            updateWorkflowNodeParameters: (workflowNodeName, parameters) =>
+            updateWorkflowNodeParameters: (workflowNodeName, parameters, version) =>
                 set((state) => {
                     const workflow = state.workflow;
 
@@ -178,7 +178,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                             ...workflow,
                             definition: JSON.stringify(definition, null, 4),
                             tasks: updatedTasks,
-                            version: (workflow.version || 0) + 1,
+                            version: version ?? workflow.version,
                         },
                     };
                 }),

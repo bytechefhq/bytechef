@@ -84,7 +84,9 @@ export default function saveProperty({
         }
 
         if (response.parameters && updatedWorkflowNodeName) {
-            useWorkflowDataStore.getState().updateWorkflowNodeParameters(updatedWorkflowNodeName, response.parameters);
+            useWorkflowDataStore
+                .getState()
+                .updateWorkflowNodeParameters(updatedWorkflowNodeName, response.parameters, response.version);
         }
     }
 
