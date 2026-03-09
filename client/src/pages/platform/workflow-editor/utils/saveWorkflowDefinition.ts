@@ -273,11 +273,6 @@ function executeWorkflowMutation({
         SPACE
     );
 
-    // Optimistic UI: update definition string immediately so the store reflects the pending change.
-    // We do NOT update tasks/triggers optimistically because workflow.tasks is a flattened list
-    // (including sub-tasks extracted from task dispatcher parameters) while definitionUpdate.tasks
-    // is hierarchical (sub-tasks nested in parameters). Mapping between these structures would
-    // drop sub-tasks and break edge computation in the layout.
     const previousWorkflow = workflow;
 
     useWorkflowDataStore.getState().setWorkflow({
