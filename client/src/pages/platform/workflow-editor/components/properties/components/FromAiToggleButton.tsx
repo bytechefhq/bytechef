@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SparklesIcon, XIcon} from 'lucide-react';
 
 interface FromAiToggleButtonProps {
@@ -12,15 +13,20 @@ const FromAiToggleButton = ({isFromAi, onToggle}: FromAiToggleButtonProps) => {
     const variant = isFromAi ? 'destructiveGhost' : 'ghost';
 
     return (
-        <Button
-            className="self-center"
-            icon={icon}
-            onClick={() => onToggle(!isFromAi)}
-            size="iconSm"
-            title={title}
-            type="button"
-            variant={variant}
-        />
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    className="self-center"
+                    icon={icon}
+                    onClick={() => onToggle(!isFromAi)}
+                    size="iconSm"
+                    type="button"
+                    variant={variant}
+                />
+            </TooltipTrigger>
+
+            <TooltipContent>{title}</TooltipContent>
+        </Tooltip>
     );
 };
 
