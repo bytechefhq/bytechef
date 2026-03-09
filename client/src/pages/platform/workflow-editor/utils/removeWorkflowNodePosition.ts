@@ -173,7 +173,14 @@ export default function removeWorkflowNodePosition({
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
             },
-            onSuccess: () => {
+            onSuccess: (updatedWorkflow) => {
+                const currentWorkflow = useWorkflowDataStore.getState().workflow;
+
+                useWorkflowDataStore.getState().setWorkflow({
+                    ...currentWorkflow,
+                    version: updatedWorkflow.version,
+                });
+
                 invalidateWorkflowQueries();
                 incrementLayoutResetCounter();
             },
