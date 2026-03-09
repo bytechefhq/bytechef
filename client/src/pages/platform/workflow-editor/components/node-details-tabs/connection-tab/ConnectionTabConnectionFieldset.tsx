@@ -38,7 +38,7 @@ const ConnectionTabConnectionFieldset = ({
     }
 
     return (
-        <fieldset className="space-y-2" key={componentConnection.key}>
+        <fieldset className="min-w-0 space-y-2" key={componentConnection.key}>
             <ConnectionTabConnectionSelect
                 componentConnection={componentConnection}
                 componentConnectionsCount={componentConnectionsCount}
