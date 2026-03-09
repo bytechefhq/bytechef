@@ -31,6 +31,9 @@ bytechef:
         url: jdbc:postgresql://localhost:5433/bytechef_vectorstore
         username: postgres
         password: postgres
+    copilot:
+      memory:
+        provider: in_memory
   datasource:
     # PostgreSQL database
     #    url: jdbc:postgresql://localhost:5432/bytechef
