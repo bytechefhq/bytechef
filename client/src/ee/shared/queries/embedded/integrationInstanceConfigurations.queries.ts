@@ -26,8 +26,12 @@ export const useGetIntegrationInstanceConfigurationQuery = (id: number, enabled?
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetIntegrationInstanceConfigurationsQuery = (filters: GetIntegrationInstanceConfigurationsRequest) =>
+export const useGetIntegrationInstanceConfigurationsQuery = (
+    filters: GetIntegrationInstanceConfigurationsRequest,
+    enabled?: boolean
+) =>
     useQuery<IntegrationInstanceConfiguration[], Error>({
         queryKey: IntegrationInstanceConfigurationKeys.filteredIntegrationInstanceConfigurations(filters),
         queryFn: () => new IntegrationInstanceConfigurationApi().getIntegrationInstanceConfigurations(filters),
+        enabled: enabled === undefined ? true : enabled,
     });

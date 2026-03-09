@@ -23,12 +23,30 @@ export interface ComboBoxProps {
     name?: string;
     onBlur?: FocusEventHandler;
     onChange?: (item?: ComboBoxItemType) => void;
+    onOpen?: () => void;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;
 }
 
-const ComboBox: FC<ComboBoxProps> = ({disabled, emptyMessage, items, name, onBlur, onChange, value}: ComboBoxProps) => {
+const ComboBox: FC<ComboBoxProps> = ({
+    disabled,
+    emptyMessage,
+    items,
+    name,
+    onBlur,
+    onChange,
+    onOpen,
+    value,
+}: ComboBoxProps) => {
     const [open, setOpen] = useState(false);
+
+    const handleOpenChange = (isOpen: boolean) => {
+        setOpen(isOpen);
+
+        if (isOpen && onOpen) {
+            onOpen();
+        }
+    };
 
     const commandItems = items.map((comboBoxItem) => (
         <CommandItem
@@ -53,7 +71,7 @@ const ComboBox: FC<ComboBoxProps> = ({disabled, emptyMessage, items, name, onBlu
     const item = items.find((item) => item.value === value);
 
     return (
-        <Popover modal onOpenChange={setOpen} open={open}>
+        <Popover modal onOpenChange={handleOpenChange} open={open}>
             <PopoverTrigger asChild onBlur={onBlur}>
                 <Button
                     aria-expanded={open}

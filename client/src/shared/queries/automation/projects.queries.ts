@@ -17,8 +17,9 @@ export const useGetProjectQuery = (id: number, initialData?: Project, enabled?: 
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetWorkspaceProjectsQuery = (filters: GetWorkspaceProjectsRequest) =>
+export const useGetWorkspaceProjectsQuery = (filters: GetWorkspaceProjectsRequest, enabled?: boolean) =>
     useQuery<Project[], Error>({
         queryKey: ProjectKeys.filteredProjects(filters),
         queryFn: () => new ProjectApi().getWorkspaceProjects(filters),
+        enabled: enabled === undefined ? true : enabled,
     });

@@ -85,6 +85,9 @@ export const WorkflowExecutions = () => {
         searchParams.get('startDate') ? new Date(+searchParams.get('startDate')!) : undefined
     );
     const [filterWorkflowId, setFilterWorkflowId] = useState<string | undefined>();
+    const [filtersInteracted, setFiltersInteracted] = useState<boolean>(
+        !!searchParams.get('projectId') || !!searchParams.get('projectDeploymentId')
+    );
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -95,14 +98,20 @@ export const WorkflowExecutions = () => {
         !!filterProjectDeploymentId
     );
 
-    const {data: projectDeployments} = useGetWorkspaceProjectDeploymentsQuery({
-        environmentId: currentEnvironmentId,
-        id: currentWorkspaceId!,
-        includeAllFields: false,
-        projectId: filterProjectId,
-    });
+    const {data: projectDeployments} = useGetWorkspaceProjectDeploymentsQuery(
+        {
+            environmentId: currentEnvironmentId,
+            id: currentWorkspaceId!,
+            includeAllFields: false,
+            projectId: filterProjectId,
+        },
+        filtersInteracted
+    );
 
-    const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!, includeAllFields: false});
+    const {data: projects} = useGetWorkspaceProjectsQuery(
+        {id: currentWorkspaceId!, includeAllFields: false},
+        filtersInteracted
+    );
 
     const {
         data: workflowExecutionPage,
@@ -335,6 +344,7 @@ export const WorkflowExecutions = () => {
                         <Label>Project</Label>
 
                         <ComboBox
+                            emptyMessage={!projects ? 'Loading...' : 'No item found.'}
                             items={
                                 projects?.length
                                     ? projects?.map((project) => ({
@@ -344,6 +354,7 @@ export const WorkflowExecutions = () => {
                                     : []
                             }
                             onChange={handleProjectChange}
+                            onOpen={() => setFiltersInteracted(true)}
                             value={filterProjectId}
                         />
                     </div>
@@ -352,6 +363,7 @@ export const WorkflowExecutions = () => {
                         <Label>Deployment</Label>
 
                         <ComboBox
+                            emptyMessage={!projectDeployments ? 'Loading...' : 'No item found.'}
                             items={
                                 projectDeployments?.length
                                     ? projectDeployments?.map((projectDeployment) => ({
@@ -371,6 +383,7 @@ export const WorkflowExecutions = () => {
                                     : []
                             }
                             onChange={handleProjectDeploymentChange}
+                            onOpen={() => setFiltersInteracted(true)}
                             value={filterProjectDeploymentId}
                         />
                     </div>

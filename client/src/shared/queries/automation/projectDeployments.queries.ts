@@ -23,8 +23,12 @@ export const useGetProjectDeploymentQuery = (id: number, enabled?: boolean) =>
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetWorkspaceProjectDeploymentsQuery = (filters: GetWorkspaceProjectDeploymentsRequest) =>
+export const useGetWorkspaceProjectDeploymentsQuery = (
+    filters: GetWorkspaceProjectDeploymentsRequest,
+    enabled?: boolean
+) =>
     useQuery<ProjectDeployment[], Error>({
         queryKey: ProjectDeploymentKeys.filteredProjectDeployments(filters),
         queryFn: () => new ProjectDeploymentApi().getWorkspaceProjectDeployments(filters),
+        enabled: enabled === undefined ? true : enabled,
     });
