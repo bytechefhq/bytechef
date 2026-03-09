@@ -178,3 +178,7 @@ rebel.xml
 ######################
 **/local.env
 **/.env
+
+# Davia
+.davia/
+.claude/skills/davia-documentation/SKILL.md
