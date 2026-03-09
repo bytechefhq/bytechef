@@ -72,8 +72,8 @@ Name: createFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING |  | true |
-| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder. | false |
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
+| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder | false |
 | name | Folder Name | STRING |  | true |
 
 #### Example JSON Structure
@@ -155,6 +155,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
+
+#### Find Parent Folder ID
+
+To find the Parent Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-parent-folder-id).
 
 
 
@@ -167,7 +174,7 @@ Name: createList
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING |  | true |
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
 | displayName | List Name | STRING |  | true |
 | description | List Description | STRING |  | true |
 
@@ -235,6 +242,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
 
 
 
@@ -247,7 +257,7 @@ Name: createListItem
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING |  | true |
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
 | listId | List ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
 | columns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> siteId, listId </details> |  | null |
 
@@ -271,6 +281,13 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
+
+#### Find List ID
+
+To find the List ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-list-id).
 
 
 
@@ -283,7 +300,7 @@ Name: uploadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING |  | true |
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
 | parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder | false |
 | file | File Entry | FILE_ENTRY | File to upload. | true |
 
@@ -364,6 +381,58 @@ Type: OBJECT
 }
 ```
 
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
+
+#### Find Parent Folder ID
+
+To find the Parent Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-parent-folder-id).
+
+
+
+
+## Triggers
+
+
+### New File
+Name: newFile
+
+`Triggers when file is uploaded to folder.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
+| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, root folder will be monitored for new file. | false |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New File",
+  "name" : "newFile",
+  "parameters" : {
+    "siteId" : "",
+    "parentFolder" : ""
+  },
+  "type" : "microsoftSharePoint/v1/newFile"
+}
+```
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
+
+#### Find Parent Folder ID
+
+To find the Parent Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-parent-folder-id).
 
 
 
@@ -375,3 +444,29 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find your Site ID
+
+Only way of finding Site ID in Microsoft SharePoint is using Microsoft Graph API.
+
+1. Go to your Microsoft SharePoint site.
+2. If your URL is `https://company.sharepoint.com/sites/Finance` then your site name is `Finance`.
+3. Then use this Microsoft Graph API endpoint; `GET https://graph.microsoft.com/v1.0/sites/company.sharepoint.com:/sites/Finance`
+4. You will get your folder ID.
+
+### How to find your Parent Folder ID
+
+Only way of finding Folder ID in Microsoft SharePoint is using Microsoft Graph API endpoint: `GET https://graph.microsoft.com/v1.0/sites/{site-id}/drives`.
+
+### How to find your List ID
+
+1. Open the SharePoint site.
+2. Go to the Site Contents.
+3. Find your list and click on 3 vertical dots (...)
+4. Click on Settings
+5. Look at the browser URL.
+6. If your URL is `https://6kqn7f.sharepoint.com/sites/Testsite/_layouts/15/listedit.aspx?List=2c8d8a57-10e1-43b7-b801-6cd5b328f55b`
+7. Then your List ID is `2c8d8a57-10e1-43b7-b801-6cd5b328f55b`
