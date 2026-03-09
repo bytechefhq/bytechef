@@ -1,0 +1,15 @@
+query integrationWorkflowsByIntegrationId($integrationId: ID!) {
+    integrationWorkflowsByIntegrationId(integrationId: $integrationId) {
+        id
+        label
+        description
+        integrationWorkflowId
+        workflowUuid
+        workflowTaskComponentNames
+        workflowTriggerComponentNames
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+    }
+}

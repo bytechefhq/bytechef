@@ -1,0 +1,3 @@
+mutation deleteEmbeddedMcpServer($mcpServerId: ID!) {
+    deleteEmbeddedMcpServer(mcpServerId: $mcpServerId)
+}
