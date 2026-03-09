@@ -11,42 +11,64 @@ import {describe, expect, it} from 'vitest';
  * `getComponentIcon` changes after a data fetch), and the sync useEffect
  * hasn't run yet when Backspace fires.
  *
- * Fix: `onCreate()` lifecycle hook initializes storage from configure
- * options, closing the timing gap between extension creation and React
- * sync effect.
+ * Fix: `getIsFormulaMode` ref-based getter in the Backspace handler
+ * always reads the current React state via a ref, bypassing stale
+ * storage entirely. `onCreate()` also initializes storage from options
+ * as a secondary safeguard.
  */
 
 describe('formulaModeBackspace', () => {
     describe('backspace exit condition', () => {
         /**
          * Replicates the Backspace handler logic from FormulaMode.extension.ts.
+         * Uses `getIsFormulaMode()` (ref-based getter) with `storage.isFormulaMode` as fallback.
          * Uses `doc.textContent.trim() === ''` instead of `editor.isEmpty`
          * for robustness against TipTap structural artifacts.
          */
-        const shouldExitFormulaMode = (textContent: string, storageIsFormulaMode: boolean): boolean => {
+        const shouldExitFormulaMode = (
+            textContent: string,
+            storageIsFormulaMode: boolean,
+            getIsFormulaMode?: () => boolean
+        ): boolean => {
             const hasNoContent = textContent.trim() === '';
+            const currentFormulaMode = getIsFormulaMode?.() ?? storageIsFormulaMode;
 
-            return hasNoContent && storageIsFormulaMode;
+            return hasNoContent && currentFormulaMode;
         };
 
-        it('should exit formula mode when editor is empty and storage says formula mode', () => {
+        it('should exit formula mode when editor is empty and getter says formula mode', () => {
+            expect(shouldExitFormulaMode('', false, () => true)).toBe(true);
+        });
+
+        it('should exit formula mode when editor is empty and storage says formula mode (no getter)', () => {
             expect(shouldExitFormulaMode('', true)).toBe(true);
         });
 
         it('should exit when editor has only whitespace', () => {
-            expect(shouldExitFormulaMode('  \n  ', true)).toBe(true);
+            expect(shouldExitFormulaMode('  \n  ', false, () => true)).toBe(true);
         });
 
         it('should NOT exit when editor has content', () => {
-            expect(shouldExitFormulaMode('3+3', true)).toBe(false);
+            expect(shouldExitFormulaMode('3+3', true, () => true)).toBe(false);
         });
 
-        it('should NOT exit when not in formula mode', () => {
+        it('should NOT exit when not in formula mode (getter returns false)', () => {
+            expect(shouldExitFormulaMode('', false, () => false)).toBe(false);
+        });
+
+        it('should NOT exit when not in formula mode (no getter, storage false)', () => {
             expect(shouldExitFormulaMode('', false)).toBe(false);
         });
 
         it('should NOT exit when editor has a mention text', () => {
-            expect(shouldExitFormulaMode('${trigger_1.output}', true)).toBe(false);
+            expect(shouldExitFormulaMode('${trigger_1.output}', true, () => true)).toBe(false);
+        });
+
+        it('getter takes priority over stale storage', () => {
+            // Storage is false (stale after extension recreation), but getter reads current React state
+            expect(shouldExitFormulaMode('', false, () => true)).toBe(true);
+            // Storage is true (stale), but getter says formula mode was exited
+            expect(shouldExitFormulaMode('', true, () => false)).toBe(false);
         });
     });
 
@@ -127,8 +149,7 @@ describe('formulaModeBackspace', () => {
             isFormulaMode = false;
 
             // Old sync effect checks value — BUG: re-enables formula mode
-            const oldEffectReEnables =
-                typeof value === 'string' && value.startsWith('=') && isFormulaMode === false;
+            const oldEffectReEnables = typeof value === 'string' && value.startsWith('=') && isFormulaMode === false;
 
             expect(oldEffectReEnables).toBe(true); // condition was true, would call setIsFormulaMode(true)
         });

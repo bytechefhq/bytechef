@@ -100,8 +100,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const pendingValueRef = useRef<string | number | null | undefined>(undefined);
         const editorValueRef = useRef(editorValue);
         const isFocusedRef = useRef(false);
+        const isFormulaModeRef = useRef(isFormulaMode);
 
         editorValueRef.current = editorValue;
+        isFormulaModeRef.current = isFormulaMode;
 
         const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
@@ -141,6 +143,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
                 FormulaMode.configure({
+                    getIsFormulaMode: () => isFormulaModeRef.current ?? false,
                     initialFormulaMode: isFormulaMode ?? false,
                     saveNullValue: () => {
                         if (
@@ -664,11 +667,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     />
                 )}
 
-                {handleFromAiClick &&
-                    expressionEnabled !== false &&
-                    currentNode?.clusterElementType === 'tools' && (
-                        <FromAiToggleButton isFromAi={isFromAi} onToggle={handleFromAiClick} />
-                    )}
+                {handleFromAiClick && expressionEnabled !== false && currentNode?.clusterElementType === 'tools' && (
+                    <FromAiToggleButton isFromAi={isFromAi} onToggle={handleFromAiClick} />
+                )}
 
                 {controlType === 'RICH_TEXT' && editor && <PropertyMentionsInputBubbleMenu editor={editor} />}
             </>
