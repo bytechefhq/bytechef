@@ -44,6 +44,8 @@ import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvi
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.model.tool.ToolCallingManager;
@@ -54,12 +56,16 @@ import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.web.client.RestClient;
 
 /**
@@ -234,6 +240,20 @@ public class CopilotConfiguration {
                     .model(openAiChatModel)
                     .temperature(openAiChatTemperature)
                     .build())
+            .build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.memory", name = "provider", havingValue = "jdbc")
+    ChatMemory jdbcChatMemory(JdbcTemplate jdbcTemplate) {
+        return MessageWindowChatMemory.builder()
+            .chatMemoryRepository(JdbcChatMemoryRepository
+                .builder()
+                .jdbcTemplate(jdbcTemplate)
+                .dialect(JdbcChatMemoryRepositoryDialect.from(jdbcTemplate.getDataSource()))
+                .dataSource(jdbcTemplate.getDataSource())
+                .build())
+            .maxMessages(500)
             .build();
     }
 
