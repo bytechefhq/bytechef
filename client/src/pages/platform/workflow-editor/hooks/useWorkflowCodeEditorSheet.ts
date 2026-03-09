@@ -36,6 +36,7 @@ const useWorkflowCodeEditorSheet = ({
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
 
     const [markers, setMarkers] = useState<editor.IMarkerData[]>([]);
+
     const hasErrors = markers.some((marker) => marker.severity === MarkerSeverity.Error);
 
     const ai = useApplicationInfoStore((state) => state.ai);
