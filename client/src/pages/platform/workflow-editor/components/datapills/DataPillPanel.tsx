@@ -1,4 +1,5 @@
 import {Input} from '@/components/ui/input';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import DataPillPanelBody, {
     OperationType,
@@ -15,11 +16,12 @@ import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetail
 
 interface DataPillPanelProps {
     className?: string;
+    loading?: boolean;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     workflowNodeOutputs: Array<WorkflowNodeOutput>;
 }
 
-const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOutputs}: DataPillPanelProps) => {
+const DataPillPanel = ({className, loading, previousComponentDefinitions, workflowNodeOutputs}: DataPillPanelProps) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
     const {setDataPillPanelOpen} = useDataPillPanelStore(
@@ -125,11 +127,38 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
                     </div>
 
                     <div className="flex min-h-0 flex-1 overflow-hidden bg-surface-main">
-                        <DataPillPanelBody
-                            dataPillFilterQuery={dataPillFilterQuery}
-                            operations={operations}
-                            workflowInputs={workflow.inputs}
-                        />
+                        {loading ? (
+                            <div className="w-full">
+                                {Array.from({length: 4}).map((_, index) => (
+                                    <div
+                                        className="flex items-center justify-between border-b border-border/50 p-4"
+                                        key={index}
+                                    >
+                                        <div className="flex items-center space-x-4">
+                                            <Skeleton className="size-8 shrink-0 rounded" />
+
+                                            <div className="flex flex-col gap-1.5">
+                                                <Skeleton className="h-4 w-24" />
+
+                                                <Skeleton className="h-3 w-16" />
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-4">
+                                            <Skeleton className="h-5 w-16 rounded" />
+
+                                            <Skeleton className="size-5 shrink-0 rounded" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <DataPillPanelBody
+                                dataPillFilterQuery={dataPillFilterQuery}
+                                operations={operations}
+                                workflowInputs={workflow.inputs}
+                            />
+                        )}
                     </div>
                 </main>
             </div>
