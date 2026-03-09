@@ -105,6 +105,7 @@ public class MicrosoftSharePointUploadFileAction {
                                 string("mimeType")
                                     .description("The MIME type for the file..")))))
         .perform(MicrosoftSharePointUploadFileAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#upload-file")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointUploadFileAction() {

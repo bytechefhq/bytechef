@@ -88,6 +88,7 @@ public class MicrosoftSharePointCreateListAction {
                                         "Specifies whether this list is hidden in the SharePoint user interface."),
                                 string("template")))))
         .perform(MicrosoftSharePointCreateListAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#create-list")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointCreateListAction() {
