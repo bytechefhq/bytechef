@@ -9,6 +9,7 @@ import {
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {
     ClickedDefinitionType,
     NodeDataType,
@@ -76,6 +77,7 @@ async function createWorkflowNodeData(
     const componentDefinition = await queryClient.fetchQuery({
         queryFn: () => new ComponentDefinitionApi().getComponentDefinition(getComponentDefinitionRequest),
         queryKey: ComponentDefinitionKeys.componentDefinition(getComponentDefinitionRequest),
+        staleTime: DEFINITION_STALE_TIME,
     });
 
     if (baseNodeData.trigger) {
@@ -90,6 +92,7 @@ async function createWorkflowNodeData(
         const triggerDefinition = await queryClient.fetchQuery({
             queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(getTriggerDefinitionRequest),
             queryKey: TriggerDefinitionKeys.triggerDefinition(getTriggerDefinitionRequest),
+            staleTime: DEFINITION_STALE_TIME,
         });
 
         return {
@@ -116,6 +119,7 @@ async function createWorkflowNodeData(
         const actionDefinition = await queryClient.fetchQuery({
             queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
             queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
+            staleTime: DEFINITION_STALE_TIME,
         });
 
         return {

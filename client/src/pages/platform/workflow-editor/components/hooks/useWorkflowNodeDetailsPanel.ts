@@ -45,6 +45,7 @@ import {
     useGetWorkflowNodeParameterDisplayConditionsQuery,
 } from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {
     BranchCaseType,
@@ -241,6 +242,7 @@ export default function useWorkflowNodeDetailsPanel({
                         clusterElementDefinitionRequest
                     ),
                 queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(clusterElementDefinitionRequest),
+                staleTime: DEFINITION_STALE_TIME,
             });
 
             if (clusterElementDefinition) {
@@ -271,6 +273,7 @@ export default function useWorkflowNodeDetailsPanel({
             const actionDefinition = await queryClient.fetchQuery({
                 queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(actionDefinitionRequest),
                 queryKey: ActionDefinitionKeys.actionDefinition(actionDefinitionRequest),
+                staleTime: DEFINITION_STALE_TIME,
             });
 
             if (actionDefinition) {
@@ -301,6 +304,7 @@ export default function useWorkflowNodeDetailsPanel({
             const triggerDefinition = await queryClient.fetchQuery({
                 queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(triggerDefinitionRequest),
                 queryKey: TriggerDefinitionKeys.triggerDefinition(triggerDefinitionRequest),
+                staleTime: DEFINITION_STALE_TIME,
             });
 
             if (triggerDefinition) {

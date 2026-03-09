@@ -5,6 +5,7 @@ import {
     GetWorkflowNodeOutputRequest,
     WorkflowNodeDescriptionApi,
 } from '@/shared/middleware/platform/configuration';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowNodeDescriptionKeys = {
@@ -22,5 +23,5 @@ export const useGetWorkflowNodeDescriptionQuery = (request: GetWorkflowNodeDescr
         queryFn: () => new WorkflowNodeDescriptionApi().getWorkflowNodeDescription(request),
         queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription(request),
         enabled: enabled === undefined ? true : enabled,
-        staleTime: Infinity,
+        staleTime: DEFINITION_STALE_TIME,
     });
