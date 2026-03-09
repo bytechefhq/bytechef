@@ -315,11 +315,13 @@ export default function useDataStreamMapping() {
                     queryFn: () =>
                         new ClusterElementDefinitionApi().getComponentClusterElementDefinition({
                             clusterElementName,
+                            clusterElementType: 'PROCESSOR',
                             componentName: processor.componentName,
                             componentVersion: componentVersion,
                         }),
                     queryKey: ClusterElementDefinitionKeys.clusterElementDefinition({
                         clusterElementName,
+                        clusterElementType: 'PROCESSOR',
                         componentName: processor.componentName,
                         componentVersion: componentVersion,
                     }),

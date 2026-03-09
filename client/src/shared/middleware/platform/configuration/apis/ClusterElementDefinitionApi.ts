@@ -26,6 +26,7 @@ import {
 } from '../models/index';
 
 export interface GetComponentClusterElementDefinitionRequest {
+    clusterElementType?: string;
     componentName: string;
     componentVersion: number;
     clusterElementName: string;
@@ -69,6 +70,10 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['clusterElementType'] != null) {
+            queryParameters['clusterElementType'] = requestParameters['clusterElementType'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
