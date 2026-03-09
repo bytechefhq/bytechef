@@ -9,7 +9,10 @@ import {clearAllWorkflowMutations, isWorkflowMutating, setWorkflowMutating} from
 
 // ── Store mocks ──────────────────────────────────────────────────────
 
-const mockSetWorkflow = vi.fn();
+let mockWorkflowState: Record<string, unknown> = {};
+const mockSetWorkflow = vi.fn((newWorkflow) => {
+    mockWorkflowState = newWorkflow;
+});
 const mockReset = vi.fn();
 const mockSetWorkflowTestChatPanelOpen = vi.fn();
 
@@ -17,6 +20,7 @@ vi.mock('../stores/useWorkflowDataStore', () => ({
     default: {
         getState: () => ({
             setWorkflow: mockSetWorkflow,
+            workflow: mockWorkflowState,
         }),
     },
 }));
@@ -91,6 +95,7 @@ function makeQueryClient() {
 describe('handleDeleteTask', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockWorkflowState = {};
     });
 
     afterEach(() => {
@@ -551,6 +556,41 @@ describe('handleDeleteTask', () => {
         mutateCall[1].onSettled();
 
         expect(isWorkflowMutating('workflow-1')).toBe(false);
+    });
+
+    it('should update workflow version on success to prevent optimistic lock failures', () => {
+        const tasks = [makeTask('task_1'), makeTask('task_2')];
+        const workflow = makeWorkflow(tasks);
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        // Simulate success callback with updated workflow from server
+        const mutateCall = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0];
+        const serverWorkflow = {
+            ...workflow,
+            tasks: [makeTask('task_2')],
+            version: 2,
+        };
+
+        mutateCall[1].onSuccess(serverWorkflow);
+
+        // setWorkflow should be called: once for optimistic, once for version update
+        expect(mockSetWorkflow).toHaveBeenCalledTimes(2);
+
+        const successWorkflow = mockSetWorkflow.mock.calls[1][0];
+
+        // Version should be updated from server response
+        expect(successWorkflow.version).toBe(2);
+        // Optimistic tasks should be preserved (not overwritten by server response)
+        expect(successWorkflow.tasks).toHaveLength(1);
+        expect(successWorkflow.tasks[0].name).toBe('task_2');
     });
 
     it('should clear each data iteratee to empty object', () => {
