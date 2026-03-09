@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.OutputFunction;
 import com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
@@ -37,6 +38,7 @@ import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -107,11 +109,51 @@ public class WorkflowCallWorkflowTool {
         }
 
         @SuppressWarnings("unchecked")
-        List<? extends Property.ValueProperty<?>> properties =
-            (List<? extends Property.ValueProperty<?>>) (List<?>) objectProperty.getProperties()
+        List<? extends BaseProperty.BaseValueProperty<?>> baseProperties =
+            (List<? extends BaseProperty.BaseValueProperty<?>>) (List<?>) objectProperty.getProperties()
                 .orElse(List.of());
 
+        List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
+
+        for (BaseProperty.BaseValueProperty<?> baseProperty : baseProperties) {
+            ModifiableValueProperty<?, ?> property = toComponentProperty(baseProperty);
+
+            properties.add(property);
+        }
+
         return properties;
+    }
+
+    private static ModifiableValueProperty<?, ?> toComponentProperty(BaseProperty.BaseValueProperty<?> baseProperty) {
+        String name = baseProperty.getName();
+
+        ModifiableValueProperty<?, ?> property;
+
+        if (baseProperty instanceof BaseProperty.BaseArrayProperty<?>) {
+            property = ComponentDsl.array(name);
+        } else if (baseProperty instanceof BaseProperty.BaseBooleanProperty) {
+            property = ComponentDsl.bool(name);
+        } else if (baseProperty instanceof BaseProperty.BaseDateProperty) {
+            property = ComponentDsl.date(name);
+        } else if (baseProperty instanceof BaseProperty.BaseDateTimeProperty) {
+            property = ComponentDsl.dateTime(name);
+        } else if (baseProperty instanceof BaseProperty.BaseIntegerProperty) {
+            property = ComponentDsl.integer(name);
+        } else if (baseProperty instanceof BaseProperty.BaseNumberProperty) {
+            property = ComponentDsl.number(name);
+        } else if (baseProperty instanceof BaseProperty.BaseObjectProperty<?>) {
+            property = ComponentDsl.object(name);
+        } else {
+            property = ComponentDsl.string(name);
+        }
+
+        baseProperty.getDescription()
+            .ifPresent(property::description);
+
+        baseProperty.getRequired()
+            .ifPresent(property::required);
+
+        return property;
     }
 
     private static BaseOutputDefinition.OutputResponse output(
