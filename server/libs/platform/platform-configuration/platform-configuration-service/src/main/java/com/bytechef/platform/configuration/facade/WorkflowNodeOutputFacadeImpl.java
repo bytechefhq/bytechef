@@ -28,6 +28,7 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -71,6 +72,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -84,6 +86,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     @SuppressFBWarnings("EI")
     public WorkflowNodeOutputFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
@@ -93,6 +96,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;
+        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
@@ -386,15 +390,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
                 workflowId, clusterElement.getWorkflowNodeName(), environmentId);
 
-        Map<String, Long> connectionIds = MapUtils.toMap(
-            workflowTestConfigurationConnections,
-            WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-            WorkflowTestConfigurationConnection::getConnectionId);
+        Long connectionId = workflowTestConfigurationConnections.stream()
+            .map(WorkflowTestConfigurationConnection::getConnectionId)
+            .findFirst()
+            .orElse(null);
 
-        // Fix, cluster element tools are not necessarily the same as actions
-        outputResponse = actionDefinitionFacade.executeOutput(
+        outputResponse = clusterElementDefinitionFacade.executeOutput(
             clusterElement.getComponentName(), workflowNodeType.version(), workflowNodeType.operation(),
-            inputParameters, connectionIds);
+            inputParameters, connectionId);
 
         return Optional.ofNullable(outputResponse);
     }

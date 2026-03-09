@@ -22,6 +22,7 @@ import com.bytechef.platform.component.definition.datastream.ClusterElementResol
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -46,6 +47,11 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable ComponentConnection componentConnection, ClusterElementResolverFunction clusterElementResolver);
+
+    @Nullable
+    OutputResponse executeOutput(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection);
 
     Object executeTool(
         String componentName, String clusterElementName, Map<String, ?> inputParameters,
