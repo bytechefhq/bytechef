@@ -47,9 +47,7 @@ describe('getTasksStructuralFingerprint', () => {
             }),
         ];
 
-        expect(getTasksStructuralFingerprint(withElements)).not.toBe(
-            getTasksStructuralFingerprint(withoutElements)
-        );
+        expect(getTasksStructuralFingerprint(withElements)).not.toBe(getTasksStructuralFingerprint(withoutElements));
     });
 
     it('should treat empty clusterElements the same as no clusterElements', () => {
@@ -87,8 +85,6 @@ describe('getTasksStructuralFingerprint', () => {
             }),
         ];
 
-        expect(getTasksStructuralFingerprint(withNullValues)).toBe(
-            getTasksStructuralFingerprint(withoutElements)
-        );
+        expect(getTasksStructuralFingerprint(withNullValues)).toBe(getTasksStructuralFingerprint(withoutElements));
     });
 });
