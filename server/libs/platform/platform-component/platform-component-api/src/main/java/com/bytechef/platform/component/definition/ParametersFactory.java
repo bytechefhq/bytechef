@@ -17,12 +17,17 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.ComponentConnection;
 import java.util.Map;
 
 /**
  * @author Igor Beslic
  */
 public class ParametersFactory {
+
+    public static Parameters create(ComponentConnection componentConnection) {
+        return new ParametersImpl(componentConnection == null ? Map.of() : componentConnection.getParameters());
+    }
 
     public static Parameters create(Map<String, ?> map) {
         try {
