@@ -40,6 +40,8 @@ public interface ProjectDeploymentService {
 
     List<ProjectDeployment> getProjectDeployments();
 
+    List<ProjectDeployment> getProjectDeployments(List<Long> ids);
+
     List<ProjectDeployment> getProjectDeployments(long projectId);
 
     List<ProjectDeployment> getProjectDeployments(

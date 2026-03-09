@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.repository;
 
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -33,6 +34,13 @@ public interface TriggerExecutionRepository
 
     @Query("SELECT * FROM trigger_execution WHERE id = :id FOR UPDATE")
     Optional<TriggerExecution> findByIdForUpdate(@Param("id") long id);
+
+    @Query("""
+        SELECT distinct trigger_execution.* FROM trigger_execution
+        JOIN trigger_execution_job ON trigger_execution_job.trigger_execution_id = trigger_execution.id
+        WHERE trigger_execution_job.job_id IN (:jobIds)
+        """)
+    List<TriggerExecution> findAllByJobIdIn(@Param("jobIds") List<Long> jobIds);
 
     @Query("""
         SELECT distinct trigger_execution.* FROM trigger_execution

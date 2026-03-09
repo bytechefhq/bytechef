@@ -42,6 +42,8 @@ public interface JobService {
 
     Job getJob(long id);
 
+    List<Job> getJobs(List<Long> ids);
+
     Page<Job> getJobsPage(int pageNumber);
 
     Job getTaskExecutionJob(long taskExecutionId);

@@ -98,6 +98,12 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Job> getJobs(List<Long> ids) {
+        return jobRepository.findAllByIdIn(ids);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<Job> getJobsPage(int pageNumber) {
         return jobRepository.findAll(PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE));
     }

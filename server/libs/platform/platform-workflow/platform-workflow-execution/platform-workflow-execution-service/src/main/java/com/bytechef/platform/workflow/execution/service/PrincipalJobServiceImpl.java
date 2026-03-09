@@ -79,6 +79,12 @@ public class PrincipalJobServiceImpl implements PrincipalJobService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<PrincipalJob> getPrincipalJobs(List<Long> jobIds, PlatformType type) {
+        return principalJobRepository.findAllByJobIdInAndType(jobIds, type.ordinal());
+    }
+
+    @Override
     public long getJobPrincipalId(long jobId, PlatformType type) {
         return principalJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .map(PrincipalJob::getPrincipalId)

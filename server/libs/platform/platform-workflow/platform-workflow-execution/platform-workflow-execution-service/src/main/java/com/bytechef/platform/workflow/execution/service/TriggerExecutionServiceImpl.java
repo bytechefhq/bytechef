@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.execution.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.repository.TriggerExecutionRepository;
+import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,12 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
     @Transactional(readOnly = true)
     public Optional<TriggerExecution> fetchJobTriggerExecution(long jobId) {
         return triggerExecutionRepository.findByJobId(jobId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TriggerExecution> getJobTriggerExecutions(List<Long> jobIds) {
+        return triggerExecutionRepository.findAllByJobIdIn(jobIds);
     }
 
     @Override

@@ -44,6 +44,8 @@ public interface JobRepository {
 
     Page<Job> findAll(Pageable pageable);
 
+    List<Job> findAllByIdIn(List<Long> ids);
+
     List<Job> findAllByWorkflowId(String workflowId);
 
     Optional<Job> findById(Long id);
