@@ -164,7 +164,15 @@ export default function saveWorkflowNodesPosition({
         return;
     }
 
-    const workflowDefinition = JSON.parse(workflow.definition);
+    let workflowDefinition;
+
+    try {
+        workflowDefinition = JSON.parse(workflow.definition);
+    } catch (error) {
+        console.error('Failed to parse workflow definition:', error);
+
+        return;
+    }
 
     // Update trigger position if it was the dragged node
     if (workflowDefinition.triggers?.[0]?.name === draggedNodeId) {
