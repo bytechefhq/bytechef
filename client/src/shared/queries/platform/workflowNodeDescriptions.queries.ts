@@ -19,7 +19,8 @@ export const WorkflowNodeDescriptionKeys = {
 
 export const useGetWorkflowNodeDescriptionQuery = (request: GetWorkflowNodeDescriptionRequest, enabled?: boolean) =>
     useQuery<GetWorkflowNodeDescription200Response, Error>({
-        queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription(request),
         queryFn: () => new WorkflowNodeDescriptionApi().getWorkflowNodeDescription(request),
+        queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: Infinity,
     });

@@ -22,6 +22,7 @@ import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.qu
 import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
+import {WorkflowNodeDescriptionKeys} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
@@ -125,7 +126,17 @@ export const useProject = () => {
         workflowKeys: WorkflowKeys,
     });
 
-    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation();
+    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
+        onSuccess: (_result, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription({
+                    environmentId: variables.environmentId,
+                    id: variables.id,
+                    workflowNodeName: variables.workflowNodeName,
+                }),
+            });
+        },
+    });
 
     const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
 
