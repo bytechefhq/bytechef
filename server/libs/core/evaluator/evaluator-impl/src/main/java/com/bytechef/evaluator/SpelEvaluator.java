@@ -243,6 +243,14 @@ public class SpelEvaluator implements Evaluator {
                 }
             } else {
                 if (!validateTextExpression(string)) {
+                    if (lenient) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Invalid expression: {}", string);
+                        }
+
+                        return value;
+                    }
+
                     throw new IllegalArgumentException("Invalid expression: " + string);
                 }
 
