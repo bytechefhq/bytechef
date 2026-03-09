@@ -247,7 +247,7 @@ public interface WorkflowApi {
      *
      * @param id The id of the workflow to update. (required)
      * @param workflowModel  (required)
-     * @return Successful operation. (status code 204)
+     * @return The updated workflow object. (status code 200)
      */
     @Operation(
         operationId = "updateWorkflow",
@@ -255,15 +255,16 @@ public interface WorkflowApi {
         description = "Update an existing workflow.",
         tags = { "workflow" },
         responses = {
-            @ApiResponse(responseCode = "204", description = "Successful operation.")
+            @ApiResponse(responseCode = "200", description = "The updated workflow object.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
         value = WorkflowApi.PATH_UPDATE_WORKFLOW,
+        produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<Void> updateWorkflow(
+    default ResponseEntity<WorkflowModel> updateWorkflow(
         @NotNull @Parameter(name = "id", description = "The id of the workflow to update.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "WorkflowModel", description = "", required = true) @Valid @RequestBody WorkflowModel workflowModel
     ) {
