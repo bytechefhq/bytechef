@@ -18,19 +18,15 @@ import McpComponentDialogComponentSelectionStep from './McpComponentDialogCompon
 import McpComponentDialogToolSelectionStep from './McpComponentDialogToolSelectionStep';
 import useMcpComponentDialog from './hooks/useMcpComponentDialog';
 
-const McpComponentDialog = ({
-    mcpComponent,
-    mcpServerId,
-    onOpenChange,
-    open,
-    triggerNode,
-}: {
+interface McpComponentDialogProps {
     mcpComponent?: McpComponent;
     mcpServerId: string;
     triggerNode?: ReactNode;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
-}) => {
+}
+
+const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, triggerNode}: McpComponentDialogProps) => {
     const {
         currentStep,
         existingTools,

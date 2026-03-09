@@ -9,21 +9,18 @@ import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configurati
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
-import {SelectedToolI} from './useMcpComponentDialogToolSelectionStep';
+import {SelectedToolType} from './useMcpComponentDialogToolSelectionStep';
 
 export type StepType = 'components' | 'tools';
 
-const useMcpComponentDialog = ({
-    mcpComponent,
-    mcpServerId,
-    onOpenChange,
-    open,
-}: {
+interface UseMcpComponentDialogProps {
     mcpComponent?: McpComponent;
     mcpServerId: string;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
-}) => {
+}
+
+const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: UseMcpComponentDialogProps) => {
     const [currentStep, setCurrentStep] = useState<StepType>(mcpComponent ? 'tools' : 'components');
     const [selectedComponent, setSelectedComponent] = useState<ComponentDefinitionBasic | null>(
         mcpComponent
@@ -34,7 +31,7 @@ const useMcpComponentDialog = ({
               } as ComponentDefinitionBasic)
             : null
     );
-    const [selectedTools, setSelectedTools] = useState<SelectedToolI[]>([]);
+    const [selectedTools, setSelectedTools] = useState<SelectedToolType[]>([]);
     const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null);
 
     const {data: existingTools} = useMcpToolsByComponentIdQuery(
@@ -151,12 +148,14 @@ const useMcpComponentDialog = ({
     const handleBack = () => {
         if (mcpComponent) {
             handleClose();
-        } else {
-            setCurrentStep('components');
-            setSelectedComponent(null);
-            setSelectedTools([]);
-            setSelectedConnection(null);
+
+            return;
         }
+
+        setCurrentStep('components');
+        setSelectedComponent(null);
+        setSelectedTools([]);
+        setSelectedConnection(null);
     };
 
     const handleOpenChange = (newOpen: boolean) => {
@@ -164,22 +163,25 @@ const useMcpComponentDialog = ({
             onOpenChange(newOpen);
         }
 
-        if (!newOpen) {
-            setCurrentStep(mcpComponent ? 'tools' : 'components');
-            setSelectedComponent(
-                mcpComponent
-                    ? ({
-                          name: mcpComponent.componentName,
-                          title: mcpComponent.title || mcpComponent.componentName,
-                          version: mcpComponent.componentVersion,
-                      } as ComponentDefinitionBasic)
-                    : null
-            );
+        if (newOpen) {
+            return;
+        }
 
-            if (!mcpComponent) {
-                setSelectedTools([]);
-                setSelectedConnection(null);
-            }
+        setCurrentStep(mcpComponent ? 'tools' : 'components');
+
+        setSelectedComponent(
+            mcpComponent
+                ? ({
+                      name: mcpComponent.componentName,
+                      title: mcpComponent.title || mcpComponent.componentName,
+                      version: mcpComponent.componentVersion,
+                  } as ComponentDefinitionBasic)
+                : null
+        );
+
+        if (!mcpComponent) {
+            setSelectedTools([]);
+            setSelectedConnection(null);
         }
     };
 
