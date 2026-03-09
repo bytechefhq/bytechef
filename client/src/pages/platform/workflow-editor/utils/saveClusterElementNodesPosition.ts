@@ -10,7 +10,6 @@ import updateClusterElementsPositions from './updateClusterElementsPositions';
 
 interface SaveClusterElementNodesPositionProps {
     clickedNodeName?: string;
-    invalidateWorkflowQueries: () => void;
     movedClusterElementId?: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
@@ -18,7 +17,6 @@ interface SaveClusterElementNodesPositionProps {
 
 export default function saveClusterElementNodesPosition({
     clickedNodeName,
-    invalidateWorkflowQueries,
     movedClusterElementId,
     updateWorkflowMutation,
     workflow,
@@ -83,7 +81,6 @@ export default function saveClusterElementNodesPosition({
 
         // Save updated data but reset the position saving flag even when there are errors
         saveWorkflowDefinition({
-            invalidateWorkflowQueries,
             nodeData: {
                 ...updatedNodeData,
                 componentName: rootClusterElementNodeData.componentName,
@@ -114,7 +111,6 @@ export default function saveClusterElementNodesPosition({
         } as typeof rootClusterElementNodeData);
 
         saveWorkflowDefinition({
-            invalidateWorkflowQueries,
             nodeData: {
                 ...updatedNodeData,
                 componentName: rootClusterElementNodeData.componentName,

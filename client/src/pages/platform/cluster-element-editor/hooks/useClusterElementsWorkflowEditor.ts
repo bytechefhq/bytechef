@@ -24,7 +24,7 @@ const useClusterElementsWorkflowEditor = () => {
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const previousNodePositionsRef = useRef<Record<string, {x: number; y: number}>>({});
 
@@ -72,7 +72,6 @@ const useClusterElementsWorkflowEditor = () => {
                     setTimeout(() => {
                         if (!updateWorkflowMutation.isPending) {
                             saveClusterElementNodesPosition({
-                                invalidateWorkflowQueries,
                                 movedClusterElementId: change.id,
                                 updateWorkflowMutation,
                                 workflow,
@@ -111,10 +110,9 @@ const useClusterElementsWorkflowEditor = () => {
         resetPendingRef.current = true;
 
         clearAllClusterElementPositions({
-            invalidateWorkflowQueries,
             updateWorkflowMutation,
         });
-    }, [invalidateWorkflowQueries, updateWorkflowMutation]);
+    }, [updateWorkflowMutation]);
 
     useClusterElementsLayout();
 

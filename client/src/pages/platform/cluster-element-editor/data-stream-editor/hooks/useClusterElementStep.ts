@@ -62,7 +62,7 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
         }))
     );
 
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const queryClient = useQueryClient();
 
@@ -309,7 +309,6 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
             }
 
             saveWorkflowDefinition({
-                invalidateWorkflowQueries,
                 nodeData: {
                     ...updatedNodeData,
                     componentName: rootClusterElementNodeData.componentName,
@@ -334,7 +333,6 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
         [
             currentNode,
             elementType,
-            invalidateWorkflowQueries,
             mainClusterRootComponentDefinition,
             queryClient,
             rootClusterElementNodeData,

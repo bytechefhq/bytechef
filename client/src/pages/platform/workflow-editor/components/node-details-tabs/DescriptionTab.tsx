@@ -22,12 +22,11 @@ import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcher
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 
 interface DescriptionTabProps {
-    invalidateWorkflowQueries: () => void;
     nodeDefinition: ComponentDefinition | ClusterElementDefinition | TaskDispatcherDefinition | TriggerDefinition;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
-const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkflowMutation}: DescriptionTabProps) => {
+const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTabProps) => {
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentComponent: state.currentComponent,
@@ -63,7 +62,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
                     field: 'label',
                     value: event.target.value,
                 },
-                invalidateWorkflowQueries,
                 updateWorkflowMutation,
             });
 
@@ -77,7 +75,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
                     field: 'label',
                     value: event.target.value,
                 },
-                invalidateWorkflowQueries,
                 updateWorkflowMutation,
             });
 
@@ -86,7 +83,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
 
         saveWorkflowDefinition({
             decorative: true,
-            invalidateWorkflowQueries,
             nodeData: {
                 ...currentNode,
                 label: event.target.value,
@@ -130,7 +126,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
                     field: 'description',
                     value: event.target.value,
                 },
-                invalidateWorkflowQueries,
                 updateWorkflowMutation,
             });
 
@@ -144,7 +139,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
                     field: 'description',
                     value: event.target.value,
                 },
-                invalidateWorkflowQueries,
                 updateWorkflowMutation,
             });
 
@@ -153,7 +147,6 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
 
         saveWorkflowDefinition({
             decorative: true,
-            invalidateWorkflowQueries,
             nodeData: {
                 ...currentNode,
                 description: event.target.value,

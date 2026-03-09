@@ -96,14 +96,12 @@ const TABS: Array<{label: string; name: TabNameType}> = [
 ];
 
 interface UseWorkflowNodeDetailsPanelProps {
-    invalidateWorkflowQueries: () => void;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
 }
 
 export default function useWorkflowNodeDetailsPanel({
-    invalidateWorkflowQueries,
     previousComponentDefinitions,
     updateWorkflowMutation,
     workflowNodeOutputs,
@@ -880,7 +878,6 @@ export default function useWorkflowNodeDetailsPanel({
                         field: 'operation',
                         value: newOperationName,
                     },
-                    invalidateWorkflowQueries,
                     updateWorkflowMutation,
                 });
 
@@ -895,7 +892,6 @@ export default function useWorkflowNodeDetailsPanel({
                         field: 'operation',
                         value: newOperationName,
                     },
-                    invalidateWorkflowQueries,
                     updateWorkflowMutation,
                 });
 
@@ -903,7 +899,6 @@ export default function useWorkflowNodeDetailsPanel({
             }
 
             saveWorkflowDefinition({
-                invalidateWorkflowQueries,
                 nodeData,
                 onSuccess: () => {
                     setCurrentComponent({
@@ -947,7 +942,6 @@ export default function useWorkflowNodeDetailsPanel({
             deleteWorkflowNodeTestOutputMutation,
             workflow.id,
             queryClient,
-            invalidateWorkflowQueries,
             updateWorkflowMutation,
             fetchTriggerDefinition,
             fetchClusterElementDefinition,

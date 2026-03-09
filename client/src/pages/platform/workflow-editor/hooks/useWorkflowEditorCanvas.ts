@@ -50,7 +50,6 @@ import {isWorkflowMutating} from '../utils/workflowMutationGuard';
 interface UseWorkflowEditorCanvasParamsI {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
-    invalidateWorkflowQueries: () => void;
     leftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
@@ -59,7 +58,6 @@ interface UseWorkflowEditorCanvasParamsI {
 const useWorkflowEditorCanvas = ({
     componentDefinitions,
     customCanvasWidth,
-    invalidateWorkflowQueries,
     leftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
@@ -96,7 +94,6 @@ const useWorkflowEditorCanvas = ({
     const {invalidateWorkflowQueries: editorInvalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop({
-        invalidateWorkflowQueries,
         taskDispatcherDefinitions,
     });
 

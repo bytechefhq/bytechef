@@ -25,7 +25,6 @@ import useWorkflowNodeDetailsPanel from './hooks/useWorkflowNodeDetailsPanel';
 interface WorkflowNodeDetailsPanelProps {
     className?: string;
     closeButton?: ReactNode;
-    invalidateWorkflowQueries: () => void;
     onClose?: () => void;
     panelOpen?: boolean;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
@@ -36,7 +35,6 @@ interface WorkflowNodeDetailsPanelProps {
 const WorkflowNodeDetailsPanel = ({
     className,
     closeButton,
-    invalidateWorkflowQueries,
     onClose,
     panelOpen,
     previousComponentDefinitions,
@@ -72,7 +70,6 @@ const WorkflowNodeDetailsPanel = ({
         workflowNodeDetailsPanelOpen,
         workflowTestConfigurationConnections,
     } = useWorkflowNodeDetailsPanel({
-        invalidateWorkflowQueries,
         previousComponentDefinitions,
         updateWorkflowMutation,
         workflowNodeOutputs,
@@ -217,7 +214,6 @@ const WorkflowNodeDetailsPanel = ({
                                     {activeTab === 'description' &&
                                         (nodeDefinition ? (
                                             <DescriptionTab
-                                                invalidateWorkflowQueries={invalidateWorkflowQueries}
                                                 key={`${currentNode?.componentName}-${currentNode?.type}_description`}
                                                 nodeDefinition={nodeDefinition}
                                                 updateWorkflowMutation={updateWorkflowMutation}

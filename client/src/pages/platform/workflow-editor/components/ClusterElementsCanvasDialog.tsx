@@ -23,7 +23,6 @@ import {useShallow} from 'zustand/react/shallow';
 const DataPillPanel = lazy(() => import('./datapills/DataPillPanel'));
 
 interface ClusterElementsCanvasDialogProps {
-    invalidateWorkflowQueries: () => void;
     onOpenChange: (open: boolean) => void;
     open: boolean;
     previousComponentDefinitions: ComponentDefinitionBasic[];
@@ -32,7 +31,6 @@ interface ClusterElementsCanvasDialogProps {
 }
 
 const ClusterElementsCanvasDialog = ({
-    invalidateWorkflowQueries,
     onOpenChange,
     open,
     previousComponentDefinitions,
@@ -190,7 +188,6 @@ const ClusterElementsCanvasDialog = ({
                                     <Button icon={<XIcon />} size="icon" title="Close the canvas" variant="ghost" />
                                 </DialogClose>
                             }
-                            invalidateWorkflowQueries={invalidateWorkflowQueries}
                             previousComponentDefinitions={previousComponentDefinitions}
                             updateWorkflowMutation={updateWorkflowMutation}
                             workflowNodeOutputs={workflowNodeOutputs}
