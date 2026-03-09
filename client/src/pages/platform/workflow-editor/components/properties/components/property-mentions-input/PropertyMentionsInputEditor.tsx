@@ -44,6 +44,7 @@ interface PropertyMentionsInputEditorProps {
     controlType?: string;
     dataPills: DataPillType[];
     elementId?: string;
+    expressionEnabled?: boolean;
     handleFromAiClick?: (fromAi: boolean) => void;
     isFormulaMode?: boolean;
     isFromAi?: boolean;
@@ -69,6 +70,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             controlType,
             dataPills,
             elementId,
+            expressionEnabled,
             handleFromAiClick,
             isFormulaMode,
             isFromAi = false,
@@ -202,10 +204,13 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     renderText({node}) {
                         return `\${${node.attrs.label ?? node.attrs.id}}`;
                     },
-                    suggestion: getSuggestionOptions(),
+                    ...(expressionEnabled !== false ? {suggestion: getSuggestionOptions()} : {}),
                 }),
                 Placeholder.configure({
-                    placeholder: placeholder ? placeholder : "Use '$' for data pills and '=' for an expression",
+                    placeholder:
+                        expressionEnabled === false
+                            ? placeholder || ''
+                            : placeholder || "Use '$' for data pills and '=' for an expression",
                 }),
             ];
 
@@ -225,6 +230,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             // eslint-disable-next-line react-hooks/exhaustive-deps -- isFormulaMode intentionally omitted to avoid editor recreation on toggle
         }, [
             controlType,
+            expressionEnabled,
             getComponentIcon,
             path,
             placeholder,
@@ -658,9 +664,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     />
                 )}
 
-                {handleFromAiClick && currentNode?.clusterElementType === 'tools' && (
-                    <FromAiToggleButton isFromAi={isFromAi} onToggle={handleFromAiClick} />
-                )}
+                {handleFromAiClick &&
+                    expressionEnabled !== false &&
+                    currentNode?.clusterElementType === 'tools' && (
+                        <FromAiToggleButton isFromAi={isFromAi} onToggle={handleFromAiClick} />
+                    )}
 
                 {controlType === 'RICH_TEXT' && editor && <PropertyMentionsInputBubbleMenu editor={editor} />}
             </>
