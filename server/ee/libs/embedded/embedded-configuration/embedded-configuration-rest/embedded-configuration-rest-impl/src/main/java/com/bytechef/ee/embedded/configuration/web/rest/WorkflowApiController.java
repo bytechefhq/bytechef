@@ -99,13 +99,13 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
-    public ResponseEntity<Void> updateWorkflow(String id, WorkflowModel workflowModel) {
+    public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
         // TODO Add check regarding platform type
 
-        integrationWorkflowFacade.updateWorkflow(id, workflowModel.getDefinition(),
-            Objects.requireNonNull(workflowModel.getVersion()));
-
-        return ResponseEntity.noContent()
-            .build();
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationWorkflowFacade.updateWorkflow(
+                    id, workflowModel.getDefinition(), Objects.requireNonNull(workflowModel.getVersion())),
+                WorkflowModel.class));
     }
 }

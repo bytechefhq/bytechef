@@ -39,5 +39,5 @@ public interface IntegrationWorkflowFacade {
 
     List<IntegrationWorkflowDTO> getIntegrationWorkflows(long integrationId);
 
-    void updateWorkflow(String workflowId, String definition, int version);
+    IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
 }
