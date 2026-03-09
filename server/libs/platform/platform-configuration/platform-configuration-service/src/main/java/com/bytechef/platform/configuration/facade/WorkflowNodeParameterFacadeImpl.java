@@ -434,7 +434,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Map<String, Object> evaluate;
 
         try {
-            evaluate = evaluator.evaluate(parameterMap, outputs);
+            evaluate = evaluator.evaluate(parameterMap, outputs, true);
         } catch (Exception e) {
             if (logger.isTraceEnabled()) {
                 logger.trace(e.getMessage());
@@ -1010,7 +1010,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     private boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
         Map<String, Object> result = evaluator.evaluate(
-            Map.of("displayCondition", "=" + displayCondition), inputParameters);
+            Map.of("displayCondition", "=" + displayCondition), inputParameters, true);
 
         Object displayConditionResult = result.get("displayCondition");
 
