@@ -79,6 +79,7 @@ const WorkflowEditorLayout = ({
         handleWorkflowCodeEditorClick,
         handleWorkflowInputsClick,
         handleWorkflowOutputsClick,
+        isWorkflowNodeOutputsPending,
         previousComponentDefinitions,
         taskDispatcherDefinitions,
         testConfigurationDisabled,
@@ -107,7 +108,6 @@ const WorkflowEditorLayout = ({
                     <Suspense>
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
-                            invalidateWorkflowQueries={invalidateWorkflowQueries!}
                             leftSidebarOpen={leftSidebarOpen}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
@@ -143,7 +143,6 @@ const WorkflowEditorLayout = ({
 
             {currentComponent && !isMainRootClusterElement && !clusterElementsCanvasOpen && (
                 <WorkflowNodeDetailsPanel
-                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation!}
                     workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
@@ -152,7 +151,6 @@ const WorkflowEditorLayout = ({
 
             {clusterElementsCanvasOpen && (
                 <ClusterElementsCanvasDialog
-                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
                     onOpenChange={handleClusterElementsCanvasOpenChange}
                     open={clusterElementsCanvasOpen}
                     previousComponentDefinitions={previousComponentDefinitions}
@@ -166,6 +164,7 @@ const WorkflowEditorLayout = ({
             {currentComponent && !isMainRootClusterElement && !clusterElementsCanvasOpen && dataPillPanelOpen && (
                 <Suspense fallback={<DataPillPanelSkeleton />}>
                     <DataPillPanel
+                        loading={isWorkflowNodeOutputsPending}
                         previousComponentDefinitions={previousComponentDefinitions}
                         workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                     />

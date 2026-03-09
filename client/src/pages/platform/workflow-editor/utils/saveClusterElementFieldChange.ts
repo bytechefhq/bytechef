@@ -1,6 +1,5 @@
-import {ComponentDefinition, Workflow} from '@/shared/middleware/platform/configuration';
-import {ClusterElementsType, NodeDataType, PropertyAllType} from '@/shared/types';
-import {UseMutationResult} from '@tanstack/react-query';
+import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
+import {ClusterElementsType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -19,15 +18,13 @@ interface SaveClusterElementFieldChangeProps {
     currentComponentDefinition: ComponentDefinition;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
-    invalidateWorkflowQueries: () => void;
-    updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 export default function saveClusterElementFieldChange({
     currentComponentDefinition,
     currentOperationProperties,
     fieldUpdate,
-    invalidateWorkflowQueries,
     updateWorkflowMutation,
 }: SaveClusterElementFieldChangeProps): void {
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
@@ -108,7 +105,6 @@ export default function saveClusterElementFieldChange({
 
     saveWorkflowDefinition({
         decorative: true,
-        invalidateWorkflowQueries,
         nodeData: updatedMainRootData,
         onSuccess: () => {
             let commonUpdates: NodeDataType = {

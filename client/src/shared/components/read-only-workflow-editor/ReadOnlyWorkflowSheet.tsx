@@ -52,7 +52,6 @@ const ReadOnlyWorkflowSheet = () => {
                                 <WorkflowEditor
                                     componentDefinitions={componentDefinitions}
                                     customCanvasWidth={WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH}
-                                    invalidateWorkflowQueries={() => {}}
                                     readOnlyWorkflow={workflow}
                                     taskDispatcherDefinitions={taskDispatcherDefinitions}
                                 />

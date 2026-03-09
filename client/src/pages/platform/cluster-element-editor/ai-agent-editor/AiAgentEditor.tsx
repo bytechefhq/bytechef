@@ -37,7 +37,7 @@ export default function AiAgentEditor({
     );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const handleNodeDetailsPanelClose = useCallback(() => {
         useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
@@ -89,7 +89,6 @@ export default function AiAgentEditor({
                             <div className="absolute inset-y-0 left-0 w-[460px] overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background shadow-lg">
                                 <WorkflowNodeDetailsPanel
                                     className="relative inset-auto z-0 size-full max-w-none rounded-none border-0"
-                                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
                                     onClose={handleNodeDetailsPanelClose}
                                     panelOpen
                                     previousComponentDefinitions={previousComponentDefinitions}
