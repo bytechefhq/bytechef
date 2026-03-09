@@ -7,12 +7,22 @@ import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componen
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo, useRef} from 'react';
 
-export interface SelectedToolI {
+export type SelectedToolType = {
     name: string;
     componentName: string;
     componentVersion: number;
     title?: string;
     description?: string;
+};
+
+interface UseMcpComponentDialogToolSelectionStepProps {
+    open: boolean;
+    mcpComponent?: McpComponent;
+    selectedComponent: ComponentDefinitionBasic | null;
+    selectedTools: SelectedToolType[];
+    onToolsChange: (tools: SelectedToolType[]) => void;
+    onConnectionChange: (connection: Connection | null) => void;
+    existingTools?: McpToolsByComponentIdQuery;
 }
 
 const useMcpComponentDialogToolSelectionStep = ({
@@ -23,15 +33,7 @@ const useMcpComponentDialogToolSelectionStep = ({
     open,
     selectedComponent,
     selectedTools,
-}: {
-    open: boolean;
-    mcpComponent?: McpComponent;
-    selectedComponent: ComponentDefinitionBasic | null;
-    selectedTools: SelectedToolI[];
-    onToolsChange: (tools: SelectedToolI[]) => void;
-    onConnectionChange: (connection: Connection | null) => void;
-    existingTools?: McpToolsByComponentIdQuery;
-}) => {
+}: UseMcpComponentDialogToolSelectionStepProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -61,91 +63,105 @@ const useMcpComponentDialogToolSelectionStep = ({
     );
 
     const handleToolToggle = (tool: ClusterElementDefinitionBasic, checked: boolean) => {
-        if (checked) {
-            onToolsChange([
-                ...selectedTools,
-                {
-                    componentName: tool.componentName,
-                    componentVersion: tool.componentVersion,
-                    description: tool.description,
-                    name: tool.name,
-                    title: tool.title,
-                },
-            ]);
-        } else {
+        if (!checked) {
             onToolsChange(selectedTools.filter((selectedTool) => selectedTool.name !== tool.name));
-        }
-    };
 
-    const handleSelectAllTools = (checked: boolean) => {
-        if (checked) {
-            const allTools = toolElements.map((tool) => ({
+            return;
+        }
+
+        onToolsChange([
+            ...selectedTools,
+            {
                 componentName: tool.componentName,
                 componentVersion: tool.componentVersion,
                 description: tool.description,
                 name: tool.name,
                 title: tool.title,
-            }));
+            },
+        ]);
+    };
 
-            onToolsChange(allTools);
-        } else {
+    const handleSelectAllTools = (checked: boolean) => {
+        if (!checked) {
             onToolsChange([]);
+
+            return;
         }
+
+        const allTools = toolElements.map((tool) => ({
+            componentName: tool.componentName,
+            componentVersion: tool.componentVersion,
+            description: tool.description,
+            name: tool.name,
+            title: tool.title,
+        }));
+
+        onToolsChange(allTools);
     };
 
     const allToolsSelected = toolElements.length > 0 && selectedTools.length === toolElements.length;
     const someToolsSelected = selectedTools.length > 0 && selectedTools.length < toolElements.length;
 
     useEffect(() => {
-        if (selectAllCheckboxRef.current) {
-            const checkboxElement = selectAllCheckboxRef.current.querySelector(
-                'input[type="checkbox"]'
-            ) as HTMLInputElement;
+        if (!selectAllCheckboxRef.current) {
+            return;
+        }
 
-            if (checkboxElement) {
-                checkboxElement.indeterminate = someToolsSelected;
-            }
+        const checkboxElement = selectAllCheckboxRef.current.querySelector(
+            'input[type="checkbox"]'
+        ) as HTMLInputElement;
+
+        if (checkboxElement) {
+            checkboxElement.indeterminate = someToolsSelected;
         }
     }, [someToolsSelected]);
 
+    const hasExistingToolsAndElements =
+        existingTools?.mcpToolsByComponentId &&
+        existingTools?.mcpToolsByComponentId?.length > 0 &&
+        toolElements.length > 0;
+
     useEffect(() => {
-        if (
-            existingTools?.mcpToolsByComponentId &&
-            existingTools?.mcpToolsByComponentId?.length > 0 &&
-            toolElements.length > 0
-        ) {
-            const preSelectedTools = existingTools.mcpToolsByComponentId
-                .filter((existingTool): existingTool is McpTool => existingTool !== null)
-                .map((existingTool) => {
-                    const toolElement = toolElements.find((tool) => tool.name === existingTool.name);
-
-                    if (toolElement) {
-                        return {
-                            componentName: toolElement.componentName,
-                            componentVersion: toolElement.componentVersion,
-                            description: toolElement.description,
-                            name: existingTool.name,
-                            title: toolElement.title,
-                        };
-                    }
-
-                    return null;
-                })
-                .filter(Boolean) as SelectedToolI[];
-
-            onToolsChange(preSelectedTools);
+        if (!hasExistingToolsAndElements) {
+            return;
         }
-    }, [existingTools, toolElements, onToolsChange]);
+
+        const validExistingTools = existingTools.mcpToolsByComponentId!.filter(
+            (existingTool): existingTool is McpTool => existingTool !== null
+        );
+
+        const matchedTools = validExistingTools.map((existingTool) => {
+            const toolElement = toolElements.find((tool) => tool.name === existingTool.name);
+
+            if (!toolElement) {
+                return null;
+            }
+
+            return {
+                componentName: toolElement.componentName,
+                componentVersion: toolElement.componentVersion,
+                description: toolElement.description,
+                name: existingTool.name,
+                title: toolElement.title,
+            };
+        });
+
+        const preSelectedTools = matchedTools.filter(Boolean) as SelectedToolType[];
+
+        onToolsChange(preSelectedTools);
+    }, [existingTools?.mcpToolsByComponentId, hasExistingToolsAndElements, onToolsChange, toolElements]);
 
     useEffect(() => {
-        if (mcpComponent && connections.length > 0) {
-            const existingConnection = connections.find(
-                (conn) => conn.id?.toString() === mcpComponent.connectionId?.toString()
-            );
+        if (!mcpComponent || connections.length === 0) {
+            return;
+        }
 
-            if (existingConnection) {
-                onConnectionChange(existingConnection);
-            }
+        const existingConnection = connections.find(
+            (connection) => connection.id?.toString() === mcpComponent.connectionId?.toString()
+        );
+
+        if (existingConnection) {
+            onConnectionChange(existingConnection);
         }
     }, [mcpComponent, connections, onConnectionChange]);
 

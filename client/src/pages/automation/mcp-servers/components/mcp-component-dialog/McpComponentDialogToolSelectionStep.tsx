@@ -6,15 +6,15 @@ import {Connection} from '@/shared/middleware/automation/configuration';
 import {McpComponent, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 
-import useMcpComponentDialogToolSelectionStep, {SelectedToolI} from './hooks/useMcpComponentDialogToolSelectionStep';
+import useMcpComponentDialogToolSelectionStep, {SelectedToolType} from './hooks/useMcpComponentDialogToolSelectionStep';
 
 interface ToolSelectionStepProps {
     open: boolean;
     mcpComponent?: McpComponent;
     selectedComponent: ComponentDefinitionBasic | null;
-    selectedTools: SelectedToolI[];
+    selectedTools: SelectedToolType[];
     selectedConnection: Connection | null;
-    onToolsChange: (tools: SelectedToolI[]) => void;
+    onToolsChange: (tools: SelectedToolType[]) => void;
     onConnectionChange: (connection: Connection | null) => void;
     existingTools?: McpToolsByComponentIdQuery;
 }
