@@ -8,6 +8,7 @@ import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 interface SaveWorkflowNodesPositionProps {
     clearPositionNodeIds?: Set<string>;
     draggedNodeId: string;
+    incrementLayoutResetCounter: () => void;
     invalidateWorkflowQueries: () => void;
     nodePositions: Record<string, {x: number; y: number}>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -154,6 +155,7 @@ export function updateTaskPositions(
 export default function saveWorkflowNodesPosition({
     clearPositionNodeIds,
     draggedNodeId,
+    incrementLayoutResetCounter,
     invalidateWorkflowQueries,
     nodePositions,
     updateWorkflowMutation,
@@ -216,6 +218,7 @@ export default function saveWorkflowNodesPosition({
                 });
 
                 invalidateWorkflowQueries();
+                incrementLayoutResetCounter();
             },
         }
     );
