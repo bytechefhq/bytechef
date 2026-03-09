@@ -51,6 +51,10 @@ class WorkflowNodeTestOutputGraphQlController {
             : workflowNodeTestOutputFacade.saveClusterElementTestOutput(
                 workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId);
 
+        if (workflowNodeTestOutput == null) {
+            return null;
+        }
+
         return new WorkflowNodeTestOutputDTO(workflowNodeTestOutput);
     }
 }
