@@ -26,7 +26,6 @@ public class ScriptComponentHandlerTest {
 
     @Test
     public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/script_v1.json",
-            new ScriptComponentHandler(null).getDefinition());
+        JsonFileAssert.assertEquals("definition/script_v1.json", new ScriptComponentHandler(null).getDefinition());
     }
 }
