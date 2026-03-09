@@ -46,30 +46,11 @@ export const useWorkflowBuilder = () => {
 
     const queryClient = useQueryClient();
 
-    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            });
-        },
-    });
+    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation();
 
-    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            });
-        },
-    });
+    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation();
 
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
-        onSuccess: () => {
-            if (workflowUuid) {
-                queryClient.invalidateQueries({
-                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
-                });
-            }
-        },
         useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,
@@ -90,25 +71,9 @@ export const useWorkflowBuilder = () => {
         workflowKeys: WorkflowKeys,
     });
 
-    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
-        onSuccess: () => {
-            if (workflowUuid) {
-                queryClient.invalidateQueries({
-                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
-                });
-            }
-        },
-    });
+    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation();
 
-    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
-        onSuccess: () => {
-            if (workflowUuid) {
-                queryClient.invalidateQueries({
-                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
-                });
-            }
-        },
-    });
+    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
 
     const handleWorkflowExecutionsTestOutputCloseClick = () => {
         setShowBottomPanelOpen(false);
