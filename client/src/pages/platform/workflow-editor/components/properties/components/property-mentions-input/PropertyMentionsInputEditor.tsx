@@ -100,6 +100,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         editorValueRef.current = editorValue;
 
+        const isFocusedRef = useRef(false);
+
         const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
                 currentComponent: state.currentComponent,
@@ -534,7 +536,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             extensions,
             immediatelyRender: false,
+            onBlur: () => {
+                isFocusedRef.current = false;
+            },
             onFocus: () => {
+                isFocusedRef.current = true;
+
                 if (onFocus && editor) {
                     onFocus(editor);
                 }
@@ -551,10 +558,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }, [editorValue, getContent]);
 
         // Sync value prop into editor state when it changes externally (e.g. from Sheet save).
-        // Only reacts to `value` prop changes — uses editorValueRef to avoid firing when
-        // editorValue changes locally (which would overwrite in-flight datapill insertions).
+        // Skip sync while the editor is focused to prevent server responses from overwriting
+        // characters the user is actively typing (the debounced save fires mid-typing, and the
+        // server response carries the older value that was saved, not what the user has typed since).
         useEffect(() => {
-            if (value === undefined || value === editorValueRef.current) {
+            if (value === undefined || value === editorValueRef.current || isFocusedRef.current) {
                 return;
             }
 
