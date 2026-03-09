@@ -17,8 +17,9 @@ export const useGetIntegrationQuery = (id: number, initialData?: Integration, en
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetIntegrationsQuery = (filters?: GetIntegrationsRequest) =>
+export const useGetIntegrationsQuery = (filters?: GetIntegrationsRequest, enabled?: boolean) =>
     useQuery<Integration[], Error>({
         queryKey: IntegrationKeys.filteredIntegrations(filters ?? {}),
         queryFn: () => new IntegrationApi().getIntegrations(filters),
+        enabled: enabled === undefined ? true : enabled,
     });

@@ -110,6 +110,9 @@ export const WorkflowExecutions = () => {
         searchParams.get('startDate') ? new Date(+searchParams.get('startDate')!) : undefined
     );
     const [filterWorkflowId, setFilterWorkflowId] = useState<string | undefined>();
+    const [filtersInteracted, setFiltersInteracted] = useState<boolean>(
+        !!searchParams.get('integrationId') || !!searchParams.get('integrationInstanceConfigurationId')
+    );
 
     const navigate = useNavigate();
 
@@ -118,13 +121,16 @@ export const WorkflowExecutions = () => {
         !!filterIntegrationInstanceConfigurationId
     );
 
-    const {data: integrationInstanceConfigurations} = useGetIntegrationInstanceConfigurationsQuery({
-        environmentId: currentEnvironmentId,
-        includeAllFields: false,
-        integrationId: filterIntegrationId,
-    });
+    const {data: integrationInstanceConfigurations} = useGetIntegrationInstanceConfigurationsQuery(
+        {
+            environmentId: currentEnvironmentId,
+            includeAllFields: false,
+            integrationId: filterIntegrationId,
+        },
+        filtersInteracted
+    );
 
-    const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});
+    const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false}, filtersInteracted);
 
     const {connectedUserProjects, workflowExecutionPage, workflowExecutionsError, workflowExecutionsIsLoading} =
         useWorkflowExecutions(filterAutomations, {
@@ -426,6 +432,7 @@ export const WorkflowExecutions = () => {
                             <Label>Integration</Label>
 
                             <ComboBox
+                                emptyMessage={!integrations ? 'Loading...' : 'No item found.'}
                                 items={
                                     integrations?.length
                                         ? integrations?.map((integration) => ({
@@ -435,6 +442,7 @@ export const WorkflowExecutions = () => {
                                         : []
                                 }
                                 onChange={handleIntegrationChange}
+                                onOpen={() => setFiltersInteracted(true)}
                                 value={filterIntegrationId}
                             />
                         </div>
@@ -445,6 +453,7 @@ export const WorkflowExecutions = () => {
                             <Label>Instance Configuration</Label>
 
                             <ComboBox
+                                emptyMessage={!integrationInstanceConfigurations ? 'Loading...' : 'No item found.'}
                                 items={
                                     integrationInstanceConfigurations?.length
                                         ? integrationInstanceConfigurations?.map(
@@ -472,6 +481,7 @@ export const WorkflowExecutions = () => {
                                         : []
                                 }
                                 onChange={handleIntegrationInstanceConfigurationChange}
+                                onOpen={() => setFiltersInteracted(true)}
                                 value={filterIntegrationInstanceConfigurationId}
                             />
                         </div>
