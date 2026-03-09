@@ -32,6 +32,11 @@ public record JobServiceWrapper(JobSyncExecutor.JobFactoryFunction jobFactoryFun
     }
 
     @Override
+    public List<Job> getJobs(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Page<Job> getJobsPage(int pageNumber) {
         throw new UnsupportedOperationException();
     }
