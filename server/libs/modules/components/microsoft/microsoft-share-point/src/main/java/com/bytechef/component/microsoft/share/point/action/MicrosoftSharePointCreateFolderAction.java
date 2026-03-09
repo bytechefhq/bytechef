@@ -105,6 +105,9 @@ public class MicrosoftSharePointCreateFolderAction {
                                 string("scope")
                                     .description("The scope of the shared item.")))))
         .perform(MicrosoftSharePointCreateFolderAction::perform)
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#create-folder")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointCreateFolderAction() {

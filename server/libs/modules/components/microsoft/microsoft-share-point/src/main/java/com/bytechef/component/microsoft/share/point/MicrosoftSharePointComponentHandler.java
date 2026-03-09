@@ -41,6 +41,10 @@ public class MicrosoftSharePointComponentHandler implements ComponentHandler {
             "Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, " +
                 "providing document management, intranet, and content management features for organizations.")
         .customAction(true)
+        .customActionHelp(
+            "",
+            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/get-to-know-the-sharepoint-rest-" +
+                "service?tabs=csom")
         .icon("path:assets/microsoft-share-point.svg")
         .categories(ComponentCategory.FILE_STORAGE, ComponentCategory.COMMUNICATION)
         .connection(MicrosoftSharePointConnection.CONNECTION_DEFINITION)
@@ -49,7 +53,8 @@ public class MicrosoftSharePointComponentHandler implements ComponentHandler {
             MicrosoftSharePointCreateListAction.ACTION_DEFINITION,
             MicrosoftSharePointCreateListItemAction.ACTION_DEFINITION,
             MicrosoftSharePointUploadFileAction.ACTION_DEFINITION)
-        .triggers(MicrosoftSharePointNewFileTrigger.TRIGGER_DEFINITION);
+        .triggers(MicrosoftSharePointNewFileTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

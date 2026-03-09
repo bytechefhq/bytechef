@@ -57,6 +57,9 @@ public class MicrosoftSharePointCreateListItemAction {
                 .properties(MicrosoftSharePointUtils::createPropertiesForListItem))
         .output()
         .perform(MicrosoftSharePointCreateListItemAction::perform)
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#create-list-item")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointCreateListItemAction() {
