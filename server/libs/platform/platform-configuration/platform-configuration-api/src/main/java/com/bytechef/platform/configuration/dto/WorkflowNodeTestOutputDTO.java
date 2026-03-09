@@ -25,8 +25,7 @@ public record WorkflowNodeTestOutputDTO(Long id, String workflowId, String workf
 
     public WorkflowNodeTestOutputDTO(WorkflowNodeTestOutput workflowNodeTestOutput) {
         this(
-            workflowNodeTestOutput.getId(),
-            workflowNodeTestOutput.getWorkflowId(),
+            workflowNodeTestOutput.getId(), workflowNodeTestOutput.getWorkflowId(),
             workflowNodeTestOutput.getWorkflowNodeName());
     }
 }
