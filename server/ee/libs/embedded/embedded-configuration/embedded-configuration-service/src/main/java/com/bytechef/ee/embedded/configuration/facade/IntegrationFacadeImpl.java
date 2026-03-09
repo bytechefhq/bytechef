@@ -21,6 +21,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -29,7 +30,10 @@ import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -170,12 +174,20 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     .filter(Objects::nonNull)
                     .toList());
 
+            Map<String, ComponentDefinition> componentDefinitionMap = integrations.stream()
+                .map(Integration::getComponentName)
+                .distinct()
+                .collect(
+                    Collectors.toMap(
+                        Function.identity(),
+                        componentName -> componentDefinitionService.getComponentDefinition(componentName, null)));
+
             return CollectionUtils.map(
                 integrations,
                 integration -> new IntegrationDTO(
                     CollectionUtils.findFirstFilterOrElse(
                         categories, category -> Objects.equals(integration.getCategoryId(), category.getId()), null),
-                    componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
+                    componentDefinitionMap.get(integration.getComponentName()),
                     integration,
                     getIntegrationWorkflowIds(integration),
                     CollectionUtils.filter(
