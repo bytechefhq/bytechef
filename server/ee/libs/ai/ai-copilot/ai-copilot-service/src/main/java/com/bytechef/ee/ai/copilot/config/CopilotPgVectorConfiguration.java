@@ -69,25 +69,4 @@ public class CopilotPgVectorConfiguration {
             .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
             .build();
     }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.memory", name = "provider", havingValue = "jdbc")
-    ChatMemory jdbcChatMemory(@Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate) {
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
-            new ClassPathResource(
-                "org/springframework/ai/chat/memory/repository/jdbc/schema-postgresql.sql"));
-
-        populator.setContinueOnError(true);
-        populator.execute(pgVectorJdbcTemplate.getDataSource());
-
-        return MessageWindowChatMemory.builder()
-            .chatMemoryRepository(JdbcChatMemoryRepository
-                .builder()
-                .jdbcTemplate(pgVectorJdbcTemplate)
-                .dialect(JdbcChatMemoryRepositoryDialect.from(pgVectorJdbcTemplate.getDataSource()))
-                .dataSource(pgVectorJdbcTemplate.getDataSource())
-                .build())
-            .maxMessages(500)
-            .build();
-    }
 }
