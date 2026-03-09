@@ -362,6 +362,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     const getClusterElementDefinitionRequest = {
                         clusterElementName: operationName,
+                        clusterElementType: clusterElementType?.toUpperCase(),
                         componentName,
                         componentVersion: version,
                     };
