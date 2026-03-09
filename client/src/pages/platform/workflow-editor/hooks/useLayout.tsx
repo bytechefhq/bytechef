@@ -55,10 +55,16 @@ import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
  * (task names, types, nested task counts) but NOT when parameter values change.
  * This prevents unnecessary dagre layout recalculations on every property save.
  */
-function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
+export function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
     return tasks
         .map((task) => {
-            const parts = [task.name, task.type];
+            const hasFilledClusterElements =
+                task.clusterElements &&
+                Object.values(task.clusterElements).some(
+                    (value) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+                );
+
+            const parts = [task.name, task.type, task.clusterRoot ? 'cr' : '', hasFilledClusterElements ? 'ce' : ''];
 
             if (task.parameters) {
                 const keyCounts = new Map<string, number[]>();
