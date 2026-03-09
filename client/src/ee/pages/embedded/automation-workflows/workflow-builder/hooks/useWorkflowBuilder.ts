@@ -17,6 +17,7 @@ import {
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
+import {WorkflowNodeDescriptionKeys} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
@@ -71,7 +72,17 @@ export const useWorkflowBuilder = () => {
         workflowKeys: WorkflowKeys,
     });
 
-    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation();
+    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
+        onSuccess: (_result, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription({
+                    environmentId: variables.environmentId,
+                    id: variables.id,
+                    workflowNodeName: variables.workflowNodeName,
+                }),
+            });
+        },
+    });
 
     const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
 
