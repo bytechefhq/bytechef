@@ -58,6 +58,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
     sourceNodeName,
     trigger,
 }: WorkflowNodesPopoverMenuOperationListProps) => {
+    const [loadingOperationName, setLoadingOperationName] = useState<string | null>(null);
+
     const {setLatestComponentDefinition, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             setLatestComponentDefinition: state.setLatestComponentDefinition,
@@ -93,8 +95,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
             }))
         );
-
-    const [loadingOperationName, setLoadingOperationName] = useState<string | null>(null);
 
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
@@ -316,157 +316,165 @@ const WorkflowNodesPopoverMenuOperationList = ({
             setLoadingOperationName(operationName);
             setLatestComponentDefinition(componentDefinition);
 
-            if (trigger) {
-                captureComponentUsed(componentName, undefined, operationName);
+            try {
+                if (trigger) {
+                    captureComponentUsed(componentName, undefined, operationName);
 
-                const getTriggerDefinitionRequest = {
-                    componentName,
-                    componentVersion: version,
-                    triggerName: operationName,
-                };
+                    const getTriggerDefinitionRequest = {
+                        componentName,
+                        componentVersion: version,
+                        triggerName: operationName,
+                    };
 
-                const clickedComponentTriggerDefinition = await queryClient.fetchQuery({
-                    queryFn: () =>
-                        new TriggerDefinitionApi().getComponentTriggerDefinition(getTriggerDefinitionRequest),
-                    queryKey: TriggerDefinitionKeys.triggerDefinition(getTriggerDefinitionRequest),
-                });
+                    const clickedComponentTriggerDefinition = await queryClient.fetchQuery({
+                        queryFn: () =>
+                            new TriggerDefinitionApi().getComponentTriggerDefinition(getTriggerDefinitionRequest),
+                        queryKey: TriggerDefinitionKeys.triggerDefinition(getTriggerDefinitionRequest),
+                    });
 
-                const newTriggerNodeData = getNodeData(clickedOperation, clickedComponentTriggerDefinition);
+                    const newTriggerNodeData = getNodeData(clickedOperation, clickedComponentTriggerDefinition);
 
-                saveNodeToWorkflow(newTriggerNodeData, 0);
+                    saveNodeToWorkflow(newTriggerNodeData, 0);
 
-                setPopoverOpen(false);
+                    setPopoverOpen(false);
 
-                return;
-            }
+                    return;
+                }
 
-            if (clusterElementsCanvasOpen && clusterElementType) {
-                captureComponentUsed(componentName, undefined, operationName);
+                if (clusterElementsCanvasOpen && clusterElementType) {
+                    captureComponentUsed(componentName, undefined, operationName);
 
-                const getClusterElementDefinitionRequest = {
-                    clusterElementName: operationName,
-                    componentName,
-                    componentVersion: version,
-                };
+                    const getClusterElementDefinitionRequest = {
+                        clusterElementName: operationName,
+                        componentName,
+                        componentVersion: version,
+                    };
 
-                const clickedClusterElementDefinition = await queryClient.fetchQuery({
-                    queryFn: () =>
-                        new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
+                    const clickedClusterElementDefinition = await queryClient.fetchQuery({
+                        queryFn: () =>
+                            new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
+                                getClusterElementDefinitionRequest
+                            ),
+                        queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(
                             getClusterElementDefinitionRequest
                         ),
-                    queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(getClusterElementDefinitionRequest),
-                });
+                    });
 
-                const clusterElementData = {
-                    clusterElements: componentDefinition.clusterRoot ? {} : undefined,
-                    label: clickedOperation.componentLabel,
-                    metadata: {},
-                    name: getFormattedName(componentName),
-                    parameters:
-                        getParametersWithDefaultValues({
-                            properties: clickedClusterElementDefinition?.properties as Array<PropertyAllType>,
-                        }) || {},
-                    type: `${componentName}/v${version}/${operationName}`,
+                    const clusterElementData = {
+                        clusterElements: componentDefinition.clusterRoot ? {} : undefined,
+                        label: clickedOperation.componentLabel,
+                        metadata: {},
+                        name: getFormattedName(componentName),
+                        parameters:
+                            getParametersWithDefaultValues({
+                                properties: clickedClusterElementDefinition?.properties as Array<PropertyAllType>,
+                            }) || {},
+                        type: `${componentName}/v${version}/${operationName}`,
+                    };
+
+                    saveClusterElementToWorkflow({
+                        clusterElementData,
+                        clusterElementType,
+                        isMultipleElements: multipleClusterElementsNode,
+                        sourceNodeId,
+                    });
+
+                    setPopoverOpen(false);
+
+                    return;
+                }
+
+                const getActionDefinitionRequest = {
+                    actionName: operationName,
+                    componentName,
+                    componentVersion: componentDefinition.version,
                 };
 
-                saveClusterElementToWorkflow({
-                    clusterElementData,
-                    clusterElementType,
-                    isMultipleElements: multipleClusterElementsNode,
-                    sourceNodeId,
+                const clickedComponentActionDefinition = await queryClient.fetchQuery({
+                    queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
+                    queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
                 });
 
-                setPopoverOpen(false);
+                const newWorkflowNodeData = getNodeData(clickedOperation, clickedComponentActionDefinition);
 
-                return;
-            }
+                const handleEdgeCase = () => {
+                    const clickedEdge = edges.find((edge) => edge.id === edgeId);
 
-            const getActionDefinitionRequest = {
-                actionName: operationName,
-                componentName,
-                componentVersion: componentDefinition.version,
-            };
+                    if (!clickedEdge) {
+                        return;
+                    }
 
-            const clickedComponentActionDefinition = await queryClient.fetchQuery({
-                queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
-                queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
-            });
+                    const taskDispatcherContext = getTaskDispatcherContext({edge: clickedEdge, nodes});
 
-            const newWorkflowNodeData = getNodeData(clickedOperation, clickedComponentActionDefinition);
+                    if (taskDispatcherContext?.taskDispatcherId) {
+                        handleTaskDispatcherSubtaskOperationClick({
+                            operation: clickedOperation,
+                            operationDefinition: clickedComponentActionDefinition,
+                            queryClient,
+                            taskDispatcherContext,
+                            updateWorkflowMutation: updateWorkflowMutation!,
+                            workflow,
+                        });
 
-            const handleEdgeCase = () => {
-                const clickedEdge = edges.find((edge) => edge.id === edgeId);
-
-                if (!clickedEdge) {
-                    return;
-                }
-
-                const taskDispatcherContext = getTaskDispatcherContext({edge: clickedEdge, nodes});
-
-                if (taskDispatcherContext?.taskDispatcherId) {
-                    handleTaskDispatcherSubtaskOperationClick({
-                        operation: clickedOperation,
-                        operationDefinition: clickedComponentActionDefinition,
-                        queryClient,
-                        taskDispatcherContext,
-                        updateWorkflowMutation: updateWorkflowMutation!,
-                        workflow,
-                    });
-
-                    return;
-                }
-
-                captureComponentUsed(componentName, operationName, undefined);
-
-                const insertIndex = calculateNodeInsertIndex(clickedEdge.target);
-
-                saveNodeToWorkflow(newWorkflowNodeData, insertIndex);
-            };
-
-            const handleNonEdgeCase = () => {
-                const sourceNode = nodes.find((node) => node.id === sourceNodeId);
-
-                const taskDispatcherContext = getTaskDispatcherContext({node: sourceNode});
-
-                if (taskDispatcherContext?.taskDispatcherId) {
-                    handleTaskDispatcherSubtaskOperationClick({
-                        operation: clickedOperation,
-                        operationDefinition: clickedComponentActionDefinition,
-                        placeholderId: sourceNodeId,
-                        queryClient,
-                        taskDispatcherContext,
-                        updateWorkflowMutation: updateWorkflowMutation!,
-                        workflow,
-                    });
-                } else if (!clusterElementsCanvasOpen) {
-                    const placeholderNode = nodes.find((node) => node.id === sourceNodeId);
-
-                    if (!placeholderNode) {
                         return;
                     }
 
                     captureComponentUsed(componentName, operationName, undefined);
 
-                    let insertIndex: number | undefined = undefined;
-
-                    if (sourceNodeId?.includes('bottom-placeholder')) {
-                        const sourceNodeIndex = nodes.findIndex((node) => node.id === sourceNodeId);
-
-                        const nextNode = nodes[sourceNodeIndex + 1];
-
-                        insertIndex = calculateNodeInsertIndex(nextNode?.id);
-                    }
+                    const insertIndex = calculateNodeInsertIndex(clickedEdge.target);
 
                     saveNodeToWorkflow(newWorkflowNodeData, insertIndex);
+                };
+
+                const handleNonEdgeCase = () => {
+                    const sourceNode = nodes.find((node) => node.id === sourceNodeId);
+
+                    const taskDispatcherContext = getTaskDispatcherContext({node: sourceNode});
+
+                    if (taskDispatcherContext?.taskDispatcherId) {
+                        handleTaskDispatcherSubtaskOperationClick({
+                            operation: clickedOperation,
+                            operationDefinition: clickedComponentActionDefinition,
+                            placeholderId: sourceNodeId,
+                            queryClient,
+                            taskDispatcherContext,
+                            updateWorkflowMutation: updateWorkflowMutation!,
+                            workflow,
+                        });
+                    } else if (!clusterElementsCanvasOpen) {
+                        const placeholderNode = nodes.find((node) => node.id === sourceNodeId);
+
+                        if (!placeholderNode) {
+                            return;
+                        }
+
+                        captureComponentUsed(componentName, operationName, undefined);
+
+                        let insertIndex: number | undefined = undefined;
+
+                        if (sourceNodeId?.includes('bottom-placeholder')) {
+                            const sourceNodeIndex = nodes.findIndex((node) => node.id === sourceNodeId);
+
+                            const nextNode = nodes[sourceNodeIndex + 1];
+
+                            insertIndex = calculateNodeInsertIndex(nextNode?.id);
+                        }
+
+                        saveNodeToWorkflow(newWorkflowNodeData, insertIndex);
+                    }
+
+                    setPopoverOpen(false);
+                };
+
+                if (edgeId) {
+                    handleEdgeCase();
+                } else {
+                    handleNonEdgeCase();
                 }
-
-                setPopoverOpen(false);
-            };
-
-            if (edgeId) {
-                handleEdgeCase();
-            } else {
-                handleNonEdgeCase();
+            } catch (error) {
+                console.error('Failed to load operation definition:', error);
+            } finally {
+                setLoadingOperationName(null);
             }
         },
         [

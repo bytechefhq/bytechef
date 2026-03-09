@@ -81,7 +81,9 @@ export default function deleteProperty(
                         if (response.parameters) {
                             useWorkflowDataStore
                                 .getState()
-                                .updateWorkflowNodeParameters(clusterElementWorkflowNodeName, response.parameters);
+                                .updateWorkflowNodeParameters(
+                                    clusterElementWorkflowNodeName, response.parameters, response.version
+                                );
                         }
                     },
                 }
@@ -126,7 +128,9 @@ export default function deleteProperty(
                     if (response.parameters) {
                         useWorkflowDataStore
                             .getState()
-                            .updateWorkflowNodeParameters(nodeWorkflowNodeName, response.parameters);
+                            .updateWorkflowNodeParameters(
+                                nodeWorkflowNodeName, response.parameters, response.version
+                            );
                     }
                 },
             }
