@@ -48,64 +48,44 @@ import {
     getLayoutElements,
     getTaskAncestry,
 } from '../utils/layoutUtils';
+import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 
 /**
  * Builds a string key that changes only when the task graph structure changes
  * (task names, types, nested task counts) but NOT when parameter values change.
  * This prevents unnecessary dagre layout recalculations on every property save.
  */
+const FINGERPRINT_KEY_PREFIXES: Record<string, string> = {
+    branches: 'br',
+    caseFalse: 'cf',
+    caseTrue: 'ct',
+    cases: 'cs',
+    default: 'df',
+    iteratee: 'it',
+    tasks: 'ts',
+};
+
 function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
     return tasks
         .map((task) => {
             const parts = [task.name, task.type];
-            const parameters = task.parameters;
 
-            if (!parameters) {
-                return parts.join('|');
-            }
+            if (task.parameters) {
+                const keyCounts = new Map<string, number[]>();
 
-            // Condition: caseTrue/caseFalse lengths affect placeholder creation
-            if (Array.isArray(parameters.caseTrue)) {
-                parts.push(`ct${parameters.caseTrue.length}`);
-            }
+                forEachNestedTaskGroup(task.parameters as Record<string, unknown>, (subtasks, key) => {
+                    if (!keyCounts.has(key)) {
+                        keyCounts.set(key, []);
+                    }
 
-            if (Array.isArray(parameters.caseFalse)) {
-                parts.push(`cf${parameters.caseFalse.length}`);
-            }
+                    keyCounts.get(key)!.push(subtasks.length);
+                });
 
-            // Loop/Map: iteratee length or presence
-            if (Array.isArray(parameters.iteratee)) {
-                parts.push(`it${parameters.iteratee.length}`);
-            } else if (parameters.iteratee && typeof parameters.iteratee === 'object') {
-                // Each: iteratee is a single object, presence matters
-                parts.push(`it1`);
-            }
+                for (const [key, counts] of keyCounts) {
+                    const prefix = FINGERPRINT_KEY_PREFIXES[key] || key;
 
-            // Branch: case count and per-case task counts
-            if (Array.isArray(parameters.cases)) {
-                const caseCounts = (parameters.cases as BranchCaseType[]).map(
-                    (caseItem) => caseItem.tasks?.length || 0
-                );
-
-                parts.push(`cs${caseCounts.join('-')}`);
-            }
-
-            if (Array.isArray(parameters.default)) {
-                parts.push(`df${parameters.default.length}`);
-            }
-
-            // Parallel: tasks length
-            if (Array.isArray(parameters.tasks)) {
-                parts.push(`ts${parameters.tasks.length}`);
-            }
-
-            // Fork-join: branches count and per-branch task counts
-            if (Array.isArray(parameters.branches)) {
-                const branchCounts = parameters.branches.map((branch: WorkflowTask[]) =>
-                    Array.isArray(branch) ? branch.length : 0
-                );
-
-                parts.push(`br${branchCounts.join('-')}`);
+                    parts.push(counts.length === 1 ? `${prefix}${counts[0]}` : `${prefix}${counts.join('-')}`);
+                }
             }
 
             return parts.join('|');

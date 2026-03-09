@@ -18,6 +18,7 @@ import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
+import {forEachNestedTaskGroup} from './taskTraversalUtils';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface HandleDeleteTaskProps {
@@ -365,47 +366,10 @@ function collectAllTaskParameters(
     for (const task of tasks) {
         result.set(task.name, task.parameters);
 
-        if (!task.parameters) {
-            continue;
-        }
-
-        // Condition: caseTrue, caseFalse; Loop/Map: iteratee; Parallel: tasks; Branch: default
-        for (const key of ['caseTrue', 'caseFalse', 'iteratee', 'default', 'tasks']) {
-            const subtasks = task.parameters[key];
-
-            if (Array.isArray(subtasks) && subtasks.length > 0 && subtasks[0]?.name) {
+        if (task.parameters) {
+            forEachNestedTaskGroup(task.parameters as Record<string, unknown>, (subtasks) => {
                 collectAllTaskParameters(subtasks as Array<WorkflowTaskType>, result);
-            }
-        }
-
-        // Branch: cases[].tasks
-        if (Array.isArray(task.parameters.cases)) {
-            for (const caseItem of task.parameters.cases as Array<{tasks?: Array<WorkflowTaskType>}>) {
-                if (Array.isArray(caseItem.tasks)) {
-                    collectAllTaskParameters(caseItem.tasks, result);
-                }
-            }
-        }
-
-        // Fork-join: branches[][]
-        if (Array.isArray(task.parameters.branches)) {
-            for (const branch of task.parameters.branches as Array<Array<WorkflowTaskType>>) {
-                if (Array.isArray(branch)) {
-                    collectAllTaskParameters(branch, result);
-                }
-            }
-        }
-
-        // Each: iteratee as single object
-        if (
-            task.parameters.iteratee &&
-            !Array.isArray(task.parameters.iteratee) &&
-            typeof task.parameters.iteratee === 'object' &&
-            (task.parameters.iteratee as WorkflowTaskType).name
-        ) {
-            const singleIteratee = task.parameters.iteratee as WorkflowTaskType;
-
-            result.set(singleIteratee.name, singleIteratee.parameters);
+            });
         }
     }
 
