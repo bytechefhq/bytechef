@@ -30,6 +30,7 @@ import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,16 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
         return clusterElementDefinitionService.executeOptions(
             componentName, componentVersion, clusterElementName, propertyName, inputParameters, lookupDependsOnPaths,
             searchText, componentConnection, clusterElementResolver);
+    }
+
+    @Override
+    public OutputResponse executeOutput(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId) {
+
+        return clusterElementDefinitionService.executeOutput(
+            componentName, componentVersion, clusterElementName, inputParameters,
+            getComponentConnection(connectionId));
     }
 
     @Override

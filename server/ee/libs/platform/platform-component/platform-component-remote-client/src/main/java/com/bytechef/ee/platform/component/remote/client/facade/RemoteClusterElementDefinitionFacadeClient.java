@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.component.remote.client.facade;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -47,6 +48,14 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
         Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
         String searchText, @Nullable Long connectionId, Map<String, Long> clusterElementConnectionIds,
         Map<String, Map<String, ?>> clusterElementInputParameters) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public OutputResponse executeOutput(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId) {
 
         throw new UnsupportedOperationException();
     }
