@@ -118,6 +118,12 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<IntegrationInstance> getIntegrationInstances(List<Long> ids) {
+        return integrationInstanceRepository.findAllById(ids);
+    }
+
+    @Override
     public IntegrationInstance getIntegrationInstance(
         long connectedUserId, String workflowId, Environment environment) {
 
