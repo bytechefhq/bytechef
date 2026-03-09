@@ -1,12 +1,13 @@
 import {describe, expect, it} from 'vitest';
 
 /**
- * Replicates the `enabled` condition for the workflow test configuration
- * connections query in useWorkflowNodeDetailsPanel.ts (line 182).
+ * Specification test for the `enabled` condition of the workflow test
+ * configuration connections query in useWorkflowNodeDetailsPanel.ts (line 182).
  *
- * Tests that the connections query only fires when the component definition
- * has loaded and declares `connectionRequired: true`, preventing unnecessary
- * API calls for nodes like var, dataStorage, and task dispatchers.
+ * NOTE: This tests a replicated condition, not the production code directly,
+ * because the condition is inline in a React hook and cannot be imported.
+ * If the condition in useWorkflowNodeDetailsPanel.ts changes, this test
+ * must be updated to match.
  */
 
 interface ConnectionsQueryEnabledParamsI {
