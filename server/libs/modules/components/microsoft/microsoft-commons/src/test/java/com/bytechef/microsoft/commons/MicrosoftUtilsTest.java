@@ -17,9 +17,10 @@
 package com.bytechef.microsoft.commons;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.microsoft.commons.MicrosoftUtils.ID;
-import static com.bytechef.microsoft.commons.MicrosoftUtils.NAME;
-import static com.bytechef.microsoft.commons.MicrosoftUtils.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ODATA_NEXT_LINK;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -109,12 +110,12 @@ class MicrosoftUtilsTest {
         Map<String, Object> initialBody = Map.of(
             VALUE,
             List.of(Map.of("displayName", "Team A", "id", "1")),
-            MicrosoftUtils.ODATA_NEXT_LINK, "https://graph.microsoft.com/v1.0/teams?$skiptoken=abc");
+            ODATA_NEXT_LINK, "https://graph.microsoft.com/v1.0/teams?$skiptoken=abc");
 
         Map<String, Object> page1 = Map.of(
             VALUE,
             List.of(Map.of("displayName", "Team B", "id", "2")),
-            MicrosoftUtils.ODATA_NEXT_LINK, "https://graph.microsoft.com/v1.0/teams?$skiptoken=def");
+            ODATA_NEXT_LINK, "https://graph.microsoft.com/v1.0/teams?$skiptoken=def");
 
         Map<String, Object> page2 = Map.of(
             VALUE,
