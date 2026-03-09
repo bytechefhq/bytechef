@@ -454,7 +454,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
-    public void updateWorkflow(String workflowId, String definition, int version) {
+    public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         workflowService.update(workflowId, definition, version);
 
         for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
@@ -462,6 +462,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
                 workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName, environment.ordinal());
             }
         }
+
+        return getProjectWorkflow(workflowId);
     }
 
     private TemplateFiles readTemplate(byte[] data) {
