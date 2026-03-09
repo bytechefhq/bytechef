@@ -7,8 +7,8 @@ import {
     FormSubmitHandler,
     FormType,
     IntegrationInstanceType,
+    IntegrationInstanceWorkflowType,
     IntegrationType,
-    IntegrationWorkflowType,
     MergedWorkflowType,
     PropertyType,
     RegisterFormSubmitFunction,
@@ -131,39 +131,30 @@ export default function useConnectDialog({
 
     // Merge integration workflows with instance workflows to get complete workflow data, because the backend is incomplete
     const mergedWorkflows: MergedWorkflowType[] = useMemo(() => {
-        if (!integration?.workflows || !integration?.integrationInstances) {
+        if (!integration?.workflows) {
             return [];
         }
 
-        const currentInstance = integration.integrationInstances.find(
+        const currentInstance = integration.integrationInstances?.find(
             (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
         );
 
-        const workflows = currentInstance?.workflows || integration.workflows;
-
-        return workflows.map((workflow) => {
+        return integration.workflows.map((workflow) => {
             const instanceWorkflow = currentInstance?.workflows?.find(
                 (instanceWorkflow) => instanceWorkflow.workflowUuid === workflow.workflowUuid
             );
 
-            const baseWorkflow = integration.workflows?.find(
-                (integrationWorkflow) => integrationWorkflow.workflowUuid === workflow.workflowUuid
-            );
-
-            const serverEnabled =
-                instanceWorkflow?.enabled ?? (baseWorkflow as IntegrationWorkflowType | undefined)?.enabled ?? false;
+            const serverEnabled = instanceWorkflow?.enabled ?? workflow.enabled ?? false;
 
             const effectiveEnabled = enabledOverrides[workflow.workflowUuid] ?? serverEnabled;
 
             const workflowInputOverrides = inputOverrides[workflow.workflowUuid];
 
             return {
-                ...baseWorkflow,
-                label: baseWorkflow?.label,
-                workflowUuid: baseWorkflow?.workflowUuid ?? workflow.workflowUuid,
+                ...workflow,
                 enabled: effectiveEnabled,
-                inputs: Array.isArray(baseWorkflow?.inputs)
-                    ? baseWorkflow!.inputs.map((input: WorkflowInputType) => ({
+                inputs: Array.isArray(workflow.inputs)
+                    ? workflow.inputs.map((input: WorkflowInputType) => ({
                           ...input,
                           value:
                               workflowInputOverrides?.[input.name] ??
@@ -182,7 +173,7 @@ export default function useConnectDialog({
     const saveOAuth2Connection = useCallback(
         async (payload: CodePayloadI | TokenPayloadI) => {
             try {
-                const newIntegrationInstanceId: number = await fetch(
+                await fetch(
                     `/api/embedded/v1/integrations/${integrationId}/instances`,
                     {
                         method: 'POST',
@@ -194,12 +185,17 @@ export default function useConnectDialog({
                     }
                 );
 
-                if (typeof newIntegrationInstanceId !== 'number' || isNaN(newIntegrationInstanceId)) {
-                    throw new Error('Invalid integration instance ID received from API');
+                const integrationData: IntegrationType = await fetch(
+                    `/api/embedded/v1/integrations/${integrationId}`
+                );
+
+                const existingInstance = integrationData.integrationInstances?.[0];
+
+                if (existingInstance) {
+                    setCurrentIntegrationInstanceId(existingInstance.id);
                 }
 
-                setCurrentIntegrationInstanceId(newIntegrationInstanceId);
-
+                setIntegration(integrationData);
                 setWorkflowsView(true);
             } catch (error) {
                 console.error('Failed to save OAuth2 connection:', error);
@@ -211,7 +207,7 @@ export default function useConnectDialog({
     const saveNonOAuth2Connection = useCallback(
         async (formData: Record<string, string>) => {
             try {
-                const newIntegrationInstanceId: number = await fetch(
+                await fetch(
                     `/api/embedded/v1/integrations/${integrationId}/instances`,
                     {
                         method: 'POST',
@@ -223,11 +219,17 @@ export default function useConnectDialog({
                     }
                 );
 
-                if (typeof newIntegrationInstanceId !== 'number' || isNaN(newIntegrationInstanceId)) {
-                    throw new Error('Invalid integration instance ID received from API');
+                const integrationData: IntegrationType = await fetch(
+                    `/api/embedded/v1/integrations/${integrationId}`
+                );
+
+                const existingInstance = integrationData.integrationInstances?.[0];
+
+                if (existingInstance) {
+                    setCurrentIntegrationInstanceId(existingInstance.id);
                 }
 
-                setCurrentIntegrationInstanceId(newIntegrationInstanceId);
+                setIntegration(integrationData);
                 setWorkflowsView(true);
             } catch (error) {
                 console.error('Failed to save non-OAuth2 connection:', error);
@@ -309,7 +311,22 @@ export default function useConnectDialog({
         onError: (error: string) => console.error(error),
         onTokenSuccess: handleOnTokenSuccess,
         responseType: isOAuth2AuthorizationType ? 'code' : 'token',
-        scope: integration?.connectionConfig?.oauth2?.scopes?.join(' ') || '',
+        scope: (() => {
+            const scopes = integration?.connectionConfig?.oauth2?.scopes;
+
+            if (Array.isArray(scopes)) {
+                return scopes.join(' ');
+            }
+
+            if (scopes && typeof scopes === 'object') {
+                return Object.entries(scopes)
+                    .filter(([, enabled]) => String(enabled) === 'true')
+                    .map(([scopeName]) => scopeName)
+                    .join(' ');
+            }
+
+            return typeof scopes === 'string' ? scopes : '';
+        })(),
     });
 
     const createValidationRules = useCallback((properties: PropertyType[]): Record<string, ValidationRuleType> => {
@@ -407,9 +424,22 @@ export default function useConnectDialog({
     }, [formErrors, formValues, validateForm, validationRules]);
 
     const openDialog = async () => {
+        setIntegration(undefined);
+        setEnabledOverrides({});
+        setInputOverrides({});
         setIsOpen(true);
 
         const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+
+        const existingInstance = integrationData.integrationInstances?.[0];
+
+        if (existingInstance) {
+            setCurrentIntegrationInstanceId(existingInstance.id);
+            setWorkflowsView(true);
+        } else {
+            setCurrentIntegrationInstanceId(undefined);
+            setWorkflowsView(false);
+        }
 
         setIntegration(integrationData);
     };
@@ -432,8 +462,10 @@ export default function useConnectDialog({
                 method: 'DELETE',
             });
 
+            setCurrentIntegrationInstanceId(undefined);
             setFormValues({});
             setInputOverrides({});
+            setEnabledOverrides({});
             setWorkflowsView(false);
         } catch (error) {
             console.error('Failed to disconnect:', error);
@@ -443,7 +475,7 @@ export default function useConnectDialog({
     const handleClick = useCallback(
         (event: React.MouseEvent<HTMLButtonElement>) => {
             if ((event.target as HTMLButtonElement).name === 'disconnectButton') {
-                handleDisconnect();
+                handleDisconnect().then(() => closeDialog());
 
                 return;
             }
@@ -459,45 +491,76 @@ export default function useConnectDialog({
 
     const debouncedFetchesRef = useRef<Record<string, (...args: unknown[]) => void>>({});
 
+    const currentIntegrationInstanceIdRef = useRef(currentIntegrationInstanceId);
+    const inputOverridesRef = useRef(inputOverrides);
+    const integrationRef = useRef(integration);
+
+    currentIntegrationInstanceIdRef.current = currentIntegrationInstanceId;
+    inputOverridesRef.current = inputOverrides;
+    integrationRef.current = integration;
+
     const handleWorkflowInputChange = useCallback(
         (workflowUuid: string, inputName: string, value: string) => {
-            setInputOverrides((previous) => ({
-                ...previous,
-                [workflowUuid]: {
-                    ...previous[workflowUuid],
-                    [inputName]: value,
-                },
-            }));
+            setInputOverrides((previous) => {
+                const updated = {
+                    ...previous,
+                    [workflowUuid]: {
+                        ...previous[workflowUuid],
+                        [inputName]: value,
+                    },
+                };
 
-            if (!currentIntegrationInstanceId || isNaN(currentIntegrationInstanceId)) {
+                inputOverridesRef.current = updated;
+
+                return updated;
+            });
+
+            if (!currentIntegrationInstanceIdRef.current || isNaN(currentIntegrationInstanceIdRef.current)) {
                 console.error('Invalid integration instance ID');
 
                 return;
             }
 
-            const body = {
-                inputs: {
-                    [inputName]: value,
-                },
-            };
-
-            const debouncedFetchKey = `${workflowUuid}_${inputName}`;
+            const debouncedFetchKey = workflowUuid;
 
             if (!debouncedFetchesRef.current[debouncedFetchKey]) {
-                debouncedFetchesRef.current[debouncedFetchKey] = debounce((payload) => {
+                debouncedFetchesRef.current[debouncedFetchKey] = debounce(() => {
+                    const instanceId = currentIntegrationInstanceIdRef.current;
+
+                    if (!instanceId) {
+                        return;
+                    }
+
+                    const currentIntegration = integrationRef.current;
+                    const currentInstance = currentIntegration?.integrationInstances?.find(
+                        (instance: IntegrationInstanceType) => instance.id === instanceId
+                    );
+                    const serverInputs =
+                        (currentInstance?.workflows?.find(
+                            (workflow: IntegrationInstanceWorkflowType) =>
+                                workflow.workflowUuid === workflowUuid
+                        )?.inputs as Record<string, string> | undefined) || {};
+
+                    const mergedInputs = {
+                        ...serverInputs,
+                        ...inputOverridesRef.current[workflowUuid],
+                    };
+
                     fetch(
-                        `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowUuid}`,
+                        `/api/embedded/v1/integration-instances/${instanceId}/workflows/${workflowUuid}`,
                         {
-                            body: payload as object,
+                            body: {
+                                inputs: mergedInputs,
+                            },
                             method: 'PUT',
                         }
                     );
                 }, 600);
             }
 
-            debouncedFetchesRef.current[debouncedFetchKey](body);
+            debouncedFetchesRef.current[debouncedFetchKey]();
         },
-        [fetch, currentIntegrationInstanceId]
+        [fetch]
     );
 
     // Create portal container only once
@@ -551,6 +614,7 @@ export default function useConnectDialog({
                     integration={integration}
                     isOAuth2={isOAuth2}
                     isOpen={isOpen}
+                    loading={!integration}
                     properties={integration?.connectionConfig?.inputs}
                     registerFormSubmit={registerFormSubmit}
                     workflowsView={workflowsView}
