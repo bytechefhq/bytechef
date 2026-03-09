@@ -29,6 +29,7 @@ public class ClusterElementDefinitionErrorType extends AbstractErrorType {
     public static final ClusterElementDefinitionErrorType EXECUTE_WORKFLOW_NODE_DESCRIPTION =
         new ClusterElementDefinitionErrorType(101);
     public static final ClusterElementDefinitionErrorType EXECUTE_OPTIONS = new ClusterElementDefinitionErrorType(102);
+    public static final ClusterElementDefinitionErrorType EXECUTE_OUTPUT = new ClusterElementDefinitionErrorType(103);
     public static final ClusterElementDefinitionErrorType EXECUTE_PERFORM = new ClusterElementDefinitionErrorType(104);
     public static final ClusterElementDefinitionErrorType EXECUTE_PROCESS_ERROR_RESPONSE =
         new ClusterElementDefinitionErrorType(105);

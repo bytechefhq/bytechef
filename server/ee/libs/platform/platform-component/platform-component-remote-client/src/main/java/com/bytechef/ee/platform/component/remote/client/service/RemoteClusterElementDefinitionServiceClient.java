@@ -15,6 +15,7 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -52,6 +53,14 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable ComponentConnection componentConnection, ClusterElementResolverFunction clusterElementResolver) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public OutputResponse executeOutput(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }

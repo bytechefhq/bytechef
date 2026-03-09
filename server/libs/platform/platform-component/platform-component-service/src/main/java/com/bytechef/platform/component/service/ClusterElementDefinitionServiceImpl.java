@@ -27,11 +27,13 @@ import com.bytechef.component.definition.ClusterElementDefinition.WorkflowNodeDe
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
@@ -43,11 +45,14 @@ import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAdapater;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ClusterElementDefinitionErrorType;
+import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -120,6 +125,46 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         return doExecuteOptions(
             componentName, componentVersion, clusterElementName, propertyName, inputParameters,
             lookupDependsOnPaths, searchText, componentConnection, clusterElementContext);
+    }
+
+    @Override
+    @WithTokenRefresh(
+        errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_OUTPUT")
+    public @Nullable OutputResponse executeOutput(
+        @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
+        Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection) {
+
+        com.bytechef.component.definition.ClusterElementDefinition.OutputFunction outputFunction =
+            (com.bytechef.component.definition.ClusterElementDefinition.OutputFunction) componentDefinitionRegistry
+                .getClusterElementDefinition(componentName, componentVersion, clusterElementName)
+                .getOutputDefinition()
+                .flatMap(OutputDefinition::getOutput)
+                .orElse(null);
+
+        if (outputFunction == null) {
+            return null;
+        }
+
+        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection, true);
+
+        Parameters inputParams = ParametersFactory.create(inputParameters);
+        Parameters connectionParams = ParametersFactory.create(
+            componentConnection == null ? Map.of() : componentConnection.parameters());
+
+        try {
+            BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
+                inputParams, connectionParams, clusterElementContext);
+
+            return toOutputResponse(outputResponse);
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException) {
+                throw (ProviderException) exception;
+            }
+
+            throw new ConfigurationException(
+                exception, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_OUTPUT);
+        }
     }
 
     @Override
@@ -524,6 +569,17 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         return clusterElementDefinition.getWorkflowNodeDescription()
             .orElse((inputParameters, context) -> WorkflowNodeDescriptionUtils.renderComponentProperties(
                 inputParameters, componentTitle, operationTitle, operationDescription));
+    }
+
+    private static @Nullable OutputResponse toOutputResponse(
+        BaseOutputDefinition.@Nullable OutputResponse outputResponse) {
+
+        if (outputResponse == null) {
+            return null;
+        }
+
+        return SchemaUtils.toOutput(
+            outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
     }
 
     record ComponentClusterElementDefinitionResult(
