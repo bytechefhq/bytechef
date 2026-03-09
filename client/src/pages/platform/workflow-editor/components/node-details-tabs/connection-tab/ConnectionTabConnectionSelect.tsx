@@ -266,7 +266,7 @@ const ConnectionTabConnectionSelect = ({
     }, [componentConnections, connectionId]);
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
             <div className="space-y-1">
                 <div className="flex items-center gap-1">
                     {componentDefinition && (
@@ -286,9 +286,9 @@ const ConnectionTabConnectionSelect = ({
                     required={required}
                     value={connectionId !== undefined ? connectionId.toString() : undefined}
                 >
-                    <div className="flex w-full space-x-2">
+                    <div className="flex w-full min-w-0 space-x-2">
                         {componentConnections && componentConnections.length > 0 && (
-                            <div className="flex-1 bg-content-onsurface-primary">
+                            <div className="min-w-0 flex-1 bg-content-onsurface-primary">
                                 <SelectTrigger>
                                     <SelectValue placeholder="Choose Connection..." />
                                 </SelectTrigger>

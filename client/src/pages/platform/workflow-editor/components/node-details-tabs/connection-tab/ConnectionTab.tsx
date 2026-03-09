@@ -32,7 +32,7 @@ const ConnectionTab = ({
     );
 
     return (
-        <div className="flex h-full flex-col gap-6 overflow-auto p-4">
+        <div className="flex h-full flex-col gap-6 overflow-y-auto overflow-x-hidden p-4">
             {componentConnections.map((componentConnection) => {
                 const workflowTestConfigurationConnection = workflowTestConfigurationConnections?.find(
                     (testConfigConnection) => testConfigConnection.workflowConnectionKey === componentConnection.key
