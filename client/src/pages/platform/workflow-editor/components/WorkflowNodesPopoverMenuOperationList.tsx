@@ -121,6 +121,25 @@ const WorkflowNodesPopoverMenuOperationList = ({
         return matchingOperations;
     }, [clusterElementType, clusterElements]);
 
+    const isOperationVisible = useCallback(
+        (operationName: string): boolean => {
+            if (ff_2894) {
+                return true;
+            }
+
+            if (['streamChat', 'streamResponseToRequest'].includes(operationName)) {
+                return false;
+            }
+
+            if (!ff_2311 && operationName === 'streamAsk') {
+                return false;
+            }
+
+            return true;
+        },
+        [ff_2311, ff_2894]
+    );
+
     const operations = useMemo(
         () =>
             (trigger
@@ -128,13 +147,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 : clusterElementsCanvasOpen && clusterElement
                   ? clusterElementOperations
                   : actions
-            )?.filter(
-                (operation) =>
-                    (((!ff_2311 && !['streamAsk', 'streamResponseToRequest'].includes(operation.name)) || ff_2311) &&
-                        !ff_2894 &&
-                        !['streamChat', 'streamResponseToRequest'].includes(operation.name)) ||
-                    ff_2894
-            ),
+            )?.filter((operation) => isOperationVisible(operation.name)),
         [
             trigger,
             triggers,
@@ -142,8 +155,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
             clusterElement,
             clusterElementOperations,
             actions,
-            ff_2311,
-            ff_2894,
+            isOperationVisible,
         ]
     );
 
