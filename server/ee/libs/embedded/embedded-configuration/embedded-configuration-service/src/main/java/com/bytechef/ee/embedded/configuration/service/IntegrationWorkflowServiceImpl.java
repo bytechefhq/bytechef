@@ -77,6 +77,12 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<IntegrationWorkflow> getIntegrationWorkflows(List<Long> integrationIds) {
+        return integrationWorkflowRepository.findAllByIntegrationIdIn(integrationIds);
+    }
+
+    @Override
     public List<IntegrationWorkflow> getIntegrationWorkflows(long integrationId, int integrationVersion) {
         return integrationWorkflowRepository.findAllByIntegrationIdAndIntegrationVersion(integrationId,
             integrationVersion);

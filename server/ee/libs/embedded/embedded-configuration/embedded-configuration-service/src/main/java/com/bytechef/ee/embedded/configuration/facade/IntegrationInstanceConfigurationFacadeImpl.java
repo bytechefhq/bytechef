@@ -395,10 +395,33 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             List<IntegrationDTO> integrationDTOs = getIntegrations(integrationInstanceConfigurations);
             List<Tag> tags = getTags(integrationInstanceConfigurations);
 
+            List<Long> integrationIds = integrationInstanceConfigurations.stream()
+                .map(IntegrationInstanceConfiguration::getIntegrationId)
+                .distinct()
+                .toList();
+
+            List<IntegrationWorkflow> allIntegrationWorkflows =
+                integrationWorkflowService.getIntegrationWorkflows(integrationIds);
+
             return CollectionUtils.map(
                 integrationInstanceConfigurations,
                 integrationInstanceConfiguration -> {
-                    List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
+                    Integer integrationVersion = integrationInstanceConfiguration.getIntegrationVersion();
+
+                    List<IntegrationWorkflow> configIntegrationWorkflows =
+                        integrationVersion == null
+                            ? List.of()
+                            : allIntegrationWorkflows.stream()
+                                .filter(
+                                    integrationWorkflow -> Objects.equals(
+                                        integrationWorkflow.getIntegrationId(),
+                                        integrationInstanceConfiguration.getIntegrationId()) &&
+                                        integrationWorkflow.getIntegrationVersion() == integrationVersion)
+                                .toList();
+
+                    List<String> workflowIds = configIntegrationWorkflows.stream()
+                        .map(IntegrationWorkflow::getWorkflowId)
+                        .toList();
 
                     return toIntegrationInstanceConfigurationDTO(
                         CollectionUtils.getFirst(
@@ -411,9 +434,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                                 integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
                                 integrationInstanceConfiguration.getId()) &&
                                 workflowIds.contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
-                        integrationWorkflowService.getIntegrationWorkflows(
-                            integrationInstanceConfiguration.getIntegrationId(),
-                            integrationInstanceConfiguration.getIntegrationVersion()),
+                        configIntegrationWorkflows,
                         filterTags(tags, integrationInstanceConfiguration));
                 });
         } else {
