@@ -43,7 +43,7 @@ const ConnectionParameters = ({
         existingAuthorizations && authorizationParameters && !!Object.keys(authorizationParameters).length;
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2 overflow-hidden">
             {baseUri && customAction ? (
                 <div className="mb-8 flex">
                     <span className="w-1/3 text-sm font-medium text-muted-foreground">Base URI:</span>
@@ -62,9 +62,11 @@ const ConnectionParameters = ({
                         .filter((property) => !!connectionParameters![property.name!])
                         .map((property) => (
                             <li className="flex w-full" key={property.name}>
-                                <span className="w-1/3 text-muted-foreground">{property.name}:</span>
+                                <span className="w-1/3 shrink-0 text-muted-foreground">{property.name}:</span>
 
-                                <pre className="self-end text-xs">{connectionParameters![property.name!]}</pre>
+                                <pre className="min-w-0 flex-1 self-end truncate text-xs">
+                                    {connectionParameters![property.name!]}
+                                </pre>
                             </li>
                         ))}
 
@@ -72,7 +74,7 @@ const ConnectionParameters = ({
                     existingAuthorizations.map((authorization) => (
                         <Fragment key={authorization.name}>
                             <li className="flex">
-                                <span className="w-1/3 font-medium text-muted-foreground">Authorization:</span>
+                                <span className="w-1/3 shrink-0 font-medium text-muted-foreground">Authorization:</span>
 
                                 <span>{authorization.title}</span>
                             </li>
@@ -82,9 +84,11 @@ const ConnectionParameters = ({
                                     .filter((property) => !!authorizationParameters![property.name!])
                                     .map((property) => (
                                         <li className="flex w-full" key={property.name}>
-                                            <span className="w-1/3 text-muted-foreground">{property.name}:</span>
+                                            <span className="w-1/3 shrink-0 text-muted-foreground">
+                                                {property.name}:
+                                            </span>
 
-                                            <pre className="self-end text-xs">
+                                            <pre className="min-w-0 flex-1 self-end truncate text-xs">
                                                 {authorizationParameters![property.name!]}
                                             </pre>
                                         </li>
