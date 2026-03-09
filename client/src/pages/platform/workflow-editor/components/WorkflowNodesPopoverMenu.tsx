@@ -46,8 +46,6 @@ const WorkflowNodesPopoverMenu = ({
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
-    const {invalidateWorkflowQueries} = useWorkflowEditor();
-
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const {edges, nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -83,7 +81,6 @@ const WorkflowNodesPopoverMenu = ({
 
                 await handleTaskDispatcherClick({
                     edge,
-                    invalidateWorkflowQueries: invalidateWorkflowQueries!,
                     queryClient,
                     sourceNodeId,
                     taskDispatcherContext,
@@ -185,7 +182,6 @@ const WorkflowNodesPopoverMenu = ({
                             clusterElementType={clusterElementType}
                             componentDefinition={componentDefinitionToBeAdded}
                             edgeId={edgeId}
-                            invalidateWorkflowQueries={invalidateWorkflowQueries!}
                             multipleClusterElementsNode={multipleClusterElementsNode}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}

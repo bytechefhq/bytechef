@@ -135,7 +135,6 @@ async function createWorkflowNodeData(
 
 interface SaveDroppedNodeProps {
     captureComponentUsed: (name: string, actionName?: string, triggerName?: string) => void;
-    invalidateWorkflowQueries: () => void;
     nodeData: NodeDataType;
     operationName?: string;
     options?: {
@@ -149,7 +148,6 @@ interface SaveDroppedNodeProps {
 
 async function saveDroppedNode({
     captureComponentUsed,
-    invalidateWorkflowQueries,
     nodeData,
     operationName,
     options,
@@ -165,17 +163,14 @@ async function saveDroppedNode({
 
     saveWorkflowDefinition({
         ...options,
-        invalidateWorkflowQueries,
         nodeData,
         updateWorkflowMutation,
     });
 }
 
 export default function useHandleDrop({
-    invalidateWorkflowQueries,
     taskDispatcherDefinitions,
 }: {
-    invalidateWorkflowQueries: () => void;
     taskDispatcherDefinitions: TaskDispatcherDefinition[];
 }): [
     (targetNode: Node, droppedNode: ClickedDefinitionType) => void,
@@ -195,7 +190,6 @@ export default function useHandleDrop({
 
         await saveDroppedNode({
             captureComponentUsed,
-            invalidateWorkflowQueries,
             nodeData,
             operationName,
             options: {
@@ -218,7 +212,6 @@ export default function useHandleDrop({
 
         await saveDroppedNode({
             captureComponentUsed,
-            invalidateWorkflowQueries,
             nodeData,
             operationName,
             options: {
@@ -238,7 +231,6 @@ export default function useHandleDrop({
 
         await saveDroppedNode({
             captureComponentUsed,
-            invalidateWorkflowQueries,
             nodeData,
             operationName,
             updateWorkflowMutation: updateWorkflowMutation!,

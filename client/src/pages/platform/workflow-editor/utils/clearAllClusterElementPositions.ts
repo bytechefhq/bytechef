@@ -7,7 +7,6 @@ import {getTask} from './getTask';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface ClearAllClusterElementPositionsProps {
-    invalidateWorkflowQueries: () => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
@@ -58,7 +57,6 @@ export function clearClusterElementPositions(clusterElements: ClusterElementsTyp
 }
 
 export default function clearAllClusterElementPositions({
-    invalidateWorkflowQueries,
     updateWorkflowMutation,
 }: ClearAllClusterElementPositionsProps) {
     const {workflow} = useWorkflowDataStore.getState();
@@ -94,7 +92,6 @@ export default function clearAllClusterElementPositions({
     } as typeof rootClusterElementNodeData);
 
     saveWorkflowDefinition({
-        invalidateWorkflowQueries,
         nodeData: {
             ...updatedNodeData,
             componentName: rootClusterElementNodeData.componentName,

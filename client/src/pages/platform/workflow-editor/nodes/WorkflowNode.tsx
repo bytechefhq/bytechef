@@ -171,7 +171,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
         saveClusterElementNodesPosition({
             clickedNodeName,
-            invalidateWorkflowQueries,
             updateWorkflowMutation,
             workflow,
         });

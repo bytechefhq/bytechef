@@ -1,7 +1,6 @@
 import {TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
-import {ComponentDefinition, Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {NodeDataType, PropertyAllType, TaskDispatcherContextType} from '@/shared/types';
-import {UseMutationResult} from '@tanstack/react-query';
+import {ComponentDefinition, WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {NodeDataType, PropertyAllType, TaskDispatcherContextType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -20,8 +19,7 @@ interface SaveTaskDispatcherSubtaskFieldChangeProps {
     currentNodeIndex: number;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
-    invalidateWorkflowQueries: () => void;
-    updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 export default function saveTaskDispatcherSubtaskFieldChange({
@@ -29,7 +27,6 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     currentNodeIndex,
     currentOperationProperties,
     fieldUpdate,
-    invalidateWorkflowQueries,
     updateWorkflowMutation,
 }: SaveTaskDispatcherSubtaskFieldChangeProps): void {
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
@@ -262,7 +259,6 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     }
 
     saveWorkflowDefinition({
-        invalidateWorkflowQueries,
         onSuccess: () => {
             let commonUpdates: NodeDataType = {
                 componentName,

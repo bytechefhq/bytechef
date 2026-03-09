@@ -39,7 +39,6 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
                             customCanvasWidth={canvasWidth}
-                            invalidateWorkflowQueries={() => {}}
                             readOnlyWorkflow={workflowDetails}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
