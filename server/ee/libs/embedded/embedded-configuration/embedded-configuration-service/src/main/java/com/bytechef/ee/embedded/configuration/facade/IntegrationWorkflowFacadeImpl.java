@@ -192,7 +192,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
-    public void updateWorkflow(String workflowId, String definition, int version) {
+    public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         workflowService.update(workflowId, definition, version);
 
         for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
@@ -200,5 +200,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
                 workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName, environment.ordinal());
             }
         }
+
+        return getIntegrationWorkflow(workflowId);
     }
 }
