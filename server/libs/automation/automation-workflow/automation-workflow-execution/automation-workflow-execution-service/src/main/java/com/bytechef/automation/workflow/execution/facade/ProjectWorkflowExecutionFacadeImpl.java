@@ -254,62 +254,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     }
                 }
 
-                List<WorkflowExecutionDTO> workflowExecutionDTOs = new ArrayList<>();
-
-                for (Long jobId : jobIds) {
-                    Job job = jobMap.get(jobId);
-
-                    if (job == null) {
-                        if (logger.isWarnEnabled()) {
-                            logger.warn("Skipping job id={}: job not found", jobId);
-                        }
-
-                        continue;
-                    }
-
-                    Optional<Workflow> workflowOptional = CollectionUtils.findFirst(
-                        workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()));
-
-                    if (workflowOptional.isEmpty()) {
-                        if (logger.isWarnEnabled()) {
-                            logger.warn(
-                                "Skipping job id={}: workflow '{}' not found", job.getId(), job.getWorkflowId());
-                        }
-
-                        continue;
-                    }
-
-                    Optional<Project> projectOptional = CollectionUtils.findFirst(
-                        projects,
-                        project -> CollectionUtils.contains(
-                            projectWorkflowIdsMap.get(project.getId()), job.getWorkflowId()));
-
-                    if (projectOptional.isEmpty()) {
-                        if (logger.isWarnEnabled()) {
-                            logger.warn(
-                                "Skipping job id={}: no project found for workflow '{}'",
-                                job.getId(), job.getWorkflowId());
-                        }
-
-                        continue;
-                    }
-
-                    Long deploymentId = jobToPrincipalMap.get(jobId);
-
-                    ProjectDeployment jobProjectDeployment =
-                        deploymentId == null ? null : deploymentMap.get(deploymentId);
-
-                    TriggerExecution triggerExecution =
-                        deploymentId == null ? null : triggerExecutionByJobIdMap.get(jobId);
-
-                    workflowExecutionDTOs.add(new WorkflowExecutionDTO(
-                        Validate.notNull(job.getId(), "id"),
-                        projectOptional.get(),
-                        jobProjectDeployment,
-                        new JobDTO(job),
-                        workflowOptional.get(),
-                        getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
-                }
+                List<WorkflowExecutionDTO> workflowExecutionDTOs = buildWorkflowExecutionDTOs(
+                    jobIds, jobMap, workflows, projects, projectWorkflowIdsMap, jobToPrincipalMap, deploymentMap,
+                    triggerExecutionByJobIdMap);
 
                 workflowExecutionPage = new PageImpl<>(
                     workflowExecutionDTOs, jobIdsPage.getPageable(), jobIdsPage.getTotalElements());
@@ -317,6 +264,72 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         }
 
         return workflowExecutionPage;
+    }
+
+    private List<WorkflowExecutionDTO> buildWorkflowExecutionDTOs(
+        List<Long> jobIds, Map<Long, Job> jobMap, List<Workflow> workflows, List<Project> projects,
+        Map<Long, List<String>> projectWorkflowIdsMap, Map<Long, Long> jobToPrincipalMap,
+        Map<Long, ProjectDeployment> deploymentMap, Map<Long, TriggerExecution> triggerExecutionByJobIdMap) {
+
+        List<WorkflowExecutionDTO> workflowExecutionDTOs = new ArrayList<>();
+
+        for (Long jobId : jobIds) {
+            Job job = jobMap.get(jobId);
+
+            if (job == null) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Skipping job id={}: job not found", jobId);
+                }
+
+                continue;
+            }
+
+            Optional<Workflow> workflowOptional = CollectionUtils.findFirst(
+                workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()));
+
+            if (workflowOptional.isEmpty()) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn(
+                        "Skipping job id={}: workflow '{}' not found", job.getId(), job.getWorkflowId());
+                }
+
+                continue;
+            }
+
+            Optional<Project> projectOptional = CollectionUtils.findFirst(
+                projects,
+                project -> CollectionUtils.contains(
+                    projectWorkflowIdsMap.getOrDefault(project.getId(), List.of()),
+                    job.getWorkflowId()));
+
+            if (projectOptional.isEmpty()) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn(
+                        "Skipping job id={}: no project found for workflow '{}'",
+                        job.getId(), job.getWorkflowId());
+                }
+
+                continue;
+            }
+
+            Long deploymentId = jobToPrincipalMap.get(jobId);
+
+            ProjectDeployment jobProjectDeployment =
+                deploymentId == null ? null : deploymentMap.get(deploymentId);
+
+            TriggerExecution triggerExecution =
+                deploymentId == null ? null : triggerExecutionByJobIdMap.get(jobId);
+
+            workflowExecutionDTOs.add(new WorkflowExecutionDTO(
+                Validate.notNull(job.getId(), "id"),
+                projectOptional.get(),
+                jobProjectDeployment,
+                new JobDTO(job),
+                workflowOptional.get(),
+                getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
+        }
+
+        return workflowExecutionDTOs;
     }
 
     private DefinitionResult getDefinition(String type) {

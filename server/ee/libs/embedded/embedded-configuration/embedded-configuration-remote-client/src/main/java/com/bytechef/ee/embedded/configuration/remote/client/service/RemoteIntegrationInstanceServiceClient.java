@@ -96,6 +96,11 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     }
 
     @Override
+    public List<IntegrationInstance> getIntegrationInstances(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<IntegrationInstance> getIntegrationInstances(long integrationInstanceConfigurationId) {
         throw new UnsupportedOperationException();
     }
