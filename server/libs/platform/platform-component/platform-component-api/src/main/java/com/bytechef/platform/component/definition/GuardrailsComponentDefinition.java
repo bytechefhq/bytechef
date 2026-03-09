@@ -16,22 +16,16 @@
 
 package com.bytechef.platform.component.definition;
 
-import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
-import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
-import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
-import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
-import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
-
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface AiAgentComponentDefinition extends ClusterRootComponentDefinition {
+public interface GuardrailsComponentDefinition extends ClusterRootComponentDefinition {
 
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(MODEL, CHAT_MEMORY, RAG, GUARDRAILS, TOOLS);
+        return List.of();
     }
 }
