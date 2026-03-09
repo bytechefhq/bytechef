@@ -338,7 +338,8 @@ export default function useWorkflowNodeDetailsPanel({
             id: workflow.id!,
             workflowNodeName: currentNodeName!,
         },
-        !!currentNodeName &&
+        activeTab === 'properties' &&
+            !!currentNodeName &&
             currentNodeName !== 'manual' &&
             currentNodeName !== currentClusterElementName &&
             !currentNode?.clusterElementType
@@ -352,7 +353,8 @@ export default function useWorkflowNodeDetailsPanel({
             id: workflow.id!,
             workflowNodeName: rootClusterElementNodeData?.workflowNodeName as string,
         },
-        !!currentNode &&
+        activeTab === 'properties' &&
+            !!currentNode &&
             !!currentNodeName &&
             currentNodeName !== 'manual' &&
             currentNodeName === currentClusterElementName &&
