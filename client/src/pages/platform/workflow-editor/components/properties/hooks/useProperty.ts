@@ -246,11 +246,10 @@ export const useProperty = ({
 
     const isToolsClusterElement = toolsMode || currentNode?.clusterElementType === 'tools';
 
-    const {isSuccess: isDisplayConditionsSuccess, isPending: isDisplayConditionsPending} =
-        displayConditionsQuery ?? {
-            isSuccess: false,
-            isPending: false,
-        };
+    const {isPending: isDisplayConditionsPending, isSuccess: isDisplayConditionsSuccess} = displayConditionsQuery ?? {
+        isPending: false,
+        isSuccess: false,
+    };
 
     const previousOperationName = usePrevious(currentNode?.operationName);
 
@@ -384,12 +383,16 @@ export const useProperty = ({
     }, [controlType, property.items, type]);
 
     const isFromAi = useMemo(() => {
+        if (controlledFromAi !== undefined) {
+            return controlledFromAi;
+        }
+
         if (!currentComponent?.metadata?.ui?.fromAi || !path) {
             return false;
         }
 
         return currentComponent.metadata.ui.fromAi.includes(path);
-    }, [currentComponent?.metadata?.ui?.fromAi, path]);
+    }, [controlledFromAi, currentComponent?.metadata?.ui?.fromAi, path]);
 
     const memoizedWorkflowTask = useMemo(() => {
         return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
@@ -1013,6 +1016,8 @@ export const useProperty = ({
             if (!path || !workflow.id) {
                 return;
             }
+
+            setControlledFromAi(fromAi);
 
             let value = propertyParameterValue;
 
