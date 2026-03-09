@@ -161,6 +161,9 @@ export default function clearAllNodePositions({
             },
         },
         {
+            onError: () => {
+                invalidateWorkflowQueries();
+            },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
             },
