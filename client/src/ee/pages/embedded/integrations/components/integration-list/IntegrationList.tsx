@@ -1,10 +1,21 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import IntegrationListItem from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItem';
 import {Integration, Tag} from '@/ee/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 
 import IntegrationWorkflowList from '../integration-workflow-list/IntegrationWorkflowList';
 
-const IntegrationList = ({integrations, tags}: {integrations: Integration[]; tags: Tag[]}) => {
+const IntegrationList = ({
+    componentDefinitions,
+    integrations,
+    tags,
+    taskDispatcherDefinitions,
+}: {
+    componentDefinitions?: ComponentDefinitionBasic[];
+    integrations: Integration[];
+    tags: Tag[];
+    taskDispatcherDefinitions?: TaskDispatcherDefinition[];
+}) => {
     return (
         <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
             {integrations.map((integration) => {
@@ -19,7 +30,11 @@ const IntegrationList = ({integrations, tags}: {integrations: Integration[]; tag
                         />
 
                         <CollapsibleContent>
-                            <IntegrationWorkflowList integration={integration} />
+                            <IntegrationWorkflowList
+                                componentDefinitions={componentDefinitions}
+                                integration={integration}
+                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            />
                         </CollapsibleContent>
                     </Collapsible>
                 );

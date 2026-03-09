@@ -15,6 +15,7 @@ import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/compo
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Layers3Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
@@ -106,7 +107,14 @@ const ProjectDeployments = () => {
         }
     }
 
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
+        actionDefinitions: true,
+        triggerDefinitions: true,
+    });
+
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectDeploymentTagsQuery();
+
+    const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
     return (
         <LayoutContainer
@@ -218,12 +226,14 @@ const ProjectDeployments = () => {
                                     projects &&
                                     tags && (
                                         <ProjectDeploymentList
+                                            componentDefinitions={componentDefinitions}
                                             key={projectId}
                                             project={
                                                 projects.find((currentProject) => currentProject.id === projectId)!
                                             }
                                             projectDeployments={projectDeploymentMap.get(projectId)!}
                                             tags={tags}
+                                            taskDispatcherDefinitions={taskDispatcherDefinitions}
                                         />
                                     )
                             )}
