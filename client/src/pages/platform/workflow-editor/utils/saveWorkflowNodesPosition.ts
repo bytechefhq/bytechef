@@ -1,6 +1,6 @@
 import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
+import {BranchCaseType, NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
@@ -8,7 +8,6 @@ import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 interface SaveWorkflowNodesPositionProps {
     clearPositionNodeIds?: Set<string>;
     draggedNodeId: string;
-    incrementLayoutResetCounter: () => void;
     invalidateWorkflowQueries: () => void;
     nodePositions: Record<string, {x: number; y: number}>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -155,7 +154,6 @@ export function updateTaskPositions(
 export default function saveWorkflowNodesPosition({
     clearPositionNodeIds,
     draggedNodeId,
-    incrementLayoutResetCounter,
     invalidateWorkflowQueries,
     nodePositions,
     updateWorkflowMutation,
@@ -191,6 +189,34 @@ export default function saveWorkflowNodesPosition({
         workflowDefinition.tasks = updateTaskPositions(workflowDefinition.tasks, nodePositions, clearPositionNodeIds);
     }
 
+    // Optimistically update ReactFlow node data so the pin button appears
+    // immediately without waiting for a full re-layout
+    const {nodes, setNodes} = useWorkflowDataStore.getState();
+
+    const updatedNodes = nodes.map((node) => {
+        const position = nodePositions[node.id];
+
+        if (position) {
+            return {
+                ...node,
+                data: {
+                    ...node.data,
+                    metadata: {
+                        ...(node.data as NodeDataType).metadata,
+                        ui: {
+                            ...(node.data as NodeDataType).metadata?.ui,
+                            nodePosition: position,
+                        },
+                    },
+                },
+            };
+        }
+
+        return node;
+    });
+
+    setNodes(updatedNodes);
+
     if (isWorkflowMutating(workflow.id!)) {
         return;
     }
@@ -218,7 +244,6 @@ export default function saveWorkflowNodesPosition({
                 });
 
                 invalidateWorkflowQueries();
-                incrementLayoutResetCounter();
             },
         }
     );
