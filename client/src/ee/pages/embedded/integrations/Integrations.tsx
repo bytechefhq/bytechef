@@ -5,11 +5,13 @@ import IntegrationDialog from '@/ee/pages/embedded/integrations/components/Integ
 import IntegrationsFilterTitle from '@/ee/pages/embedded/integrations/components/IntegrationsFilterTitle';
 import IntegrationsLeftSidebarNav from '@/ee/pages/embedded/integrations/components/IntegrationsLeftSidebarNav';
 import IntegrationList from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationList';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {SquareIcon} from 'lucide-react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -41,9 +43,16 @@ const Integrations = () => {
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
+        actionDefinitions: true,
+        triggerDefinitions: true,
+    });
+
     const {data: categories, error: categoriesError, isLoading: categoriesLoading} = useGetIntegrationCategoriesQuery();
 
     const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetIntegrationTagsQuery();
+
+    const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
     return (
         <LayoutContainer
@@ -82,7 +91,12 @@ const Integrations = () => {
                 loading={categoriesLoading || integrationsLoading || tagsLoading}
             >
                 {integrations && integrations?.length > 0 && tags ? (
-                    <IntegrationList integrations={integrations} tags={tags} />
+                    <IntegrationList
+                        componentDefinitions={componentDefinitions}
+                        integrations={integrations}
+                        tags={tags}
+                        taskDispatcherDefinitions={taskDispatcherDefinitions}
+                    />
                 ) : (
                     <EmptyList
                         button={

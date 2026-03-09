@@ -1,17 +1,22 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Integration, IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 
 import IntegrationInstanceConfigurationWorkflowList from '../integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowList';
 import IntegrationInstanceConfigurationListItem from './IntegrationInstanceConfigurationListItem';
 
 const IntegrationInstanceConfigurationList = ({
+    componentDefinitions,
     integration,
     integrationInstanceConfigurations,
     tags,
+    taskDispatcherDefinitions,
 }: {
+    componentDefinitions?: ComponentDefinitionBasic[];
     integration: Integration;
     integrationInstanceConfigurations: IntegrationInstanceConfiguration[];
     tags: Tag[];
+    taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
     return (
         <>
@@ -34,6 +39,7 @@ const IntegrationInstanceConfigurationList = ({
 
                                 <CollapsibleContent>
                                     <IntegrationInstanceConfigurationWorkflowList
+                                        componentDefinitions={componentDefinitions}
                                         componentName={integration.componentName}
                                         integrationId={integration.id}
                                         integrationInstanceConfigurationId={integrationInstanceConfiguration.id!}
@@ -41,6 +47,7 @@ const IntegrationInstanceConfigurationList = ({
                                             integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows
                                         }
                                         integrationVersion={integrationInstanceConfiguration.integrationVersion!}
+                                        taskDispatcherDefinitions={taskDispatcherDefinitions}
                                     />
                                 </CollapsibleContent>
                             </Collapsible>

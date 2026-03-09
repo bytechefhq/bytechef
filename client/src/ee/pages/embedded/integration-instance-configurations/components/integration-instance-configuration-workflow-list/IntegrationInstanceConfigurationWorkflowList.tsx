@@ -1,32 +1,26 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationInstanceConfigurationWorkflowListItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItem';
 import {IntegrationInstanceConfigurationWorkflow} from '@/ee/shared/middleware/embedded/configuration';
-import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 
 const IntegrationInstanceConfigurationWorkflowList = ({
+    componentDefinitions,
     componentName,
     integrationId,
     integrationInstanceConfigurationId,
     integrationInstanceConfigurationWorkflows,
     integrationVersion,
+    taskDispatcherDefinitions,
 }: {
+    componentDefinitions?: ComponentDefinitionBasic[];
     componentName: string;
     integrationId: number;
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflow>;
     integrationVersion: number;
+    taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
-    const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
-        actionDefinitions: true,
-        triggerDefinitions: true,
-    });
-
-    const {data: taskDispatcherDefinitions, isLoading: isTaskDispatcherDefinitionsLoading} =
-        useGetTaskDispatcherDefinitionsQuery();
-
     const {data: workflows, isLoading: isIntegrationWorkflowsLoading} = useGetIntegrationVersionWorkflowsQuery(
         integrationId,
         integrationVersion
@@ -40,7 +34,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
         [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
-    return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isIntegrationWorkflowsLoading ? (
+    return !componentDefinitions || !taskDispatcherDefinitions || isIntegrationWorkflowsLoading ? (
         <div className="space-y-3 py-2">
             <Skeleton className="h-5 w-40" />
 

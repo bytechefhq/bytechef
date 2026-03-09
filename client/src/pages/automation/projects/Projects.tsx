@@ -11,9 +11,11 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -60,6 +62,11 @@ const Projects = () => {
         type: tagId ? Type.Tag : Type.Category,
     };
 
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
+        actionDefinitions: true,
+        triggerDefinitions: true,
+    });
+
     const {data: categories, error: categoriesError, isLoading: categoriesIsLoading} = useGetProjectCategoriesQuery();
 
     const {
@@ -89,6 +96,8 @@ const Projects = () => {
         }) > 0;
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
+
+    const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
     return (
         <LayoutContainer
@@ -156,10 +165,12 @@ const Projects = () => {
             >
                 {projects && projects?.length > 0 && tags ? (
                     <ProjectList
+                        componentDefinitions={componentDefinitions}
                         isRefetchingProjects={isRefetchingProjects}
                         projectGitConfigurations={projectGitConfigurations ?? []}
                         projects={projects}
                         tags={tags}
+                        taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
                 ) : (
                     <EmptyList

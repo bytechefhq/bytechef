@@ -8,13 +8,11 @@ import ProjectWorkflowListItem from '@/pages/automation/projects/components/proj
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, LayoutTemplateIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
@@ -22,7 +20,17 @@ import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
-const ProjectWorkflowList = ({project, queryEnabled}: {project: Project; queryEnabled?: boolean}) => {
+const ProjectWorkflowList = ({
+    componentDefinitions,
+    project,
+    queryEnabled,
+    taskDispatcherDefinitions,
+}: {
+    componentDefinitions?: ComponentDefinitionBasic[];
+    project: Project;
+    queryEnabled?: boolean;
+    taskDispatcherDefinitions?: TaskDispatcherDefinition[];
+}) => {
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
@@ -31,14 +39,6 @@ const ProjectWorkflowList = ({project, queryEnabled}: {project: Project; queryEn
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const ff_1041 = useFeatureFlagsStore()('ff-1041');
-
-    const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
-        actionDefinitions: true,
-        triggerDefinitions: true,
-    });
-
-    const {data: taskDispatcherDefinitions, isLoading: isTaskDispatcherDefinitionsLoading} =
-        useGetTaskDispatcherDefinitionsQuery();
 
     const workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
@@ -78,7 +78,7 @@ const ProjectWorkflowList = ({project, queryEnabled}: {project: Project; queryEn
         },
     });
 
-    return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading ? (
+    return !componentDefinitions || !taskDispatcherDefinitions || isProjectWorkflowsLoading ? (
         <div className="space-y-3 py-2">
             <Skeleton className="h-5 w-40" />
 
