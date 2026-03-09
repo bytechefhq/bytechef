@@ -209,12 +209,20 @@ public class SpelEvaluator implements Evaluator {
                     string = string.replaceAll("\\$\\{([^}]*)}", "$1");
 
                     if (!validateFormulaExpression(string)) {
-                        throw new IllegalArgumentException("Invalid formula expression: " + string);
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("Invalid formula expression: {}", string);
+                        }
+
+                        return value;
                     }
 
                     expression = expressionParser.parseExpression(string.substring(1));
-                } catch (ParseException e) {
-                    throw new IllegalArgumentException("Invalid formula expression: " + string, e);
+                } catch (ParseException parseException) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Unparseable formula expression: {}", string, parseException);
+                    }
+
+                    return value;
                 }
             } else {
                 if (!validateTextExpression(string)) {
