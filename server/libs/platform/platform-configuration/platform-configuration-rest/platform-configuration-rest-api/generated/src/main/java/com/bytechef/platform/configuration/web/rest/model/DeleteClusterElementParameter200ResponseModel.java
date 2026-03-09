@@ -41,6 +41,8 @@ public class DeleteClusterElementParameter200ResponseModel {
   @Valid
   private List<String> missingRequiredProperties = new ArrayList<>();
 
+  private @Nullable Integer version;
+
   public DeleteClusterElementParameter200ResponseModel metadata(Map<String, Object> metadata) {
     this.metadata = metadata;
     return this;
@@ -153,6 +155,26 @@ public class DeleteClusterElementParameter200ResponseModel {
     this.missingRequiredProperties = missingRequiredProperties;
   }
 
+  public DeleteClusterElementParameter200ResponseModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * The updated workflow version.
+   * @return version
+   */
+
+  @Schema(name = "version", description = "The updated workflow version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("version")
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -165,12 +187,13 @@ public class DeleteClusterElementParameter200ResponseModel {
     return Objects.equals(this.metadata, deleteClusterElementParameter200Response.metadata) &&
         Objects.equals(this.parameters, deleteClusterElementParameter200Response.parameters) &&
         Objects.equals(this.displayConditions, deleteClusterElementParameter200Response.displayConditions) &&
-        Objects.equals(this.missingRequiredProperties, deleteClusterElementParameter200Response.missingRequiredProperties);
+        Objects.equals(this.missingRequiredProperties, deleteClusterElementParameter200Response.missingRequiredProperties) &&
+        Objects.equals(this.version, deleteClusterElementParameter200Response.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(metadata, parameters, displayConditions, missingRequiredProperties);
+    return Objects.hash(metadata, parameters, displayConditions, missingRequiredProperties, version);
   }
 
   @Override
@@ -181,6 +204,7 @@ public class DeleteClusterElementParameter200ResponseModel {
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    displayConditions: ").append(toIndentedString(displayConditions)).append("\n");
     sb.append("    missingRequiredProperties: ").append(toIndentedString(missingRequiredProperties)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }
