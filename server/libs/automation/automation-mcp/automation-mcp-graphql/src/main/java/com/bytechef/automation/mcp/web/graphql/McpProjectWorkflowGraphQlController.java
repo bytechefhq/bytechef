@@ -16,6 +16,9 @@
 
 package com.bytechef.automation.mcp.web.graphql;
 
+import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
+import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_NAME;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLOW;
 
@@ -30,6 +33,7 @@ import com.bytechef.automation.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -146,22 +150,39 @@ public class McpProjectWorkflowGraphQlController {
             return List.of();
         }
 
+        List<Property> properties = new ArrayList<>();
+
+        properties.add(
+            Property.toProperty(
+                string(TOOL_NAME)
+                    .label("Name")
+                    .description("The tool name exposed to the AI model.")
+                    .expressionEnabled(false)
+                    .required(true)));
+
+        properties.add(
+            Property.toProperty(
+                string(TOOL_DESCRIPTION)
+                    .label("Description")
+                    .description("The tool description exposed to the AI model.")
+                    .controlType(ControlType.TEXT_AREA)
+                    .expressionEnabled(false)
+                    .required(true)));
+
         String inputSchema = MapUtils.getString(trigger.getParameters(), WorkflowConstants.INPUT_SCHEMA);
 
         if (inputSchema == null || inputSchema.isEmpty()) {
-            return List.of();
+            return properties;
         }
 
         BaseValueProperty<?> inputProperty = SchemaUtils.getJsonSchemaProperty(
             inputSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
 
         if (inputProperty == null) {
-            return List.of();
+            return properties;
         }
 
         if (inputProperty instanceof com.bytechef.component.definition.Property.ObjectProperty objectProperty) {
-            List<Property> properties = new ArrayList<>();
-
             for (com.bytechef.component.definition.Property childProperty : objectProperty.getProperties()
                 .orElse(List.of())) {
 
@@ -171,7 +192,9 @@ public class McpProjectWorkflowGraphQlController {
             return properties;
         }
 
-        return List.of(Property.toProperty((com.bytechef.component.definition.Property) inputProperty));
+        properties.add(Property.toProperty((com.bytechef.component.definition.Property) inputProperty));
+
+        return properties;
     }
 
     @MutationMapping
