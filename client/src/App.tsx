@@ -98,6 +98,7 @@ const embeddedNavigation: NavigationType[] = [
         icon: Settings2Icon,
         name: 'Integration Configurations',
     },
+    {href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
     {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
     {
         href: '/embedded/automation-workflows',
@@ -168,6 +169,7 @@ function App() {
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
+    const ff_2446 = useFeatureFlagsStore()('ff-2446');
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
@@ -213,6 +215,10 @@ function App() {
     const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
         if (currentEnvironmentId !== 0 && navItem.href === '/embedded/integrations') {
             return false;
+        }
+
+        if (navItem.href === '/embedded/mcp-servers') {
+            return ff_2446;
         }
 
         if (

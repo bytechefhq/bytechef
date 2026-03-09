@@ -1,0 +1,15 @@
+query integrationWorkflows {
+    integrationWorkflows {
+        id
+        label
+        description
+        integrationWorkflowId
+        workflowUuid
+        workflowTaskComponentNames
+        workflowTriggerComponentNames
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+    }
+}

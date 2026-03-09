@@ -43,6 +43,7 @@ const config: CodegenConfig = {
         '../server/ee/libs/platform/platform-custom-component/platform-custom-component-configuration/platform-custom-component-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/embedded/embedded-configuration/embedded-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/embedded/embedded-connected-user/embedded-connected-user-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/embedded/embedded-mcp/embedded-mcp-graphql/src/main/resources/graphql/*.graphqls',
     ],
 };
 

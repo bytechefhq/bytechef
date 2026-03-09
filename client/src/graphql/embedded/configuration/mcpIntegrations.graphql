@@ -1,0 +1,10 @@
+query mcpIntegrations {
+    mcpIntegrations {
+        id
+        mcpServerId
+        integration {
+            id
+            name
+        }
+    }
+}
