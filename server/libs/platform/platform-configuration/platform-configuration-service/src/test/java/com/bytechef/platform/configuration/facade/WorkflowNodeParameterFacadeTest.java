@@ -188,6 +188,7 @@ public class WorkflowNodeParameterFacadeTest {
                 parameterPath, 0);
 
             assertNotNull(result);
+            assertEquals(1, result.version());
 
             Map<String, ?> metadata = result.metadata();
 
@@ -268,6 +269,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // Then
             assertNotNull(result);
+            assertEquals(1, result.version());
             verify(workflowService).getWorkflow(workflowId);
             verify(workflowService).update(anyString(), anyString(), anyInt());
         }
