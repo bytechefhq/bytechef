@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
-import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_AI_MODEL_CALL;
+import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.OutputFunction;
@@ -84,7 +84,7 @@ public class WorkflowCallWorkflowTool {
         SubflowDataSource subflowDataSource) {
 
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> subflowDataSource
-            .getSubWorkflows(PlatformType.AUTOMATION, NEW_AI_MODEL_CALL, searchText)
+            .getSubWorkflows(PlatformType.AUTOMATION, NEW_WORKFLOW_CALL, searchText)
             .stream()
             .map(subWorkflowEntry -> option(subWorkflowEntry.name(), subWorkflowEntry.workflowUuid()))
             .toList();

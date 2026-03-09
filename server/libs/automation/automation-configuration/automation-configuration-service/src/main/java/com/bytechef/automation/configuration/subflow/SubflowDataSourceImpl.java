@@ -68,10 +68,6 @@ class SubflowDataSourceImpl implements SubflowDataSource {
         WorkflowTrigger callableTrigger = getCallableTrigger(workflow, WorkflowConstants.NEW_WORKFLOW_CALL);
 
         if (callableTrigger == null) {
-            callableTrigger = getCallableTrigger(workflow, WorkflowConstants.NEW_AI_MODEL_CALL);
-        }
-
-        if (callableTrigger == null) {
             return null;
         }
 
