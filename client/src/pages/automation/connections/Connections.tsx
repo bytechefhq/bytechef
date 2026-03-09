@@ -69,6 +69,8 @@ export const Connections = () => {
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetConnectionTagsQuery();
 
+    const isAnyLoading = allConnectionsIsLoading || componentsLoading || connectionsIsLoading || tagsIsLoading;
+
     return (
         <LayoutContainer
             header={
@@ -95,12 +97,7 @@ export const Connections = () => {
                                 />
                             </div>
                         ) : (
-                            !(
-                                allConnectionsIsLoading ||
-                                componentsLoading ||
-                                connectionsIsLoading ||
-                                tagsIsLoading
-                            ) && <EnvironmentSelect />
+                            !isAnyLoading && <EnvironmentSelect />
                         )
                     }
                     title={
