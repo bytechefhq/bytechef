@@ -489,7 +489,7 @@
     }, {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context):\n\treturn null",
+      "defaultValue": "def perform(input, context):\n\treturn None",
       "description": "Add your Python custom logic here.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1324,7 +1324,7 @@
     }, {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context):\n\treturn null",
+      "defaultValue": "def perform(input, context):\n\treturn None",
       "description": "Custom Python code to execute as a tool.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1690,7 +1690,7 @@
     "properties": [ {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context):\n\treturn null",
+      "defaultValue": "def perform(input, context):\n\treturn None",
       "description": "Custom Python code to process items. The item is available as 'item' parameter.",
       "displayCondition": null,
       "exampleValue": null,
