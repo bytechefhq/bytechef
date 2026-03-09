@@ -246,9 +246,9 @@ export const useProperty = ({
 
     const isToolsClusterElement = toolsMode || currentNode?.clusterElementType === 'tools';
 
-    const {isFetchedAfterMount: isDisplayConditionsFetched, isPending: isDisplayConditionsPending} =
+    const {isSuccess: isDisplayConditionsSuccess, isPending: isDisplayConditionsPending} =
         displayConditionsQuery ?? {
-            isFetchedAfterMount: false,
+            isSuccess: false,
             isPending: false,
         };
 
@@ -1507,11 +1507,11 @@ export const useProperty = ({
         if (displayCondition && currentComponent?.displayConditions?.[displayCondition]) {
             setIsFetchingCurrentDisplayCondition(true);
 
-            if (isDisplayConditionsFetched) {
+            if (isDisplayConditionsSuccess) {
                 setIsFetchingCurrentDisplayCondition(false);
             }
         }
-    }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsFetched]);
+    }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsSuccess]);
 
     useEffect(() => {
         if (controlledDynamicMode && resetOnModeChangeRef.current && controlledDynamicOnChangeRef.current) {
