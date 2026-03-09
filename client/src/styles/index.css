@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Sonner toast container is position:fixed with z-index:999999999 which blocks
+   click events on elements underneath (e.g. editor close buttons in dialogs).
+   Make the container click-through while keeping individual toasts interactive. */
+ol[data-sonner-toaster] {
+    pointer-events: none !important;
+}
+
+ol[data-sonner-toaster] [data-sonner-toast] {
+    pointer-events: auto !important;
+}
+
 @layer base {
     :root {
         /*@apply scroll-smooth font-display antialiased;*/
