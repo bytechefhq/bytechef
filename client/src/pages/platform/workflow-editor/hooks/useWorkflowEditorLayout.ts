@@ -5,9 +5,16 @@ import {useShallow} from 'zustand/shallow';
 
 const useWorkflowEditorLayout = () => {
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
-    const {setClusterElementsCanvasOpen, setRootClusterElementNodeData} = useWorkflowEditorStore(
+    const {
+        setClusterElementsCanvasOpen,
+        setMainClusterRootComponentDefinition,
+        setNestedClusterRootsComponentDefinitions,
+        setRootClusterElementNodeData,
+    } = useWorkflowEditorStore(
         useShallow((state) => ({
             setClusterElementsCanvasOpen: state.setClusterElementsCanvasOpen,
+            setMainClusterRootComponentDefinition: state.setMainClusterRootComponentDefinition,
+            setNestedClusterRootsComponentDefinitions: state.setNestedClusterRootsComponentDefinitions,
             setRootClusterElementNodeData: state.setRootClusterElementNodeData,
         }))
     );
@@ -22,6 +29,8 @@ const useWorkflowEditorLayout = () => {
 
         if (!open) {
             setRootClusterElementNodeData(undefined);
+            setMainClusterRootComponentDefinition(undefined);
+            setNestedClusterRootsComponentDefinitions({});
         }
     };
 

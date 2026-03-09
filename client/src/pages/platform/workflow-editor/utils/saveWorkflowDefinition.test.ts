@@ -547,6 +547,58 @@ describe('saveWorkflowDefinition', () => {
         });
     });
 
+    describe('clusterRoot preservation in optimistic update', () => {
+        it('should preserve clusterRoot on existing tasks when adding a new node', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {
+                    clusterElements: {source: [{name: 'csv_1', type: 'csvFile/v1/read'}]},
+                    clusterRoot: true,
+                    name: 'dataStream_1',
+                    parameters: {},
+                    type: 'dataStream/v1/stream',
+                },
+            ]);
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            expect(optimisticWorkflow.tasks).toHaveLength(2);
+            expect(optimisticWorkflow.tasks[0].name).toBe('dataStream_1');
+            expect(optimisticWorkflow.tasks[0].clusterRoot).toBe(true);
+            expect(optimisticWorkflow.tasks[1].name).toBe('httpClient_1');
+        });
+
+        it('should not add clusterRoot to tasks that did not have it', async () => {
+            mockWorkflowState = makeWorkflowState([{name: 'logger_1', parameters: {}, type: 'logger/v1/info'}]);
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            expect(optimisticWorkflow.tasks).toHaveLength(2);
+            expect(optimisticWorkflow.tasks[0].clusterRoot).toBeUndefined();
+        });
+    });
+
     describe('decorative flag', () => {
         it('should save when decorative is true even without other changes', async () => {
             const existingTask = {

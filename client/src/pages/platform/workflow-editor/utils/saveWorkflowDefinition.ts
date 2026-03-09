@@ -275,8 +275,25 @@ function executeWorkflowMutation({
 
     const previousWorkflow = workflow;
 
-    const optimisticTasks =
+    let optimisticTasks =
         newTask && definitionUpdate.tasks ? flattenDefinitionTasks(definitionUpdate.tasks) : undefined;
+
+    // Preserve server-computed properties (clusterRoot) that exist in workflow.tasks
+    // but not in the JSON definition. Without this, cluster root nodes (DataStream, AI Agent)
+    // temporarily render as regular workflow nodes during the optimistic update.
+    if (optimisticTasks && workflow.tasks) {
+        const existingTasksByName = new Map(workflow.tasks.map((task) => [task.name, task]));
+
+        optimisticTasks = optimisticTasks.map((task) => {
+            const existingTask = existingTasksByName.get(task.name);
+
+            if (existingTask?.clusterRoot) {
+                return {...task, clusterRoot: existingTask.clusterRoot};
+            }
+
+            return task;
+        });
+    }
 
     useWorkflowDataStore.getState().setWorkflow({
         ...workflow,
