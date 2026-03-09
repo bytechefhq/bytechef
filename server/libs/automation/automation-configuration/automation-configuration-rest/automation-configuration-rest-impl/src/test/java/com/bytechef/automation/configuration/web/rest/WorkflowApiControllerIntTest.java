@@ -217,6 +217,9 @@ public class WorkflowApiControllerIntTest {
             .version(0);
 
         try {
+            when(projectWorkflowFacade.updateWorkflow("1", DEFINITION, 0))
+                .thenReturn(getWorkflowDTO());
+
             this.webTestClient
                 .put()
                 .uri("/internal/workflows/1")
@@ -225,7 +228,8 @@ public class WorkflowApiControllerIntTest {
                 .bodyValue(workflowModel)
                 .exchange()
                 .expectStatus()
-                .isNoContent();
+                .isOk()
+                .expectBody(WorkflowModel.class);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
