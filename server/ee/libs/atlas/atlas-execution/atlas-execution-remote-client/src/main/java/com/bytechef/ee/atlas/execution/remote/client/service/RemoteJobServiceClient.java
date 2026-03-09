@@ -77,6 +77,11 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
+    public List<Job> getJobs(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job getJob(long id) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder

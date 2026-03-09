@@ -41,6 +41,8 @@ public interface PrincipalJobService {
 
     long getJobPrincipalId(long jobId, PlatformType type);
 
+    List<PrincipalJob> getPrincipalJobs(List<Long> jobIds, PlatformType type);
+
     List<Long> getJobIds(long principalId, PlatformType type);
 
     Page<Long> getJobIds(

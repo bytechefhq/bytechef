@@ -34,6 +34,9 @@ public interface JdbcJobRepository
     extends ListPagingAndSortingRepository<Job, Long>, ListCrudRepository<Job, Long>, JobRepository {
 
     @Override
+    List<Job> findAllByIdIn(List<Long> ids);
+
+    @Override
     Optional<Job> findById(Long id);
 
     @Override

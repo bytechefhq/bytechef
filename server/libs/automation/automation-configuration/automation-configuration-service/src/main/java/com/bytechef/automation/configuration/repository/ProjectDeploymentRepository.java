@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Repository;
 public interface ProjectDeploymentRepository
     extends ListPagingAndSortingRepository<ProjectDeployment, Long>, CrudRepository<ProjectDeployment, Long>,
     CustomProjectDeploymentRepository {
+
+    List<ProjectDeployment> findAllByIdIn(List<Long> ids);
 
     Optional<ProjectDeployment> findByProjectIdAndEnvironment(long projectId, int environment);
 }

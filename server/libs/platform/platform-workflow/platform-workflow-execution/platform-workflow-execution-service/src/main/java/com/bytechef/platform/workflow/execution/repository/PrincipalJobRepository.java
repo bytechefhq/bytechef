@@ -32,6 +32,8 @@ public interface PrincipalJobRepository extends ListCrudRepository<PrincipalJob,
 
     int DEFAULT_PAGE_SIZE = 20;
 
+    List<PrincipalJob> findAllByJobIdInAndType(List<Long> jobIds, int type);
+
     Optional<PrincipalJob> findByJobIdAndType(Long jobId, int type);
 
     Optional<PrincipalJob> findTop1ByPrincipalIdAndTypeOrderByJobIdDesc(long principalId, int type);

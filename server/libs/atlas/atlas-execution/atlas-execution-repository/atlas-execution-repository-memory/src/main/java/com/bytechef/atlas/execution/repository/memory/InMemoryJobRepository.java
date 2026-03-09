@@ -23,6 +23,7 @@ import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.data.domain.Page;
@@ -74,6 +75,14 @@ public class InMemoryJobRepository implements JobRepository {
     @Override
     public Page<Job> findAll(Pageable pageable) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Job> findAllByIdIn(List<Long> ids) {
+        return ids.stream()
+            .map(id -> cache.get(TenantCacheKeyUtils.getKey(id)))
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     @Override

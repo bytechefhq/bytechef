@@ -28,6 +28,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -44,6 +45,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
@@ -55,10 +57,12 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -189,11 +193,17 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             if (projectDeploymentIds.isEmpty()) {
                 workflowExecutionPage = Page.empty();
             } else {
-                Page<Job> jobsPage = principalJobService
-                    .getJobIds(
-                        jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
-                        pageNumber)
-                    .map(jobService::getJob);
+                Page<Long> jobIdsPage = principalJobService.getJobIds(
+                    jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
+                    pageNumber);
+
+                List<Long> jobIds = jobIdsPage.getContent();
+
+                List<Job> jobs = jobService.getJobs(jobIds);
+
+                Map<Long, Job> jobMap = jobs.stream()
+                    .collect(Collectors.toMap(
+                        job -> Validate.notNull(job.getId(), "id"), Function.identity()));
 
                 List<Project> projects = new ArrayList<>();
 
@@ -204,16 +214,59 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 }
 
                 List<Workflow> workflows = workflowService.getWorkflows(
-                    CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
+                    CollectionUtils.map(jobs, Job::getWorkflowId));
 
-                Map<Long, List<String>> projectWorkflowIdsMap = projects.stream()
-                    .collect(Collectors.toMap(
-                        project -> Validate.notNull(project.getId(), "id"),
-                        project -> projectWorkflowService.getProjectWorkflowIds(project.getId())));
+                List<Long> projectIds = projects.stream()
+                    .map(project -> Validate.notNull(project.getId(), "id"))
+                    .toList();
+
+                Map<Long, List<String>> projectWorkflowIdsMap = projectWorkflowService.getProjectWorkflows(projectIds)
+                    .stream()
+                    .collect(Collectors.groupingBy(
+                        ProjectWorkflow::getProjectId,
+                        Collectors.mapping(ProjectWorkflow::getWorkflowId, Collectors.toList())));
+
+                List<PrincipalJob> principalJobs =
+                    principalJobService.getPrincipalJobs(jobIds, PlatformType.AUTOMATION);
+
+                Map<Long, Long> jobToPrincipalMap = principalJobs.stream()
+                    .collect(Collectors.toMap(PrincipalJob::getJobId, PrincipalJob::getPrincipalId));
+
+                List<Long> principalIds = principalJobs.stream()
+                    .map(PrincipalJob::getPrincipalId)
+                    .distinct()
+                    .toList();
+
+                Map<Long, ProjectDeployment> deploymentMap =
+                    projectDeploymentService.getProjectDeployments(principalIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                            deployment -> Validate.notNull(deployment.getId(), "id"), Function.identity()));
+
+                List<TriggerExecution> triggerExecutions =
+                    triggerExecutionService.getJobTriggerExecutions(jobIds);
+
+                Map<Long, TriggerExecution> triggerExecutionByJobIdMap = new HashMap<>();
+
+                for (TriggerExecution triggerExecution : triggerExecutions) {
+                    for (Long triggerJobId : triggerExecution.getJobIds()) {
+                        triggerExecutionByJobIdMap.putIfAbsent(triggerJobId, triggerExecution);
+                    }
+                }
 
                 List<WorkflowExecutionDTO> workflowExecutionDTOs = new ArrayList<>();
 
-                for (Job job : jobsPage) {
+                for (Long jobId : jobIds) {
+                    Job job = jobMap.get(jobId);
+
+                    if (job == null) {
+                        if (logger.isWarnEnabled()) {
+                            logger.warn("Skipping job id={}: job not found", jobId);
+                        }
+
+                        continue;
+                    }
+
                     Optional<Workflow> workflowOptional = CollectionUtils.findFirst(
                         workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()));
 
@@ -241,18 +294,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                         continue;
                     }
 
-                    Optional<Long> jobDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
-                        job.getId(), PlatformType.AUTOMATION);
+                    Long deploymentId = jobToPrincipalMap.get(jobId);
 
-                    ProjectDeployment jobProjectDeployment = jobDeploymentIdOptional
-                        .map(projectDeploymentService::getProjectDeployment)
-                        .orElse(null);
+                    ProjectDeployment jobProjectDeployment =
+                        deploymentId == null ? null : deploymentMap.get(deploymentId);
 
-                    TriggerExecution triggerExecution = jobDeploymentIdOptional.isPresent()
-                        ? triggerExecutionService.fetchJobTriggerExecution(
-                            Validate.notNull(job.getId(), "id"))
-                            .orElse(null)
-                        : null;
+                    TriggerExecution triggerExecution =
+                        deploymentId == null ? null : triggerExecutionByJobIdMap.get(jobId);
 
                     workflowExecutionDTOs.add(new WorkflowExecutionDTO(
                         Validate.notNull(job.getId(), "id"),
@@ -260,14 +308,11 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                         jobProjectDeployment,
                         new JobDTO(job),
                         workflowOptional.get(),
-                        getTriggerExecutionDTO(
-                            jobDeploymentIdOptional.orElse(null),
-                            triggerExecution,
-                            job)));
+                        getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
                 }
 
                 workflowExecutionPage = new PageImpl<>(
-                    workflowExecutionDTOs, jobsPage.getPageable(), jobsPage.getTotalElements());
+                    workflowExecutionDTOs, jobIdsPage.getPageable(), jobIdsPage.getTotalElements());
             }
         }
 
