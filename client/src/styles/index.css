@@ -74,3 +74,7 @@ ol[data-sonner-toaster] [data-sonner-toast] {
     font-size: 1rem;
     line-height: 1.5rem;
 }
+
+.aui-thread-root .aui-composer-root {
+    box-shadow: none;
+}
