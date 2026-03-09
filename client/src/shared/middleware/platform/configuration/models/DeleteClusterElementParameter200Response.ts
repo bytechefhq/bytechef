@@ -38,11 +38,17 @@ export interface DeleteClusterElementParameter200Response {
      */
     displayConditions?: { [key: string]: boolean; };
     /**
-     * 
+     *
      * @type {Array<string>}
      * @memberof DeleteClusterElementParameter200Response
      */
     missingRequiredProperties?: Array<string>;
+    /**
+     * The updated workflow version.
+     * @type {number}
+     * @memberof DeleteClusterElementParameter200Response
+     */
+    version?: number;
 }
 
 /**
@@ -66,6 +72,7 @@ export function DeleteClusterElementParameter200ResponseFromJSONTyped(json: any,
         'parameters': json['parameters'] == null ? undefined : json['parameters'],
         'displayConditions': json['displayConditions'] == null ? undefined : json['displayConditions'],
         'missingRequiredProperties': json['missingRequiredProperties'] == null ? undefined : json['missingRequiredProperties'],
+        'version': json['version'] == null ? undefined : json['version'],
     };
 }
 
@@ -84,6 +91,7 @@ export function DeleteClusterElementParameter200ResponseToJSONTyped(value?: Dele
         'parameters': value['parameters'],
         'displayConditions': value['displayConditions'],
         'missingRequiredProperties': value['missingRequiredProperties'],
+        'version': value['version'],
     };
 }
 
