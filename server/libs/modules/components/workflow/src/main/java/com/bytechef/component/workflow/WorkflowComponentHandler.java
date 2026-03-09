@@ -22,10 +22,8 @@ import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLO
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.workflow.action.WorkflowResponseToAiModelCallAction;
 import com.bytechef.component.workflow.action.WorkflowResponseToWorkflowCallAction;
 import com.bytechef.component.workflow.cluster.WorkflowCallWorkflowTool;
-import com.bytechef.component.workflow.trigger.WorkflowNewAiModelCallTrigger;
 import com.bytechef.component.workflow.trigger.WorkflowNewWorkflowCallTrigger;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import org.springframework.stereotype.Component;
@@ -45,11 +43,9 @@ public class WorkflowComponentHandler implements ComponentHandler {
             .icon("path:assets/workflow.svg")
             .categories(ComponentCategory.HELPERS)
             .triggers(
-                WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION,
-                WorkflowNewAiModelCallTrigger.TRIGGER_DEFINITION)
+                WorkflowNewWorkflowCallTrigger.TRIGGER_DEFINITION)
             .actions(
-                WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION,
-                WorkflowResponseToAiModelCallAction.ACTION_DEFINITION)
+                WorkflowResponseToWorkflowCallAction.ACTION_DEFINITION)
             .clusterElements(WorkflowCallWorkflowTool.of(subflowDataSource));
     }
 
