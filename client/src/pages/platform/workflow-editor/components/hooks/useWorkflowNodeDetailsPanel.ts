@@ -179,7 +179,7 @@ export default function useWorkflowNodeDetailsPanel({
                 ? (rootClusterElementNodeData?.workflowNodeName as string)
                 : (currentNode?.workflowNodeName as string),
         },
-        !!workflow.id && !!currentNode
+        !!workflow.id && !!currentNode && !!currentComponentDefinition?.connectionRequired
     );
 
     const {data: currentClusterElementDefinition} = useGetClusterElementDefinitionQuery(
