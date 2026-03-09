@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {getNodeLabel} from '@/pages/platform/workflow-editor/utils/getNodeLabel';
 import {NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
@@ -83,6 +84,19 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const parentClusterRootId = data.parentClusterRootId;
     const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
     const hasSavedNodePosition = isRegularNode && !data.trigger && data.metadata?.ui?.nodePosition;
+
+    const {tasks: workflowTasks, triggers: workflowTriggers} = workflow;
+
+    const nodeLabel = useMemo(
+        () =>
+            getNodeLabel({
+                fallbackLabel: data.title || data.label,
+                workflow,
+                workflowNodeName: data.workflowNodeName,
+            }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- only recompute when tasks/triggers change, not on every workflow reference change
+        [data.label, data.title, data.workflowNodeName, workflowTasks, workflowTriggers]
+    );
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
@@ -353,7 +367,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     <span
                                         className={twMerge('font-semibold', isNestedClusterRoot && 'w-full truncate')}
                                     >
-                                        {data.title || data.label}
+                                        {nodeLabel}
                                     </span>
 
                                     {data.operationName && (
@@ -413,7 +427,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             (isClusterElement || (isHorizontal && isRegularNode)) && 'w-full truncate'
                         )}
                     >
-                        {data.title || data.label}
+                        {nodeLabel}
                     </span>
 
                     {data.operationName && (

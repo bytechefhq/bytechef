@@ -10,6 +10,7 @@ import useClusterElementsDataStore from '../../cluster-element-editor/stores/use
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import {getNodeLabel} from '../utils/getNodeLabel';
 
 export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], activeTab?: TabNameType) {
     const {setActiveTab, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
@@ -63,7 +64,14 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
 
         if (!isNodeAlreadyOpen) {
             setDataPillPanelOpen(false);
-            setCurrentNode({...data, description: ''});
+
+            const {workflow} = useWorkflowDataStore.getState();
+
+            setCurrentNode({
+                ...data,
+                description: '',
+                label: getNodeLabel({fallbackLabel: data.label, workflow, workflowNodeName: data.workflowNodeName}),
+            });
 
             if (!!data.clusterRoot && !clusterElementsCanvasOpen) {
                 setClusterElementsCanvasOpen(true);
