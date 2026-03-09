@@ -108,6 +108,11 @@ public class WorkflowNodeParameterFacadeTest {
             actionDefinitionService, clusterElementDefinitionService, evaluator,
             taskDispatcherDefinitionService, triggerDefinitionService, workflowNodeOutputFacade,
             workflowService, workflowTestConfigurationService);
+
+        Workflow updatedWorkflow = mock(Workflow.class);
+
+        when(updatedWorkflow.getVersion()).thenReturn(1);
+        when(workflowService.update(anyString(), anyString(), anyInt())).thenReturn(updatedWorkflow);
     }
 
     @Test

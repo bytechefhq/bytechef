@@ -1066,6 +1066,9 @@ paths:
                     type: "array"
                     items:
                       type: "string"
+                  version:
+                    description: "The updated workflow version."
+                    type: "integer"
     patch:
       description: "Updates a cluster element parameter."
       summary: "Updates a cluster element parameter"
@@ -1156,6 +1159,9 @@ paths:
                     type: "array"
                     items:
                       type: "string"
+                  version:
+                    description: "The updated workflow version."
+                    type: "integer"
   /workflows/{id}/workflow-nodes/{workflowNodeName}/descriptions:
     get:
       description: "Get an action description shown in the editor."
@@ -1482,6 +1488,9 @@ paths:
                     type: "array"
                     items:
                       type: "string"
+                  version:
+                    description: "The updated workflow version."
+                    type: "integer"
     patch:
       description: "Updates a workflow node parameter."
       summary: "Updates a workflow node parameter"
@@ -1556,6 +1565,9 @@ paths:
                     type: "array"
                     items:
                       type: "string"
+                  version:
+                    description: "The updated workflow version."
+                    type: "integer"
   /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs:
     delete:
       description: "Delete existing workflow node test output."

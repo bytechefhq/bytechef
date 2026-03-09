@@ -150,12 +150,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             removeEmptyCollections(workflowNodeStructure.parameterMap);
         }
 
-        workflowService.update(
+        Workflow updatedWorkflow = workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
-            workflowNodeStructure.parameterMap);
+            workflowNodeStructure.parameterMap, updatedWorkflow.getVersion());
     }
 
     @Override
@@ -201,12 +201,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             removeEmptyCollections(workflowNodeStructure.parameterMap);
         }
 
-        workflowService.update(
+        Workflow updatedWorkflow = workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
-            workflowNodeStructure.parameterMap);
+            workflowNodeStructure.parameterMap, updatedWorkflow.getVersion());
     }
 
     @Override
@@ -351,12 +351,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             removeEmptyCollections(workflowNodeStructure.parameterMap);
         }
 
-        workflowService.update(
+        Workflow updatedWorkflow = workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
-            workflowNodeStructure.parameterMap);
+            workflowNodeStructure.parameterMap, updatedWorkflow.getVersion());
     }
 
     @Override
@@ -404,12 +404,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             removeEmptyCollections(workflowNodeStructure.parameterMap);
         }
 
-        workflowService.update(
+        Workflow updatedWorkflow = workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
-            workflowNodeStructure.parameterMap);
+            workflowNodeStructure.parameterMap, updatedWorkflow.getVersion());
     }
 
     protected static boolean hasExpressionVariable(String displayCondition, String parameterPath) {
