@@ -13,12 +13,14 @@ export default function calculateNodeInsertIndex(targetId: string): number {
     const branchTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('branch/')) || [];
     const eachTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('each/')) || [];
     const forkJoinTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('fork-join/')) || [];
+    const mapTasks = tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('map/')) || [];
 
     let tasksInConditions = 0;
     let tasksInLoops = 0;
     let tasksInBranches = 0;
     let tasksInEach = 0;
     let tasksInForkJoins = 0;
+    let tasksInMaps = 0;
 
     if (conditionTasks.length) {
         tasksInConditions = conditionTasks.reduce((count, conditionTask) => {
@@ -63,5 +65,17 @@ export default function calculateNodeInsertIndex(targetId: string): number {
         );
     }
 
-    return nextTaskIndex - tasksInConditions - tasksInLoops - tasksInBranches - tasksInEach - tasksInForkJoins;
+    if (mapTasks.length) {
+        tasksInMaps = mapTasks.reduce((count, mapTask) => count + (mapTask.parameters?.iteratee?.length || 0), 0);
+    }
+
+    return (
+        nextTaskIndex -
+        tasksInConditions -
+        tasksInLoops -
+        tasksInBranches -
+        tasksInEach -
+        tasksInForkJoins -
+        tasksInMaps
+    );
 }
