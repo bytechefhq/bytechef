@@ -35,6 +35,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
+import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -190,10 +191,32 @@ public abstract class AbstractAiAgentChatAction {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (ClusterElement clusterElement : toolClusterElements) {
-            ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
+            Object clusterElementFunction = clusterElementDefinitionService.getClusterElement(
+                clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                clusterElement.getClusterElementName());
 
-            toolCallbacks.add(
-                aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnection, editorEnvironment));
+            if (clusterElementFunction instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
+                try {
+                    ComponentConnection componentConnection = connectionParameters.get(
+                        clusterElement.getWorkflowNodeName());
+
+                    ToolCallback[] providerCallbacks = toolCallbackProviderFunction
+                        .apply(
+                            ParametersFactory.create(clusterElement.getParameters()),
+                            ParametersFactory.create(componentConnection), context)
+                        .getToolCallbacks();
+
+                    toolCallbacks.addAll(Arrays.asList(providerCallbacks));
+                } catch (Exception exception) {
+                    throw new RuntimeException(exception);
+                }
+            } else {
+                ComponentConnection componentConnection = connectionParameters.get(
+                    clusterElement.getWorkflowNodeName());
+
+                toolCallbacks.add(
+                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnection, editorEnvironment));
+            }
         }
 
         if (toolExecutionListener == null) {
