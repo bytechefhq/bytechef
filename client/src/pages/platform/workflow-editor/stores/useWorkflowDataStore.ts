@@ -60,6 +60,37 @@ interface WorkflowDataStateI {
     ) => void;
 }
 
+function updateClusterElementParameters(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    clusterElements: Record<string, any>,
+    workflowNodeName: string,
+    parameters: Record<string, object>
+): boolean {
+    for (const elementValue of Object.values(clusterElements)) {
+        if (!elementValue) {
+            continue;
+        }
+
+        const elements = Array.isArray(elementValue) ? elementValue : [elementValue];
+
+        for (const element of elements) {
+            if (element.name === workflowNodeName) {
+                element.parameters = parameters;
+
+                return true;
+            }
+
+            if (element.clusterElements) {
+                if (updateClusterElementParameters(element.clusterElements, workflowNodeName, parameters)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 function updateTaskParametersInTasks(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tasks: any[],
@@ -71,6 +102,12 @@ function updateTaskParametersInTasks(
             task.parameters = parameters;
 
             return true;
+        }
+
+        if (task.clusterElements) {
+            if (updateClusterElementParameters(task.clusterElements, workflowNodeName, parameters)) {
+                return true;
+            }
         }
 
         if (task.parameters) {
