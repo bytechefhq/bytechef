@@ -27,6 +27,7 @@ import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatche
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
@@ -87,13 +88,9 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
             return List.of();
         }
 
-        OutputResponse outputResponse = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
+        BaseProperty.BaseValueProperty<?> inputSchema = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
 
-        if (outputResponse == null) {
-            return List.of();
-        }
-
-        if (!(outputResponse.getOutputSchema() instanceof ObjectProperty objectProperty)) {
+        if (!(inputSchema instanceof ObjectProperty objectProperty)) {
             return List.of();
         }
 
@@ -108,6 +105,12 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
             return null;
         }
 
-        return subflowDataSource.getSubWorkflowOutputSchema(workflowUuid);
+        BaseProperty.BaseValueProperty<?> outputSchema = subflowDataSource.getSubWorkflowOutputSchema(workflowUuid);
+
+        if (outputSchema == null) {
+            return null;
+        }
+
+        return OutputResponse.of(outputSchema);
     }
 }

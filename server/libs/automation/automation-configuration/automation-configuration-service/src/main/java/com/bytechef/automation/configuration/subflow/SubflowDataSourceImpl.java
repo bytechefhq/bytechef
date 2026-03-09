@@ -24,7 +24,6 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -60,7 +59,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
     }
 
     @Override
-    public @Nullable OutputResponse getSubWorkflowInputSchema(String workflowUuid) {
+    public BaseProperty.@Nullable BaseValueProperty<?> getSubWorkflowInputSchema(String workflowUuid) {
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -77,18 +76,11 @@ class SubflowDataSourceImpl implements SubflowDataSource {
             return null;
         }
 
-        BaseProperty.BaseValueProperty<?> inputProperty = SchemaUtils.getJsonSchemaProperty(
-            inputSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
-
-        if (inputProperty == null) {
-            return null;
-        }
-
-        return OutputResponse.of(inputProperty);
+        return SchemaUtils.getJsonSchemaProperty(inputSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
     }
 
     @Override
-    public @Nullable OutputResponse getSubWorkflowOutputSchema(String workflowUuid) {
+    public BaseProperty.@Nullable BaseValueProperty<?> getSubWorkflowOutputSchema(String workflowUuid) {
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -105,14 +97,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
             return null;
         }
 
-        BaseProperty.BaseValueProperty<?> outputProperty = SchemaUtils.getJsonSchemaProperty(
-            outputSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
-
-        if (outputProperty == null) {
-            return null;
-        }
-
-        return OutputResponse.of(outputProperty);
+        return SchemaUtils.getJsonSchemaProperty(outputSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
     }
 
     @Override
