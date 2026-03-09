@@ -1,4 +1,4 @@
-import {CLUSTER_ELEMENT_NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
+import {CLUSTER_ELEMENT_NODE_WIDTH, NODE_HEIGHT, PLACEHOLDER_NODE_HEIGHT, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     BranchChildTasksType,
@@ -9,6 +9,7 @@ import {
     MapChildTasksType,
     ParallelChildTasksType,
 } from '@/shared/types';
+import {Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {
@@ -17,6 +18,7 @@ import {
     CLUSTER_ELEMENT_OVERLAP_PADDING,
     CLUSTER_ROOT_GAP,
     collectTaskDispatcherData,
+    getClusterElementsLayoutElements,
 } from './layoutUtils';
 
 // Type for test tasks with potentially malformed parameters
@@ -394,5 +396,96 @@ describe('cluster root spacing', () => {
 
     it('should use CLUSTER_ROOT_GAP as overlap resolution minimum between cluster roots', () => {
         expect(CLUSTER_ROOT_GAP).toBeGreaterThanOrEqual(CLUSTER_ELEMENT_OVERLAP_PADDING);
+    });
+});
+
+describe('getClusterElementsLayoutElements new node positioning with moved siblings', () => {
+    const canvasWidth = 1200;
+    const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_ELEMENT_GAP;
+    const childBaseY = 160 + PLACEHOLDER_NODE_HEIGHT + NODE_HEIGHT / 4;
+
+    function makeRootNode(): Node {
+        return {
+            data: {
+                clusterElementTypesCount: 1,
+                clusterElements: {typeA: []},
+            },
+            id: 'root',
+            position: {x: 0, y: 0},
+            type: 'clusterRoot',
+        };
+    }
+
+    function makeChildNode(nodeId: string, overrides: {metadata?: Record<string, unknown>} = {}): Node {
+        return {
+            data: {
+                clusterElementType: 'typeA',
+                clusterElementTypeIndex: 0,
+                isNestedClusterRoot: false,
+                metadata: overrides.metadata || {},
+                parentClusterRootElementsTypeCount: 1,
+            },
+            id: nodeId,
+            parentId: 'root',
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        };
+    }
+
+    it('should place a new node next to the actual rightmost sibling, not the default position', () => {
+        // Sibling at index 0 has been manually moved far to the left (saved position)
+        // Sibling at index 1 has been manually moved far to the left (saved position)
+        // New node (index 2) should be placed relative to the actual rightmost sibling
+        const movedX = 50;
+
+        const nodes: Node[] = [
+            makeRootNode(),
+            makeChildNode('child-0', {metadata: {ui: {nodePosition: {x: movedX, y: childBaseY}}}}),
+            makeChildNode('child-1', {metadata: {ui: {nodePosition: {x: movedX + horizontalGap, y: childBaseY}}}}),
+            makeChildNode('child-2'), // New node, no saved position
+        ];
+
+        const result = getClusterElementsLayoutElements({canvasWidth, edges: [], nodes});
+        const newNode = result.nodes.find((node) => node.id === 'child-2');
+        const secondSibling = result.nodes.find((node) => node.id === 'child-1');
+
+        expect(newNode).toBeDefined();
+        expect(secondSibling).toBeDefined();
+
+        // New node should be placed one horizontalGap to the right of the rightmost sibling
+        expect(newNode!.position.x).toBe(secondSibling!.position.x + horizontalGap);
+    });
+
+    it('should place a new node next to a sibling moved to the left', () => {
+        // Only one existing sibling, moved far to the left
+        const movedX = -200;
+
+        const nodes: Node[] = [
+            makeRootNode(),
+            makeChildNode('child-0', {metadata: {ui: {nodePosition: {x: movedX, y: childBaseY}}}}),
+            makeChildNode('child-1'), // New node
+        ];
+
+        const result = getClusterElementsLayoutElements({canvasWidth, edges: [], nodes});
+        const newNode = result.nodes.find((node) => node.id === 'child-1');
+
+        expect(newNode).toBeDefined();
+
+        // Should be placed relative to the moved sibling, not the default position
+        expect(newNode!.position.x).toBe(movedX + horizontalGap);
+    });
+
+    it('should use the default position when no siblings have saved positions', () => {
+        const nodes: Node[] = [makeRootNode(), makeChildNode('child-0'), makeChildNode('child-1')];
+
+        const result = getClusterElementsLayoutElements({canvasWidth, edges: [], nodes});
+        const firstNode = result.nodes.find((node) => node.id === 'child-0');
+        const secondNode = result.nodes.find((node) => node.id === 'child-1');
+
+        expect(firstNode).toBeDefined();
+        expect(secondNode).toBeDefined();
+
+        // Second node should be one gap away from the first
+        expect(secondNode!.position.x).toBe(firstNode!.position.x + horizontalGap);
     });
 });
