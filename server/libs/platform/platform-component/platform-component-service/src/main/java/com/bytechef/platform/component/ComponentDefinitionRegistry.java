@@ -334,6 +334,23 @@ public class ComponentDefinitionRegistry {
             componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
     }
 
+    public List<ComponentDefinition> getDynamicComponentDefinitions() {
+        return dynamicComponentHandlerRegistries.stream()
+            .flatMap(dynamicComponentHandlerRegistry -> CollectionUtils.stream(
+                dynamicComponentHandlerRegistry.getComponentHandlers()))
+            .map(ComponentHandler::getDefinition)
+            .toList();
+    }
+
+    public List<ComponentDefinition> getStaticComponentDefinitions() {
+        return CollectionUtils.sort(
+            componentDefinitionsMap.values()
+                .stream()
+                .flatMap(map -> CollectionUtils.stream(map.values()))
+                .toList(),
+            this::compare);
+    }
+
     public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
