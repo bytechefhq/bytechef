@@ -157,11 +157,9 @@ public class McpToolFacade extends AbstractToolFacade {
                 continue;
             }
 
-            String toolName = MapUtils.getString(trigger.getParameters(), ToolConstants.TOOL_NAME);
-            String description = MapUtils.getString(trigger.getParameters(), ToolConstants.TOOL_DESCRIPTION);
-
             Map<String, ?> workflowParameters = mcpProjectWorkflow.getParameters();
 
+            String toolName = MapUtils.getString(workflowParameters, ToolConstants.TOOL_NAME);
             List<FromAiResult> fromAiResults = extractFromAiResults(workflowParameters);
 
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
@@ -171,6 +169,8 @@ public class McpToolFacade extends AbstractToolFacade {
                         projectDeploymentWorkflow, trigger.getName(), workflowParameters, mcpProject.getMcpServerId()))
                 .inputType(Map.class)
                 .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
+
+            String description = MapUtils.getString(workflowParameters, ToolConstants.TOOL_DESCRIPTION);
 
             if (description != null) {
                 builder.description(description);
