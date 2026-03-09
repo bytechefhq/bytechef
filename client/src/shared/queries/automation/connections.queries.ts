@@ -6,6 +6,7 @@ import {
     GetWorkspaceConnectionsRequest,
     Tag,
 } from '@/shared/middleware/automation/configuration';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
@@ -31,4 +32,5 @@ export const useGetWorkspaceConnectionsQuery = (request: GetWorkspaceConnections
         queryKey: ConnectionKeys.filteredConnections(request),
         queryFn: () => new ConnectionApi().getWorkspaceConnections(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });

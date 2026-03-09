@@ -23,6 +23,8 @@ import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowNodeDescriptionKeys} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
+import {WorkflowNodeParameterKeys} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
@@ -134,6 +136,18 @@ export const useProject = () => {
                     id: variables.id,
                     workflowNodeName: variables.workflowNodeName,
                 }),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions({
+                    environmentId: variables.environmentId,
+                    id: variables.id,
+                    workflowNodeName: variables.workflowNodeName,
+                }),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOutputKeys.workflowNodeOutputs,
             });
         },
     });

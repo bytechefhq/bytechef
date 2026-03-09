@@ -3,6 +3,7 @@ import {
     ComponentDefinitionKeys,
     GetComponentDefinitionsRequestI,
 } from '@/shared/queries/platform/componentDefinitions.queries';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 export const useGetComponentDefinitionsQuery = (request: GetComponentDefinitionsRequestI, enabled?: boolean) => {
@@ -13,5 +14,6 @@ export const useGetComponentDefinitionsQuery = (request: GetComponentDefinitions
                 ...request,
             }),
         queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
+        staleTime: DEFINITION_STALE_TIME,
     });
 };

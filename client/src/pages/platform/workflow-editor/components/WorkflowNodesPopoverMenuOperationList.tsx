@@ -10,6 +10,7 @@ import {
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -330,6 +331,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         queryFn: () =>
                             new TriggerDefinitionApi().getComponentTriggerDefinition(getTriggerDefinitionRequest),
                         queryKey: TriggerDefinitionKeys.triggerDefinition(getTriggerDefinitionRequest),
+                        staleTime: DEFINITION_STALE_TIME,
                     });
 
                     const newTriggerNodeData = getNodeData(clickedOperation, clickedComponentTriggerDefinition);
@@ -358,6 +360,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(
                             getClusterElementDefinitionRequest
                         ),
+                        staleTime: DEFINITION_STALE_TIME,
                     });
 
                     const clusterElementData = {
@@ -393,6 +396,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 const clickedComponentActionDefinition = await queryClient.fetchQuery({
                     queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
                     queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
+                    staleTime: DEFINITION_STALE_TIME,
                 });
 
                 const newWorkflowNodeData = getNodeData(clickedOperation, clickedComponentActionDefinition);

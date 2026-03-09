@@ -5,6 +5,7 @@ import {
     GetComponentDefinitionRequest,
     GetConnectionComponentDefinitionRequest,
 } from '@/shared/middleware/platform/configuration';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 export interface GetComponentDefinitionsRequestI {
@@ -38,6 +39,7 @@ export const useGetComponentDefinitionQuery = (request: GetComponentDefinitionRe
         queryKey: ComponentDefinitionKeys.componentDefinition(request),
         queryFn: () => new ComponentDefinitionApi().getComponentDefinition(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });
 
 export const useGetConnectionComponentDefinitionQuery = (
@@ -48,4 +50,5 @@ export const useGetConnectionComponentDefinitionQuery = (
         queryKey: ComponentDefinitionKeys.connectionComponentDefinition(request),
         queryFn: () => new ComponentDefinitionApi().getConnectionComponentDefinition(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });

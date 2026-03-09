@@ -5,6 +5,7 @@ import {
     WorkflowTestConfigurationApi,
     WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
@@ -31,6 +32,7 @@ export const useGetWorkflowTestConfigurationConnectionsQuery = (
         queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurationConnections(request),
         queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfigurationConnections(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });
 
 export const useGetWorkflowTestConfigurationQuery = (requestParameters: GetWorkflowTestConfigurationRequest) =>

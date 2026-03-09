@@ -4,6 +4,7 @@ import {
     GetWorkflowNodeParameterDisplayConditionsRequest,
     WorkflowNodeParameterApi,
 } from '@/shared/middleware/platform/configuration';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 
 /* eslint-disable sort-keys */
 
@@ -37,6 +38,7 @@ export const useGetWorkflowNodeParameterDisplayConditionsQuery = (
         queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions(request),
         queryFn: () => new WorkflowNodeParameterApi().getWorkflowNodeParameterDisplayConditions(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });
 
 export const useGetClusterElementParameterDisplayConditionsQuery = (
@@ -47,4 +49,5 @@ export const useGetClusterElementParameterDisplayConditionsQuery = (
         queryKey: WorkflowNodeParameterKeys.propertyClusterElementParameterDisplayConditions(request),
         queryFn: () => new WorkflowNodeParameterApi().getClusterElementParameterDisplayConditions(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });
