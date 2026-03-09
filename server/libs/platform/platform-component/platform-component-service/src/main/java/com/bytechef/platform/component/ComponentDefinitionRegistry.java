@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -211,7 +210,8 @@ public class ComponentDefinitionRegistry {
     public List<? extends ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList());
+        return componentDefinition.getActions()
+            .orElse(Collections.emptyList());
     }
 
     public Property getActionProperty(
@@ -221,9 +221,11 @@ public class ComponentDefinitionRegistry {
 
         ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
 
+        List<? extends Property> properties = actionDefinition.getProperties()
+            .orElseThrow();
+
         return getProperty(
-            propertyName, OptionalUtils.get(actionDefinition.getProperties()), inputParameters, connectionParameters,
-            lookupDependsOnPaths, context);
+            propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
     }
 
     public Authorization getAuthorization(
@@ -231,7 +233,8 @@ public class ComponentDefinitionRegistry {
 
         ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName, connectionVersion);
 
-        return OptionalUtils.orElse(connectionDefinition.getAuthorizations(), List.of())
+        return connectionDefinition.getAuthorizations()
+            .orElse(List.of())
             .stream()
             .filter(authorization -> {
                 AuthorizationType curAuthorizationType = authorization.getType();
@@ -331,7 +334,8 @@ public class ComponentDefinitionRegistry {
             componentDefinition -> componentDefinition.getConnection()
                 .map(connectionDefinition -> connectionDefinition.getVersion() == connectionVersion)
                 .orElse(false),
-            componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
+            componentDefinition -> componentDefinition.getConnection()
+                .orElseThrow());
     }
 
     public List<ComponentDefinition> getDynamicComponentDefinitions() {
@@ -368,7 +372,8 @@ public class ComponentDefinitionRegistry {
     public List<? extends TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return OptionalUtils.orElse(componentDefinition.getTriggers(), Collections.emptyList());
+        return componentDefinition.getTriggers()
+            .orElse(Collections.emptyList());
     }
 
     public Property getTriggerProperty(
@@ -378,9 +383,11 @@ public class ComponentDefinitionRegistry {
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
 
+        List<? extends Property> properties = triggerDefinition.getProperties()
+            .orElseThrow();
+
         return getProperty(
-            propertyName, OptionalUtils.get(triggerDefinition.getProperties()), inputParameters, connectionParameters,
-            lookupDependsOnPaths, context);
+            propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
     }
 
     public boolean hasComponentDefinition(String name, @Nullable Integer version) {
@@ -409,7 +416,8 @@ public class ComponentDefinitionRegistry {
                     curProperty -> Objects.equals(
                         curProperty.getName(), propertyName.substring(0, propertyName.length() - 3)));
 
-                List<? extends Property> items = OptionalUtils.get(arrayProperty.getItems());
+                List<? extends Property> items = arrayProperty.getItems()
+                    .orElseThrow();
 
                 return items.getFirst();
             } else {
@@ -449,10 +457,12 @@ public class ComponentDefinitionRegistry {
                     String.join(".", subProperties.subList(1, subProperties.size())),
                     dynamicPropertyProperties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
             } else if (firstProperty instanceof ArrayProperty arrayProperty) {
-                List<? extends Property.ValueProperty<?>> items = OptionalUtils.get(arrayProperty.getItems());
+                List<? extends Property.ValueProperty<?>> items = arrayProperty.getItems()
+                    .orElseThrow();
 
                 if (items.getFirst() instanceof ObjectProperty objectProperty) {
-                    items = OptionalUtils.get(objectProperty.getProperties());
+                    items = objectProperty.getProperties()
+                        .orElseThrow();
                 }
 
                 return getProperty(
@@ -466,23 +476,35 @@ public class ComponentDefinitionRegistry {
                     String subProperty = subProperties.get(i);
 
                     if (subProperty.endsWith("]")) {
+                        List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty
+                            .getProperties()
+                            .orElseThrow();
+
                         ArrayProperty arrayProperty = (ArrayProperty) CollectionUtils.getFirst(
-                            OptionalUtils.get(objectProperty.getProperties()),
+                            objectPropertyProperties,
                             curProperty -> Objects.equals(
                                 curProperty.getName(), subProperty.substring(0, subProperty.length() - 3)));
 
-                        List<? extends Property> items = OptionalUtils.get(arrayProperty.getItems());
+                        List<? extends Property> items = arrayProperty.getItems()
+                            .orElseThrow();
 
                         objectProperty = (ObjectProperty) items.getFirst();
                     } else {
+                        List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty
+                            .getProperties()
+                            .orElseThrow();
+
                         objectProperty = (ObjectProperty) CollectionUtils.getFirst(
-                            OptionalUtils.get(objectProperty.getProperties()),
+                            objectPropertyProperties,
                             curProperty -> Objects.equals(curProperty.getName(), subProperty));
                     }
                 }
 
+                List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty.getProperties()
+                    .orElseThrow();
+
                 return CollectionUtils.getFirst(
-                    OptionalUtils.get(objectProperty.getProperties()),
+                    objectPropertyProperties,
                     curProperty -> Objects.equals(curProperty.getName(), subProperties.getLast()));
             }
         }
@@ -499,33 +521,40 @@ public class ComponentDefinitionRegistry {
 
     private void validate(List<ComponentDefinition> componentDefinitions) {
         for (ComponentDefinition componentDefinition : componentDefinitions) {
-            List<? extends ActionDefinition> actionDefinitions = OptionalUtils.orElse(
-                componentDefinition.getActions(), List.of());
+            List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions()
+                .orElse(List.of());
 
             for (ActionDefinition actionDefinition : actionDefinitions) {
                 if (log.isTraceEnabled()) {
                     log.trace("Validating %s.%s".formatted(componentDefinition.getName(), actionDefinition.getName()));
                 }
 
-                PropertyUtils.checkInputProperties(
-                    OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
+                List<? extends Property> properties = actionDefinition.getProperties()
+                    .orElse(List.of());
+
+                PropertyUtils.checkInputProperties(properties);
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(actionDefinition.getOutputDefinition(), OutputDefinition::getOutputSchema,
-                        null));
+                    actionDefinition.getOutputDefinition()
+                        .map(OutputDefinition::getOutputSchema)
+                        .orElse(null));
             }
 
-            List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
-                componentDefinition.getTriggers(), List.of());
+            List<? extends TriggerDefinition> triggerDefinitions = componentDefinition.getTriggers()
+                .orElse(List.of());
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
                 if (log.isTraceEnabled()) {
                     log.trace("Validating %s.%s".formatted(componentDefinition.getName(), triggerDefinition.getName()));
                 }
 
-                PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
+                List<? extends Property> properties = triggerDefinition.getProperties()
+                    .orElse(List.of());
+
+                PropertyUtils.checkInputProperties(properties);
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(triggerDefinition.getOutputDefinition(), OutputDefinition::getOutputSchema,
-                        null));
+                    triggerDefinition.getOutputDefinition()
+                        .map(OutputDefinition::getOutputSchema)
+                        .orElse(null));
 
                 if (triggerDefinition.getType() == null) {
                     throw new IllegalArgumentException(
