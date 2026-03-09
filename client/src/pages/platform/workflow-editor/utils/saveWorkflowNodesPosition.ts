@@ -192,6 +192,7 @@ export default function saveWorkflowNodesPosition({
     // Optimistically update ReactFlow node data so the pin button appears
     // immediately without waiting for a full re-layout
     const {nodes, setNodes} = useWorkflowDataStore.getState();
+    const previousNodes = nodes;
 
     const updatedNodes = nodes.map((node) => {
         const position = nodePositions[node.id];
@@ -232,6 +233,9 @@ export default function saveWorkflowNodesPosition({
             },
         },
         {
+            onError: () => {
+                setNodes(previousNodes);
+            },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
             },
