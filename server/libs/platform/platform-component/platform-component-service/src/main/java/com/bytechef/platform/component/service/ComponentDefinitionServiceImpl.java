@@ -42,6 +42,8 @@ import org.springframework.stereotype.Service;
 @Service("componentDefinitionService")
 public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
+    @Nullable
+    private volatile List<ComponentDefinition> cachedComponentDefinitions;
     private final List<ComponentDefinitionFilter> componentDefinitionFilters;
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
@@ -70,10 +72,33 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions() {
-        return componentDefinitionRegistry.getComponentDefinitions()
+        List<ComponentDefinition> componentDefinitions = this.cachedComponentDefinitions;
+
+        if (componentDefinitions == null) {
+            componentDefinitions = componentDefinitionRegistry.getStaticComponentDefinitions()
+                .stream()
+                .map(ComponentDefinition::new)
+                .toList();
+
+            this.cachedComponentDefinitions = componentDefinitions;
+        }
+
+        List<ComponentDefinition> dynamicComponentDefinitions = componentDefinitionRegistry
+            .getDynamicComponentDefinitions()
             .stream()
             .map(ComponentDefinition::new)
             .toList();
+
+        if (dynamicComponentDefinitions.isEmpty()) {
+            return componentDefinitions;
+        }
+
+        List<ComponentDefinition> mergedComponentDefinition = new ArrayList<>(componentDefinitions);
+
+        mergedComponentDefinition.addAll(dynamicComponentDefinitions);
+        mergedComponentDefinition.sort(Comparator.comparing(ComponentDefinition::getName));
+
+        return mergedComponentDefinition;
     }
 
     @Override
