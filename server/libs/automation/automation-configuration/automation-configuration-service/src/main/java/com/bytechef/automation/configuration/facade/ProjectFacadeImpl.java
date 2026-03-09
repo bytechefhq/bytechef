@@ -557,26 +557,39 @@ public class ProjectFacadeImpl implements ProjectFacade {
             apiCollections, categoryId, projectDeployments, tagId, status, workspaceId);
 
         if (includeAllFields) {
+            List<Long> projectIds = projects.stream()
+                .map(Project::getId)
+                .toList();
+
+            List<ProjectWorkflow> allProjectWorkflows = projectWorkflowService.getProjectWorkflows(projectIds);
+
+            List<Category> categories = categoryService.getCategories(
+                projects.stream()
+                    .map(Project::getCategoryId)
+                    .filter(Objects::nonNull)
+                    .toList());
+
+            List<Tag> allTags = tagService.getTags(
+                projects.stream()
+                    .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
+                    .filter(Objects::nonNull)
+                    .toList());
+
             return CollectionUtils.map(
                 projects,
                 project -> new ProjectDTO(
                     CollectionUtils.findFirstFilterOrElse(
-                        categoryService.getCategories(
-                            projects.stream()
-                                .map(Project::getCategoryId)
-                                .filter(Objects::nonNull)
-                                .toList()),
+                        categories,
                         category -> Objects.equals(project.getCategoryId(), category.getId()),
                         null),
                     project,
-                    projectWorkflowService.getProjectProjectWorkflowIds(project.getId(),
-                        project.getLastProjectVersion()),
+                    allProjectWorkflows.stream()
+                        .filter(projectWorkflow -> Objects.equals(projectWorkflow.getProjectId(), project.getId()) &&
+                            projectWorkflow.getProjectVersion() == project.getLastProjectVersion())
+                        .map(ProjectWorkflow::getId)
+                        .toList(),
                     CollectionUtils.filter(
-                        tagService.getTags(
-                            projects.stream()
-                                .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
-                                .filter(Objects::nonNull)
-                                .toList()),
+                        allTags,
                         tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
         } else {
             return CollectionUtils.map(projects, ProjectDTO::new);
