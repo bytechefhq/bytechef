@@ -6,6 +6,7 @@ import {
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration/apis/TriggerDefinitionApi';
 import {TriggerDefinition} from '@/shared/middleware/platform/configuration/models/TriggerDefinition';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 import type {TriggerDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -30,6 +31,7 @@ export const useGetTriggerDefinitionQuery = (request: GetComponentTriggerDefinit
         queryKey: TriggerDefinitionKeys.triggerDefinition(request),
         queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });
 
 export const useGetTriggerDefinitionsQuery = (request: GetComponentTriggerDefinitionsRequest, enabled?: boolean) =>
@@ -37,4 +39,5 @@ export const useGetTriggerDefinitionsQuery = (request: GetComponentTriggerDefini
         queryKey: TriggerDefinitionKeys.filteredTriggerDefinitions(request),
         queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinitions(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });

@@ -6,6 +6,7 @@ import {
     WorkflowNodeOutput,
     WorkflowNodeOutputApi,
 } from '@/shared/middleware/platform/configuration';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowNodeOutputKeys = {
@@ -39,6 +40,7 @@ export const useGetClusterElementOutputQuery = (request: GetClusterElementOutput
         queryKey: WorkflowNodeOutputKeys.clusterElementOutput(request),
         queryFn: () => new WorkflowNodeOutputApi().getClusterElementOutput(request),
         enabled: enabled ?? true,
+        staleTime: DEFINITION_STALE_TIME,
     });
 
 export const useGetWorkflowNodeOutputQuery = (request: GetWorkflowNodeOutputRequest, enabled?: boolean) =>
@@ -46,6 +48,7 @@ export const useGetWorkflowNodeOutputQuery = (request: GetWorkflowNodeOutputRequ
         queryKey: WorkflowNodeOutputKeys.workflowNodeOutput(request),
         queryFn: () => new WorkflowNodeOutputApi().getWorkflowNodeOutput(request),
         enabled: enabled ?? true,
+        staleTime: DEFINITION_STALE_TIME,
     });
 
 export const useGetPreviousWorkflowNodeOutputsQuery = (
@@ -56,4 +59,5 @@ export const useGetPreviousWorkflowNodeOutputsQuery = (
         queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs(request),
         queryFn: () => new WorkflowNodeOutputApi().getPreviousWorkflowNodeOutputs(request),
         enabled: enabled ?? true,
+        staleTime: DEFINITION_STALE_TIME,
     });

@@ -7,6 +7,7 @@ import {
     Tag,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
@@ -27,6 +28,7 @@ export const getConnectedUserConnectionsQuery =
                     connectionIds,
                 }),
             enabled: enabled === undefined ? true : enabled,
+            staleTime: DEFINITION_STALE_TIME,
         });
 
 export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabled?: boolean) =>
@@ -34,6 +36,7 @@ export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabled?:
         queryKey: ConnectionKeys.filteredConnections(filters),
         queryFn: () => new ConnectionApi().getConnections(filters),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });
 
 export const useGetConnectionTagsQuery = () =>

@@ -18,6 +18,8 @@ import {
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {WorkflowNodeDescriptionKeys} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
+import {WorkflowNodeParameterKeys} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
@@ -80,6 +82,18 @@ export const useWorkflowBuilder = () => {
                     id: variables.id,
                     workflowNodeName: variables.workflowNodeName,
                 }),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions({
+                    environmentId: variables.environmentId,
+                    id: variables.id,
+                    workflowNodeName: variables.workflowNodeName,
+                }),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOutputKeys.workflowNodeOutputs,
             });
         },
     });

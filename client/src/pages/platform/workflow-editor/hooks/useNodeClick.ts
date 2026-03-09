@@ -1,3 +1,4 @@
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {NodeDataType, TabNameType} from '@/shared/types';
@@ -21,6 +22,7 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
             }))
         );
 
+    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const setRightSidebarOpen = useRightSidebarStore((state) => state.setRightSidebarOpen);
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
@@ -60,6 +62,7 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         setActiveTab(activeTab ?? 'description');
 
         if (!isNodeAlreadyOpen) {
+            setDataPillPanelOpen(false);
             setCurrentNode({...data, description: ''});
 
             if (!!data.clusterRoot && !clusterElementsCanvasOpen) {
@@ -82,6 +85,7 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         nodes,
         clusterElementsCanvasNodes,
         clusterElementsCanvasOpen,
+        setDataPillPanelOpen,
         setRightSidebarOpen,
         setWorkflowTestChatPanelOpen,
         setActiveTab,

@@ -5,6 +5,7 @@ import {
     GetComponentClusterElementDefinitionRequest,
     GetRootComponentClusterElementDefinitionsRequest,
 } from '@/shared/middleware/platform/configuration';
+import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 
 /* eslint-disable sort-keys */
 
@@ -34,6 +35,7 @@ export const useGetClusterElementDefinitionQuery = (
         queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(request),
         queryFn: () => new ClusterElementDefinitionApi().getComponentClusterElementDefinition(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });
 
 export const useGetRootComponentClusterElementDefinitions = (
@@ -44,4 +46,5 @@ export const useGetRootComponentClusterElementDefinitions = (
         queryKey: ClusterElementDefinitionKeys.filteredClusterElementDefinitions(request),
         queryFn: () => new ClusterElementDefinitionApi().getRootComponentClusterElementDefinitions(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
     });
