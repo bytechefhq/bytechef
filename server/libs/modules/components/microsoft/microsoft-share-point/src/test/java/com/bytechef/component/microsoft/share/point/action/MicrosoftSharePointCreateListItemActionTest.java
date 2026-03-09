@@ -18,31 +18,72 @@ package com.bytechef.component.microsoft.share.point.action;
 
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.COLUMNS;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FIELDS;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
-class MicrosoftSharePointCreateListItemActionTest extends AbstractMicrosoftSharePointActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class MicrosoftSharePointCreateListItemActionTest {
+
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(LIST_ID, "listId", SITE_ID, "siteId", COLUMNS, Map.of()));
+    private final Map<String, Object> responseMap = Map.of("key", "value");
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedParameters.getMap(COLUMNS, Map.of()))
-            .thenReturn(Map.of());
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        Object result =
-            MicrosoftSharePointCreateListItemAction.perform(mockedParameters, mockedParameters, mockedContext);
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
+
+        Object result = MicrosoftSharePointCreateListItemAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
 
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
         Http.Body body = bodyArgumentCaptor.getValue();
 
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals(Map.of(FIELDS, Map.of()), body.getContent());
+        assertEquals("/sites/siteId/lists/listId/items", stringArgumentCaptor.getValue());
     }
-
 }

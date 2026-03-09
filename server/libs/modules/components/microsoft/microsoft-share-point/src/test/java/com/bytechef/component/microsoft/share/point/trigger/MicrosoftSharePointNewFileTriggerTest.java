@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.microsoft.one.drive.trigger;
+package com.bytechef.component.microsoft.share.point.trigger;
 
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
@@ -34,11 +35,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-class MicrosoftOneDriveNewFileTriggerTest {
+class MicrosoftSharePointNewFileTriggerTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(PARENT_ID, "xy"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(SITE_ID, "siteId", PARENT_FOLDER, "parentFolder"));
     private final PollOutput mockedPollOutput = mock(PollOutput.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
@@ -57,11 +59,12 @@ class MicrosoftOneDriveNewFileTriggerTest {
                 triggerContextArgumentCaptor.capture()))
                 .thenReturn(mockedPollOutput);
 
-            PollOutput result = MicrosoftOneDriveNewFileTrigger.poll(
+            PollOutput result = MicrosoftSharePointNewFileTrigger.poll(
                 mockedParameters, null, mockedParameters, mockedTriggerContext);
 
             assertEquals(mockedPollOutput, result);
-            assertEquals(List.of("/me/drive/items/xy/children", "file"), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of("/sites/siteId/drive/items/parentFolder/children", "file"),
+                stringArgumentCaptor.getAllValues());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
         }
