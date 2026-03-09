@@ -127,6 +127,7 @@ type UsePropertyReturnType = {
     handleMentionInputValueChange: (value: string | number) => void;
     handleMultiSelectChange: (value: string[]) => void;
     handleSelectChange: (value: string, name: string) => void;
+    expressionEnabled: boolean | undefined;
     hasError: boolean;
     hidden: boolean | undefined;
     inputRef: RefObject<HTMLInputElement | null>;
@@ -1549,6 +1550,7 @@ export const useProperty = ({
         displayCondition,
         editorRef,
         errorMessage,
+        expressionEnabled,
         formattedOptions,
         fromAiExpression,
         handleCodeEditorChange,
