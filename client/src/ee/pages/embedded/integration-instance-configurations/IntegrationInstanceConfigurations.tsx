@@ -14,6 +14,7 @@ import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Settings2Icon, TagIcon} from 'lucide-react';
@@ -39,6 +40,11 @@ const IntegrationInstanceConfigurations = () => {
     };
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
+
+    const {data: actionTriggerComponentDefinitions} = useGetComponentDefinitionsQuery({
+        actionDefinitions: true,
+        triggerDefinitions: true,
+    });
 
     const {
         data: componentDefinitions,
@@ -96,6 +102,8 @@ const IntegrationInstanceConfigurations = () => {
     }
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetIntegrationInstanceConfigurationTagsQuery();
+
+    const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
     return (
         <LayoutContainer
@@ -258,6 +266,7 @@ const IntegrationInstanceConfigurations = () => {
                                     integrations &&
                                     tags && (
                                         <IntegrationInstanceConfigurationList
+                                            componentDefinitions={actionTriggerComponentDefinitions}
                                             integration={
                                                 integrations.find(
                                                     (currentIntegration) => currentIntegration.id === integrationId
@@ -268,6 +277,7 @@ const IntegrationInstanceConfigurations = () => {
                                             }
                                             key={integrationId}
                                             tags={tags}
+                                            taskDispatcherDefinitions={taskDispatcherDefinitions}
                                         />
                                     )
                             )}

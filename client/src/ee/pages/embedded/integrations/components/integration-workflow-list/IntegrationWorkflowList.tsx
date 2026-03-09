@@ -4,28 +4,26 @@ import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationWorkflowListItem from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowListItem';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
-import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {WorkflowIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
-const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
+const IntegrationWorkflowList = ({
+    componentDefinitions,
+    integration,
+    taskDispatcherDefinitions,
+}: {
+    componentDefinitions?: ComponentDefinitionBasic[];
+    integration: Integration;
+    taskDispatcherDefinitions?: TaskDispatcherDefinition[];
+}) => {
     const {captureIntegrationWorkflowCreated} = useAnalytics();
 
     const navigate = useNavigate();
-
-    const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
-        actionDefinitions: true,
-        triggerDefinitions: true,
-    });
-
-    const {data: taskDispatcherDefinitions, isLoading: isTaskDispatcherDefinitionsLoading} =
-        useGetTaskDispatcherDefinitionsQuery();
 
     const workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
@@ -47,7 +45,7 @@ const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
         },
     });
 
-    return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isIntegrationWorkflowsLoading ? (
+    return !componentDefinitions || !taskDispatcherDefinitions || isIntegrationWorkflowsLoading ? (
         <div className="space-y-3 py-2">
             <Skeleton className="h-5 w-40" />
 

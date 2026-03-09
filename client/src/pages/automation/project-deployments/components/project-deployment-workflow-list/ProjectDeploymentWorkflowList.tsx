@@ -2,35 +2,29 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentWorkflowListItem from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItem';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {ChevronDownIcon} from 'lucide-react';
 
 const ProjectDeploymentWorkflowList = ({
+    componentDefinitions,
     environmentId,
     projectDeploymentEnabled,
     projectDeploymentId,
     projectDeploymentWorkflows,
     projectId,
     projectVersion,
+    taskDispatcherDefinitions,
 }: {
+    componentDefinitions?: ComponentDefinitionBasic[];
     environmentId: number;
-    projectId: number;
-    projectDeploymentId: number;
     projectDeploymentEnabled: boolean;
+    projectDeploymentId: number;
     projectDeploymentWorkflows: Array<ProjectDeploymentWorkflow>;
+    projectId: number;
     projectVersion: number;
+    taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
-    const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
-        actionDefinitions: true,
-        triggerDefinitions: true,
-    });
-
-    const {data: taskDispatcherDefinitions, isLoading: isTaskDispatcherDefinitionsLoading} =
-        useGetTaskDispatcherDefinitionsQuery();
-
     const {data: workflows, isLoading: isProjectWorkflowsLoading} = useGetProjectVersionWorkflowsQuery(
         projectId,
         projectVersion
@@ -44,7 +38,7 @@ const ProjectDeploymentWorkflowList = ({
         [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
-    if (isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading) {
+    if (!componentDefinitions || !taskDispatcherDefinitions || isProjectWorkflowsLoading) {
         return (
             <div className="space-y-3 py-2">
                 <Skeleton className="h-5 w-40" />
