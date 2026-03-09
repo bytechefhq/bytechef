@@ -407,7 +407,7 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Update an existing workflow.
      * Update an existing workflow
      */
-    async updateWorkflowRaw(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateWorkflowRaw(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workflow>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -440,15 +440,17 @@ export class WorkflowApi extends runtime.BaseAPI {
             body: WorkflowToJSON(requestParameters['workflow']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowFromJSON(jsonValue));
     }
 
     /**
      * Update an existing workflow.
      * Update an existing workflow
      */
-    async updateWorkflow(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.updateWorkflowRaw(requestParameters, initOverrides);
+    async updateWorkflow(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Workflow> {
+        const response = await this.updateWorkflowRaw(requestParameters, initOverrides);
+
+        return await response.value();
     }
 
 }
