@@ -270,24 +270,34 @@ export const getClusterElementsLayoutElements = ({
             const regularChildren = typeChildren.filter((child) => !child.data.isNestedClusterRoot);
             const clusterRootChildren = typeChildren.filter((child) => child.data.isNestedClusterRoot);
 
+            const positionedRegularSiblings: {position: {x: number}}[] = [];
+
             for (let childIndex = 0; childIndex < regularChildren.length; childIndex++) {
                 const child = regularChildren[childIndex];
 
                 if (containsNodePosition(child.data.metadata)) {
-                    positionedNodes.push({...child, position: child.data.metadata.ui.nodePosition});
+                    const savedPosition = child.data.metadata.ui.nodePosition;
+
+                    positionedNodes.push({...child, position: savedPosition});
+                    positionedRegularSiblings.push({position: savedPosition});
                 } else {
                     const firstChildX = handleX - CLUSTER_ELEMENT_NODE_WIDTH / 2;
                     let childX: number;
 
-                    if (childIndex === 0) {
+                    if (positionedRegularSiblings.length === 0) {
                         childX = firstChildX;
                     } else if (isRightSide) {
-                        childX = firstChildX + childIndex * horizontalGap;
+                        const maxSiblingX = Math.max(...positionedRegularSiblings.map((sibling) => sibling.position.x));
+
+                        childX = maxSiblingX + horizontalGap;
                     } else {
-                        childX = firstChildX - childIndex * horizontalGap;
+                        const minSiblingX = Math.min(...positionedRegularSiblings.map((sibling) => sibling.position.x));
+
+                        childX = minSiblingX - horizontalGap;
                     }
 
                     positionedNodes.push({...child, position: {x: childX, y: childBaseY}});
+                    positionedRegularSiblings.push({position: {x: childX}});
                 }
 
                 const childExtent = positionChildrenOfParent(child.id);
@@ -295,27 +305,45 @@ export const getClusterElementsLayoutElements = ({
                 maxExtentY = Math.max(maxExtentY, childBaseY + childExtent);
             }
 
+            const positionedClusterRootSiblings: {position: {x: number}; width: number}[] = [];
+
             for (let childIndex = 0; childIndex < clusterRootChildren.length; childIndex++) {
                 const child = clusterRootChildren[childIndex];
                 const childTypesCount = (child.data.clusterElementTypesCount as number) || 1;
                 const childWidth = calculateNodeWidth(childTypesCount) || ROOT_CLUSTER_WIDTH;
-                const clusterRootHorizontalGap = childWidth + CLUSTER_ROOT_GAP;
 
                 if (containsNodePosition(child.data.metadata)) {
-                    positionedNodes.push({...child, position: child.data.metadata.ui.nodePosition});
+                    const savedPosition = child.data.metadata.ui.nodePosition;
+
+                    positionedNodes.push({...child, position: savedPosition});
+                    positionedClusterRootSiblings.push({position: savedPosition, width: childWidth});
                 } else {
                     const firstChildX = handleX - childWidth / 2;
                     let childX: number;
 
-                    if (childIndex === 0) {
+                    if (positionedClusterRootSiblings.length === 0) {
                         childX = firstChildX;
                     } else if (isRightSide) {
-                        childX = firstChildX + childIndex * clusterRootHorizontalGap;
+                        const rightmostSibling = positionedClusterRootSiblings.reduce(
+                            (rightmost, sibling) =>
+                                sibling.position.x + sibling.width > rightmost.position.x + rightmost.width
+                                    ? sibling
+                                    : rightmost,
+                            positionedClusterRootSiblings[0]
+                        );
+
+                        childX = rightmostSibling.position.x + rightmostSibling.width + CLUSTER_ROOT_GAP;
                     } else {
-                        childX = firstChildX - childIndex * clusterRootHorizontalGap;
+                        const leftmostSibling = positionedClusterRootSiblings.reduce(
+                            (leftmost, sibling) => (sibling.position.x < leftmost.position.x ? sibling : leftmost),
+                            positionedClusterRootSiblings[0]
+                        );
+
+                        childX = leftmostSibling.position.x - childWidth - CLUSTER_ROOT_GAP;
                     }
 
                     positionedNodes.push({...child, position: {x: childX, y: childBaseY}});
+                    positionedClusterRootSiblings.push({position: {x: childX}, width: childWidth});
                 }
 
                 const childExtent = positionChildrenOfParent(child.id);
