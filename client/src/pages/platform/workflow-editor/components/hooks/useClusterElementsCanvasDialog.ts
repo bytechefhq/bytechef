@@ -237,6 +237,14 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         }
     }, [preferenceKey, isDataStreamClusterRoot, isDataStreamSimpleModeAvailable, setShowDataStreamEditor]);
 
+    const handlePointerDownOutside = useCallback((event: CustomEvent<{originalEvent: PointerEvent}>) => {
+        const target = event.target as HTMLElement;
+
+        if (target.closest('[data-sonner-toast]') || target.closest('[data-sonner-toaster]')) {
+            event.preventDefault();
+        }
+    }, []);
+
     return {
         copilotEnabled,
         handleClose,
@@ -244,6 +252,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         handleCopilotClick,
         handleCopilotClose,
         handleOpenChange,
+        handlePointerDownOutside,
         handleTestClick,
         handleToggleEditor,
         isAiAgentClusterRoot,
