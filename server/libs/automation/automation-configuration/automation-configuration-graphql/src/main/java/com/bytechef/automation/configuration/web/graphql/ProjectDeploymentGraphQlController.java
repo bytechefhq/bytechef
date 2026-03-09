@@ -21,15 +21,20 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -55,19 +60,52 @@ public class ProjectDeploymentGraphQlController {
         this.tagService = tagService;
     }
 
-    @SchemaMapping(typeName = "ProjectDeployment", field = "environment")
-    public EnvironmentDTO environment(ProjectDeployment projectDeployment) {
-        return new EnvironmentDTO(environmentService.getEnvironment(projectDeployment.getEnvironmentId()));
+    @BatchMapping(typeName = "ProjectDeployment", field = "environment")
+    public Map<ProjectDeployment, EnvironmentDTO> environment(List<ProjectDeployment> projectDeployments) {
+        return projectDeployments.stream()
+            .collect(
+                Collectors.toMap(
+                    projectDeployment -> projectDeployment,
+                    projectDeployment -> new EnvironmentDTO(
+                        environmentService.getEnvironment(projectDeployment.getEnvironmentId()))));
     }
 
-    @SchemaMapping(typeName = "ProjectDeployment", field = "project")
-    public Project project(ProjectDeployment projectDeployment) {
-        return projectService.getProject(projectDeployment.getProjectId());
+    @BatchMapping(typeName = "ProjectDeployment", field = "project")
+    public Map<ProjectDeployment, Project> project(List<ProjectDeployment> projectDeployments) {
+        List<Long> projectIds = projectDeployments.stream()
+            .map(ProjectDeployment::getProjectId)
+            .distinct()
+            .toList();
+
+        Map<Long, Project> projectMap = projectService.getProjects(projectIds)
+            .stream()
+            .collect(Collectors.toMap(
+                project -> Objects.requireNonNull(project.getId(), "id"), Function.identity()));
+
+        return projectDeployments.stream()
+            .collect(
+                Collectors.toMap(
+                    projectDeployment -> projectDeployment,
+                    projectDeployment -> projectMap.get(projectDeployment.getProjectId())));
     }
 
-    @SchemaMapping(typeName = "ProjectDeployment", field = "tags")
-    public List<Tag> tags(ProjectDeployment projectDeployment) {
-        return tagService.getTags(projectDeployment.getTagIds());
+    @BatchMapping(typeName = "ProjectDeployment", field = "tags")
+    public Map<ProjectDeployment, List<Tag>> tags(List<ProjectDeployment> projectDeployments) {
+        List<Long> tagIds = projectDeployments.stream()
+            .flatMap(projectDeployment -> CollectionUtils.stream(projectDeployment.getTagIds()))
+            .distinct()
+            .toList();
+
+        List<Tag> tags = tagService.getTags(tagIds);
+
+        return projectDeployments.stream()
+            .collect(
+                Collectors.toMap(
+                    projectDeployment -> projectDeployment,
+                    projectDeployment -> tags.stream()
+                        .filter(tag -> projectDeployment.getTagIds()
+                            .contains(tag.getId()))
+                        .toList()));
     }
 
     @QueryMapping(name = "workspaceProjectDeployments")
