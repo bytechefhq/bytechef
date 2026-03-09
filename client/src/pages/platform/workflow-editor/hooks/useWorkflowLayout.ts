@@ -109,13 +109,13 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
                 ? rootClusterElementNodeData?.workflowNodeName
                 : currentNode?.name,
         },
-        dataPillPanelOpen && !!workflowNodes?.length && !!currentNode && !!currentNode?.name && !currentNode?.trigger
+        dataPillPanelOpen && !!workflowNodes?.length && !!currentNode && !!currentNode?.name
     );
 
     let filteredWorkflowNodeOutputs;
     let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
 
-    if (!currentNode?.trigger && workflowNodeOutputs && componentDefinitions) {
+    if (workflowNodeOutputs && componentDefinitions) {
         const filteredNodeOutputs = filterWorkflowNodeOutputs(
             workflowNodeOutputs,
             componentDefinitions,
