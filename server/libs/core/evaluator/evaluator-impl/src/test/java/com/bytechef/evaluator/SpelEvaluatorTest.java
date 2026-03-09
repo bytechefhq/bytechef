@@ -82,16 +82,14 @@ public class SpelEvaluatorTest {
 
     @Test
     public void test5() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> {
-            Map<String, Object> context = new HashMap<>();
+        Map<String, Object> context = new HashMap<>();
 
-            context.put("number", "5");
+        context.put("number", "5");
 
-            Map<String, Object> map = EVALUATOR.evaluate(
-                Map.of("type", "type", "hello", "=T(java.lang.Integer).valueOf(number)"), context);
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("type", "type", "hello", "=T(java.lang.Integer).valueOf(number)"), context);
 
-            MapUtils.get(map, "hello");
-        });
+        assertEquals("=T(java.lang.Integer).valueOf(number)", MapUtils.get(map, "hello"));
     }
 
     @Test
@@ -415,17 +413,15 @@ public class SpelEvaluatorTest {
     public void test42() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
-        assertThrowsExactly(IllegalArgumentException.class, () -> {
-            EVALUATOR.evaluate(Map.of("hour", "=${localDateTime}.getHour()"), Map.of("localDateTime", localDateTime));
-        });
+        Map<String, Object> map1 = EVALUATOR.evaluate(
+            Map.of("hour", "=${localDateTime}.getHour()"), Map.of("localDateTime", localDateTime));
 
-        assertThrowsExactly(IllegalArgumentException.class, () -> {
-            EVALUATOR.evaluate(Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
-        });
+        assertEquals("=${localDateTime}.getHour()", MapUtils.get(map1, "hour"));
 
-        assertThrowsExactly(IllegalArgumentException.class, () -> {
-            EVALUATOR.evaluate(Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
-        });
+        Map<String, Object> map2 = EVALUATOR.evaluate(
+            Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
+
+        assertEquals("=${localDateTime.getHour()}", MapUtils.get(map2, "hour"));
 
         assertThrowsExactly(IllegalArgumentException.class, () -> {
             EVALUATOR.evaluate(Map.of("hour", "${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
@@ -479,6 +475,30 @@ public class SpelEvaluatorTest {
             Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"), testMap);
 
         assertFalse(MapUtils.getBoolean(map, "equalsIgnoreCase"));
+    }
+
+    @Test
+    public void testIncompleteFormulaReturnsOriginalValue() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("type", "type", "value", "=222+"), Collections.emptyMap());
+
+        assertEquals("=222+", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testIncompleteFormulaWithAccessorReturnsOriginalValue() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("type", "type", "value", "=n1+"), Map.of("n1", 5));
+
+        assertEquals("=n1+", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testFormulaWithTrailingOperatorReturnsOriginalValue() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("type", "type", "value", "=10*3-"), Collections.emptyMap());
+
+        assertEquals("=10*3-", MapUtils.get(map, "value"));
     }
 
     @Test
