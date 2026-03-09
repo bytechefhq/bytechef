@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.cluster;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
-import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SEARCH_PROPERTIES;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
@@ -67,13 +67,11 @@ public abstract class AbstractSearchTool {
             .type(TOOLS)
             .properties(
                 Stream
-                    .concat(
-                        Stream.of(
-                            string(QUERY)
-                                .label("Query")
-                                .description("The query to be executed.")
-                                .required(true)),
-                        properties.stream())
+                    .of(
+                        Stream.of(QUERY_PROPERTY),
+                        properties.stream(),
+                        SEARCH_PROPERTIES.stream())
+                    .flatMap(stream -> stream)
                     .toList())
             .object(() -> searchTool::apply);
     }
