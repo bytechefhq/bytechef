@@ -235,7 +235,10 @@ export default async function saveWorkflowDefinition({
 
     executeWorkflowMutation({
         definitionUpdate: {tasks: updatedWorkflowDefinitionTasks},
+        newTask: existingWorkflowTask ? undefined : newTask,
+        nodeIndex,
         onSuccess,
+        taskDispatcherContext,
         updateWorkflowMutation,
         workflow,
         workflowDefinition,
@@ -247,15 +250,46 @@ interface ExecuteWorkflowMutationProps {
         tasks?: Array<WorkflowTask>;
         triggers?: Array<WorkflowTrigger>;
     };
+    newTask?: WorkflowTask;
+    nodeIndex?: number;
     onSuccess?: () => void;
+    taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
     workflowDefinition: WorkflowDefinitionType;
 }
 
+function buildOptimisticTasksWithInsert(
+    workflowTasks: WorkflowTask[],
+    newTask: WorkflowTask,
+    nodeIndex?: number,
+    taskDispatcherContext?: TaskDispatcherContextType
+): WorkflowTask[] {
+    // For nested tasks (inside task dispatchers), append to end;
+    // the server response will place them correctly
+    if (taskDispatcherContext?.taskDispatcherId) {
+        return [...workflowTasks, newTask];
+    }
+
+    // For top-level tasks at a specific index
+    if (nodeIndex !== undefined && nodeIndex > -1) {
+        const result = [...workflowTasks];
+
+        result.splice(nodeIndex, 0, newTask);
+
+        return result;
+    }
+
+    // Default: append to end
+    return [...workflowTasks, newTask];
+}
+
 function executeWorkflowMutation({
     definitionUpdate,
+    newTask,
+    nodeIndex,
     onSuccess,
+    taskDispatcherContext,
     updateWorkflowMutation,
     workflow,
     workflowDefinition,
@@ -275,9 +309,14 @@ function executeWorkflowMutation({
 
     const previousWorkflow = workflow;
 
+    const optimisticTasks = newTask
+        ? buildOptimisticTasksWithInsert(workflow.tasks ?? [], newTask, nodeIndex, taskDispatcherContext)
+        : undefined;
+
     useWorkflowDataStore.getState().setWorkflow({
         ...workflow,
         definition: updatedDefinition,
+        ...(optimisticTasks ? {tasks: optimisticTasks} : {}),
     });
 
     setWorkflowMutating(workflow.id!, true);
