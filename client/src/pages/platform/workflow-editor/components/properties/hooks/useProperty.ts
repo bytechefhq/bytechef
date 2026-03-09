@@ -226,7 +226,7 @@ export const useProperty = ({
 
     const controlledDynamicOnChangeRef = useRef<((value: string) => void) | null>(null);
     const editorRef = useRef<Editor>(null!);
-    const initialMountRef = useRef(true);
+
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
@@ -1434,15 +1434,10 @@ export const useProperty = ({
         }
     }, [control, controlType, expressionEnabled]);
 
-    // Sync propertyParameterValue from workflow definition on change; skip initial mount (mount effect already set from store).
+    // Sync propertyParameterValue from workflow definition whenever it changes (including on mount,
+    // so that remounted Property components pick up the latest saved values after tab switching).
     useEffect(() => {
         if (control) {
-            return;
-        }
-
-        if (initialMountRef.current) {
-            initialMountRef.current = false;
-
             return;
         }
 
