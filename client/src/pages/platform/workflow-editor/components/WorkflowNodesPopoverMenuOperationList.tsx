@@ -468,12 +468,14 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 if (edgeId) {
                     handleEdgeCase();
+
+                    setPopoverOpen(false);
                 } else {
                     handleNonEdgeCase();
                 }
             } catch (error) {
                 console.error('Failed to load operation definition:', error);
-            } finally {
+
                 setLoadingOperationName(null);
             }
         },
