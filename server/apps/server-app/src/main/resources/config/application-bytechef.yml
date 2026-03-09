@@ -1,5 +1,19 @@
 bytechef:
   ai:
+    agent:
+      memory:
+        enabled: true
+        # Memory provider (jdbc | redis) default: jdbc
+        provider: jdbc
+        jdbc:
+          initialize-schema: true
+        redis:
+          host: localhost
+          port: 6379
+          index-name: bytechef-chat-memory-idx
+          key-prefix: "bytechef-chat-memory:"
+          # time-to-live: 24h
+          initialize-schema: true
     anthropic:
       chat:
         options:
