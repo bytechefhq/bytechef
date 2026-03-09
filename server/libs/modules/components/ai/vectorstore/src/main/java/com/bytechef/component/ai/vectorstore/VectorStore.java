@@ -17,6 +17,8 @@
 package com.bytechef.component.ai.vectorstore;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SIMILARITY_THRESHOLD;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TOP_K;
 
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
@@ -24,6 +26,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.SearchRequest;
 
 /**
  * @author Monika Kušter
@@ -56,6 +59,13 @@ public interface VectorStore {
         org.springframework.ai.vectorstore.VectorStore vectorStore = createVectorStore(
             connectionParameters, embeddingModel);
 
-        return vectorStore.similaritySearch(inputParameters.getRequiredString(QUERY));
+        SearchRequest searchRequest = SearchRequest.builder()
+            .query(inputParameters.getRequiredString(QUERY))
+            .topK(inputParameters.getInteger(TOP_K, SearchRequest.DEFAULT_TOP_K))
+            .similarityThreshold(
+                inputParameters.getDouble(SIMILARITY_THRESHOLD, SearchRequest.SIMILARITY_THRESHOLD_ACCEPT_ALL))
+            .build();
+
+        return vectorStore.similaritySearch(searchRequest);
     }
 }
