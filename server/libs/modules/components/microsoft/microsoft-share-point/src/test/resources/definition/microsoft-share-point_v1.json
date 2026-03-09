@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new folder at path you specify.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#create-folder"
+    },
     "metadata": null,
     "name": "createFolder",
     "outputDefinition": {
@@ -997,7 +1000,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the SharePoint site.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1021,7 +1024,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "If no folder is selected, file will be uploaded to root folder.",
+      "description": "If no folder is selected, file will be uploaded to root folder",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1073,7 +1076,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new list",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#create-list"
+    },
     "metadata": null,
     "name": "createList",
     "outputDefinition": {
@@ -1794,7 +1800,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the SharePoint site.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1867,7 +1873,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new item in a list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#create-list-item"
+    },
     "metadata": null,
     "name": "createListItem",
     "outputDefinition": {
@@ -1882,7 +1891,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the SharePoint site.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1952,7 +1961,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Upload file to Microsoft SharePoint folder.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#upload-file"
+    },
     "metadata": null,
     "name": "uploadFile",
     "outputDefinition": {
@@ -2861,7 +2873,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the SharePoint site.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3116,7 +3128,10 @@
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/get-to-know-the-sharepoint-rest-service?tabs=csom"
+  },
   "description": "Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, providing document management, intranet, and content management features for organizations.",
   "icon": "path:assets/microsoft-share-point.svg",
   "metadata": null,
@@ -3124,7 +3139,87 @@
   "resources": null,
   "tags": null,
   "title": "Microsoft SharePoint",
-  "triggers": null,
+  "triggers": [ {
+    "batch": null,
+    "deduplicate": null,
+    "deprecated": null,
+    "description": "Triggers when file is uploaded to folder.",
+    "dynamicWebhookRefresh": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#new-file"
+    },
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "name": "newFile",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "poll": { },
+    "processErrorResponse": { },
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The ID of the SharePoint site.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Site ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "siteId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "If no folder is selected, root folder will be monitored for new file.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Parent Folder ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "parentFolder",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "siteId" ]
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "New File",
+    "type": "POLLING",
+    "webhookDisable": null,
+    "webhookEnable": null,
+    "webhookRawBody": null,
+    "webhookRequest": null,
+    "webhookValidate": null,
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null,
+    "workflowSyncExecution": null
+  } ],
   "unifiedApi": null,
   "version": 1
 }
