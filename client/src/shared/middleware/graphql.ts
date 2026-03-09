@@ -1167,7 +1167,7 @@ export type Mutation = {
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
-  saveClusterElementTestOutput: WorkflowNodeTestOutputResult;
+  saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
@@ -3767,7 +3767,7 @@ export type SaveClusterElementTestOutputMutationVariables = Exact<{
 }>;
 
 
-export type SaveClusterElementTestOutputMutation = { __typename?: 'Mutation', saveClusterElementTestOutput: { __typename?: 'WorkflowNodeTestOutputResult', id: any, workflowId: string, workflowNodeName: string } };
+export type SaveClusterElementTestOutputMutation = { __typename?: 'Mutation', saveClusterElementTestOutput?: { __typename?: 'WorkflowNodeTestOutputResult', id: any, workflowId: string, workflowNodeName: string } | null };
 
 export type SaveWorkflowTestConfigurationConnectionMutationVariables = Exact<{
   workflowId: Scalars['String']['input'];
