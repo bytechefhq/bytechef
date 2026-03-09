@@ -305,6 +305,9 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
                     workflowNodeOutputDTOs.add(
                         getWorkflowNodeOutputDTO(workflowId, workflowTask, false, environmentId));
+                } else {
+                    workflowNodeOutputDTOs.add(
+                        getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId));
                 }
             } else {
                 workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId));
