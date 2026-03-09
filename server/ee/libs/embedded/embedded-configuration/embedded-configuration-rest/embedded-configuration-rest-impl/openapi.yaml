@@ -1352,8 +1352,12 @@ paths:
               $ref: "#/components/schemas/Workflow"
         required: true
       responses:
-        "204":
-          description: "Successful operation."
+        "200":
+          description: "The updated workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
   /workflows/by-integration-workflow-id/{integrationWorkflowId}:
     get:
       description: "Get workflow for particular integration."
