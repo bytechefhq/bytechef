@@ -13,8 +13,8 @@ import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinition
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon} from 'lucide-react';
-import {useCallback, useMemo} from 'react';
+import {ComponentIcon, Loader2Icon} from 'lucide-react';
+import {useCallback, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -41,7 +41,6 @@ interface WorkflowNodesPopoverMenuOperationListProps {
     clusterElementType?: string;
     componentDefinition: ComponentDefinition;
     edgeId?: string;
-    invalidateWorkflowQueries: () => void;
     multipleClusterElementsNode?: boolean;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
@@ -53,7 +52,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
     clusterElementType,
     componentDefinition,
     edgeId,
-    invalidateWorkflowQueries,
     multipleClusterElementsNode,
     setPopoverOpen,
     sourceNodeId,
@@ -95,6 +93,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
             }))
         );
+
+    const [loadingOperationName, setLoadingOperationName] = useState<string | null>(null);
 
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
@@ -182,7 +182,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
     const saveNodeToWorkflow = useCallback(
         (nodeData: NodeDataType, nodeIndex?: number) => {
             saveWorkflowDefinition({
-                invalidateWorkflowQueries,
                 nodeData,
                 nodeIndex,
                 onSuccess: () =>
@@ -194,7 +193,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 updateWorkflowMutation: updateWorkflowMutation!,
             });
         },
-        [invalidateWorkflowQueries, queryClient, updateWorkflowMutation, workflow]
+        [queryClient, updateWorkflowMutation, workflow]
     );
 
     const saveClusterElementToWorkflow = useCallback(
@@ -272,7 +271,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
             }
 
             saveWorkflowDefinition({
-                invalidateWorkflowQueries,
                 nodeData: {
                     ...updatedNodeData,
                     componentName: rootClusterElementNodeData.componentName,
@@ -300,7 +298,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
             currentNode,
             workflowNodeDetailsPanelOpen,
             sourceNodeName,
-            invalidateWorkflowQueries,
             updateWorkflowMutation,
             setCurrentNode,
             setWorkflowNodeDetailsPanelOpen,
@@ -310,12 +307,13 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const handleOperationClick = useCallback(
         async (clickedOperation: ClickedOperationType) => {
-            if (!componentDefinition) {
+            if (!componentDefinition || loadingOperationName) {
                 return;
             }
 
             const {componentName, operationName, version} = clickedOperation;
 
+            setLoadingOperationName(operationName);
             setLatestComponentDefinition(componentDefinition);
 
             if (trigger) {
@@ -407,7 +405,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 if (taskDispatcherContext?.taskDispatcherId) {
                     handleTaskDispatcherSubtaskOperationClick({
-                        invalidateWorkflowQueries,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         queryClient,
@@ -433,7 +430,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 if (taskDispatcherContext?.taskDispatcherId) {
                     handleTaskDispatcherSubtaskOperationClick({
-                        invalidateWorkflowQueries,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         placeholderId: sourceNodeId,
@@ -475,6 +471,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
         },
         [
             componentDefinition,
+            loadingOperationName,
             setLatestComponentDefinition,
             trigger,
             clusterElementsCanvasOpen,
@@ -490,7 +487,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
             sourceNodeId,
             edges,
             nodes,
-            invalidateWorkflowQueries,
             updateWorkflowMutation,
             workflow,
         ]
@@ -522,26 +518,43 @@ const WorkflowNodesPopoverMenuOperationList = ({
             </header>
 
             <ul className="h-96 space-y-2 overflow-auto rounded-br-lg p-3">
-                {operations?.map((operation) => (
-                    <li
-                        className="cursor-pointer space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 hover:border-blue-200"
-                        key={operation.name}
-                        onClick={() => {
-                            handleOperationClick({
-                                componentLabel: title,
-                                componentName: name,
-                                icon: icon,
-                                operationName: operation.name,
-                                type: `${name}/v${version}/${operation.name}`,
-                                version: version,
-                            });
-                        }}
-                    >
-                        <h3 className="text-sm">{operation.title}</h3>
+                {operations?.map((operation) => {
+                    const isLoading = loadingOperationName === operation.name;
+                    const isDisabled = loadingOperationName !== null;
 
-                        <p className="break-words text-xs text-muted-foreground">{operation.description}</p>
-                    </li>
-                ))}
+                    return (
+                        <li
+                            className={`space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 ${isDisabled ? 'cursor-wait opacity-70' : 'cursor-pointer hover:border-blue-200'}`}
+                            key={operation.name}
+                            onClick={() => {
+                                if (isDisabled) {
+                                    return;
+                                }
+
+                                handleOperationClick({
+                                    componentLabel: title,
+                                    componentName: name,
+                                    icon: icon,
+                                    operationName: operation.name,
+                                    type: `${name}/v${version}/${operation.name}`,
+                                    version: version,
+                                });
+                            }}
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className="min-w-0 flex-1 space-y-1">
+                                    <h3 className="text-sm">{operation.title}</h3>
+
+                                    <p className="break-words text-xs text-muted-foreground">{operation.description}</p>
+                                </div>
+
+                                {isLoading && (
+                                    <Loader2Icon className="size-4 shrink-0 animate-spin text-muted-foreground" />
+                                )}
+                            </div>
+                        </li>
+                    );
+                })}
             </ul>
         </div>
     );
