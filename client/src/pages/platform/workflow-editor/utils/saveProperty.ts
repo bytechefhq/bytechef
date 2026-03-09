@@ -6,6 +6,7 @@ import {
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UseMutationResult} from '@tanstack/react-query';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {decodePath} from './encodingUtils';
@@ -56,7 +57,10 @@ export default function saveProperty({
 
     const decodedPath = decodePath(path);
 
-    function handleSuccess(response: DeleteClusterElementParameter200Response & {workflowNodeName?: string}) {
+    function handleSuccess(
+        response: DeleteClusterElementParameter200Response & {workflowNodeName?: string},
+        updatedWorkflowNodeName: string
+    ) {
         if (successCallback) {
             successCallback();
         }
@@ -77,6 +81,10 @@ export default function saveProperty({
                 metadata: response.metadata,
                 parameters: response.parameters,
             });
+        }
+
+        if (response.parameters && updatedWorkflowNodeName) {
+            useWorkflowDataStore.getState().updateWorkflowNodeParameters(updatedWorkflowNodeName, response.parameters);
         }
     }
 
@@ -105,13 +113,15 @@ export default function saveProperty({
                     workflowNodeName: rootClusterElementNodeData?.workflowNodeName ?? '',
                 },
                 {
-                    onSuccess: (response) => handleSuccess(response),
+                    onSuccess: (response) => handleSuccess(response, clusterElementWorkflowNodeName),
                 }
             )
         );
 
         return;
     }
+
+    const nodeWorkflowNodeName = rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '';
 
     enqueueWorkflowMutation(() =>
         updateWorkflowNodeParameterMutation.mutateAsync(
@@ -124,10 +134,10 @@ export default function saveProperty({
                     type,
                     value,
                 },
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || currentNode?.workflowNodeName || '',
+                workflowNodeName: nodeWorkflowNodeName,
             },
             {
-                onSuccess: (response) => handleSuccess(response),
+                onSuccess: (response) => handleSuccess(response, nodeWorkflowNodeName),
             }
         )
     );
