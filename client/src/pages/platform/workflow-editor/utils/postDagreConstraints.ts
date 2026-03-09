@@ -672,14 +672,8 @@ export function centerNodesAfterBottomGhost(
     });
 }
 
-interface ConditionCaseChildrenI {
-    conditionCaseOffset: number;
-    crossAxis: 'x' | 'y';
-}
-
 /**
  * Checks whether a condition branch contains only simple (non-task-dispatcher)
- * nodes by walking from the first node to the bottom ghost.
  */
 function isBranchSimple(firstNodeId: string, bottomGhostId: string, allNodes: Node[], edges: Edge[]): boolean {
     let currentNodeId = firstNodeId;
@@ -724,7 +718,14 @@ function isBranchSimple(firstNodeId: string, bottomGhostId: string, allNodes: No
  * branches with nested dispatchers need their dagre-assigned space.
  * Only pulls inward, never pushes outward.
  */
-export function alignConditionCaseChildren(allNodes: Node[], edges: Edge[], options: ConditionCaseChildrenI): void {
+export function pullSimpleConditionChildrenInward(
+    allNodes: Node[],
+    edges: Edge[],
+    options: {
+        conditionCaseOffset: number;
+        crossAxis: 'x' | 'y';
+    }
+): void {
     const {conditionCaseOffset, crossAxis} = options;
 
     const simpleConditions = new Set<string>();
@@ -737,6 +738,7 @@ export function alignConditionCaseChildren(allNodes: Node[], edges: Edge[], opti
         }
 
         const conditionId = conditionNode.id;
+
         const topGhostId = `${conditionId}-condition-top-ghost`;
         const bottomGhostId = `${conditionId}-condition-bottom-ghost`;
 
@@ -793,6 +795,7 @@ export function alignConditionCaseChildren(allNodes: Node[], edges: Edge[], opti
         }
 
         const conditionCross = conditionNode.position[crossAxis];
+
         const expectedCross = isLeftCase ? conditionCross - conditionCaseOffset : conditionCross + conditionCaseOffset;
         const currentCross = targetNode.position[crossAxis];
 
