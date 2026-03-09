@@ -55,16 +55,6 @@ import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
  * (task names, types, nested task counts) but NOT when parameter values change.
  * This prevents unnecessary dagre layout recalculations on every property save.
  */
-const FINGERPRINT_KEY_PREFIXES: Record<string, string> = {
-    branches: 'br',
-    caseFalse: 'cf',
-    caseTrue: 'ct',
-    cases: 'cs',
-    default: 'df',
-    iteratee: 'it',
-    tasks: 'ts',
-};
-
 function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
     return tasks
         .map((task) => {
@@ -82,9 +72,7 @@ function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
                 });
 
                 for (const [key, counts] of keyCounts) {
-                    const prefix = FINGERPRINT_KEY_PREFIXES[key] || key;
-
-                    parts.push(counts.length === 1 ? `${prefix}${counts[0]}` : `${prefix}${counts.join('-')}`);
+                    parts.push(counts.length === 1 ? `${key}${counts[0]}` : `${key}${counts.join('-')}`);
                 }
             }
 
