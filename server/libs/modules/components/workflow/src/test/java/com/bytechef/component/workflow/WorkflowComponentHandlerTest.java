@@ -30,7 +30,6 @@ public class WorkflowComponentHandlerTest {
     @Test
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/workflow_v1.json",
-            new WorkflowComponentHandler(mock(SubflowDataSource.class)).getDefinition());
+            "definition/workflow_v1.json", new WorkflowComponentHandler(mock(SubflowDataSource.class)).getDefinition());
     }
 }
