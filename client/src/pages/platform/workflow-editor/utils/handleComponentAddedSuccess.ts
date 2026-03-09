@@ -21,10 +21,16 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
         return;
     }
 
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore.getState();
+    const {
+        currentComponent,
+        currentNode,
+        setCurrentComponent,
+        setCurrentNode,
+        setWorkflowNodeDetailsPanelOpen,
+        workflowNodeDetailsPanelOpen,
+    } = useWorkflowNodeDetailsPanelStore.getState();
 
-    if (useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen) {
+    if (workflowNodeDetailsPanelOpen) {
         if (currentNode?.trigger && nodeData.trigger) {
             setCurrentNode({...currentNode, ...nodeData});
             setCurrentComponent({...currentComponent, ...nodeData});
