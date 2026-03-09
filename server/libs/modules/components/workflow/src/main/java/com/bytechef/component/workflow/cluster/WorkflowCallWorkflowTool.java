@@ -102,12 +102,16 @@ public class WorkflowCallWorkflowTool {
 
         BaseProperty.BaseValueProperty<?> inputSchema = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
 
-        if (!(inputSchema instanceof Property.ObjectProperty objectProperty)) {
+        if (!(inputSchema instanceof BaseProperty.BaseObjectProperty<?> objectProperty)) {
             return List.of();
         }
 
-        return objectProperty.getProperties()
-            .orElse(List.of());
+        @SuppressWarnings("unchecked")
+        List<? extends Property.ValueProperty<?>> properties =
+            (List<? extends Property.ValueProperty<?>>) (List<?>) objectProperty.getProperties()
+                .orElse(List.of());
+
+        return properties;
     }
 
     private static BaseOutputDefinition.OutputResponse output(
