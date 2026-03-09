@@ -440,6 +440,7 @@ const useWorkflowEditorCanvas = ({
                 saveWorkflowNodesPosition({
                     clearPositionNodeIds,
                     draggedNodeId: draggedNode.id,
+                    incrementLayoutResetCounter,
                     invalidateWorkflowQueries: editorInvalidateWorkflowQueries,
                     nodePositions,
                     updateWorkflowMutation,
@@ -451,7 +452,14 @@ const useWorkflowEditorCanvas = ({
             childDragStartRef.current = new Map();
             draggingPlaceholderRef.current = null;
         },
-        [editorInvalidateWorkflowQueries, layoutDirection, setIsNodeDragging, updateWorkflowMutation, workflow.id]
+        [
+            editorInvalidateWorkflowQueries,
+            incrementLayoutResetCounter,
+            layoutDirection,
+            setIsNodeDragging,
+            updateWorkflowMutation,
+            workflow.id,
+        ]
     );
 
     let canvasWidth = window.innerWidth - 120;
@@ -494,11 +502,10 @@ const useWorkflowEditorCanvas = ({
         resetPendingRef.current = true;
 
         clearAllNodePositions({
+            incrementLayoutResetCounter,
             invalidateWorkflowQueries: editorInvalidateWorkflowQueries,
             updateWorkflowMutation,
         });
-
-        incrementLayoutResetCounter();
     }, [editorInvalidateWorkflowQueries, incrementLayoutResetCounter, updateWorkflowMutation, workflow.id]);
 
     useLayout({

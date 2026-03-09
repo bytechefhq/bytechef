@@ -6,6 +6,7 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface ClearAllNodePositionsProps {
+    incrementLayoutResetCounter: () => void;
     invalidateWorkflowQueries: () => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
@@ -114,6 +115,7 @@ export function clearTaskPositions(tasks: WorkflowTask[]): WorkflowTask[] {
 }
 
 export default function clearAllNodePositions({
+    incrementLayoutResetCounter,
     invalidateWorkflowQueries,
     updateWorkflowMutation,
 }: ClearAllNodePositionsProps) {
@@ -171,6 +173,7 @@ export default function clearAllNodePositions({
                 });
 
                 invalidateWorkflowQueries();
+                incrementLayoutResetCounter();
             },
         }
     );
