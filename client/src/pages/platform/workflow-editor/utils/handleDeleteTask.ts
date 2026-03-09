@@ -3,8 +3,14 @@ import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {BranchCaseType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
-import {QueryClient, UseMutationResult} from '@tanstack/react-query';
+import {
+    BranchCaseType,
+    NodeDataType,
+    UpdateWorkflowMutationType,
+    WorkflowDefinitionType,
+    WorkflowTaskType,
+} from '@/shared/types';
+import {QueryClient} from '@tanstack/react-query';
 
 import useWorkflowDataStore, {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -23,7 +29,7 @@ interface HandleDeleteTaskProps {
     queryClient: QueryClient;
     setRootClusterElementNodeData?: (node: NodeDataType) => void;
     setCurrentNode?: (node: NodeDataType) => void;
-    updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowDataType;
 }
 
@@ -349,6 +355,64 @@ export default function handleDeleteTask({
 }
 
 /**
+ * Recursively collects all task name→parameters mappings from the hierarchical definition tasks,
+ * including tasks nested inside task dispatcher parameters (condition caseTrue/caseFalse, loop iteratee, etc.).
+ */
+function collectAllTaskParameters(
+    tasks: Array<WorkflowTaskType>,
+    result: Map<string, Record<string, object> | undefined> = new Map()
+): Map<string, Record<string, object> | undefined> {
+    for (const task of tasks) {
+        result.set(task.name, task.parameters);
+
+        if (!task.parameters) {
+            continue;
+        }
+
+        // Condition: caseTrue, caseFalse; Loop/Map: iteratee; Parallel: tasks; Branch: default
+        for (const key of ['caseTrue', 'caseFalse', 'iteratee', 'default', 'tasks']) {
+            const subtasks = task.parameters[key];
+
+            if (Array.isArray(subtasks) && subtasks.length > 0 && subtasks[0]?.name) {
+                collectAllTaskParameters(subtasks as Array<WorkflowTaskType>, result);
+            }
+        }
+
+        // Branch: cases[].tasks
+        if (Array.isArray(task.parameters.cases)) {
+            for (const caseItem of task.parameters.cases as Array<{tasks?: Array<WorkflowTaskType>}>) {
+                if (Array.isArray(caseItem.tasks)) {
+                    collectAllTaskParameters(caseItem.tasks, result);
+                }
+            }
+        }
+
+        // Fork-join: branches[][]
+        if (Array.isArray(task.parameters.branches)) {
+            for (const branch of task.parameters.branches as Array<Array<WorkflowTaskType>>) {
+                if (Array.isArray(branch)) {
+                    collectAllTaskParameters(branch, result);
+                }
+            }
+        }
+
+        // Each: iteratee as single object
+        if (
+            task.parameters.iteratee &&
+            !Array.isArray(task.parameters.iteratee) &&
+            typeof task.parameters.iteratee === 'object' &&
+            (task.parameters.iteratee as WorkflowTaskType).name
+        ) {
+            const singleIteratee = task.parameters.iteratee as WorkflowTaskType;
+
+            result.set(singleIteratee.name, singleIteratee.parameters);
+        }
+    }
+
+    return result;
+}
+
+/**
  * Builds optimistic tasks by removing the deleted task and applying parameter changes
  * from definition-parsed tasks onto the rich workflow task objects (which carry componentName, icon, etc.).
  * Handles both top-level deletion (filter) and nested deletion (parent parameter update).
@@ -358,7 +422,7 @@ export function buildOptimisticTasks(
     updatedTasks: Array<WorkflowTaskType>,
     deletedTaskName: string
 ): WorkflowTask[] {
-    const updatedParametersByName = new Map(updatedTasks.map((task) => [task.name, task.parameters]));
+    const updatedParametersByName = collectAllTaskParameters(updatedTasks);
 
     return workflowTasks
         .filter((task) => task.name !== deletedTaskName)
