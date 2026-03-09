@@ -26,5 +26,5 @@ import java.util.Set;
 @SuppressFBWarnings("EI")
 public record ParameterResultDTO(
     Map<String, Boolean> displayConditions, Map<String, ?> metadata, Set<String> missingRequiredProperties,
-    Map<String, ?> parameters) {
+    Map<String, ?> parameters, int version) {
 }
