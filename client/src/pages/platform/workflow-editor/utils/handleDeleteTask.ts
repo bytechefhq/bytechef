@@ -351,6 +351,17 @@ export default function handleDeleteTask({
 
                 invalidateWorkflowQueries();
             },
+            onSuccess: (updatedWorkflow) => {
+                // Update the version from the server response so that the next mutation
+                // uses the correct version (prevents OptimisticLockingFailureException).
+                // Keep the current optimistic state to avoid layout flicker.
+                const currentWorkflow = useWorkflowDataStore.getState().workflow;
+
+                useWorkflowDataStore.getState().setWorkflow({
+                    ...currentWorkflow,
+                    version: updatedWorkflow.version,
+                });
+            },
         }
     );
 }
