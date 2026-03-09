@@ -1,0 +1,22 @@
+### How to find your Site ID
+
+Only way of finding Site ID in Microsoft SharePoint is using Microsoft Graph API.
+
+1. Go to your Microsoft SharePoint site.
+2. If your URL is `https://company.sharepoint.com/sites/Finance` then your site name is `Finance`.
+3. Then use this Microsoft Graph API endpoint; `GET https://graph.microsoft.com/v1.0/sites/company.sharepoint.com:/sites/Finance`
+4. You will get your folder ID.
+
+### How to find your Parent Folder ID
+
+Only way of finding Folder ID in Microsoft SharePoint is using Microsoft Graph API endpoint: `GET https://graph.microsoft.com/v1.0/sites/{site-id}/drives`.
+
+### How to find your List ID
+
+1. Open the SharePoint site.
+2. Go to the Site Contents.
+3. Find your list and click on 3 vertical dots (...)
+4. Click on Settings
+5. Look at the browser URL.
+6. If your URL is `https://6kqn7f.sharepoint.com/sites/Testsite/_layouts/15/listedit.aspx?List=2c8d8a57-10e1-43b7-b801-6cd5b328f55b`
+7. Then your List ID is `2c8d8a57-10e1-43b7-b801-6cd5b328f55b`
