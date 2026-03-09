@@ -111,8 +111,10 @@ public class WorkflowNodeParameterFacadeTest {
 
         Workflow updatedWorkflow = mock(Workflow.class);
 
-        when(updatedWorkflow.getVersion()).thenReturn(1);
-        when(workflowService.update(anyString(), anyString(), anyInt())).thenReturn(updatedWorkflow);
+        lenient().when(updatedWorkflow.getVersion())
+            .thenReturn(1);
+        lenient().when(workflowService.update(anyString(), anyString(), anyInt()))
+            .thenReturn(updatedWorkflow);
     }
 
     @Test
