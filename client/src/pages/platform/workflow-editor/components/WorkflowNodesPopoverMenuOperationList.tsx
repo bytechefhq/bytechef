@@ -33,7 +33,7 @@ import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import {getTask} from '../utils/getTask';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
-import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
+import handleComponentAddedSuccess, {openNodeDetailsPanelForNewNode} from '../utils/handleComponentAddedSuccess';
 import handleTaskDispatcherSubtaskOperationClick from '../utils/handleTaskDispatcherSubtaskOperationClick';
 import processClusterElementsHierarchy from '../utils/processClusterElementsHierarchy';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
@@ -193,6 +193,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     }),
                 updateWorkflowMutation: updateWorkflowMutation!,
             });
+
+            openNodeDetailsPanelForNewNode(nodeData);
         },
         [queryClient, updateWorkflowMutation, workflow]
     );
