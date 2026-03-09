@@ -1,5 +1,6 @@
 import {useAiAgentTestingChatStore} from '@/pages/platform/cluster-element-editor/ai-agent-editor/stores';
 import {useTestingModeStore} from '@/pages/platform/cluster-element-editor/ai-agent-editor/stores/useTestingModeStore';
+import useClusterElementsDataStore from '@/pages/platform/cluster-element-editor/stores/useClusterElementsDataStore';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -199,6 +200,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
             if (!isOpen) {
                 useCopilotStore.getState().restoreConversationState();
                 useClusterElementsCanvasDialogStore.getState().reset();
+                useClusterElementsDataStore.getState().reset();
                 useTestingModeStore.getState().resetTestingMode();
                 resetNodeDetailsPanel();
             }

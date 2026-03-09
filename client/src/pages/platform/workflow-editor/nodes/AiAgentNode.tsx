@@ -9,7 +9,7 @@ import {HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {ComponentIcon, PinOffIcon, TrashIcon} from 'lucide-react';
-import {memo, useEffect, useMemo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -31,7 +31,6 @@ import styles from './NodeTypes.module.css';
 const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
-    const [hasIcons, setHasIcons] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {currentNode} = useWorkflowNodeDetailsPanelStore(
@@ -124,13 +123,20 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         });
     };
 
-    useEffect(() => {
-        if (memoizedIconsList.iconsToShow.length > 0) {
-            setHasIcons(true);
-        } else {
-            setHasIcons(false);
-        }
-    }, [memoizedIconsList.iconsToShow]);
+    const hasIcons = useMemo(() => memoizedIconsList.iconsToShow.length > 0, [memoizedIconsList.iconsToShow]);
+
+    // Must mirror the layout's hasValidClusterElements check exactly (layoutUtils.tsx line 510-514)
+    // to keep handle position in sync with the -85px cross-axis offset applied during layout.
+    // Using data.clusterElements (from node props) instead of workflow.definition (from store)
+    // prevents a timing mismatch when switching between workflows.
+    const hasValidClusterElements = useMemo(
+        () =>
+            !!data.clusterElements &&
+            Object.entries(data.clusterElements as Record<string, unknown>).some(
+                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+            ),
+        [data.clusterElements]
+    );
 
     const isHorizontal = layoutDirection === 'LR';
 
@@ -299,7 +305,9 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 )}
                 isConnectable={false}
                 position={mapHandlePosition(Position.Top, layoutDirection)}
-                style={layoutDirection === 'TB' ? (hasIcons ? {left: '120px'} : {left: '36px'}) : undefined}
+                style={
+                    layoutDirection === 'TB' ? (hasValidClusterElements ? {left: '120px'} : {left: '36px'}) : undefined
+                }
                 type="target"
             />
 
@@ -310,7 +318,9 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 )}
                 isConnectable={false}
                 position={mapHandlePosition(Position.Bottom, layoutDirection)}
-                style={layoutDirection === 'TB' ? (hasIcons ? {left: '120px'} : {left: '36px'}) : undefined}
+                style={
+                    layoutDirection === 'TB' ? (hasValidClusterElements ? {left: '120px'} : {left: '36px'}) : undefined
+                }
                 type="source"
             />
         </div>

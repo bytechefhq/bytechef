@@ -501,7 +501,28 @@ export const getLayoutElements = async ({
 
     const triggerCrossHalf = direction === 'LR' ? NODE_WIDTH / 2 : 72 / 2;
 
-    const canvasCenteringOffset = canvasCrossDimension / 2 - dagreGraph.node(nodes[0].id)[crossAxis] - triggerCrossHalf;
+    // When a cluster root node with valid elements gets a -85px cross-axis shift,
+    // the overall layout looks visually off-center. Compensate by shifting the
+    // centering offset by half the cluster root offset so the node group is balanced.
+    const hasClusterRootOffset =
+        direction === 'TB' &&
+        nodes.some(
+            (node) =>
+                node.data.clusterRoot &&
+                node.data.clusterElements &&
+                Object.entries(node.data.clusterElements).some(
+                    ([, value]) =>
+                        value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+                )
+        );
+
+    const clusterRootCenteringCompensation = hasClusterRootOffset ? 85 / 2 : 0;
+
+    const canvasCenteringOffset =
+        canvasCrossDimension / 2 -
+        dagreGraph.node(nodes[0].id)[crossAxis] -
+        triggerCrossHalf +
+        clusterRootCenteringCompensation;
 
     const allNodes = nodes.map((node) => {
         const dagreNode = dagreGraph.node(node.id);
