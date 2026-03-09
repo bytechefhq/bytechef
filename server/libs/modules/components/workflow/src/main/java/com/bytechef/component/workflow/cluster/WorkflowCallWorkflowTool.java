@@ -34,6 +34,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import java.util.List;
@@ -99,13 +100,9 @@ public class WorkflowCallWorkflowTool {
             return List.of();
         }
 
-        BaseOutputDefinition.OutputResponse outputResponse = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
+        BaseProperty.BaseValueProperty<?> inputSchema = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
 
-        if (outputResponse == null) {
-            return List.of();
-        }
-
-        if (!(outputResponse.getOutputSchema() instanceof Property.ObjectProperty objectProperty)) {
+        if (!(inputSchema instanceof Property.ObjectProperty objectProperty)) {
             return List.of();
         }
 
@@ -122,6 +119,12 @@ public class WorkflowCallWorkflowTool {
             return null;
         }
 
-        return subflowDataSource.getSubWorkflowOutputSchema(workflowUuid);
+        BaseProperty.BaseValueProperty<?> outputSchema = subflowDataSource.getSubWorkflowOutputSchema(workflowUuid);
+
+        if (outputSchema == null) {
+            return null;
+        }
+
+        return BaseOutputDefinition.OutputResponse.of(outputSchema);
     }
 }

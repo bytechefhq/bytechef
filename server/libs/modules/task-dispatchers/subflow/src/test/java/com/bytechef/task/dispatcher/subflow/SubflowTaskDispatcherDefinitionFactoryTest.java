@@ -19,9 +19,11 @@ package com.bytechef.task.dispatcher.subflow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertiesDataSource;
@@ -65,12 +67,12 @@ class SubflowTaskDispatcherDefinitionFactoryTest {
         SubflowDataSource stubDataSource = new SubflowDataSource() {
 
             @Override
-            public OutputResponse getSubWorkflowInputSchema(String workflowUuid) {
+            public BaseProperty.BaseValueProperty<?> getSubWorkflowInputSchema(String workflowUuid) {
                 return null;
             }
 
             @Override
-            public OutputResponse getSubWorkflowOutputSchema(String workflowUuid) {
+            public BaseProperty.BaseValueProperty<?> getSubWorkflowOutputSchema(String workflowUuid) {
                 return null;
             }
 
@@ -134,16 +136,17 @@ class SubflowTaskDispatcherDefinitionFactoryTest {
 
     @Test
     void testOutputDelegatesToSubflowDataSource() throws Exception {
-        OutputResponse expectedResponse = OutputResponse.of(
-            com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string("test"));
+        Property.StringProperty stringProperty =
+            com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string("test");
 
-        when(subflowDataSource.getSubWorkflowOutputSchema("test-uuid")).thenReturn(expectedResponse);
+        doReturn(stringProperty).when(subflowDataSource)
+            .getSubWorkflowOutputSchema("test-uuid");
 
         OutputFunction outputFunction = getOutputFunction();
 
         OutputResponse result = (OutputResponse) outputFunction.apply(Map.of("workflowUuid", "test-uuid"));
 
-        assertEquals(expectedResponse, result);
+        assertEquals(OutputResponse.of(stringProperty), result);
     }
 
     private PropertiesFunction getDynamicPropertiesFunction() {

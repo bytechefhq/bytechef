@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.registry;
 
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
@@ -26,12 +26,12 @@ import org.springframework.stereotype.Component;
 public class RemoteSubflowDataSourceClient implements SubflowDataSource {
 
     @Override
-    public @Nullable OutputResponse getSubWorkflowInputSchema(String workflowUuid) {
+    public BaseProperty.@Nullable BaseValueProperty<?> getSubWorkflowInputSchema(String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public @Nullable OutputResponse getSubWorkflowOutputSchema(String workflowUuid) {
+    public BaseProperty.@Nullable BaseValueProperty<?> getSubWorkflowOutputSchema(String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 
