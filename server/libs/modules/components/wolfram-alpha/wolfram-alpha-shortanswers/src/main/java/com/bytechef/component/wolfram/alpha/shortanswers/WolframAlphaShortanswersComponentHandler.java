@@ -18,8 +18,11 @@ package com.bytechef.component.wolfram.alpha.shortanswers;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
+import java.util.List;
 
 /**
  * @author Nikolina Spehar
@@ -28,9 +31,38 @@ import com.google.auto.service.AutoService;
 public class WolframAlphaShortanswersComponentHandler extends AbstractWolframAlphaShortanswersComponentHandler {
 
     @Override
+    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
+            String name = actionDefinition.getName();
+
+            if (name.equals("getShortAnswer")) {
+                actionDefinition.help(
+                    "",
+                    "https://docs.bytechef.io/reference/components/wolfram-alpha-shortanswers_v1#get-short-answer");
+            }
+        }
+
+        return super.modifyActions(actionDefinitions);
+    }
+
+    @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .icon("path:assets/wolfram-alpha.svg")
-            .categories(ComponentCategory.HELPERS);
+            .categories(ComponentCategory.HELPERS)
+            .customAction(true)
+            .customActionHelp("", "https://products.wolframalpha.com/short-answers-api/documentation/")
+            .version(1);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help(
+                "",
+                "https://docs.bytechef.io/reference/components/wolfram-alpha-shortanswers_v1#connection-setup")
+            .version(1);
     }
 }
