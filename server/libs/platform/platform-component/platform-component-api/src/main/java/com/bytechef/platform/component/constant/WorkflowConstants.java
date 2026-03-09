@@ -23,9 +23,7 @@ public class WorkflowConstants {
 
     public static final String INPUT_SCHEMA = "inputSchema";
     public static final String OUTPUT_SCHEMA = "outputSchema";
-    public static final String NEW_AI_MODEL_CALL = "newAiModelCall";
     public static final String NEW_WORKFLOW_CALL = "newWorkflowCall";
-    public static final String RESPONSE_TO_AI_MODEL_CALL = "responseToAiModelCall";
     public static final String RESPONSE_TO_WORKFLOW_CALL = "responseToWorkflowCall";
     public static final String WORKFLOW = "workflow";
 

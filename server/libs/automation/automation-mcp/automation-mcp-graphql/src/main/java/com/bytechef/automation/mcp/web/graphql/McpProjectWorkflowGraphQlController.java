@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.mcp.web.graphql;
 
-import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_AI_MODEL_CALL;
+import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLOW;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -247,7 +247,7 @@ public class McpProjectWorkflowGraphQlController {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), NEW_AI_MODEL_CALL)) {
+                Objects.equals(workflowNodeType.operation(), NEW_WORKFLOW_CALL)) {
 
                 return workflowTrigger;
             }

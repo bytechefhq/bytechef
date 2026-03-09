@@ -335,7 +335,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             String operation = workflowNodeType.operation();
 
             if (Objects.equals(name, WorkflowConstants.WORKFLOW) &&
-                Objects.equals(operation, WorkflowConstants.NEW_AI_MODEL_CALL)) {
+                Objects.equals(operation, WorkflowConstants.NEW_WORKFLOW_CALL)) {
 
                 return workflowTrigger;
             }
