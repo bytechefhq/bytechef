@@ -14,9 +14,12 @@ const useMcpComponentDialogComponentSelectionStep = (open: boolean) => {
     const filteredComponents = components.filter((component) => {
         const hasTools = component.clusterElementsCount?.TOOLS && component.clusterElementsCount.TOOLS > 0;
 
-        if (!hasTools) return false;
+        if (!hasTools) {
+            return false;
+        }
 
         const searchLower = searchTerm.toLowerCase();
+
         const nameMatch = component.name.toLowerCase().includes(searchLower);
         const titleMatch = component.title?.toLowerCase().includes(searchLower);
 
