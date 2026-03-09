@@ -521,8 +521,14 @@ class HttpClientExecutor {
             .map(contentType -> {
                 String mediaType = contentType.split(";")[0].trim();
 
+                mediaType = mediaType.toLowerCase();
+
                 if (mediaType.equals("text/json")) {
                     mediaType = "application/json";
+                }
+
+                if (responseType.getType() == ResponseType.Type.TEXT && mediaType.startsWith("text/")) {
+                    return true;
                 }
 
                 return Strings.CI.equals(mediaType, responseType.getContentType()) ||
