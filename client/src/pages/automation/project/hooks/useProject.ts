@@ -20,7 +20,6 @@ import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/conne
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/automation/projectWorkflows.queries';
-import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -99,36 +98,11 @@ export const useProject = () => {
 
     const queryClient = useQueryClient();
 
-    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectKeys.project(+projectId!),
-            });
+    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation();
 
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            });
-        },
-    });
-
-    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectKeys.project(+projectId!),
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            });
-        },
-    });
+    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation();
 
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
-            });
-        },
         useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,
@@ -151,21 +125,9 @@ export const useProject = () => {
         workflowKeys: WorkflowKeys,
     });
 
-    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
-            });
-        },
-    });
+    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation();
 
-    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
-            });
-        },
-    });
+    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
 
     const invalidateWorkflowQueries = () => {
         const queryKey = ProjectWorkflowKeys.projectWorkflows(+projectId!);

@@ -5,7 +5,6 @@ import {
     IntegrationWorkflowKeys,
     useGetIntegrationWorkflowQuery,
 } from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -75,36 +74,11 @@ export const useIntegration = () => {
 
     const queryClient = useQueryClient();
 
-    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: IntegrationKeys.integration(+integrationId!),
-            });
+    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation();
 
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            });
-        },
-    });
-
-    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: IntegrationKeys.integration(+integrationId!),
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            });
-        },
-    });
+    const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation();
 
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: IntegrationWorkflowKeys.integrationWorkflows(+integrationId!),
-            });
-        },
         useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,
@@ -123,21 +97,9 @@ export const useIntegration = () => {
         workflowKeys: WorkflowKeys,
     });
 
-    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: IntegrationWorkflowKeys.integrationWorkflow(+integrationId!, +integrationWorkflowId!),
-            });
-        },
-    });
+    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation();
 
-    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: IntegrationWorkflowKeys.integrationWorkflow(+integrationId!, +integrationWorkflowId!),
-            });
-        },
-    });
+    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
 
     const invalidateWorkflowQueries = () => {
         const queryKey = IntegrationWorkflowKeys.integrationWorkflows(+integrationId!);
