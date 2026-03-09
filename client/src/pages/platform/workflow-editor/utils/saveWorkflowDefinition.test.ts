@@ -469,6 +469,84 @@ describe('saveWorkflowDefinition', () => {
         });
     });
 
+    describe('optimistic task insertion', () => {
+        it('should include new task in optimistic tasks when adding a node', async () => {
+            mockWorkflowState = makeWorkflowState([{name: 'existing_1', parameters: {}, type: 'test/v1/action'}]);
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            // Should include both existing and new task
+            expect(optimisticWorkflow.tasks).toHaveLength(2);
+            expect(optimisticWorkflow.tasks[0].name).toBe('existing_1');
+            expect(optimisticWorkflow.tasks[1].name).toBe('httpClient_1');
+        });
+
+        it('should insert new task at specified nodeIndex', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {name: 'task_1', parameters: {}, type: 'test/v1/action'},
+                {name: 'task_2', parameters: {}, type: 'test/v1/action'},
+            ]);
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                nodeIndex: 1,
+                updateWorkflowMutation: mutation,
+            });
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            expect(optimisticWorkflow.tasks).toHaveLength(3);
+            expect(optimisticWorkflow.tasks[0].name).toBe('task_1');
+            expect(optimisticWorkflow.tasks[1].name).toBe('httpClient_1');
+            expect(optimisticWorkflow.tasks[2].name).toBe('task_2');
+        });
+
+        it('should not modify tasks when updating an existing task', async () => {
+            const existingTask = {
+                name: 'httpClient_1',
+                parameters: {url: 'http://old.com'},
+                type: 'httpClient/v1/get',
+            };
+
+            mockWorkflowState = makeWorkflowState([existingTask]);
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    parameters: {url: 'http://new.com'},
+                    version: 1,
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+
+            // Should keep the existing tasks unchanged (no new task inserted)
+            expect(optimisticWorkflow.tasks).toHaveLength(1);
+            expect(optimisticWorkflow.tasks[0].name).toBe('httpClient_1');
+        });
+    });
+
     describe('decorative flag', () => {
         it('should save when decorative is true even without other changes', async () => {
             const existingTask = {
