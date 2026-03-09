@@ -377,7 +377,7 @@ export const useProperty = ({
 
     const typeIcon = useMemo(() => {
         if (controlType === 'MULTI_SELECT') {
-            return TYPE_ICONS[property.items?.[0].type as keyof typeof TYPE_ICONS];
+            return TYPE_ICONS[property.items?.[0]?.type as keyof typeof TYPE_ICONS];
         }
 
         return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
