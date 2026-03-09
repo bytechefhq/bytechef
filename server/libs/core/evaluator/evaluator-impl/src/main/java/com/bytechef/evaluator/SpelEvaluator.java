@@ -152,7 +152,12 @@ public class SpelEvaluator implements Evaluator {
     }
 
     public Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context) {
-        return evaluateInternal(map, context);
+        return evaluateInternal(map, context, false);
+    }
+
+    @Override
+    public Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
+        return evaluateInternal(map, context, lenient);
     }
 
     private StandardEvaluationContext createEvaluationContext(Map<String, ?> context, boolean formulaExpression) {
@@ -167,7 +172,9 @@ public class SpelEvaluator implements Evaluator {
         return evaluationContext;
     }
 
-    private String evaluate(CompositeStringExpression compositeStringExpression, Map<String, ?> context) {
+    private String evaluate(
+        CompositeStringExpression compositeStringExpression, Map<String, ?> context, boolean lenient) {
+
         StringBuilder sb = new StringBuilder();
         Expression[] subExpressions = compositeStringExpression.getExpressions();
 
@@ -177,7 +184,9 @@ public class SpelEvaluator implements Evaluator {
 
                 continue;
             } else if (subExpression instanceof SpelExpression) {
-                sb.append(evaluate(ACCESSOR_PREFIX + subExpression.getExpressionString() + ACCESSOR_SUFFIX, context));
+                sb.append(
+                    evaluate(
+                        ACCESSOR_PREFIX + subExpression.getExpressionString() + ACCESSOR_SUFFIX, context, lenient));
 
                 continue;
             }
@@ -191,7 +200,7 @@ public class SpelEvaluator implements Evaluator {
     }
 
     @Nullable
-    private Object evaluate(Object value, Map<String, ?> context) {
+    private Object evaluate(Object value, Map<String, ?> context, boolean lenient) {
         if (value instanceof String string) {
             Expression expression;
             boolean formulaExpression = false;
@@ -209,20 +218,28 @@ public class SpelEvaluator implements Evaluator {
                     string = string.replaceAll("\\$\\{([^}]*)}", "$1");
 
                     if (!validateFormulaExpression(string)) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace("Invalid formula expression: {}", string);
+                        if (lenient) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Invalid formula expression: {}", string);
+                            }
+
+                            return value;
+                        }
+
+                        throw new IllegalArgumentException("Invalid formula expression: " + string);
+                    }
+
+                    expression = expressionParser.parseExpression(string.substring(1));
+                } catch (ParseException parseException) {
+                    if (lenient) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Unparseable formula expression: {}", string, parseException);
                         }
 
                         return value;
                     }
 
-                    expression = expressionParser.parseExpression(string.substring(1));
-                } catch (ParseException parseException) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("Unparseable formula expression: {}", string, parseException);
-                    }
-
-                    return value;
+                    throw new IllegalArgumentException("Unparseable formula expression: " + string, parseException);
                 }
             } else {
                 if (!validateTextExpression(string)) {
@@ -234,15 +251,15 @@ public class SpelEvaluator implements Evaluator {
             }
 
             if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
-                return evaluate((CompositeStringExpression) expression, context);
+                return evaluate((CompositeStringExpression) expression, context, lenient);
             } else if (expression instanceof LiteralExpression) {
                 return expression.getValue();
             } else {
                 try {
                     return expression.getValue(createEvaluationContext(context, formulaExpression));
-                } catch (SpelEvaluationException e) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(e.getMessage());
+                } catch (SpelEvaluationException spelEvaluationException) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(spelEvaluationException.getMessage());
                     }
 
                     return value;
@@ -252,22 +269,22 @@ public class SpelEvaluator implements Evaluator {
             List<Object> evaluatedlist = new ArrayList<>();
 
             for (Object item : list) {
-                evaluatedlist.add(evaluate(item, context));
+                evaluatedlist.add(evaluate(item, context, lenient));
             }
 
             return evaluatedlist;
         } else if (value instanceof Map<?, ?> map) {
-            return evaluateInternal(map, context);
+            return evaluateInternal(map, context, lenient);
         }
 
         return value;
     }
 
-    private Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, ?> context) {
+    private Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, ?> context, boolean lenient) {
         Map<String, Object> newMap = new LinkedHashMap<>();
 
         for (Entry<?, ?> entry : map.entrySet()) {
-            newMap.put((String) entry.getKey(), evaluate(entry.getValue(), context));
+            newMap.put((String) entry.getKey(), evaluate(entry.getValue(), context, lenient));
         }
 
         return newMap;

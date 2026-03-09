@@ -86,8 +86,18 @@ public class SpelEvaluatorTest {
 
         context.put("number", "5");
 
+        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+            Map.of("type", "type", "hello", "=T(java.lang.Integer).valueOf(number)"), context));
+    }
+
+    @Test
+    public void testLenientModeReturnsOriginalValueForInvalidFormula() {
+        Map<String, Object> context = new HashMap<>();
+
+        context.put("number", "5");
+
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "hello", "=T(java.lang.Integer).valueOf(number)"), context);
+            Map.of("type", "type", "hello", "=T(java.lang.Integer).valueOf(number)"), context, true);
 
         assertEquals("=T(java.lang.Integer).valueOf(number)", MapUtils.get(map, "hello"));
     }
@@ -162,7 +172,7 @@ public class SpelEvaluatorTest {
     @Test
     public void test13() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "thing", "=number*3"), Collections.emptyMap());
+            Map.of("type", "type", "thing", "=number*3"), Collections.emptyMap(), true);
 
         assertEquals("=number*3", MapUtils.get(map, "thing"));
     }
@@ -413,19 +423,29 @@ public class SpelEvaluatorTest {
     public void test42() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
+        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+            Map.of("hour", "=${localDateTime}.getHour()"), Map.of("localDateTime", localDateTime)));
+
+        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+            Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime)));
+
+        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+            Map.of("hour", "${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime)));
+    }
+
+    @Test
+    public void testLenientModeReturnsOriginalValueForMethodCallFormula() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+
         Map<String, Object> map1 = EVALUATOR.evaluate(
-            Map.of("hour", "=${localDateTime}.getHour()"), Map.of("localDateTime", localDateTime));
+            Map.of("hour", "=${localDateTime}.getHour()"), Map.of("localDateTime", localDateTime), true);
 
         assertEquals("=${localDateTime}.getHour()", MapUtils.get(map1, "hour"));
 
         Map<String, Object> map2 = EVALUATOR.evaluate(
-            Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
+            Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime), true);
 
         assertEquals("=${localDateTime.getHour()}", MapUtils.get(map2, "hour"));
-
-        assertThrowsExactly(IllegalArgumentException.class, () -> {
-            EVALUATOR.evaluate(Map.of("hour", "${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
-        });
     }
 
     @Test
@@ -478,25 +498,31 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testIncompleteFormulaReturnsOriginalValue() {
+    public void testIncompleteFormulaThrowsInStrictMode() {
+        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+            Map.of("type", "type", "value", "=222+"), Collections.emptyMap()));
+    }
+
+    @Test
+    public void testIncompleteFormulaReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "value", "=222+"), Collections.emptyMap());
+            Map.of("type", "type", "value", "=222+"), Collections.emptyMap(), true);
 
         assertEquals("=222+", MapUtils.get(map, "value"));
     }
 
     @Test
-    public void testIncompleteFormulaWithAccessorReturnsOriginalValue() {
+    public void testIncompleteFormulaWithAccessorReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "value", "=n1+"), Map.of("n1", 5));
+            Map.of("type", "type", "value", "=n1+"), Map.of("n1", 5), true);
 
         assertEquals("=n1+", MapUtils.get(map, "value"));
     }
 
     @Test
-    public void testFormulaWithTrailingOperatorReturnsOriginalValue() {
+    public void testFormulaWithTrailingOperatorReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "value", "=10*3-"), Collections.emptyMap());
+            Map.of("type", "type", "value", "=10*3-"), Collections.emptyMap(), true);
 
         assertEquals("=10*3-", MapUtils.get(map, "value"));
     }

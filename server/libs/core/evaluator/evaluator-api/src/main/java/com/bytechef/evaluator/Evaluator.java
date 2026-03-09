@@ -33,4 +33,17 @@ public interface Evaluator {
      * @return the evaluate {@link java.util.Map}.
      */
     Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context);
+
+    /**
+     * Evaluate the {@link java.util.Map} against the provided {@link java.util.Map}.}
+     *
+     * @param map     The {@link java.util.Map} instance to evaluate
+     * @param context The context to evaluate the task against
+     * @param lenient When {@code true} (editor preview), invalid formula expressions return the original value. When
+     *                {@code false} (workflow execution), invalid formula expressions throw an exception.
+     * @return the evaluate {@link java.util.Map}.
+     */
+    default Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
+        return evaluate(map, context);
+    }
 }
