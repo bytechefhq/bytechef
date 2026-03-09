@@ -16,6 +16,7 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Link2Icon, TagIcon} from 'lucide-react';
+import {useMemo} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectionList from './components/connection-list/ConnectionList';
@@ -38,15 +39,7 @@ export const Connections = () => {
         type: tagId ? Type.Tag : Type.Component,
     };
 
-    const {
-        data: allConnections,
-        error: allConnectionsError,
-        isLoading: allConnectionsIsLoading,
-    } = useGetConnectionsQuery({
-        environmentId: currentEnvironmentId,
-    });
-
-    const allComponentNames = Array.from(new Set(allConnections?.map((connection) => connection.componentName)));
+    const hasActiveFilter = !!componentName || !!tagId;
 
     const {data: componentDefinitions, isLoading: componentsLoading} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
@@ -57,10 +50,33 @@ export const Connections = () => {
         error: connectionsError,
         isLoading: connectionsIsLoading,
     } = useGetConnectionsQuery({
-        componentName: searchParams.get('componentName') ? searchParams.get('componentName')! : undefined,
+        componentName: componentName ? componentName : undefined,
         environmentId: currentEnvironmentId,
-        tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
+        tagId: tagId ? parseInt(tagId) : undefined,
     });
+
+    const {
+        data: unfilteredConnections,
+        error: unfilteredConnectionsError,
+        isLoading: unfilteredConnectionsIsLoading,
+    } = useGetConnectionsQuery(
+        {
+            environmentId: currentEnvironmentId,
+        },
+        hasActiveFilter
+    );
+
+    const allComponentNames = useMemo(
+        () =>
+            Array.from(
+                new Set(
+                    (hasActiveFilter ? unfilteredConnections : connections)?.map(
+                        (connection) => connection.componentName
+                    )
+                )
+            ),
+        [connections, hasActiveFilter, unfilteredConnections]
+    );
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetConnectionTagsQuery();
 
@@ -163,8 +179,8 @@ export const Connections = () => {
             leftSidebarWidth="64"
         >
             <PageLoader
-                errors={[allConnectionsError, connectionsError, tagsError]}
-                loading={allConnectionsIsLoading || componentsLoading || connectionsIsLoading || tagsIsLoading}
+                errors={[connectionsError, tagsError, unfilteredConnectionsError]}
+                loading={componentsLoading || connectionsIsLoading || tagsIsLoading || unfilteredConnectionsIsLoading}
             >
                 {componentDefinitions && connections && connections?.length > 0 ? (
                     connections &&
