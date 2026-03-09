@@ -324,17 +324,30 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             List<Project> projects = getProjects(projectDeployments);
             List<Tag> tags = getTags(projectDeployments);
 
+            List<Long> projectIds = projectDeployments.stream()
+                .map(ProjectDeployment::getProjectId)
+                .distinct()
+                .toList();
+
+            List<ProjectWorkflow> allProjectWorkflows = projectWorkflowService.getProjectWorkflows(projectIds);
+
             return CollectionUtils.map(
                 projectDeployments,
                 projectDeployment -> {
                     Project project = CollectionUtils.getFirst(
                         projects, curProject -> Objects.equals(curProject.getId(), projectDeployment.getProjectId()));
 
-                    List<String> workflowIds = projectWorkflowService.getProjectWorkflowIds(
-                        projectDeployment.getProjectId(), projectDeployment.getProjectVersion());
+                    List<String> workflowIds = allProjectWorkflows.stream()
+                        .filter(projectWorkflow -> Objects.equals(
+                            projectWorkflow.getProjectId(), projectDeployment.getProjectId()) &&
+                            projectWorkflow.getProjectVersion() == projectDeployment.getProjectVersion())
+                        .map(ProjectWorkflow::getWorkflowId)
+                        .toList();
 
-                    List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-                        projectDeployment.getProjectId());
+                    List<ProjectWorkflow> deploymentProjectWorkflows = allProjectWorkflows.stream()
+                        .filter(projectWorkflow -> Objects.equals(
+                            projectWorkflow.getProjectId(), projectDeployment.getProjectId()))
+                        .toList();
 
                     return new ProjectDeploymentDTO(
                         projectDeployment,
@@ -345,7 +358,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                                     projectDeploymentWorkflow.getProjectDeploymentId(), projectDeployment.getId()) &&
                                     workflowIds.contains(projectDeploymentWorkflow.getWorkflowId())),
                             projectDeploymentWorkflow -> toProjectDeploymentWorkflowDTO(
-                                projectDeploymentWorkflow, projectDeployment, projectWorkflows)),
+                                projectDeploymentWorkflow, projectDeployment, deploymentProjectWorkflows)),
                         project,
                         getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
                         filterTags(tags, projectDeployment));
