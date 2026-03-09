@@ -11,6 +11,7 @@ import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
     Workflow,
+    WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
 import {WIDTHS} from '@/shared/theme/constants';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
@@ -18,6 +19,7 @@ import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
+import {useStoreWithEqualityFn} from 'zustand/traditional';
 
 import useDataPillPanelStore from '../stores/useDataPillPanelStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
@@ -47,6 +49,70 @@ import {
     getTaskAncestry,
 } from '../utils/layoutUtils';
 
+/**
+ * Builds a string key that changes only when the task graph structure changes
+ * (task names, types, nested task counts) but NOT when parameter values change.
+ * This prevents unnecessary dagre layout recalculations on every property save.
+ */
+function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
+    return tasks
+        .map((task) => {
+            const parts = [task.name, task.type];
+            const parameters = task.parameters;
+
+            if (!parameters) {
+                return parts.join('|');
+            }
+
+            // Condition: caseTrue/caseFalse lengths affect placeholder creation
+            if (Array.isArray(parameters.caseTrue)) {
+                parts.push(`ct${parameters.caseTrue.length}`);
+            }
+
+            if (Array.isArray(parameters.caseFalse)) {
+                parts.push(`cf${parameters.caseFalse.length}`);
+            }
+
+            // Loop/Map: iteratee length or presence
+            if (Array.isArray(parameters.iteratee)) {
+                parts.push(`it${parameters.iteratee.length}`);
+            } else if (parameters.iteratee && typeof parameters.iteratee === 'object') {
+                // Each: iteratee is a single object, presence matters
+                parts.push(`it1`);
+            }
+
+            // Branch: case count and per-case task counts
+            if (Array.isArray(parameters.cases)) {
+                const caseCounts = (parameters.cases as BranchCaseType[]).map(
+                    (caseItem) => caseItem.tasks?.length || 0
+                );
+
+                parts.push(`cs${caseCounts.join('-')}`);
+            }
+
+            if (Array.isArray(parameters.default)) {
+                parts.push(`df${parameters.default.length}`);
+            }
+
+            // Parallel: tasks length
+            if (Array.isArray(parameters.tasks)) {
+                parts.push(`ts${parameters.tasks.length}`);
+            }
+
+            // Fork-join: branches count and per-branch task counts
+            if (Array.isArray(parameters.branches)) {
+                const branchCounts = parameters.branches.map((branch: WorkflowTask[]) =>
+                    Array.isArray(branch) ? branch.length : 0
+                );
+
+                parts.push(`br${branchCounts.join('-')}`);
+            }
+
+            return parts.join('|');
+        })
+        .join(',');
+}
+
 interface UseLayoutProps {
     canvasHeight?: number;
     canvasWidth: number;
@@ -69,14 +135,51 @@ export default function useLayout({
     const storeDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const layoutDirection = directionProp || storeDirection;
 
-    let workflow = useWorkflowDataStore((state) => state.workflow);
+    // Selective subscriptions with structural equality — prevents re-renders on parameter-only
+    // changes (typing). Only re-renders when task graph structure changes (add/delete node).
+    const storeTasks = useStoreWithEqualityFn(
+        useWorkflowDataStore,
+        (state) => state.workflow.tasks,
+        (previousTasks, nextTasks) => {
+            if (previousTasks === nextTasks) {
+                return true;
+            }
+
+            if (!previousTasks || !nextTasks) {
+                return false;
+            }
+
+            return getTasksStructuralFingerprint(previousTasks) === getTasksStructuralFingerprint(nextTasks);
+        }
+    );
+
+    const storeTriggers = useStoreWithEqualityFn(
+        useWorkflowDataStore,
+        (state) => state.workflow.triggers,
+        (previousTriggers, nextTriggers) => {
+            if (previousTriggers === nextTriggers) {
+                return true;
+            }
+
+            if (!previousTriggers || !nextTriggers) {
+                return false;
+            }
+
+            if (previousTriggers.length !== nextTriggers.length) {
+                return false;
+            }
+
+            return previousTriggers.every(
+                (trigger, index) =>
+                    trigger.name === nextTriggers[index].name && trigger.type === nextTriggers[index].type
+            );
+        }
+    );
+
     const isWorkflowLoaded = useWorkflowDataStore((state) => state.isWorkflowLoaded);
 
-    if (!workflow.tasks && readOnlyWorkflow) {
-        workflow = {...workflow, ...readOnlyWorkflow};
-    }
-
-    const {tasks, triggers} = workflow;
+    const tasks = storeTasks || readOnlyWorkflow?.tasks;
+    const triggers = storeTriggers || readOnlyWorkflow?.triggers;
 
     const {incrementLayoutResetCounter, initializeWithCanvasWidth, setEdges, setNodes, setSavedPositionCrossAxisShift} =
         useWorkflowDataStore(
