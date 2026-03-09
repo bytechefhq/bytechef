@@ -72,7 +72,7 @@ public class ScriptPythonTool {
                         .description("Custom Python code to execute as a tool.")
                         .controlType(CODE_EDITOR)
                         .languageId("python")
-                        .defaultValue("def perform(input, context):\n\treturn null")
+                        .defaultValue("def perform(input, context):\n\treturn None")
                         .required(true)),
             "python", polyglotEngine);
     }
