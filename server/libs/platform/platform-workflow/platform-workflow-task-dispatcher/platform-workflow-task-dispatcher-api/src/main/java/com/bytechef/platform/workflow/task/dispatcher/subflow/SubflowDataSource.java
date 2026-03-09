@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.subflow;
 
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.domain.SubflowEntry;
 import java.util.List;
@@ -27,11 +27,9 @@ import org.jspecify.annotations.Nullable;
  */
 public interface SubflowDataSource {
 
-    @Nullable
-    OutputResponse getSubWorkflowInputSchema(String workflowUuid);
+    BaseProperty.@Nullable BaseValueProperty<?> getSubWorkflowInputSchema(String workflowUuid);
 
-    @Nullable
-    OutputResponse getSubWorkflowOutputSchema(String workflowUuid);
+    BaseProperty.@Nullable BaseValueProperty<?> getSubWorkflowOutputSchema(String workflowUuid);
 
     List<SubflowEntry> getSubWorkflows(PlatformType platformType, String triggerName, String search);
 }

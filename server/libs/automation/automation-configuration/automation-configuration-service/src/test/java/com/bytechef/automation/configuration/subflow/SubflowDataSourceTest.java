@@ -32,7 +32,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
@@ -83,7 +83,7 @@ class SubflowDataSourceTest {
             mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of());
 
-            OutputResponse result = subflowDataSource.getSubWorkflowInputSchema(WORKFLOW_UUID);
+            BaseProperty.BaseValueProperty<?> result = subflowDataSource.getSubWorkflowInputSchema(WORKFLOW_UUID);
 
             assertNull(result);
         }
@@ -111,7 +111,7 @@ class SubflowDataSourceTest {
                 .when(() -> MapUtils.getString(callableTrigger.getParameters(), WorkflowConstants.INPUT_SCHEMA))
                 .thenReturn(null);
 
-            OutputResponse result = subflowDataSource.getSubWorkflowInputSchema(WORKFLOW_UUID);
+            BaseProperty.BaseValueProperty<?> result = subflowDataSource.getSubWorkflowInputSchema(WORKFLOW_UUID);
 
             assertNull(result);
         }
@@ -126,7 +126,7 @@ class SubflowDataSourceTest {
         when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
         when(workflow.getTasks(true)).thenReturn(List.of());
 
-        OutputResponse result = subflowDataSource.getSubWorkflowOutputSchema(WORKFLOW_UUID);
+        BaseProperty.BaseValueProperty<?> result = subflowDataSource.getSubWorkflowOutputSchema(WORKFLOW_UUID);
 
         assertNull(result);
     }
@@ -150,7 +150,7 @@ class SubflowDataSourceTest {
                 .when(() -> MapUtils.getString(callableResponseTask.getParameters(), WorkflowConstants.OUTPUT_SCHEMA))
                 .thenReturn(null);
 
-            OutputResponse result = subflowDataSource.getSubWorkflowOutputSchema(WORKFLOW_UUID);
+            BaseProperty.BaseValueProperty<?> result = subflowDataSource.getSubWorkflowOutputSchema(WORKFLOW_UUID);
 
             assertNull(result);
         }
