@@ -41,15 +41,35 @@
             return Object.fromEntries(parameters.entries());
         }
 
+        // Extract the opener's origin from the OAuth state parameter
+        function getOpenerOrigin(payload) {
+            try {
+                const state = payload.state;
+
+                if (state) {
+                    const decoded = decodeURIComponent(atob(state));
+                    const stateObj = JSON.parse(decoded);
+
+                    if (stateObj.origin) {
+                        return stateObj.origin;
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to decode state for opener origin:', error);
+            }
+
+            return window.location.origin;
+        }
+
         // Send message using available methods (postMessage, BroadcastChannel, localStorage)
         // Uses all available methods to ensure message delivery across different browser contexts
-        function sendOAuthMessage(message, messageElement) {
+        function sendOAuthMessage(message, messageElement, targetOrigin) {
             let messageSent = false;
 
             // Method 1: Try window.opener.postMessage (preferred)
             if (window.opener) {
                 try {
-                    window.opener.postMessage(message, window.location.origin);
+                    window.opener.postMessage(message, targetOrigin);
                     messageSent = true;
                 } catch (error) {
                     console.warn('Failed to send message via window.opener:', error);
@@ -102,6 +122,7 @@
             };
 
             const error = payload.error;
+            const targetOrigin = getOpenerOrigin(payload);
 
             // Handle error case
             if (error) {
@@ -111,7 +132,7 @@
                 sendOAuthMessage({
                     error: errorMessage,
                     type: OAUTH_RESPONSE
-                }, messageElement);
+                }, messageElement, targetOrigin);
             }
             // Handle success case - let parent window validate state
             else {
@@ -120,7 +141,7 @@
                 sendOAuthMessage({
                     payload,
                     type: OAUTH_RESPONSE
-                }, messageElement);
+                }, messageElement, targetOrigin);
             }
         }
 
