@@ -96,7 +96,7 @@ import {
     type UpdateWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {render, screen} from '@/shared/util/test-utils';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import * as React from 'react';
 import {type Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -302,6 +302,151 @@ describe('PropertyMentionsInputEditor', () => {
             await microtaskTick(2);
 
             expect(screen.getByRole('textbox', {name: 'ExprEditor'}).textContent).toBe('someExpression');
+        });
+    });
+
+    describe('focus guard — prevents value overwrite during typing', () => {
+        it('should not overwrite editor content with stale value prop while focused', async () => {
+            const {rerender} = render(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        label="FocusGuard"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        placeholder=""
+                        type="STRING"
+                        value="initial"
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            const textbox = screen.getByRole('textbox', {name: 'FocusGuard'});
+
+            expect(textbox.textContent).toBe('initial');
+
+            // Focus the editor (simulates user clicking into the field)
+            const user = userEvent.setup();
+
+            await user.click(textbox);
+
+            // Type additional characters
+            await user.type(textbox, 'XYZ');
+
+            await microtaskTick(2);
+
+            // Simulate server response arriving with the old saved value
+            rerender(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        label="FocusGuard"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        placeholder=""
+                        type="STRING"
+                        value="initial"
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            // Editor should retain the user's typed content, NOT revert to "initial"
+            expect(textbox.textContent).toContain('XYZ');
+        });
+
+        it('should sync value prop after editor loses focus', async () => {
+            const {rerender} = render(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        label="BlurSync"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        placeholder=""
+                        type="STRING"
+                        value="before"
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            const textbox = screen.getByRole('textbox', {name: 'BlurSync'});
+
+            expect(textbox.textContent).toBe('before');
+
+            // Focus, type, then blur
+            const user = userEvent.setup();
+
+            await user.click(textbox);
+            await user.type(textbox, '!!');
+
+            // Click outside to blur the editor
+            await user.click(document.body);
+
+            await microtaskTick(2);
+
+            // Now rerender with a new external value — should sync because editor is blurred
+            rerender(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        label="BlurSync"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        placeholder=""
+                        type="STRING"
+                        value="after"
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            expect(textbox.textContent).toBe('after');
+        });
+
+        it('should allow external sync when editor was never focused', async () => {
+            const {rerender} = render(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        label="NoFocus"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        placeholder=""
+                        type="STRING"
+                        value="original"
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            expect(screen.getByRole('textbox', {name: 'NoFocus'}).textContent).toBe('original');
+
+            // Rerender with new value without ever focusing the editor
+            rerender(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        label="NoFocus"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        placeholder=""
+                        type="STRING"
+                        value="externally updated"
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            expect(screen.getByRole('textbox', {name: 'NoFocus'}).textContent).toBe('externally updated');
         });
     });
 
