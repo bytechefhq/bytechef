@@ -45,6 +45,7 @@ interface PropertyMentionsInputProps {
     description?: string;
     error?: boolean;
     errorMessage?: string;
+    expressionEnabled?: boolean;
     handleFromAiClick?: (fromAi: boolean) => void;
     handleInputTypeSwitchButtonClick?: () => void;
     isFromAi?: boolean;
@@ -72,6 +73,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             description,
             error,
             errorMessage,
+            expressionEnabled,
             handleFromAiClick,
             handleInputTypeSwitchButtonClick,
             isFormulaMode,
@@ -129,7 +131,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 if (typeof newValue === 'string') {
                     const startsWithEquals = newValue.trim().startsWith('=');
 
-                    if (startsWithEquals && setIsFormulaMode) {
+                    if (startsWithEquals && setIsFormulaMode && expressionEnabled !== false) {
                         setIsFormulaMode(true);
 
                         const processedValue = newValue.trim().substring(1);
@@ -142,7 +144,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 return true;
             },
-            [setIsFormulaMode]
+            [expressionEnabled, setIsFormulaMode]
         );
 
         const getPropertyMentionsInputEditorRef = useCallback(
@@ -190,7 +192,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
         // Check initial value for formula mode
         useEffect(() => {
-            if (isInitialLoadRef.current && setIsFormulaMode) {
+            if (isInitialLoadRef.current && setIsFormulaMode && expressionEnabled !== false) {
                 const initialValue = value ?? defaultValue;
 
                 if (typeof initialValue === 'string' && initialValue.trim().startsWith('=')) {
@@ -199,7 +201,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 isInitialLoadRef.current = false;
             }
-        }, [value, defaultValue, setIsFormulaMode]);
+        }, [value, defaultValue, expressionEnabled, setIsFormulaMode]);
 
         return (
             <fieldset className={twMerge('w-full', label && 'space-y-1')}>
@@ -290,6 +292,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             controlType={controlType}
                             dataPills={dataPills}
                             elementId={elementId}
+                            expressionEnabled={expressionEnabled}
                             handleFromAiClick={handleFromAiClick}
                             isFormulaMode={isFormulaMode}
                             isFromAi={isFromAi}

@@ -88,6 +88,7 @@ const Property = ({
         displayCondition,
         editorRef,
         errorMessage,
+        expressionEnabled,
         formattedOptions,
         fromAiExpression,
         handleCodeEditorChange,
@@ -194,6 +195,7 @@ const Property = ({
                     description={description}
                     error={hasError}
                     errorMessage={errorMessage}
+                    expressionEnabled={expressionEnabled}
                     handleFromAiClick={handleFromAiClick}
                     handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                     isFormulaMode={isFormulaMode}
@@ -352,7 +354,7 @@ const Property = ({
                                         required={required}
                                         showInputTypeSwitchButton
                                         trailingAction={
-                                            isToolsClusterElement ? (
+                                            isToolsClusterElement && expressionEnabled !== false ? (
                                                 <FromAiToggleButton
                                                     isFromAi={!!isFieldFromAi}
                                                     onToggle={(fromAi) => handleFromAiToggle(fromAi, fieldOnChange)}
@@ -532,7 +534,7 @@ const Property = ({
                                                 showInputTypeSwitchButton={showControlledSwitch}
                                                 title={type}
                                                 trailingAction={
-                                                    showFromAi ? (
+                                                    showFromAi && expressionEnabled !== false ? (
                                                         <FromAiToggleButton
                                                             isFromAi={!!isFieldFromAi}
                                                             onToggle={(fromAi) =>
