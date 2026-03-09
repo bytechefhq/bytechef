@@ -42,7 +42,7 @@ public class ScriptPythonItemProcessor {
                         .description("Custom Python code to process items. The item is available as 'item' parameter.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("python")
-                        .defaultValue("def perform(input, context):\n\treturn null")
+                        .defaultValue("def perform(input, context):\n\treturn None")
                         .required(true)),
             "python", polyglotEngine);
     }

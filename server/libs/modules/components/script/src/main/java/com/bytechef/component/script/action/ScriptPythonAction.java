@@ -58,7 +58,7 @@ public class ScriptPythonAction {
                         .description("Add your Python custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("python")
-                        .defaultValue("def perform(input, context):\n\treturn null")
+                        .defaultValue("def perform(input, context):\n\treturn None")
                         .required(true))
                 .output(),
             "python", polyglotEngine);
