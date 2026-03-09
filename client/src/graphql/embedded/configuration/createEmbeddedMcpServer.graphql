@@ -1,0 +1,9 @@
+mutation createEmbeddedMcpServer($input: CreateEmbeddedMcpServerInput!) {
+    createEmbeddedMcpServer(input: $input) {
+        enabled
+        environmentId
+        id
+        name
+        type
+    }
+}

@@ -82,6 +82,7 @@ const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-
 const EmbeddedConnections = lazy(() =>
     import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
 );
+const EmbeddedMcpServers = lazy(() => import('@/ee/pages/embedded/mcp-servers/McpServers'));
 const EmbeddedIntegrationWorkflowExecutions = lazy(() =>
     import('@/ee/pages/embedded/workflow-executions/WorkflowExecutions').then((module) => ({
         default: module.WorkflowExecutions,
@@ -886,6 +887,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <EmbeddedMcpServers />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'mcp-servers',
                                 },
                                 {
                                     children: [

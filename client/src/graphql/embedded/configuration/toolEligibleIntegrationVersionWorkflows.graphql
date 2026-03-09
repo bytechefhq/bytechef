@@ -1,0 +1,10 @@
+query toolEligibleIntegrationVersionWorkflows($integrationId: ID!, $integrationVersion: Int!) {
+    toolEligibleIntegrationVersionWorkflows(
+        integrationId: $integrationId
+        integrationVersion: $integrationVersion
+    ) {
+        id
+        integrationWorkflowId
+        label
+    }
+}

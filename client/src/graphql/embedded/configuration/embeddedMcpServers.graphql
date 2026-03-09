@@ -1,0 +1,31 @@
+query embeddedMcpServers {
+    embeddedMcpServers {
+        id
+        enabled
+        environmentId
+        lastModifiedDate
+        mcpComponents {
+            componentName
+            componentVersion
+            connectionId
+            id
+            lastModifiedDate
+            mcpServerId
+            title
+            mcpTools {
+                id
+                mcpComponentId
+                name
+                title
+                parameters
+            }
+        }
+        name
+        tags {
+            id
+            name
+        }
+        type
+        url
+    }
+}
