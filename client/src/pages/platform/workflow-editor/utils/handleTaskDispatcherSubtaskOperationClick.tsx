@@ -13,7 +13,7 @@ import InlineSVG from 'react-inlinesvg';
 import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
-import handleComponentAddedSuccess from './handleComponentAddedSuccess';
+import handleComponentAddedSuccess, {openNodeDetailsPanelForNewNode} from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
@@ -94,4 +94,6 @@ export default function handleTaskDispatcherSubtaskOperationClick({
         taskDispatcherContext,
         updateWorkflowMutation,
     });
+
+    openNodeDetailsPanelForNewNode(newWorkflowNodeData);
 }
