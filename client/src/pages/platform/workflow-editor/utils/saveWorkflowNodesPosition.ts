@@ -1,9 +1,16 @@
 import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
+import {Node} from '@xyflow/react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
+import {
+    consumePendingDefinition,
+    hasPendingDefinition,
+    isWorkflowMutating,
+    setPendingDefinition,
+    setWorkflowMutating,
+} from './workflowMutationGuard';
 
 interface SaveWorkflowNodesPositionProps {
     clearPositionNodeIds?: Set<string>;
@@ -83,6 +90,24 @@ export function updateTaskPositions(
                             nodePositions,
                             clearPositionNodeIds
                         ),
+                    },
+                };
+            } else if (
+                typeof updatedTask.parameters.iteratee === 'object' &&
+                (updatedTask.parameters.iteratee as WorkflowTask).name
+            ) {
+                // Single-object iteratee (each dispatcher) — wrap, update, unwrap
+                const [updatedIteratee] = updateTaskPositions(
+                    [updatedTask.parameters.iteratee as WorkflowTask],
+                    nodePositions,
+                    clearPositionNodeIds
+                );
+
+                updatedTask = {
+                    ...updatedTask,
+                    parameters: {
+                        ...updatedTask.parameters,
+                        iteratee: updatedIteratee,
                     },
                 };
             }
@@ -197,6 +222,19 @@ export default function saveWorkflowNodesPosition({
         workflowDefinition.tasks = updateTaskPositions(workflowDefinition.tasks, nodePositions, clearPositionNodeIds);
     }
 
+    // Update the store's definition immediately so the layout effect
+    // can read the latest positions when it re-runs (e.g. on panel toggle).
+    // storeTasks uses fingerprint equality that ignores position metadata,
+    // so this is the only way to keep positions in sync without a full refetch.
+    const updatedDefinitionStr = JSON.stringify(workflowDefinition, null, SPACE);
+
+    useWorkflowDataStore.setState((state) => ({
+        workflow: {
+            ...state.workflow,
+            definition: updatedDefinitionStr,
+        },
+    }));
+
     // Optimistically update ReactFlow node data so the pin button appears
     // immediately without waiting for a full re-layout
     const {nodes, setNodes} = useWorkflowDataStore.getState();
@@ -227,17 +265,52 @@ export default function saveWorkflowNodesPosition({
     setNodes(updatedNodes);
 
     if (isWorkflowMutating(workflow.id!)) {
+        // Queue the definition so it can be sent when the current mutation settles.
+        // Without this, the in-flight mutation's refetch would overwrite the locally
+        // synced definition with server data that lacks the skipped positions.
+        setPendingDefinition(workflow.id!, updatedDefinitionStr);
+
         return;
     }
 
-    setWorkflowMutating(workflow.id!, true);
+    firePositionMutation({
+        definition: updatedDefinitionStr,
+        invalidateWorkflowQueries,
+        previousNodes,
+        setNodes,
+        updateWorkflowMutation,
+        version: workflow.version,
+        workflowId: workflow.id!,
+    });
+}
+
+interface FirePositionMutationProps {
+    definition: string;
+    invalidateWorkflowQueries: () => void;
+    previousNodes: Node[];
+    setNodes: (nodes: Node[]) => void;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
+    version?: number;
+    workflowId: string;
+}
+
+function firePositionMutation({
+    definition,
+    invalidateWorkflowQueries,
+    previousNodes,
+    setNodes,
+    updateWorkflowMutation,
+    version,
+    workflowId,
+}: FirePositionMutationProps) {
+    setWorkflowMutating(workflowId, true);
 
     updateWorkflowMutation.mutate(
         {
-            id: workflow.id!,
+            id: workflowId,
             workflow: {
-                definition: JSON.stringify(workflowDefinition, null, SPACE),
-                version: workflow.version,
+                definition,
+                version,
             },
         },
         {
@@ -245,7 +318,34 @@ export default function saveWorkflowNodesPosition({
                 setNodes(previousNodes);
             },
             onSettled: () => {
-                setWorkflowMutating(workflow.id!, false);
+                setWorkflowMutating(workflowId, false);
+
+                // If another position save was skipped while this mutation was
+                // in flight, fire it now with the latest queued definition.
+                const pendingDefinition = consumePendingDefinition(workflowId);
+
+                if (pendingDefinition) {
+                    const currentWorkflow = useWorkflowDataStore.getState().workflow;
+
+                    // Re-sync the store definition in case the refetch from
+                    // onSuccess already overwrote it with stale server data.
+                    useWorkflowDataStore.setState((state) => ({
+                        workflow: {
+                            ...state.workflow,
+                            definition: pendingDefinition,
+                        },
+                    }));
+
+                    firePositionMutation({
+                        definition: pendingDefinition,
+                        invalidateWorkflowQueries,
+                        previousNodes: useWorkflowDataStore.getState().nodes,
+                        setNodes: useWorkflowDataStore.getState().setNodes,
+                        updateWorkflowMutation,
+                        version: currentWorkflow.version,
+                        workflowId,
+                    });
+                }
             },
             onSuccess: (updatedWorkflow) => {
                 const currentWorkflow = useWorkflowDataStore.getState().workflow;
@@ -255,7 +355,14 @@ export default function saveWorkflowNodesPosition({
                     version: updatedWorkflow.version,
                 });
 
-                invalidateWorkflowQueries();
+                // Only invalidate queries if there are no pending position saves.
+                // A pending save means another mutation will fire from onSettled,
+                // and its own onSuccess will invalidate queries with up-to-date
+                // server data. Invalidating here would trigger a refetch that
+                // overwrites the locally synced definition with stale server data.
+                if (!hasPendingDefinition(workflowId)) {
+                    invalidateWorkflowQueries();
+                }
             },
         }
     );

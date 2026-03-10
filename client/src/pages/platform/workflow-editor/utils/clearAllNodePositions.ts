@@ -3,7 +3,13 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
+import {
+    consumePendingDefinition,
+    hasPendingDefinition,
+    isWorkflowMutating,
+    setPendingDefinition,
+    setWorkflowMutating,
+} from './workflowMutationGuard';
 
 interface ClearAllNodePositionsProps {
     incrementLayoutResetCounter: () => void;
@@ -56,6 +62,19 @@ export function clearTaskPositions(tasks: WorkflowTask[]): WorkflowTask[] {
                     parameters: {
                         ...updatedTask.parameters,
                         iteratee: clearTaskPositions(updatedTask.parameters.iteratee as WorkflowTask[]),
+                    },
+                };
+            } else if (
+                typeof updatedTask.parameters.iteratee === 'object' &&
+                (updatedTask.parameters.iteratee as WorkflowTask).name
+            ) {
+                const [updatedIteratee] = clearTaskPositions([updatedTask.parameters.iteratee as WorkflowTask]);
+
+                updatedTask = {
+                    ...updatedTask,
+                    parameters: {
+                        ...updatedTask.parameters,
+                        iteratee: updatedIteratee,
                     },
                 };
             }
@@ -146,7 +165,20 @@ export default function clearAllNodePositions({
         workflowDefinition.tasks = clearTaskPositions(workflowDefinition.tasks);
     }
 
+    // Update the store's definition immediately so the layout effect
+    // reads cleared positions when incrementLayoutResetCounter fires.
+    const updatedDefinitionStr = JSON.stringify(workflowDefinition, null, SPACE);
+
+    useWorkflowDataStore.setState((state) => ({
+        workflow: {
+            ...state.workflow,
+            definition: updatedDefinitionStr,
+        },
+    }));
+
     if (isWorkflowMutating(workflow.id!)) {
+        setPendingDefinition(workflow.id!, updatedDefinitionStr);
+
         return;
     }
 
@@ -156,7 +188,7 @@ export default function clearAllNodePositions({
         {
             id: workflow.id!,
             workflow: {
-                definition: JSON.stringify(workflowDefinition, null, SPACE),
+                definition: updatedDefinitionStr,
                 version: workflow.version,
             },
         },
@@ -166,6 +198,50 @@ export default function clearAllNodePositions({
             },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
+
+                const pendingDefinition = consumePendingDefinition(workflow.id!);
+
+                if (pendingDefinition) {
+                    const currentWorkflow = useWorkflowDataStore.getState().workflow;
+
+                    useWorkflowDataStore.setState((state) => ({
+                        workflow: {
+                            ...state.workflow,
+                            definition: pendingDefinition,
+                        },
+                    }));
+
+                    setWorkflowMutating(workflow.id!, true);
+
+                    updateWorkflowMutation.mutate(
+                        {
+                            id: workflow.id!,
+                            workflow: {
+                                definition: pendingDefinition,
+                                version: currentWorkflow.version,
+                            },
+                        },
+                        {
+                            onError: () => {
+                                invalidateWorkflowQueries();
+                            },
+                            onSettled: () => {
+                                setWorkflowMutating(workflow.id!, false);
+                            },
+                            onSuccess: (retryWorkflow) => {
+                                const retryCurrentWorkflow = useWorkflowDataStore.getState().workflow;
+
+                                useWorkflowDataStore.getState().setWorkflow({
+                                    ...retryCurrentWorkflow,
+                                    version: retryWorkflow.version,
+                                });
+
+                                invalidateWorkflowQueries();
+                                incrementLayoutResetCounter();
+                            },
+                        }
+                    );
+                }
             },
             onSuccess: (updatedWorkflow) => {
                 const currentWorkflow = useWorkflowDataStore.getState().workflow;
@@ -175,8 +251,10 @@ export default function clearAllNodePositions({
                     version: updatedWorkflow.version,
                 });
 
-                invalidateWorkflowQueries();
-                incrementLayoutResetCounter();
+                if (!hasPendingDefinition(workflow.id!)) {
+                    invalidateWorkflowQueries();
+                    incrementLayoutResetCounter();
+                }
             },
         }
     );
