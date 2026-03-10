@@ -16,15 +16,6 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.constant;
 
-import com.bytechef.component.ai.vectorstore.VectorStore;
-import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
-import com.bytechef.component.definition.Parameters;
-import java.util.List;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.document.DocumentReader;
-import org.springframework.ai.document.DocumentTransformer;
-import org.springframework.ai.embedding.EmbeddingModel;
-
 /**
  * @author Ivica Cardic
  */
@@ -39,50 +30,5 @@ public final class KnowledgeBaseVectorStoreConstants {
     public static final String TOP_K = "topK";
 
     private KnowledgeBaseVectorStoreConstants() {
-    }
-
-    public static VectorStore createVectorStore(org.springframework.ai.vectorstore.VectorStore vectorStore) {
-        return new VectorStore() {
-
-            @Override
-            public org.springframework.ai.vectorstore.VectorStore createVectorStore(
-                Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
-
-                Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
-
-                return new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId);
-            }
-
-            @Override
-            public void load(
-                Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
-                DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
-
-                Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
-
-                org.springframework.ai.vectorstore.VectorStore wrappedVectorStore =
-                    new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId);
-
-                List<Document> documents = documentReader.read();
-
-                for (DocumentTransformer documentTransformer : documentTransformers) {
-                    documents = documentTransformer.transform(documents);
-                }
-
-                wrappedVectorStore.add(documents);
-            }
-
-            @Override
-            public List<Document> search(
-                Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
-
-                Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
-
-                org.springframework.ai.vectorstore.VectorStore wrappedVectorStore =
-                    new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId);
-
-                return wrappedVectorStore.similaritySearch(inputParameters.getRequiredString(QUERY));
-            }
-        };
     }
 }
