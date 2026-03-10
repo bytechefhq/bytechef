@@ -23,8 +23,10 @@ import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChat
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils.getChatMemoryRepository;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionDefinition;
@@ -74,6 +76,12 @@ public class JdbcChatMemoryAddMessagesAction {
                                     .label("Content")
                                     .description("The content of the message.")
                                     .required(true))))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            string(CONVERSATION_ID),
+                            integer("messageCount"))))
             .perform(
                 (MultipleConnectionsPerformFunction) (
                     inputParameters, componentConnections, extensions, context) -> perform(inputParameters,
@@ -108,7 +116,7 @@ public class JdbcChatMemoryAddMessagesAction {
         repository.saveAll(conversationId, existingMessages);
 
         return Map.of(
-            "conversationId", conversationId,
+            CONVERSATION_ID, conversationId,
             "messageCount", existingMessages.size());
     }
 
