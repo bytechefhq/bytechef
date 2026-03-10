@@ -25,6 +25,7 @@ interface WorkflowNodesTabsItemProps extends HTMLAttributes<HTMLLIElement> {
 const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: WorkflowNodesTabsItemProps) => {
     const [isVisible, setIsVisible] = useState(false);
     const ref = useRef<HTMLLIElement>(null);
+    const iconRef = useRef<HTMLSpanElement>(null);
 
     let nodeName = node.name;
 
@@ -39,6 +40,28 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
     const onDragStart = (event: DragEventI) => {
         event.dataTransfer.setData('application/reactflow', nodeName);
         event.dataTransfer.effectAllowed = 'move';
+
+        if (iconRef.current) {
+            const nodeContainer = document.createElement('div');
+
+            nodeContainer.style.cssText =
+                'width:56px;height:56px;border-radius:8px;border:2px solid #e2e8f0;background:#fff;display:flex;align-items:center;justify-content:center;position:absolute;top:-1000px;left:-1000px;';
+
+            const iconClone = iconRef.current.cloneNode(true) as HTMLElement;
+
+            iconClone.style.cssText = 'width:28px;height:28px;margin:0;';
+
+            const svgElement = iconClone.querySelector('svg');
+
+            if (svgElement) {
+                svgElement.style.cssText = 'width:100%;height:100%;display:block;';
+            }
+
+            nodeContainer.appendChild(iconClone);
+            document.body.appendChild(nodeContainer);
+            event.dataTransfer.setDragImage(nodeContainer, 28, 28);
+            setTimeout(() => document.body.removeChild(nodeContainer), 0);
+        }
     };
 
     useEffect(() => {
@@ -80,21 +103,23 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
             onDragStart={(event) => onDragStart(event)}
             ref={ref}
         >
-            {node.icon ? (
-                isVisible ? (
-                    <InlineSVG
-                        cacheRequests={true}
-                        className="mr-2 size-7 flex-none"
-                        loader={<ComponentIcon className="mr-2 size-7 flex-none" />}
-                        src={node.icon}
-                        title={node.title}
-                    />
+            <span className="mr-2 flex-none" ref={iconRef}>
+                {node.icon ? (
+                    isVisible ? (
+                        <InlineSVG
+                            cacheRequests={true}
+                            className="size-7"
+                            loader={<ComponentIcon className="size-7" />}
+                            src={node.icon}
+                            title={node.title}
+                        />
+                    ) : (
+                        <ComponentIcon className="size-7" />
+                    )
                 ) : (
-                    <ComponentIcon className="mr-2 size-7 flex-none" />
-                )
-            ) : (
-                <ComponentIcon className="mr-2 size-7 flex-none" />
-            )}
+                    <ComponentIcon className="size-7" />
+                )}
+            </span>
 
             <div className="flex flex-col">
                 <p className="text-sm font-medium">{node?.title}</p>
