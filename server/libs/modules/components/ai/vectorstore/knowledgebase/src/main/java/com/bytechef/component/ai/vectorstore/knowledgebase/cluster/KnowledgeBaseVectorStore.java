@@ -16,12 +16,20 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.createVectorStore;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 
+import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import java.util.List;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.document.DocumentReader;
+import org.springframework.ai.document.DocumentTransformer;
+import org.springframework.ai.embedding.EmbeddingModel;
 
 /**
  * Knowledge Base VectorStore cluster element for AI agent integration.
@@ -39,5 +47,50 @@ public final class KnowledgeBaseVectorStore {
 
         return VectorStoreDefinition.of(
             "Knowledge Base", createVectorStore(vectorStore), clusterElementDefinitionService);
+    }
+
+    public static VectorStore createVectorStore(org.springframework.ai.vectorstore.VectorStore vectorStore) {
+        return new VectorStore() {
+
+            @Override
+            public org.springframework.ai.vectorstore.VectorStore createVectorStore(
+                Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
+
+                Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
+
+                return new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId);
+            }
+
+            @Override
+            public void load(
+                Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
+                DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
+
+                Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
+
+                org.springframework.ai.vectorstore.VectorStore wrappedVectorStore =
+                    new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId);
+
+                List<Document> documents = documentReader.read();
+
+                for (DocumentTransformer documentTransformer : documentTransformers) {
+                    documents = documentTransformer.transform(documents);
+                }
+
+                wrappedVectorStore.add(documents);
+            }
+
+            @Override
+            public List<Document> search(
+                Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
+
+                Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
+
+                org.springframework.ai.vectorstore.VectorStore wrappedVectorStore =
+                    new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId);
+
+                return wrappedVectorStore.similaritySearch(inputParameters.getRequiredString(QUERY));
+            }
+        };
     }
 }
