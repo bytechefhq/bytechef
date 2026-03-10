@@ -48,22 +48,24 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
     const isEditMode = !!mcpProject?.id;
 
     const [isOpen, setIsOpen] = useState(!triggerNode);
-    const [curProjectId, setCurProjectId] = useState<number | undefined>(
+    const [currentProjectId, setCurrentProjectId] = useState<number | undefined>(
         isEditMode ? Number(mcpProject.project?.id) : undefined
     );
-    const [curProjectVersion, setCurProjectVersion] = useState<number | undefined>(
+    const [currentProjectVersion, setCurrentProjectVersion] = useState<number | undefined>(
         isEditMode ? (mcpProject.projectVersion ?? undefined) : undefined
     );
 
-    const initialSelectedWorkflowIds = useMemo(
-        () =>
-            isEditMode
-                ? mcpProject.mcpProjectWorkflows
-                      ?.filter((workflow) => workflow?.workflow?.id != null)
-                      .map((workflow) => workflow!.workflow!.id!) || []
-                : [],
-        [isEditMode, mcpProject?.mcpProjectWorkflows]
-    );
+    const initialSelectedWorkflowIds = useMemo(() => {
+        if (!isEditMode) {
+            return [];
+        }
+
+        const mcpProjectWorkflows = mcpProject.mcpProjectWorkflows ?? [];
+
+        return mcpProjectWorkflows
+            .filter((workflow) => workflow?.workflow?.id != null)
+            .map((workflow) => workflow!.workflow!.id!);
+    }, [isEditMode, mcpProject?.mcpProjectWorkflows]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -78,10 +80,10 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
 
     const {data: eligibleWorkflowsData} = useToolEligibleProjectVersionWorkflowsQuery(
         {
-            projectId: String(curProjectId || 0),
-            projectVersion: curProjectVersion || 0,
+            projectId: String(currentProjectId || 0),
+            projectVersion: currentProjectVersion || 0,
         },
-        {enabled: !!(curProjectId && curProjectVersion)}
+        {enabled: !!(currentProjectId && currentProjectVersion)}
     );
 
     const eligibleWorkflows = eligibleWorkflowsData?.toolEligibleProjectVersionWorkflows;
@@ -180,91 +182,66 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
 
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveMcpProject)}>
+                        {isEditMode && (
+                            <>
+                                <FormItem>
+                                    <FormLabel>Project</FormLabel>
+
+                                    <Input disabled value={mcpProject.project?.name || ''} />
+                                </FormItem>
+
+                                <FormItem>
+                                    <FormLabel>Project Version</FormLabel>
+
+                                    <Input disabled value={`v${mcpProject.projectVersion}`} />
+                                </FormItem>
+                            </>
+                        )}
+
                         {!isEditMode && (
-                            <FormField
-                                control={control}
-                                name="mcpServerId"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>MCP Server</FormLabel>
-
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                disabled={!!mcpServer}
-                                                placeholder={mcpServer ? mcpServer.name : 'Select MCP Server'}
-                                                value={mcpServer ? mcpServer.name : field.value}
-                                            />
-                                        </FormControl>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        )}
-
-                        {isEditMode ? (
-                            <FormItem>
-                                <FormLabel>Project</FormLabel>
-
-                                <Input disabled value={mcpProject.project?.name || ''} />
-                            </FormItem>
-                        ) : (
-                            <FormField
-                                control={control}
-                                name="projectId"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Project</FormLabel>
-
-                                        <FormControl>
-                                            <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                                apiCollections={false}
-                                                onBlur={field.onBlur}
-                                                onChange={(item) => {
-                                                    if (item) {
-                                                        setValue('projectId', item.value);
-                                                        resetField('projectVersion');
-
-                                                        setCurProjectId(item.value);
-                                                        setCurProjectVersion(undefined);
-                                                    }
-                                                }}
-                                                value={field.value}
-                                            />
-                                        </FormControl>
-
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                shouldUnregister={false}
-                            />
-                        )}
-
-                        {isEditMode ? (
-                            <FormItem>
-                                <FormLabel>Project Version</FormLabel>
-
-                                <Input disabled value={`v${mcpProject.projectVersion}`} />
-                            </FormItem>
-                        ) : (
-                            curProjectId && (
+                            <>
                                 <FormField
                                     control={control}
-                                    name="projectVersion"
+                                    name="mcpServerId"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>Project Version</FormLabel>
+                                            <FormLabel>MCP Server</FormLabel>
 
                                             <FormControl>
-                                                <ProjectDeploymentDialogBasicStepProjectVersionsSelect
-                                                    onChange={(value) => {
-                                                        field.onChange(value);
-                                                        setCurProjectVersion(value);
-                                                        setValue('selectedWorkflowIds', []);
+                                                <Input
+                                                    {...field}
+                                                    disabled={!!mcpServer}
+                                                    placeholder={mcpServer ? mcpServer.name : 'Select MCP Server'}
+                                                    value={mcpServer ? mcpServer.name : field.value}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="projectId"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Project</FormLabel>
+
+                                            <FormControl>
+                                                <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                                    apiCollections={false}
+                                                    onBlur={field.onBlur}
+                                                    onChange={(item) => {
+                                                        if (item) {
+                                                            setValue('projectId', item.value);
+                                                            resetField('projectVersion');
+
+                                                            setCurrentProjectId(item.value);
+                                                            setCurrentProjectVersion(undefined);
+                                                        }
                                                     }}
-                                                    projectId={curProjectId}
-                                                    projectVersion={curProjectVersion}
+                                                    value={field.value}
                                                 />
                                             </FormControl>
 
@@ -273,7 +250,34 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                                     )}
                                     shouldUnregister={false}
                                 />
-                            )
+
+                                {currentProjectId && (
+                                    <FormField
+                                        control={control}
+                                        name="projectVersion"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Project Version</FormLabel>
+
+                                                <FormControl>
+                                                    <ProjectDeploymentDialogBasicStepProjectVersionsSelect
+                                                        onChange={(value) => {
+                                                            field.onChange(value);
+                                                            setCurrentProjectVersion(value);
+                                                            setValue('selectedWorkflowIds', []);
+                                                        }}
+                                                        projectId={currentProjectId}
+                                                        projectVersion={currentProjectVersion}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                        shouldUnregister={false}
+                                    />
+                                )}
+                            </>
                         )}
 
                         {eligibleWorkflows && eligibleWorkflows.length > 0 && (
