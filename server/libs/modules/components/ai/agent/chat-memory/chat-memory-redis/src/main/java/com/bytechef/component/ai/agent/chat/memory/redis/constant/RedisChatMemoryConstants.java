@@ -22,6 +22,7 @@ package com.bytechef.component.ai.agent.chat.memory.redis.constant;
 public class RedisChatMemoryConstants {
 
     public static final String CONVERSATION_ID = "conversationId";
+    public static final String DEFAULT_KEY_PREFIX = "bytechef-chat-memory:";
     public static final String HOST = "host";
     public static final String KEY_PREFIX = "keyPrefix";
     public static final String MESSAGES = "messages";
