@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.util.VectorStoreUtils;
-import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -73,12 +72,13 @@ public final class SearchToolDefinition {
                         SEARCH_PROPERTIES.stream())
                     .flatMap(stream -> stream)
                     .toList())
-            .object(() -> searchToolDefinition::apply);
+            .object(() -> (MultipleConnectionsToolFunction) (
+                inputParameters, connectionParameters, extensions, componentConnections,
+                context) -> searchToolDefinition.apply(inputParameters, extensions, componentConnections));
     }
 
     private Object apply(
-        Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections, ClusterElementContext context) {
+        Parameters inputParameters, Parameters extensions, Map<String, ComponentConnection> componentConnections) {
 
         ComponentConnection vectorStoreComponentConnection = componentConnections.get(componentName);
         EmbeddingModel embeddingModel = VectorStoreUtils.getEmbeddingModel(
