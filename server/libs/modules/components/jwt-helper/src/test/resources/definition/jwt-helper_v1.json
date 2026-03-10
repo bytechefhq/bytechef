@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates JWT token.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jwt-helper_v1#sign"
+    },
     "metadata": null,
     "name": "sign",
     "outputDefinition": {
@@ -178,7 +181,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Verify JWT token.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jwt-helper_v1#verify"
+    },
     "metadata": null,
     "name": "verify",
     "outputDefinition": {
