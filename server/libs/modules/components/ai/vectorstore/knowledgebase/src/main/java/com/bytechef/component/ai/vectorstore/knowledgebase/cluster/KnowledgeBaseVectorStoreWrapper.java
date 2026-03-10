@@ -69,7 +69,8 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
         Filter.Expression combinedExpression = new Filter.Expression(
             Filter.ExpressionType.AND,
             new Filter.Expression(
-                Filter.ExpressionType.EQ, new Filter.Key(METADATA_KNOWLEDGE_BASE_ID),
+                Filter.ExpressionType.EQ,
+                new Filter.Key(METADATA_KNOWLEDGE_BASE_ID),
                 new Filter.Value(knowledgeBaseId)),
             filterExpression);
 
