@@ -18,6 +18,8 @@ package com.bytechef.component.wait.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.wait.constant.WaitConstants.DATE_TIME;
 
 import com.bytechef.component.definition.ActionContext;
@@ -45,6 +47,12 @@ public class WaitAtSpecifiedTimeAction {
                     .label("Date and Time")
                     .description("The date and time to wait until before resuming workflow execution.")
                     .required(true))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            dateTime("scheduledAt")
+                                .description("The date and time at which the workflow was scheduled to resume."))))
             .perform(waitAtSpecifiedTimeAction::perform)
             .resumePerform(waitAtSpecifiedTimeAction::resumePerform);
     }

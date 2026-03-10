@@ -17,8 +17,11 @@
 package com.bytechef.component.wait.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.wait.constant.WaitConstants.AMOUNT;
 import static com.bytechef.component.wait.constant.WaitConstants.UNIT;
@@ -58,6 +61,16 @@ public class WaitAfterTimeIntervalAction {
                         option("Minutes", "MINUTES"),
                         option("Hours", "HOURS"),
                         option("Days", "DAYS")))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            integer(AMOUNT)
+                                .description("The amount of time that was waited."),
+                            dateTime("scheduledAt")
+                                .description("The date and time at which the workflow was scheduled to resume."),
+                            string(UNIT)
+                                .description("The unit of time that was waited."))))
             .perform(waitAfterTimeIntervalAction::perform)
             .resumePerform(waitAfterTimeIntervalAction::resumePerform);
     }
