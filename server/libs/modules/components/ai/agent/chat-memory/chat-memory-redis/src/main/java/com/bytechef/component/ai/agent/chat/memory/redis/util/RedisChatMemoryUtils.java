@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.chat.memory.redis.util;
 
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.DEFAULT_KEY_PREFIX;
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.HOST;
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.KEY_PREFIX;
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.PASSWORD;
@@ -33,8 +34,6 @@ import redis.clients.jedis.JedisPooled;
  * @author Ivica Cardic
  */
 public class RedisChatMemoryUtils {
-
-    private static final String DEFAULT_KEY_PREFIX = "bytechef-chat-memory:";
 
     public static ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
         JedisPooled jedisClient = getJedisClient(connectionParameters);
@@ -59,7 +58,11 @@ public class RedisChatMemoryUtils {
         String username = connectionParameters.getString(USERNAME);
         String password = connectionParameters.getString(PASSWORD);
 
-        if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
+        if (username != null && !username.isBlank()) {
+            if (password == null || password.isBlank()) {
+                throw new IllegalArgumentException("Password is required when username is provided");
+            }
+
             return new JedisPooled(host, port, username, password);
         } else if (password != null && !password.isBlank()) {
             return new JedisPooled(host, port, null, password);
