@@ -103,7 +103,7 @@ public class WorkflowCallWorkflowTool {
                 return null;
             }
 
-            return BaseOutputDefinition.OutputResponse.of(outputSchema);
+            return BaseOutputDefinition.OutputResponse.of(toComponentProperty(outputSchema));
         };
     }
 
