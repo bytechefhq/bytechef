@@ -1,0 +1,8 @@
+extend type Query {
+    validateWorkflow(workflow: String!): WorkflowValidationResult!
+}
+
+type WorkflowValidationResult {
+    errors: [String!]!
+    warnings: [String!]!
+}
