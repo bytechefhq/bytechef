@@ -108,8 +108,11 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                     taskDispatcherDefinitionService.getTaskDispatcherDefinition(
                         workflowNodeType.name(), workflowNodeType.version());
 
-                return taskDispatcherDefinition.getProperties()
-                    .stream()
+                return java.util.stream.Stream.concat(
+                    taskDispatcherDefinition.getProperties()
+                        .stream(),
+                    taskDispatcherDefinition.getTaskProperties()
+                        .stream())
                     .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
                     .toList();
             }
@@ -190,6 +193,39 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             }
         } else if (baseProperty instanceof Property property) {
             type = property.getType()
+                .name();
+        } else if (baseProperty instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty tdObjectProperty) {
+            type = "OBJECT";
+            List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> properties =
+                tdObjectProperty.getProperties();
+
+            if (properties != null && !properties.isEmpty()) {
+                nestedPropertyInfos = properties.stream()
+                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                    .toList();
+            }
+        } else if (baseProperty instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty tdArrayProperty) {
+            type = "ARRAY";
+            List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> items =
+                tdArrayProperty.getItems();
+
+            if (items != null && !items.isEmpty()) {
+                nestedPropertyInfos = items.stream()
+                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                    .toList();
+            }
+        } else if (baseProperty instanceof com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty tdFileEntryProperty) {
+            type = "FILE_ENTRY";
+            List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.ValueProperty<?>> properties =
+                tdFileEntryProperty.getProperties();
+
+            if (properties != null && !properties.isEmpty()) {
+                nestedPropertyInfos = properties.stream()
+                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                    .toList();
+            }
+        } else if (baseProperty instanceof com.bytechef.platform.workflow.task.dispatcher.domain.Property tdProperty) {
+            type = tdProperty.getType()
                 .name();
         } else {
             type = "OBJECT";
