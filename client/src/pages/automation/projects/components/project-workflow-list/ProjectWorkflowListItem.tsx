@@ -143,8 +143,6 @@ const ProjectWorkflowListItem = ({
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onError: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast.error('Workflow duplication failed.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});

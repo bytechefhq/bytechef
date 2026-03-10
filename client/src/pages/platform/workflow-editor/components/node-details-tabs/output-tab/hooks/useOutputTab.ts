@@ -17,7 +17,6 @@ import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {toast} from 'sonner';
 
 interface UseOutputTabProps {
     clusterElementType?: string;
@@ -109,9 +108,6 @@ export default function useOutputTab({
     });
 
     const saveClusterElementTestOutputMutation = useSaveClusterElementTestOutputMutation({
-        onError: () => {
-            toast.error('Failed to test cluster element. Please try again.');
-        },
         onSuccess: invalidateNodeOutputs,
     });
 

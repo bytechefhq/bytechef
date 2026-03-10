@@ -5,7 +5,6 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UseMutationResult} from '@tanstack/react-query';
-import {toast} from 'sonner';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -64,8 +63,6 @@ export default function deleteProperty(
                 {
                     onError: (error) => {
                         console.error('Failed to delete cluster element parameter:', error);
-
-                        toast.error('Failed to delete property. Please try again.');
                     },
                     onSuccess: (response) => {
                         const {setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
@@ -116,8 +113,6 @@ export default function deleteProperty(
             {
                 onError: (error) => {
                     console.error('Failed to delete workflow node parameter:', error);
-
-                    toast.error('Failed to delete property. Please try again.');
                 },
                 onSuccess: (response) => {
                     const {setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();

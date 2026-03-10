@@ -47,7 +47,6 @@ vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
     useDuplicateWorkflowMutation: ({onError, onSuccess}: {onError: () => void; onSuccess: () => void}) => {
         duplicateOnSuccess = onSuccess;
         duplicateOnError = onError;
-
         return {mutate: mockDuplicateMutate};
     },
     useUpdateWorkflowMutation: ({onSuccess}: {onSuccess: () => void}) => {
