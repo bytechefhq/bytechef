@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.chat.memory.mongodb;
 
-import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.MongoDbChatMemoryConstants.COLLECTION_NAME;
 import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.MongoDbChatMemoryConstants.CONNECTION_STRING;
 import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.MongoDbChatMemoryConstants.DATABASE_NAME;
 import static com.bytechef.component.definition.ComponentDsl.component;
@@ -51,11 +50,6 @@ public class MongoDbChatMemoryComponentHandler implements ComponentHandler {
                 .label("Database Name")
                 .description("The MongoDB database name.")
                 .defaultValue("spring_ai")
-                .required(false),
-            string(COLLECTION_NAME)
-                .label("Collection Name")
-                .description("The MongoDB collection name for storing chat messages.")
-                .defaultValue("chat_memory")
                 .required(false));
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("mongoDbChatMemory")

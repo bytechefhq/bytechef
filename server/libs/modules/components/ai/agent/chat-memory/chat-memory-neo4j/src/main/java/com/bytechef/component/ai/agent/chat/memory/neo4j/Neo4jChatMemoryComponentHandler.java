@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.chat.memory.neo4j;
 
-import static com.bytechef.component.ai.agent.chat.memory.neo4j.constant.Neo4jChatMemoryConstants.DATABASE;
 import static com.bytechef.component.ai.agent.chat.memory.neo4j.constant.Neo4jChatMemoryConstants.PASSWORD;
 import static com.bytechef.component.ai.agent.chat.memory.neo4j.constant.Neo4jChatMemoryConstants.URI;
 import static com.bytechef.component.ai.agent.chat.memory.neo4j.constant.Neo4jChatMemoryConstants.USERNAME;
@@ -50,12 +49,7 @@ public class Neo4jChatMemoryComponentHandler implements ComponentHandler {
                 .label("URI")
                 .description("The Neo4j server URI.")
                 .defaultValue("bolt://localhost:7687")
-                .required(true),
-            string(DATABASE)
-                .label("Database")
-                .description("The Neo4j database name.")
-                .defaultValue("neo4j")
-                .required(false))
+                .required(true))
         .authorizations(
             authorization(AuthorizationType.CUSTOM)
                 .properties(

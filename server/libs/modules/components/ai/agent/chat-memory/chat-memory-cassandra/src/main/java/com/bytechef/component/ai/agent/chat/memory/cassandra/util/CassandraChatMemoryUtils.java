@@ -50,10 +50,17 @@ public class CassandraChatMemoryUtils {
         String password = connectionParameters.getString(PASSWORD);
 
         CqlSessionBuilder sessionBuilder = CqlSession.builder()
-            .addContactPoint(new InetSocketAddress(contactPoints, port))
             .withLocalDatacenter(datacenter);
 
-        if (username != null && !username.isBlank()) {
+        for (String contactPoint : contactPoints.split(",")) {
+            String host = contactPoint.trim();
+
+            if (!host.isEmpty()) {
+                sessionBuilder.addContactPoint(new InetSocketAddress(host, port));
+            }
+        }
+
+        if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
             sessionBuilder.withAuthCredentials(username, password);
         }
 
