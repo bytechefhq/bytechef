@@ -23,53 +23,51 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("MS")
 public class ChatMemoryDeleteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteConversation")
-        .title("Delete Conversation")
-        .description("Deletes all messages for a conversation.")
-        .properties(
-            string(CONVERSATION_ID)
-                .label("Conversation ID")
-                .description("The unique identifier for the conversation to delete.")
-                .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(CONVERSATION_ID),
-                        bool("deleted"))))
-        .perform(ChatMemoryDeleteAction::perform);
-
-    private static ChatMemoryRepository chatMemoryRepository;
+    public static ModifiableActionDefinition of(ChatMemoryRepository chatMemoryRepository) {
+        return action("deleteConversation")
+            .title("Delete Conversation")
+            .description("Deletes all messages for a conversation.")
+            .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation to delete.")
+                    .required(true))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            string(CONVERSATION_ID),
+                            bool("deleted"))))
+            .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
+                inputParameters, chatMemoryRepository));
+    }
 
     private ChatMemoryDeleteAction() {
     }
 
-    public static void setChatMemoryRepository(ChatMemoryRepository chatMemoryRepository) {
-        ChatMemoryDeleteAction.chatMemoryRepository = chatMemoryRepository;
-    }
-
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
 
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
+
+        boolean existed = !chatMemoryRepository.findByConversationId(conversationId)
+            .isEmpty();
 
         chatMemoryRepository.deleteByConversationId(conversationId);
 
         return Map.of(
             CONVERSATION_ID, conversationId,
-            "deleted", true);
+            "deleted", existed);
     }
 }

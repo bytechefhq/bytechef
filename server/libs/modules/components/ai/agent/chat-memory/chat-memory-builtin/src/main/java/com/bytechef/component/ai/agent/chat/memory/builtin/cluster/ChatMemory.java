@@ -20,11 +20,7 @@ import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunc
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -32,34 +28,26 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("MS")
 public class ChatMemory {
 
-    private static ChatMemoryRepository chatMemoryRepository;
-
-    public static final ClusterElementDefinition<ChatMemoryFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
+    public static ClusterElementDefinition<ChatMemoryFunction> of(ChatMemoryRepository chatMemoryRepository) {
+        return ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("Chat Memory")
             .description("Memory is retrieved from the application database and added into the prompt's system text.")
             .type(CHAT_MEMORY)
-            .object(() -> ChatMemory::apply);
-
-    public static void setChatMemoryRepository(ChatMemoryRepository chatMemoryRepository) {
-        ChatMemory.chatMemoryRepository = chatMemoryRepository;
+            .object(() -> (inputParameters, connectionParameters, extensions, componentConnections) -> apply(
+                chatMemoryRepository));
     }
 
-    protected static PromptChatMemoryAdvisor apply(
-        Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections) {
+    private ChatMemory() {
+    }
 
+    protected static PromptChatMemoryAdvisor apply(ChatMemoryRepository chatMemoryRepository) {
         MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
             .chatMemoryRepository(chatMemoryRepository)
             .build();
 
         return PromptChatMemoryAdvisor.builder(chatMemory)
             .build();
-    }
-
-    private ChatMemory() {
     }
 }

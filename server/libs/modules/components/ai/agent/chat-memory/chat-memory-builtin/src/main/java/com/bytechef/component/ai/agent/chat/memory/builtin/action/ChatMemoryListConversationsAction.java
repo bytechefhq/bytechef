@@ -23,10 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
@@ -34,33 +32,27 @@ import org.springframework.ai.chat.memory.ChatMemoryRepository;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("MS")
 public class ChatMemoryListConversationsAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listConversations")
-        .title("List Conversations")
-        .description("Lists all conversation IDs in the chat memory.")
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        array("conversationIds")
-                            .items(string()),
-                        integer("count"))))
-        .perform(ChatMemoryListConversationsAction::perform);
-
-    private static ChatMemoryRepository chatMemoryRepository;
+    public static ModifiableActionDefinition of(ChatMemoryRepository chatMemoryRepository) {
+        return action("listConversations")
+            .title("List Conversations")
+            .description("Lists all conversation IDs in the chat memory.")
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            array("conversationIds")
+                                .items(string()),
+                            integer("count"))))
+            .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
+                chatMemoryRepository));
+    }
 
     private ChatMemoryListConversationsAction() {
     }
 
-    public static void setChatMemoryRepository(ChatMemoryRepository chatMemoryRepository) {
-        ChatMemoryListConversationsAction.chatMemoryRepository = chatMemoryRepository;
-    }
-
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    protected static Object perform(ChatMemoryRepository chatMemoryRepository) {
         List<String> conversationIds = chatMemoryRepository.findConversationIds();
 
         return Map.of(
