@@ -37,7 +37,7 @@ public class MilvusConstants {
     public static final String PORT = "port";
     public static final String URI = "uri";
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         MilvusServiceClient milvusServiceClient = new MilvusServiceClient(ConnectParam.newBuilder()
             .withAuthorization(connectionParameters.getRequiredString(USERNAME),
                 connectionParameters.getRequiredString(PASSWORD))

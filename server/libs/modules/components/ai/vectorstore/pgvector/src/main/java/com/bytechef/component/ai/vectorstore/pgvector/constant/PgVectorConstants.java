@@ -39,7 +39,7 @@ public class PgVectorConstants {
     public static final String TABLE_NAME = "tableName";
     public static final String URL = "url";
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
         dataSource.setUrl(connectionParameters.getRequiredString(URL));

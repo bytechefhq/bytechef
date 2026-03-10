@@ -32,7 +32,7 @@ public class PineconeConstants {
 
     private static final Pattern PATTERN = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         Matcher matcher = PATTERN.matcher(connectionParameters.getRequiredString(HOST));
 
         if (matcher.find()) {
