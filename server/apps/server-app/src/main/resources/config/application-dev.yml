@@ -25,6 +25,8 @@ spring:
 #####
 
 bytechef:
+  featureFlags:
+    - ff-1570
   ai:
     vectorstore:
       pgvector:

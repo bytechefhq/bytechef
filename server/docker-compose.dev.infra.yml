@@ -17,6 +17,8 @@ services:
       - "POSTGRES_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}"
       - "POSTGRES_USER=postgres"
       - "POSTGRES_DB=bytechef_vectorstore"
+    env_file:
+      - .env
   postgres:
     image: postgres:16-alpine
     platform: linux/amd64
@@ -28,6 +30,8 @@ services:
     - "POSTGRES_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}"
     - "POSTGRES_USER=postgres"
     - "POSTGRES_DB=bytechef"
+    env_file:
+      - .env
   rabbitmq:
     image: rabbitmq:4.1.4-management-alpine
     platform: linux/amd64

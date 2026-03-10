@@ -71,7 +71,7 @@ services:
       - BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME=postgres
       - BYTECHEF_AI_VECTORSTORE_PGVECTOR_PASSWORD=${PASSWORD_FROM_LOCAL_DOT_ENV_FILE}
     env_file:
-      - local.env
+      - .env
     ports:
       - "9555:9555"
 volumes:
