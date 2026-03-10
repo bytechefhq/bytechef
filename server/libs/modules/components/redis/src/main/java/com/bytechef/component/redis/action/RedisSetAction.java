@@ -81,9 +81,11 @@ public class RedisSetAction {
 
             String result;
 
-            if (Boolean.TRUE.equals(expire) && ttl != null) {
+            if (Boolean.TRUE.equals(expire)) {
+                int effectiveTtl = (ttl != null) ? ttl : 60;
+
                 result = jedis.set(key, value, SetParams.setParams()
-                    .ex(ttl));
+                    .ex(effectiveTtl));
             } else {
                 result = jedis.set(key, value);
             }
