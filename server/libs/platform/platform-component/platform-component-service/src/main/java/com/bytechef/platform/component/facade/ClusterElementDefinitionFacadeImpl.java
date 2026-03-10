@@ -118,7 +118,7 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
     }
 
     @Override
-    public OutputResponse executeOutput(
+    public @Nullable OutputResponse executeOutput(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable Long connectionId) {
 

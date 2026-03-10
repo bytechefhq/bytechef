@@ -124,13 +124,26 @@ public class WorkflowCallWorkflowTool {
         return properties;
     }
 
+    @SuppressWarnings("unchecked")
     private static ModifiableValueProperty<?, ?> toComponentProperty(BaseProperty.BaseValueProperty<?> baseProperty) {
         String name = baseProperty.getName();
 
         ModifiableValueProperty<?, ?> property;
 
-        if (baseProperty instanceof BaseProperty.BaseArrayProperty<?>) {
-            property = ComponentDsl.array(name);
+        if (baseProperty instanceof BaseProperty.BaseArrayProperty<?> arrayProperty) {
+            ComponentDsl.ModifiableArrayProperty arrayProp = ComponentDsl.array(name);
+
+            arrayProperty.getItems()
+                .ifPresent(items -> {
+                    List<ModifiableValueProperty<?, ?>> itemProperties =
+                        ((List<BaseProperty.BaseValueProperty<?>>) (List<?>) items).stream()
+                            .map(WorkflowCallWorkflowTool::toComponentProperty)
+                            .toList();
+
+                    arrayProp.items(itemProperties);
+                });
+
+            property = arrayProp;
         } else if (baseProperty instanceof BaseProperty.BaseBooleanProperty) {
             property = ComponentDsl.bool(name);
         } else if (baseProperty instanceof BaseProperty.BaseDateProperty) {
@@ -141,8 +154,20 @@ public class WorkflowCallWorkflowTool {
             property = ComponentDsl.integer(name);
         } else if (baseProperty instanceof BaseProperty.BaseNumberProperty) {
             property = ComponentDsl.number(name);
-        } else if (baseProperty instanceof BaseProperty.BaseObjectProperty<?>) {
-            property = ComponentDsl.object(name);
+        } else if (baseProperty instanceof BaseProperty.BaseObjectProperty<?> objectProperty) {
+            ComponentDsl.ModifiableObjectProperty objectProp = ComponentDsl.object(name);
+
+            objectProperty.getProperties()
+                .ifPresent(childProperties -> {
+                    List<ModifiableValueProperty<?, ?>> childComponentProperties =
+                        ((List<BaseProperty.BaseValueProperty<?>>) (List<?>) childProperties).stream()
+                            .map(WorkflowCallWorkflowTool::toComponentProperty)
+                            .toList();
+
+                    objectProp.properties(childComponentProperties);
+                });
+
+            property = objectProp;
         } else {
             property = ComponentDsl.string(name);
         }
