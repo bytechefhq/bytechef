@@ -18,7 +18,7 @@ package com.bytechef.component.ai.vectorstore.oracle.cluster;
 
 import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -31,6 +31,6 @@ public class OracleVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractVectorStore.of("Oracle", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("Oracle", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

@@ -66,13 +66,14 @@ public final class KnowledgeBaseLoadAction {
             List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases();
 
             for (KnowledgeBase knowledgeBase : knowledgeBases) {
-                if (searchText == null ||
-                    knowledgeBase.getName()
-                        .toLowerCase()
-                        .contains(searchText.toLowerCase())) {
+                String name = knowledgeBase.getName();
 
-                    options.add(option(knowledgeBase.getName(), knowledgeBase.getId()
-                        .longValue()));
+                String lowerCase = name.toLowerCase();
+
+                if (searchText == null || lowerCase.contains(searchText.toLowerCase())) {
+                    Long knowledgeBaseId = knowledgeBase.getId();
+
+                    options.add(option(name, knowledgeBaseId.longValue()));
                 }
             }
 
