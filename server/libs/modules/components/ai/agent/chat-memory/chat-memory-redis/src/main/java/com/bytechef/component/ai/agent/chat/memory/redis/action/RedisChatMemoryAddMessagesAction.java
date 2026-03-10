@@ -23,8 +23,10 @@ import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisCh
 import static com.bytechef.component.ai.agent.chat.memory.redis.util.RedisChatMemoryUtils.getChatMemoryRepository;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionContext;
@@ -69,6 +71,12 @@ public class RedisChatMemoryAddMessagesAction {
                                 .label("Content")
                                 .description("The content of the message.")
                                 .required(true))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(CONVERSATION_ID),
+                        integer("messageCount"))))
         .perform(RedisChatMemoryAddMessagesAction::perform);
 
     private RedisChatMemoryAddMessagesAction() {
@@ -96,7 +104,7 @@ public class RedisChatMemoryAddMessagesAction {
         repository.saveAll(conversationId, existingMessages);
 
         return Map.of(
-            "conversationId", conversationId,
+            CONVERSATION_ID, conversationId,
             "messageCount", existingMessages.size());
     }
 
