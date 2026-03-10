@@ -20,19 +20,28 @@ import static com.bytechef.component.github.constant.GithubConstants.ASSIGNEES;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
@@ -40,31 +49,51 @@ import org.mockito.MockedStatic;
  * @author Mayank Madan
  * @author Monika Kušter
  */
-class GithubAddAssigneesToIssueActionTest extends AbstractGithubActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class GithubAddAssigneesToIssueActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", ASSIGNEES, List.of("githubUsername", "githubUsername2")));
-    protected final Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
+        REPOSITORY, "testRepo", ISSUE, "testIssue", ASSIGNEES, List.of("githubUsername", "githubUsername2")));
+    private final Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() throws Exception {
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
             githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
                 .thenReturn("testOwner");
 
             when(mockedHttp.post(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
+            when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(responseMap);
 
-            Object result = executePerformFunction(GithubAddAssigneesToIssueAction.ACTION_DEFINITION, mockedParameters);
+            Object result = GithubAddAssigneesToIssueAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(responseMap, result);
-            assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
-            assertEquals("/repos/testOwner/testRepo/issues/testIssue/assignees", stringArgumentCaptor.getValue());
 
-            Http.Body body = bodyArgumentCaptor.getValue();
+            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            Http.Configuration.ConfigurationBuilder configurationBuilder =
+                configurationBuilderArgumentCaptor.getValue();
+            Http.Configuration configuration = configurationBuilder.build();
+            Http.ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals(
+                "/repos/testOwner/testRepo/issues/testIssue/assignees", stringArgumentCaptor.getValue());
+
+            Body body = bodyArgumentCaptor.getValue();
 
             assertEquals(Map.of(ASSIGNEES, List.of("githubUsername", "githubUsername2")), body.getContent());
         }
