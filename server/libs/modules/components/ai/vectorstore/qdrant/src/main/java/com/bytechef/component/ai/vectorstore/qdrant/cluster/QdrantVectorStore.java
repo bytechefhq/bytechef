@@ -18,7 +18,7 @@ package com.bytechef.component.ai.vectorstore.qdrant.cluster;
 
 import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -31,6 +31,6 @@ public class QdrantVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractVectorStore.of("Qdrant", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("Qdrant", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

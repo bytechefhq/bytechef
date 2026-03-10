@@ -19,7 +19,7 @@ package com.bytechef.component.ai.vectorstore.s3.cluster;
 import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.S3_VECTOR_STORE;
 import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractSearchTool;
+import com.bytechef.component.ai.vectorstore.cluster.SearchToolDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -33,6 +33,6 @@ public class S3SearchTool {
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractSearchTool.of("S3", S3_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return SearchToolDefinition.of("S3", S3_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

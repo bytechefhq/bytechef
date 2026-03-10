@@ -19,7 +19,7 @@ package com.bytechef.component.ai.vectorstore.pinecone.cluster;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.PINECONE;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractSearchTool;
+import com.bytechef.component.ai.vectorstore.cluster.SearchToolDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -33,6 +33,6 @@ public class PineconeSearchTool {
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractSearchTool.of("Pinecone", PINECONE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return SearchToolDefinition.of("Pinecone", PINECONE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

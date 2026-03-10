@@ -23,6 +23,7 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseLoadAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseSearchAction;
+import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseSearchTool;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -42,11 +43,11 @@ import org.springframework.stereotype.Component;
  */
 @Component(KNOWLEDGE_BASE + "_v1_ComponentHandler")
 @ConditionalOnProperty(prefix = "bytechef.knowledgebase", name = "enabled", havingValue = "true")
-public class KnowledgeBaseVectorStoreComponentHandler implements ComponentHandler {
+public class KnowledgeBaseComponentHandler implements ComponentHandler {
 
     private final VectorStoreComponentDefinition componentDefinition;
 
-    public KnowledgeBaseVectorStoreComponentHandler(
+    public KnowledgeBaseComponentHandler(
         ClusterElementDefinitionService clusterElementDefinitionService,
         KnowledgeBaseService knowledgeBaseService, TagService tagService,
         @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
@@ -68,18 +69,20 @@ public class KnowledgeBaseVectorStoreComponentHandler implements ComponentHandle
             ClusterElementDefinitionService clusterElementDefinitionService,
             KnowledgeBaseService knowledgeBaseService, TagService tagService, VectorStore vectorStore) {
 
-            super(component(KNOWLEDGE_BASE)
-                .title("Knowledge Base")
-                .description(
-                    "Search ByteChef's internal knowledge base to retrieve relevant document chunks using " +
-                        "semantic similarity search powered by vector embeddings.")
-                .icon("path:assets/knowledge-base.svg")
-                .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                .actions(
-                    KnowledgeBaseLoadAction.of(clusterElementDefinitionService, knowledgeBaseService, vectorStore),
-                    KnowledgeBaseSearchAction.of(knowledgeBaseService, tagService, vectorStore))
-                .clusterElements(
-                    KnowledgeBaseVectorStore.of(clusterElementDefinitionService, vectorStore)));
+            super(
+                component(KNOWLEDGE_BASE)
+                    .title("Knowledge Base")
+                    .description(
+                        "Search ByteChef's internal knowledge base to retrieve relevant document chunks using " +
+                            "semantic similarity search powered by vector embeddings.")
+                    .icon("path:assets/knowledge-base.svg")
+                    .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+                    .actions(
+                        KnowledgeBaseLoadAction.of(clusterElementDefinitionService, knowledgeBaseService, vectorStore),
+                        KnowledgeBaseSearchAction.of(knowledgeBaseService, tagService, vectorStore))
+                    .clusterElements(
+                        KnowledgeBaseSearchTool.of(clusterElementDefinitionService, vectorStore),
+                        KnowledgeBaseVectorStore.of(clusterElementDefinitionService, vectorStore)));
         }
     }
 }

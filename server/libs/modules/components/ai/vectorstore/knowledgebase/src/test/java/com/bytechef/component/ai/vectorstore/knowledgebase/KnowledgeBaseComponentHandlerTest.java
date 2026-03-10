@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-class KnowledgeBaseVectorStoreComponentHandlerTest {
+class KnowledgeBaseComponentHandlerTest {
 
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
             "definition/knowledgeBase_v1.json",
-            new KnowledgeBaseVectorStoreComponentHandler(null, null, null, null).getDefinition());
+            new KnowledgeBaseComponentHandler(null, null, null, null).getDefinition());
     }
 }
