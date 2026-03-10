@@ -442,6 +442,12 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableActionDefinition perform(WebSocketPerformFunction perform) {
+            this.performFunction = perform;
+
+            return this;
+        }
+
         public ModifiableActionDefinition processErrorResponse(ProcessErrorResponseFunction processErrorResponse) {
             this.processErrorResponseFunction = processErrorResponse;
 
@@ -3670,7 +3676,8 @@ public final class ComponentDsl {
                 webhookEnableFunction, dynamicWebhookRefreshFunction, webhookRequestFunction, help,
                 listenerDisableConsumer, listenerEnableConsumer, name, outputDefinition, pollFunction, properties,
                 title, type, webhookRawBody, webhookValidateFunction,
-                webhookValidateOnEnableFunction, workflowNodeDescriptionFunction, workflowSyncExecution);
+                webhookValidateOnEnableFunction, workflowNodeDescriptionFunction,
+                workflowSyncExecution);
         }
 
         @Override

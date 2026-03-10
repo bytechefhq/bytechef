@@ -22,6 +22,7 @@ import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SseStreamTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
+import com.bytechef.platform.worker.task.WebSocketStreamTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +47,13 @@ public class PlatformWorkerConfiguration {
     @Bean
     SuspendTaskExecutionPostOutputProcessor suspendTaskExecutionPostOutputProcessor(TriggerScheduler triggerScheduler) {
         return new SuspendTaskExecutionPostOutputProcessor(triggerScheduler);
+    }
+
+    @Bean
+    WebSocketStreamTaskExecutionPostOutputProcessor webSocketStreamTaskExecutionPostOutputProcessor(
+        MessageBroker messageBroker) {
+
+        return new WebSocketStreamTaskExecutionPostOutputProcessor(messageBroker);
     }
 
     @Bean

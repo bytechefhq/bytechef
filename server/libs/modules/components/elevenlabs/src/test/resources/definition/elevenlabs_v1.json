@@ -5,6 +5,328 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
+    "description": "Generate speech in real-time using ElevenLabs WebSocket-based text-to-speech API. Receives text via WebSocket, forwards to ElevenLabs for speech synthesis, and streams generated audio chunks back.",
+    "help": null,
+    "metadata": null,
+    "name": "createRealtimeSpeech",
+    "outputDefinition": null,
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Voice to use for converting the text into speech.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Voice",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "voiceId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "eleven_flash_v2_5",
+      "description": "The model to use for text-to-speech generation.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model_id",
+      "options": [ {
+        "description": null,
+        "label": "Eleven Flash v2.5 (Fastest)",
+        "value": "eleven_flash_v2_5"
+      }, {
+        "description": null,
+        "label": "Eleven Multilingual v2",
+        "value": "eleven_multilingual_v2"
+      }, {
+        "description": null,
+        "label": "Eleven Turbo v2.5",
+        "value": "eleven_turbo_v2_5"
+      }, {
+        "description": null,
+        "label": "Eleven Turbo v2",
+        "value": "eleven_turbo_v2"
+      }, {
+        "description": null,
+        "label": "Eleven Monolingual v1",
+        "value": "eleven_monolingual_v1"
+      }, {
+        "description": null,
+        "label": "Eleven Multilingual v1",
+        "value": "eleven_multilingual_v1"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "NUMBER",
+      "defaultValue": 0.5,
+      "description": "Voice stability (0.0 to 1.0). Lower values produce more variation, higher values produce more consistent speech.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Stability",
+      "maxNumberPrecision": null,
+      "maxValue": 1.0,
+      "metadata": { },
+      "minNumberPrecision": null,
+      "minValue": 0.0,
+      "name": "stability",
+      "numberPrecision": null,
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "NUMBER"
+    }, {
+      "advancedOption": null,
+      "controlType": "NUMBER",
+      "defaultValue": 0.8,
+      "description": "Voice similarity boost (0.0 to 1.0). Higher values make the voice more closely match the original voice.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Similarity Boost",
+      "maxNumberPrecision": null,
+      "maxValue": 1.0,
+      "metadata": { },
+      "minNumberPrecision": null,
+      "minValue": 0.0,
+      "name": "similarityBoost",
+      "numberPrecision": null,
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "NUMBER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "mp3_44100_128",
+      "description": "The output audio format.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Output Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "outputFormat",
+      "options": [ {
+        "description": null,
+        "label": "MP3 44.1kHz 128kbps",
+        "value": "mp3_44100_128"
+      }, {
+        "description": null,
+        "label": "MP3 44.1kHz 64kbps",
+        "value": "mp3_44100_64"
+      }, {
+        "description": null,
+        "label": "MP3 44.1kHz 32kbps",
+        "value": "mp3_44100_32"
+      }, {
+        "description": null,
+        "label": "PCM 16kHz",
+        "value": "pcm_16000"
+      }, {
+        "description": null,
+        "label": "PCM 22.05kHz",
+        "value": "pcm_22050"
+      }, {
+        "description": null,
+        "label": "PCM 24kHz",
+        "value": "pcm_24000"
+      }, {
+        "description": null,
+        "label": "PCM 44.1kHz",
+        "value": "pcm_44100"
+      }, {
+        "description": null,
+        "label": "μ-law 8kHz",
+        "value": "ulaw_8000"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "title": "Create Realtime Speech",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Transcribe audio in real-time using ElevenLabs WebSocket-based speech-to-text API. Receives audio via WebSocket, forwards to ElevenLabs for transcription, and streams transcription results back.",
+    "help": null,
+    "metadata": null,
+    "name": "createRealtimeTranscript",
+    "outputDefinition": null,
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": "scribe_v2_realtime",
+      "description": "The model to use for real-time transcription.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model_id",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The language code for transcription (e.g., 'en' for English). If not specified, the language is auto-detected.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Language Code",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "languageCode",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": 16000,
+      "description": "The sample rate of the audio in Hz.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Sample Rate",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "sampleRate",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "pcm_16000",
+      "description": "The format of the audio data.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Audio Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "audioFormat",
+      "options": [ {
+        "description": null,
+        "label": "PCM 16-bit signed, 16kHz",
+        "value": "pcm_16000"
+      }, {
+        "description": null,
+        "label": "PCM 16-bit signed, 22.05kHz",
+        "value": "pcm_22050"
+      }, {
+        "description": null,
+        "label": "PCM 16-bit signed, 44.1kHz",
+        "value": "pcm_44100"
+      }, {
+        "description": null,
+        "label": "PCM μ-law, 8kHz",
+        "value": "ulaw_8000"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Whether to include word-level timestamps in the transcription.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Include Timestamps",
+      "metadata": { },
+      "name": "includeTimestamps",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    } ],
+    "resumePerform": null,
+    "title": "Create Realtime Transcript",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Turn text into sound effects for your videos, voice-overs or video games using the most advanced sound effects model in the world.",
     "help": null,
     "metadata": null,

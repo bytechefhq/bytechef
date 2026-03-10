@@ -179,7 +179,8 @@ public class JobSyncExecutor {
                 new CallableResponseTaskExecutionPostOutputProcessor(),
                 new SuspendTaskExecutionPostOutputProcessor(null),
                 new WebhookResponseTaskExecutionPostOutputProcessor(),
-                new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges)));
+                new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
+                new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges)));
 
         receive(
             memoryMessageBroker, TaskWorkerMessageRoute.CONTROL_EVENTS, event -> {
