@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Ivica Cardic
@@ -312,6 +313,82 @@ public interface ActionDefinition {
     }
 
     /**
+     * Functional interface for handling bidirectional WebSocket communication within an action or trigger. Similar to
+     * {@link SseEmitterHandler} but supports receiving messages from connected clients in addition to sending data.
+     */
+    @FunctionalInterface
+    interface WebSocketHandler {
+
+        /**
+         * Handles bidirectional WebSocket communication through the provided emitter.
+         *
+         * @param webSocketEmitter the emitter for sending/receiving WebSocket messages
+         */
+        void handle(WebSocketEmitter webSocketEmitter);
+
+        /**
+         * Represents a bidirectional WebSocket connection that supports sending and receiving both text and binary
+         * messages, with lifecycle event listeners.
+         */
+        interface WebSocketEmitter {
+
+            /**
+             * Registers a listener for incoming binary messages.
+             *
+             * @param binaryMessageListener consumer invoked with binary data received from the client
+             */
+            void addBinaryMessageListener(Consumer<byte[]> binaryMessageListener);
+
+            /**
+             * Registers a listener for connection close events.
+             *
+             * @param closeListener runnable invoked when the WebSocket connection closes
+             */
+            void addCloseListener(Runnable closeListener);
+
+            /**
+             * Registers a listener for incoming text messages.
+             *
+             * @param messageListener consumer invoked with deserialized message data from the client
+             */
+            void addMessageListener(Consumer<Object> messageListener);
+
+            /**
+             * Registers a listener for timeout events.
+             *
+             * @param timeoutListener runnable invoked when a timeout occurs
+             */
+            void addTimeoutListener(Runnable timeoutListener);
+
+            /**
+             * Marks the WebSocket communication as completed.
+             */
+            void complete();
+
+            /**
+             * Marks the WebSocket communication as failed with an error.
+             *
+             * @param throwable the error that caused the failure
+             */
+            void error(Throwable throwable);
+
+            /**
+             * Sends text/JSON data to the connected WebSocket client.
+             *
+             * @param data the data to send (will be serialized to JSON)
+             */
+            void send(Object data);
+
+            /**
+             * Sends binary data to the connected WebSocket client.
+             *
+             * @param data the binary data to send
+             */
+            void sendBinary(byte[] data);
+        }
+    }
+
+    /**
      *
      */
     @FunctionalInterface
@@ -487,6 +564,30 @@ public interface ActionDefinition {
          * @throws Exception if an error occurs during action execution or setup
          */
         SseEmitterHandler apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+            throws Exception;
+    }
+
+    /**
+     * Functional interface for executing actions that require bidirectional WebSocket communication. Returns a
+     * {@link WebSocketHandler} that bridges the action's WebSocket data to/from connected clients.
+     *
+     * @see WebSocketHandler
+     * @see ActionContext
+     * @see Parameters
+     */
+    @FunctionalInterface
+    interface WebSocketPerformFunction extends BasePerformFunction {
+
+        /**
+         * Executes the action and returns a {@link WebSocketHandler} for bidirectional WebSocket communication.
+         *
+         * @param inputParameters      the input parameters for the action
+         * @param connectionParameters the connection parameters for authentication
+         * @param context              the action execution context
+         * @return the {@link WebSocketHandler} that will handle WebSocket messages
+         * @throws Exception if an error occurs during action execution
+         */
+        WebSocketHandler apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 
