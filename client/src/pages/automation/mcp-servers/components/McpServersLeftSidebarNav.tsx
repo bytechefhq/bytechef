@@ -1,49 +1,30 @@
 import {Type} from '@/pages/automation/mcp-servers/McpServers';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {McpProject, PlatformType, useMcpProjectsQuery, useMcpServerTagsQuery} from '@/shared/middleware/graphql';
+import {Tag} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {TagIcon} from 'lucide-react';
-import {useSearchParams} from 'react-router-dom';
 
 interface McpServersLeftSidebarNavProps {
-    validMcpServerIds: Set<string>;
     allComponentNames: string[];
+    componentDefinitions?: ComponentDefinitionBasic[];
+    componentDefinitionsIsLoading: boolean;
+    filterData: {id?: string; type: Type};
+    mcpProjectsIsLoading: boolean;
+    tags?: Tag[];
+    tagsIsLoading: boolean;
+    uniqueProjects: {id: string; name: string}[];
 }
 
-const McpServersLeftSidebarNav = ({allComponentNames, validMcpServerIds}: McpServersLeftSidebarNavProps) => {
-    const [searchParams] = useSearchParams();
-
-    const componentName = searchParams.get('componentName');
-    const projectId = searchParams.get('projectId');
-    const tagId = searchParams.get('tagId');
-
-    const filterData = {
-        id: componentName ? componentName : projectId ? projectId : tagId ? tagId : undefined,
-        type: componentName ? Type.Component : projectId ? Type.Project : Type.Tag,
-    };
-
-    const {data: componentDefinitions, isLoading: componentDefinitionsIsLoading} = useGetComponentDefinitionsQuery({});
-
-    const {data: mcpProjectsData, isLoading: mcpProjectsIsLoading} = useMcpProjectsQuery();
-
-    const {data: tagsData, isLoading: tagsIsLoading} = useMcpServerTagsQuery({type: PlatformType.Automation});
-
-    const tags = tagsData?.mcpServerTags;
-
-    const mcpProjects =
-        mcpProjectsData?.mcpProjects?.filter((project): project is McpProject => project !== null) || [];
-
-    const workspaceMcpProjects = mcpProjects.filter((project) => validMcpServerIds.has(project.mcpServerId));
-
-    const uniqueProjects = Array.from(
-        new Map(
-            workspaceMcpProjects
-                .filter((project) => project.project?.id && project.project?.name)
-                .map((project) => [project.project!.id, {id: project.project!.id, name: project.project!.name}])
-        ).values()
-    );
-
+const McpServersLeftSidebarNav = ({
+    allComponentNames,
+    componentDefinitions,
+    componentDefinitionsIsLoading,
+    filterData,
+    mcpProjectsIsLoading,
+    tags,
+    tagsIsLoading,
+    uniqueProjects,
+}: McpServersLeftSidebarNavProps) => {
     return (
         <>
             <LeftSidebarNav
