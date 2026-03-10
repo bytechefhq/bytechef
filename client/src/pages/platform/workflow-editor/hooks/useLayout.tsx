@@ -40,6 +40,7 @@ import createMapEdges from '../utils/createMapEdges';
 import createMapNode from '../utils/createMapNode';
 import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
+import extractDefinitionPositions from '../utils/extractDefinitionPositions';
 import {
     collectTaskDispatcherData,
     convertTaskToNode,
@@ -48,6 +49,7 @@ import {
     getLayoutElements,
     getTaskAncestry,
 } from '../utils/layoutUtils';
+import {containsNodePosition} from '../utils/postDagreConstraints';
 import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 
 /**
@@ -670,6 +672,65 @@ export default function useLayout({
             const lastEdge = edges[edges.length - 1];
             if (lastEdge && lastEdge.target === FINAL_PLACEHOLDER_NODE_ID) {
                 edges.pop();
+            }
+        }
+
+        // Sync position metadata from the latest workflow definition into layout
+        // nodes. storeTasks uses fingerprint equality that ignores position metadata,
+        // so allNodes may have stale/missing positions when the layout is triggered
+        // by panel toggles or position resets. The definition is the source of truth.
+        if (!readOnlyWorkflow) {
+            const currentDefinition = useWorkflowDataStore.getState().workflow.definition;
+
+            if (currentDefinition) {
+                const definitionPositions = extractDefinitionPositions(currentDefinition);
+
+                layoutNodes = layoutNodes.map((node) => {
+                    const nodeData = node.data as NodeDataType;
+                    const definitionPosition = definitionPositions.get(node.id);
+                    const hasNodePosition = containsNodePosition(nodeData.metadata);
+
+                    if (definitionPosition) {
+                        const currentNodePosition = hasNodePosition ? nodeData.metadata!.ui!.nodePosition : undefined;
+
+                        if (
+                            !currentNodePosition ||
+                            currentNodePosition.x !== definitionPosition.x ||
+                            currentNodePosition.y !== definitionPosition.y
+                        ) {
+                            return {
+                                ...node,
+                                data: {
+                                    ...nodeData,
+                                    metadata: {
+                                        ...nodeData.metadata,
+                                        ui: {
+                                            ...nodeData.metadata?.ui,
+                                            nodePosition: definitionPosition,
+                                        },
+                                    },
+                                },
+                            };
+                        }
+                    } else if (hasNodePosition) {
+                        // Node has position but definition doesn't — position was removed
+                        return {
+                            ...node,
+                            data: {
+                                ...nodeData,
+                                metadata: {
+                                    ...nodeData.metadata,
+                                    ui: {
+                                        ...nodeData.metadata?.ui,
+                                        nodePosition: undefined,
+                                    },
+                                },
+                            },
+                        };
+                    }
+
+                    return node;
+                });
             }
         }
 
