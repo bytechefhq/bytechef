@@ -131,7 +131,19 @@ class FtpRemoteFileClient implements RemoteFileClient {
             String directoryPath = currentPath.toString();
 
             if (!ftpClient.changeWorkingDirectory(directoryPath)) {
-                ftpClient.makeDirectory(directoryPath);
+                boolean created = ftpClient.makeDirectory(directoryPath);
+
+                if (!created) {
+                    throw new ProviderException(
+                        "Failed to create remote directory '" + directoryPath + "': " +
+                            ftpClient.getReplyString());
+                }
+
+                if (!ftpClient.changeWorkingDirectory(directoryPath)) {
+                    throw new ProviderException(
+                        "Created remote directory but cannot access '" + directoryPath + "': " +
+                            ftpClient.getReplyString());
+                }
             }
         }
 
@@ -139,14 +151,37 @@ class FtpRemoteFileClient implements RemoteFileClient {
     }
 
     @Override
+    @SuppressWarnings("PMD.EmptyCatchBlock")
     public boolean isDirectory(String path) throws IOException {
         FTPFile[] files = ftpClient.listFiles(path);
 
-        if (files.length == 1 && files[0].isFile()) {
-            return false;
+        if (files.length == 1) {
+            FTPFile file = files[0];
+
+            if (file.isDirectory()) {
+                return true;
+            }
+
+            if (file.isFile()) {
+                return false;
+            }
+        } else if (files.length > 1) {
+            return true;
         }
 
-        return true;
+        String currentDir = ftpClient.printWorkingDirectory();
+
+        try {
+            return ftpClient.changeWorkingDirectory(path);
+        } finally {
+            if (currentDir != null) {
+                try {
+                    ftpClient.changeWorkingDirectory(currentDir);
+                } catch (IOException ioException) {
+                    // Best-effort restoration of working directory
+                }
+            }
+        }
     }
 
     @Override

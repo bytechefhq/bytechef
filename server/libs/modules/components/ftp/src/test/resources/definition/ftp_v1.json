@@ -304,7 +304,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Upload File",
     "workflowNodeDescription": null
   }, {
@@ -552,7 +551,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Download File",
     "workflowNodeDescription": null
   }, {
@@ -912,7 +910,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Directory",
     "workflowNodeDescription": null
   }, {
@@ -996,8 +993,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "deletedPath": "/uploads/old-file.pdf",
-          "success": true
+          "success": true,
+          "deletedPath": "/uploads/old-file.pdf"
         }
       },
       "outputSchema": {
@@ -1067,8 +1064,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "deletedPath": "/uploads/old-file.pdf",
-        "success": true
+        "success": true,
+        "deletedPath": "/uploads/old-file.pdf"
       }
     },
     "perform": { },
@@ -1120,7 +1117,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete",
     "workflowNodeDescription": null
   }, {
@@ -1225,9 +1221,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
+          "newPath": "/archive/new-name.pdf",
           "success": true,
-          "oldPath": "/uploads/old-name.pdf",
-          "newPath": "/archive/new-name.pdf"
+          "oldPath": "/uploads/old-name.pdf"
         }
       },
       "outputSchema": {
@@ -1318,9 +1314,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
+        "newPath": "/archive/new-name.pdf",
         "success": true,
-        "oldPath": "/uploads/old-name.pdf",
-        "newPath": "/archive/new-name.pdf"
+        "oldPath": "/uploads/old-name.pdf"
       }
     },
     "perform": { },
@@ -1393,7 +1389,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Rename/Move",
     "workflowNodeDescription": null
   } ],
@@ -2386,8 +2381,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "deletedPath": "/uploads/old-file.pdf",
-          "success": true
+          "success": true,
+          "deletedPath": "/uploads/old-file.pdf"
         }
       },
       "outputSchema": {
@@ -2457,8 +2452,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "deletedPath": "/uploads/old-file.pdf",
-        "success": true
+        "success": true,
+        "deletedPath": "/uploads/old-file.pdf"
       }
     },
     "processErrorResponse": null,
@@ -2614,9 +2609,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
+          "newPath": "/archive/new-name.pdf",
           "success": true,
-          "oldPath": "/uploads/old-name.pdf",
-          "newPath": "/archive/new-name.pdf"
+          "oldPath": "/uploads/old-name.pdf"
         }
       },
       "outputSchema": {
@@ -2707,9 +2702,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
+        "newPath": "/archive/new-name.pdf",
         "success": true,
-        "oldPath": "/uploads/old-name.pdf",
-        "newPath": "/archive/new-name.pdf"
+        "oldPath": "/uploads/old-name.pdf"
       }
     },
     "processErrorResponse": null,
@@ -2835,8 +2830,8 @@
       }, {
         "advancedOption": null,
         "controlType": "INTEGER",
-        "defaultValue": 21,
-        "description": "The port number of the FTP server.",
+        "defaultValue": null,
+        "description": "The port number of the server. Defaults to 21 for FTP and 22 for SFTP if not specified.",
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
@@ -2849,7 +2844,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": true,
+        "required": false,
         "type": "INTEGER"
       }, {
         "advancedOption": null,

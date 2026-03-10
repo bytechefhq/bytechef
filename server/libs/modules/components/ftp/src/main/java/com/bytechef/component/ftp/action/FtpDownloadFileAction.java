@@ -28,9 +28,9 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.ftp.util.RemoteFileClient;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
 /**
  * @author Ivica Cardic
@@ -59,12 +59,28 @@ public class FtpDownloadFileAction {
             String remotePath = inputParameters.getRequiredString(PATH);
             String filename = remotePath.substring(remotePath.lastIndexOf('/') + 1);
 
-            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                remoteFileClient.retrieveFile(remotePath, outputStream);
+            try (PipedInputStream pipedInputStream = new PipedInputStream();
+                PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream)) {
 
-                try (ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
-                    return context.file(file -> file.storeContent(filename, inputStream));
-                }
+                Thread writerThread = new Thread(() -> {
+                    try {
+                        remoteFileClient.retrieveFile(remotePath, pipedOutputStream);
+                    } catch (IOException ioException) {
+                        throw new ProviderException(
+                            "Failed to download file: " + ioException.getMessage(), ioException);
+                    } finally {
+                        try {
+                            pipedOutputStream.close();
+                        } catch (IOException ioException) {
+                            throw new ProviderException(
+                                "Failed to close pipe: " + ioException.getMessage(), ioException);
+                        }
+                    }
+                });
+
+                writerThread.start();
+
+                return context.file(file -> file.storeContent(filename, pipedInputStream));
             }
         } catch (IOException ioException) {
             throw new ProviderException("Failed to download file: " + ioException.getMessage(), ioException);
