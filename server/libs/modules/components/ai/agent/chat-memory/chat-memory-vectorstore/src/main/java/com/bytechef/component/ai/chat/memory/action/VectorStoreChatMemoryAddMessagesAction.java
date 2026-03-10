@@ -25,8 +25,10 @@ import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemo
 import static com.bytechef.component.ai.chat.memory.util.VectorStoreChatMemoryUtils.getVectorStore;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionDefinition;
@@ -74,6 +76,12 @@ public class VectorStoreChatMemoryAddMessagesAction {
                                     .label("Content")
                                     .description("The content of the message.")
                                     .required(true))))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            string(CONVERSATION_ID),
+                            integer("messageCount"))))
             .perform(
                 (MultipleConnectionsPerformFunction) (
                     inputParameters, componentConnections, extensions, context) -> perform(inputParameters,
@@ -112,7 +120,7 @@ public class VectorStoreChatMemoryAddMessagesAction {
         vectorStore.add(documents);
 
         return Map.of(
-            "conversationId", conversationId,
+            CONVERSATION_ID, conversationId,
             "messageCount", documents.size());
     }
 }
