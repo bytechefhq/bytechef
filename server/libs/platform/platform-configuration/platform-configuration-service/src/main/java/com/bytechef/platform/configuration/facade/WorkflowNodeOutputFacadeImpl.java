@@ -390,7 +390,11 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
                 workflowId, clusterElement.getWorkflowNodeName(), environmentId);
 
+        String clusterElementWorkflowNodeName = clusterElement.getWorkflowNodeName();
+
         Long connectionId = workflowTestConfigurationConnections.stream()
+            .filter(connection -> Objects.equals(
+                connection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
             .map(WorkflowTestConfigurationConnection::getConnectionId)
             .findFirst()
             .orElse(null);

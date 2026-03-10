@@ -63,6 +63,7 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -521,7 +522,7 @@ class HttpClientExecutor {
             .map(contentType -> {
                 String mediaType = contentType.split(";")[0].trim();
 
-                mediaType = mediaType.toLowerCase();
+                mediaType = mediaType.toLowerCase(Locale.ROOT);
 
                 if (mediaType.equals("text/json")) {
                     mediaType = "application/json";
