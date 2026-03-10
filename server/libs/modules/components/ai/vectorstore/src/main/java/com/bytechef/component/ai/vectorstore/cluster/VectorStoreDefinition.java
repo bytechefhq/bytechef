@@ -67,6 +67,7 @@ public final class VectorStoreDefinition {
         EmbeddingModel embeddingModel = VectorStoreUtils.getEmbeddingModel(
             extensions, componentConnections, clusterElementDefinitionService);
 
-        return vectorStore.createVectorStore(ParametersFactory.create(connectionParameters), embeddingModel);
+        return vectorStore.createVectorStore(
+            inputParameters, ParametersFactory.create(connectionParameters), embeddingModel);
     }
 }
