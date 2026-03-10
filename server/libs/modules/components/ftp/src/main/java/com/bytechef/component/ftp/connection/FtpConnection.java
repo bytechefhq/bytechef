@@ -46,9 +46,9 @@ public class FtpConnection {
                         .required(true),
                     integer(PORT)
                         .label("Port")
-                        .description("The port number of the FTP server.")
-                        .defaultValue(21)
-                        .required(true),
+                        .description(
+                            "The port number of the server. Defaults to 21 for FTP and 22 for SFTP if not specified.")
+                        .required(false),
                     string(USERNAME)
                         .label("Username")
                         .description("The username for authentication.")

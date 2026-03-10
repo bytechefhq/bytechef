@@ -106,7 +106,7 @@ public class FtpListAction {
             fileInfo.put("type", type);
             fileInfo.put("size", file.size());
             fileInfo.put("modifiedAt", file.modifiedAt() != null ? file.modifiedAt()
-                .toString() : "");
+                .toString() : null);
 
             results.add(fileInfo);
 
