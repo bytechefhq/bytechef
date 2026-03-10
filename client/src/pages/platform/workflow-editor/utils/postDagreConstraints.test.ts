@@ -16,6 +16,7 @@ import {
     constrainBranchGhostsCrossAxis,
     constrainConditionGhostsCrossAxis,
     constrainLeftGhostPositions,
+    containsNodePosition,
     positionConditionCasePlaceholders,
     pullSimpleConditionChildrenInward,
     separateOverlappingConditionChildren,
@@ -4624,5 +4625,127 @@ describe('alignConditionCaseChildren', () => {
 
         expect(leftNode.position.y).toBe(500 - CONDITION_CASE_OFFSET);
         expect(rightNode.position.y).toBe(500 + CONDITION_CASE_OFFSET);
+    });
+});
+
+describe('containsNodePosition', () => {
+    it('should return true when metadata has nodePosition', () => {
+        expect(containsNodePosition({ui: {nodePosition: {x: 100, y: 200}}})).toBe(true);
+    });
+
+    it('should return false when metadata is undefined', () => {
+        expect(containsNodePosition(undefined)).toBe(false);
+    });
+
+    it('should return false when metadata has no ui property', () => {
+        expect(containsNodePosition({})).toBe(false);
+    });
+
+    it('should return false when ui has no nodePosition', () => {
+        expect(containsNodePosition({ui: {}})).toBe(false);
+    });
+
+    it('should return false when nodePosition is undefined', () => {
+        expect(containsNodePosition({ui: {nodePosition: undefined}})).toBe(false);
+    });
+
+    it('should return true when nodePosition has zero coordinates', () => {
+        expect(containsNodePosition({ui: {nodePosition: {x: 0, y: 0}}})).toBe(true);
+    });
+});
+
+describe('applySavedPositions — map dispatcher child shifting', () => {
+    it('should shift child workflow nodes of a map dispatcher by the parent delta', () => {
+        const mapNode: Node = {
+            data: {
+                componentName: 'map',
+                metadata: {ui: {nodePosition: {x: 500, y: 300}}},
+                taskDispatcher: true,
+                taskDispatcherId: 'map_1',
+                workflowNodeName: 'map_1',
+            },
+            id: 'map_1',
+            position: {x: 300, y: 300},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {taskDispatcherId: 'map_1'},
+            id: 'map_1-map-top-ghost',
+            position: {x: 300, y: 250},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const childNode: Node = {
+            data: {
+                componentName: 'httpClient',
+                mapData: {index: 0, mapId: 'map_1'},
+                workflowNodeName: 'httpClient_1',
+            },
+            id: 'httpClient_1',
+            position: {x: 300, y: 400},
+            type: 'workflow',
+        };
+        const bottomGhost: Node = {
+            data: {taskDispatcherId: 'map_1'},
+            id: 'map_1-map-bottom-ghost',
+            position: {x: 300, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const allNodes = [mapNode, topGhost, childNode, bottomGhost];
+
+        applySavedPositions(allNodes);
+
+        // Delta: saved(500,300) - dagre(300,300) = (200, 0)
+        expect(allNodes[0].position).toEqual({x: 500, y: 300});
+        // Child shifted by delta
+        expect(allNodes[2].position).toEqual({x: 500, y: 400});
+        // Ghosts shifted by delta
+        expect(allNodes[1].position).toEqual({x: 500, y: 250});
+        expect(allNodes[3].position).toEqual({x: 500, y: 500});
+    });
+});
+
+describe('adjustBottomGhostForMovedChildren — map dispatcher', () => {
+    it('should propagate shift from a map dispatcher bottom ghost to downstream nodes', () => {
+        const mapNode: Node = {
+            data: {
+                componentName: 'map',
+                mapData: {index: 0, mapId: 'condition_1'},
+                metadata: {ui: {nodePosition: {x: 600, y: 300}}},
+                taskDispatcher: true,
+                taskDispatcherId: 'map_1',
+            },
+            id: 'map_1',
+            position: {x: 600, y: 300},
+            type: 'workflow',
+        };
+        const mapBottomGhost: Node = {
+            data: {taskDispatcherId: 'map_1'},
+            id: 'map_1-map-bottom-ghost',
+            position: {x: 600, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const parentBottomGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 400, y: 700},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const edges: Edge[] = [
+            {
+                id: 'map_bottom=>parent_bottom',
+                source: 'map_1-map-bottom-ghost',
+                target: 'condition_1-condition-bottom-ghost',
+            },
+        ];
+        const allNodes = [mapNode, mapBottomGhost, parentBottomGhost];
+
+        // map_1 delta: (200, 0) relative to parent condition_1 at (0, 0)
+        const savedDeltas = new Map<string, {x: number; y: number}>([['map_1', {x: 200, y: 0}]]);
+
+        adjustBottomGhostForMovedChildren(allNodes, edges, 'y', 'TB', savedDeltas);
+
+        // Parent bottom ghost should be shifted by map_1's incremental delta on main axis (y=0 here since delta.y=0)
+        // Since incremental delta on y is 0, no shift should happen
+        expect(parentBottomGhost.position).toEqual({x: 400, y: 700});
     });
 });

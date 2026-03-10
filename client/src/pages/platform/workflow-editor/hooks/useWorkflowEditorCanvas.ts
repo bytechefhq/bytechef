@@ -38,6 +38,7 @@ import WorkflowNode from '../nodes/WorkflowNode';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import clearAllNodePositions from '../utils/clearAllNodePositions';
+import {collectAllDescendantNodes, collectChainSuccessorNodes} from '../utils/collectDescendantNodes';
 import {
     DraggingPlaceholderStateType,
     buildDraggingPlaceholderState,
@@ -272,53 +273,6 @@ const useWorkflowEditorCanvas = ({
     const childDragStartRef = useRef<Map<string, XYPosition>>(new Map());
     const draggingPlaceholderRef = useRef<DraggingPlaceholderStateType | null>(null);
 
-    const isChildNodeOfDispatcher = useCallback((node: Node, dispatcherId: string) => {
-        const nodeData = node.data as NodeDataType;
-
-        return (
-            node.id !== dispatcherId &&
-            (nodeData.taskDispatcherId === dispatcherId ||
-                nodeData.conditionData?.conditionId === dispatcherId ||
-                nodeData.loopData?.loopId === dispatcherId ||
-                nodeData.mapData?.mapId === dispatcherId ||
-                nodeData.branchData?.branchId === dispatcherId ||
-                nodeData.eachData?.eachId === dispatcherId ||
-                nodeData.parallelData?.parallelId === dispatcherId ||
-                nodeData.forkJoinData?.forkJoinId === dispatcherId)
-        );
-    }, []);
-
-    const collectAllDescendantNodes = useCallback(
-        (dispatcherId: string, allNodes: Node[]): Map<string, XYPosition> => {
-            const collected = new Set<string>();
-            const startPositions = new Map<string, XYPosition>();
-
-            const collect = (currentDispatcherId: string) => {
-                allNodes.forEach((node) => {
-                    if (collected.has(node.id)) {
-                        return;
-                    }
-
-                    if (isChildNodeOfDispatcher(node, currentDispatcherId)) {
-                        collected.add(node.id);
-                        startPositions.set(node.id, {...node.position});
-
-                        const nodeData = node.data as NodeDataType;
-
-                        if (nodeData.taskDispatcher && nodeData.taskDispatcherId) {
-                            collect(nodeData.taskDispatcherId);
-                        }
-                    }
-                });
-            };
-
-            collect(dispatcherId);
-
-            return startPositions;
-        },
-        [isChildNodeOfDispatcher]
-    );
-
     const handleNodeDragStart = useCallback(
         (_event: React.MouseEvent, node: Node) => {
             setIsNodeDragging(true);
@@ -329,7 +283,19 @@ const useWorkflowEditorCanvas = ({
             if (nodeData.taskDispatcher) {
                 draggingDispatcherIdRef.current = node.id;
                 dispatcherDragStartRef.current = {...node.position};
-                childDragStartRef.current = collectAllDescendantNodes(node.id, currentNodes);
+
+                const descendants = collectAllDescendantNodes(node.id, currentNodes);
+
+                // Also collect chain successor nodes (tasks that follow the
+                // dispatcher's bottom ghost in the main flow)
+                const chainSuccessors = collectChainSuccessorNodes(
+                    node.id,
+                    currentNodes,
+                    currentEdges,
+                    new Set(descendants.keys())
+                );
+
+                childDragStartRef.current = new Map([...descendants, ...chainSuccessors]);
             }
 
             draggingPlaceholderRef.current = buildDraggingPlaceholderState(
@@ -341,7 +307,7 @@ const useWorkflowEditorCanvas = ({
                 childDragStartRef.current
             );
         },
-        [collectAllDescendantNodes, setIsNodeDragging]
+        [setIsNodeDragging]
     );
 
     const handleNodesChange = useCallback(
