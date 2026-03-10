@@ -18,7 +18,7 @@ package com.bytechef.component.ai.vectorstore.pinecone.cluster;
 
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -31,6 +31,6 @@ public class PineconeVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractVectorStore.of("Pinecone", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("Pinecone", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

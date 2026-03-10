@@ -18,7 +18,7 @@ package com.bytechef.component.ai.vectorstore.neo4j.cluster;
 
 import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -34,6 +34,6 @@ public final class Neo4jVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractVectorStore.of("Neo4j", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("Neo4j", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

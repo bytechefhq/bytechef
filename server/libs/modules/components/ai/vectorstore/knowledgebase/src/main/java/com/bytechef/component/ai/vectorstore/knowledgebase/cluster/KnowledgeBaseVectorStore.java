@@ -18,11 +18,10 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.createVectorStore;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import org.springframework.ai.vectorstore.VectorStore;
 
 /**
  * Knowledge Base VectorStore cluster element for AI agent integration.
@@ -35,9 +34,10 @@ public final class KnowledgeBaseVectorStore {
     }
 
     public static ClusterElementDefinition<VectorStoreFunction> of(
-        ClusterElementDefinitionService clusterElementDefinitionService, VectorStore vectorStore) {
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
-        return AbstractVectorStore.of("Knowledge Base", createVectorStore(vectorStore),
-            clusterElementDefinitionService);
+        return VectorStoreDefinition.of(
+            "Knowledge Base", createVectorStore(vectorStore), clusterElementDefinitionService);
     }
 }

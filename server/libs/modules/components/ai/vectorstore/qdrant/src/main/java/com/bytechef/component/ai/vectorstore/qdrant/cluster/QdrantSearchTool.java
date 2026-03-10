@@ -19,7 +19,7 @@ package com.bytechef.component.ai.vectorstore.qdrant.cluster;
 import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.QDRANT;
 import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractSearchTool;
+import com.bytechef.component.ai.vectorstore.cluster.SearchToolDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -33,6 +33,6 @@ public class QdrantSearchTool {
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractSearchTool.of("Qdrant", QDRANT, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return SearchToolDefinition.of("Qdrant", QDRANT, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }
