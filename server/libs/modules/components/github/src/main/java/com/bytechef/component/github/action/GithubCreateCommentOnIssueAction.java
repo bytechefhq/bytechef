@@ -46,6 +46,7 @@ public class GithubCreateCommentOnIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCommentOnIssue")
         .title("Create Comment on Issue")
         .description("Adds a comment to the specified issue.")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#create-comment-on-issue")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)

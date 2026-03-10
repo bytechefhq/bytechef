@@ -40,6 +40,7 @@ public class GithubListIssuesAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listIssues")
         .title("List Issues")
         .description("Retrieve issues assigned to the authenticated user across all accessible repositories.")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#list-issues")
         .properties(
             string(FILTER)
                 .label("Filter")
