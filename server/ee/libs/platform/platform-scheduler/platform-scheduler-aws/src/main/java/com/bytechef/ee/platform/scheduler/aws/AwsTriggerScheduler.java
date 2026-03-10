@@ -24,6 +24,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
+import software.amazon.awssdk.services.scheduler.model.ConflictException;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindowMode;
 import software.amazon.awssdk.services.scheduler.model.Target;
 
@@ -92,6 +93,8 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         String workflowExecutionIdString = workflowExecutionId.toString();
+        String scheduleName = DYNAMIC_WEBHOOK_TRIGGER_REFRESH + workflowExecutionIdString.substring(0, 16);
+        String clientToken = workflowExecutionIdString.substring(16);
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
@@ -99,17 +102,28 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .input(workflowExecutionIdString + AwsTriggerSchedulerConstants.SPLITTER + connectionId)
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionIdString.substring(16))
-            .groupName(DYNAMIC_WEBHOOK_TRIGGER_REFRESH)
-            .name(DYNAMIC_WEBHOOK_TRIGGER_REFRESH + workflowExecutionIdString.substring(0, 16))
-            .target(sqsTarget)
-            .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-            .startDate(webhookExpirationDate));
+        try {
+            schedulerClient.createSchedule(request -> request.clientToken(clientToken)
+                .groupName(DYNAMIC_WEBHOOK_TRIGGER_REFRESH)
+                .name(scheduleName)
+                .target(sqsTarget)
+                .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+                .startDate(webhookExpirationDate));
+        } catch (ConflictException e) {
+            schedulerClient.updateSchedule(request -> request.clientToken(clientToken)
+                .groupName(DYNAMIC_WEBHOOK_TRIGGER_REFRESH)
+                .name(scheduleName)
+                .target(sqsTarget)
+                .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+                .startDate(webhookExpirationDate));
+        }
     }
 
     @Override
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
         String workflowExecutionIdString = workflowExecutionId.toString();
+        String scheduleName = POLLING_TRIGGER + workflowExecutionIdString.substring(0, 16);
+        String clientToken = workflowExecutionIdString.substring(16);
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
@@ -117,13 +131,23 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .input(workflowExecutionIdString)
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionIdString.substring(16))
-            .groupName(POLLING_TRIGGER)
-            .name(POLLING_TRIGGER + workflowExecutionIdString.substring(0, 16))
-            .target(sqsTarget)
-            .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-            .startDate(Instant.now())
-            .scheduleExpression("rate(%s minutes)".formatted(pollingTriggerCheckPeriod)));
+        try {
+            schedulerClient.createSchedule(request -> request.clientToken(clientToken)
+                .groupName(POLLING_TRIGGER)
+                .name(scheduleName)
+                .target(sqsTarget)
+                .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+                .startDate(Instant.now())
+                .scheduleExpression("rate(%s minutes)".formatted(pollingTriggerCheckPeriod)));
+        } catch (ConflictException e) {
+            schedulerClient.updateSchedule(request -> request.clientToken(clientToken)
+                .groupName(POLLING_TRIGGER)
+                .name(scheduleName)
+                .target(sqsTarget)
+                .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+                .startDate(Instant.now())
+                .scheduleExpression("rate(%s minutes)".formatted(pollingTriggerCheckPeriod)));
+        }
     }
 
     @Override
@@ -157,6 +181,9 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId) {
 
         String workflowExecutionIdString = workflowExecutionId.toString();
+        String scheduleName = SCHEDULE_TRIGGER + workflowExecutionIdString.substring(0, 16);
+        String clientToken = workflowExecutionIdString.substring(16);
+        String cronExpression = "cron(" + pattern.substring(2) + ")";
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
@@ -166,13 +193,24 @@ public class AwsTriggerScheduler implements TriggerScheduler {
                 .build())
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionIdString.substring(16))
-            .groupName(SCHEDULE_TRIGGER)
-            .name(SCHEDULE_TRIGGER + workflowExecutionIdString.substring(0, 16))
-            .target(sqsTarget)
-            .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-            .scheduleExpressionTimezone(zoneId)
-            .startDate(Instant.now())
-            .scheduleExpression("cron(" + pattern.substring(2) + ")"));
+        try {
+            schedulerClient.createSchedule(request -> request.clientToken(clientToken)
+                .groupName(SCHEDULE_TRIGGER)
+                .name(scheduleName)
+                .target(sqsTarget)
+                .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+                .scheduleExpressionTimezone(zoneId)
+                .startDate(Instant.now())
+                .scheduleExpression(cronExpression));
+        } catch (ConflictException e) {
+            schedulerClient.updateSchedule(request -> request.clientToken(clientToken)
+                .groupName(SCHEDULE_TRIGGER)
+                .name(scheduleName)
+                .target(sqsTarget)
+                .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+                .scheduleExpressionTimezone(zoneId)
+                .startDate(Instant.now())
+                .scheduleExpression(cronExpression));
+        }
     }
 }
