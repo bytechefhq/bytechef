@@ -64,14 +64,10 @@
     "element": null,
     "help": null,
     "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": null,
-        "placeholder": null,
-        "sampleOutput": { }
-      },
+      "output": { },
+      "outputResponse": null,
       "outputSchema": null,
-      "sampleOutput": { }
+      "sampleOutput": null
     },
     "processErrorResponse": null,
     "properties": [ {
