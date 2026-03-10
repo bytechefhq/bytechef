@@ -41,7 +41,7 @@ public class InMemoryChatMemory {
     public static final ClusterElementDefinition<ChatMemoryFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("In Memory Chat Memory")
-            .description("Memory is retrieved added into the prompt's system text.")
+            .description("Memory is retrieved and added into the prompt's system text.")
             .type(CHAT_MEMORY)
             .object(() -> InMemoryChatMemory::apply);
 

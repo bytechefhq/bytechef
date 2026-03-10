@@ -126,7 +126,6 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Messages",
     "workflowNodeDescription": null
   }, {
@@ -422,7 +421,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Messages",
     "workflowNodeDescription": null
   }, {
@@ -600,7 +598,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete Conversation",
     "workflowNodeDescription": null
   }, {
@@ -789,13 +786,12 @@
     "processErrorResponse": null,
     "properties": null,
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Conversations",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
     "name": "chatMemory",
-    "description": "Memory is retrieved added into the prompt's system text.",
+    "description": "Memory is retrieved and added into the prompt's system text.",
     "element": { },
     "help": null,
     "outputDefinition": null,
