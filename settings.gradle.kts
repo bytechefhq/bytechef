@@ -194,7 +194,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-test:platform-
 include("server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest")
 include("server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service")
 include("server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api")
-include("server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-rest")
+include("server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-graphql")
 include("server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-service")
 include("server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api")
 include("server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl")
