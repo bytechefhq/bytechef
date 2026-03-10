@@ -43,12 +43,14 @@ class GithubListRepositoryIssuesActionTest {
 
     @Test
     void testPerform() {
+
         try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
             githubUtilsMockedStatic.when(() -> GithubUtils.getRepositoryIssues(
                 parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(List.of());
 
-            List<Map<?, ?>> result = GithubListRepositoryIssuesAction.perform(mockedParameters, null, mockedContext);
+            List<Map<?, ?>> result = GithubListRepositoryIssuesAction.perform(
+                mockedParameters, null, mockedContext);
 
             assertEquals(List.of(), result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
