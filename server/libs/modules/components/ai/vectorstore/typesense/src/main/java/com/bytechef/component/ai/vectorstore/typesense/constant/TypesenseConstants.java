@@ -38,7 +38,7 @@ public class TypesenseConstants {
     public static final String PROTOCOL = "protocol";
     public static final String TYPESENSE = "typesense";
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         List<Node> nodes = List.of(
             new Node(
                 connectionParameters.getRequiredString(PROTOCOL),

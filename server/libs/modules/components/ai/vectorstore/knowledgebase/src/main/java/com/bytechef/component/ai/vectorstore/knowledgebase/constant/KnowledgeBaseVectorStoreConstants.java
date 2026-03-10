@@ -46,9 +46,9 @@ public final class KnowledgeBaseVectorStoreConstants {
 
             @Override
             public org.springframework.ai.vectorstore.VectorStore createVectorStore(
-                Parameters connectionParameters, EmbeddingModel embeddingModel) {
+                Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
 
-                Long knowledgeBaseId = connectionParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
+                Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
 
                 return new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId);
             }

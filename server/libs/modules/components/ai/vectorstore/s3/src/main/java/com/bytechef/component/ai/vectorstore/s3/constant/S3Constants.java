@@ -57,7 +57,7 @@ public class S3Constants {
 
         @Override
         public org.springframework.ai.vectorstore.VectorStore createVectorStore(
-            Parameters connectionParameters, EmbeddingModel embeddingModel) {
+            Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
 
             SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel)
                 .build();

@@ -41,7 +41,7 @@ public class CouchbaseConstants {
     public static final String SCOPE_NAME = "scopeName";
     public static final String SIMILARITY = "similarity";
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         Cluster cluster = Cluster.connect(
             connectionParameters.getRequiredString(CONNECTION_STRING),
             connectionParameters.getRequiredString(USERNAME),

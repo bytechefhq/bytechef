@@ -32,7 +32,7 @@ public class RedisConstants {
     public static final String PUBLIC_ENDPOINT = "publicEndpoint";
     public static final String REDIS = "redis";
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         String publicEndpoint = connectionParameters.getRequiredString(PUBLIC_ENDPOINT);
 
         int i = publicEndpoint.indexOf(":");
