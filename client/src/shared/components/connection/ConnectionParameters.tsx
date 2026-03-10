@@ -64,7 +64,10 @@ const ConnectionParameters = ({
                             <li className="flex w-full" key={property.name}>
                                 <span className="w-1/3 shrink-0 text-muted-foreground">{property.name}:</span>
 
-                                <pre className="min-w-0 flex-1 self-end truncate text-xs">
+                                <pre
+                                    className="min-w-0 flex-1 self-end truncate text-xs"
+                                    title={String(connectionParameters![property.name!])}
+                                >
                                     {connectionParameters![property.name!]}
                                 </pre>
                             </li>
@@ -88,7 +91,10 @@ const ConnectionParameters = ({
                                                 {property.name}:
                                             </span>
 
-                                            <pre className="min-w-0 flex-1 self-end truncate text-xs">
+                                            <pre
+                                                className="min-w-0 flex-1 self-end truncate text-xs"
+                                                title={String(authorizationParameters![property.name!])}
+                                            >
                                                 {authorizationParameters![property.name!]}
                                             </pre>
                                         </li>
