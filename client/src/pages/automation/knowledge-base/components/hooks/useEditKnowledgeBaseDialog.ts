@@ -24,9 +24,6 @@ export default function useEditKnowledgeBaseDialog({
     const queryClient = useQueryClient();
 
     const updateMutation = useUpdateKnowledgeBaseMutation({
-        onError: () => {
-            toast.error('Failed to save settings. Please try again.');
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBase.id}]});
             queryClient.invalidateQueries({queryKey: ['knowledgeBases']});

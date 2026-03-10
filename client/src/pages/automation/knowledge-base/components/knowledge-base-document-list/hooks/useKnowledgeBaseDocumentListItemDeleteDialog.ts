@@ -21,9 +21,6 @@ export default function useKnowledgeBaseDocumentListItemDeleteDialog({
     const queryClient = useQueryClient();
 
     const deleteMutation = useDeleteKnowledgeBaseDocumentMutation({
-        onError: () => {
-            toast.error('Failed to delete document. Please try again.');
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBaseId}]});
             queryClient.invalidateQueries({queryKey: ['knowledgeBases']});

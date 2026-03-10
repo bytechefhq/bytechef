@@ -27,7 +27,7 @@ vi.mock('@tanstack/react-query', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useDeleteKnowledgeBaseMutation: vi.fn((options: {onError: () => void; onSuccess: () => void}) => ({
+    useDeleteKnowledgeBaseMutation: vi.fn((options: {onSuccess: () => void}) => ({
         isPending: false,
         mutate: (vars: unknown) => {
             hoisted.deleteMutate(vars);

@@ -7,7 +7,6 @@ import {
     UpdateWorkflowMutationType,
     WorkflowDefinitionType,
 } from '@/shared/types';
-import {toast} from 'sonner';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {flattenDefinitionTasks} from './flattenDefinitionTasks';
@@ -316,8 +315,6 @@ function executeWorkflowMutation({
                 console.error('Failed to save workflow definition:', error);
 
                 useWorkflowDataStore.getState().setWorkflow(previousWorkflow);
-
-                toast.error('Failed to save workflow. Please try again.');
             },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
