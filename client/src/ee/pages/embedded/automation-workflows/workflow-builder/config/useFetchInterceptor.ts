@@ -98,7 +98,28 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
-                if (response.status < 200 || response.status > 299) {
+                if (response.url.includes('/graphql')) {
+                    const clonedResponse = response.clone();
+
+                    clonedResponse
+                        .json()
+                        .then((data: {errors?: Array<{message?: string}>}) => {
+                            if (data.errors?.length) {
+                                const errorMessage = [
+                                    ...new Set(data.errors.map((error) => error.message || 'Unknown error')),
+                                ].join('\n');
+
+                                showErrorToast(toastId, 'Error', {description: errorMessage});
+                            } else if (response.status < 200 || response.status > 299) {
+                                showErrorToast(toastId, `Request failed with status ${response.status}`);
+                            }
+                        })
+                        .catch(() => {
+                            if (response.status < 200 || response.status > 299) {
+                                showErrorToast(toastId, `Request failed with status ${response.status}`);
+                            }
+                        });
+                } else if (response.status < 200 || response.status > 299) {
                     const clonedResponse = response.clone();
 
                     clonedResponse

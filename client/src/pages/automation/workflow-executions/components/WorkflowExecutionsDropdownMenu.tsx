@@ -17,7 +17,6 @@ const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecu
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore();
 
     const stopJobMutation = useStopJobMutation({
-        onError: () => toast.error('Failed to stop Workflow Execution'),
         onSuccess: () => {
             toast('Stopping Workflow Execution');
 

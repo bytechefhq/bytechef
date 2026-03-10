@@ -16,9 +16,6 @@ export default function useKnowledgeBaseDeleteAlertDialog({
     const queryClient = useQueryClient();
 
     const deleteKnowledgeBaseMutation = useDeleteKnowledgeBaseMutation({
-        onError: () => {
-            toast.error('Failed to delete knowledge base.');
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 

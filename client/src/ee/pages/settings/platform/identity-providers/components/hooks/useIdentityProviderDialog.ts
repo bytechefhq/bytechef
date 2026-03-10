@@ -7,7 +7,6 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
-import {toast} from 'sonner';
 
 interface UseIdentityProviderDialogI {
     clientId: string;
@@ -79,9 +78,6 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     const queryClient = useQueryClient();
 
     const createMutation = useCreateIdentityProviderMutation({
-        onError: () => {
-            toast.error('Failed to create identity provider. Please try again.');
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['identityProviders']});
             handleClose();
@@ -89,9 +85,6 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     });
 
     const updateMutation = useUpdateIdentityProviderMutation({
-        onError: () => {
-            toast.error('Failed to update identity provider. Please try again.');
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['identityProviders']});
             handleClose();

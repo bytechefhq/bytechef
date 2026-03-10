@@ -52,9 +52,6 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
     });
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
-        onError: () => {
-            toast.error(`Project duplication failed.`);
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
@@ -67,8 +64,6 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onError: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast.error('Workflow duplication failed.');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});

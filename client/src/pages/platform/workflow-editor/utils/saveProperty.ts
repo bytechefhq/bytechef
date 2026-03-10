@@ -5,7 +5,6 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UseMutationResult} from '@tanstack/react-query';
-import {toast} from 'sonner';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -118,8 +117,6 @@ export default function saveProperty({
                 {
                     onError: (error) => {
                         console.error('Failed to save cluster element parameter:', error);
-
-                        toast.error('Failed to save property. Please try again.');
                     },
                     onSuccess: (response) => handleSuccess(response, clusterElementWorkflowNodeName),
                 }
@@ -147,8 +144,6 @@ export default function saveProperty({
             {
                 onError: (error) => {
                     console.error('Failed to save workflow node parameter:', error);
-
-                    toast.error('Failed to save property. Please try again.');
                 },
                 onSuccess: (response) => handleSuccess(response, nodeWorkflowNodeName),
             }

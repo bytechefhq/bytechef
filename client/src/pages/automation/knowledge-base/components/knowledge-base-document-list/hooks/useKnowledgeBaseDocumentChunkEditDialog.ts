@@ -23,9 +23,6 @@ export default function useKnowledgeBaseDocumentChunkEditDialog({
     const queryClient = useQueryClient();
 
     const updateMutation = useUpdateKnowledgeBaseDocumentChunkMutation({
-        onError: () => {
-            toast.error('Failed to update chunk. Please try again.');
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBaseId}]});
 

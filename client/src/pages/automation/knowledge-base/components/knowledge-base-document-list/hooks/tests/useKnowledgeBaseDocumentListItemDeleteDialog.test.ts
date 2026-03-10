@@ -35,7 +35,7 @@ vi.mock('@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentDelete
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useDeleteKnowledgeBaseDocumentMutation: vi.fn((options: {onSuccess: () => void; onError: () => void}) => ({
+    useDeleteKnowledgeBaseDocumentMutation: vi.fn((options: {onSuccess: () => void}) => ({
         isPending: false,
         mutate: (vars: unknown) => {
             hoisted.deleteMutate(vars);
