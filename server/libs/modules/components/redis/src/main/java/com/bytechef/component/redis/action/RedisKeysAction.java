@@ -28,8 +28,9 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.redis.util.RedisUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.params.ScanParams;
+import redis.clients.jedis.resps.ScanResult;
 
 /**
  * @author Ivica Cardic
@@ -59,9 +60,23 @@ public class RedisKeysAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         try (Jedis jedis = RedisUtils.getJedis(connectionParameters)) {
-            Set<String> keys = jedis.keys(inputParameters.getRequiredString(KEY_PATTERN));
+            String pattern = inputParameters.getRequiredString(KEY_PATTERN);
 
-            return new ArrayList<>(keys);
+            ScanParams scanParams = new ScanParams().match(pattern)
+                .count(100);
+
+            List<String> keys = new ArrayList<>();
+            String cursor = ScanParams.SCAN_POINTER_START;
+
+            do {
+                ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+
+                keys.addAll(scanResult.getResult());
+
+                cursor = scanResult.getCursor();
+            } while (!cursor.equals(ScanParams.SCAN_POINTER_START));
+
+            return keys;
         }
     }
 }
