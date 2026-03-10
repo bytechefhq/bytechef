@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-impl"))
     implementation(project(":server:libs:core:encryption:encryption-property"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
+    implementation(project(":server:libs:core:graphql:graphql-impl"))
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-service"))
