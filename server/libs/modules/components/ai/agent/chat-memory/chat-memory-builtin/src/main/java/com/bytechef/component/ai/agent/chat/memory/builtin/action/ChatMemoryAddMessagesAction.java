@@ -22,14 +22,15 @@ import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatM
 import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.MESSAGE_ROLE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,48 +42,50 @@ import org.springframework.ai.chat.messages.UserMessage;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("MS")
 public class ChatMemoryAddMessagesAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addMessages")
-        .title("Add Messages")
-        .description("Adds messages to the chat memory for a conversation.")
-        .properties(
-            string(CONVERSATION_ID)
-                .label("Conversation ID")
-                .description("The unique identifier for the conversation.")
-                .required(true),
-            array(MESSAGES)
-                .label("Messages")
-                .description("The messages to add to the conversation.")
-                .required(true)
-                .items(
+    public static ModifiableActionDefinition of(ChatMemoryRepository chatMemoryRepository) {
+        return action("addMessages")
+            .title("Add Messages")
+            .description("Adds messages to the chat memory for a conversation.")
+            .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation.")
+                    .required(true),
+                array(MESSAGES)
+                    .label("Messages")
+                    .description("The messages to add to the conversation.")
+                    .required(true)
+                    .items(
+                        object()
+                            .properties(
+                                string(MESSAGE_ROLE)
+                                    .label("Role")
+                                    .description("The role of the message sender.")
+                                    .required(true)
+                                    .options(
+                                        option("User", "user"),
+                                        option("Assistant", "assistant")),
+                                string(MESSAGE_CONTENT)
+                                    .label("Content")
+                                    .description("The content of the message.")
+                                    .required(true))))
+            .output(
+                outputSchema(
                     object()
                         .properties(
-                            string(MESSAGE_ROLE)
-                                .label("Role")
-                                .description("The role of the message sender.")
-                                .required(true)
-                                .options(
-                                    option("User", "user"),
-                                    option("Assistant", "assistant")),
-                            string(MESSAGE_CONTENT)
-                                .label("Content")
-                                .description("The content of the message.")
-                                .required(true))))
-        .perform(ChatMemoryAddMessagesAction::perform);
-
-    private static ChatMemoryRepository chatMemoryRepository;
+                            string(CONVERSATION_ID),
+                            integer("messageCount"))))
+            .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
+                inputParameters, chatMemoryRepository));
+    }
 
     private ChatMemoryAddMessagesAction() {
     }
 
-    public static void setChatMemoryRepository(ChatMemoryRepository chatMemoryRepository) {
-        ChatMemoryAddMessagesAction.chatMemoryRepository = chatMemoryRepository;
-    }
-
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
 
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
         Object[] messagesArray = inputParameters.getRequiredArray(MESSAGES);
@@ -102,7 +105,7 @@ public class ChatMemoryAddMessagesAction {
         chatMemoryRepository.saveAll(conversationId, existingMessages);
 
         return Map.of(
-            "conversationId", conversationId,
+            CONVERSATION_ID, conversationId,
             "messageCount", existingMessages.size());
     }
 
@@ -110,7 +113,8 @@ public class ChatMemoryAddMessagesAction {
         return switch (role) {
             case "user" -> new UserMessage(content);
             case "assistant" -> new AssistantMessage(content);
-            default -> throw new IllegalArgumentException("Unsupported role: " + role);
+            default -> throw new IllegalArgumentException(
+                "Unsupported role: " + role + ". Supported roles are: user, assistant.");
         };
     }
 }

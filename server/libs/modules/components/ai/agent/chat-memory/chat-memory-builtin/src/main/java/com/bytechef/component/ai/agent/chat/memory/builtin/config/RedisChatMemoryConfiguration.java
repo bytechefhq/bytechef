@@ -38,19 +38,30 @@ class RedisChatMemoryConfiguration {
         this.applicationProperties = applicationProperties;
     }
 
-    @Bean
-    ChatMemoryRepository chatMemoryRepository() {
+    @Bean(destroyMethod = "close")
+    JedisPooled jedisPooled() {
         ApplicationProperties.Ai.Agent.Memory.Redis redisProperties =
             applicationProperties.getAi()
                 .getAgent()
                 .getMemory()
                 .getRedis();
 
-        JedisPooled jedisClient = new JedisPooled(redisProperties.getHost(), redisProperties.getPort());
+        return new JedisPooled(redisProperties.getHost(), redisProperties.getPort());
+    }
+
+    @Bean
+    ChatMemoryRepository chatMemoryRepository(JedisPooled jedisPooled) {
+        ApplicationProperties.Ai.Agent.Memory.Redis redisProperties =
+            applicationProperties.getAi()
+                .getAgent()
+                .getMemory()
+                .getRedis();
 
         RedisChatMemoryRepository.Builder builder = RedisChatMemoryRepository.builder()
-            .jedisClient(jedisClient)
-            .keyPrefix(redisProperties.getKeyPrefix());
+            .jedisClient(jedisPooled)
+            .keyPrefix(redisProperties.getKeyPrefix())
+            .indexName(redisProperties.getIndexName())
+            .initializeSchema(redisProperties.isInitializeSchema());
 
         String timeToLive = redisProperties.getTimeToLive();
 
