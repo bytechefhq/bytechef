@@ -149,15 +149,13 @@ const WorkflowEditorLayout = ({
                 />
             )}
 
-            {clusterElementsCanvasOpen && (
-                <ClusterElementsCanvasDialog
-                    onOpenChange={handleClusterElementsCanvasOpenChange}
-                    open={clusterElementsCanvasOpen}
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    updateWorkflowMutation={updateWorkflowMutation!}
-                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                />
-            )}
+            <ClusterElementsCanvasDialog
+                onOpenChange={handleClusterElementsCanvasOpenChange}
+                open={clusterElementsCanvasOpen}
+                previousComponentDefinitions={previousComponentDefinitions}
+                updateWorkflowMutation={updateWorkflowMutation!}
+                workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+            />
 
             {workflow.id && <WorkflowTestChatPanel />}
 

@@ -116,7 +116,7 @@ const ClusterElementsCanvasDialog = ({
             </DialogHeader>
 
             <DialogContent
-                className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0"
+                className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0 data-[state=closed]:zoom-out-[0.98] data-[state=open]:zoom-in-[0.98] data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0"
                 onPointerDownOutside={handlePointerDownOutside}
             >
                 {isDataStreamClusterRoot && showDataStreamEditor ? (
