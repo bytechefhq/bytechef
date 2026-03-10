@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 
 /**
@@ -102,7 +103,12 @@ public class PiiGuardrails {
         if (customPatternStrings != null) {
             for (String patternString : customPatternStrings) {
                 if (patternString != null && !patternString.isEmpty()) {
-                    patterns.add(new PiiPattern("CUSTOM", Pattern.compile(patternString)));
+                    try {
+                        patterns.add(new PiiPattern("CUSTOM", Pattern.compile(patternString)));
+                    } catch (PatternSyntaxException exception) {
+                        throw new IllegalArgumentException(
+                            "Invalid PII regex pattern: " + patternString, exception);
+                    }
                 }
             }
         }

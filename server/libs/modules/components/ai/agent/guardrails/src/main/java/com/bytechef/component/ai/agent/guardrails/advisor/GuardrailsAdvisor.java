@@ -89,7 +89,7 @@ public class GuardrailsAdvisor implements CallAdvisor, StreamAdvisor {
             String userMessage = extractUserMessage(chatClientRequest);
             GuardrailsResult inputResult = validateContent(userMessage);
 
-            if (inputResult.tripwireTriggered() && MODE_CLASSIFY.equals(mode)) {
+            if (inputResult.tripwireTriggered()) {
                 return createBlockedResponse();
             }
         }
@@ -124,14 +124,43 @@ public class GuardrailsAdvisor implements CallAdvisor, StreamAdvisor {
             String userMessage = extractUserMessage(chatClientRequest);
             GuardrailsResult inputResult = validateContent(userMessage);
 
-            if (inputResult.tripwireTriggered() && MODE_CLASSIFY.equals(mode)) {
+            if (inputResult.tripwireTriggered()) {
                 return Flux.just(createBlockedResponse());
             }
         }
 
-        // For streaming, we validate output as the stream completes
-        // Note: Full output validation in streaming mode requires buffering the entire response
-        return streamAdvisorChain.nextStream(chatClientRequest);
+        Flux<ChatClientResponse> downstreamStream = streamAdvisorChain.nextStream(chatClientRequest);
+
+        if (!validateOutput) {
+            return downstreamStream;
+        }
+
+        return downstreamStream
+            .collectList()
+            .flatMapMany(responses -> {
+                StringBuilder aggregatedContent = new StringBuilder();
+
+                for (ChatClientResponse response : responses) {
+                    String assistantMessage = extractAssistantMessage(response);
+
+                    if (assistantMessage != null && !assistantMessage.isEmpty()) {
+                        aggregatedContent.append(assistantMessage);
+                    }
+                }
+
+                GuardrailsResult outputResult = validateContent(aggregatedContent.toString());
+
+                if (outputResult.tripwireTriggered()) {
+                    if (MODE_CLASSIFY.equals(mode)) {
+                        return Flux.just(createBlockedResponse());
+                    }
+
+                    return Flux.fromIterable(responses)
+                        .map(this::sanitizeResponse);
+                }
+
+                return Flux.fromIterable(responses);
+            });
     }
 
     private GuardrailsResult validateContent(String content) {
@@ -263,6 +292,14 @@ public class GuardrailsAdvisor implements CallAdvisor, StreamAdvisor {
         // Mask keywords
         if (sensitiveWords != null && !sensitiveWords.isEmpty()) {
             sanitized = KeywordMatcher.mask(sanitized, sensitiveWords);
+        }
+
+        // Mask custom patterns
+        if (customPatterns != null && !customPatterns.isEmpty()) {
+            for (Pattern pattern : customPatterns) {
+                sanitized = pattern.matcher(sanitized)
+                    .replaceAll("<CUSTOM_PATTERN>");
+            }
         }
 
         return sanitized;

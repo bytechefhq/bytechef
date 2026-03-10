@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 
 /**
@@ -96,7 +97,12 @@ public class CustomPatternGuardrails {
         if (patternStrings != null) {
             for (String patternString : patternStrings) {
                 if (patternString != null && !patternString.isEmpty()) {
-                    patterns.add(Pattern.compile(patternString));
+                    try {
+                        patterns.add(Pattern.compile(patternString));
+                    } catch (PatternSyntaxException exception) {
+                        throw new IllegalArgumentException(
+                            "Invalid regex pattern: " + patternString, exception);
+                    }
                 }
             }
         }

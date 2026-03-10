@@ -38,7 +38,8 @@ public class PiiDetector {
         new PiiPattern(
             "EMAIL",
             Pattern.compile("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")),
-        // Phone number - simple pattern matching 10 consecutive digits with optional separators
+        // Phone number - simple pattern matching 10 digits with required separators (e.g., 123-456-7890, (123)
+        // 456-7890)
         new PiiPattern(
             "PHONE",
             Pattern.compile("\\b[0-9]{3}[-.][0-9]{3}[-.][0-9]{4}\\b|\\([0-9]{3}\\)[-.\\s][0-9]{3}[-.][0-9]{4}")),
