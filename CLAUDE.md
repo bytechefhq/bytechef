@@ -246,7 +246,6 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 ### React Patterns (Client)
 - Use `fieldset` (with `border-0`) for semantic form grouping instead of `div`
-- Replace nested ternary operators with render functions (e.g., `renderTrigger()`)
 - Use `useMemo` for computed values instead of IIFEs in JSX
 - Prefer `||` over `??` for JSX fallbacks (e.g., `trigger || defaultTrigger`)
 
