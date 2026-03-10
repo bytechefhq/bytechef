@@ -50,6 +50,7 @@ public class GoogleDriveUploadFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload File")
         .description("Uploads a file in your Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#upload-file")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File Entry")

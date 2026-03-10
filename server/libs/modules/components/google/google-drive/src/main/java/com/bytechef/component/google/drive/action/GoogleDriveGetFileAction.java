@@ -41,6 +41,7 @@ public class GoogleDriveGetFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFile")
         .title("Get File")
         .description("Retrieve a specified file from your Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#get-file")
         .properties(
             string(FILE_ID)
                 .label("File ID")

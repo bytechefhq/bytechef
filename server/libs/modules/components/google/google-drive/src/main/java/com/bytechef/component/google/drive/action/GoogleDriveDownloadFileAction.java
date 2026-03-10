@@ -44,6 +44,7 @@ public class GoogleDriveDownloadFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
         .title("Download File")
         .description("Download selected file from Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#download-file")
         .properties(
             string(FILE_ID)
                 .label("File ID")

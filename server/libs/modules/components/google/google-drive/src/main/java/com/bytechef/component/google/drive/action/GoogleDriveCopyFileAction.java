@@ -39,10 +39,11 @@ public class GoogleDriveCopyFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("copyFile")
         .title("Copy File")
         .description("Copy a selected file to a different location within Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#copy-file")
         .properties(
             string(FILE_ID)
                 .label("File ID")
-                .description("The id of the file to be copied.")
+                .description("The ID of the file to be copied.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true),
             string(FILE_NAME)

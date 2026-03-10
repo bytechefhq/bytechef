@@ -55,6 +55,7 @@ public class GoogleDriveCreateNewTextFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createNewTextFile")
         .title("Create New Text File")
         .description("Creates a new text file in Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#create-new-text-file")
         .properties(
             string(FILE_NAME)
                 .label("File Name")
