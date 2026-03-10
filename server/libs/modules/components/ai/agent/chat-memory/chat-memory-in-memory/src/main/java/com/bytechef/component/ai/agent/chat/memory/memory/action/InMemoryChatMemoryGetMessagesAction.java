@@ -17,6 +17,9 @@
 package com.bytechef.component.ai.agent.chat.memory.memory.action;
 
 import static com.bytechef.component.ai.agent.chat.memory.memory.constant.InMemoryChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.ai.agent.chat.memory.memory.constant.InMemoryChatMemoryConstants.MESSAGES;
+import static com.bytechef.component.ai.agent.chat.memory.memory.constant.InMemoryChatMemoryConstants.MESSAGE_CONTENT;
+import static com.bytechef.component.ai.agent.chat.memory.memory.constant.InMemoryChatMemoryConstants.MESSAGE_ROLE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -52,12 +55,12 @@ public class InMemoryChatMemoryGetMessagesAction {
                 object()
                     .properties(
                         string(CONVERSATION_ID),
-                        array("messages")
+                        array(MESSAGES)
                             .items(
                                 object()
                                     .properties(
-                                        string("role"),
-                                        string("content"))))))
+                                        string(MESSAGE_ROLE),
+                                        string(MESSAGE_CONTENT))))))
         .perform(InMemoryChatMemoryGetMessagesAction::perform);
 
     private InMemoryChatMemoryGetMessagesAction() {
@@ -77,7 +80,7 @@ public class InMemoryChatMemoryGetMessagesAction {
 
         return Map.of(
             CONVERSATION_ID, conversationId,
-            "messages", messageList);
+            MESSAGES, messageList);
     }
 
     private static Map<String, String> toMessageMap(Message message) {
@@ -86,16 +89,16 @@ public class InMemoryChatMemoryGetMessagesAction {
         MessageType messageType = message.getMessageType();
 
         if (messageType == MessageType.USER) {
-            map.put("role", "user");
+            map.put(MESSAGE_ROLE, "user");
         } else if (messageType == MessageType.ASSISTANT) {
-            map.put("role", "assistant");
+            map.put(MESSAGE_ROLE, "assistant");
         } else if (messageType == MessageType.SYSTEM) {
-            map.put("role", "system");
+            map.put(MESSAGE_ROLE, "system");
         } else {
-            map.put("role", messageType.getValue());
+            map.put(MESSAGE_ROLE, messageType.getValue());
         }
 
-        map.put("content", message.getText());
+        map.put(MESSAGE_CONTENT, message.getText());
 
         return map;
     }

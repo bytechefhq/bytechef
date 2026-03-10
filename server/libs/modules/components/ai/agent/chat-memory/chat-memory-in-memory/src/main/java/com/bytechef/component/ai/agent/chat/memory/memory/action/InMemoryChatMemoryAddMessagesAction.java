@@ -74,7 +74,6 @@ public class InMemoryChatMemoryAddMessagesAction {
     private InMemoryChatMemoryAddMessagesAction() {
     }
 
-    @SuppressWarnings("unchecked")
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
@@ -97,7 +96,7 @@ public class InMemoryChatMemoryAddMessagesAction {
         repository.saveAll(conversationId, existingMessages);
 
         return Map.of(
-            "conversationId", conversationId,
+            CONVERSATION_ID, conversationId,
             "messageCount", existingMessages.size());
     }
 
@@ -105,7 +104,8 @@ public class InMemoryChatMemoryAddMessagesAction {
         return switch (role) {
             case "user" -> new UserMessage(content);
             case "assistant" -> new AssistantMessage(content);
-            default -> throw new IllegalArgumentException("Unsupported role: " + role);
+            default -> throw new IllegalArgumentException(
+                "Unsupported role: " + role + ". Supported roles are: user, assistant.");
         };
     }
 }
