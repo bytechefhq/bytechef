@@ -5,9 +5,14 @@ import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configurati
 import {ReactNode} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-interface UniqueProjectI {
-    id: string;
-    name: string;
+interface McpServersFilterTitleProps {
+    componentDefinitions: ComponentDefinitionBasic[] | undefined;
+    filterData: {id?: string; type: Type};
+    tags: Tag[] | undefined;
+    uniqueProjects: Array<{
+        id: string;
+        name: string;
+    }>;
 }
 
 const McpServersFilterTitle = ({
@@ -15,41 +20,47 @@ const McpServersFilterTitle = ({
     filterData,
     tags,
     uniqueProjects,
-}: {
-    componentDefinitions: ComponentDefinitionBasic[] | undefined;
-    filterData: {id?: string; type: Type};
-    tags: Tag[] | undefined;
-    uniqueProjects: UniqueProjectI[];
-}) => {
+}: McpServersFilterTitleProps) => {
     const [searchParams] = useSearchParams();
 
     let pageTitle: string | ReactNode | undefined;
 
-    if (filterData.type === Type.Component && filterData.id) {
-        pageTitle = componentDefinitions?.find(
-            (componentDefinition) => componentDefinition.name === filterData.id
-        )?.title;
-    } else if (filterData.type === Type.Project && filterData.id) {
-        pageTitle = uniqueProjects.find((project) => project.id === filterData.id)?.name;
-    } else if (filterData.type === Type.Tag && filterData.id) {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
+    const filterId = filterData.id;
+    const filterType = filterData.type;
+
+    if (filterId && filterType === Type.Component) {
+        const matchedComponent = componentDefinitions?.find(
+            (componentDefinition) => componentDefinition.name === filterId
+        );
+
+        pageTitle = matchedComponent?.title;
+    } else if (filterId && filterType === Type.Project) {
+        const matchedProject = uniqueProjects.find((project) => project.id === filterId);
+
+        pageTitle = matchedProject?.name;
+    } else if (filterId && filterType === Type.Tag) {
+        const matchedTag = tags?.find((tag) => tag.id === filterId);
+
+        pageTitle = matchedTag?.name;
     }
 
-    const filterType = searchParams.get('componentName')
-        ? 'component'
-        : searchParams.get('projectId')
-          ? 'project'
-          : searchParams.get('tagId')
-            ? 'tag'
-            : undefined;
+    let filterLabel: string | undefined;
+
+    if (searchParams.get('componentName')) {
+        filterLabel = 'component';
+    } else if (searchParams.get('projectId')) {
+        filterLabel = 'project';
+    } else if (searchParams.get('tagId')) {
+        filterLabel = 'tag';
+    }
 
     return (
         <div className="space-x-1">
             <span className="text-sm font-semibold uppercase text-muted-foreground">Filter by </span>
 
-            {filterType ? (
+            {filterLabel ? (
                 <>
-                    <span className="text-sm uppercase text-muted-foreground">{filterType}:</span>
+                    <span className="text-sm uppercase text-muted-foreground">{filterLabel}:</span>
 
                     <Badge
                         label={typeof pageTitle === 'string' ? pageTitle : 'Unknown'}
