@@ -28,7 +28,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.model.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -47,8 +46,8 @@ class GoogleDriveCopyFileActionTest {
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
-    void testPerform() throws IOException {
-        try (MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class);) {
+    void testPerform() {
+        try (MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
             googleUtilsMockedStatic
                 .when(() -> GoogleUtils.copyFileOnGoogleDrive(
                     parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
