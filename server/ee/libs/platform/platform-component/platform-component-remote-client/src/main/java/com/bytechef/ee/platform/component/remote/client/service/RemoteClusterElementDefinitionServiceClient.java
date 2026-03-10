@@ -58,11 +58,11 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
-    public OutputResponse executeOutput(
+    public @Nullable OutputResponse executeOutput(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection) {
 
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override

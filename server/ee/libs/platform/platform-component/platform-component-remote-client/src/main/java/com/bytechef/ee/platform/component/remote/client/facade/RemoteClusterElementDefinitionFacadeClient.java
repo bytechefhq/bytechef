@@ -53,11 +53,11 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
     }
 
     @Override
-    public OutputResponse executeOutput(
+    public @Nullable OutputResponse executeOutput(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable Long connectionId) {
 
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
