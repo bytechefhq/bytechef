@@ -31,11 +31,10 @@ import com.bytechef.component.definition.ClusterElementDefinition.OutputFunction
 import com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
+import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import java.util.ArrayList;
@@ -76,11 +75,8 @@ public class WorkflowCallWorkflowTool {
                 dynamicProperties(INPUTS)
                     .description("The input parameters for the sub-workflow.")
                     .propertiesLookupDependsOn(WORKFLOW_UUID)
-                    .properties((PropertiesFunction) (
-                        inputParameters, connectionParameters, lookupDependsOnPaths, context) -> inputs(
-                            inputParameters, subflowDataSource)))
-            .output((OutputFunction) (inputParameters, connectionParameters, context) -> output(
-                inputParameters, subflowDataSource));
+                    .properties(getPropertiesFunction(subflowDataSource)))
+            .output(getOutputFunction(subflowDataSource));
     }
 
     private static ClusterElementDefinition.OptionsFunction<String> getWorkflowOptionsFunction(
@@ -93,57 +89,76 @@ public class WorkflowCallWorkflowTool {
             .toList();
     }
 
-    private static List<? extends Property.ValueProperty<?>> inputs(
-        Parameters inputParameters, SubflowDataSource subflowDataSource) {
+    private static OutputFunction getOutputFunction(SubflowDataSource subflowDataSource) {
+        return (inputParameters, connectionParameters, context) -> {
+            String workflowUuid = inputParameters.getString(WORKFLOW_UUID);
 
-        String workflowUuid = inputParameters.getString(WORKFLOW_UUID);
+            if (workflowUuid == null || workflowUuid.isEmpty()) {
+                return null;
+            }
 
-        if (workflowUuid == null || workflowUuid.isEmpty()) {
-            return List.of();
-        }
+            BaseValueProperty<?> outputSchema = subflowDataSource.getSubWorkflowOutputSchema(workflowUuid);
 
-        BaseProperty.BaseValueProperty<?> inputSchema = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
+            if (outputSchema == null) {
+                return null;
+            }
 
-        if (!(inputSchema instanceof BaseProperty.BaseObjectProperty<?> objectProperty)) {
-            return List.of();
-        }
+            return BaseOutputDefinition.OutputResponse.of(outputSchema);
+        };
+    }
 
-        @SuppressWarnings("unchecked")
-        List<? extends BaseProperty.BaseValueProperty<?>> baseProperties =
-            (List<? extends BaseProperty.BaseValueProperty<?>>) (List<?>) objectProperty.getProperties()
-                .orElse(List.of());
+    private static PropertiesFunction getPropertiesFunction(SubflowDataSource subflowDataSource) {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
-        List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
+            String workflowUuid = inputParameters.getString(WORKFLOW_UUID);
 
-        for (BaseProperty.BaseValueProperty<?> baseProperty : baseProperties) {
-            ModifiableValueProperty<?, ?> property = toComponentProperty(baseProperty);
+            if (workflowUuid == null || workflowUuid.isEmpty()) {
+                return List.of();
+            }
 
-            properties.add(property);
-        }
+            BaseValueProperty<?> inputSchema = subflowDataSource.getSubWorkflowInputSchema(workflowUuid);
 
-        return properties;
+            if (!(inputSchema instanceof BaseProperty.BaseObjectProperty<?> objectProperty)) {
+                return List.of();
+            }
+
+            @SuppressWarnings("unchecked")
+            List<? extends BaseValueProperty<?>> baseProperties =
+                (List<? extends BaseValueProperty<?>>) objectProperty.getProperties()
+                    .orElse(List.of());
+
+            List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
+
+            for (BaseValueProperty<?> baseProperty : baseProperties) {
+                ModifiableValueProperty<?, ?> property = toComponentProperty(baseProperty);
+
+                properties.add(property);
+            }
+
+            return properties;
+        };
     }
 
     @SuppressWarnings("unchecked")
-    private static ModifiableValueProperty<?, ?> toComponentProperty(BaseProperty.BaseValueProperty<?> baseProperty) {
+    private static ModifiableValueProperty<?, ?> toComponentProperty(BaseValueProperty<?> baseProperty) {
         String name = baseProperty.getName();
 
         ModifiableValueProperty<?, ?> property;
 
         if (baseProperty instanceof BaseProperty.BaseArrayProperty<?> arrayProperty) {
-            ComponentDsl.ModifiableArrayProperty arrayProp = ComponentDsl.array(name);
+            ComponentDsl.ModifiableArrayProperty newArrayProperty = ComponentDsl.array(name);
 
             arrayProperty.getItems()
                 .ifPresent(items -> {
                     List<ModifiableValueProperty<?, ?>> itemProperties =
-                        ((List<BaseProperty.BaseValueProperty<?>>) (List<?>) items).stream()
-                            .map(WorkflowCallWorkflowTool::toComponentProperty)
+                        ((List<BaseValueProperty<?>>) items).stream()
+                            .<ModifiableValueProperty<?, ?>>map(WorkflowCallWorkflowTool::toComponentProperty)
                             .toList();
 
-                    arrayProp.items(itemProperties);
+                    newArrayProperty.items(itemProperties);
                 });
 
-            property = arrayProp;
+            property = newArrayProperty;
         } else if (baseProperty instanceof BaseProperty.BaseBooleanProperty) {
             property = ComponentDsl.bool(name);
         } else if (baseProperty instanceof BaseProperty.BaseDateProperty) {
@@ -155,19 +170,19 @@ public class WorkflowCallWorkflowTool {
         } else if (baseProperty instanceof BaseProperty.BaseNumberProperty) {
             property = ComponentDsl.number(name);
         } else if (baseProperty instanceof BaseProperty.BaseObjectProperty<?> objectProperty) {
-            ComponentDsl.ModifiableObjectProperty objectProp = ComponentDsl.object(name);
+            ComponentDsl.ModifiableObjectProperty newObjectProperty = ComponentDsl.object(name);
 
             objectProperty.getProperties()
                 .ifPresent(childProperties -> {
                     List<ModifiableValueProperty<?, ?>> childComponentProperties =
-                        ((List<BaseProperty.BaseValueProperty<?>>) (List<?>) childProperties).stream()
-                            .map(WorkflowCallWorkflowTool::toComponentProperty)
+                        ((List<BaseValueProperty<?>>) childProperties).stream()
+                            .<ModifiableValueProperty<?, ?>>map(WorkflowCallWorkflowTool::toComponentProperty)
                             .toList();
 
-                    objectProp.properties(childComponentProperties);
+                    newObjectProperty.properties(childComponentProperties);
                 });
 
-            property = objectProp;
+            property = newObjectProperty;
         } else {
             property = string(name);
         }
@@ -179,23 +194,5 @@ public class WorkflowCallWorkflowTool {
             .ifPresent(property::required);
 
         return property;
-    }
-
-    private static BaseOutputDefinition.OutputResponse output(
-        Parameters inputParameters, SubflowDataSource subflowDataSource) {
-
-        String workflowUuid = inputParameters.getString(WORKFLOW_UUID);
-
-        if (workflowUuid == null || workflowUuid.isEmpty()) {
-            return null;
-        }
-
-        BaseProperty.BaseValueProperty<?> outputSchema = subflowDataSource.getSubWorkflowOutputSchema(workflowUuid);
-
-        if (outputSchema == null) {
-            return null;
-        }
-
-        return BaseOutputDefinition.OutputResponse.of(outputSchema);
     }
 }
