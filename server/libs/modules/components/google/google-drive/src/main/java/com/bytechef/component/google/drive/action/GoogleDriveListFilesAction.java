@@ -40,6 +40,7 @@ public class GoogleDriveListFilesAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFiles")
         .title("List Files")
         .description("List files in a Google Drive folder.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#list-files")
         .properties(
             string(FOLDER_ID)
                 .label("Parent Folder ID")

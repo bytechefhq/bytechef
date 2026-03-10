@@ -49,6 +49,7 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and " +
                 "collaborate online.")
         .customAction(true)
+        .customActionHelp("", "https://developers.google.com/workspace/drive/api/guides/about-sdk")
         .icon("path:assets/google-drive.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)
@@ -74,7 +75,8 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             tool(GoogleDriveUploadFileAction.ACTION_DEFINITION))
         .triggers(
             GoogleDriveNewFileTrigger.TRIGGER_DEFINITION,
-            GoogleDriveNewFolderTrigger.TRIGGER_DEFINITION);
+            GoogleDriveNewFolderTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
