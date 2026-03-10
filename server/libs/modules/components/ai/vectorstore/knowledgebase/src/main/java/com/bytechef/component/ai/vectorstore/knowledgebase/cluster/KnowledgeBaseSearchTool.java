@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.vectorstore.redis.cluster;
+package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
-import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS;
-import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.VECTOR_STORE;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.createVectorStore;
 
 import com.bytechef.component.ai.vectorstore.cluster.SearchToolDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
+import org.springframework.ai.vectorstore.VectorStore;
 
 /**
  * @author Ivica Cardic
  */
-public class RedisSearchTool {
+public class KnowledgeBaseSearchTool {
 
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
-        ClusterElementDefinitionService clusterElementDefinitionService) {
+        ClusterElementDefinitionService clusterElementDefinitionService, VectorStore vectorStore) {
 
-        return SearchToolDefinition.of("Redis", REDIS, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return SearchToolDefinition.of(
+            "Couchbase", KNOWLEDGE_BASE, createVectorStore(vectorStore), List.of(), clusterElementDefinitionService);
     }
 }

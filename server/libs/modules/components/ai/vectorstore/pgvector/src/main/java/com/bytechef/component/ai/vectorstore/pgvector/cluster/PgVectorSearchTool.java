@@ -19,7 +19,7 @@ package com.bytechef.component.ai.vectorstore.pgvector.cluster;
 import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.PGVECTOR;
 import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractSearchTool;
+import com.bytechef.component.ai.vectorstore.cluster.SearchToolDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -33,7 +33,7 @@ public class PgVectorSearchTool {
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractSearchTool.of(
+        return SearchToolDefinition.of(
             "PGVector", PGVECTOR, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

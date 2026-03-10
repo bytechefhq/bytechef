@@ -19,7 +19,7 @@ package com.bytechef.component.ai.vectorstore.neo4j.cluster;
 import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstants.NEO4J;
 import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractSearchTool;
+import com.bytechef.component.ai.vectorstore.cluster.SearchToolDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -33,6 +33,6 @@ public class Neo4jSearchTool {
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractSearchTool.of("Neo4j", NEO4J, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return SearchToolDefinition.of("Neo4j", NEO4J, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }
