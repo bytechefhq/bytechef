@@ -38,32 +38,29 @@ import org.springframework.stereotype.Component;
 @AutoService(ComponentHandler.class)
 public class ChatMemoryComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("chatMemory")
-        .title("Chat Memory")
-        .description("Built-in Chat Memory using application database.")
-        .icon("path:assets/chat-memory.svg")
-        .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-        .actions(
-            ChatMemoryAddMessagesAction.ACTION_DEFINITION,
-            ChatMemoryGetMessagesAction.ACTION_DEFINITION,
-            ChatMemoryDeleteAction.ACTION_DEFINITION,
-            ChatMemoryListConversationsAction.ACTION_DEFINITION)
-        .clusterElements(ChatMemory.CLUSTER_ELEMENT_DEFINITION);
+    private final ComponentDefinition componentDefinition;
 
     public ChatMemoryComponentHandler() {
+        this(null);
     }
 
     @Autowired(required = false)
     public ChatMemoryComponentHandler(ChatMemoryRepository chatMemoryRepository) {
-        ChatMemoryAddMessagesAction.setChatMemoryRepository(chatMemoryRepository);
-        ChatMemoryGetMessagesAction.setChatMemoryRepository(chatMemoryRepository);
-        ChatMemoryDeleteAction.setChatMemoryRepository(chatMemoryRepository);
-        ChatMemoryListConversationsAction.setChatMemoryRepository(chatMemoryRepository);
-        ChatMemory.setChatMemoryRepository(chatMemoryRepository);
+        this.componentDefinition = component("chatMemory")
+            .title("Chat Memory")
+            .description("Built-in Chat Memory using application database.")
+            .icon("path:assets/chat-memory.svg")
+            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+            .actions(
+                ChatMemoryAddMessagesAction.of(chatMemoryRepository),
+                ChatMemoryGetMessagesAction.of(chatMemoryRepository),
+                ChatMemoryDeleteAction.of(chatMemoryRepository),
+                ChatMemoryListConversationsAction.of(chatMemoryRepository))
+            .clusterElements(ChatMemory.of(chatMemoryRepository));
     }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
 }

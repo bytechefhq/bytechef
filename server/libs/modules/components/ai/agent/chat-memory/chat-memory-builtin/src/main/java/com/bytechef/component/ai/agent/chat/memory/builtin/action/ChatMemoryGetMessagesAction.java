@@ -23,10 +23,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,41 +36,37 @@ import org.springframework.ai.chat.messages.MessageType;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("MS")
 public class ChatMemoryGetMessagesAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMessages")
-        .title("Get Messages")
-        .description("Retrieves all messages from a conversation.")
-        .properties(
-            string(CONVERSATION_ID)
-                .label("Conversation ID")
-                .description("The unique identifier for the conversation.")
-                .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(CONVERSATION_ID),
-                        array("messages")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("role"),
-                                        string("content"))))))
-        .perform(ChatMemoryGetMessagesAction::perform);
-
-    private static ChatMemoryRepository chatMemoryRepository;
+    public static ModifiableActionDefinition of(ChatMemoryRepository chatMemoryRepository) {
+        return action("getMessages")
+            .title("Get Messages")
+            .description("Retrieves all messages from a conversation.")
+            .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation.")
+                    .required(true))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            string(CONVERSATION_ID),
+                            array("messages")
+                                .items(
+                                    object()
+                                        .properties(
+                                            string("role"),
+                                            string("content"))))))
+            .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
+                inputParameters, chatMemoryRepository));
+    }
 
     private ChatMemoryGetMessagesAction() {
     }
 
-    public static void setChatMemoryRepository(ChatMemoryRepository chatMemoryRepository) {
-        ChatMemoryGetMessagesAction.chatMemoryRepository = chatMemoryRepository;
-    }
-
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
 
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
 

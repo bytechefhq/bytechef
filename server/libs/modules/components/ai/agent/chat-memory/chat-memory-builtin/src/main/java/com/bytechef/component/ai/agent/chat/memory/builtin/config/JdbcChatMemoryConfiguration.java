@@ -19,8 +19,12 @@ package com.bytechef.component.ai.agent.chat.memory.builtin.config;
 import com.bytechef.config.ApplicationProperties;
 import javax.sql.DataSource;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.chat.memory.repository.jdbc.HsqldbChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.MysqlChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.OracleChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.SqlServerChatMemoryRepositoryDialect;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,19 +79,13 @@ class JdbcChatMemoryConfiguration {
     }
 
     private String getSchemaScript(JdbcChatMemoryRepositoryDialect dialect) {
-        String dialectName = dialect.getClass()
-            .getSimpleName()
-            .toLowerCase();
-
-        if (dialectName.contains("postgres")) {
-            return "org/springframework/ai/chat/memory/repository/jdbc/schema-postgresql.sql";
-        } else if (dialectName.contains("mysql") || dialectName.contains("maria")) {
+        if (dialect instanceof MysqlChatMemoryRepositoryDialect) {
             return "org/springframework/ai/chat/memory/repository/jdbc/schema-mysql.sql";
-        } else if (dialectName.contains("oracle")) {
+        } else if (dialect instanceof OracleChatMemoryRepositoryDialect) {
             return "org/springframework/ai/chat/memory/repository/jdbc/schema-oracle.sql";
-        } else if (dialectName.contains("sqlserver")) {
+        } else if (dialect instanceof SqlServerChatMemoryRepositoryDialect) {
             return "org/springframework/ai/chat/memory/repository/jdbc/schema-sqlserver.sql";
-        } else if (dialectName.contains("hsql")) {
+        } else if (dialect instanceof HsqldbChatMemoryRepositoryDialect) {
             return "org/springframework/ai/chat/memory/repository/jdbc/schema-hsqldb.sql";
         }
 
