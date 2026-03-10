@@ -22,7 +22,6 @@ package com.bytechef.component.ai.agent.chat.memory.neo4j.constant;
 public class Neo4jChatMemoryConstants {
 
     public static final String CONVERSATION_ID = "conversationId";
-    public static final String DATABASE = "database";
     public static final String MESSAGES = "messages";
     public static final String MESSAGE_CONTENT = "content";
     public static final String MESSAGE_ROLE = "role";

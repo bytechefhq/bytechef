@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.mongodb.constant;
+package com.bytechef.component.ai.agent.chat.memory.neo4j;
 
-/**
- * @author Ivica Cardic
- */
-public class MongoDbChatMemoryConstants {
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
-    public static final String CONNECTION_STRING = "connectionString";
-    public static final String CONVERSATION_ID = "conversationId";
-    public static final String DATABASE_NAME = "databaseName";
-    public static final String MESSAGES = "messages";
-    public static final String MESSAGE_CONTENT = "content";
-    public static final String MESSAGE_ROLE = "role";
+public class Neo4jChatMemoryComponentHandlerTest {
+
+    @Test
+    public void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals(
+            "definition/neo4j-chat-memory_v1.json", new Neo4jChatMemoryComponentHandler().getDefinition());
+    }
 }
