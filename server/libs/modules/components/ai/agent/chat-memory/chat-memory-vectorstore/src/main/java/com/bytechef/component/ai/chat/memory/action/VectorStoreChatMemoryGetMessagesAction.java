@@ -99,7 +99,7 @@ public class VectorStoreChatMemoryGetMessagesAction {
             .build();
 
         SearchRequest searchRequest = SearchRequest.builder()
-            .query("")
+            .query(conversationId)
             .topK(topK)
             .filterExpression(filterExpression)
             .build();
