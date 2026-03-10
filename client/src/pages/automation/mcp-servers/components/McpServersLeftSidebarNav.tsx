@@ -3,6 +3,7 @@ import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav
 import {Tag} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {TagIcon} from 'lucide-react';
+import {useMemo} from 'react';
 
 interface McpServersLeftSidebarNavProps {
     allComponentNames: string[];
@@ -25,6 +26,14 @@ const McpServersLeftSidebarNav = ({
     tagsIsLoading,
     uniqueProjects,
 }: McpServersLeftSidebarNavProps) => {
+    const filteredComponentDefinitions = useMemo(
+        () =>
+            componentDefinitions?.filter((componentDefinition) =>
+                allComponentNames.includes(componentDefinition.name)
+            ) ?? [],
+        [componentDefinitions, allComponentNames]
+    );
+
     return (
         <>
             <LeftSidebarNav
@@ -39,21 +48,19 @@ const McpServersLeftSidebarNav = ({
                         />
 
                         {!componentDefinitionsIsLoading &&
-                            componentDefinitions
-                                ?.filter((componentDefinition: ComponentDefinitionBasic) =>
-                                    allComponentNames.includes(componentDefinition.name)
-                                )
-                                ?.map((item: ComponentDefinitionBasic) => (
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current: filterData?.id === item.name && filterData.type === Type.Component,
-                                            id: item.name!,
-                                            name: item.title!,
-                                        }}
-                                        key={item.name}
-                                        toLink={`?componentName=${item.name}`}
-                                    />
-                                ))}
+                            filteredComponentDefinitions.map((componentDefinition: ComponentDefinitionBasic) => (
+                                <LeftSidebarNavItem
+                                    item={{
+                                        current:
+                                            filterData?.id === componentDefinition.name &&
+                                            filterData.type === Type.Component,
+                                        id: componentDefinition.name!,
+                                        name: componentDefinition.title!,
+                                    }}
+                                    key={componentDefinition.name}
+                                    toLink={`?componentName=${componentDefinition.name}`}
+                                />
+                            ))}
                     </>
                 }
                 title="Components"
@@ -62,21 +69,21 @@ const McpServersLeftSidebarNav = ({
             <LeftSidebarNav
                 body={
                     <>
+                        {!mcpProjectsIsLoading && uniqueProjects.length === 0 && (
+                            <span className="px-3 text-xs">No projects.</span>
+                        )}
+
                         {!mcpProjectsIsLoading &&
-                            (uniqueProjects.length > 0 ? (
-                                uniqueProjects.map((project) => (
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current: filterData?.id === project.id && filterData.type === Type.Project,
-                                            id: project.id!,
-                                            name: project.name,
-                                        }}
-                                        key={project.id}
-                                        toLink={`?projectId=${project.id}`}
-                                    />
-                                ))
-                            ) : (
-                                <span className="px-3 text-xs">No projects.</span>
+                            uniqueProjects.map((project) => (
+                                <LeftSidebarNavItem
+                                    item={{
+                                        current: filterData?.id === project.id && filterData.type === Type.Project,
+                                        id: project.id!,
+                                        name: project.name,
+                                    }}
+                                    key={project.id}
+                                    toLink={`?projectId=${project.id}`}
+                                />
                             ))}
                     </>
                 }
@@ -86,22 +93,20 @@ const McpServersLeftSidebarNav = ({
             <LeftSidebarNav
                 body={
                     <>
+                        {!tagsIsLoading && !tags?.length && <span className="px-3 text-xs">No defined tags.</span>}
+
                         {!tagsIsLoading &&
-                            (tags?.length ? (
-                                tags.map((item) => (
-                                    <LeftSidebarNavItem
-                                        icon={<TagIcon className="mr-1 size-4" />}
-                                        item={{
-                                            current: filterData?.id === item!.id && filterData.type === Type.Tag,
-                                            id: item!.id,
-                                            name: item!.name,
-                                        }}
-                                        key={item!.id}
-                                        toLink={`?tagId=${item!.id}`}
-                                    />
-                                ))
-                            ) : (
-                                <span className="px-3 text-xs">No defined tags.</span>
+                            tags?.map((tag) => (
+                                <LeftSidebarNavItem
+                                    icon={<TagIcon className="mr-1 size-4" />}
+                                    item={{
+                                        current: filterData?.id === tag!.id && filterData.type === Type.Tag,
+                                        id: tag!.id,
+                                        name: tag!.name,
+                                    }}
+                                    key={tag!.id}
+                                    toLink={`?tagId=${tag!.id}`}
+                                />
                             ))}
                     </>
                 }
