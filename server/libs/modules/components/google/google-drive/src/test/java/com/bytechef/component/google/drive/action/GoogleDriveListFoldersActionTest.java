@@ -26,7 +26,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.services.drive.model.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,7 @@ class GoogleDriveListFoldersActionTest {
         .setKind("drive#file");
 
     @Test
-    void testPerform() throws IOException {
+    void testPerform() {
         try (MockedStatic<GoogleDriveUtils> googleDriveUtilsMockedStatic = mockStatic(GoogleDriveUtils.class)) {
             googleDriveUtilsMockedStatic.when(() -> GoogleDriveUtils.listFiles(
                 stringArgumentCaptor.capture(), booleanArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
