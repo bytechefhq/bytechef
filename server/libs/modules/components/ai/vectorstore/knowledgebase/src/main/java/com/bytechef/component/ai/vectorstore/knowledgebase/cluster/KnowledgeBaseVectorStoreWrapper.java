@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.document.Document;
@@ -45,13 +46,17 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
 
     @Override
     public void add(List<Document> documents) {
-        for (Document document : documents) {
-            Map<String, Object> metadata = document.getMetadata();
+        List<Document> wrappedDocuments = documents.stream()
+            .map(document -> {
+                Map<String, Object> metadata = new HashMap<>(document.getMetadata());
 
-            metadata.put(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId);
-        }
+                metadata.put(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId);
 
-        vectorStore.add(documents);
+                return new Document(document.getId(), document.getText(), metadata);
+            })
+            .toList();
+
+        vectorStore.add(wrappedDocuments);
     }
 
     @Override
