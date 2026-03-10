@@ -48,6 +48,7 @@ public class JwtHelperVerifyAction {
                 .description("Secret of the JWT token.")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/jwt-helper_v1#verify")
         .perform(JwtHelperVerifyAction::perform);
 
     private JwtHelperVerifyAction() {

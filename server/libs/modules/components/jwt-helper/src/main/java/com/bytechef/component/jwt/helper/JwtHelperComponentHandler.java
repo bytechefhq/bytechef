@@ -41,7 +41,8 @@ public class JwtHelperComponentHandler implements ComponentHandler {
             JwtHelperVerifyAction.ACTION_DEFINITION)
         .clusterElements(
             tool(JwtHelperSignAction.ACTION_DEFINITION),
-            tool(JwtHelperVerifyAction.ACTION_DEFINITION));
+            tool(JwtHelperVerifyAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
