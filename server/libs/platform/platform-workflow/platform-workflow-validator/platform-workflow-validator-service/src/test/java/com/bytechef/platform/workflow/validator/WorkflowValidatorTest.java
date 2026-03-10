@@ -3876,7 +3876,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasksAddsNestedTasksToTaskDefinitionsConditionNoErrors() {
+    void validateWorkflowAddsNestedTasksToTaskDefinitionsConditionNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -3954,7 +3954,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasksAddsNestedTasksToTaskDefinitionsLoopNoErrors() {
+    void validateWorkflowAddsNestedTasksToTaskDefinitionsLoopNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -4021,7 +4021,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasksAddsNestedTasksToTaskDefinitionMapMultipleFlowsNoErrors() {
+    void validateWorkflowAddsNestedTasksToTaskDefinitionMapMultipleFlowsNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
