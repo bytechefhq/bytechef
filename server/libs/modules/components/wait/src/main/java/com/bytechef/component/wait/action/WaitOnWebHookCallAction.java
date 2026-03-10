@@ -17,8 +17,11 @@
 package com.bytechef.component.wait.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.wait.constant.WaitConstants.AMOUNT;
 import static com.bytechef.component.wait.constant.WaitConstants.CSRF_TOKEN;
@@ -74,6 +77,12 @@ public class WaitOnWebHookCallAction {
                         option("Minutes", "MINUTES"),
                         option("Hours", "HOURS"),
                         option("Days", "DAYS")))
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            bool("resumed")
+                                .description("Whether the workflow was resumed by a webhook call."))))
             .perform(waitOnWebHookCallAction::perform)
             .beforeSuspend(waitOnWebHookCallAction::beforeSuspend)
             .resumePerform(waitOnWebHookCallAction::resumePerform);
@@ -91,9 +100,10 @@ public class WaitOnWebHookCallAction {
         Instant expiresAt = Instant.now()
             .plus(amount, chronoUnit);
 
-        context.suspend(new Suspend(
-            Map.of("csrfToken", csrfToken, "expiresAt", expiresAt.toEpochMilli(), "amount", amount, "unit", unit),
-            expiresAt));
+        context.suspend(
+            new Suspend(
+                Map.of("csrfToken", csrfToken, "expiresAt", expiresAt.toEpochMilli(), "amount", amount, "unit", unit),
+                expiresAt));
 
         return null;
     }
