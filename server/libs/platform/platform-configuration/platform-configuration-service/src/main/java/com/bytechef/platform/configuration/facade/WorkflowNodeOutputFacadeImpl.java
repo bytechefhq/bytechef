@@ -363,7 +363,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, clusterElementWorkflowNodeName, environmentId)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
-            .or(() -> getClusterElementDynamicOutputResponse(workflowId, workflowTask, clusterElement, environmentId))
+            .or(() -> getClusterElementDynamicOutputResponse(workflowId, clusterElement, environmentId))
             .orElse(null);
 
         if (outputResponse == null) {
@@ -373,21 +373,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         return new ClusterElementOutputDTO(clusterElementDefinition, outputResponse, clusterElementWorkflowNodeName);
     }
 
-    @SuppressWarnings("unchecked")
     private Optional<OutputResponse> getClusterElementDynamicOutputResponse(
-        String workflowId, WorkflowTask workflowTask, ClusterElement clusterElement, long environmentId) {
-
-        OutputResponse outputResponse;
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        String workflowId, ClusterElement clusterElement, long environmentId) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
-        Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName(), environmentId);
-
-        Map<String, ?> inputParameters = workflowTask.evaluateParameters(
-            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+        Map<String, ?> clusterElementParameters = clusterElement.getParameters();
 
         List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
             workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
@@ -402,9 +393,9 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .findFirst()
             .orElse(null);
 
-        outputResponse = clusterElementDefinitionFacade.executeOutput(
+        OutputResponse outputResponse = clusterElementDefinitionFacade.executeOutput(
             clusterElement.getComponentName(), workflowNodeType.version(), workflowNodeType.operation(),
-            inputParameters, connectionId);
+            clusterElementParameters, connectionId);
 
         return Optional.ofNullable(outputResponse);
     }

@@ -74,6 +74,12 @@ public final class OutputDefinition implements BaseOutputDefinition {
         return new OutputDefinition(output);
     }
 
+    public static OutputDefinition of(ClusterElementDefinition.OutputFunction output) {
+        Objects.requireNonNull(output, "'output' mut not be null");
+
+        return new OutputDefinition(output);
+    }
+
     public static OutputDefinition of(TriggerDefinition.OutputFunction output) {
         Objects.requireNonNull(output, "'output' mut not be null");
 
