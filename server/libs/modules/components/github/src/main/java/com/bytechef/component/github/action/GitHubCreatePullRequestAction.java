@@ -54,6 +54,7 @@ public class GitHubCreatePullRequestAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPullRequest")
         .title("Create Pull Request")
         .description("Creates a new pull request.")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#create-pull-request")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)

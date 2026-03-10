@@ -42,8 +42,9 @@ import java.util.Map;
 public class GithubAddAssigneesToIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addAssigneesToIssue")
-        .title("Add Assignee to Issue")
-        .description("Adds an assignees to the specified issue.")
+        .title("Add Assignees to Issue")
+        .description("Adds assignees to the specified issue.")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#add-assignees-to-issue")
         .properties(
             string(REPOSITORY)
                 .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
