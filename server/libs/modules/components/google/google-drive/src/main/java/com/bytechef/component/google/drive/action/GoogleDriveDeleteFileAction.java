@@ -38,10 +38,11 @@ public class GoogleDriveDeleteFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFile")
         .title("Delete File")
         .description("Delete a selected file from Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#delete-file")
         .properties(
             string(FILE_ID)
                 .label("File ID")
-                .description("The id of a file to delete.")
+                .description("The ID of a file to delete.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true))
         .perform(GoogleDriveDeleteFileAction::perform);

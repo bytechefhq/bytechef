@@ -40,10 +40,12 @@ public class GoogleDriveNewFolderTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newFolder")
         .title("New Folder")
         .description("Triggers when new folder is uploaded to Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#new-folder")
         .type(TriggerType.POLLING)
         .properties(
             string(FOLDER_ID)
                 .label("Parent Folder")
+                .description("The ID of the folder where the new folder is uploaded.")
                 .options(GoogleUtils.getFileOptionsByMimeTypeForTriggers(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
                 .required(true))
         .output(

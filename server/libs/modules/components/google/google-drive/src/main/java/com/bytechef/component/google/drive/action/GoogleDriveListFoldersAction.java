@@ -40,11 +40,12 @@ public class GoogleDriveListFoldersAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFolders")
         .title("List Folders")
         .description("List folders in a Google Drive folder.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#list-folders")
         .properties(
             string(FOLDER_ID)
                 .label("Parent Folder ID")
                 .description(
-                    "ID of the Folder from which you want to list folders. If no folder is specified, the root " +
+                    "ID of the folder from which you want to list folders. If no folder is specified, the root " +
                         "folder will be used.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
                 .required(false))

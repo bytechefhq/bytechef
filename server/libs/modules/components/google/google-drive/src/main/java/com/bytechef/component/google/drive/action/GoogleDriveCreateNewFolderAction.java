@@ -46,6 +46,7 @@ public class GoogleDriveCreateNewFolderAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createNewFolder")
         .title("Create New Folder")
         .description("Creates a new empty folder in Google Drive.")
+        .help("", "https://docs.bytechef.io/reference/components/google-drive_v1#create-new-folder")
         .properties(
             string(FOLDER_NAME)
                 .label("Folder Name")
