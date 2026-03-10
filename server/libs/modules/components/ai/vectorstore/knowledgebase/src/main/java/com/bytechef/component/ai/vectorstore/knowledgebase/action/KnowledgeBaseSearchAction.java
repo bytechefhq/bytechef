@@ -205,11 +205,8 @@ public final class KnowledgeBaseSearchAction {
     private static Filter.Expression buildTagFilter(List<Long> tagIds) {
         FilterExpressionBuilder filterExpressionBuilder = new FilterExpressionBuilder();
 
-        // Build OR expression for tags: tag_ids contains tagId1 OR tag_ids contains tagId2...
-        // Since PgVector doesn't support array contains directly, we use IN for each tag
-        // and combine with OR
         Filter.Expression[] tagExpressions = tagIds.stream()
-            .map(tagId -> filterExpressionBuilder.in(METADATA_TAG_IDS, tagId)
+            .map(tagId -> filterExpressionBuilder.eq(METADATA_TAG_IDS + "_" + tagId, true)
                 .build())
             .toArray(Filter.Expression[]::new);
 
