@@ -69,6 +69,7 @@ public class JwtHelperSignAction {
             outputSchema(
                 string()
                     .description("JWT token that was created form the payload.")))
+        .help("", "https://docs.bytechef.io/reference/components/jwt-helper_v1#sign")
         .perform(JwtHelperSignAction::perform);
 
     private JwtHelperSignAction() {
