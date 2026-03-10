@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.chat.memory.redis;
 
+import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.DEFAULT_KEY_PREFIX;
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.HOST;
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.KEY_PREFIX;
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.PASSWORD;
@@ -62,7 +63,7 @@ public class RedisChatMemoryComponentHandler implements ComponentHandler {
             string(KEY_PREFIX)
                 .label("Key Prefix")
                 .description("The prefix for Redis keys used to store chat messages.")
-                .defaultValue("bytechef-chat-memory:")
+                .defaultValue(DEFAULT_KEY_PREFIX)
                 .required(false),
             string(TIME_TO_LIVE)
                 .label("Time to Live")
