@@ -6,29 +6,33 @@ import {useEffect, useRef} from 'react';
 import {toast} from 'sonner';
 
 const TOAST_COOLDOWN_MS = 10_000;
-const recentToastIds = new Map<string, number>();
+const recentToastTimestamps = new Map<string, number>();
 
 export function clearRecentToasts() {
-    recentToastIds.clear();
+    recentToastTimestamps.clear();
 }
 
-function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
+function shouldShowToast(toastId: string): boolean {
     const now = Date.now();
 
-    for (const [id, timestamp] of recentToastIds) {
+    for (const [id, timestamp] of recentToastTimestamps) {
         if (now - timestamp >= TOAST_COOLDOWN_MS) {
-            recentToastIds.delete(id);
+            recentToastTimestamps.delete(id);
         }
     }
 
-    const lastShown = recentToastIds.get(toastId);
+    const lastShown = recentToastTimestamps.get(toastId);
 
     if (lastShown !== undefined && now - lastShown < TOAST_COOLDOWN_MS) {
-        return;
+        return false;
     }
 
-    recentToastIds.set(toastId, now);
+    recentToastTimestamps.set(toastId, now);
 
+    return true;
+}
+
+function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
     toast.error(title, {...options, id: toastId});
 }
 
@@ -89,6 +93,10 @@ export default function useFetchInterceptor() {
                 }
 
                 const toastId = `${new URL(response.url).pathname}-${response.status}`;
+
+                if (!shouldShowToast(toastId)) {
+                    return response;
+                }
 
                 if (response.status < 200 || response.status > 299) {
                     const clonedResponse = response.clone();
