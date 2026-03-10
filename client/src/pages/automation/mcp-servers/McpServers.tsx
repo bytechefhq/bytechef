@@ -23,15 +23,16 @@ const McpServers = () => {
     const {
         allComponentNames,
         componentDefinitions,
+        componentDefinitionsIsLoading,
         filterData,
         filteredMcpServers,
+        mcpProjectsIsLoading,
         mcpServersError,
         mcpServersIsLoading,
         tags,
         tagsError,
         tagsIsLoading,
         uniqueProjects,
-        validMcpServerIds,
         validMcpServers,
     } = useMcpServers();
 
@@ -70,7 +71,16 @@ const McpServers = () => {
                 />
             }
             leftSidebarBody={
-                <McpServersLeftSidebarNav allComponentNames={allComponentNames} validMcpServerIds={validMcpServerIds} />
+                <McpServersLeftSidebarNav
+                    allComponentNames={allComponentNames}
+                    componentDefinitions={componentDefinitions}
+                    componentDefinitionsIsLoading={componentDefinitionsIsLoading}
+                    filterData={filterData}
+                    mcpProjectsIsLoading={mcpProjectsIsLoading}
+                    tags={tags}
+                    tagsIsLoading={tagsIsLoading}
+                    uniqueProjects={uniqueProjects}
+                />
             }
             leftSidebarHeader={<Header position="sidebar" title="MCP Servers" />}
             leftSidebarWidth="64"
