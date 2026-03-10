@@ -40,7 +40,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Load Data",
     "workflowNodeDescription": null
   }, {
@@ -190,7 +189,6 @@
       "type": "NUMBER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Search Data",
     "workflowNodeDescription": null
   } ],
@@ -217,6 +215,85 @@
     "required": true
   } ],
   "clusterElements": [ {
+    "name": "search",
+    "description": "Search data from Couchbase using LLM embeddings.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The query to be executed.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Query",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "query",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": 4,
+      "description": "The top 'k' similar results to return.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Top K",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "topK",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "NUMBER",
+      "defaultValue": 0.0,
+      "description": "Similarity threshold score to filter the search response by. Only documents with similarity score equal or greater than the threshold will be returned. A threshold value of 0 means any similarity is accepted. A threshold value of 1 means an exact match is required.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Similarity Threshold",
+      "maxNumberPrecision": null,
+      "maxValue": 1.0,
+      "metadata": { },
+      "minNumberPrecision": null,
+      "minValue": 0.0,
+      "name": "similarityThreshold",
+      "numberPrecision": null,
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "NUMBER"
+    } ],
+    "title": "Couchbase Search",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "name": "vectorStore",
     "description": "Knowledge Base VectorStore.",
     "element": { },

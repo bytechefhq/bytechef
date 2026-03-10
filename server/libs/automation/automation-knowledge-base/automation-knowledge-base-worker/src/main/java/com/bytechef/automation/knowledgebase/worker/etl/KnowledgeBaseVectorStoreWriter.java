@@ -133,7 +133,9 @@ public class KnowledgeBaseVectorStoreWriter {
         }
 
         if (tagIds != null && !tagIds.isEmpty()) {
-            metadata.put(METADATA_TAG_IDS, tagIds);
+            for (Long tagId : tagIds) {
+                metadata.put(METADATA_TAG_IDS + "_" + tagId, true);
+            }
         }
 
         return new Document(document.getId(), content, metadata);
