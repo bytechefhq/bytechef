@@ -42,7 +42,7 @@ public class Neo4jConstants {
     public static final String NEO4J = "neo4j";
     public static final String URI = "uri";
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         Driver driver = GraphDatabase.driver(
             connectionParameters.getRequiredString(URI),
             AuthTokens.basic(

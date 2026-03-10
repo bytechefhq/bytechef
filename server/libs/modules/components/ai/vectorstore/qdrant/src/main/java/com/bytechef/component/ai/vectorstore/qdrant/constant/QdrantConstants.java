@@ -33,7 +33,7 @@ public class QdrantConstants {
     public static final String PORT = "port";
     public static final String QDRANT = "qdrant";
 
-    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         QdrantClient qdrantClient = new QdrantClient(
             QdrantGrpcClient.newBuilder(
                 connectionParameters.getRequiredString(HOST),
