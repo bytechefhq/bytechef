@@ -95,6 +95,10 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
             queryKey: ['mcpProjectsByServerId'],
         });
 
+        queryClient.invalidateQueries({
+            queryKey: ['mcpProjects'],
+        });
+
         closeDialog();
     };
 
@@ -104,6 +108,10 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['mcpProjectsByServerId'],
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ['mcpProjects'],
             });
 
             closeDialog();

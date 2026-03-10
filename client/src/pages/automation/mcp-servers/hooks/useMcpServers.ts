@@ -23,7 +23,7 @@ const useMcpServers = () => {
 
     const filterData = {
         id: componentName ? componentName : projectId ? projectId : tagId ? tagId : undefined,
-        type: componentName ? Type.Component : projectId ? Type.Project : Type.Tag,
+        type: componentName ? Type.Component : projectId ? Type.Project : tagId ? Type.Tag : Type.Component,
     };
 
     const {
@@ -38,9 +38,9 @@ const useMcpServers = () => {
         isLoading: tagsIsLoading,
     } = useMcpServerTagsQuery({type: PlatformType.Automation});
 
-    const {data: mcpProjectsData} = useMcpProjectsQuery();
+    const {data: mcpProjectsData, isLoading: mcpProjectsIsLoading} = useMcpProjectsQuery();
 
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
+    const {data: componentDefinitions, isLoading: componentDefinitionsIsLoading} = useGetComponentDefinitionsQuery({});
 
     const validMcpServers = data?.workspaceMcpServers?.filter((server) => server !== null) || [];
     const tags = tagsData?.mcpServerTags as Tag[] | undefined;
@@ -76,8 +76,8 @@ const useMcpServers = () => {
             return false;
         }
 
-        if (componentName && server.mcpComponents) {
-            if (!server.mcpComponents.some((mcpComponent) => mcpComponent?.componentName === componentName)) {
+        if (componentName) {
+            if (!server.mcpComponents?.some((mcpComponent) => mcpComponent?.componentName === componentName)) {
                 return false;
             }
         }
@@ -106,8 +106,10 @@ const useMcpServers = () => {
     return {
         allComponentNames,
         componentDefinitions,
+        componentDefinitionsIsLoading,
         filterData,
         filteredMcpServers,
+        mcpProjectsIsLoading,
         mcpServersError,
         mcpServersIsLoading,
         tags,
