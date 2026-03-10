@@ -40,10 +40,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
+import software.amazon.awssdk.services.scheduler.model.ConflictException;
 import software.amazon.awssdk.services.scheduler.model.CreateScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.CreateScheduleResponse;
 import software.amazon.awssdk.services.scheduler.model.DeleteScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.DeleteScheduleResponse;
+import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
+import software.amazon.awssdk.services.scheduler.model.UpdateScheduleResponse;
 
 /**
  * Unit tests for the AwsTriggerScheduler class that ensure all scheduling and cancellation methods interacting with AWS
@@ -96,6 +99,9 @@ class AwsTriggerSchedulerTest {
                 .build());
         when(mockSchedulerClient.deleteSchedule(any(Consumer.class)))
             .thenReturn(DeleteScheduleResponse.builder()
+                .build());
+        when(mockSchedulerClient.updateSchedule(any(Consumer.class)))
+            .thenReturn(UpdateScheduleResponse.builder()
                 .build());
     }
 
@@ -274,6 +280,113 @@ class AwsTriggerSchedulerTest {
 
         assertNotNull(request);
         assertEquals("DynamicWebhookTriggerRefresh", request.groupName());
+    }
+
+    @Test
+    void testScheduleScheduleTriggerUpdatesOnConflict() {
+        // Given
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 123L, "test-workflow", "test-trigger");
+        String pattern = "0 0 12 * * ?";
+        String zoneId = "UTC";
+        Map<String, Object> output = Map.of("key", "value");
+
+        when(mockSchedulerClient.createSchedule(any(Consumer.class)))
+            .thenThrow(ConflictException.builder()
+                .message("Schedule already exists")
+                .build());
+
+        // When
+        assertDoesNotThrow(() -> awsTriggerScheduler.scheduleScheduleTrigger(
+            pattern, zoneId, output, workflowExecutionId));
+
+        // Then
+        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+
+        verify(mockSchedulerClient).updateSchedule(captor.capture());
+
+        UpdateScheduleRequest.Builder builder = UpdateScheduleRequest.builder();
+
+        captor.getValue()
+            .accept(builder);
+
+        UpdateScheduleRequest request = builder.build();
+
+        assertNotNull(request);
+        assertEquals("ScheduleTrigger", request.groupName());
+        assertEquals("cron(0 12 * * ?)", request.scheduleExpression());
+        assertEquals(zoneId, request.scheduleExpressionTimezone());
+    }
+
+    @Test
+    void testSchedulePollingTriggerUpdatesOnConflict() {
+        // Given
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 456L, "test-polling-workflow", "test-trigger");
+
+        when(mockSchedulerClient.createSchedule(any(Consumer.class)))
+            .thenThrow(ConflictException.builder()
+                .message("Schedule already exists")
+                .build());
+
+        // When
+        assertDoesNotThrow(() -> awsTriggerScheduler.schedulePollingTrigger(workflowExecutionId));
+
+        // Then
+        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+
+        verify(mockSchedulerClient).updateSchedule(captor.capture());
+
+        UpdateScheduleRequest.Builder builder = UpdateScheduleRequest.builder();
+
+        captor.getValue()
+            .accept(builder);
+
+        UpdateScheduleRequest request = builder.build();
+
+        assertNotNull(request);
+        assertEquals("PollingTrigger", request.groupName());
+        assertEquals("rate(5 minutes)", request.scheduleExpression());
+    }
+
+    @Test
+    void testScheduleDynamicWebhookTriggerRefreshUpdatesOnConflict() {
+        // Given
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 101L, "test-webhook-workflow", "test-trigger");
+        Instant webhookExpirationDate = LocalDateTime.now()
+            .plusHours(1)
+            .toInstant(ZoneOffset.UTC);
+        String componentName = "testComponent";
+        int componentVersion = 1;
+        Long connectionId = 456L;
+
+        when(mockSchedulerClient.createSchedule(any(Consumer.class)))
+            .thenThrow(ConflictException.builder()
+                .message("Schedule already exists")
+                .build());
+
+        // When
+        assertDoesNotThrow(() -> awsTriggerScheduler.scheduleDynamicWebhookTriggerRefresh(
+            webhookExpirationDate, componentName, componentVersion, workflowExecutionId, connectionId));
+
+        // Then
+        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+
+        verify(mockSchedulerClient).updateSchedule(captor.capture());
+
+        UpdateScheduleRequest.Builder builder = UpdateScheduleRequest.builder();
+
+        captor.getValue()
+            .accept(builder);
+
+        UpdateScheduleRequest request = builder.build();
+
+        assertNotNull(request);
+        assertEquals("DynamicWebhookTriggerRefresh", request.groupName());
+        assertNotNull(request.target());
+        assertNotNull(request.target()
+            .arn());
     }
 
     @Test
