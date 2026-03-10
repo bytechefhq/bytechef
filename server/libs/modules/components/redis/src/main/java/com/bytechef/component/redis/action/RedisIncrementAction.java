@@ -74,8 +74,10 @@ public class RedisIncrementAction {
 
             long newValue = jedis.incr(key);
 
-            if (Boolean.TRUE.equals(expire) && ttl != null) {
-                jedis.expire(key, ttl);
+            if (Boolean.TRUE.equals(expire)) {
+                int effectiveTtl = (ttl != null) ? ttl : 60;
+
+                jedis.expire(key, effectiveTtl);
             }
 
             return newValue;

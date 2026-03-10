@@ -92,7 +92,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Delete",
     "workflowNodeDescription": null
   }, {
@@ -182,7 +181,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get",
     "workflowNodeDescription": null
   }, {
@@ -311,7 +309,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Increment",
     "workflowNodeDescription": null
   }, {
@@ -420,7 +417,6 @@
     "processErrorResponse": null,
     "properties": null,
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Info",
     "workflowNodeDescription": null
   }, {
@@ -552,7 +548,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Keys",
     "workflowNodeDescription": null
   }, {
@@ -638,7 +633,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "List Length",
     "workflowNodeDescription": null
   }, {
@@ -752,7 +746,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Pop",
     "workflowNodeDescription": null
   }, {
@@ -859,7 +852,6 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Publish",
     "workflowNodeDescription": null
   }, {
@@ -990,7 +982,6 @@
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Push",
     "workflowNodeDescription": null
   }, {
@@ -1150,7 +1141,6 @@
       "type": "INTEGER"
     } ],
     "resumePerform": null,
-    "suspendPerform": null,
     "title": "Set",
     "workflowNodeDescription": null
   } ],
