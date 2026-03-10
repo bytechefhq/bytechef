@@ -190,50 +190,64 @@ const useWorkflowEditorCanvas = ({
                 return;
             }
         } else {
+            const getClosestEdgeElement = (element: HTMLElement | null): HTMLElement | null => {
+                let current: HTMLElement | null = element;
+
+                while (current) {
+                    if (
+                        current.tagName === 'DIV' &&
+                        current.id &&
+                        current.id.match(/^.+=>.+$/) &&
+                        !current.id.endsWith('-button')
+                    ) {
+                        return current;
+                    }
+
+                    current = current.parentElement;
+                }
+
+                return null;
+            };
+
             const isTargetNode = event.target instanceof HTMLElement;
             const isTargetEdge = event.target instanceof SVGElement;
 
             if (isTargetNode) {
                 const targetNodeElement = (event.target as HTMLElement).closest('.react-flow__node') as HTMLElement;
 
-                if (!targetNodeElement || targetNodeElement?.dataset.nodetype === 'trigger') {
-                    return;
-                }
+                if (targetNodeElement && targetNodeElement?.dataset.nodetype !== 'trigger') {
+                    const targetNodeId = targetNodeElement.dataset.id!;
 
-                const targetNodeId = targetNodeElement.dataset.id!;
+                    const {nodes} = useWorkflowDataStore.getState();
 
-                const {nodes} = useWorkflowDataStore.getState();
+                    const targetNode = nodes.find((node) => node.id === targetNodeId);
 
-                const targetNode = nodes.find((node) => node.id === targetNodeId);
-
-                if (targetNode && targetNode.type === 'placeholder') {
-                    if (targetNode?.position.x === 0 && targetNode?.position.y === 0) {
-                        return;
-                    }
-
-                    handleDropOnPlaceholderNode(targetNode, droppedNode);
-                }
-            } else if (isTargetEdge) {
-                const getClosestEdgeElement = (element: HTMLElement): HTMLElement | null => {
-                    let current: HTMLElement | null = element;
-
-                    while (current) {
-                        if (
-                            current.tagName === 'DIV' &&
-                            current.id &&
-                            current.id.match(/^.+=>.+$/) &&
-                            !current.id.endsWith('-button')
-                        ) {
-                            return current;
+                    if (targetNode && targetNode.type === 'placeholder') {
+                        if (targetNode?.position.x === 0 && targetNode?.position.y === 0) {
+                            return;
                         }
 
-                        current = current.parentElement;
-                    }
+                        handleDropOnPlaceholderNode(targetNode, droppedNode);
 
-                    return null;
-                };
+                        return;
+                    }
+                }
 
                 const edgeElement = getClosestEdgeElement(event.target as HTMLElement);
+
+                if (edgeElement) {
+                    const {edges} = useWorkflowDataStore.getState();
+
+                    const targetEdge = edges.find((edge) => edge.id === edgeElement.id);
+
+                    if (targetEdge) {
+                        handleDropOnWorkflowEdge(targetEdge, droppedNode);
+
+                        return;
+                    }
+                }
+            } else if (isTargetEdge) {
+                const edgeElement = getClosestEdgeElement((event.target as SVGElement).closest('div'));
 
                 if (!edgeElement) {
                     return;
@@ -266,6 +280,7 @@ const useWorkflowEditorCanvas = ({
             (nodeData.taskDispatcherId === dispatcherId ||
                 nodeData.conditionData?.conditionId === dispatcherId ||
                 nodeData.loopData?.loopId === dispatcherId ||
+                nodeData.mapData?.mapId === dispatcherId ||
                 nodeData.branchData?.branchId === dispatcherId ||
                 nodeData.eachData?.eachId === dispatcherId ||
                 nodeData.parallelData?.parallelId === dispatcherId ||
