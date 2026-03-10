@@ -238,9 +238,12 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     }, [preferenceKey, isDataStreamClusterRoot, isDataStreamSimpleModeAvailable, setShowDataStreamEditor]);
 
     const handlePointerDownOutside = useCallback((event: CustomEvent<{originalEvent: PointerEvent}>) => {
-        const target = event.target as HTMLElement;
+        const target = event.detail.originalEvent.target;
 
-        if (target.closest('[data-sonner-toast]') || target.closest('[data-sonner-toaster]')) {
+        if (
+            target instanceof Element &&
+            (target.closest('[data-sonner-toast]') || target.closest('[data-sonner-toaster]'))
+        ) {
             event.preventDefault();
         }
     }, []);
