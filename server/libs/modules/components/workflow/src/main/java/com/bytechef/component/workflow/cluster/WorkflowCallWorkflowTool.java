@@ -169,7 +169,7 @@ public class WorkflowCallWorkflowTool {
 
             property = objectProp;
         } else {
-            property = ComponentDsl.string(name);
+            property = string(name);
         }
 
         baseProperty.getDescription()
