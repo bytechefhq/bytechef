@@ -369,6 +369,41 @@ describe('useFetchInterceptor', () => {
             });
         });
 
+        it('does not suppress GraphQL error toast after successful GraphQL 200', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const successResponse = createMockResponse({
+                jsonData: {data: {users: []}},
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(successResponse);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+
+            const errorResponse = createMockResponse({
+                jsonData: {errors: [{message: 'Something broke'}]},
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(errorResponse);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
+                description: 'Something broke',
+                id: '/graphql-200',
+            });
+        });
+
         it('does not show toast when GraphQL 2xx response has invalid JSON', async () => {
             renderHook(() => useFetchInterceptor());
 
