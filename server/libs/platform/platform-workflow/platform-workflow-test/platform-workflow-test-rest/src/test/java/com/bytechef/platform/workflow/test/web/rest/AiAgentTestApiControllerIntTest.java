@@ -158,6 +158,36 @@ class AiAgentTestApiControllerIntTest {
     }
 
     @Test
+    void testAiAgentEmitsRootCauseMessageOnWrappedException() throws Exception {
+        when(aiAgentTestFacade.executeAiAgentAction(anyString(), anyString(), anyLong(), anyString(), anyString(),
+            anyList())).thenThrow(
+                new RuntimeException(new NullPointerException("Unknown value for : url")));
+
+        MvcResult mvcResult = mockMvc.perform(
+            post("/internal/ai-agent-tests")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .content(createRequestJson("wf-1", "node-1", 1L, "conv-1", "Hello")))
+            .andExpect(status().isOk())
+            .andExpect(request().asyncStarted())
+            .andReturn();
+
+        mvcResult.getAsyncResult(10000);
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+            .andExpect(status().isOk());
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        String body = response.getContentAsString(StandardCharsets.UTF_8);
+
+        assertThat(body).contains("event:error");
+        assertThat(body).contains("Unknown value for : url");
+        assertThat(body).doesNotContain("java.lang.RuntimeException");
+        assertThat(body).doesNotContain("java.lang.NullPointerException");
+    }
+
+    @Test
     void testAiAgentStreamingEmitsErrorOnHandlerFailure() throws Exception {
         ActionDefinition.SseEmitterHandler sseEmitterHandler = sseEmitter -> {
             sseEmitter.send("partial");
