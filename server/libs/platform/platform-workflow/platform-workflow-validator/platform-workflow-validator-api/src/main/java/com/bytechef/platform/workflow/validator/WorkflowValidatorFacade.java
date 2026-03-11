@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -36,6 +37,12 @@ public interface WorkflowValidatorFacade {
     /**
      * Holds the result of a workflow validation, containing lists of error messages and warning messages.
      */
+    @SuppressFBWarnings("EI")
     record WorkflowValidationResult(List<String> errors, List<String> warnings) {
+
+        public WorkflowValidationResult(List<String> errors, List<String> warnings) {
+            this.errors = List.copyOf(errors);
+            this.warnings = List.copyOf(warnings);
+        }
     }
 }
