@@ -478,17 +478,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                     additionalParameters.ifPresent(mergedInputParameters::putAll);
                 }
-            }
+            } else {
+                Optional<BeforeResumeFunction> beforeResumeOptional = actionDefinition.getBeforeResume();
 
-            Optional<BeforeResumeFunction> beforeResumeOptional = actionDefinition.getBeforeResume();
+                if (beforeResumeOptional.isPresent()) {
+                    Optional<Map<String, ?>> additionalParameters = beforeResumeOptional.get()
+                        .apply(
+                            null, ParametersFactory.create(mergedInputParameters),
+                            ParametersFactory.create(continueParameters), context);
 
-            if (beforeResumeOptional.isPresent()) {
-                Optional<Map<String, ?>> additionalParameters = beforeResumeOptional.get()
-                    .apply(
-                        null, ParametersFactory.create(mergedInputParameters),
-                        ParametersFactory.create(continueParameters), context);
-
-                additionalParameters.ifPresent(mergedInputParameters::putAll);
+                    additionalParameters.ifPresent(mergedInputParameters::putAll);
+                }
             }
 
             return resumePerformFunction.apply(
