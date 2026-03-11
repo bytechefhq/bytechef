@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.ALL;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.EXCLUDE;
+import static com.bytechef.component.mcp.client.constant.McpClientConstants.HTTP_SSE;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.HTTP_STREAMABLE;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.INCLUDE;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.TOOLS_TO_EXCLUDE;
@@ -158,25 +159,30 @@ public class McpClientUtils {
         Consumer<HttpRequest.Builder> requestCustomizer = getRequestCustomizer(
             connectionParameters, connectionDefinitionService, context);
 
-        McpClientTransport transport;
+        McpClientTransport transport = switch (transportType) {
+            case HTTP_STREAMABLE -> {
+                HttpClientStreamableHttpTransport.Builder builder =
+                    HttpClientStreamableHttpTransport.builder(serverUrl);
 
-        if (HTTP_STREAMABLE.equals(transportType)) {
-            HttpClientStreamableHttpTransport.Builder builder = HttpClientStreamableHttpTransport.builder(serverUrl);
+                if (requestCustomizer != null) {
+                    builder.customizeRequest(requestCustomizer);
+                }
 
-            if (requestCustomizer != null) {
-                builder.customizeRequest(requestCustomizer);
+                yield builder.build();
             }
+            case HTTP_SSE -> {
+                HttpClientSseClientTransport.Builder builder = HttpClientSseClientTransport.builder(serverUrl);
 
-            transport = builder.build();
-        } else {
-            HttpClientSseClientTransport.Builder builder = HttpClientSseClientTransport.builder(serverUrl);
+                if (requestCustomizer != null) {
+                    builder.customizeRequest(requestCustomizer);
+                }
 
-            if (requestCustomizer != null) {
-                builder.customizeRequest(requestCustomizer);
+                yield builder.build();
             }
-
-            transport = builder.build();
-        }
+            default -> throw new IllegalArgumentException(
+                "Unsupported MCP transport type: " + transportType +
+                    ". Supported values are: " + HTTP_STREAMABLE + ", " + HTTP_SSE);
+        };
 
         return McpClient.sync(transport)
             .build();
@@ -261,21 +267,27 @@ public class McpClientUtils {
     }
 
     private static AuthorizationType getAuthorizationType(Parameters connectionParameters) {
-        if (connectionParameters.getString(TOKEN) != null) {
+        String token = connectionParameters.getString(TOKEN);
+
+        if (token != null && !token.isBlank()) {
             return AuthorizationType.BEARER_TOKEN;
         }
 
-        if (connectionParameters.getString(ACCESS_TOKEN) != null) {
+        String accessToken = connectionParameters.getString(ACCESS_TOKEN);
+
+        if (accessToken != null && !accessToken.isBlank()) {
             String authorizationUrl = connectionParameters.getString(Authorization.AUTHORIZATION_URL);
 
-            if (authorizationUrl != null) {
+            if (authorizationUrl != null && !authorizationUrl.isBlank()) {
                 return AuthorizationType.OAUTH2_AUTHORIZATION_CODE;
             }
 
             return AuthorizationType.OAUTH2_CLIENT_CREDENTIALS;
         }
 
-        if (connectionParameters.getString(KEY) != null) {
+        String key = connectionParameters.getString(KEY);
+
+        if (key != null && !key.isBlank()) {
             return AuthorizationType.API_KEY;
         }
 

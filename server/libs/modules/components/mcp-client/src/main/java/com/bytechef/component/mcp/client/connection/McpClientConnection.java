@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.mcp.client.constant.McpClientConstants.HTTP_SSE;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.HTTP_STREAMABLE;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.TRANSPORT_TYPE;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.URL;
@@ -46,6 +47,14 @@ public class McpClientConnection {
             string(URL)
                 .label("Server URL")
                 .description("The URL of the MCP server to connect to.")
+                .required(true),
+            string(TRANSPORT_TYPE)
+                .label("Transport Type")
+                .description("The transport protocol to use for connecting to the MCP server.")
+                .options(
+                    option("HTTP Streamable", HTTP_STREAMABLE),
+                    option("SSE", HTTP_SSE))
+                .defaultValue(HTTP_STREAMABLE)
                 .required(true))
         .authorizationRequired(false)
         .authorizations(
@@ -95,20 +104,7 @@ public class McpClientConnection {
                     string(SCOPES)
                         .label("Scopes")
                         .description("Optional comma-delimited list of scopes")
-                        .controlType(ControlType.TEXT_AREA))
-                .properties(
-                    string(URL)
-                        .label("Server URL")
-                        .description("The URL of the MCP server to connect to.")
-                        .required(true),
-                    string(TRANSPORT_TYPE)
-                        .label("Transport Type")
-                        .description("The transport protocol to use for connecting to the MCP server.")
-                        .options(
-                            option("HTTP Streamable", HTTP_STREAMABLE),
-                            option("SSE", "sse"))
-                        .defaultValue(HTTP_STREAMABLE)
-                        .required(true)));
+                        .controlType(ControlType.TEXT_AREA)));
 
     private McpClientConnection() {
     }
