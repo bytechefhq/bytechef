@@ -4,7 +4,7 @@ import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {
-    consumePendingDefinition,
+    drainPendingDefinitionMutation,
     hasPendingDefinition,
     isWorkflowMutating,
     setPendingDefinition,
@@ -199,49 +199,13 @@ export default function clearAllNodePositions({
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
 
-                const pendingDefinition = consumePendingDefinition(workflow.id!);
-
-                if (pendingDefinition) {
-                    const currentWorkflow = useWorkflowDataStore.getState().workflow;
-
-                    useWorkflowDataStore.setState((state) => ({
-                        workflow: {
-                            ...state.workflow,
-                            definition: pendingDefinition,
-                        },
-                    }));
-
-                    setWorkflowMutating(workflow.id!, true);
-
-                    updateWorkflowMutation.mutate(
-                        {
-                            id: workflow.id!,
-                            workflow: {
-                                definition: pendingDefinition,
-                                version: currentWorkflow.version,
-                            },
-                        },
-                        {
-                            onError: () => {
-                                invalidateWorkflowQueries();
-                            },
-                            onSettled: () => {
-                                setWorkflowMutating(workflow.id!, false);
-                            },
-                            onSuccess: (retryWorkflow) => {
-                                const retryCurrentWorkflow = useWorkflowDataStore.getState().workflow;
-
-                                useWorkflowDataStore.getState().setWorkflow({
-                                    ...retryCurrentWorkflow,
-                                    version: retryWorkflow.version,
-                                });
-
-                                invalidateWorkflowQueries();
-                                incrementLayoutResetCounter();
-                            },
-                        }
-                    );
-                }
+                drainPendingDefinitionMutation({
+                    incrementLayoutResetCounter,
+                    invalidateWorkflowQueries,
+                    onError: invalidateWorkflowQueries,
+                    updateWorkflowMutation,
+                    workflowId: workflow.id!,
+                });
             },
             onSuccess: (updatedWorkflow) => {
                 const currentWorkflow = useWorkflowDataStore.getState().workflow;
