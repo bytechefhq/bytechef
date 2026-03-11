@@ -449,9 +449,14 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                 return toolCallbackProviderFunction.apply(inputParameters, connectionParameters, context);
             }
 
-            ToolFunction toolFunction = (ToolFunction) clusterElement;
+            if (clusterElement instanceof ToolFunction toolFunction) {
+                return toolFunction.apply(inputParameters, connectionParameters, context);
+            }
 
-            return toolFunction.apply(inputParameters, connectionParameters, context);
+            throw new ExecutionException(
+                "Unsupported cluster element type: " + clusterElement.getClass()
+                    .getName(),
+                inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
         } catch (Exception exception) {
             if (exception instanceof ProviderException) {
                 throw (ProviderException) exception;

@@ -23,6 +23,7 @@ public class McpClientConstants {
 
     public static final String ALL = "all";
     public static final String EXCLUDE = "exclude";
+    public static final String HTTP_SSE = "sse";
     public static final String HTTP_STREAMABLE = "httpStreamable";
     public static final String INCLUDE = "include";
     public static final String MCP_CLIENT = "mcpClient";
