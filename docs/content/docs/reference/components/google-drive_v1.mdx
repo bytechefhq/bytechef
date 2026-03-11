@@ -66,7 +66,7 @@ Name: copyFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileId | File ID | STRING | The id of the file to be copied. | true |
+| fileId | File ID | STRING | The ID of the file to be copied. | true |
 | fileName | New File Name | STRING | The name of the new file created as a result of the copy operation. | true |
 | folderId | Destination Folder ID | STRING | The ID of the folder where the copied file will be stored. | true |
 
@@ -113,6 +113,13 @@ Type: OBJECT
 }
 ```
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/google-drive_v1#how-to-find-file-id).
+
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
 
 
 
@@ -146,7 +153,7 @@ Name: createNewFolder
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
@@ -175,6 +182,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
 
 
 
@@ -212,7 +222,7 @@ Name: createNewTextFile
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
@@ -241,6 +251,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
 
 
 
@@ -253,7 +266,7 @@ Name: deleteFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileId | File ID | STRING | The id of a file to delete. | true |
+| fileId | File ID | STRING | The ID of a file to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -273,6 +286,9 @@ This action does not produce any output.
 
 
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/google-drive_v1#how-to-find-file-id).
 
 
 
@@ -328,6 +344,9 @@ Type: FILE_ENTRY
 }
 ```
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/google-drive_v1#how-to-find-file-id).
 
 
 
@@ -383,6 +402,9 @@ Type: OBJECT
 }
 ```
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/google-drive_v1#how-to-find-file-id).
 
 
 
@@ -441,6 +463,9 @@ Items Type: OBJECT
 } ]
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
 
 
 
@@ -453,7 +478,7 @@ Name: listFolders
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Parent Folder ID | STRING | ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used. | false |
+| folderId | Parent Folder ID | STRING | ID of the folder from which you want to list folders. If no folder is specified, the root folder will be used. | false |
 
 #### Example JSON Structure
 ```json
@@ -499,6 +524,9 @@ Items Type: OBJECT
 } ]
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
 
 
 
@@ -537,7 +565,7 @@ Name: uploadFile
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
@@ -566,6 +594,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
 
 
 
@@ -584,7 +615,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Parent Folder | STRING |  | true |
+| folderId | Parent Folder | STRING | The ID of the folder where the new file is uploaded. | true |
 
 
 #### Output
@@ -620,6 +651,9 @@ Items Type: OBJECT
   "type" : "googleDrive/v1/newFile"
 }
 ```
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
 
 
 
@@ -634,7 +668,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Parent Folder | STRING |  | true |
+| folderId | Parent Folder | STRING | The ID of the folder where the new folder is uploaded. | true |
 
 
 #### Output
@@ -670,6 +704,9 @@ Items Type: OBJECT
   "type" : "googleDrive/v1/newFolder"
 }
 ```
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
 
 
 
@@ -684,6 +721,32 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 <hr />
 
 # Additional Instructions
+
+### How to find File ID
+
+To find a File ID, open the file in your browser. The ID is the long string of letters and numbers in the URL between `/d/` and the next `/` (usually `/view` or `/edit`).
+
+For example, in the URL `https://drive.google.com/file/d/1234567890abcdefghijklmnopqrstuvwxyz/view`, the File ID is `1234567890abcdefghijklmnopqrstuvwxyz`.
+
+The File ID can also be found in the output of the following actions and triggers:
+* **Copy File**
+* **Create New Text File**
+* **Get File**
+* **List Files**
+* **Upload File**
+* **New File** trigger
+
+### How to find Folder ID
+
+To find a Folder ID, open the folder in your browser. The ID is the string of characters at the end of the URL after `folders/`.
+
+For example, in the URL `https://drive.google.com/drive/folders/abcjhadjh213102398890r4`, the Folder ID is `abcjhadjh213102398890r4`.
+
+The Folder ID can also be found in the output of the following actions and triggers:
+* **Create New Folder**
+* **Get File**
+* **List Folders**
+* **New Folder** trigger
 
 ## Troubleshooting
 
