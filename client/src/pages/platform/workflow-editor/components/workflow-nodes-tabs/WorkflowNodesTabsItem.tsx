@@ -44,23 +44,28 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
         if (iconRef.current) {
             const nodeContainer = document.createElement('div');
 
-            nodeContainer.style.cssText =
-                'width:56px;height:56px;border-radius:8px;border:2px solid #e2e8f0;background:#fff;display:flex;align-items:center;justify-content:center;position:absolute;top:-1000px;left:-1000px;';
+            nodeContainer.className =
+                'flex size-14 items-center justify-center rounded-lg border-2 border-slate-200 bg-white absolute -left-[1000px] -top-[1000px]';
 
             const iconClone = iconRef.current.cloneNode(true) as HTMLElement;
 
-            iconClone.style.cssText = 'width:28px;height:28px;margin:0;';
+            iconClone.className = 'm-0 size-7';
 
             const svgElement = iconClone.querySelector('svg');
 
             if (svgElement) {
-                svgElement.style.cssText = 'width:100%;height:100%;display:block;';
+                svgElement.setAttribute('class', 'block size-full');
             }
 
             nodeContainer.appendChild(iconClone);
             document.body.appendChild(nodeContainer);
             event.dataTransfer.setDragImage(nodeContainer, 28, 28);
-            setTimeout(() => document.body.removeChild(nodeContainer), 0);
+
+            requestAnimationFrame(() => {
+                if (nodeContainer.parentNode) {
+                    document.body.removeChild(nodeContainer);
+                }
+            });
         }
     };
 
