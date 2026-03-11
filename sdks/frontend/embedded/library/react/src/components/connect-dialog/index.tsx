@@ -434,6 +434,7 @@ export default function useConnectDialog({
 
             setFormValues({});
             setInputOverrides({});
+            debouncedFetchesRef.current = {};
             setWorkflowsView(false);
         } catch (error) {
             console.error('Failed to disconnect:', error);
@@ -499,6 +500,11 @@ export default function useConnectDialog({
         },
         [fetch, currentIntegrationInstanceId]
     );
+
+    // Clear debounced fetch cache when instance ID changes to avoid stale closures
+    useEffect(() => {
+        debouncedFetchesRef.current = {};
+    }, [currentIntegrationInstanceId]);
 
     // Create portal container only once
     useEffect(() => {
