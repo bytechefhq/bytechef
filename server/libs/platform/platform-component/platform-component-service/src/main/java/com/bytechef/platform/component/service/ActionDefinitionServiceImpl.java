@@ -476,9 +476,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                             ParametersFactory.create(inputParameters), ParametersFactory.create(continueParameters),
                             context);
 
-                    if (additionalParameters.isPresent()) {
-                        mergedInputParameters.putAll(additionalParameters.get());
-                    }
+                    additionalParameters.ifPresent(mergedInputParameters::putAll);
                 }
             }
 
@@ -490,9 +488,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         null, ParametersFactory.create(mergedInputParameters),
                         ParametersFactory.create(continueParameters), context);
 
-                if (additionalParameters.isPresent()) {
-                    mergedInputParameters.putAll(additionalParameters.get());
-                }
+                additionalParameters.ifPresent(mergedInputParameters::putAll);
             }
 
             return resumePerformFunction.apply(
