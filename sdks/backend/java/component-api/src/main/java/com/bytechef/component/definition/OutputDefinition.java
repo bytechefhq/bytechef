@@ -46,20 +46,20 @@ public final class OutputDefinition implements BaseOutputDefinition {
     }
 
     public static OutputDefinition of(ValueProperty<?> outputSchema) {
-        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
+        Objects.requireNonNull(outputSchema, "'outputSchema' must not be null");
 
         return of(outputSchema, null, null);
     }
 
     public static OutputDefinition of(Object sampleOutput) {
-        Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");
+        Objects.requireNonNull(sampleOutput, "'sampleOutput' must not be null");
 
         return of(null, sampleOutput, null);
     }
 
     public static OutputDefinition of(ValueProperty<?> outputSchema, Object sampleOutput) {
-        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
-        Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");
+        Objects.requireNonNull(outputSchema, "'outputSchema' must not be null");
+        Objects.requireNonNull(sampleOutput, "'sampleOutput' must not be null");
 
         return of(outputSchema, sampleOutput, null);
     }
@@ -69,19 +69,19 @@ public final class OutputDefinition implements BaseOutputDefinition {
     }
 
     public static OutputDefinition of(ActionDefinition.BaseOutputFunction output) {
-        Objects.requireNonNull(output, "'output' mut not be null");
+        Objects.requireNonNull(output, "'output' must not be null");
 
         return new OutputDefinition(output);
     }
 
     public static OutputDefinition of(ClusterElementDefinition.OutputFunction output) {
-        Objects.requireNonNull(output, "'output' mut not be null");
+        Objects.requireNonNull(output, "'output' must not be null");
 
         return new OutputDefinition(output);
     }
 
     public static OutputDefinition of(TriggerDefinition.OutputFunction output) {
-        Objects.requireNonNull(output, "'output' mut not be null");
+        Objects.requireNonNull(output, "'output' must not be null");
 
         return new OutputDefinition(output);
     }

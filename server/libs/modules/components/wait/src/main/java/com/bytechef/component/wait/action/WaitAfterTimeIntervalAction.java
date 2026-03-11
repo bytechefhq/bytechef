@@ -31,6 +31,8 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
@@ -98,7 +100,7 @@ public class WaitAfterTimeIntervalAction {
 
         long expiresAtMillis = continueParameters.getLong("expiresAt");
 
-        Instant scheduledAt = Instant.ofEpochMilli(expiresAtMillis);
+        LocalDateTime scheduledAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAtMillis), ZoneOffset.UTC);
 
         int amount = continueParameters.getInteger("amount");
         String unit = continueParameters.getString("unit");
