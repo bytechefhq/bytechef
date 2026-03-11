@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Copy a selected file to a different location within Google Drive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#copy-file"
+    },
     "metadata": null,
     "name": "copyFile",
     "outputDefinition": {
@@ -233,7 +236,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The id of the file to be copied.",
+      "description": "The ID of the file to be copied.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -309,7 +312,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new empty folder in Google Drive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#create-new-folder"
+    },
     "metadata": null,
     "name": "createNewFolder",
     "outputDefinition": {
@@ -422,9 +428,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "mimeType": "plain/text",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name": "new-file.txt",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -533,9 +539,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name": "new-file.txt",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -596,7 +602,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new text file in Google Drive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#create-new-text-file"
+    },
     "metadata": null,
     "name": "createNewTextFile",
     "outputDefinition": {
@@ -709,9 +718,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "mimeType": "plain/text",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name": "new-file.txt",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -820,9 +829,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name": "new-file.txt",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -937,7 +946,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete a selected file from Google Drive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#delete-file"
+    },
     "metadata": null,
     "name": "deleteFile",
     "outputDefinition": null,
@@ -947,7 +959,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The id of a file to delete.",
+      "description": "The ID of a file to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -978,7 +990,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Download selected file from Google Drive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#download-file"
+    },
     "metadata": null,
     "name": "downloadFile",
     "outputDefinition": {
@@ -1228,7 +1243,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieve a specified file from your Google Drive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#get-file"
+    },
     "metadata": null,
     "name": "getFile",
     "outputDefinition": {
@@ -1486,7 +1504,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "List files in a Google Drive folder.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#list-files"
+    },
     "metadata": null,
     "name": "listFiles",
     "outputDefinition": {
@@ -1786,7 +1807,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "List folders in a Google Drive folder.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#list-folders"
+    },
     "metadata": null,
     "name": "listFolders",
     "outputDefinition": {
@@ -2055,7 +2079,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.",
+      "description": "ID of the folder from which you want to list folders. If no folder is specified, the root folder will be used.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2086,7 +2110,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Uploads a file in your Google Drive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#upload-file"
+    },
     "metadata": null,
     "name": "uploadFile",
     "outputDefinition": {
@@ -2199,9 +2226,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "mimeType": "plain/text",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name": "new-file.txt",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -2310,9 +2337,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name": "new-file.txt",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -2674,7 +2701,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The id of the file to be copied.",
+      "description": "The ID of the file to be copied.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2864,9 +2891,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "mimeType": "plain/text",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name": "new-file.txt",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -2975,9 +3002,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name": "new-file.txt",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -3151,9 +3178,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "mimeType": "plain/text",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name": "new-file.txt",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -3262,9 +3289,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name": "new-file.txt",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -3388,7 +3415,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "The id of a file to delete.",
+      "description": "The ID of a file to delete.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4496,7 +4523,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.",
+      "description": "ID of the folder from which you want to list folders. If no folder is specified, the root folder will be used.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4641,9 +4668,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "mimeType": "plain/text",
+          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name": "new-file.txt",
-          "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -4752,9 +4779,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "mimeType": "plain/text",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name": "new-file.txt",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -4974,7 +5001,10 @@
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.google.com/workspace/drive/api/guides/about-sdk"
+  },
   "description": "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and collaborate online.",
   "icon": "path:assets/google-drive.svg",
   "metadata": null,
@@ -4988,7 +5018,10 @@
     "deprecated": null,
     "description": "Triggers when new file is uploaded to Google Drive.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#new-file"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newFile",
@@ -5258,7 +5291,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the folder where the new file is uploaded.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -5295,7 +5328,10 @@
     "deprecated": null,
     "description": "Triggers when new folder is uploaded to Google Drive.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#new-folder"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newFolder",
@@ -5565,7 +5601,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "The ID of the folder where the new folder is uploaded.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
