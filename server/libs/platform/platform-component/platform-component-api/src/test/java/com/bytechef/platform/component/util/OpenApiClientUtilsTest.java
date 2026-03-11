@@ -18,6 +18,7 @@ package com.bytechef.platform.component.util;
 
 import static com.bytechef.commons.util.MapUtils.setObjectMapper;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,9 +32,12 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.exception.ProviderException;
@@ -133,6 +137,32 @@ class OpenApiClientUtilsTest {
             mapArgumentCaptor.getAllValues());
         assertEquals(
             Http.Body.of(Map.of("name", "John"), Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testExecuteJsonWithOneArrayProperty() {
+        Object expectedResult = Map.of("ok", true);
+
+        when(mockedResponse.getStatusCode())
+            .thenReturn(200);
+        when(mockedResponse.getBody())
+            .thenReturn(expectedResult);
+
+        ModifiableArrayProperty arrayProperty = array("array")
+            .metadata(Map.of("type", PropertyType.BODY))
+            .items(string());
+
+        Map<String, Object> metadata = Map.of(
+            "bodyContentType", BodyContentType.JSON,
+            "mimeType", "application/json");
+
+        OpenApiClientUtils.execute(Map.of(), List.of(arrayProperty), null, metadata,
+            null, mockedContext);
+
+        Body body = bodyArgumentCaptor.getValue();
+        Body expectedBody = Body.of(Map.of("array", List.of()), BodyContentType.JSON);
+
+        assertEquals(expectedBody, body);
     }
 
     @Test
