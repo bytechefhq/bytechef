@@ -26,7 +26,7 @@ import java.util.Map;
 public class ParametersFactory {
 
     public static Parameters create(ComponentConnection componentConnection) {
-        return new ParametersImpl(componentConnection == null ? Map.of() : componentConnection.getParameters());
+        return create(componentConnection == null ? Map.of() : componentConnection.getParameters());
     }
 
     public static Parameters create(Map<String, ?> map) {
