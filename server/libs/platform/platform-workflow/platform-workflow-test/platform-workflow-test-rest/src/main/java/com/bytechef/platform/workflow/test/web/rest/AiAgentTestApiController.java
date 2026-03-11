@@ -120,12 +120,7 @@ class AiAgentTestApiController {
                     StringUtils.sanitize(aiAgentTestRequest.workflowNodeName()),
                     StringUtils.sanitize(exception.getMessage()), exception);
 
-                String errorMessage = exception.getMessage() != null
-                    ? exception.getMessage()
-                    : "An unexpected error occurred: " + exception.getClass()
-                        .getSimpleName();
-
-                sendEvent(sseEmitter, "error", errorMessage);
+                sendEvent(sseEmitter, "error", getRootCauseMessage(exception));
 
                 completeEmitter(sseEmitter, testId);
             }
@@ -146,6 +141,24 @@ class AiAgentTestApiController {
 
         return ResponseEntity.ok()
             .build();
+    }
+
+    private static String getRootCauseMessage(Throwable throwable) {
+        Throwable rootCause = throwable;
+
+        while (rootCause.getCause() != null) {
+            rootCause = rootCause.getCause();
+        }
+
+        String message = rootCause.getMessage();
+
+        if (message != null) {
+            return message;
+        }
+
+        Class<? extends Throwable> rootCauseClass = rootCause.getClass();
+
+        return "An unexpected error occurred: " + rootCauseClass.getSimpleName();
     }
 
     private void completeEmitter(SseEmitter sseEmitter, String testId) {
@@ -232,12 +245,7 @@ class AiAgentTestApiController {
 
             completed = true;
 
-            String errorMessage = throwable.getMessage() != null
-                ? throwable.getMessage()
-                : "An unexpected error occurred: " + throwable.getClass()
-                    .getSimpleName();
-
-            sendEvent(springSseEmitter, "error", errorMessage);
+            sendEvent(springSseEmitter, "error", getRootCauseMessage(throwable));
 
             completeEmitter(springSseEmitter, testId);
         }
