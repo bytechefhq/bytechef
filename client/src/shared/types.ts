@@ -25,6 +25,7 @@ import {
     TriggerDefinition,
     TriggerType,
     ValueProperty,
+    Workflow,
     WorkflowInput,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
@@ -357,7 +358,7 @@ export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
     properties?: Array<PropertyAllType>;
 };
 
-export type UpdateWorkflowMutationType = UseMutationResult<void, Error, UpdateWorkflowRequestI, unknown>;
+export type UpdateWorkflowMutationType = UseMutationResult<Workflow, Error, UpdateWorkflowRequestI, unknown>;
 
 export type TaskDispatcherContextType = {
     branchIndex?: number;
