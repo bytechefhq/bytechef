@@ -57,14 +57,23 @@ class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAda
 
     private String getDeepestCauseMessage(Throwable throwable) {
         String message = throwable.getMessage();
+        String lastNonBlankMessage = (message != null && !message.isBlank()) ? message : null;
         Throwable currentException = throwable;
 
         while (currentException.getCause() != null) {
             currentException = currentException.getCause();
 
             message = currentException.getMessage();
+
+            if (message != null && !message.isBlank()) {
+                lastNonBlankMessage = message;
+            }
         }
 
-        return message;
+        if (lastNonBlankMessage != null) {
+            return lastNonBlankMessage;
+        }
+
+        return throwable.toString();
     }
 }

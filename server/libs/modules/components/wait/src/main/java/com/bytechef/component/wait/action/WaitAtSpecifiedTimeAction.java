@@ -76,7 +76,8 @@ public class WaitAtSpecifiedTimeAction {
 
         long expiresAtMillis = continueParameters.getLong("expiresAt");
 
-        Instant scheduledAt = Instant.ofEpochMilli(expiresAtMillis);
+        LocalDateTime scheduledAt =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAtMillis), ZoneId.systemDefault());
 
         return Map.of("scheduledAt", scheduledAt);
     }
