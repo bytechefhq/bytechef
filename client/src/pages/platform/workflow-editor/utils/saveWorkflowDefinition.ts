@@ -1,7 +1,12 @@
 import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
-import {UseMutationResult} from '@tanstack/react-query';
+import {
+    BranchCaseType,
+    NodeDataType,
+    TaskDispatcherContextType,
+    UpdateWorkflowMutationType,
+    WorkflowDefinitionType,
+} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
@@ -9,26 +14,19 @@ import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
-type UpdateWorkflowRequestType = {
-    id: string;
-    workflow: Workflow;
-};
-
 interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
-    invalidateWorkflowQueries?: () => void;
     nodeData?: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
     placeholderId?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
-    updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
     updatedWorkflowTasks?: Array<WorkflowTask>;
 }
 
 export default async function saveWorkflowDefinition({
     decorative,
-    invalidateWorkflowQueries,
     nodeData,
     nodeIndex,
     onSuccess,
@@ -75,7 +73,6 @@ export default async function saveWorkflowDefinition({
 
         executeWorkflowMutation({
             definitionUpdate: {triggers: [newTrigger]},
-            invalidateWorkflowQueries,
             onSuccess: () => {
                 if (onSuccess) {
                     onSuccess();
@@ -230,7 +227,6 @@ export default async function saveWorkflowDefinition({
 
     executeWorkflowMutation({
         definitionUpdate: {tasks: updatedWorkflowDefinitionTasks},
-        invalidateWorkflowQueries,
         onSuccess,
         updateWorkflowMutation,
         workflow,
@@ -243,16 +239,14 @@ interface ExecuteWorkflowMutationProps {
         tasks?: Array<WorkflowTask>;
         triggers?: Array<WorkflowTrigger>;
     };
-    invalidateWorkflowQueries?: () => void;
     onSuccess?: () => void;
-    updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
     workflowDefinition: WorkflowDefinitionType;
 }
 
 function executeWorkflowMutation({
     definitionUpdate,
-    invalidateWorkflowQueries,
     onSuccess,
     updateWorkflowMutation,
     workflow,
@@ -262,34 +256,52 @@ function executeWorkflowMutation({
         return;
     }
 
+    const updatedDefinition = JSON.stringify(
+        {
+            ...workflowDefinition,
+            ...definitionUpdate,
+        },
+        null,
+        SPACE
+    );
+
+    // Optimistic UI: update definition string immediately so the store reflects the pending change.
+    // We do NOT update tasks/triggers optimistically because workflow.tasks is a flattened list
+    // (including sub-tasks extracted from task dispatcher parameters) while definitionUpdate.tasks
+    // is hierarchical (sub-tasks nested in parameters). Mapping between these structures would
+    // drop sub-tasks and break edge computation in the layout.
+    const previousWorkflow = workflow;
+
+    useWorkflowDataStore.getState().setWorkflow({
+        ...workflow,
+        definition: updatedDefinition,
+    });
+
     setWorkflowMutating(workflow.id!, true);
 
     updateWorkflowMutation.mutate(
         {
             id: workflow.id!,
             workflow: {
-                definition: JSON.stringify(
-                    {
-                        ...workflowDefinition,
-                        ...definitionUpdate,
-                    },
-                    null,
-                    SPACE
-                ),
+                definition: updatedDefinition,
                 version: workflow.version,
             },
         },
         {
+            onError: () => {
+                useWorkflowDataStore.getState().setWorkflow(previousWorkflow);
+            },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
             },
-            onSuccess: () => {
+            onSuccess: (updatedWorkflow) => {
+                useWorkflowDataStore.getState().setWorkflow({
+                    ...updatedWorkflow,
+                    definition: updatedDefinition,
+                });
+
                 if (onSuccess) {
                     onSuccess();
-                }
-
-                if (invalidateWorkflowQueries) {
-                    invalidateWorkflowQueries();
                 }
             },
         }

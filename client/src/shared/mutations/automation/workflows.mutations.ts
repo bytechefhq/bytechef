@@ -5,6 +5,7 @@ import {
     DuplicateWorkflow200Response,
     DuplicateWorkflowRequest,
     UpdateWorkflowRequest,
+    Workflow,
     WorkflowApi,
 } from '@/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
@@ -53,7 +54,7 @@ export const useDuplicateWorkflowMutation = (mutationProps?: DuplicateWorkflowMu
     });
 
 interface UpdateWorkflowMutationProps {
-    onSuccess?: (result: void, variables: UpdateWorkflowRequest) => void;
+    onSuccess?: (result: Workflow, variables: UpdateWorkflowRequest) => void;
     onError?: (error: Error, variables: UpdateWorkflowRequest) => void;
 }
 

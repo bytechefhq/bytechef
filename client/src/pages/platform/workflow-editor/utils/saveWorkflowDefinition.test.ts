@@ -35,6 +35,7 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore', () =
 
 function makeWorkflowState(tasks: Array<Record<string, unknown>> = [], triggers: Array<Record<string, unknown>> = []) {
     return {
+        setWorkflow: vi.fn(),
         workflow: {
             definition: JSON.stringify({tasks, triggers}, null, SPACE),
             id: 'workflow-1',
