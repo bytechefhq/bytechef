@@ -248,7 +248,8 @@ const useWorkflowEditorCanvas = ({
                     }
                 }
             } else if (isTargetEdge) {
-                const edgeElement = getClosestEdgeElement((event.target as SVGElement).closest('div'));
+                const closestDiv = (event.target as SVGElement).closest('div');
+                const edgeElement = closestDiv instanceof HTMLElement ? getClosestEdgeElement(closestDiv) : null;
 
                 if (!edgeElement) {
                     return;
