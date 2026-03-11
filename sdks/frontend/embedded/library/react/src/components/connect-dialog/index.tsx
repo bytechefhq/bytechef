@@ -141,7 +141,7 @@ export default function useConnectDialog({
 
         return integration.workflows.map((workflow) => {
             const instanceWorkflow = currentInstance?.workflows?.find(
-                (instanceWorkflow) => instanceWorkflow.workflowUuid === workflow.workflowUuid
+                (currentWorkflow) => currentWorkflow.workflowUuid === workflow.workflowUuid
             );
 
             const serverEnabled = instanceWorkflow?.enabled ?? workflow.enabled ?? false;
@@ -302,6 +302,23 @@ export default function useConnectDialog({
         [saveOAuth2Connection]
     );
 
+    const oauth2Scope = useMemo(() => {
+        const scopes = integration?.connectionConfig?.oauth2?.scopes;
+
+        if (Array.isArray(scopes)) {
+            return scopes.join(' ');
+        }
+
+        if (scopes && typeof scopes === 'object') {
+            return Object.entries(scopes)
+                .filter(([, enabled]) => String(enabled) === 'true')
+                .map(([scopeName]) => scopeName)
+                .join(' ');
+        }
+
+        return typeof scopes === 'string' ? scopes : '';
+    }, [integration?.connectionConfig?.oauth2?.scopes]);
+
     const {getAuth} = useOAuth2({
         ...integration?.connectionConfig?.oauth2,
         authorizationUrl: integration?.connectionConfig?.oauth2?.authorizationUrl || '',
@@ -311,22 +328,7 @@ export default function useConnectDialog({
         onError: (error: string) => console.error(error),
         onTokenSuccess: handleOnTokenSuccess,
         responseType: isOAuth2AuthorizationType ? 'code' : 'token',
-        scope: (() => {
-            const scopes = integration?.connectionConfig?.oauth2?.scopes;
-
-            if (Array.isArray(scopes)) {
-                return scopes.join(' ');
-            }
-
-            if (scopes && typeof scopes === 'object') {
-                return Object.entries(scopes)
-                    .filter(([, enabled]) => String(enabled) === 'true')
-                    .map(([scopeName]) => scopeName)
-                    .join(' ');
-            }
-
-            return typeof scopes === 'string' ? scopes : '';
-        })(),
+        scope: oauth2Scope,
     });
 
     const createValidationRules = useCallback((properties: PropertyType[]): Record<string, ValidationRuleType> => {
@@ -336,10 +338,10 @@ export default function useConnectDialog({
 
         const rules: Record<string, ValidationRuleType> = {};
 
-        properties.forEach((prop) => {
-            rules[prop.name] = {
-                required: !!prop.required,
-                requiredMessage: prop.required ? `${prop.label} is required` : undefined,
+        properties.forEach((property) => {
+            rules[property.name] = {
+                required: !!property.required,
+                requiredMessage: property.required ? `${property.label} is required` : undefined,
             };
         });
 
@@ -386,7 +388,7 @@ export default function useConnectDialog({
                 onInput: (event: React.FormEvent<HTMLInputElement>) => {
                     const value = event.currentTarget.value;
 
-                    setFormValues((prev: Record<string, string>) => ({...prev, [name]: value}));
+                    setFormValues((previous: Record<string, string>) => ({...previous, [name]: value}));
                 },
             }),
             handleSubmit: (callback: (data: {[key: string]: unknown}) => void) => (event?: React.FormEvent) => {
@@ -395,10 +397,10 @@ export default function useConnectDialog({
                 }
 
                 const currentValues = Object.entries(inputRefs.current).reduce(
-                    (acc, [name, ref]) => {
-                        acc[name] = ref.value;
+                    (values, [name, ref]) => {
+                        values[name] = ref.value;
 
-                        return acc;
+                        return values;
                     },
                     {} as Record<string, string>
                 );
