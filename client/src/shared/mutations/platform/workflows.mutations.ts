@@ -8,7 +8,7 @@ export interface UpdateWorkflowRequestI {
 }
 
 interface UpdateWorkflowMutationPropsI {
-    onSuccess?: (result: void, variables: UpdateWorkflowRequestI) => void;
+    onSuccess?: (result: Workflow, variables: UpdateWorkflowRequestI) => void;
     onError?: (error: Error, variables: UpdateWorkflowRequestI) => void;
 }
 
@@ -26,7 +26,7 @@ const useUpdatePlatformWorkflowMutation = ({
 }: {
     useUpdateWorkflowMutation: (
         mutationProps?: UpdateWorkflowMutationPropsI | undefined
-    ) => UseMutationResult<void, Error, UpdateWorkflowRequestI, unknown>;
+    ) => UseMutationResult<Workflow, Error, UpdateWorkflowRequestI, unknown>;
     workflowId: string;
     workflowKeys: WorkflowKeysI;
     onError?: () => void;
@@ -45,10 +45,6 @@ const useUpdatePlatformWorkflowMutation = ({
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: workflowKeys.workflow(workflowId),
-            });
-
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflowId),
             });
