@@ -117,6 +117,7 @@ export default function useConnectDialog({
     const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
     const [enabledOverrides, setEnabledOverrides] = useState<Record<string, boolean | undefined>>({});
     const [inputOverrides, setInputOverrides] = useState<Record<string, Record<string, string>>>({});
+    const [isLoading, setIsLoading] = useState(false);
     const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
     const [currentIntegrationInstanceId, setCurrentIntegrationInstanceId] = useState<number | undefined>(
         integrationInstanceId ? Number(integrationInstanceId) : undefined
@@ -173,7 +174,7 @@ export default function useConnectDialog({
     const saveOAuth2Connection = useCallback(
         async (payload: CodePayloadI | TokenPayloadI) => {
             try {
-                await fetch(
+                const newIntegrationInstanceId: number = await fetch(
                     `/api/embedded/v1/integrations/${integrationId}/instances`,
                     {
                         method: 'POST',
@@ -189,10 +190,12 @@ export default function useConnectDialog({
                     `/api/embedded/v1/integrations/${integrationId}`
                 );
 
-                const existingInstance = integrationData.integrationInstances?.[0];
+                const createdInstance = integrationData.integrationInstances?.find(
+                    (instance) => instance.id === newIntegrationInstanceId
+                ) || integrationData.integrationInstances?.[0];
 
-                if (existingInstance) {
-                    setCurrentIntegrationInstanceId(existingInstance.id);
+                if (createdInstance) {
+                    setCurrentIntegrationInstanceId(createdInstance.id);
                 }
 
                 setIntegration(integrationData);
@@ -207,7 +210,7 @@ export default function useConnectDialog({
     const saveNonOAuth2Connection = useCallback(
         async (formData: Record<string, string>) => {
             try {
-                await fetch(
+                const newIntegrationInstanceId: number = await fetch(
                     `/api/embedded/v1/integrations/${integrationId}/instances`,
                     {
                         method: 'POST',
@@ -223,10 +226,12 @@ export default function useConnectDialog({
                     `/api/embedded/v1/integrations/${integrationId}`
                 );
 
-                const existingInstance = integrationData.integrationInstances?.[0];
+                const createdInstance = integrationData.integrationInstances?.find(
+                    (instance) => instance.id === newIntegrationInstanceId
+                ) || integrationData.integrationInstances?.[0];
 
-                if (existingInstance) {
-                    setCurrentIntegrationInstanceId(existingInstance.id);
+                if (createdInstance) {
+                    setCurrentIntegrationInstanceId(createdInstance.id);
                 }
 
                 setIntegration(integrationData);
@@ -429,21 +434,39 @@ export default function useConnectDialog({
         setIntegration(undefined);
         setEnabledOverrides({});
         setInputOverrides({});
+        setIsLoading(true);
         setIsOpen(true);
 
-        const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+        try {
+            const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
 
-        const existingInstance = integrationData.integrationInstances?.[0];
+            let targetInstance: IntegrationInstanceType | undefined;
 
-        if (existingInstance) {
-            setCurrentIntegrationInstanceId(existingInstance.id);
-            setWorkflowsView(true);
-        } else {
-            setCurrentIntegrationInstanceId(undefined);
-            setWorkflowsView(false);
+            if (integrationInstanceId && integrationData.integrationInstances) {
+                targetInstance = integrationData.integrationInstances.find(
+                    (instance) => instance.id === Number(integrationInstanceId)
+                );
+            }
+
+            if (!targetInstance) {
+                targetInstance = integrationData.integrationInstances?.[0];
+            }
+
+            if (targetInstance) {
+                setCurrentIntegrationInstanceId(targetInstance.id);
+                setWorkflowsView(true);
+            } else if (integrationInstanceId) {
+                setCurrentIntegrationInstanceId(Number(integrationInstanceId));
+                setWorkflowsView(true);
+            } else {
+                setCurrentIntegrationInstanceId(undefined);
+                setWorkflowsView(false);
+            }
+
+            setIntegration(integrationData);
+        } finally {
+            setIsLoading(false);
         }
-
-        setIntegration(integrationData);
     };
 
     const closeDialog = () => {
@@ -459,25 +482,24 @@ export default function useConnectDialog({
             return;
         }
 
-        try {
-            await fetch(`/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}`, {
-                method: 'DELETE',
-            });
+        await fetch(`/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}`, {
+            method: 'DELETE',
+        });
 
-            setCurrentIntegrationInstanceId(undefined);
-            setFormValues({});
-            setInputOverrides({});
-            setEnabledOverrides({});
-            setWorkflowsView(false);
-        } catch (error) {
-            console.error('Failed to disconnect:', error);
-        }
+        setCurrentIntegrationInstanceId(undefined);
+        setFormValues({});
+        setInputOverrides({});
+        setEnabledOverrides({});
+        debouncedFetchesRef.current = {};
+        setWorkflowsView(false);
     }, [fetch, currentIntegrationInstanceId]);
 
     const handleClick = useCallback(
         (event: React.MouseEvent<HTMLButtonElement>) => {
             if ((event.target as HTMLButtonElement).name === 'disconnectButton') {
-                handleDisconnect().then(() => closeDialog());
+                handleDisconnect()
+                    .then(() => closeDialog())
+                    .catch((error) => console.error('Failed to disconnect:', error));
 
                 return;
             }
@@ -548,7 +570,7 @@ export default function useConnectDialog({
                         ...inputOverridesRef.current[workflowUuid],
                     };
 
-                    fetch(
+                    void fetch(
                         `/api/embedded/v1/integration-instances/${instanceId}/workflows/${workflowUuid}`,
                         {
                             body: {
@@ -556,7 +578,7 @@ export default function useConnectDialog({
                             },
                             method: 'PUT',
                         }
-                    );
+                    ).catch((error) => console.error('Failed to save workflow inputs:', error));
                 }, 600);
             }
 
@@ -616,7 +638,7 @@ export default function useConnectDialog({
                     integration={integration}
                     isOAuth2={isOAuth2}
                     isOpen={isOpen}
-                    loading={!integration}
+                    loading={isLoading}
                     properties={integration?.connectionConfig?.inputs}
                     registerFormSubmit={registerFormSubmit}
                     workflowsView={workflowsView}
