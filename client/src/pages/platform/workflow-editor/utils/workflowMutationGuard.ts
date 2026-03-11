@@ -16,6 +16,10 @@
  * synced definition with server data that lacks the skipped positions.
  */
 
+import {UpdateWorkflowMutationType} from '@/shared/types';
+
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+
 const mutatingWorkflows = new Set<string>();
 
 /**
@@ -64,4 +68,82 @@ export function consumePendingDefinition(workflowId: string): string | undefined
 export function clearAllWorkflowMutations(): void {
     mutatingWorkflows.clear();
     pendingDefinitions.clear();
+}
+
+interface DrainPendingMutationProps {
+    incrementLayoutResetCounter: () => void;
+    invalidateWorkflowQueries: () => void;
+    onError?: () => void;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
+    workflowId: string;
+}
+
+/**
+ * Recursively drains any pending definition mutations. Each time a mutation
+ * settles, it checks for another pending definition and fires again until
+ * no more remain. This prevents skipped mutations from being lost when
+ * multiple position saves overlap.
+ */
+export function drainPendingDefinitionMutation({
+    incrementLayoutResetCounter,
+    invalidateWorkflowQueries,
+    onError,
+    updateWorkflowMutation,
+    workflowId,
+}: DrainPendingMutationProps): void {
+    const pendingDefinition = consumePendingDefinition(workflowId);
+
+    if (!pendingDefinition) {
+        return;
+    }
+
+    const currentWorkflow = useWorkflowDataStore.getState().workflow;
+
+    useWorkflowDataStore.setState((state) => ({
+        workflow: {
+            ...state.workflow,
+            definition: pendingDefinition,
+        },
+    }));
+
+    setWorkflowMutating(workflowId, true);
+
+    updateWorkflowMutation.mutate(
+        {
+            id: workflowId,
+            workflow: {
+                definition: pendingDefinition,
+                version: currentWorkflow.version,
+            },
+        },
+        {
+            onError: () => {
+                onError?.();
+            },
+            onSettled: () => {
+                setWorkflowMutating(workflowId, false);
+
+                drainPendingDefinitionMutation({
+                    incrementLayoutResetCounter,
+                    invalidateWorkflowQueries,
+                    onError,
+                    updateWorkflowMutation,
+                    workflowId,
+                });
+            },
+            onSuccess: (retryWorkflow) => {
+                const retryCurrentWorkflow = useWorkflowDataStore.getState().workflow;
+
+                useWorkflowDataStore.getState().setWorkflow({
+                    ...retryCurrentWorkflow,
+                    version: retryWorkflow.version,
+                });
+
+                if (!hasPendingDefinition(workflowId)) {
+                    invalidateWorkflowQueries();
+                    incrementLayoutResetCounter();
+                }
+            },
+        }
+    );
 }

@@ -92,6 +92,25 @@ describe('extractDefinitionPositions', () => {
         expect(result.get('child_1')).toEqual({x: 100, y: 200});
     });
 
+    it('should extract positions from single-object iteratee', () => {
+        const definition = makeDefinition({
+            tasks: [
+                makeTask(
+                    'each_1',
+                    {x: 15, y: 25},
+                    {
+                        iteratee: makeTask('child_single', {x: 110, y: 210}),
+                    }
+                ),
+            ],
+        });
+
+        const result = extractDefinitionPositions(definition);
+
+        expect(result.get('each_1')).toEqual({x: 15, y: 25});
+        expect(result.get('child_single')).toEqual({x: 110, y: 210});
+    });
+
     it('should extract positions from branch cases and default', () => {
         const definition = makeDefinition({
             tasks: [
