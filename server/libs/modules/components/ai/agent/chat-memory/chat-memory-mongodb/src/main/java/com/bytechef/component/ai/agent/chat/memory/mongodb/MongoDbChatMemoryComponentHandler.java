@@ -18,6 +18,9 @@ package com.bytechef.component.ai.agent.chat.memory.mongodb;
 
 import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.MongoDbChatMemoryConstants.CONNECTION_STRING;
 import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.MongoDbChatMemoryConstants.DATABASE_NAME;
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -28,9 +31,11 @@ import com.bytechef.component.ai.agent.chat.memory.mongodb.action.MongoDbChatMem
 import com.bytechef.component.ai.agent.chat.memory.mongodb.action.MongoDbChatMemoryGetMessagesAction;
 import com.bytechef.component.ai.agent.chat.memory.mongodb.action.MongoDbChatMemoryListConversationsAction;
 import com.bytechef.component.ai.agent.chat.memory.mongodb.cluster.MongoDbChatMemory;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
 
 /**
@@ -49,8 +54,20 @@ public class MongoDbChatMemoryComponentHandler implements ComponentHandler {
             string(DATABASE_NAME)
                 .label("Database Name")
                 .description("The MongoDB database name.")
-                .defaultValue("spring_ai")
-                .required(false));
+                .defaultValue("local")
+                .required(false))
+        .authorizations(
+            authorization(Authorization.AuthorizationType.CUSTOM)
+                .properties(
+                    string(USERNAME)
+                        .label("Username")
+                        .description("The MongoDB username.")
+                        .required(false),
+                    string(PASSWORD)
+                        .label("Password")
+                        .description("The MongoDB password.")
+                        .controlType(Property.ControlType.PASSWORD)
+                        .required(false)));
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("mongoDbChatMemory")
         .title("MongoDB Chat Memory")
