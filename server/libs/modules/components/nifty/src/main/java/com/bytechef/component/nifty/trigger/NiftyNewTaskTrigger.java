@@ -49,6 +49,7 @@ public class NiftyNewTaskTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newTask")
         .title("New Task")
         .description("Triggers when new task is created.")
+        .help("", "https://docs.bytechef.io/reference/components/nifty_v1#new-task")
         .properties(
             string(APP_ID)
                 .label("Application")
