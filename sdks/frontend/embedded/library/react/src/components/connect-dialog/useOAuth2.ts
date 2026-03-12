@@ -1,4 +1,4 @@
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {CodePayloadI, TokenPayloadI} from './types';
 
 const OAUTH_STATE_KEY = 'react-use-oauth2-state-key';
@@ -249,6 +249,10 @@ const useOAuth2 = ({
             }
         };
     }, [authorizationUrl, clientId, redirectUri, scope, responseType, onCodeSuccess, onTokenSuccess, onError, setUI]);
+
+    useEffect(() => {
+        extraQueryParametersRef.current = extraQueryParameters;
+    }, [extraQueryParameters]);
 
     return {error, getAuth, loading};
 };
