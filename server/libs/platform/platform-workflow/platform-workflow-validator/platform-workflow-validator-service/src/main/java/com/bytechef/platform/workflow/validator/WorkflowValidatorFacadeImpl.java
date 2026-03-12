@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.FileEntryProperty;
@@ -33,6 +34,8 @@ import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -62,21 +65,18 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         StringBuilder warnings = new StringBuilder();
 
         WorkflowValidator.validateWorkflow(
-            workflow,
-            this::getTaskProperties,
-            this::getTaskOutputProperty,
-            new HashMap<>(),
-            new HashMap<>(),
-            errors,
-            warnings);
+            workflow, this::getTaskProperties, this::getTaskOutputProperty, new HashMap<>(), new HashMap<>(),
+            errors, warnings);
 
-        List<String> errorList = Arrays.stream(errors.toString()
-            .split("\n"))
+        String errorsString = errors.toString();
+
+        List<String> errorList = Arrays.stream(errorsString.split("\n"))
             .filter(line -> !line.isBlank())
             .toList();
 
-        List<String> warningList = Arrays.stream(warnings.toString()
-            .split("\n"))
+        String warningsString = warnings.toString();
+
+        List<String> warningList = Arrays.stream(warningsString.split("\n"))
             .filter(line -> !line.isBlank())
             .toList();
 
@@ -89,7 +89,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
             if ("trigger".equals(kind)) {
                 TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    Objects.requireNonNull(workflowNodeType.operation()));
 
                 return triggerDefinition.getProperties()
                     .stream()
@@ -108,11 +109,9 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                     taskDispatcherDefinitionService.getTaskDispatcherDefinition(
                         workflowNodeType.name(), workflowNodeType.version());
 
-                return java.util.stream.Stream.concat(
-                    taskDispatcherDefinition.getProperties()
-                        .stream(),
-                    taskDispatcherDefinition.getTaskProperties()
-                        .stream())
+                return Stream.concat(
+                    CollectionUtils.stream(taskDispatcherDefinition.getProperties()),
+                    CollectionUtils.stream(taskDispatcherDefinition.getTaskProperties()))
                     .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
                     .toList();
             }
@@ -130,7 +129,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
             if ("trigger".equals(kind)) {
                 TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    Objects.requireNonNull(workflowNodeType.operation()));
 
                 outputResponse = triggerDefinition.getOutputResponse();
             } else if (workflowNodeType.operation() != null) {
@@ -164,80 +164,87 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         String type;
         List<PropertyInfo> nestedPropertyInfos = null;
 
-        if (baseProperty instanceof ObjectProperty objectProperty) {
-            type = "OBJECT";
-            List<? extends Property> properties = objectProperty.getProperties();
+        switch (baseProperty) {
+            case ObjectProperty objectProperty -> {
+                type = "OBJECT";
+                List<? extends Property> properties = objectProperty.getProperties();
 
-            if (properties != null && !properties.isEmpty()) {
-                nestedPropertyInfos = properties.stream()
-                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
-                    .toList();
+                if (properties != null && !properties.isEmpty()) {
+                    nestedPropertyInfos = properties.stream()
+                        .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                        .toList();
+                }
             }
-        } else if (baseProperty instanceof ArrayProperty arrayProperty) {
-            type = "ARRAY";
-            List<? extends Property> items = arrayProperty.getItems();
+            case ArrayProperty arrayProperty -> {
+                type = "ARRAY";
+                List<? extends Property> items = arrayProperty.getItems();
 
-            if (items != null && !items.isEmpty()) {
-                nestedPropertyInfos = items.stream()
-                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
-                    .toList();
+                if (items != null && !items.isEmpty()) {
+                    nestedPropertyInfos = items.stream()
+                        .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                        .toList();
+                }
             }
-        } else if (baseProperty instanceof FileEntryProperty fileEntryProperty) {
-            type = "FILE_ENTRY";
-            List<? extends Property> properties = fileEntryProperty.getProperties();
+            case FileEntryProperty fileEntryProperty -> {
+                type = "FILE_ENTRY";
+                List<? extends Property> properties = fileEntryProperty.getProperties();
 
-            if (properties != null && !properties.isEmpty()) {
-                nestedPropertyInfos = properties.stream()
-                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
-                    .toList();
+                if (properties != null && !properties.isEmpty()) {
+                    nestedPropertyInfos = properties.stream()
+                        .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                        .toList();
+                }
             }
-        } else if (baseProperty instanceof Property property) {
-            type = property.getType()
-                .name();
-        } else if (baseProperty instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty tdObjectProperty) {
-            type = "OBJECT";
-            List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> properties =
-                tdObjectProperty.getProperties();
+            case Property property -> {
+                com.bytechef.component.definition.Property.Type propertyType = property.getType();
 
-            if (properties != null && !properties.isEmpty()) {
-                nestedPropertyInfos = properties.stream()
-                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
-                    .toList();
+                type = propertyType.name();
             }
-        } else if (baseProperty instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty tdArrayProperty) {
-            type = "ARRAY";
-            List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> items =
-                tdArrayProperty.getItems();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty -> {
+                type = "OBJECT";
+                List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> properties =
+                    objectProperty
+                        .getProperties();
 
-            if (items != null && !items.isEmpty()) {
-                nestedPropertyInfos = items.stream()
-                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
-                    .toList();
+                if (properties != null && !properties.isEmpty()) {
+                    nestedPropertyInfos = properties.stream()
+                        .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                        .toList();
+                }
             }
-        } else if (baseProperty instanceof com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty tdFileEntryProperty) {
-            type = "FILE_ENTRY";
-            List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.ValueProperty<?>> properties =
-                tdFileEntryProperty.getProperties();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty -> {
+                type = "ARRAY";
+                List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> items = arrayProperty
+                    .getItems();
 
-            if (properties != null && !properties.isEmpty()) {
-                nestedPropertyInfos = properties.stream()
-                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
-                    .toList();
+                if (items != null && !items.isEmpty()) {
+                    nestedPropertyInfos = items.stream()
+                        .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                        .toList();
+                }
             }
-        } else if (baseProperty instanceof com.bytechef.platform.workflow.task.dispatcher.domain.Property tdProperty) {
-            type = tdProperty.getType()
-                .name();
-        } else {
-            type = "OBJECT";
+            case com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty fileEntryProperty -> {
+                type = "FILE_ENTRY";
+                List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.ValueProperty<?>> properties =
+                    fileEntryProperty.getProperties();
+
+                if (properties != null && !properties.isEmpty()) {
+                    nestedPropertyInfos = properties.stream()
+                        .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                        .toList();
+                }
+            }
+            case com.bytechef.platform.workflow.task.dispatcher.domain.Property property -> {
+                com.bytechef.platform.workflow.task.dispatcher.definition.Property.Type propertyType =
+                    property.getType();
+
+                type = propertyType.name();
+            }
+            default -> type = "OBJECT";
         }
 
         return new PropertyInfo(
-            baseProperty.getName(),
-            type,
-            baseProperty.getDescription(),
-            baseProperty.getRequired(),
-            baseProperty.getExpressionEnabled(),
-            baseProperty.getDisplayCondition(),
-            nestedPropertyInfos);
+            baseProperty.getName(), type, baseProperty.getDescription(), baseProperty.getRequired(),
+            baseProperty.getExpressionEnabled(), baseProperty.getDisplayCondition(), nestedPropertyInfos);
     }
 }
