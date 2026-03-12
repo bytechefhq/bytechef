@@ -30,11 +30,14 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer.EmbeddedMcpServerSecurityConfigurer;
 import com.bytechef.ee.embedded.ai.mcp.server.service.ConnectTokenService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationService;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationWorkflowService;
+import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
@@ -50,6 +53,7 @@ import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
@@ -77,9 +81,11 @@ import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.transport.WebMvcStreamableServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -100,19 +106,27 @@ import org.springframework.web.servlet.function.ServerResponse;
 @Configuration
 public class EmbeddedMcpServerConfiguration {
 
-    public static final String EXTERNAL_USER_ID = "externalUserId";
-    public static final String SECRET_KEY = "secretKey";
+    private static final String ENVIRONMENT = "environment";
+    private static final String EXTERNAL_USER_ID = "externalUserId";
+    private static final String SECRET_KEY = "secretKey";
+    private static final int TIMEOUT = 300;
 
     @Bean
     WebMvcStreamableServerTransportProvider embeddedWebMvcStreamableHttpServerTransportProvider() {
         return WebMvcStreamableServerTransportProvider.builder()
             .mcpEndpoint("/api/embedded/{secretKey}/mcp")
             .contextExtractor(serverRequest -> {
+                String externalUserId = SecurityUtils.getCurrentUserLogin();
                 String secretKey = serverRequest.pathVariable(SECRET_KEY);
-                String externalUserId = serverRequest.param(EXTERNAL_USER_ID)
-                    .orElse("");
+                HttpServletRequest httpServletRequest = serverRequest.servletRequest();
 
-                return McpTransportContext.create(Map.of(SECRET_KEY, secretKey, EXTERNAL_USER_ID, externalUserId));
+                String environment = httpServletRequest.getHeader("X-Environment");
+
+                return McpTransportContext.create(
+                    Map.of(
+                        ENVIRONMENT, environment,
+                        EXTERNAL_USER_ID,
+                        externalUserId, SECRET_KEY, secretKey));
             })
             .build();
     }
@@ -129,16 +143,16 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     EmbeddedMcpToolFacade embeddedMcpToolFacade(
-        ApplicationProperties applicationProperties,
-        ChildJobPrincipalFactory childJobPrincipalFactory,
+        ApplicationProperties applicationProperties, ChildJobPrincipalFactory childJobPrincipalFactory,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, ConnectedUserService connectedUserService,
         ContextService contextService, CounterService counterService, Environment environment,
-        Evaluator evaluator,
+        Evaluator evaluator, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationInstanceService integrationInstanceService, JobService jobService,
-        McpComponentService mcpComponentService, McpIntegrationWorkflowService mcpIntegrationWorkflowService,
-        McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, SubflowResolver subflowResolver,
+        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
+        JobService jobService, McpComponentService mcpComponentService,
+        McpIntegrationWorkflowService mcpIntegrationWorkflowService, McpServerService mcpServerService,
+        PrincipalJobFacade principalJobFacade, SubflowResolver subflowResolver,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WorkflowService workflowService) {
@@ -159,14 +173,15 @@ public class EmbeddedMcpServerConfiguration {
             getTaskDispatcherResolverFactories(
                 childJobPrincipalFactory, contextService, counterService, coordinatorEventPublisher, evaluator,
                 jobService, subflowResolver, taskExecutionService, taskFileStorage),
-            taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService);
+            taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, TIMEOUT, workflowService);
 
         return new EmbeddedMcpToolFacade(
             clusterElementDefinitionFacade, clusterElementDefinitionService, connectedUserService,
-            connectTokenService(), evaluator, integrationInstanceConfigurationWorkflowService,
-            integrationInstanceService, jobSyncExecutor, mcpComponentService, mcpIntegrationWorkflowService,
-            mcpServerService, principalJobFacade, applicationProperties.getPublicUrl(), taskExecutionService,
-            taskFileStorage, workflowService);
+            connectTokenService(), evaluator, integrationInstanceConfigurationService,
+            integrationInstanceConfigurationWorkflowService,
+            integrationInstanceService, integrationService, jobSyncExecutor, mcpComponentService,
+            mcpIntegrationWorkflowService, mcpServerService, principalJobFacade, applicationProperties.getPublicUrl(),
+            taskExecutionService, taskFileStorage, workflowService);
     }
 
     @Bean
@@ -185,30 +200,16 @@ public class EmbeddedMcpServerConfiguration {
                     .logging()
                     .build())
             .toolFilter((exchange) -> {
+                List<McpServerFeatures.AsyncToolSpecification> toolSpecifications = new ArrayList<>();
+
                 McpTransportContext mcpTransportContext = exchange.transportContext();
 
-                Object secretKeyObject = mcpTransportContext.get(SECRET_KEY);
-
-                if (secretKeyObject == null) {
-                    return List.of();
-                }
-
-                String secretKey = secretKeyObject.toString();
-
-                Object externalUserIdObject = mcpTransportContext.get(EXTERNAL_USER_ID);
-
-                if (externalUserIdObject == null || externalUserIdObject.toString()
-                    .isEmpty()) {
-                    return List.of();
-                }
-
-                String externalUserId = externalUserIdObject.toString();
-
-                McpServer mcpServer = mcpServerService.getMcpServer(secretKey);
+                String externalUserId = (String) mcpTransportContext.get(EXTERNAL_USER_ID);
+                com.bytechef.platform.configuration.domain.Environment environment = getEnvironment(
+                    (String) mcpTransportContext.get(ENVIRONMENT));
+                McpServer mcpServer = mcpServerService.getMcpServer((String) mcpTransportContext.get(SECRET_KEY));
 
                 String tenantId = mcpServer.getSecretKey();
-
-                List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
 
                 mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
                     .stream()
@@ -216,23 +217,27 @@ public class EmbeddedMcpServerConfiguration {
                         mcpComponent -> CollectionUtils.stream(
                             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
                     .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(
-                        embeddedMcpToolFacade.getFunctionToolCallback(mcpTool, externalUserId, tenantId)))
-                    .forEach(tools::add);
+                        embeddedMcpToolFacade.getFunctionToolCallback(
+                            mcpTool, externalUserId, environment, tenantId)))
+                    .forEach(toolSpecifications::add);
 
                 mcpIntegrationService.getMcpServerMcpIntegrations(mcpServer.getId())
                     .stream()
                     .flatMap(mcpIntegration -> CollectionUtils.stream(
-                        embeddedMcpToolFacade.getFunctionToolCallbacks(mcpIntegration, externalUserId, tenantId)))
+                        embeddedMcpToolFacade.getFunctionToolCallbacks(
+                            mcpIntegration, externalUserId, environment, tenantId)))
                     .map(McpToolUtils::toAsyncToolSpecification)
-                    .forEach(tools::add);
+                    .forEach(toolSpecifications::add);
 
-                return tools;
+                return toolSpecifications;
             })
             .build();
     }
 
     @Bean
-    SecurityConfigurerContributor embeddedMcpServerSecurityConfigurerContributor(McpServerService mcpServerService) {
+    SecurityConfigurerContributor embeddedMcpServerSecurityConfigurerContributor(
+        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
+
         return new SecurityConfigurerContributor() {
 
             @Override
@@ -240,7 +245,7 @@ public class EmbeddedMcpServerConfiguration {
             public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
                 getSecurityConfigurerAdapter() {
 
-                return (T) new EmbeddedMcpServerSecurityConfigurer(mcpServerService);
+                return (T) new EmbeddedMcpServerSecurityConfigurer(connectedUserService, signingKeyService);
             }
         };
     }
@@ -262,6 +267,14 @@ public class EmbeddedMcpServerConfiguration {
         return List.of(
             new SubflowJobStatusEventListener(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+    }
+
+    private com.bytechef.platform.configuration.domain.Environment getEnvironment(String environment) {
+        if (StringUtils.isNotBlank(environment)) {
+            return com.bytechef.platform.configuration.domain.Environment.valueOf(environment.toUpperCase());
+        }
+
+        return com.bytechef.platform.configuration.domain.Environment.PRODUCTION;
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
