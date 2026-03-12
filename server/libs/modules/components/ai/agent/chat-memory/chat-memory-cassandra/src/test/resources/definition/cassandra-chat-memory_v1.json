@@ -944,7 +944,7 @@
     }, {
       "advancedOption": null,
       "controlType": "TEXT",
-      "defaultValue": "spring_ai",
+      "defaultValue": null,
       "description": "The Cassandra keyspace to use.",
       "displayCondition": null,
       "exampleValue": null,

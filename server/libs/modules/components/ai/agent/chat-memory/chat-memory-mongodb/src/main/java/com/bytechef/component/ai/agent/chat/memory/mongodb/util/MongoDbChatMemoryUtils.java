@@ -18,8 +18,13 @@ package com.bytechef.component.ai.agent.chat.memory.mongodb.util;
 
 import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.MongoDbChatMemoryConstants.CONNECTION_STRING;
 import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.MongoDbChatMemoryConstants.DATABASE_NAME;
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
 
 import com.bytechef.component.definition.Parameters;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
@@ -35,8 +40,17 @@ public class MongoDbChatMemoryUtils {
     public static ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
         String connectionString = connectionParameters.getRequiredString(CONNECTION_STRING);
         String databaseName = connectionParameters.getString(DATABASE_NAME, "spring_ai");
+        String username = connectionParameters.getString(USERNAME);
+        String password = connectionParameters.getString(PASSWORD);
 
-        MongoClient mongoClient = MongoClients.create(connectionString);
+        MongoClientSettings.Builder mongoBuilder = MongoClientSettings.builder()
+            .applyConnectionString(new ConnectionString(connectionString));
+
+        if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
+            mongoBuilder.credential(MongoCredential.createCredential(username, databaseName, password.toCharArray()));
+        }
+
+        MongoClient mongoClient = MongoClients.create(mongoBuilder.build());
 
         MongoTemplate mongoTemplate = new MongoTemplate(
             new SimpleMongoClientDatabaseFactory(mongoClient, databaseName));

@@ -68,7 +68,6 @@ public class CassandraChatMemoryComponentHandler implements ComponentHandler {
             string(KEYSPACE)
                 .label("Keyspace")
                 .description("The Cassandra keyspace to use.")
-                .defaultValue("spring_ai")
                 .required(false),
             string(TABLE)
                 .label("Table")

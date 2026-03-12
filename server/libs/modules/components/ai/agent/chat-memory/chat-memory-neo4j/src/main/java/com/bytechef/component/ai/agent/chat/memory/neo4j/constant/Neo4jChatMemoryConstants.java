@@ -25,7 +25,5 @@ public class Neo4jChatMemoryConstants {
     public static final String MESSAGES = "messages";
     public static final String MESSAGE_CONTENT = "content";
     public static final String MESSAGE_ROLE = "role";
-    public static final String PASSWORD = "password";
     public static final String URI = "uri";
-    public static final String USERNAME = "username";
 }
