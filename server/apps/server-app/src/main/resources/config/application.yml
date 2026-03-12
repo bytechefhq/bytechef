@@ -137,10 +137,6 @@ spring:
     chat:
       client:
         enabled: ${bytechef.ai.copilot.enabled}
-      memory:
-        repository:
-          jdbc:
-            initialize-schema: always
     model:
       audio:
         speech: none
