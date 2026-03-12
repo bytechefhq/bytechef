@@ -97,9 +97,11 @@ public class ActionApiController implements ActionApi {
         }
 
         return ResponseEntity.ok(
-            actionFacade.executeAction(
-                externalUserId, componentName, componentVersion, actionName, inputParameters, xInstanceId,
-                environment));
+            Map.of(
+                "result",
+                actionFacade.executeAction(
+                    externalUserId, componentName, componentVersion, actionName, inputParameters, xInstanceId,
+                    environment)));
     }
 
     @InitBinder
