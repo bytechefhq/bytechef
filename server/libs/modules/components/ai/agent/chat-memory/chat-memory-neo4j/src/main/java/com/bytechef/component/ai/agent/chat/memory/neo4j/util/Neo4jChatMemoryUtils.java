@@ -16,9 +16,9 @@
 
 package com.bytechef.component.ai.agent.chat.memory.neo4j.util;
 
-import static com.bytechef.component.ai.agent.chat.memory.neo4j.constant.Neo4jChatMemoryConstants.PASSWORD;
 import static com.bytechef.component.ai.agent.chat.memory.neo4j.constant.Neo4jChatMemoryConstants.URI;
-import static com.bytechef.component.ai.agent.chat.memory.neo4j.constant.Neo4jChatMemoryConstants.USERNAME;
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
 
 import com.bytechef.component.definition.Parameters;
 import org.neo4j.driver.AuthTokens;
