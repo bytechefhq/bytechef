@@ -19,11 +19,15 @@ import org.springframework.security.core.userdetails.User;
 public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
 
     private String externalUserId;
+    private String secretKey;
 
-    public EmbeddedApiKeyAuthenticationToken(long environmentId, String externalUserId, String tenantId) {
+    public EmbeddedApiKeyAuthenticationToken(
+        long environmentId, String externalUserId, String secretKey, String tenantId) {
+
         super(environmentId, tenantId);
 
         this.externalUserId = externalUserId;
+        this.secretKey = secretKey;
     }
 
     @SuppressFBWarnings("EI")
@@ -33,5 +37,9 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
 
     public String getExternalUserId() {
         return externalUserId;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 }

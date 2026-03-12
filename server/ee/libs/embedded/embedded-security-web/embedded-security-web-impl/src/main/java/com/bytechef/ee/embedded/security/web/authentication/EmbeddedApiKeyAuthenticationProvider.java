@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.security.web.authentication;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
+import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -23,10 +24,14 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvider {
 
+    private final ApiKeyService apiKeyService;
     private final ConnectedUserService connectedUserService;
 
     @SuppressFBWarnings("EI")
-    public EmbeddedApiKeyAuthenticationProvider(ConnectedUserService connectedUserService) {
+    public EmbeddedApiKeyAuthenticationProvider(
+        ApiKeyService apiKeyService, ConnectedUserService connectedUserService) {
+
+        this.apiKeyService = apiKeyService;
         this.connectedUserService = connectedUserService;
     }
 
@@ -36,6 +41,13 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
             (EmbeddedApiKeyAuthenticationToken) authentication;
 
         long environmentId = embeddedApiKeyAuthenticationToken.getEnvironmentId();
+
+        if (embeddedApiKeyAuthenticationToken.getSecretKey() == null) {
+            if(!apiKeyService.exists(embeddedApiKeyAuthenticationToken.getSecretKey(), environmentId)) {
+                throw new IllegalArgumentException("Invalid API key");
+            }
+        }
+
         String externalUserId = embeddedApiKeyAuthenticationToken.getExternalUserId();
 
         ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environmentId)

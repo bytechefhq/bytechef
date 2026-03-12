@@ -67,7 +67,6 @@ public class JsonSchemaGeneratorUtils {
 
         ObjectNode schemaObjectNode = objectMapper.createObjectNode();
 
-        schemaObjectNode.put("$schema", SchemaVersion.DRAFT_2020_12.getIdentifier());
         schemaObjectNode.put("type", "object");
 
         ObjectNode propertiesObjectNode = schemaObjectNode.putObject("properties");
@@ -82,6 +81,18 @@ public class JsonSchemaGeneratorUtils {
 
             // TODO check array and object, it seems schema is not generated correctly
             ObjectNode parameterObjectNode = TYPE_SCHEMA_GENERATOR.generateSchema(getType(property.getType()));
+
+            parameterObjectNode.remove("$schema");
+
+            if (!parameterObjectNode.has("type")) {
+                parameterObjectNode.put("type", "string");
+            }
+
+            if (parameterObjectNode.has("items") && parameterObjectNode.get("items")
+                .isEmpty()) {
+                ((ObjectNode) parameterObjectNode.get("items")).put("type", "string");
+            }
+
             String parameterDescription = property.getDescription();
 
             if (StringUtils.isNotEmpty(parameterDescription)) {
@@ -107,11 +118,11 @@ public class JsonSchemaGeneratorUtils {
             case com.bytechef.component.definition.Property.Type.INTEGER -> Integer.class;
             case com.bytechef.component.definition.Property.Type.NUMBER -> Double.class;
             case com.bytechef.component.definition.Property.Type.STRING -> String.class;
+            case com.bytechef.component.definition.Property.Type.NULL -> Object.class;
             case com.bytechef.component.definition.Property.Type.DYNAMIC_PROPERTIES,
                 com.bytechef.component.definition.Property.Type.FILE_ENTRY,
                 com.bytechef.component.definition.Property.Type.OBJECT -> Map.class;
             case com.bytechef.component.definition.Property.Type.TIME -> LocalTime.class;
-            default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }
 }

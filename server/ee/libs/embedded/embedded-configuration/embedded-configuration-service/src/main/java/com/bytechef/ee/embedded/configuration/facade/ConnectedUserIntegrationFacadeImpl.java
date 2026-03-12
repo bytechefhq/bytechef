@@ -30,10 +30,13 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,6 +56,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
+    private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -65,7 +69,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     @SuppressFBWarnings("EI")
     public ConnectedUserIntegrationFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
-        ConnectionService connectionService,
+        ConnectionFacade connectionFacade, ConnectionService connectionService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
@@ -74,6 +78,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserService = connectedUserService;
+        this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -100,13 +105,21 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectionDefinition connectionDefinition = Objects.requireNonNull(componentDefinition.getConnection());
 
-        Connection connection = connectionService.create(
-            integrationInstanceConfiguration.getAuthorizationType(), integration.getComponentName(),
-            connectionDefinition.getVersion(), environment.ordinal(),
-            integrationInstanceConfiguration.getName(), connectionParameters, PlatformType.EMBEDDED);
+        Map<String, Object> mergedParameters = new HashMap<>(
+            integrationInstanceConfiguration.getConnectionParameters());
+
+        mergedParameters.putAll(connectionParameters);
+
+        ConnectionDTO connectionDTO = new ConnectionDTO(
+            false, integrationInstanceConfiguration.getAuthorizationType(), Map.of(), null,
+            integration.getComponentName(), Map.of(), connectionDefinition.getVersion(), null, null, null,
+            environment.ordinal(), null, null, null, integrationInstanceConfiguration.getName(),
+            mergedParameters, List.of(), 0);
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
         return integrationInstanceService.create(
-            connectedUser.getId(), connection.getId(), integrationInstanceConfiguration.getId());
+            connectedUser.getId(), connectionId, integrationInstanceConfiguration.getId());
     }
 
     @Override

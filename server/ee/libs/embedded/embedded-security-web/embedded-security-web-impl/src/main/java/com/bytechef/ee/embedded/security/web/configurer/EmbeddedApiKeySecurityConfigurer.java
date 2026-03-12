@@ -12,6 +12,7 @@ import static org.springframework.security.web.util.matcher.RegexRequestMatcher.
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationProvider;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -25,14 +26,14 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
 
     @SuppressFBWarnings("EI")
     public EmbeddedApiKeySecurityConfigurer(
-        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
+        ApiKeyService apiKeyService, ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
 
         super(
             request -> regexMatcher("^/api/embedded/v[0-9]+/.+").matches(request) ||
                 (regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) &&
                     request.getHeader("Authorization") != null),
             new EmbeddedApiKeyAuthenticationConverter(signingKeyService),
-            new EmbeddedApiKeyAuthenticationProvider(connectedUserService));
+            new EmbeddedApiKeyAuthenticationProvider(apiKeyService, connectedUserService));
     }
 
     @Override
