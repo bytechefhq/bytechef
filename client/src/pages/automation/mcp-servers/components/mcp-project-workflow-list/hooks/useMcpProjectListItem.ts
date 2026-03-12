@@ -5,7 +5,7 @@ import {useMemo, useState} from 'react';
 
 const useMcpProjectListItem = (mcpProject: McpProject) => {
     const [showEditWorkflowsDialog, setShowEditWorkflowsDialog] = useState(false);
-    const [showUpdateProjectVersionDialog, setShowUpdateProjectVersionDialog] = useState(false);
+    const [showChangeProjectVersionDialog, setShowChangeProjectVersionDialog] = useState(false);
 
     const {data: projectDeployment} = useGetProjectDeploymentQuery(+mcpProject.projectDeploymentId!);
 
@@ -38,17 +38,17 @@ const useMcpProjectListItem = (mcpProject: McpProject) => {
             .invalidateQueries({
                 queryKey: ['mcpProjectsByServerId'],
             })
-            .then(() => setShowUpdateProjectVersionDialog(false));
+            .then(() => setShowChangeProjectVersionDialog(false));
     };
 
     return {
         handleOnProjectDeploymentDialogClose,
         mcpWorkflowUuids,
         projectDeployment,
+        setShowChangeProjectVersionDialog,
         setShowEditWorkflowsDialog,
-        setShowUpdateProjectVersionDialog,
+        showChangeProjectVersionDialog,
         showEditWorkflowsDialog,
-        showUpdateProjectVersionDialog,
     };
 };
 

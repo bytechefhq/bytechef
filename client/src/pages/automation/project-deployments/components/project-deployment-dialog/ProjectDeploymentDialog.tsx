@@ -45,19 +45,19 @@ import ProjectDeploymentDialogWorkflowsStep from './ProjectDeploymentDialogWorkf
 import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
 
 interface ProjectDeploymentDialogProps {
+    changeProjectVersion?: boolean;
     filterWorkflowUuids?: string[];
     onClose?: () => void;
     projectDeployment?: ProjectDeployment;
     triggerNode?: ReactNode;
-    updateProjectVersion?: boolean;
 }
 
 const ProjectDeploymentDialog = ({
+    changeProjectVersion = false,
     filterWorkflowUuids,
     onClose,
     projectDeployment,
     triggerNode,
-    updateProjectVersion = false,
 }: ProjectDeploymentDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [groupConnections, setGroupConnections] = useState(false);
@@ -182,11 +182,11 @@ const ProjectDeploymentDialog = ({
         {
             content: (
                 <ProjectDeploymentDialogBasicStep
+                    changeProjectVersion={changeProjectVersion}
                     control={control}
                     getValues={getValues}
                     projectDeployment={projectDeployment}
                     setValue={setValue}
-                    updateProjectVersion={updateProjectVersion}
                 />
             ),
             name: 'Basic',
@@ -336,8 +336,8 @@ const ProjectDeploymentDialog = ({
                     <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 p-6">
                         <div className="flex w-full flex-col space-y-1">
                             <DialogTitle>
-                                {updateProjectVersion
-                                    ? 'Upgrade Project Version'
+                                {changeProjectVersion
+                                    ? 'Change Project Version'
                                     : `${projectDeployment?.id ? 'Edit' : 'New'} Deployment ${!projectDeployment?.id ? '-' : ''} ${
                                           !projectDeployment?.id
                                               ? projectDeploymentDialogSteps[activeStepIndex].name
@@ -389,13 +389,13 @@ const ProjectDeploymentDialog = ({
                                     <Button label="Cancel" variant="outline" />
                                 </DialogClose>
 
-                                {(!projectDeployment?.id || updateProjectVersion) && (
+                                {(!projectDeployment?.id || changeProjectVersion) && (
                                     <Button label="Next" onClick={handleSubmit(handleNextClick)} />
                                 )}
                             </>
                         )}
 
-                        {(activeStepIndex === 1 || (projectDeployment?.id && !updateProjectVersion)) && (
+                        {(activeStepIndex === 1 || (projectDeployment?.id && !changeProjectVersion)) && (
                             <>
                                 {activeStepIndex === 1 && hasVisibleConnections && (
                                     <div className="mr-auto flex items-center gap-2">

@@ -13,19 +13,19 @@ import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectDialogBasicStepProps {
+    changeProjectVersion: boolean;
     control: Control<ProjectDeployment>;
     getValues: UseFormGetValues<ProjectDeployment>;
     projectDeployment: ProjectDeployment | undefined;
     setValue: UseFormSetValue<ProjectDeployment>;
-    updateProjectVersion: boolean;
 }
 
 const ProjectDeploymentDialogBasicStep = ({
+    changeProjectVersion,
     control,
     getValues,
     projectDeployment,
     setValue,
-    updateProjectVersion,
 }: ProjectDialogBasicStepProps) => {
     const [currentProjectId, setCurrentProjectId] = useState(getValues('projectId'));
     const [currentProjectVersion, setCurrentProjectVersion] = useState<number | undefined>(getValues('projectVersion'));
@@ -90,7 +90,7 @@ const ProjectDeploymentDialogBasicStep = ({
                 )}
             />
 
-            {!updateProjectVersion && (
+            {!changeProjectVersion && (
                 <FormField
                     control={control}
                     name="name"
@@ -115,7 +115,7 @@ const ProjectDeploymentDialogBasicStep = ({
                 />
             )}
 
-            {currentProjectId && (!projectDeployment?.id || updateProjectVersion) && (
+            {currentProjectId && (!projectDeployment?.id || changeProjectVersion) && (
                 <FormField
                     control={control}
                     name="projectVersion"
@@ -143,7 +143,7 @@ const ProjectDeploymentDialogBasicStep = ({
                 />
             )}
 
-            {!updateProjectVersion && (
+            {!changeProjectVersion && (
                 <FormField
                     control={control}
                     name="description"
@@ -161,7 +161,7 @@ const ProjectDeploymentDialogBasicStep = ({
                 />
             )}
 
-            {!updateProjectVersion && (
+            {!changeProjectVersion && (
                 <FormField
                     control={control}
                     name="tags"
