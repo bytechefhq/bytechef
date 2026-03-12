@@ -31,6 +31,8 @@ import com.bytechef.component.google.drive.action.GoogleDriveDownloadFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveGetFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveListFilesAction;
 import com.bytechef.component.google.drive.action.GoogleDriveListFoldersAction;
+import com.bytechef.component.google.drive.action.GoogleDriveShareFileAction;
+import com.bytechef.component.google.drive.action.GoogleDriveShareFolderAction;
 import com.bytechef.component.google.drive.action.GoogleDriveUploadFileAction;
 import com.bytechef.component.google.drive.trigger.GoogleDriveNewFileTrigger;
 import com.bytechef.component.google.drive.trigger.GoogleDriveNewFolderTrigger;
@@ -62,6 +64,8 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             GoogleDriveGetFileAction.ACTION_DEFINITION,
             GoogleDriveListFilesAction.ACTION_DEFINITION,
             GoogleDriveListFoldersAction.ACTION_DEFINITION,
+            GoogleDriveShareFileAction.ACTION_DEFINITION,
+            GoogleDriveShareFolderAction.ACTION_DEFINITION,
             GoogleDriveUploadFileAction.ACTION_DEFINITION)
         .clusterElements(
             tool(GoogleDriveCopyFileAction.ACTION_DEFINITION),
@@ -72,6 +76,8 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             tool(GoogleDriveGetFileAction.ACTION_DEFINITION),
             tool(GoogleDriveListFilesAction.ACTION_DEFINITION),
             tool(GoogleDriveListFoldersAction.ACTION_DEFINITION),
+            tool(GoogleDriveShareFileAction.ACTION_DEFINITION),
+            tool(GoogleDriveShareFolderAction.ACTION_DEFINITION),
             tool(GoogleDriveUploadFileAction.ACTION_DEFINITION))
         .triggers(
             GoogleDriveNewFileTrigger.TRIGGER_DEFINITION,
