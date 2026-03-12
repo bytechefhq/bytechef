@@ -5,8 +5,296 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
+    "description": "Add labels to the task.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nifty_v1#add-labels"
+    },
+    "metadata": {
+      "path": "/tasks/{taskId}/labels",
+      "mimeType": "application/json",
+      "method": "PUT",
+      "bodyContentType": "JSON"
+    },
+    "name": "addLabels",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": {
+            "responseType": {
+              "contentType": "application/json",
+              "type": "JSON"
+            }
+          },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "A confirmation message indicating whether the labels where added successfully.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "message",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "ARRAY_BUILDER",
+            "defaultValue": null,
+            "description": "List of labels added to the task.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "items": [ {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": "List of labels added to the task.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": null,
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "regex": null,
+              "required": null,
+              "type": "STRING"
+            } ],
+            "label": null,
+            "maxItems": null,
+            "metadata": { },
+            "minItems": null,
+            "multipleValues": null,
+            "name": "labels",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": false,
+            "type": "ARRAY"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": {
+          "responseType": {
+            "contentType": "application/json",
+            "type": "JSON"
+          }
+        },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "A confirmation message indicating whether the labels where added successfully.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "message",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "regex": null,
+          "required": false,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "ARRAY_BUILDER",
+          "defaultValue": null,
+          "description": "List of labels added to the task.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "items": [ {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "List of labels added to the task.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "regex": null,
+            "required": null,
+            "type": "STRING"
+          } ],
+          "label": null,
+          "maxItems": null,
+          "metadata": { },
+          "minItems": null,
+          "multipleValues": null,
+          "name": "labels",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": false,
+          "type": "ARRAY"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "perform": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the task to add label to.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Task ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "PATH"
+      },
+      "minLength": null,
+      "name": "taskId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "MULTI_SELECT",
+      "defaultValue": null,
+      "description": "List of labels to add to the task.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "List of labels to add to the task.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": {
+          "type": "BODY"
+        },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Labels",
+      "maxItems": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "labels",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": "Add to Labels",
+      "required": true,
+      "type": "ARRAY"
+    } ],
+    "resumePerform": null,
+    "title": "Add Labels",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Creates new project.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nifty_v1#create-project"
+    },
     "metadata": {
       "path": "/projects",
       "mimeType": "application/json",
@@ -327,7 +615,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new status",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nifty_v1#create-status"
+    },
     "metadata": {
       "path": "/taskgroups",
       "mimeType": "application/json",
@@ -787,7 +1078,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new task",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nifty_v1#create-task"
+    },
     "metadata": {
       "path": "/tasks",
       "mimeType": "application/json",
@@ -1185,7 +1479,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets task details.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nifty_v1#get-task"
+    },
     "metadata": {
       "method": "GET",
       "path": "/tasks/{taskId}"
@@ -1458,7 +1755,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets tracked time report information.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nifty_v1#get-tracked-time-report"
+    },
     "metadata": {
       "method": "GET",
       "path": "/time"
@@ -2142,14 +2442,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nifty_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Nifty Web API documentation",
+    "learnMoreUrl": "https://developers.niftypm.com/"
+  },
   "description": "Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity.",
   "icon": "path:assets/nifty.svg",
   "metadata": null,
