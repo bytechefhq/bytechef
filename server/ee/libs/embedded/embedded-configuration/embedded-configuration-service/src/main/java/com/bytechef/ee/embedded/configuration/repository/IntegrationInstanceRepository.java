@@ -31,7 +31,7 @@ public interface IntegrationInstanceRepository
         SELECT DISTINCT integration_instance.* FROM integration_instance
         JOIN integration_instance_configuration on integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
         JOIN integration on integration_instance_configuration.integration_id = integration.id
-        WHERE integration.component_name = :componentName
+        WHERE LOWER(integration.component_name) = LOWER(:componentName)
         AND integration_instance_configuration.environment = :environment
         AND integration_instance.connected_user_id = :connectedUserId
         """)
@@ -70,7 +70,7 @@ public interface IntegrationInstanceRepository
         SELECT DISTINCT integration_instance.* FROM integration_instance
         JOIN integration_instance_configuration on integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
         JOIN integration on integration_instance_configuration.integration_id = integration.id
-        WHERE integration.component_name = :componentName
+        WHERE LOWER(integration.component_name) = LOWER(:componentName)
         AND integration_instance_configuration.environment = :environment
         AND integration_instance.connected_user_id = :connectedUserId
         ORDER BY integration_instance.created_date DESC
@@ -84,7 +84,7 @@ public interface IntegrationInstanceRepository
         SELECT DISTINCT integration_instance.* FROM integration_instance
         JOIN integration_instance_configuration on integration_instance_configuration_id = integration_instance_configuration.id
         JOIN integration on integration_instance_configuration.integration_id = integration.id
-        WHERE integration.component_name in (:componentNames)
+        WHERE LOWER(integration.component_name) in (:componentNames)
         AND integration_instance_configuration.environment = :environment
         AND integration_instance.connected_user_id = :connectedUserId
         ORDER BY integration_instance.created_date DESC

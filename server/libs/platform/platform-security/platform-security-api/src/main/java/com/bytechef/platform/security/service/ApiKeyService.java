@@ -30,6 +30,8 @@ public interface ApiKeyService {
 
     void delete(long id);
 
+    boolean exists(String secretKey, long environmentId);
+
     ApiKey getApiKey(String secretKey);
 
     ApiKey getApiKey(String secretKey, long environmentId);
@@ -39,4 +41,5 @@ public interface ApiKeyService {
     List<ApiKey> getApiKeys(long environmentId, @Nullable PlatformType type);
 
     ApiKey update(ApiKey apiKey);
+
 }
