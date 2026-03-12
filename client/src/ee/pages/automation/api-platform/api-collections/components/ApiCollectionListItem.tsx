@@ -29,7 +29,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showApiEndpointDialog, setShowApiEndpointDialog] = useState(false);
-    const [showUpdateProjectVersionDialog, setShowUpdateProjectVersionDialog] = useState(false);
+    const [showChangeProjectVersionDialog, setShowChangeProjectVersionDialog] = useState(false);
 
     const setApiCollectionEnabled = useApiCollectionsEnabledStore(
         ({setApiCollectionEnabled}) => setApiCollectionEnabled
@@ -93,7 +93,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
             .invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             })
-            .then(() => setShowUpdateProjectVersionDialog(false));
+            .then(() => setShowChangeProjectVersionDialog(false));
     };
 
     return (
@@ -185,10 +185,10 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
                         <ApiCollectionListItemDropDownMenu
                             apiCollectionId={apiCollection.id!}
+                            onChangeProjectVersionClick={() => setShowChangeProjectVersionDialog(true)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
                             onNewEndpoint={() => setShowApiEndpointDialog(true)}
-                            onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
                         />
                     </div>
                 </div>
@@ -217,12 +217,12 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                 />
             )}
 
-            {showUpdateProjectVersionDialog && (
+            {showChangeProjectVersionDialog && (
                 <ProjectDeploymentDialog
+                    changeProjectVersion={true}
                     filterWorkflowUuids={endpointWorkflowUuids}
                     onClose={handleOnProjectDeploymentDialogClose}
                     projectDeployment={projectDeployment}
-                    updateProjectVersion={true}
                 />
             )}
         </>

@@ -14,14 +14,14 @@ import useMcpProjectListItemDropdownMenu from './hooks/useMcpProjectListItemDrop
 
 interface McpProjectListItemDropdownMenuProps {
     mcpProject: McpProject;
+    onChangeProjectVersionClick: () => void;
     onEditWorkflowsClick: () => void;
-    onUpdateProjectVersionClick: () => void;
 }
 
 const McpProjectListItemDropdownMenu = ({
     mcpProject,
+    onChangeProjectVersionClick,
     onEditWorkflowsClick,
-    onUpdateProjectVersionClick,
 }: McpProjectListItemDropdownMenuProps) => {
     const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
         useMcpProjectListItemDropdownMenu(mcpProject.id.toString());
@@ -36,7 +36,7 @@ const McpProjectListItemDropdownMenu = ({
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={onEditWorkflowsClick}>Edit Workflows</DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
+                    <DropdownMenuItem onClick={onChangeProjectVersionClick}>Change Project Version</DropdownMenuItem>
 
                     <DropdownMenuSeparator />
 

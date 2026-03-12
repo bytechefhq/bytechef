@@ -17,10 +17,10 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
         handleOnProjectDeploymentDialogClose,
         mcpWorkflowUuids,
         projectDeployment,
+        setShowChangeProjectVersionDialog,
         setShowEditWorkflowsDialog,
-        setShowUpdateProjectVersionDialog,
+        showChangeProjectVersionDialog,
         showEditWorkflowsDialog,
-        showUpdateProjectVersionDialog,
     } = useMcpProjectListItem(mcpProject);
 
     return (
@@ -72,7 +72,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                     <McpProjectListItemDropdownMenu
                         mcpProject={mcpProject}
                         onEditWorkflowsClick={() => setShowEditWorkflowsDialog(true)}
-                        onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
+                        onChangeProjectVersionClick={() => setShowChangeProjectVersionDialog(true)}
                     />
                 </div>
             </div>
@@ -81,12 +81,12 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                 <McpProjectWorkflowDialog mcpProject={mcpProject} onClose={() => setShowEditWorkflowsDialog(false)} />
             )}
 
-            {showUpdateProjectVersionDialog && (
+            {showChangeProjectVersionDialog && (
                 <ProjectDeploymentDialog
                     filterWorkflowUuids={mcpWorkflowUuids}
                     onClose={handleOnProjectDeploymentDialogClose}
                     projectDeployment={projectDeployment}
-                    updateProjectVersion={true}
+                    changeProjectVersion={true}
                 />
             )}
         </div>
