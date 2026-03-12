@@ -32,7 +32,7 @@ import tools.jackson.databind.JsonNode;
  */
 public class WorkflowValidator {
 
-    protected static final String[] NESTED_TASK_PROPERTIES = new String[] {
+    static final String[] NESTED_TASK_PROPERTIES = new String[] {
         "caseTrue", "caseFalse", "iteratee", "tasks"
     };
 
