@@ -30,6 +30,8 @@ import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Luka Ljubić
@@ -112,6 +114,35 @@ public class NiftyUtils extends AbstractNiftyUtils {
             .getBody(new TypeReference<>() {});
 
         return getOptions(body, "tasks");
+    }
+
+    public static List<Option<String>> getLabelsOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        int offset = 0;
+        final int limit = 100;
+        List<Option<String>> options = null;
+
+        while (true) {
+            String url = "/labels?limit=" + limit + "&offset=" + offset;
+
+            Map<String, Object> response = context.http(http -> http.get(url))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<Map<String, Object>>() {});
+
+            List<Option<String>> pageOptions = getOptions(response, "items");
+
+            options = options == null ? pageOptions : Stream.concat(options.stream(), pageOptions.stream())
+                .collect(Collectors.toList());
+            if (pageOptions.size() < limit)
+                break;
+
+            offset += limit;
+        }
+
+        return options;
     }
 
     private static List<Option<String>> getOptions(Map<String, Object> body, String resource) {
