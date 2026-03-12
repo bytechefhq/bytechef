@@ -153,7 +153,7 @@ Name: createNewFolder
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
 
 
 
@@ -222,7 +222,7 @@ Name: createNewTextFile
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
 
 
 
@@ -530,6 +530,88 @@ To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to
 
 
 
+### Share File
+Name: shareFile
+
+`Share a specified file from your Google Drive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileId | File ID | STRING | ID of the file to be shared. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Share File",
+  "name" : "shareFile",
+  "parameters" : {
+    "fileId" : ""
+  },
+  "type" : "googleDrive/v1/shareFile"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/google-drive_v1#how-to-find-file-id).
+
+
+
+### Share Folder
+Name: shareFolder
+
+`Share a specified folder from your Google Drive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| folderId | Folder ID | STRING | ID of the folder to be shared. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Share Folder",
+  "name" : "shareFolder",
+  "parameters" : {
+    "folderId" : ""
+  },
+  "type" : "googleDrive/v1/shareFolder"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/google-drive_v1#how-to-find-folder-id).
+
+
+
 ### Upload File
 Name: uploadFile
 
@@ -565,7 +647,7 @@ Name: uploadFile
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
 
 
 

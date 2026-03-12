@@ -429,8 +429,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -540,8 +540,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -719,8 +719,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -830,8 +830,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -2109,6 +2109,196 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
+    "description": "Share a specified file from your Google Drive.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#share-file"
+    },
+    "metadata": null,
+    "name": "shareFile",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "A link for opening the file in a relevant Google editor or viewer in a browser.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "A link for opening the file in a relevant Google editor or viewer in a browser.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the file to be shared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "File ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "fileId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "title": "Share File",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Share a specified folder from your Google Drive.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-drive_v1#share-folder"
+    },
+    "metadata": null,
+    "name": "shareFolder",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "A link for opening the folder in a relevant Google editor or viewer in a browser.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "A link for opening the folder in a relevant Google editor or viewer in a browser.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the folder to be shared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Folder ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "folderId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "title": "Share Folder",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Uploads a file in your Google Drive.",
     "help": {
       "body": "",
@@ -2227,8 +2417,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -2338,8 +2528,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "perform": { },
@@ -2892,8 +3082,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -3003,8 +3193,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
@@ -3179,8 +3369,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -3290,8 +3480,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
@@ -4554,6 +4744,190 @@
     },
     "workflowNodeDescription": null
   }, {
+    "name": "shareFile",
+    "description": "Share a specified file from your Google Drive.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "A link for opening the file in a relevant Google editor or viewer in a browser.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "A link for opening the file in a relevant Google editor or viewer in a browser.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the file to be shared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "File ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "fileId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Share File",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "shareFolder",
+    "description": "Share a specified folder from your Google Drive.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "A link for opening the folder in a relevant Google editor or viewer in a browser.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "A link for opening the folder in a relevant Google editor or viewer in a browser.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the folder to be shared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Folder ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "folderId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Share Folder",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "name": "uploadFile",
     "description": "Uploads a file in your Google Drive.",
     "element": { },
@@ -4669,8 +5043,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name": "new-file.txt",
-          "mimeType": "plain/text"
+          "mimeType": "plain/text",
+          "name": "new-file.txt"
         }
       },
       "outputSchema": {
@@ -4780,8 +5154,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name": "new-file.txt",
-        "mimeType": "plain/text"
+        "mimeType": "plain/text",
+        "name": "new-file.txt"
       }
     },
     "processErrorResponse": null,
