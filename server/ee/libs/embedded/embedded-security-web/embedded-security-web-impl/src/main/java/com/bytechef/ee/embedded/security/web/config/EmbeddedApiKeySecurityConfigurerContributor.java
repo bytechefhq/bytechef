@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.configurer.EmbeddedApiKeySecurityConfigurer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Configuration;
@@ -26,13 +27,15 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @ConditionalOnEEVersion
 public class EmbeddedApiKeySecurityConfigurerContributor implements SecurityConfigurerContributor {
 
+    private final ApiKeyService apiKeyService;
     private final ConnectedUserService connectedUserService;
     private final SigningKeyService signingKeyService;
 
     @SuppressFBWarnings("EI")
     public EmbeddedApiKeySecurityConfigurerContributor(
-        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
+        ApiKeyService apiKeyService, ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
 
+        this.apiKeyService = apiKeyService;
         this.connectedUserService = connectedUserService;
         this.signingKeyService = signingKeyService;
     }
@@ -40,6 +43,6 @@ public class EmbeddedApiKeySecurityConfigurerContributor implements SecurityConf
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
-        return (T) new EmbeddedApiKeySecurityConfigurer(connectedUserService, signingKeyService);
+        return (T) new EmbeddedApiKeySecurityConfigurer(apiKeyService, connectedUserService, signingKeyService);
     }
 }

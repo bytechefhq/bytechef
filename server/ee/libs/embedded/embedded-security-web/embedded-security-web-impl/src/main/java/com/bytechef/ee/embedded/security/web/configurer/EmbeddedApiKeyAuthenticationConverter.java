@@ -69,7 +69,7 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
             TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
             return new EmbeddedApiKeyAuthenticationToken(
-                environment.ordinal(), externalUserId, tenantKey.getTenantId());
+                environment.ordinal(), externalUserId, null, tenantKey.getTenantId());
         } else {
             String externalUserId;
             Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
@@ -83,7 +83,7 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
             TenantKey tenantKey = TenantKey.parse(authToken);
 
             return new EmbeddedApiKeyAuthenticationToken(
-                environment.ordinal(), externalUserId, tenantKey.getTenantId());
+                environment.ordinal(), externalUserId, authToken, tenantKey.getTenantId());
         }
     }
 

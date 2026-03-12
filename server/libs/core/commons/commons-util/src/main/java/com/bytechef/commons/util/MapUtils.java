@@ -873,6 +873,16 @@ public class MapUtils {
             }
         }
 
+        if (elementType.isEnum() && value instanceof String string) {
+            for (Object enumConstant : elementType.getEnumConstants()) {
+                String name = ((Enum<?>) enumConstant).name();
+
+                if (name.equalsIgnoreCase(string)) {
+                    return elementType.cast(enumConstant);
+                }
+            }
+        }
+
         return objectMapper.convertValue(value, elementType);
     }
 
