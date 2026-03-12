@@ -49,7 +49,7 @@ paths:
                       type: "string"
                       description: "The team that this project is shared with."
                       x-dynamic-options: true
-                      x-dynamic-options-dependecy:
+                      x-dynamic-options-dependency:
                         - "data.workspace"
       responses:
         201:
@@ -129,7 +129,7 @@ paths:
                       type: "string"
                       description: "Asana project to create the task in."
                       x-dynamic-options: true
-                      x-dynamic-options-dependecy:
+                      x-dynamic-options-dependency:
                         - "workspace"
                     name:
                       type: "string"
@@ -152,7 +152,7 @@ paths:
                       type: "string"
                       description: "User to assign the task to."
                       x-dynamic-options: true
-                      x-dynamic-options-dependecy:
+                      x-dynamic-options-dependency:
                         - "workspace"
       responses:
         201:
@@ -210,6 +210,393 @@ paths:
                           name:
                             type: "string"
                             description: "Name of the user."
+  /tasks/{taskGid}/subtasks:
+    post:
+      tags:
+        - "Subtasks"
+      summary: "Create Subtask"
+      description: "Creates a new subtask and adds it to the parent task."
+      operationId: "createSubtask"
+      x-ai-agent-tool: true
+      security:
+        - oauth2:
+            - "tasks:read"
+            - "tasks:write"
+            - "workspaces:read"
+            - "projects:read"
+            - "tags:read"
+            - "users:read"
+      parameters:
+        - name: "taskGid"
+          in: "path"
+          required: true
+          description: "The task gID of the task that will be the parent of the subtask."
+          schema:
+            title: "Task gID"
+            type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "data.workspace"
+              - "data.project"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Subtask"
+              type: "object"
+              properties:
+                data:
+                  type: "object"
+                  required:
+                    - "workspace"
+                    - "project"
+                    - "name"
+                  properties:
+                    workspace:
+                      type: "string"
+                      description: "The workspace to create the subtask in."
+                      x-dynamic-options: true
+                    project:
+                      type: "string"
+                      description: "The project to create the subtask in."
+                      x-dynamic-options: true
+                      x-dynamic-options-dependency:
+                        - "data.workspace"
+                    name:
+                      type: "string"
+                      description: "Name of the subtask."
+                    notes:
+                      type: "string"
+                      description: "Free-form textual information associated with the subtask (i.e. its description)."
+                    due_on:
+                      type: "string"
+                      format: "date"
+                      title: "Due Date"
+                      description: "The date on which this subtask is due."
+                    assignee:
+                      type: "string"
+                      description: "Gid of a user to assign the subtask to."
+                      x-dynamic-options: true
+                      x-dynamic-options-dependency:
+                        - "data.workspace"
+      responses:
+        201:
+          description: "Successfully created new subtask"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      gid:
+                        type: "string"
+                        description: "Globally unique identifier for the subtask."
+                      due_on:
+                        type: "string"
+                        format: "date"
+                        description: "The date on which this subtask is due."
+                      notes:
+                        type: "string"
+                        description: "Free-form textual information associated with the subtask (i.e. its description)."
+                      name:
+                        type: "string"
+                        description: "Name of the subtask."
+                      workspace:
+                        type: "object"
+                        description: "The workspace or organization that the subtask is associated with."
+                        properties:
+                          gid:
+                            type: "string"
+                            description: "Globally unique identifier for the workspace."
+                          name:
+                            type: "string"
+                            description: "Name of the workspace."
+                      project:
+                        type: "object"
+                        description: "The project that the subtask is associated with."
+                        properties:
+                          gid:
+                            type: "string"
+                            description: "Globally unique identifier for the project."
+                          name:
+                            type: "string"
+                            description: "Name of the project."
+                      parent:
+                        type: "object"
+                        description: "The parent task of this subtask."
+                        properties:
+                          gid:
+                            type: "string"
+                            description: "Globally unique identifier for the parent task."
+                          name:
+                            type: "string"
+                            description: "Name of the parent task."
+                      assignee:
+                        type: "object"
+                        description: "User assigned to the task."
+                        properties:
+                          gid:
+                            type: "string"
+                            description: "Globally unique identifier for the user."
+                          name:
+                            type: "string"
+                            description: "Name of the user."
+  /custom_fields:
+    post:
+      tags:
+        - "Custom Fields"
+      summary: "Create Custom Field"
+      description: "Creates a custom field for a task."
+      operationId: "createCustomField"
+      x-ai-agent-tool: true
+      security:
+        - oauth2:
+            - "tasks:write"
+            - "workspaces:read"
+            - "projects:read"
+            - "tags:read"
+            - "users:read"
+            - "custom_fields:write"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Custom Field"
+              type: "object"
+              properties:
+                data:
+                  type: "object"
+                  required:
+                    - "workspace"
+                    - "name"
+                    - "resource_subtype"
+                  properties:
+                    workspace:
+                      type: "string"
+                      description: "The workspace to create a custom field in."
+                      x-dynamic-options: true
+                    name:
+                      type: "string"
+                      description: "The name of the custom field."
+                    description:
+                      type: "string"
+                      description: "The description of the custom field."
+                    resource_subtype:
+                      type: "string"
+                      description: "The type of the custom field."
+                      enum:
+                        - "text"
+                        - "enum"
+                        - "multi_enum"
+                        - "date"
+                        - "number"
+                        - "people"
+                        - "reference"
+                    text_value:
+                      type: "string"
+                      description: "The value of the text custom field."
+                    enum_options:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          name:
+                            type: "string"
+                            description: "The name of the enum option."
+                          enabled:
+                            type: "boolean"
+                            description: "Whether or not the enum option is a selectable value for the custom field."
+                          color:
+                            type: "string"
+                            description: "The color of the enum option."
+                    number_value:
+                      type: "number"
+                      description: "The value of the number custom field."
+                    precision:
+                      type: "integer"
+                      description: "This field dictates the number of places after the decimal to round to."
+                    date_value:
+                      type: "object"
+                      description: "The value of the date custom field."
+                      properties:
+                        date:
+                          type: "string"
+                          format: "date"
+                        date_time:
+                          type: "string"
+                          format: "date-time"
+                    people_value:
+                      type: "array"
+                      description: "The value of the people custom field."
+                      items:
+                        type: "string"
+                    reference_value:
+                      type: "array"
+                      description: "The value of the reference custom field."
+                      items:
+                        type: "string"
+                    format:
+                      type: "string"
+                      description: "The format of this custom field."
+                      enum:
+                        - "currency"
+                        - "identifier"
+                        - "percentage"
+                        - "custom"
+                        - "duration"
+                        - "none"
+                    currency_code:
+                      type: "string"
+                      description: "ISO 4217 currency code to format this custom field."
+      responses:
+        201:
+          description: "Successfully created new task"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      gid:
+                        type: "string"
+                        description: "Globally unique identifier for the task."
+                      resource_type:
+                        type: "string"
+                        description: "Type of the resource."
+                      name:
+                        type: "string"
+                        description: "Name of the custom field."
+                      type:
+                        type: "string"
+                        description: "The type of custom field."
+                      enum_options:
+                        type: "array"
+                        description: "Enumeration options available for the custom field."
+                        items:
+                          type: "object"
+                          properties:
+                            gid:
+                              type: "string"
+                              description: "Globally unique identifier for the enum option."
+                            resource_type:
+                              type: "string"
+                              description: "Type of resource."
+                            name:
+                              type: "string"
+                              description: "Name of the enum option."
+                            enabled:
+                              type: "boolean"
+                              description: "Whether the enum option is enabled."
+                            color:
+                              type: "string"
+                              description: "Color associated with the enum option."
+                      input_restrictions:
+                        type: "string"
+                        description: "Restrictions on where the field can be used."
+                      date_value:
+                        type: "object"
+                        description: "Date value stored in the field."
+                        properties:
+                          date:
+                            type: "string"
+                            format: "date"
+                            description: "Date portion of the value."
+                          date_time:
+                            type: "string"
+                            format: "date-time"
+                            description: "Date-time value of the field."
+                      enum_value:
+                        type: "object"
+                        description: "Currently selected enum value."
+                        properties:
+                          gid:
+                            type: "string"
+                            description: "Globally unique identifier for the enum option."
+                          resource_type:
+                            type: "string"
+                            description: "Type of resource."
+                          name:
+                            type: "string"
+                            description: "Name of the enum option."
+                          enabled:
+                            type: "boolean"
+                            description: "Whether the option is enabled."
+                          color:
+                            type: "string"
+                            description: "Color of the enum option."
+                      multi_enum_values:
+                        type: "array"
+                        description: "Multiple enum values selected."
+                        items:
+                          type: "object"
+                          properties:
+                            gid:
+                              type: "string"
+                              description: "Globally unique identifier for the enum option."
+                            resource_type:
+                              type: "string"
+                              description: "Type of resource."
+                            name:
+                              type: "string"
+                              description: "Name of the enum option."
+                            enabled:
+                              type: "boolean"
+                              description: "Whether the option is enabled."
+                            color:
+                              type: "string"
+                              description: "Color of the enum option."
+                      number_value:
+                        type: "number"
+                        description: "Numeric value stored in the field."
+                      text_value:
+                        type: "string"
+                        description: "Text value stored in the field."
+                      precision:
+                        type: "integer"
+                        description: "Number of decimal places allowed."
+                      format:
+                        type: "string"
+                        description: "Formatting style of the field."
+                      currency_code:
+                        type: "string"
+                        description: "Currency code used if the field represents money."
+                      people_value:
+                        type: "array"
+                        description: "Users referenced by the custom field."
+                        items:
+                          type: "object"
+                          properties:
+                            gid:
+                              type: "string"
+                              description: "Globally unique identifier for the user."
+                            resource_type:
+                              type: "string"
+                              description: "Type of resource."
+                            name:
+                              type: "string"
+                              description: "Name of the user."
+                      reference_value:
+                        type: "array"
+                        description: "Referenced resources such as tasks."
+                        items:
+                          type: "object"
+                          properties:
+                            gid:
+                              type: "string"
+                              description: "Globally unique identifier."
+                            resource_type:
+                              type: "string"
+                              description: "Type of referenced resource."
+                            name:
+                              type: "string"
+                              description: "Name of the referenced resource."
+                      resource_subtype:
+                        type: "string"
+                        description: "Subtype of the resource."
 components:
   securitySchemes:
     oauth2:
