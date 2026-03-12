@@ -2,9 +2,9 @@ import LoadingDots from '@/components/LoadingDots';
 import {Skeleton} from '@/components/ui/skeleton';
 import {twMerge} from 'tailwind-merge';
 
-export const WorkflowRightSidebarSkeleton = () => (
+export const WorkflowRightSidebarSkeleton = ({itemCount = 4}: {itemCount?: number}) => (
     <div className="absolute right-0 m-2 flex flex-col items-center gap-1 rounded-md border border-stroke-neutral-secondary bg-background p-1">
-        {Array.from({length: 4}).map((_, index) => (
+        {Array.from({length: itemCount}).map((_, index) => (
             <Skeleton className="size-9" key={index} />
         ))}
     </div>

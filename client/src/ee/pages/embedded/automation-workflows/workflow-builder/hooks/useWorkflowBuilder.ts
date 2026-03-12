@@ -138,6 +138,10 @@ export const useWorkflowBuilder = () => {
 
         window.addEventListener('message', listener);
 
+        if (window.parent !== window) {
+            window.parent.postMessage({type: 'EMBED_READY'}, '*');
+        }
+
         return () => {
             setRightSidebarOpen(false);
 

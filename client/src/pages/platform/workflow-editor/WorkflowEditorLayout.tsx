@@ -37,6 +37,7 @@ interface WorkflowEditorLayoutProps {
     includeComponents?: string[];
     leftSidebarOpen?: boolean;
     runDisabled: boolean;
+    showCopilot?: boolean;
     showWorkflowInputs: boolean;
 }
 
@@ -44,6 +45,7 @@ const WorkflowEditorLayout = ({
     includeComponents,
     leftSidebarOpen,
     runDisabled,
+    showCopilot = true,
     showWorkflowInputs,
 }: WorkflowEditorLayoutProps) => {
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
@@ -126,7 +128,11 @@ const WorkflowEditorLayout = ({
                 )}
 
                 {componentDefinitions && taskDispatcherDefinitions && (
-                    <Suspense fallback={<WorkflowRightSidebarSkeleton />}>
+                    <Suspense
+                        fallback={
+                            <WorkflowRightSidebarSkeleton itemCount={!showCopilot && !showWorkflowInputs ? 2 : 4} />
+                        }
+                    >
                         <WorkflowRightSidebar
                             copilotPanelOpen={copilotPanelOpen}
                             onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
@@ -135,6 +141,7 @@ const WorkflowEditorLayout = ({
                             onWorkflowInputsClick={handleWorkflowInputsClick}
                             onWorkflowOutputsClick={handleWorkflowOutputsClick}
                             rightSidebarOpen={rightSidebarOpen}
+                            showCopilot={showCopilot}
                             showWorkflowInputs={showWorkflowInputs}
                         />
                     </Suspense>
