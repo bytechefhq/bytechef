@@ -133,8 +133,7 @@ public class McpServerGraphQlController {
 
     private String getMcpServerUrl(McpServer mcpServer) {
         if (mcpServer.getType() == PlatformType.EMBEDDED) {
-            return publicUrl + "/api/embedded/" + mcpServer.getSecretKey() +
-                "/mcp?externalUserId={EXTERNAL_USER_ID}";
+            return publicUrl + "/api/embedded/" + mcpServer.getSecretKey() + "/mcp";
         }
 
         return publicUrl + "/api/automation/" + mcpServer.getSecretKey() + "/mcp";

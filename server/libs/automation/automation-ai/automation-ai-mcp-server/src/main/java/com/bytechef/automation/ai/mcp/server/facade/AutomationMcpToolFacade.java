@@ -67,9 +67,9 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 /**
  * @author Matija Petanjek
  */
-public class McpToolFacade extends AbstractToolFacade {
+public class AutomationMcpToolFacade extends AbstractToolFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(McpToolFacade.class);
+    private static final Logger logger = LoggerFactory.getLogger(AutomationMcpToolFacade.class);
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -84,7 +84,7 @@ public class McpToolFacade extends AbstractToolFacade {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public McpToolFacade(
+    public AutomationMcpToolFacade(
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         JobSyncExecutor jobSyncExecutor, McpComponentService mcpComponentService,

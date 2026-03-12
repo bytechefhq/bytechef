@@ -7,12 +7,12 @@
 
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
-import com.bytechef.platform.mcp.domain.McpServer;
-import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.security.exception.UserNotActivatedException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Objects;
+import java.util.List;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
@@ -23,11 +23,11 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class EmbeddedMcpServerApiKeyAuthenticationProvider implements AuthenticationProvider {
 
-    private final McpServerService mcpServerService;
+    private final ConnectedUserService connectedUserService;
 
     @SuppressFBWarnings("EI")
-    public EmbeddedMcpServerApiKeyAuthenticationProvider(McpServerService mcpServerService) {
-        this.mcpServerService = mcpServerService;
+    public EmbeddedMcpServerApiKeyAuthenticationProvider(ConnectedUserService connectedUserService) {
+        this.connectedUserService = connectedUserService;
     }
 
     @Override
@@ -35,21 +35,27 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
         EmbeddedMcpServerApiKeyAuthenticationToken embeddedMcpServerApiKeyAuthenticationToken =
             (EmbeddedMcpServerApiKeyAuthenticationToken) authentication;
 
-        McpServer mcpServer = mcpServerService.getMcpServer(
-            embeddedMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey());
+        long environmentId = embeddedMcpServerApiKeyAuthenticationToken.getEnvironmentId();
+        String externalUserId = embeddedMcpServerApiKeyAuthenticationToken.getExternalUserId();
 
-        if (!Objects.equals(
-            mcpServer.getSecretKey(), embeddedMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey())) {
+        ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environmentId)
+            .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
 
-            throw new BadCredentialsException("Invalid secret key");
-        }
-
-        return new EmbeddedMcpServerApiKeyAuthenticationToken(
-            embeddedMcpServerApiKeyAuthenticationToken.getAuthSecretKey());
+        return new EmbeddedMcpServerApiKeyAuthenticationToken(createSpringSecurityUser(externalUserId, connectedUser));
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
         return authentication.equals(EmbeddedMcpServerApiKeyAuthenticationToken.class);
+    }
+
+    private org.springframework.security.core.userdetails.User createSpringSecurityUser(
+        String externalUserId, ConnectedUser connectedUser) {
+
+        if (!connectedUser.isEnabled()) {
+            throw new UserNotActivatedException("Connected User " + externalUserId + " was not enabled");
+        }
+
+        return new org.springframework.security.core.userdetails.User(connectedUser.getExternalId(), "", List.of());
     }
 }
