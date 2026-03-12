@@ -37,8 +37,31 @@ export default function useMcpComponentToolPropertiesPopover(
     }, [clusterElementDefinition]);
 
     const defaultValues = useMemo(() => {
-        return (mcpTool.parameters as Record<string, unknown>) ?? {};
-    }, [mcpTool.parameters]);
+        const propertyDefaults: Record<string, unknown> = {};
+
+        for (const property of properties) {
+            const propertyRecord = property as unknown as Record<string, unknown>;
+
+            const resolvedDefault =
+                propertyRecord.defaultValue ??
+                propertyRecord.integerDefaultValue ??
+                propertyRecord.numberDefaultValue ??
+                propertyRecord.booleanDefaultValue ??
+                propertyRecord.arrayDefaultValue ??
+                propertyRecord.objectDefaultValue ??
+                propertyRecord.dateDefaultValue ??
+                propertyRecord.dateTimeDefaultValue ??
+                propertyRecord.timeDefaultValue;
+
+            if (property.name && resolvedDefault !== undefined && resolvedDefault !== null) {
+                propertyDefaults[property.name] = resolvedDefault;
+            }
+        }
+
+        const savedParameters = (mcpTool.parameters as Record<string, unknown>) ?? {};
+
+        return {...propertyDefaults, ...savedParameters};
+    }, [mcpTool.parameters, properties]);
 
     const form = useForm({
         defaultValues,
