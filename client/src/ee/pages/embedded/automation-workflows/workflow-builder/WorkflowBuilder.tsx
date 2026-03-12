@@ -104,6 +104,7 @@ const WorkflowBuilder = () => {
                                 <WorkflowEditorLayout
                                     includeComponents={includeComponents}
                                     runDisabled={runDisabled}
+                                    showCopilot={false}
                                     showWorkflowInputs={false}
                                 />
                             )}

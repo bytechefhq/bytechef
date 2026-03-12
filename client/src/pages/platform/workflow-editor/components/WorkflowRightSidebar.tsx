@@ -13,6 +13,7 @@ export interface WorkflowRightSidebarProps {
     onWorkflowInputsClick: () => void;
     onWorkflowOutputsClick: () => void;
     rightSidebarOpen: boolean;
+    showCopilot?: boolean;
     showWorkflowInputs?: boolean;
 }
 const WorkflowRightSidebar = ({
@@ -23,6 +24,7 @@ const WorkflowRightSidebar = ({
     onWorkflowInputsClick,
     onWorkflowOutputsClick,
     rightSidebarOpen,
+    showCopilot = true,
     showWorkflowInputs = true,
 }: WorkflowRightSidebarProps) => {
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
@@ -66,7 +68,7 @@ const WorkflowRightSidebar = ({
                 ],
             ].filter((item) => {
                 if (item.name === 'Copilot') {
-                    return ff_1570;
+                    return showCopilot && ff_1570;
                 }
 
                 if (item.name === 'Workflow Outputs') {
@@ -76,7 +78,7 @@ const WorkflowRightSidebar = ({
                 return true;
             }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [copilotPanelOpen, ff_1840, rightSidebarOpen]
+        [copilotPanelOpen, ff_1840, rightSidebarOpen, showCopilot]
     );
 
     const activeItemStyling =
