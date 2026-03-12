@@ -31,15 +31,16 @@ import com.bytechef.component.wolfram.alpha.full.results.connection.WolframAlpha
  */
 public abstract class AbstractWolframAlphaFullResultsComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
-        component("wolfram-alpha-full-results")
+        component("wolframAlphaFullResults")
             .title("Wolfram Alpha Full Results")
             .description(
-                "Wolfram Alpha Full Results returns the computed results of your query in a variety of formats."))
-                    .actions(modifyActions(WolframAlphaFullResultsGetFullResultAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(WolframAlphaFullResultsConnection.CONNECTION_DEFINITION))
-                    .clusterElements(
-                        modifyClusterElements(tool(WolframAlphaFullResultsGetFullResultAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                "Wolfram Alpha Full Results returns the computed results of your query in a variety of formats.")
+            .version(1))
+                .actions(modifyActions(WolframAlphaFullResultsGetFullResultAction.ACTION_DEFINITION))
+                .connection(modifyConnection(WolframAlphaFullResultsConnection.CONNECTION_DEFINITION))
+                .clusterElements(
+                    modifyClusterElements(tool(WolframAlphaFullResultsGetFullResultAction.ACTION_DEFINITION)))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {
