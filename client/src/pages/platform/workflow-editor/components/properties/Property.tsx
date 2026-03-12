@@ -620,7 +620,7 @@ const Property = ({
                                         showInputTypeSwitchButton={isToolsClusterElement}
                                         value={fieldValue !== undefined ? fieldValue : selectValue}
                                         workflowId={workflow.id!}
-                                        workflowNodeName={currentNode!.name}
+                                        workflowNodeName={currentNode?.name ?? ''}
                                     />
                                 )}
                                 rules={{required}}
