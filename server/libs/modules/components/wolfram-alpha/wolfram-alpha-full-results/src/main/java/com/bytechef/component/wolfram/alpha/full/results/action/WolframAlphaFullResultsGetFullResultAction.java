@@ -20,11 +20,14 @@ import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.wolfram.alpha.full.results.property.WolframAlphaFullResultsWolframQueryResponseProperties;
 import java.util.Map;
 
 /**
@@ -39,7 +42,7 @@ public class WolframAlphaFullResultsGetFullResultAction {
         .metadata(
             Map.of(
                 "method", "GET",
-                "path", "/query", "responseType", ResponseType.XML
+                "path", "/query"
 
             ))
         .properties(string("input").label("Query")
@@ -55,13 +58,6 @@ public class WolframAlphaFullResultsGetFullResultAction {
                 .placeholder("Add to Format")
                 .label("Format")
                 .description("The desired format for individual result pods.")
-                .required(false)
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.QUERY)),
-            string("output").label("Output")
-                .description("The desired format for full results.")
-                .options(option("Xml", "xml"), option("Json", "json"))
                 .required(false)
                 .metadata(
                     Map.of(
@@ -212,7 +208,10 @@ public class WolframAlphaFullResultsGetFullResultAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .output();
+        .output(outputSchema(object().properties(WolframAlphaFullResultsWolframQueryResponseProperties.PROPERTIES)
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.XML))));
 
     private WolframAlphaFullResultsGetFullResultAction() {
     }
