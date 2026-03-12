@@ -18,7 +18,6 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFron
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendWorkflowConfigurationConnectionRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,17 +45,15 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
     private final EnvironmentService environmentService;
-    private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
         ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService,
-        EnvironmentService environmentService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade) {
+        EnvironmentService environmentService) {
 
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
         this.environmentService = environmentService;
-        this.workflowTestConfigurationFacade = workflowTestConfigurationFacade;
     }
 
     @Override
