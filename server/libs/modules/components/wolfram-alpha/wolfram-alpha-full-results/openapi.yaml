@@ -41,17 +41,6 @@ paths:
                 - "mathml"
                 - "sound"
                 - "wav"
-        - name: "output"
-          in: "query"
-          required: false
-          description: "The desired format for full results."
-          schema:
-            type: "string"
-            title: "Output"
-            description: "The desired format for full results."
-            enum:
-              - "xml"
-              - "json"
         - name: "ip"
           in: "query"
           required: false
@@ -232,14 +221,125 @@ paths:
             title: "Include Pod ID"
             description: "Specifies a pod ID to include in the result e.g. \"Result\", \"BasicInformation: PeopleData\", \"DecimalApproximation\"."
       responses:
-        200:
-          description: "Full result."
-          x-dynamic-output: true
+        "200":
+          description: Full Wolfram Alpha query result
           content:
-            application/xml:
+            text/xml:
               schema:
-                type: "object"
+                $ref: '#/components/schemas/WolframQueryResponse'
 components:
+  schemas:
+    WolframQueryResponse:
+      type: object
+      properties:
+        queryresult:
+          $ref: "#/components/schemas/QueryResult"
+    QueryResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        error:
+          type: boolean
+        numpods:
+          type: integer
+        datatypes:
+          type: string
+        parsetiming:
+          type: number
+          format: float
+        parsetimedout:
+          type: boolean
+        id:
+          type: string
+        kernelId:
+          type: string
+        processId:
+          type: integer
+        version:
+          type: string
+        inputstring:
+          type: string
+        sbsallowed:
+          type: boolean
+        parentId:
+          type: string
+        requestId:
+          type: string
+        timing:
+          type: number
+          format: float
+        timedout:
+          type: string
+        timedoutpods:
+          type: string
+        pods:
+          type: array
+          items:
+            $ref: "#/components/schemas/Pod"
+
+    Pod:
+      type: object
+      properties:
+        title:
+          type: string
+        scanner:
+          type: string
+        id:
+          type: string
+        position:
+          type: integer
+        error:
+          type: boolean
+        numsubpods:
+          type: integer
+        primary:
+          type: boolean
+        subpods:
+          type: array
+          items:
+            $ref: "#/components/schemas/Subpod"
+        expressiontypes:
+          $ref: "#/components/schemas/ExpressionTypes"
+
+    Subpod:
+      type: object
+      properties:
+        title:
+          type: string
+        plaintext:
+          type: string
+        img:
+          $ref: "#/components/schemas/Image"
+
+    Image:
+      type: object
+      properties:
+        src:
+          type: string
+          format: uri
+        alt:
+          type: string
+        title:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+        type:
+          type: string
+        themes:
+          type: string
+        colorinvertable:
+          type: boolean
+        contenttype:
+          type: string
+
+    ExpressionTypes:
+      type: object
+      properties:
+        name:
+          type: string
   securitySchemes:
     ApiKeyQuery:
       type: apiKey
