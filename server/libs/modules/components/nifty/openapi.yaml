@@ -147,6 +147,52 @@ paths:
                   description:
                     type: "string"
                     description: "Description of the task."
+  /tasks/{taskId}/labels:
+    put:
+      summary: "Add Labels"
+      description: "Add labels to the task."
+      operationId: "addLabels"
+      parameters:
+        - name: "taskId"
+          in: "path"
+          description: "ID of the task to add label to."
+          required: true
+          schema:
+            type: "string"
+            title: "Task ID"
+            x-dynamic-options: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Project"
+              required:
+                - "labels"
+              properties:
+                labels:
+                  type: "array"
+                  description: "List of labels to add to the task."
+                  items:
+                    type: "string"
+                  x-dynamic-options: true
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "A confirmation message indicating whether the labels where added successfully."
+                  labels:
+                    type: "array"
+                    description: "List of labels added to the task."
+                    items:
+                      type: "string"
   /taskgroups:
     post:
       summary: "Create Status"
