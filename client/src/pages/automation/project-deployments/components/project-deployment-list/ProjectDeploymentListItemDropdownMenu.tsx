@@ -10,15 +10,15 @@ import {
 import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
 interface ProjectDeploymentListItemDropdownMenuProps {
+    onChangeProjectVersionClick: () => void;
     onDeleteClick: () => void;
     onEditClick: () => void;
-    onUpdateProjectVersionClick: () => void;
 }
 
 const ProjectDeploymentListItemDropdownMenu = ({
+    onChangeProjectVersionClick,
     onDeleteClick,
     onEditClick,
-    onUpdateProjectVersionClick,
 }: ProjectDeploymentListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
@@ -31,8 +31,8 @@ const ProjectDeploymentListItemDropdownMenu = ({
                     <EditIcon /> Edit
                 </DropdownMenuItem>
 
-                <DropdownMenuItem className="dropdown-menu-item" onClick={onUpdateProjectVersionClick}>
-                    <RefreshCcwIcon /> Update Project Version
+                <DropdownMenuItem className="dropdown-menu-item" onClick={onChangeProjectVersionClick}>
+                    <RefreshCcwIcon /> Change Project Version
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator className="m-0" />

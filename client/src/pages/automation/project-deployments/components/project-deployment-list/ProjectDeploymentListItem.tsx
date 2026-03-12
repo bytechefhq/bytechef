@@ -30,7 +30,7 @@ interface ProjectDeploymentListItemProps {
 const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDeploymentListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [showUpdateProjectVersionDialog, setShowUpdateProjectVersionDialog] = useState(false);
+    const [showChangeProjectVersionDialog, setShowChangeProjectVersionDialog] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -206,9 +206,9 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                         </div>
 
                         <ProjectDeploymentListItemDropdownMenu
+                            onChangeProjectVersionClick={() => setShowChangeProjectVersionDialog(true)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
-                            onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
                         />
                     </div>
                 </div>
@@ -233,11 +233,11 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                 />
             )}
 
-            {showUpdateProjectVersionDialog && (
+            {showChangeProjectVersionDialog && (
                 <ProjectDeploymentDialog
-                    onClose={() => setShowUpdateProjectVersionDialog(false)}
+                    changeProjectVersion={true}
+                    onClose={() => setShowChangeProjectVersionDialog(false)}
                     projectDeployment={projectDeployment}
-                    updateProjectVersion={true}
                 />
             )}
         </>
