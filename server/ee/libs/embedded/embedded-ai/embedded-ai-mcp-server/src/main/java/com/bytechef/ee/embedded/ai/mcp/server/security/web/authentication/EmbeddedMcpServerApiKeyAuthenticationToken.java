@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.core.userdetails.User;
 
 /**
  * @version ee
@@ -17,41 +18,20 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
 
-    private final String authSecretKey;
     private String externalUserId;
-    private String mcpServerSecretKey;
 
-    public EmbeddedMcpServerApiKeyAuthenticationToken(String authSecretKey) {
-        setAuthenticated(true);
+    public EmbeddedMcpServerApiKeyAuthenticationToken(long environmentId, String externalUserId, String tenantId) {
+        super(environmentId, tenantId);
 
-        this.authSecretKey = authSecretKey;
-    }
-
-    public EmbeddedMcpServerApiKeyAuthenticationToken(
-        String mcpServerSecretKey, String externalUserId, String authSecretKey, String tenantId) {
-
-        super(-1, tenantId);
-
-        this.authSecretKey = authSecretKey;
         this.externalUserId = externalUserId;
-        this.mcpServerSecretKey = mcpServerSecretKey;
     }
 
-    public String getAuthSecretKey() {
-        return authSecretKey;
+    @SuppressFBWarnings("EI")
+    public EmbeddedMcpServerApiKeyAuthenticationToken(User user) {
+        super(user);
     }
 
     public String getExternalUserId() {
         return externalUserId;
-    }
-
-    public String getMcpServerSecretKey() {
-        return mcpServerSecretKey;
-    }
-
-    @Override
-    @SuppressFBWarnings("EI")
-    public Object getPrincipal() {
-        return authSecretKey;
     }
 }

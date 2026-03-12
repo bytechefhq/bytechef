@@ -57,7 +57,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     public boolean exists(String secretKey, long environmentId) {
-        return apiKeyRepository.existsBySecretKeyAndEnvironment(secretKey, (int)environmentId);
+        return apiKeyRepository.existsBySecretKeyAndEnvironment(secretKey, (int) environmentId);
     }
 
     @Override

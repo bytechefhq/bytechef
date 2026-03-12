@@ -32,7 +32,7 @@ import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
-import com.bytechef.automation.ai.mcp.server.facade.McpToolFacade;
+import com.bytechef.automation.ai.mcp.server.facade.AutomationMcpToolFacade;
 import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.mcp.service.McpProjectService;
@@ -121,7 +121,7 @@ public class AutomationMcpServerConfiguration {
     }
 
     @Bean
-    McpToolFacade mcpToolFacade(
+    AutomationMcpToolFacade mcpToolFacade(
         ChildJobPrincipalFactory childJobPrincipalFactory,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, ContextService contextService,
@@ -151,7 +151,7 @@ public class AutomationMcpServerConfiguration {
                 jobService, subflowResolver, taskExecutionService, taskFileStorage),
             taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService);
 
-        return new McpToolFacade(
+        return new AutomationMcpToolFacade(
             clusterElementDefinitionFacade, clusterElementDefinitionService, evaluator, jobSyncExecutor,
             mcpComponentService, mcpProjectWorkflowService, mcpServerService, principalJobFacade,
             projectDeploymentWorkflowService, taskExecutionService, taskFileStorage, workflowService);
@@ -160,7 +160,7 @@ public class AutomationMcpServerConfiguration {
     @Bean
     FilterableMcpAsyncServer automationMcpAsyncServer(
         McpComponentService mcpComponentService, McpProjectService mcpProjectService,
-        McpServerService mcpServerService, McpToolService mcpToolService, McpToolFacade mcpToolFacade) {
+        McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade) {
 
         return new FilterableMcpServerBuilder(automationWebMvcStreamableHttpServerTransportProvider())
             .serverInfo("automation-mcp-server", "1.0.0")

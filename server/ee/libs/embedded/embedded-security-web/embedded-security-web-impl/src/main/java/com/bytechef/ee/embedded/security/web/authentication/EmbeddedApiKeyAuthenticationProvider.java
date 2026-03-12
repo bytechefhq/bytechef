@@ -42,10 +42,10 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
 
         long environmentId = embeddedApiKeyAuthenticationToken.getEnvironmentId();
 
-        if (embeddedApiKeyAuthenticationToken.getSecretKey() == null) {
-            if(!apiKeyService.exists(embeddedApiKeyAuthenticationToken.getSecretKey(), environmentId)) {
-                throw new IllegalArgumentException("Invalid API key");
-            }
+        if (embeddedApiKeyAuthenticationToken.getSecretKey() != null &&
+            !apiKeyService.exists(embeddedApiKeyAuthenticationToken.getSecretKey(), environmentId)) {
+
+            throw new IllegalArgumentException("Invalid API key");
         }
 
         String externalUserId = embeddedApiKeyAuthenticationToken.getExternalUserId();
