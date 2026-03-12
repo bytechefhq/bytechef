@@ -203,7 +203,7 @@ public class OpenApiClientUtils {
                             }
 
                             if (!curValues.contains(value)) {
-                                curValues.add(URLEncoder.encode(value, StandardCharsets.UTF_8));
+                                curValues.add(value);
                             }
                         }
                     }
