@@ -129,7 +129,7 @@ class OpenApiClientUtilsTest {
         assertEquals("/users/1", stringArgumentCaptor.getValue());
         assertEquals(Http.RequestMethod.POST, requestMethodArgumentCaptor.getValue());
         assertEquals(
-            List.of(Map.of("X-Token", List.of("abc123")), Map.of("q", List.of("hello+world%2Fok"))),
+            List.of(Map.of("X-Token", List.of("abc123")), Map.of("q", List.of("hello world/ok"))),
             mapArgumentCaptor.getAllValues());
         assertEquals(
             Http.Body.of(Map.of("name", "John"), Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
