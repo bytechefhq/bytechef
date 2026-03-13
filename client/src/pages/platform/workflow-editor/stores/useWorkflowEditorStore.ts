@@ -9,6 +9,9 @@ export interface WorkflowEditorI {
     clusterElementsCanvasOpen: boolean;
     setClusterElementsCanvasOpen: (clusterElementsCanvasOpen: boolean) => void;
 
+    contextMenuOpen: boolean;
+    setContextMenuOpen: (contextMenuOpen: boolean) => void;
+
     mainClusterRootComponentDefinition: ComponentDefinition | undefined;
     setMainClusterRootComponentDefinition: (
         mainClusterRootComponentDefinition: ComponentDefinition | undefined
@@ -18,6 +21,9 @@ export interface WorkflowEditorI {
     setNestedClusterRootsComponentDefinitions: (
         setNestedClusterRootsComponentDefinitions: Record<string, NestedClusterRootComponentDefinitionType>
     ) => void;
+
+    renamingNodeName: string | undefined;
+    setRenamingNodeName: (renamingNodeName: string | undefined) => void;
 
     rootClusterElementNodeData: NodeDataType | undefined;
     setRootClusterElementNodeData: (rootClusterElementNodeData: NodeDataType | undefined) => void;
@@ -56,6 +62,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                     clusterElementsCanvasOpen,
                 })),
 
+            contextMenuOpen: false,
+            setContextMenuOpen: (contextMenuOpen) =>
+                set(() => ({
+                    contextMenuOpen,
+                })),
+
             mainClusterRootComponentDefinition: undefined,
             setMainClusterRootComponentDefinition: (mainClusterRootComponentDefinition) =>
                 set(() => ({
@@ -66,6 +78,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setNestedClusterRootsComponentDefinitions: (nestedClusterRootsComponentDefinitions) =>
                 set(() => ({
                     nestedClusterRootsComponentDefinitions,
+                })),
+
+            renamingNodeName: undefined,
+            setRenamingNodeName: (renamingNodeName) =>
+                set(() => ({
+                    renamingNodeName,
                 })),
 
             rootClusterElementNodeData: undefined,
