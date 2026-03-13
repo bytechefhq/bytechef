@@ -20,6 +20,7 @@ import static com.bytechef.component.google.drive.util.GoogleDriveUtils.LAST_TIM
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -30,6 +31,8 @@ import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Get;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
@@ -49,15 +52,46 @@ import org.mockito.MockedStatic;
 class GoogleDriveUtilsTest {
 
     private final List<File> files = new ArrayList<>();
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
-    private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
+    private final Files mockedFiles = mock(Files.class);
+    private final Get mockedGet = mock(Get.class);
+    private final Files.List mockedList = mock(Files.List.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FOLDER_ID, "parent", LAST_TIME_CHECKED, Instant.parse("2000-01-01T01:01:01Z")));
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+
+    @Test
+    void testGetFileWebViewLink() throws IOException {
+        File testFile = new File()
+            .setId("testFolderId")
+            .setName("folderName")
+            .setMimeType("application/vnd.google-apps.folder")
+            .setKind("drive#file")
+            .setWebViewLink("https://drive.google.com/drive/folders/testFolderId");
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedDrive);
+            when(mockedDrive.files())
+                .thenReturn(mockedFiles);
+            when(mockedFiles.get(stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.setFields(stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.execute())
+                .thenReturn(testFile);
+
+            String sharedLink = GoogleDriveUtils.getFileWebViewLink(mockedParameters, "testId");
+
+            assertEquals("https://drive.google.com/drive/folders/testFolderId", sharedLink);
+            assertEquals(List.of("testId", "webViewLink"), stringArgumentCaptor.getAllValues());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+        }
+    }
 
     @Test
     void testGetPollOutput() throws IOException {
