@@ -30,7 +30,6 @@ import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.ArrayList;
@@ -66,7 +65,6 @@ public class MicrosoftSharePointCreateListItemAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
         Map<String, ?> map = inputParameters.getMap(COLUMNS, Map.of());
 
         List<Object> objects = new ArrayList<>();
@@ -83,6 +81,6 @@ public class MicrosoftSharePointCreateListItemAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(FIELDS, objects.toArray()))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
