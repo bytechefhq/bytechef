@@ -130,7 +130,7 @@ paths:
                       description: "Asana project to create the task in."
                       x-dynamic-options: true
                       x-dynamic-options-dependency:
-                        - "workspace"
+                        - "data.workspace"
                     name:
                       type: "string"
                       description: "Name of the task."
@@ -153,7 +153,7 @@ paths:
                       description: "User to assign the task to."
                       x-dynamic-options: true
                       x-dynamic-options-dependency:
-                        - "workspace"
+                        - "data.workspace"
       responses:
         201:
           description: "Successfully created new task"
