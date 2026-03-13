@@ -31,9 +31,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
@@ -53,11 +56,11 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 class GithubAddLabelsToIssueActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", LABELS, List.of("help-wanted", "docs")));
-    private final Object mockedObject = mock(Object.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -77,26 +80,19 @@ class GithubAddLabelsToIssueActionTest {
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(mockedObject);
 
-            Object result = GithubAddLabelsToIssueAction.perform(
-                mockedParameters, null, mockedContext);
+            Object result = GithubAddLabelsToIssueAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(mockedObject, result);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
 
-            assertNotNull(capturedFunction);
-
-            Http.Configuration.ConfigurationBuilder configurationBuilder =
-                configurationBuilderArgumentCaptor.getValue();
-            Http.Configuration configuration = configurationBuilder.build();
-            Http.ResponseType responseType = configuration.getResponseType();
-
-            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
             assertEquals("/repos/testOwner/testRepo/issues/testIssue/labels", stringArgumentCaptor.getValue());
-
-            Body body = bodyArgumentCaptor.getValue();
-
-            assertEquals(Map.of(LABELS, List.of("help-wanted", "docs")), body.getContent());
+            assertEquals(
+                Body.of(Map.of(LABELS, List.of("help-wanted", "docs")), BodyContentType.JSON),
+                bodyArgumentCaptor.getValue());
         }
     }
 }

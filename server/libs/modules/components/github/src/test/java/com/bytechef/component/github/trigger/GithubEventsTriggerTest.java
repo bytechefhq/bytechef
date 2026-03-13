@@ -20,13 +20,22 @@ import static com.bytechef.component.github.constant.GithubConstants.EVENTS;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -35,72 +44,92 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.github.util.GithubUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GithubEventsTriggerTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(
+    private final Parameters mockedInputParameters = MockParametersFactory.create(
         Map.of(REPOSITORY, "repo", EVENTS, List.of("event1", "event2")));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final Parameters mockedOutputParameters = MockParametersFactory.create(Map.of(ID, 12));
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
-    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testWebhookEnable() {
-        String webhookUrl = "testWebhookUrl";
+    void testWebhookEnable(
+        TriggerContext mockedTriggerContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(ID, 123));
+        try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
+            githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
+                .thenReturn("testOwner");
 
-        WebhookEnableOutput webhookEnableOutput = GithubEventsTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
+            String webhookUrl = "testWebhookUrl";
 
-        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, 123), null);
+            when(mockedHttp.post(stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(Map.of(ID, 123));
 
-        assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
+            WebhookEnableOutput webhookEnableOutput = GithubEventsTrigger.webhookEnable(
+                mockedInputParameters, mockedInputParameters, webhookUrl, "testWorkflowExecutionId",
+                mockedTriggerContext);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+            WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, 123), null);
 
-        Map<String, Object> expectedBody = Map.of(
-            EVENTS, List.of("event1", "event2"),
-            "config", Map.of("url", webhookUrl, "content_type", "json"));
+            assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertEquals(expectedBody, body.getContent());
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
+            assertEquals("/repos/testOwner/repo/hooks", stringArgumentCaptor.getValue());
+
+            Map<String, Object> expectedBody = Map.of(
+                EVENTS, List.of("event1", "event2"),
+                "config", Map.of("url", webhookUrl, "content_type", "json"));
+
+            assertEquals(Body.of(expectedBody, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
+            assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
+        }
     }
 
     @Test
-    void testWebhookDisable() {
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+    void testWebhookDisable(
+        TriggerContext mockedTriggerContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
-        GithubEventsTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, "testWorkflowExecutionId", mockedTriggerContext);
+        try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
+            githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
+                .thenReturn("testOwner");
 
-        verify(mockedTriggerContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).execute();
+            when(mockedHttp.delete(stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+
+            GithubEventsTrigger.webhookDisable(
+                mockedInputParameters, null, mockedOutputParameters, "testWorkflowExecutionId", mockedTriggerContext);
+
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+            assertEquals("/repos/testOwner/repo/hooks/12", stringArgumentCaptor.getValue());
+        }
     }
 
     @Test
@@ -111,8 +140,8 @@ class GithubEventsTriggerTest {
             .thenReturn(content);
 
         Map<String, Object> result = GithubEventsTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedInputParameters, mockedInputParameters, mock(HttpHeaders.class), mockedHttpParameters,
+            mockedWebhookBody, mock(WebhookMethod.class), mockedInputParameters, mock(TriggerContext.class));
 
         assertEquals(content, result);
     }
