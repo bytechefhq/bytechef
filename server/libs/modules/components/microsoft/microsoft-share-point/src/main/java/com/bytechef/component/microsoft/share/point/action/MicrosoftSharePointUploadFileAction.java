@@ -36,7 +36,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
@@ -124,6 +123,6 @@ public class MicrosoftSharePointUploadFileAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

@@ -22,18 +22,17 @@ import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSha
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
@@ -63,25 +62,21 @@ class MicrosoftSharePointCreateListActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
         Object result = MicrosoftSharePointCreateListAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(Map.of(DISPLAY_NAME, "displayName", DESCRIPTION, "description"), body.getContent());
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            Body.of(Map.of(DISPLAY_NAME, "displayName", DESCRIPTION, "description"), Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
         assertEquals("/sites/siteId/lists", stringArgumentCaptor.getValue());
     }
 }

@@ -46,9 +46,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -207,21 +209,17 @@ class MicrosoftSharePointUtilsTest {
                 .maxLength(255)
                 .required(true));
 
-        assertEquals(expectedProperties,
-            MicrosoftSharePointUtils.createPropertiesForListItem(mockedParameters, mockedParameters, Map.of(),
-                mockedContext));
+        List<? extends Property.ValueProperty<?>> result = MicrosoftSharePointUtils.createPropertiesForListItem(
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertEquals(expectedProperties, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/sites/siteId/lists/listId/columns", stringArgumentCaptor.getValue());
-
     }
 
     @Test
@@ -235,24 +233,16 @@ class MicrosoftSharePointUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, List.of(Map.of(DISPLAY_NAME, "list", ID, "listId"))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
+        List<Option<String>> result = MicrosoftSharePointUtils.getListIdOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        expectedOptions.add(option("list", "listId"));
-
-        assertEquals(
-            expectedOptions,
-            MicrosoftSharePointUtils.getListIdOptions(
-                mockedParameters, mockedParameters, Map.of(), "", mockedContext));
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertEquals(List.of(option("list", "listId")), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/sites/siteId/lists", stringArgumentCaptor.getValue());
     }
 
@@ -284,27 +274,19 @@ class MicrosoftSharePointUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, List.of(Map.of(NAME, "folderName", ID, "folderId"))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("folderName", "folderId"));
-
         List<Option<String>> folderIdOptions = MicrosoftSharePointUtils.getFolderIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<String> expectedStrings = List.of("/sites/siteId/drive/items/root/children", "$filter", "folder ne null");
 
-        assertEquals(expectedOptions, folderIdOptions);
+        assertEquals(List.of(option("folderName", "folderId")), folderIdOptions);
         assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -320,24 +302,16 @@ class MicrosoftSharePointUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, List.of(Map.of(DISPLAY_NAME, "site", ID, "siteId"))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("site", "siteId"));
-
         List<Option<String>> siteOptions = MicrosoftSharePointUtils.getSiteOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        assertEquals(expectedOptions, siteOptions);
+        assertEquals(List.of(option("site", "siteId")), siteOptions);
         assertEquals(List.of("/sites", "search", "*"), stringArgumentCaptor.getAllValues());
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }

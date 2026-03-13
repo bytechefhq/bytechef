@@ -88,6 +88,7 @@ public class MicrosoftSharePointUtils {
                 }
             }
         }
+
         return properties;
     }
 
@@ -172,6 +173,7 @@ public class MicrosoftSharePointUtils {
                     .required(required);
             }
         }
+
         return null;
     }
 

@@ -33,7 +33,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
@@ -95,7 +94,6 @@ public class MicrosoftSharePointCreateListAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
         return context
             .http(http -> http.post("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -104,6 +102,6 @@ public class MicrosoftSharePointCreateListAction {
                     DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME),
                     DESCRIPTION, inputParameters.getRequiredString(DESCRIPTION)))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

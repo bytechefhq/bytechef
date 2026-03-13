@@ -30,12 +30,13 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
@@ -66,7 +67,7 @@ class MicrosoftSharePointUploadFileActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
         when(mockedContext.encoder(any()))
             .thenReturn("urlEncoded");
@@ -75,19 +76,13 @@ class MicrosoftSharePointUploadFileActionTest {
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(mockedFileEntry, body.getContent());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(Body.of(mockedFileEntry), bodyArgumentCaptor.getValue());
         assertEquals(
             "/sites/siteId/drive/items/parentFolder:/urlEncoded:/content",
             stringArgumentCaptor.getValue());
