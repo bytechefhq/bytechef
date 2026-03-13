@@ -18,6 +18,7 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -37,10 +38,10 @@ import org.mockito.MockedStatic;
  */
 class GoogleDriveListFilesActionTest {
 
-    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = forClass(Boolean.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FOLDER_ID, "testId"));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     private final File testFile = new File()
         .setId("testFileId")

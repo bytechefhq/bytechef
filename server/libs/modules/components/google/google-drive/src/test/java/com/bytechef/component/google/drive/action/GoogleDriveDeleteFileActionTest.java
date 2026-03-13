@@ -19,6 +19,7 @@ package com.bytechef.component.google.drive.action;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -32,6 +33,8 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Delete;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -44,12 +47,12 @@ import org.mockito.MockedStatic;
 class GoogleDriveDeleteFileActionTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Drive.Files.Delete mockedDelete = mock(Drive.Files.Delete.class);
+    private final Delete mockedDelete = mock(Delete.class);
     private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Files mockedFiles = mock(Files.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ID, "testId"));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() throws IOException {

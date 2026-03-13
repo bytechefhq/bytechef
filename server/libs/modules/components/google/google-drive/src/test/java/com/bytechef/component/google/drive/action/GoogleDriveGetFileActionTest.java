@@ -18,6 +18,7 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
@@ -28,6 +29,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Get;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.Map;
@@ -40,12 +43,12 @@ import org.mockito.MockedStatic;
  */
 class GoogleDriveGetFileActionTest {
 
-    private final Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
     private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Files mockedFiles = mock(Files.class);
+    private final Get mockedGet = mock(Get.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ID, "testId"));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     private final File testFile = new File()
         .setId("testFileId")
