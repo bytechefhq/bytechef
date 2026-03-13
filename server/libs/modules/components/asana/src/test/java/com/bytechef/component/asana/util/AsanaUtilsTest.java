@@ -17,6 +17,7 @@
 package com.bytechef.component.asana.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -26,19 +27,18 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,171 +50,163 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class AsanaUtilsTest {
 
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(
-            "data", Map.of(
-                "workspace", "data.workspace",
-                "project", "data.project")));
-    private static final Map<String, List<Map<String, String>>> map = new LinkedHashMap<>();
-    private static final List<Option<String>> expectedOptions = new ArrayList<>();
+    private final List<Option<String>> expectedOptions = List.of(option("name", "gid"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of("data", Map.of("workspace", "data.workspace", "project", "data.project")));
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
-    @BeforeAll
-    static void beforeAll() {
-        List<Map<String, String>> data = new ArrayList<>();
-        Map<String, String> dataMap = new LinkedHashMap<>();
-
-        dataMap.put("name", "name");
-        dataMap.put("gid", "gid");
-
-        data.add(dataMap);
-
-        map.put("data", data);
-
-        expectedOptions.add(option("name", "gid"));
-    }
-
     @BeforeEach
-    void beforeEach(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
-
+    void beforeEach(Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
+            .thenReturn(Map.of("data", List.of(Map.of("name", "name", "gid", "gid"))));
     }
 
     @Test
     void testGetAssigneeOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        assertEquals(
-            expectedOptions,
-            AsanaUtils.getAssigneeOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        List<Option<String>> result = AsanaUtils.getAssigneeOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/users", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/users?workspace=data.workspace&limit=100", stringArgumentCaptor.getValue());
+        Object[] expectedQueryParameters = {
+            "limit", 100, "offset", null, "workspace", "data.workspace",
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetProjectOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        assertEquals(
-            expectedOptions,
-            AsanaUtils.getProjectOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        List<Option<String>> result =
+            AsanaUtils.getProjectOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/projects", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/projects?workspace=data.workspace&limit=100", stringArgumentCaptor.getValue());
+        Object[] expectedQueryParameters = {
+            "limit", 100, "offset", null, "workspace", "data.workspace",
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetTagsOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        assertEquals(
-            expectedOptions,
-            AsanaUtils.getTagsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        List<Option<String>> result =
+            AsanaUtils.getTagsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/tags", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/tags?limit=100", stringArgumentCaptor.getValue());
+        Object[] expectedQueryParameters = {
+            "limit", 100, "offset", null,
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetTeamOptionsOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        assertEquals(
-            expectedOptions,
-            AsanaUtils.getTeamOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        List<Option<String>> result =
+            AsanaUtils.getTeamOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/workspaces/data.workspace/teams", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/workspaces/data.workspace/teams?limit=100", stringArgumentCaptor.getValue());
+        Object[] expectedQueryParameters = {
+            "limit", 100, "offset", null,
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetWorkspaceOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        assertEquals(
-            expectedOptions,
-            AsanaUtils.getWorkspaceOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        List<Option<String>> workspaceOptions = AsanaUtils.getWorkspaceOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertEquals(expectedOptions, workspaceOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/workspaces", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/workspaces?limit=100", stringArgumentCaptor.getValue());
+        Object[] expectedQueryParameters = {
+            "limit", 100, "offset", null,
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetTaskGidOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        assertEquals(
-            expectedOptions,
-            AsanaUtils.getTaskGidOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        List<Option<String>> taskGidOptions = AsanaUtils.getTaskGidOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertEquals(expectedOptions, taskGidOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/projects/data.project/tasks", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/projects/data.project/tasks?opt_fields=gid,name&limit=100", stringArgumentCaptor.getValue());
+        Object[] expectedQueryParameters = {
+            "limit", 100, "offset", null, "opt_fields", "gid,name"
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
     }
 }
