@@ -47,7 +47,17 @@ Version: 1
     - `https://app.bytechef.io/callback` (Cloud)
     - `http://localhost:5173/callback` (Local dev)
 11. Click on **Add**.
-12. Done 🚀.
+12. Add following scopes:
+    - custom_fields:write
+    - projects:read
+    - projects:write
+    - tags:read
+    - tasks:read
+    - tasks:write
+    - teams:read
+    - users:read
+    - workspaces:read
+13. Done 🚀.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/6a4aa71b-42d9-4edf-9a31-476b730cbd0b?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
@@ -59,6 +69,126 @@ Version: 1
 
 
 ## Actions
+
+
+### Create Custom Field
+Name: createCustomField
+
+`Creates a custom field for a task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace), STRING\(name), STRING\(description), STRING\(resource_subtype), STRING\(text_value), [&#123;STRING\(name), BOOLEAN\(enabled), STRING\(color)&#125;]\(enum_options), NUMBER\(number_value), INTEGER\(precision), &#123;DATE\(date), DATE_TIME\(date_time)&#125;\(date_value), [STRING]\(people_value), [STRING]\(reference_value), STRING\(format), STRING\(currency_code)&#125; </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Custom Field",
+  "name" : "createCustomField",
+  "parameters" : {
+    "data" : {
+      "workspace" : "",
+      "name" : "",
+      "description" : "",
+      "resource_subtype" : "",
+      "text_value" : "",
+      "enum_options" : [ {
+        "name" : "",
+        "enabled" : false,
+        "color" : ""
+      } ],
+      "number_value" : 0.0,
+      "precision" : 1,
+      "date_value" : {
+        "date" : "2021-01-01",
+        "date_time" : "2021-01-01T00:00:00"
+      },
+      "people_value" : [ "" ],
+      "reference_value" : [ "" ],
+      "format" : "",
+      "currency_code" : ""
+    }
+  },
+  "type" : "asana/v1/createCustomField"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(gid), STRING\(resource_type), STRING\(name), STRING\(type), [&#123;STRING\(gid), STRING\(resource_type), STRING\(name), BOOLEAN\(enabled), STRING\(color)&#125;]\(enum_options), STRING\(input_restrictions), &#123;DATE\(date), DATE_TIME\(date_time)&#125;\(date_value), &#123;STRING\(gid), STRING\(resource_type), STRING\(name), BOOLEAN\(enabled), STRING\(color)&#125;\(enum_value), [&#123;STRING\(gid), STRING\(resource_type), STRING\(name), BOOLEAN\(enabled), STRING\(color)&#125;]\(multi_enum_values), NUMBER\(number_value), STRING\(text_value), INTEGER\(precision), STRING\(format), STRING\(currency_code), [&#123;STRING\(gid), STRING\(resource_type), STRING\(name)&#125;]\(people_value), [&#123;STRING\(gid), STRING\(resource_type), STRING\(name)&#125;]\(reference_value), STRING\(resource_subtype)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "gid" : "",
+    "resource_type" : "",
+    "name" : "",
+    "type" : "",
+    "enum_options" : [ {
+      "gid" : "",
+      "resource_type" : "",
+      "name" : "",
+      "enabled" : false,
+      "color" : ""
+    } ],
+    "input_restrictions" : "",
+    "date_value" : {
+      "date" : "2021-01-01",
+      "date_time" : "2021-01-01T00:00:00"
+    },
+    "enum_value" : {
+      "gid" : "",
+      "resource_type" : "",
+      "name" : "",
+      "enabled" : false,
+      "color" : ""
+    },
+    "multi_enum_values" : [ {
+      "gid" : "",
+      "resource_type" : "",
+      "name" : "",
+      "enabled" : false,
+      "color" : ""
+    } ],
+    "number_value" : 0.0,
+    "text_value" : "",
+    "precision" : 1,
+    "format" : "",
+    "currency_code" : "",
+    "people_value" : [ {
+      "gid" : "",
+      "resource_type" : "",
+      "name" : ""
+    } ],
+    "reference_value" : [ {
+      "gid" : "",
+      "resource_type" : "",
+      "name" : ""
+    } ],
+    "resource_subtype" : ""
+  }
+}
+```
+
+#### Find Workspace ID
+
+To find your workspace ID, click [here](/reference/components/asana_v1#how-to-find-your-workspace-id).
+
 
 
 ### Create Project
@@ -124,6 +254,109 @@ Type: OBJECT
 }
 ```
 
+#### Find Workspace ID
+
+To find your workspace ID, click [here](/reference/components/asana_v1#how-to-find-your-workspace-id).
+
+#### Find Team ID
+
+To find your team ID, click [here](/reference/components/asana_v1#how-to-find-your-team-id).
+
+
+
+
+
+### Create Subtask
+Name: createSubtask
+
+`Creates a new subtask and adds it to the parent task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| taskGid | Task gID | STRING <details> <summary> Depends On </summary> data.workspace, data.project </details> | The task gID of the task that will be the parent of the subtask. | true |
+| data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), STRING\(assignee)&#125; </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Subtask",
+  "name" : "createSubtask",
+  "parameters" : {
+    "taskGid" : "",
+    "data" : {
+      "workspace" : "",
+      "project" : "",
+      "name" : "",
+      "notes" : "",
+      "due_on" : "2021-01-01",
+      "assignee" : ""
+    }
+  },
+  "type" : "asana/v1/createSubtask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(gid), DATE\(due_on), STRING\(notes), STRING\(name), &#123;STRING\(gid), STRING\(name)&#125;\(workspace), &#123;STRING\(gid), STRING\(name)&#125;\(project), &#123;STRING\(gid), STRING\(name)&#125;\(parent), &#123;STRING\(gid), STRING\(name)&#125;\(assignee)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "gid" : "",
+    "due_on" : "2021-01-01",
+    "notes" : "",
+    "name" : "",
+    "workspace" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "project" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "parent" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "assignee" : {
+      "gid" : "",
+      "name" : ""
+    }
+  }
+}
+```
+
+#### Find Workspace ID
+
+To find your workspace ID, click [here](/reference/components/asana_v1#how-to-find-your-workspace-id).
+
+#### Find Project ID
+
+To find your project ID, click [here](/reference/components/asana_v1#how-to-find-your-project-id).
+
+#### Find Parent Task IDs
+
+To find parent task IDs, click [here](/reference/components/asana_v1#how-to-find-your-task-id).
+
+#### Find Assignee User ID
+
+To find the user ID of the assignee, click [here](/reference/components/asana_v1#how-to-find-user-id).
 
 
 
@@ -198,6 +431,21 @@ Type: OBJECT
 }
 ```
 
+#### Find Workspace ID
+
+To find your workspace ID, click [here](/reference/components/asana_v1#how-to-find-your-workspace-id).
+
+#### Find Project ID
+
+To find your project ID, click [here](/reference/components/asana_v1#how-to-find-your-project-id).
+
+#### Find Assignee User ID
+
+To find the user ID of the assignee, click [here](/reference/components/asana_v1#how-to-find-user-id).
+
+#### Find Tag IDs
+
+To find tag IDs, click [here](/reference/components/asana_v1#how-to-find-tags-id).
 
 
 
@@ -209,3 +457,164 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find your Workspace ID
+
+You have several methods to find your Asana workspace ID:
+
+* **Method 1: Through the Asana URL**
+
+1. Log in to **Asana**.
+
+2. Open the workspace you want to use.
+
+3. Look at the URL in your browser. It will look similar to:
+
+   ```
+   https://app.asana.com/0/123456789012345/home
+   ```
+
+4. The number after `/0/` (`123456789012345` in this example) is your **workspace ID**.
+
+
+* **Method 2: Through the Asana API**
+
+1. Open your browser or API client.
+
+2. Enter the following request:
+
+   ```
+   https://app.asana.com/api/1.0/workspaces
+   ```
+
+3. Look for the workspace you want in the JSON response.
+
+4. The value under `gid` is your **workspace ID**.
+
+
+### How to find your Team ID
+
+You have several methods to find your Asana team ID:
+
+* **Method 1: Through the Asana URL**
+
+1. Open **Asana**.
+
+2. Navigate to the team you want to use.
+
+3. Look at the URL in your browser. It will look similar to:
+
+   ```
+   https://app.asana.com/0/team/987654321098765/overview
+   ```
+
+4. The number in the URL (`987654321098765` in this example) is your **team ID**.
+
+
+* **Method 2: Through the Asana API**
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
+
+   ```
+   https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/teams
+   ```
+
+3. Find the team you want in the JSON response.
+
+4. The value under `gid` is the **team ID**.
+
+
+### How to find your Project ID
+
+You have several methods to find your Asana project ID:
+
+* **Method 1: Through the Project URL**
+
+1. Open the project in **Asana**.
+
+2. Look at the URL in your browser. It will look similar to:
+
+   ```
+   https://app.asana.com/0/123456789012345/678901234567890
+   ```
+
+3. The **second number** (`678901234567890` in this example) is the **project ID**.
+
+* **Method 2: Through the Asana API**
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
+
+   ```
+   https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/projects
+   ```
+
+3. Find the project in the JSON response.
+
+4. The value under `gid` is the **project ID**.
+
+
+### How to find your Task ID
+
+You have several methods to find your Asana task ID:
+
+* **Method 1: Through the Task URL**
+
+1. Open the task in **Asana**.
+
+2. Look at the URL in your browser. It will look similar to:
+
+   ```
+   https://app.asana.com/0/123456789012345/987654321012345
+   ```
+
+3. The **second number** (`987654321012345` in this example) is the **task ID**.
+
+* **Method 2: Through the Asana API**
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `PROJECT_GID` with your project ID):
+
+   ```
+   https://app.asana.com/api/1.0/projects/PROJECT_GID/tasks
+   ```
+
+3. Find the task in the JSON response.
+
+4. The value under `gid` is the **task ID**.
+
+
+### How to find User ID
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
+
+   ```
+   https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/users
+   ```
+
+3. Find the user in the JSON response.
+
+4. The value under `gid` is the **user ID**.
+
+### How to find Tags ID
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
+
+   ```
+   https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/tags
+   ```
+
+3. Find the tag you want in the JSON response.
+
+4. The value under `gid` is the **tag ID**.
