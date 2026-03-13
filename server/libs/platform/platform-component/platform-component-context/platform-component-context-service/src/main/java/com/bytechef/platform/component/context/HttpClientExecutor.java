@@ -526,6 +526,8 @@ class HttpClientExecutor {
 
                 if (mediaType.equals("text/json")) {
                     mediaType = "application/json";
+                } else if (mediaType.equals("text/xml")) {
+                    mediaType = "application/xml";
                 }
 
                 if (responseType.getType() == ResponseType.Type.TEXT && mediaType.startsWith("text/")) {
