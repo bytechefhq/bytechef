@@ -105,9 +105,13 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     public IntegrationInstance getIntegrationInstance(
         long connectedUserId, List<String> componentNames, Environment environment) {
 
+        List<String> lowercasedComponentNames = componentNames.stream()
+            .map(String::toLowerCase)
+            .toList();
+
         return OptionalUtils.get(
             integrationInstanceRepository.findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
-                connectedUserId, componentNames, environment.ordinal()));
+                connectedUserId, lowercasedComponentNames, environment.ordinal()));
     }
 
     @Override

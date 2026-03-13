@@ -110,11 +110,15 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         mergedParameters.putAll(connectionParameters);
 
-        ConnectionDTO connectionDTO = new ConnectionDTO(
-            false, integrationInstanceConfiguration.getAuthorizationType(), Map.of(), null,
-            integration.getComponentName(), Map.of(), connectionDefinition.getVersion(), null, null, null,
-            environment.ordinal(), null, null, null, integrationInstanceConfiguration.getName(),
-            mergedParameters, List.of(), 0);
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(integrationInstanceConfiguration.getAuthorizationType())
+            .componentName(integration.getComponentName())
+            .connectionVersion(connectionDefinition.getVersion())
+            .environmentId(environment.ordinal())
+            .name(integrationInstanceConfiguration.getName())
+            .parameters(mergedParameters)
+            .tags(List.of())
+            .build();
 
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 

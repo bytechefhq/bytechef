@@ -271,7 +271,11 @@ public class EmbeddedMcpServerConfiguration {
 
     private com.bytechef.platform.configuration.domain.Environment getEnvironment(String environment) {
         if (StringUtils.isNotBlank(environment)) {
-            return com.bytechef.platform.configuration.domain.Environment.valueOf(environment.toUpperCase());
+            try {
+                return com.bytechef.platform.configuration.domain.Environment.valueOf(environment.toUpperCase());
+            } catch (IllegalArgumentException illegalArgumentException) {
+                return com.bytechef.platform.configuration.domain.Environment.PRODUCTION;
+            }
         }
 
         return com.bytechef.platform.configuration.domain.Environment.PRODUCTION;
