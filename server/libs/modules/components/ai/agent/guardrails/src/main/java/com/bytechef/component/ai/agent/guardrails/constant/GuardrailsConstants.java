@@ -21,17 +21,15 @@ package com.bytechef.component.ai.agent.guardrails.constant;
  */
 public class GuardrailsConstants {
 
-    public static final String GUARDRAILS = "guardrails";
-
     // Operation modes
     public static final String MODE = "mode";
     public static final String MODE_CLASSIFY = "classify";
     public static final String MODE_SANITIZE = "sanitize";
 
     // Configuration
-    public static final String SENSITIVE_WORDS = "sensitiveWords";
-    public static final String PII_PATTERNS = "piiPatterns";
     public static final String CUSTOM_REGEX_PATTERNS = "customRegexPatterns";
+    public static final String PII_DETECTION = "piiDetection";
+    public static final String SENSITIVE_KEYWORDS = "sensitiveKeywords";
 
     // Validation targets
     public static final String VALIDATE_INPUT = "validateInput";

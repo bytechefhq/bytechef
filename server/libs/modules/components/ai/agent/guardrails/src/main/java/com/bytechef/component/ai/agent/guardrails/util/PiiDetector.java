@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.agent.guardrails.util;
 
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Option;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -56,7 +58,32 @@ public class PiiDetector {
             "IP_ADDRESS",
             Pattern.compile("\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b")));
 
+    public static List<Option<String>> getPiiDetectionOptions() {
+        return List.of(
+            ComponentDsl.option("Email address", "EMAIL"),
+            ComponentDsl.option("Phone number (e.g., 123-456-7890, (123) 456-7890)", "PHONE"),
+            ComponentDsl.option("Credit card number", "CREDIT_CARD"),
+            ComponentDsl.option("IP address (IPv4)", "IP_ADDRESS"),
+            ComponentDsl.option("US Social Security Number", "SSN"));
+    }
+
     private PiiDetector() {
+    }
+
+    /**
+     * Filter the default PII patterns to only those matching the given type names.
+     *
+     * @param selectedTypes the list of PII type names to include (e.g., "EMAIL", "PHONE")
+     * @return filtered list of PII patterns
+     */
+    public static List<PiiPattern> filterByTypes(List<String> selectedTypes) {
+        if (selectedTypes == null || selectedTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return DEFAULT_PII_PATTERNS.stream()
+            .filter(piiPattern -> selectedTypes.contains(piiPattern.type()))
+            .toList();
     }
 
     /**
