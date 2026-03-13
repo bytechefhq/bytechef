@@ -63,7 +63,8 @@ class MicrosoftSharePointNewFileTriggerTest {
                 mockedParameters, null, mockedParameters, mockedTriggerContext);
 
             assertEquals(mockedPollOutput, result);
-            assertEquals(List.of("/sites/siteId/drive/items/parentFolder/children", "file"),
+            assertEquals(
+                List.of("/sites/siteId/drive/items/parentFolder/children", "file"),
                 stringArgumentCaptor.getAllValues());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
