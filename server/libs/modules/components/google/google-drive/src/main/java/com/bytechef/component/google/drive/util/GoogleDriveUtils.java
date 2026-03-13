@@ -47,6 +47,21 @@ public class GoogleDriveUtils {
     private GoogleDriveUtils() {
     }
 
+    public static String getFileWebViewLink(Parameters connectionParameters, String fileId) {
+        Drive drive = GoogleServices.getDrive(connectionParameters);
+
+        try {
+            return drive
+                .files()
+                .get(fileId)
+                .setFields("webViewLink")
+                .execute()
+                .getWebViewLink();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
+    }
+
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext, boolean newFile) {
