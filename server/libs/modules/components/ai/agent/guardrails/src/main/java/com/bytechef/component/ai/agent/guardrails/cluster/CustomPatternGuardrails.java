@@ -47,25 +47,18 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 public class CustomPatternGuardrails {
 
     public static ClusterElementDefinition<GuardrailsFunction> of() {
-        return new CustomPatternGuardrails().build();
+        return build();
     }
 
     private CustomPatternGuardrails() {
     }
 
-    private ClusterElementDefinition<GuardrailsFunction> build() {
+    private static ClusterElementDefinition<GuardrailsFunction> build() {
         return ComponentDsl.<GuardrailsFunction>clusterElement("customPatternGuardrails")
             .title("Custom Pattern Guardrails")
             .description("Block or sanitize content matching custom regular expression patterns.")
             .type(GUARDRAILS)
             .properties(
-                ComponentDsl.string(MODE)
-                    .label("Mode")
-                    .description("Operation mode: classify (block) or sanitize (mask).")
-                    .options(
-                        ComponentDsl.option("Classify (Block)", MODE_CLASSIFY),
-                        ComponentDsl.option("Sanitize (Mask)", MODE_SANITIZE))
-                    .defaultValue(MODE_CLASSIFY),
                 ComponentDsl.array(CUSTOM_REGEX_PATTERNS)
                     .label("Regex Patterns")
                     .description("List of regular expression patterns to detect.")
@@ -79,14 +72,21 @@ public class CustomPatternGuardrails {
                     .label("Validate Output")
                     .description("Check model response before returning.")
                     .defaultValue(true),
+                ComponentDsl.string(MODE)
+                    .label("Output Mode")
+                    .description("Operation mode: classify (block) or sanitize (mask).")
+                    .options(
+                        ComponentDsl.option("Classify (Block)", MODE_CLASSIFY),
+                        ComponentDsl.option("Sanitize (Mask)", MODE_SANITIZE))
+                    .defaultValue(MODE_CLASSIFY),
                 ComponentDsl.string(BLOCKED_MESSAGE)
                     .label("Blocked Message")
                     .description("Message to return when content is blocked.")
                     .defaultValue(DEFAULT_BLOCKED_MESSAGE))
-            .object(() -> this::apply);
+            .object(() -> CustomPatternGuardrails::apply);
     }
 
-    protected Advisor apply(
+    protected static Advisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
 
