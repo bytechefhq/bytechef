@@ -1580,7 +1580,7 @@ public class ComponentInitOpenApiGenerator {
         } else {
             responseType = switch (mimeType) {
                 case "application/json" -> "JSON";
-                case "application/xml" -> "XML";
+                case "application/xml", "text/xml" -> "XML";
                 case "application/octet-stream" -> "BINARY";
                 default -> "TEXT";
             };
