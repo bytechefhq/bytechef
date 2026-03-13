@@ -20,9 +20,7 @@ import static com.bytechef.component.ai.agent.guardrails.GuardrailsComponentHand
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.ai.agent.guardrails.cluster.CustomPatternGuardrails;
-import com.bytechef.component.ai.agent.guardrails.cluster.KeywordGuardrails;
-import com.bytechef.component.ai.agent.guardrails.cluster.PiiGuardrails;
+import com.bytechef.component.ai.agent.guardrails.cluster.Guardrails;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
@@ -48,9 +46,7 @@ public class GuardrailsComponentHandler implements ComponentHandler {
                 .icon("path:assets/guardrails.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .clusterElements(
-                    KeywordGuardrails.of(),
-                    PiiGuardrails.of(),
-                    CustomPatternGuardrails.of()));
+                    Guardrails.of()));
     }
 
     @Override
