@@ -52,6 +52,14 @@ public abstract class AbstractNiftyUtils {
         return List.of();
     }
 
+    public static List<Option<String>> getLabelsOptions(
+        Parameters inputParameters,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
+        Context context) {
+
+        return List.of();
+    }
+
     public static List<Option<String>> getTemplateIdOptions(
         Parameters inputParameters,
         Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,

@@ -22,6 +22,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.nifty.trigger.NiftyNewTaskTrigger;
@@ -55,6 +56,39 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
             modifiableActionDefinition.properties(properties);
         }
 
+        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
+            String name = actionDefinition.getName();
+
+            switch (name) {
+                case "addLabels" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/nifty_v1#add-labels");
+                case "createProject" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/nifty_v1#create-project");
+                case "createStatus" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/nifty_v1#create-status");
+                case "createTask" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/nifty_v1#create-task");
+                case "getTask" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/nifty_v1#get-task");
+                case "getTrackedTimeReport" ->
+                    actionDefinition.help(
+                        "",
+                        "https://docs.bytechef.io/reference/components/nifty_v1#get-tracked-time-report");
+                default -> {
+                }
+            }
+        }
+
         return super.modifyActions(actionDefinitions);
     }
 
@@ -62,8 +96,20 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp(
+                "Nifty Web API documentation", "https://developers.niftypm.com/")
             .icon("path:assets/nifty.svg")
+            .version(1)
             .categories(ComponentCategory.PROJECT_MANAGEMENT, ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/nifty_v1#connection-setup")
+            .version(1);
     }
 
 }
