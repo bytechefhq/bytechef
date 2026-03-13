@@ -47,8 +47,7 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
             .customAction(true)
             .icon("path:assets/asana.svg")
             .categories(ComponentCategory.PROJECT_MANAGEMENT)
-            .customActionHelp(
-                "Asana Web API documentation", "https://developers.asana.com/docs/api-explorer")
+            .customActionHelp("Asana Web API documentation", "https://developers.asana.com/docs/api-explorer")
             .version(1);
     }
 
@@ -95,33 +94,25 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (actionDefinition.getName()
-            .equals("createCustomField")
-            && Objects.equals(modifiableProperty.getName(), "data")) {
+        String actionDefinitionName = actionDefinition.getName();
 
+        if (actionDefinitionName.equals("createCustomField") && Objects.equals(modifiableProperty.getName(), "data")) {
             Optional<List<? extends ValueProperty<?>>> propertiesOptional =
                 ((ModifiableObjectProperty) modifiableProperty).getProperties();
 
             for (BaseProperty baseProperty : propertiesOptional.get()) {
-
                 if (Objects.equals(baseProperty.getName(), "text_value")) {
                     ((ModifiableStringProperty) baseProperty)
                         .displayCondition("%s == '%s'".formatted("data.resource_subtype", "text"));
-                }
-
-                else if (Objects.equals(baseProperty.getName(), "enum_options")) {
+                } else if (Objects.equals(baseProperty.getName(), "enum_options")) {
                     ((ModifiableArrayProperty) baseProperty)
-                        .displayCondition("%s == '%s' || %s == '%s'"
-                            .formatted("data.resource_subtype", "enum",
-                                "data.resource_subtype", "multi_enum"));
-                }
-
-                else if (Objects.equals(baseProperty.getName(), "number_value")) {
+                        .displayCondition(
+                            "%s == '%s' || %s == '%s'".formatted(
+                                "data.resource_subtype", "enum", "data.resource_subtype", "multi_enum"));
+                } else if (Objects.equals(baseProperty.getName(), "number_value")) {
                     ((ModifiableNumberProperty) baseProperty)
                         .displayCondition("%s == '%s'".formatted("data.resource_subtype", "number"));
-                }
-
-                else if (Objects.equals(baseProperty.getName(), "precision")) {
+                } else if (Objects.equals(baseProperty.getName(), "precision")) {
                     ((ModifiableIntegerProperty) baseProperty)
                         .displayCondition("%s == '%s'".formatted("data.resource_subtype", "number"));
                 }
@@ -129,14 +120,10 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
                 else if (Objects.equals(baseProperty.getName(), "date_value")) {
                     ((ModifiableObjectProperty) baseProperty)
                         .displayCondition("%s == '%s'".formatted("data.resource_subtype", "date"));
-                }
-
-                else if (Objects.equals(baseProperty.getName(), "people_value")) {
+                } else if (Objects.equals(baseProperty.getName(), "people_value")) {
                     ((ModifiableArrayProperty) baseProperty)
                         .displayCondition("%s == '%s'".formatted("data.resource_subtype", "people"));
-                }
-
-                else if (Objects.equals(baseProperty.getName(), "reference_value")) {
+                } else if (Objects.equals(baseProperty.getName(), "reference_value")) {
                     ((ModifiableArrayProperty) baseProperty)
                         .displayCondition("%s == '%s'".formatted("data.resource_subtype", "reference"));
                 }

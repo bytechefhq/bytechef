@@ -41,8 +41,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
         String searchText, Context context) {
 
         return getPaginatedOptions(
-            "/users?workspace=" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class),
-            context);
+            context, "/users", "workspace", inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class));
     }
 
     public static List<Option<String>> getProjectOptions(
@@ -50,17 +49,14 @@ public class AsanaUtils extends AbstractAsanaUtils {
         String searchText, Context context) {
 
         return getPaginatedOptions(
-            "/projects?workspace=" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class),
-            context);
+            context, "/projects", "workspace", inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class));
     }
 
     public static List<Option<String>> getTagsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        return getPaginatedOptions(
-            "/tags",
-            context);
+        return getPaginatedOptions(context, "/tags");
     }
 
     public static List<Option<String>> getTeamOptions(
@@ -68,17 +64,15 @@ public class AsanaUtils extends AbstractAsanaUtils {
         String searchText, Context context) {
 
         return getPaginatedOptions(
-            "/workspaces/" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class) + "/teams",
-            context);
+            context,
+            "/workspaces/" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class) + "/teams");
     }
 
     public static List<Option<String>> getWorkspaceOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        return getPaginatedOptions(
-            "/workspaces",
-            context);
+        return getPaginatedOptions(context, "/workspaces");
     }
 
     public static List<Option<String>> getTaskGidOptions(
@@ -86,37 +80,38 @@ public class AsanaUtils extends AbstractAsanaUtils {
         String searchText, Context context) {
 
         return getPaginatedOptions(
-            "/projects/" + inputParameters.getRequiredFromPath("data.project", String.class)
-                + "/tasks?opt_fields=gid,name",
-            context);
+            context,
+            "/projects/" + inputParameters.getRequiredFromPath("data.project", String.class) + "/tasks",
+            "opt_fields", "gid,name");
     }
 
-    private static List<Option<String>> getPaginatedOptions(String baseUrl, Context context) {
+    private static List<Option<String>> getPaginatedOptions(
+        Context context, String url, Object... additionalQueryParameters) {
 
         List<Option<String>> options = new ArrayList<>();
         String offset = null;
-        final int limit = 100;
+        int limit = 100;
 
         do {
+            List<Object> queryParameters = new ArrayList<>();
 
-            StringBuilder url = new StringBuilder(baseUrl);
-            url.append(baseUrl.contains("?") ? "&" : "?")
-                .append("limit=")
-                .append(limit);
-            if (offset != null) {
-                url.append("&offset=")
-                    .append(offset);
-            }
+            queryParameters.add("limit");
+            queryParameters.add(limit);
+            queryParameters.add("offset");
+            queryParameters.add(offset);
 
-            Map<String, Object> response = context.http(http -> http.get(url.toString()))
+            queryParameters.addAll(List.of(additionalQueryParameters));
+
+            Map<String, Object> body = context.http(http -> http.get(url))
+                .queryParameters(queryParameters.toArray())
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
-                .getBody(new TypeReference<Map<String, Object>>() {});
+                .getBody(new TypeReference<>() {});
 
-            Object dataObj = response.get("data");
+            Object dataObj = body.get("data");
             addOptions(dataObj, options);
 
-            offset = extractNextOffset(response);
+            offset = extractNextOffset(body);
 
         } while (offset != null);
 
@@ -124,15 +119,10 @@ public class AsanaUtils extends AbstractAsanaUtils {
     }
 
     private static void addOptions(Object dataObj, List<Option<String>> options) {
-
         if (dataObj instanceof List<?> dataList) {
             for (Object obj : dataList) {
                 if (obj instanceof Map<?, ?> map) {
-
-                    String gid = String.valueOf(map.get("gid"));
-                    String name = String.valueOf(map.get("name"));
-
-                    options.add(option(name, gid));
+                    options.add(option((String) map.get("name"), (String) map.get("gid")));
                 }
             }
         }
@@ -143,6 +133,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
 
         if (nextPageObj instanceof Map<?, ?> nextPage) {
             Object offsetObj = nextPage.get("offset");
+
             if (offsetObj != null) {
                 return offsetObj.toString();
             }
