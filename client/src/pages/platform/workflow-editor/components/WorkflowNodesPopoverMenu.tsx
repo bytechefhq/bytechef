@@ -24,6 +24,8 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     hideTaskDispatchers?: boolean;
     multipleClusterElementsNode?: boolean;
     nodeIndex?: number;
+    onOpenChange?: (open: boolean) => void;
+    open?: boolean;
     sourceNodeId: string;
     sourceNodeName?: string;
 }
@@ -38,13 +40,18 @@ const WorkflowNodesPopoverMenu = ({
     hideTriggerComponents = false,
     multipleClusterElementsNode = false,
     nodeIndex,
+    onOpenChange: externalOnOpenChange,
+    open: externalOpen,
     sourceNodeId,
     sourceNodeName,
 }: WorkflowNodesPopoverMenuProps) => {
     const [actionPanelOpen, setActionPanelOpen] = useState(false);
     const [componentDefinitionToBeAdded, setComponentDefinitionToBeAdded] = useState<ComponentDefinition | null>(null);
-    const [popoverOpen, setPopoverOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
+
+    const popoverOpen = externalOpen ?? internalOpen;
+    const setPopoverOpen = externalOnOpenChange ?? setInternalOpen;
 
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const {edges, nodes} = useWorkflowDataStore(
@@ -134,6 +141,7 @@ const WorkflowNodesPopoverMenu = ({
             setPopoverOpen(false);
             setTrigger(false);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
