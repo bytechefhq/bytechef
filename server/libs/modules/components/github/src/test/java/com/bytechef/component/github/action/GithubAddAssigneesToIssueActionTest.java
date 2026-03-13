@@ -30,9 +30,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
@@ -52,11 +55,11 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 class GithubAddAssigneesToIssueActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        REPOSITORY, "testRepo", ISSUE, "testIssue", ASSIGNEES, List.of("githubUsername", "githubUsername2")));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", ASSIGNEES, List.of("githubUsername", "githubUsername2")));
     private final Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -79,23 +82,16 @@ class GithubAddAssigneesToIssueActionTest {
             Object result = GithubAddAssigneesToIssueAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(responseMap, result);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
 
-            assertNotNull(capturedFunction);
-
-            Http.Configuration.ConfigurationBuilder configurationBuilder =
-                configurationBuilderArgumentCaptor.getValue();
-            Http.Configuration configuration = configurationBuilder.build();
-            Http.ResponseType responseType = configuration.getResponseType();
-
-            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
+            assertEquals("/repos/testOwner/testRepo/issues/testIssue/assignees", stringArgumentCaptor.getValue());
             assertEquals(
-                "/repos/testOwner/testRepo/issues/testIssue/assignees", stringArgumentCaptor.getValue());
-
-            Body body = bodyArgumentCaptor.getValue();
-
-            assertEquals(Map.of(ASSIGNEES, List.of("githubUsername", "githubUsername2")), body.getContent());
+                Body.of(Map.of(ASSIGNEES, List.of("githubUsername", "githubUsername2")), BodyContentType.JSON),
+                bodyArgumentCaptor.getValue());
         }
     }
 }

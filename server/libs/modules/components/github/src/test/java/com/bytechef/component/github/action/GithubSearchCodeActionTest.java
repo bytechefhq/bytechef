@@ -26,6 +26,7 @@ import static com.bytechef.component.github.constant.GithubConstants.PATH;
 import static com.bytechef.component.github.constant.GithubConstants.PER_PAGE;
 import static com.bytechef.component.github.constant.GithubConstants.QUERY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -35,15 +36,15 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,8 +59,8 @@ class GithubSearchCodeActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(OWNER, "testOwner", REPOSITORY, "testRepo", QUERY, "testQuery", EXTENSION, "testExtension",
             FILENAME, "testFileName", PATH, "testPath", IN, "file", PAGE, 1, PER_PAGE, 20));
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-    private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
 
     @Test
     void testPerform(
@@ -69,7 +70,7 @@ class GithubSearchCodeActionTest {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(OK, true));
@@ -77,29 +78,57 @@ class GithubSearchCodeActionTest {
         Object result = GithubSearchCodeAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(OK, true), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/search/code", stringArgumentCaptor.getValue());
 
-        Object[] queryObject = queryArgumentCaptor.getValue();
-        List<Object> queryList = Arrays.asList(queryObject);
-
-        String query =
-            "testQuery repo:testOwner/testRepo extension:testExtension filename:testFileName path:testPath in:file";
-
-        List<Object> expectedQueryList = Arrays.asList(
-            "q", query,
+        Object[] expectedQuery = {
+            "q",
+            "testQuery repo:testOwner/testRepo extension:testExtension filename:testFileName path:testPath in:file",
             PAGE, 1,
-            PER_PAGE, 20);
+            PER_PAGE, 20
+        };
 
-        assertEquals(expectedQueryList, queryList);
+        assertArrayEquals(expectedQuery, objectsArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testPerformWithMinimumParameters(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters minParameters = MockParametersFactory.create(
+            Map.of(OWNER, "testOwner", REPOSITORY, "testRepo", QUERY, "testQuery"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(OK, true));
+
+        Object result = GithubSearchCodeAction.perform(minParameters, null, mockedContext);
+
+        assertEquals(Map.of(OK, true), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/search/code", stringArgumentCaptor.getValue());
+
+        Object[] expectedQuery = {
+            "q", "testQuery repo:testOwner/testRepo",
+            PAGE, null,
+            PER_PAGE, null
+        };
+
+        assertArrayEquals(expectedQuery, objectsArgumentCaptor.getValue());
     }
 }

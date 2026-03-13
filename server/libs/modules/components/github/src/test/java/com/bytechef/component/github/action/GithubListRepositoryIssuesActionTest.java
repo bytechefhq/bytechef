@@ -17,13 +17,13 @@
 package com.bytechef.component.github.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.github.util.GithubUtils;
-import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -36,21 +36,19 @@ import org.mockito.MockedStatic;
  */
 class GithubListRepositoryIssuesActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
     private final Context mockedContext = mock(Context.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
 
     @Test
     void testPerform() {
-
         try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
             githubUtilsMockedStatic.when(() -> GithubUtils.getRepositoryIssues(
                 parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(List.of());
 
-            List<Map<?, ?>> result = GithubListRepositoryIssuesAction.perform(
-                mockedParameters, null, mockedContext);
+            List<Map<?, ?>> result = GithubListRepositoryIssuesAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(List.of(), result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());

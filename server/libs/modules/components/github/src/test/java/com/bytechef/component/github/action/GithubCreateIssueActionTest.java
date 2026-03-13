@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
@@ -71,20 +72,15 @@ class GithubCreateIssueActionTest {
         Object result = GithubCreateIssueAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(OK, true), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
         assertEquals("/repos/testOwner/testRepo/issues", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of(TITLE, "name", BODY, "description"), body.getContent());
+        assertEquals(
+            Body.of(Map.of(TITLE, "name", BODY, "description"), Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }
