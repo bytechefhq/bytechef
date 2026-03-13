@@ -130,7 +130,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
         const [uncontrolledValues, setUncontrolledValues] = useState(defaultValue);
 
-        const selectedValues = isControlled ? value : uncontrolledValues;
+        const selectedValues = isControlled ? (Array.isArray(value) ? value : []) : uncontrolledValues;
 
         const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
