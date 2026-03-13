@@ -44,7 +44,7 @@ public class GoogleDriveNewFolderTrigger {
         .type(TriggerType.POLLING)
         .properties(
             string(FOLDER_ID)
-                .label("Parent Folder")
+                .label("Parent Folder ID")
                 .description("The ID of the folder where the new folder is uploaded.")
                 .options(GoogleUtils.getFileOptionsByMimeTypeForTriggers(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
                 .required(true))
