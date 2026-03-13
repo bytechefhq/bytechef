@@ -5377,7 +5377,7 @@
   "customAction": true,
   "customActionHelp": {
     "body": "",
-    "learnMoreUrl": "https://developers.google.com/workspace/drive/api/guides/about-sdk"
+    "learnMoreUrl": "https://developers.google.com/workspace/drive/api/reference/rest/v3"
   },
   "description": "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and collaborate online.",
   "icon": "path:assets/google-drive.svg",
@@ -5670,7 +5670,7 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Parent Folder",
+      "label": "Parent Folder ID",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
@@ -5980,7 +5980,7 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Parent Folder",
+      "label": "Parent Folder ID",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
