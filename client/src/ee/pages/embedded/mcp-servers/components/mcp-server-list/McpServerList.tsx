@@ -62,12 +62,10 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                                         <div className="flex-1 space-y-4">
                                             <h2 className="font-semibold text-foreground">Server URL</h2>
 
-                                            {mcpServer.url && (
-                                                <McpServerConfigurationCode
-                                                    codeSnippet={mcpServer.url}
-                                                    onRefresh={handleRefresh}
-                                                />
-                                            )}
+                                            <McpServerConfigurationCode
+                                                codeSnippet={mcpServer.url || ''}
+                                                onRefresh={handleRefresh}
+                                            />
                                         </div>
                                     </TabsContent>
                                 </Tabs>
