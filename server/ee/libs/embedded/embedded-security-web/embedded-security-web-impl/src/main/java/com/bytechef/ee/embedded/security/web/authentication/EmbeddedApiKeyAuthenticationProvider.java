@@ -14,6 +14,7 @@ import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
@@ -45,7 +46,7 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
         if (embeddedApiKeyAuthenticationToken.getSecretKey() != null &&
             !apiKeyService.exists(embeddedApiKeyAuthenticationToken.getSecretKey(), environmentId)) {
 
-            throw new IllegalArgumentException("Invalid API key");
+            throw new BadCredentialsException("Invalid API key");
         }
 
         String externalUserId = embeddedApiKeyAuthenticationToken.getExternalUserId();
