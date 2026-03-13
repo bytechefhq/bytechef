@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
+import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {getNodeLabel} from '@/pages/platform/workflow-editor/utils/getNodeLabel';
@@ -11,7 +12,7 @@ import {NodeDataType} from '@/shared/types';
 import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {ArrowLeftRightIcon, ComponentIcon, PinOffIcon, TrashIcon} from 'lucide-react';
+import {ArrowLeftRightIcon, CheckIcon, ComponentIcon, PinOffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -32,10 +33,13 @@ import {mapHandlePosition} from '../utils/directionUtils';
 import handleDeleteTask from '../utils/handleDeleteTask';
 import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
+import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
+    const [renameValue, setRenameValue] = useState('');
+    const [switchPopoverOpen, setSwitchPopoverOpen] = useState(false);
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const isHorizontal = layoutDirection === 'LR';
@@ -55,16 +59,22 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
     const {
         clusterElementsCanvasOpen,
+        contextMenuOpen,
         mainClusterRootComponentDefinition,
         nestedClusterRootsComponentDefinitions,
+        renamingNodeName,
         rootClusterElementNodeData,
+        setRenamingNodeName,
         setRootClusterElementNodeData,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            contextMenuOpen: state.contextMenuOpen,
             mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
             nestedClusterRootsComponentDefinitions: state.nestedClusterRootsComponentDefinitions,
+            renamingNodeName: state.renamingNodeName,
             rootClusterElementNodeData: state.rootClusterElementNodeData,
+            setRenamingNodeName: state.setRenamingNodeName,
             setRootClusterElementNodeData: state.setRootClusterElementNodeData,
         }))
     );
@@ -94,7 +104,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 workflow,
                 workflowNodeName: data.workflowNodeName,
             }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- only recompute when tasks/triggers change, not on every workflow reference change
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [data.label, data.title, data.workflowNodeName, workflowTasks, workflowTriggers]
     );
 
@@ -199,15 +209,53 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         });
     };
 
+    const handleRenameSubmit = (newLabel: string) => {
+        const trimmed = newLabel.trim();
+
+        if (trimmed && trimmed !== nodeLabel) {
+            saveWorkflowDefinition({
+                decorative: true,
+                nodeData: {
+                    ...data,
+                    label: trimmed,
+                    name: data.workflowNodeName,
+                },
+                updateWorkflowMutation: updateWorkflowMutation!,
+            });
+        }
+
+        setRenamingNodeName(undefined);
+    };
+
+    const handleRenameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            handleRenameSubmit(renameValue);
+        }
+
+        if (event.key === 'Escape') {
+            setRenamingNodeName(undefined);
+        }
+    };
+
+    const handleStartRename = () => {
+        setRenameValue(nodeLabel ?? '');
+        setRenamingNodeName(data.name);
+    };
+
+    const isRenaming = renamingNodeName === data.name;
+
+    const suppressHover = contextMenuOpen || isRenaming || switchPopoverOpen;
+
     const nodeDescription =
         workflowNodeDescription?.description && !data.clusterElementType
             ? workflowNodeDescription.description
             : clusterElementDefinitionData?.description;
 
-    return (
+    const nodeContent = (
         <div
             className={twMerge(
-                'group relative flex min-w-60 cursor-pointer justify-center',
+                'relative flex min-w-60 cursor-pointer justify-center',
+                !suppressHover && 'group',
                 !data.taskDispatcher && 'items-center',
                 (data.trigger || isMainRootClusterElement) && 'nodrag',
                 isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center gap-1',
@@ -223,6 +271,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             hideActionComponents
                             hideClusterElementComponents
                             hideTaskDispatchers
+                            onOpenChange={setSwitchPopoverOpen}
+                            open={switchPopoverOpen}
                             sourceNodeId={id}
                         >
                             <Button
@@ -236,7 +286,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         <div className="flex flex-col gap-1">
                             <Button
                                 className="opacity-100"
-                                icon={<TrashIcon />}
+                                icon={<Trash2Icon />}
                                 onClick={() => handleDeleteNodeClick(data)}
                                 size="iconSm"
                                 title="Delete a node"
@@ -271,7 +321,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             'opacity-100',
                             !data.multipleClusterElementsNode && hasSavedClusterElementPosition && 'self-center'
                         )}
-                        icon={<TrashIcon />}
+                        icon={<Trash2Icon />}
                         onClick={() => handleDeleteNodeClick(data)}
                         size="iconSm"
                         title="Delete a node"
@@ -320,6 +370,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         setHoveredNodeName(undefined);
                     }
                 }}
+                open={suppressHover ? false : undefined}
             >
                 <HoverCardTrigger>
                     <Button
@@ -420,15 +471,39 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         isHorizontal && isRegularNode && 'w-auto min-w-0 max-w-[150px]'
                     )}
                 >
-                    <span
-                        className={twMerge(
-                            'font-semibold',
-                            isClusterElement && 'text-sm',
-                            (isClusterElement || (isHorizontal && isRegularNode)) && 'w-full truncate'
-                        )}
-                    >
-                        {nodeLabel}
-                    </span>
+                    {isRenaming ? (
+                        <div className="z-10 flex items-center rounded-md border-2 p-1 shadow-sm">
+                            <div className="flex items-center">
+                                <input
+                                    autoFocus
+                                    className="nodrag w-48 cursor-text select-text rounded border border-stroke-neutral-secondary bg-surface-neutral-secondary px-2 py-1 text-sm font-semibold outline-none hover:bg-surface-neutral-secondary-hover"
+                                    onBlur={(event) => handleRenameSubmit(event.target.value)}
+                                    onChange={(event) => setRenameValue(event.target.value)}
+                                    onKeyDown={handleRenameKeyDown}
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    value={renameValue}
+                                />
+
+                                <Button
+                                    className="ml-1 size-8 shrink-0 cursor-pointer [&_svg]:size-5"
+                                    icon={<CheckIcon className="text-content-brand-primary" />}
+                                    onClick={() => handleRenameSubmit(renameValue)}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <span
+                            className={twMerge(
+                                'font-semibold',
+                                isClusterElement && 'w-full truncate text-sm',
+                                isHorizontal && isRegularNode && 'w-full truncate'
+                            )}
+                        >
+                            {nodeLabel}
+                        </span>
+                    )}
 
                     {data.operationName && (
                         <pre
@@ -529,6 +604,23 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             )}
         </div>
     );
+
+    if (isRegularNode) {
+        return (
+            <WorkflowNodeContextMenu
+                data={data}
+                hasSavedPosition={!!hasSavedNodePosition}
+                onDelete={() => handleDeleteNodeClick(data)}
+                onRename={handleStartRename}
+                onResetPosition={() => handleRemoveNodePosition(data.name)}
+                onSwitch={() => setSwitchPopoverOpen(true)}
+            >
+                {nodeContent}
+            </WorkflowNodeContextMenu>
+        );
+    }
+
+    return nodeContent;
 };
 
 export default memo(WorkflowNode);
