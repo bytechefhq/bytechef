@@ -31,9 +31,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -68,24 +71,16 @@ class GithubCreateCommentOnIssueActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(OK, true));
 
-        Object result = GithubCreateCommentOnIssueAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = GithubCreateCommentOnIssueAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(OK, true), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/repos/testOwner/testRepo/issues/testIssue/comments", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of(BODY, "comment"), body.getContent());
+        assertEquals(Body.of(Map.of(BODY, "comment"), BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

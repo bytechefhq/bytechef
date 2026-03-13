@@ -20,6 +20,7 @@ import static com.bytechef.component.github.constant.GithubConstants.FILTER;
 import static com.bytechef.component.github.constant.GithubConstants.STATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -39,11 +40,11 @@ import org.mockito.MockedStatic;
  */
 class GithubListIssuesActionTest {
 
-    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILTER, "all", STATE, "all"));
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = forClass(Boolean.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Context mockedContext = mock(Context.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILTER, "all", STATE, "all"));
 
     @Test
     void testPerform() {
@@ -55,11 +56,9 @@ class GithubListIssuesActionTest {
                     stringArgumentCaptor.capture()))
                 .thenReturn(List.of());
 
-            List<Map<String, ?>> result = GithubListIssuesAction.perform(
-                mockedParameters, null, mockedContext);
+            List<Map<String, ?>> result = GithubListIssuesAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(List.of(), result);
-
             assertEquals(List.of("/issues", FILTER, "all", STATE, "all"), stringArgumentCaptor.getAllValues());
             assertFalse(booleanArgumentCaptor.getValue());
         }

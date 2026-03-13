@@ -32,9 +32,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -50,10 +53,11 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class GithubCreateForkActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(OWNER, "testOwner", REPOSITORY, "testRepo", NAME, "name",
-            ORGANIZATION, "testOrganization", DEFAULT_BRANCH_ONLY, true));
+        Map.of(
+            OWNER, "testOwner", REPOSITORY, "testRepo", NAME, "name", ORGANIZATION, "testOrganization",
+            DEFAULT_BRANCH_ONLY, true));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -72,21 +76,17 @@ class GithubCreateForkActionTest {
         Object result = GithubCreateForkAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of(OK, true), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/repos/testOwner/testRepo/forks", stringArgumentCaptor.getValue());
         assertEquals(
-            Http.Body.of(
+            Body.of(
                 Map.of(NAME, "name", ORGANIZATION, "testOrganization", DEFAULT_BRANCH_ONLY, true),
-                Http.BodyContentType.JSON),
+                BodyContentType.JSON),
             bodyArgumentCaptor.getValue());
     }
 }
