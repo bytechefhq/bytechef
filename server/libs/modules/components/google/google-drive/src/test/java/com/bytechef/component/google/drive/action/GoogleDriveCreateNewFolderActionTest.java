@@ -20,6 +20,7 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -29,6 +30,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Create;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.List;
@@ -43,14 +46,14 @@ import org.mockito.MockedStatic;
  */
 class GoogleDriveCreateNewFolderActionTest {
 
-    private final ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
-    private final Drive.Files.Create mockedCreate = mock(Drive.Files.Create.class);
+    private final ArgumentCaptor<File> fileArgumentCaptor = forClass(File.class);
+    private final Create mockedCreate = mock(Create.class);
     private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Files mockedFiles = mock(Files.class);
     private final File mockedGoogleFile = mock(File.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FOLDER_NAME, "folderName", FOLDER_ID, "parentFolder"));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
@@ -65,8 +68,8 @@ class GoogleDriveCreateNewFolderActionTest {
             when(mockedCreate.execute())
                 .thenReturn(mockedGoogleFile);
 
-            File result =
-                GoogleDriveCreateNewFolderAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
+            File result = GoogleDriveCreateNewFolderAction.perform(
+                mockedParameters, mockedParameters, mock(ActionContext.class));
 
             assertEquals(mockedGoogleFile, result);
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());

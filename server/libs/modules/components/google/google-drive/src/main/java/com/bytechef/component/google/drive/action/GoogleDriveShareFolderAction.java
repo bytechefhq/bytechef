@@ -20,17 +20,13 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.google.commons.GoogleUtils;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
-import java.io.IOException;
 
 /**
  * @author Marija Horvat
@@ -57,20 +53,6 @@ public class GoogleDriveShareFolderAction {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        try {
-            File file = drive
-                .files()
-                .get(inputParameters.getRequiredString(FOLDER_ID))
-                .setFields("webViewLink")
-                .execute();
-
-            return (String) file.get("webViewLink");
-
-        } catch (IOException e) {
-            throw translateGoogleIOException(e);
-        }
+        return GoogleDriveUtils.getFileWebViewLink(connectionParameters, inputParameters.getRequiredString(FOLDER_ID));
     }
 }

@@ -19,6 +19,7 @@ package com.bytechef.component.google.drive.action;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -27,12 +28,16 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Create;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -44,24 +49,21 @@ import org.mockito.MockedStatic;
 class GoogleDriveUploadFileActionTest {
 
     private final ArgumentCaptor<AbstractInputStreamContent> abstractInputStreamContentArgumentCaptor =
-        ArgumentCaptor.forClass(AbstractInputStreamContent.class);
-    private final ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
+        forClass(AbstractInputStreamContent.class);
+    private final ArgumentCaptor<File> fileArgumentCaptor = forClass(File.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Drive.Files.Create mockedCreate = mock(Drive.Files.Create.class);
+    private final Create mockedCreate = mock(Create.class);
     private final Drive mockedDrive = mock(Drive.class);
     private final java.io.File mockedFile = mock(java.io.File.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Files mockedFiles = mock(Files.class);
     private final File mockedGoogleFile = mock(File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FILE_ENTRY, mockedFileEntry, FOLDER_ID, "parentFolder"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
-        when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
-            .thenReturn(mockedFileEntry);
-        when(mockedParameters.getString(FOLDER_ID))
-            .thenReturn("parentFolder");
         when(mockedFileEntry.getName())
             .thenReturn("name");
         when(mockedFileEntry.getMimeType())

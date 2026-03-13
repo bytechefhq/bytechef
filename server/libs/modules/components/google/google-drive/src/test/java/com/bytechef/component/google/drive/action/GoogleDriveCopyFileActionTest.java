@@ -20,6 +20,7 @@ import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -43,7 +44,7 @@ class GoogleDriveCopyFileActionTest {
     private final File mockedFile = mock(File.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FILE_ID, "originalFileId", FILE_NAME, "newFileName", FOLDER_ID, "newFolderId"));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() {
