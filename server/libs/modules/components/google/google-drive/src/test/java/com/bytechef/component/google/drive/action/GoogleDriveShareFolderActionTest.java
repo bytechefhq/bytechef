@@ -18,17 +18,14 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -40,44 +37,25 @@ import org.mockito.MockedStatic;
  */
 class GoogleDriveShareFolderActionTest {
 
-    private final Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
-    private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FOLDER_ID, "testId"));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
-    private final File testFile = new File()
-        .setId("testFolderId")
-        .setName("folderName")
-        .setMimeType("application/vnd.google-apps.folder")
-        .setKind("drive#file")
-        .set("webViewLink", "https://drive.google.com/drive/folders/testFolderId");
+    private final Parameters mockedConnectionParameters = mock(Parameters.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(FOLDER_ID, "testId"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getDrive(parametersArgumentCaptor.capture()))
-                .thenReturn(mockedDrive);
-            when(mockedDrive.files())
-                .thenReturn(mockedFiles);
-            when(mockedFiles.get(stringArgumentCaptor.capture()))
-                .thenReturn(mockedGet);
-            when(mockedGet.setFields("webViewLink"))
-                .thenReturn(mockedGet);
-            when(mockedGet.execute())
-                .thenReturn(testFile);
+        try (MockedStatic<GoogleDriveUtils> googleDriveUtilsMockedStatic = mockStatic(GoogleDriveUtils.class)) {
+            googleDriveUtilsMockedStatic
+                .when(() -> GoogleDriveUtils.getFileWebViewLink(
+                    parametersArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn("link");
 
             String sharedLink = GoogleDriveShareFolderAction.perform(
-                mockedParameters, mockedParameters, mock(ActionContext.class));
+                mockedInputParameters, mockedConnectionParameters, mock(ActionContext.class));
 
-            verify(mockedDrive.files()).get("testId");
-            verify(mockedGet).setFields("webViewLink");
-
-            assertEquals("https://drive.google.com/drive/folders/testFolderId", sharedLink);
+            assertEquals("link", sharedLink);
             assertEquals("testId", stringArgumentCaptor.getValue());
-            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
         }
     }
 }
