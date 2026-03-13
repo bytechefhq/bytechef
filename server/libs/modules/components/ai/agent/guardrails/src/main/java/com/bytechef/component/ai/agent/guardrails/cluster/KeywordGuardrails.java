@@ -44,25 +44,18 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 public class KeywordGuardrails {
 
     public static ClusterElementDefinition<GuardrailsFunction> of() {
-        return new KeywordGuardrails().build();
+        return build();
     }
 
     private KeywordGuardrails() {
     }
 
-    private ClusterElementDefinition<GuardrailsFunction> build() {
+    private static ClusterElementDefinition<GuardrailsFunction> build() {
         return ComponentDsl.<GuardrailsFunction>clusterElement("keywordGuardrails")
             .title("Keyword Guardrails")
             .description("Block or sanitize content containing specified keywords or phrases.")
             .type(GUARDRAILS)
             .properties(
-                ComponentDsl.string(MODE)
-                    .label("Mode")
-                    .description("Operation mode: classify (block) or sanitize (mask).")
-                    .options(
-                        ComponentDsl.option("Classify (Block)", MODE_CLASSIFY),
-                        ComponentDsl.option("Sanitize (Mask)", MODE_SANITIZE))
-                    .defaultValue(MODE_CLASSIFY),
                 ComponentDsl.array(SENSITIVE_WORDS)
                     .label("Sensitive Words")
                     .description("List of words or phrases to detect.")
@@ -76,14 +69,21 @@ public class KeywordGuardrails {
                     .label("Validate Output")
                     .description("Check model response before returning.")
                     .defaultValue(true),
+                ComponentDsl.string(MODE)
+                    .label("Output Mode")
+                    .description("Operation mode: classify (block) or sanitize (mask).")
+                    .options(
+                        ComponentDsl.option("Classify (Block)", MODE_CLASSIFY),
+                        ComponentDsl.option("Sanitize (Mask)", MODE_SANITIZE))
+                    .defaultValue(MODE_CLASSIFY),
                 ComponentDsl.string(BLOCKED_MESSAGE)
                     .label("Blocked Message")
                     .description("Message to return when content is blocked.")
                     .defaultValue(DEFAULT_BLOCKED_MESSAGE))
-            .object(() -> this::apply);
+            .object(() -> KeywordGuardrails::apply);
     }
 
-    protected Advisor apply(
+    protected static Advisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
 

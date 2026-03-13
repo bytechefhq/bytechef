@@ -49,29 +49,22 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 public class PiiGuardrails {
 
     public static ClusterElementDefinition<GuardrailsFunction> of() {
-        return new PiiGuardrails().build();
+        return build();
     }
 
     private PiiGuardrails() {
     }
 
-    private ClusterElementDefinition<GuardrailsFunction> build() {
+    private static ClusterElementDefinition<GuardrailsFunction> build() {
         return ComponentDsl.<GuardrailsFunction>clusterElement("piiGuardrails")
-            .title("PII Guardrails")
+            .title("Personally Identifiable Information Guardrails")
             .description(
                 "Detect and protect personally identifiable information (PII) such as email addresses, phone " +
                     "numbers, social security numbers, and credit card numbers.")
             .type(GUARDRAILS)
             .properties(
-                ComponentDsl.string(MODE)
-                    .label("Mode")
-                    .description("Operation mode: classify (block) or sanitize (mask).")
-                    .options(
-                        ComponentDsl.option("Classify (Block)", MODE_CLASSIFY),
-                        ComponentDsl.option("Sanitize (Mask)", MODE_SANITIZE))
-                    .defaultValue(MODE_SANITIZE),
                 ComponentDsl.array(PII_PATTERNS)
-                    .label("Additional PII Patterns")
+                    .label("Regex Patterns")
                     .description("Custom regex patterns for PII detection (optional). Default patterns detect email, " +
                         "phone, SSN, credit cards, and IP addresses.")
                     .items(ComponentDsl.string())
@@ -84,14 +77,21 @@ public class PiiGuardrails {
                     .label("Validate Output")
                     .description("Check model response before returning.")
                     .defaultValue(true),
+                ComponentDsl.string(MODE)
+                    .label("Output Mode")
+                    .description("Operation mode: classify (block) or sanitize (mask).")
+                    .options(
+                        ComponentDsl.option("Classify (Block)", MODE_CLASSIFY),
+                        ComponentDsl.option("Sanitize (Mask)", MODE_SANITIZE))
+                    .defaultValue(MODE_SANITIZE),
                 ComponentDsl.string(BLOCKED_MESSAGE)
                     .label("Blocked Message")
                     .description("Message to return when content is blocked (only used in classify mode).")
                     .defaultValue(DEFAULT_BLOCKED_MESSAGE))
-            .object(() -> this::apply);
+            .object(() -> PiiGuardrails::apply);
     }
 
-    protected Advisor apply(
+    protected static Advisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
 
