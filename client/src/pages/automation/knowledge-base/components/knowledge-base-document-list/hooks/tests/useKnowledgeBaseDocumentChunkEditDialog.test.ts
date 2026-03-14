@@ -44,7 +44,7 @@ vi.mock('@/pages/automation/knowledge-base/stores/useKnowledgeBaseDocumentChunkE
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useUpdateKnowledgeBaseDocumentChunkMutation: vi.fn((options: {onSuccess: () => void; onError: () => void}) => ({
+    useUpdateKnowledgeBaseDocumentChunkMutation: vi.fn((options: {onSuccess: () => void}) => ({
         isPending: false,
         mutate: (vars: unknown) => {
             hoisted.updateMutate(vars);

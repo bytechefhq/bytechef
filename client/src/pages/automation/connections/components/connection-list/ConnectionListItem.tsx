@@ -60,9 +60,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const queryClient = useQueryClient();
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
-        onError: () => {
-            toast.error(`Failed to delete "${connection.name}". Please try again.`);
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
@@ -83,8 +80,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const disconnectConnectionMutation = useDisconnectConnectionMutation({
         onError: () => {
             setShowDisconnectDialog(false);
-
-            toast.error(`Failed to disconnect "${connection.name}". Please try again.`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({

@@ -123,9 +123,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     });
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
-        onError: () => {
-            toast.error('Project duplication failed.');
-        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 

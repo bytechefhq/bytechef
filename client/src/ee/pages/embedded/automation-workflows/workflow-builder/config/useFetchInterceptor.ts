@@ -1,36 +1,11 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {shouldShowToast, showErrorToast} from '@/shared/util/toast-throttle';
 import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
-import {toast} from 'sonner';
 
-const TOAST_COOLDOWN_MS = 10_000;
-const recentToastIds = new Map<string, number>();
-
-export function clearRecentToasts() {
-    recentToastIds.clear();
-}
-
-function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
-    const now = Date.now();
-
-    for (const [id, timestamp] of recentToastIds) {
-        if (now - timestamp >= TOAST_COOLDOWN_MS) {
-            recentToastIds.delete(id);
-        }
-    }
-
-    const lastShown = recentToastIds.get(toastId);
-
-    if (lastShown !== undefined && now - lastShown < TOAST_COOLDOWN_MS) {
-        return;
-    }
-
-    recentToastIds.set(toastId, now);
-
-    toast.error(title, {...options, id: toastId});
-}
+export {clearRecentToasts} from '@/shared/util/toast-throttle';
 
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
@@ -88,9 +63,13 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
-                const toastId = `${new URL(response.url).pathname}-${response.status}`;
-
                 if (response.status < 200 || response.status > 299) {
+                    const toastId = `${new URL(response.url).pathname}-${response.status}`;
+
+                    if (!shouldShowToast(toastId)) {
+                        return response;
+                    }
+
                     const clonedResponse = response.clone();
 
                     clonedResponse
