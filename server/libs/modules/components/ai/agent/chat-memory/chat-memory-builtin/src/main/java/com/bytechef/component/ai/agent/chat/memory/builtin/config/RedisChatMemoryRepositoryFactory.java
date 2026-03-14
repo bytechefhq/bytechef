@@ -20,42 +20,21 @@ import com.bytechef.config.ApplicationProperties;
 import java.time.Duration;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.redis.RedisChatMemoryRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.JedisPooled;
 
 /**
  * @author Ivica Cardic
  */
-@Configuration
-@ConditionalOnProperty(prefix = "bytechef.ai.agent.memory", name = "provider", havingValue = "redis")
-class RedisChatMemoryConfiguration {
+public class RedisChatMemoryRepositoryFactory {
 
-    private final ApplicationProperties applicationProperties;
-
-    RedisChatMemoryConfiguration(ApplicationProperties applicationProperties) {
-        this.applicationProperties = applicationProperties;
-    }
-
-    @Bean(destroyMethod = "close")
-    JedisPooled jedisPooled() {
+    public static ChatMemoryRepository create(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai.Agent.Memory.Redis redisProperties =
             applicationProperties.getAi()
                 .getAgent()
                 .getMemory()
                 .getRedis();
 
-        return new JedisPooled(redisProperties.getHost(), redisProperties.getPort());
-    }
-
-    @Bean
-    ChatMemoryRepository chatMemoryRepository(JedisPooled jedisPooled) {
-        ApplicationProperties.Ai.Agent.Memory.Redis redisProperties =
-            applicationProperties.getAi()
-                .getAgent()
-                .getMemory()
-                .getRedis();
+        JedisPooled jedisPooled = new JedisPooled(redisProperties.getHost(), redisProperties.getPort());
 
         RedisChatMemoryRepository.Builder builder = RedisChatMemoryRepository.builder()
             .jedisClient(jedisPooled)
@@ -72,7 +51,7 @@ class RedisChatMemoryConfiguration {
         return builder.build();
     }
 
-    private Duration parseDuration(String timeToLive) {
+    private static Duration parseDuration(String timeToLive) {
         timeToLive = timeToLive.trim()
             .toLowerCase();
 
@@ -87,5 +66,8 @@ class RedisChatMemoryConfiguration {
         }
 
         return Duration.parse(timeToLive);
+    }
+
+    private RedisChatMemoryRepositoryFactory() {
     }
 }

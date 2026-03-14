@@ -25,9 +25,6 @@ import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryReposito
 import org.springframework.ai.chat.memory.repository.jdbc.MysqlChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.memory.repository.jdbc.OracleChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.memory.repository.jdbc.SqlServerChatMemoryRepositoryDialect;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -35,21 +32,11 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 /**
  * @author Ivica Cardic
  */
-@Configuration
-@ConditionalOnProperty(
-    prefix = "bytechef.ai.agent.memory", name = "provider", havingValue = "jdbc", matchIfMissing = true)
-class JdbcChatMemoryConfiguration {
+public class JdbcChatMemoryRepositoryFactory {
 
-    private final ApplicationProperties applicationProperties;
-    private final DataSource dataSource;
+    public static ChatMemoryRepository create(
+        ApplicationProperties applicationProperties, DataSource dataSource) {
 
-    JdbcChatMemoryConfiguration(ApplicationProperties applicationProperties, DataSource dataSource) {
-        this.applicationProperties = applicationProperties;
-        this.dataSource = dataSource;
-    }
-
-    @Bean
-    ChatMemoryRepository chatMemoryRepository() {
         JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
 
         if (applicationProperties.getAi()
@@ -57,7 +44,8 @@ class JdbcChatMemoryConfiguration {
             .getMemory()
             .getJdbc()
             .isInitializeSchema()) {
-            initializeSchema(dialect);
+
+            initializeSchema(dialect, dataSource);
         }
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -68,7 +56,7 @@ class JdbcChatMemoryConfiguration {
             .build();
     }
 
-    private void initializeSchema(JdbcChatMemoryRepositoryDialect dialect) {
+    private static void initializeSchema(JdbcChatMemoryRepositoryDialect dialect, DataSource dataSource) {
         String schemaScript = getSchemaScript(dialect);
 
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
@@ -78,7 +66,7 @@ class JdbcChatMemoryConfiguration {
         populator.execute(dataSource);
     }
 
-    private String getSchemaScript(JdbcChatMemoryRepositoryDialect dialect) {
+    private static String getSchemaScript(JdbcChatMemoryRepositoryDialect dialect) {
         if (dialect instanceof MysqlChatMemoryRepositoryDialect) {
             return "org/springframework/ai/chat/memory/repository/jdbc/schema-mysql.sql";
         } else if (dialect instanceof OracleChatMemoryRepositoryDialect) {
@@ -90,5 +78,8 @@ class JdbcChatMemoryConfiguration {
         }
 
         return "org/springframework/ai/chat/memory/repository/jdbc/schema-postgresql.sql";
+    }
+
+    private JdbcChatMemoryRepositoryFactory() {
     }
 }
