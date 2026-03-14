@@ -1,0 +1,85 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.ai.agent.chat.memory.builtin.config;
+
+import com.bytechef.config.ApplicationProperties;
+import javax.sql.DataSource;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.chat.memory.repository.jdbc.HsqldbChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.MysqlChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.OracleChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.SqlServerChatMemoryRepositoryDialect;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+
+/**
+ * @author Ivica Cardic
+ */
+public class JdbcChatMemoryRepositoryFactory {
+
+    public static ChatMemoryRepository create(
+        ApplicationProperties applicationProperties, DataSource dataSource) {
+
+        JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
+
+        if (applicationProperties.getAi()
+            .getAgent()
+            .getMemory()
+            .getJdbc()
+            .isInitializeSchema()) {
+
+            initializeSchema(dialect, dataSource);
+        }
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+        return JdbcChatMemoryRepository.builder()
+            .jdbcTemplate(jdbcTemplate)
+            .dialect(dialect)
+            .build();
+    }
+
+    private static void initializeSchema(JdbcChatMemoryRepositoryDialect dialect, DataSource dataSource) {
+        String schemaScript = getSchemaScript(dialect);
+
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+
+        populator.addScript(new ClassPathResource(schemaScript));
+        populator.setContinueOnError(true);
+        populator.execute(dataSource);
+    }
+
+    private static String getSchemaScript(JdbcChatMemoryRepositoryDialect dialect) {
+        if (dialect instanceof MysqlChatMemoryRepositoryDialect) {
+            return "org/springframework/ai/chat/memory/repository/jdbc/schema-mysql.sql";
+        } else if (dialect instanceof OracleChatMemoryRepositoryDialect) {
+            return "org/springframework/ai/chat/memory/repository/jdbc/schema-oracle.sql";
+        } else if (dialect instanceof SqlServerChatMemoryRepositoryDialect) {
+            return "org/springframework/ai/chat/memory/repository/jdbc/schema-sqlserver.sql";
+        } else if (dialect instanceof HsqldbChatMemoryRepositoryDialect) {
+            return "org/springframework/ai/chat/memory/repository/jdbc/schema-hsqldb.sql";
+        }
+
+        return "org/springframework/ai/chat/memory/repository/jdbc/schema-postgresql.sql";
+    }
+
+    private JdbcChatMemoryRepositoryFactory() {
+    }
+}
