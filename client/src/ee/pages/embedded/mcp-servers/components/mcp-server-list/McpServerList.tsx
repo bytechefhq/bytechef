@@ -1,7 +1,7 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
+import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
 import {McpIntegrationWorkflow, McpServer, Tag, useMcpIntegrationsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 
@@ -59,10 +59,14 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                                     </TabsContent>
 
                                     <TabsContent className="max-w-screen-lg py-3" value="connect">
-                                        <McpServerConfiguration
-                                            mcpServerUrl={mcpServer.url}
-                                            onRefresh={handleRefresh}
-                                        />
+                                        <div className="flex-1 space-y-4">
+                                            <h2 className="font-semibold text-foreground">Server URL</h2>
+
+                                            <McpServerConfigurationCode
+                                                codeSnippet={mcpServer.url || ''}
+                                                onRefresh={handleRefresh}
+                                            />
+                                        </div>
                                     </TabsContent>
                                 </Tabs>
                             </CollapsibleContent>
