@@ -18,7 +18,7 @@ package com.bytechef.component.ai.vectorstore.typesense.cluster;
 
 import static com.bytechef.component.ai.vectorstore.typesense.constant.TypesenseConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -31,7 +31,7 @@ public class TypesenseVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractVectorStore.of(
+        return VectorStoreDefinition.of(
             "Typesense", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

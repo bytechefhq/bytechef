@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.util.VectorStoreUtils;
-import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -39,13 +38,13 @@ import org.springframework.ai.embedding.EmbeddingModel;
 /**
  * @author Ivica Cardic
  */
-public abstract class AbstractSearchTool {
+public final class SearchToolDefinition {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final String componentName;
     private final VectorStore vectorStore;
 
-    protected AbstractSearchTool(
+    public SearchToolDefinition(
         String componentName, VectorStore vectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
@@ -58,8 +57,8 @@ public abstract class AbstractSearchTool {
         String title, String componentName, VectorStore vectorStore, List<Property> properties,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        AbstractSearchTool searchTool = new AbstractSearchTool(
-            componentName, vectorStore, clusterElementDefinitionService) {};
+        SearchToolDefinition searchToolDefinition = new SearchToolDefinition(
+            componentName, vectorStore, clusterElementDefinitionService);
 
         return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("search")
             .title("%s Search".formatted(title))
@@ -73,12 +72,13 @@ public abstract class AbstractSearchTool {
                         SEARCH_PROPERTIES.stream())
                     .flatMap(stream -> stream)
                     .toList())
-            .object(() -> searchTool::apply);
+            .object(() -> (MultipleConnectionsToolFunction) (
+                inputParameters, connectionParameters, extensions, componentConnections,
+                context) -> searchToolDefinition.apply(inputParameters, extensions, componentConnections));
     }
 
-    protected Object apply(
-        Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections, ClusterElementContext context) {
+    private Object apply(
+        Parameters inputParameters, Parameters extensions, Map<String, ComponentConnection> componentConnections) {
 
         ComponentConnection vectorStoreComponentConnection = componentConnections.get(componentName);
         EmbeddingModel embeddingModel = VectorStoreUtils.getEmbeddingModel(

@@ -19,7 +19,7 @@ package com.bytechef.component.ai.vectorstore.oracle.cluster;
 import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.ORACLE_VECTOR_STORE;
 import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractSearchTool;
+import com.bytechef.component.ai.vectorstore.cluster.SearchToolDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -33,7 +33,7 @@ public class OracleSearchTool {
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractSearchTool.of(
+        return SearchToolDefinition.of(
             "Oracle", ORACLE_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
     }
 }

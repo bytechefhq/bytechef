@@ -18,7 +18,7 @@ package com.bytechef.component.ai.vectorstore.couchbase.cluster;
 
 import static com.bytechef.component.ai.vectorstore.couchbase.constant.CouchbaseConstants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -31,6 +31,6 @@ public class CouchbaseVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractVectorStore.of("Couchbase", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("Couchbase", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

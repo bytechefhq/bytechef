@@ -18,7 +18,7 @@ package com.bytechef.component.ai.vectorstore.s3.cluster;
 
 import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.VECTOR_STORE;
 
-import com.bytechef.component.ai.vectorstore.cluster.AbstractVectorStore;
+import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -34,6 +34,6 @@ public class S3VectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return AbstractVectorStore.of("S3", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("S3", VECTOR_STORE, clusterElementDefinitionService);
     }
 }
