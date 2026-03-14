@@ -91,7 +91,7 @@ public class WebhookUtils {
 
     private static String getCsrfToken(HttpHeaders headers) {
         return headers
-            .firstValue("x-csrf-token")
+            .firstValue("X-Csrf-Token")
             .orElse(null);
     }
 }
