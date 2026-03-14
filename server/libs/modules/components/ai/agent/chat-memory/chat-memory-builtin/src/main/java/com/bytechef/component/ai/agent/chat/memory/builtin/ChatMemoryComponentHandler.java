@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.chat.memory.builtin;
 
+import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.CHAT_MEMORY;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -24,9 +25,13 @@ import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryDele
 import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryGetMessagesAction;
 import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryListConversationsAction;
 import com.bytechef.component.ai.agent.chat.memory.builtin.cluster.ChatMemory;
+import com.bytechef.component.ai.agent.chat.memory.builtin.config.JdbcChatMemoryRepositoryFactory;
+import com.bytechef.component.ai.agent.chat.memory.builtin.config.RedisChatMemoryRepositoryFactory;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.google.auto.service.AutoService;
+import com.bytechef.config.ApplicationProperties;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import javax.sql.DataSource;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,21 +39,34 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component
-@AutoService(ComponentHandler.class)
+@Component(CHAT_MEMORY + "_v1_ComponentHandler")
 public class ChatMemoryComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
 
-    public ChatMemoryComponentHandler() {
-        this(null);
-    }
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
+    public ChatMemoryComponentHandler(
+        ApplicationProperties applicationProperties, @Autowired(required = false) DataSource dataSource) {
 
-    @Autowired(required = false)
-    public ChatMemoryComponentHandler(ChatMemoryRepository chatMemoryRepository) {
-        this.componentDefinition = component("chatMemory")
+        ChatMemoryRepository chatMemoryRepository = null;
+
+        if (applicationProperties != null) {
+            ApplicationProperties.Ai.Agent.Memory memoryProperties =
+                applicationProperties.getAi()
+                    .getAgent()
+                    .getMemory();
+
+            if (memoryProperties.isEnabled()) {
+                chatMemoryRepository = switch (memoryProperties.getProvider()) {
+                    case JDBC -> JdbcChatMemoryRepositoryFactory.create(applicationProperties, dataSource);
+                    case REDIS -> RedisChatMemoryRepositoryFactory.create(applicationProperties);
+                };
+            }
+        }
+
+        this.componentDefinition = component(CHAT_MEMORY)
             .title("Chat Memory")
-            .description("Built-in Chat Memory using application database.")
+            .description("Built-in chat memory.")
             .icon("path:assets/chat-memory.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .actions(

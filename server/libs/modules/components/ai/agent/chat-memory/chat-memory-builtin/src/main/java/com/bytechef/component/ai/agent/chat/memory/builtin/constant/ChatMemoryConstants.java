@@ -21,6 +21,7 @@ package com.bytechef.component.ai.agent.chat.memory.builtin.constant;
  */
 public class ChatMemoryConstants {
 
+    public static final String CHAT_MEMORY = "chatMemory";
     public static final String CONVERSATION_ID = "conversationId";
     public static final String MESSAGES = "messages";
     public static final String MESSAGE_CONTENT = "content";
