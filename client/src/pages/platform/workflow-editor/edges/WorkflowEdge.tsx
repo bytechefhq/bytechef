@@ -148,8 +148,26 @@ export default function WorkflowEdge({
                     sourceNodeId={sourceNodeId}
                 >
                     <div
-                        className="nodrag nopan"
+                        className="nodrag nopan p-8"
                         id={id}
+                        onDragEnter={() => setDropzoneActive(true)}
+                        onDragLeave={(event) => {
+                            const relatedTarget = event.relatedTarget as Node | null;
+
+                            if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
+                                setDropzoneActive(false);
+                            }
+                        }}
+                        onDragOver={(event) => {
+                            event.preventDefault();
+
+                            setDropzoneActive(true);
+                        }}
+                        onDrop={(event) => {
+                            event.preventDefault();
+
+                            setDropzoneActive(false);
+                        }}
                         style={{
                             pointerEvents: 'all',
                             position: 'absolute',
@@ -165,24 +183,6 @@ export default function WorkflowEdge({
                                     : 'size-6 border-2 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
                             )}
                             id={`${id}-button`}
-                            onDragEnter={() => setDropzoneActive(true)}
-                            onDragLeave={(event) => {
-                                const relatedTarget = event.relatedTarget as Node | null;
-
-                                if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
-                                    setDropzoneActive(false);
-                                }
-                            }}
-                            onDragOver={(event) => {
-                                event.preventDefault();
-
-                                setDropzoneActive(true);
-                            }}
-                            onDrop={(event) => {
-                                event.preventDefault();
-
-                                setDropzoneActive(false);
-                            }}
                         >
                             <PlusIcon
                                 className={twMerge(

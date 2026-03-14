@@ -38,6 +38,7 @@ import WorkflowNode from '../nodes/WorkflowNode';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import clearAllNodePositions from '../utils/clearAllNodePositions';
+import {collectAllDescendantNodes, collectChainSuccessorNodes} from '../utils/collectDescendantNodes';
 import {
     DraggingPlaceholderStateType,
     buildDraggingPlaceholderState,
@@ -190,50 +191,65 @@ const useWorkflowEditorCanvas = ({
                 return;
             }
         } else {
+            const getClosestEdgeElement = (element: HTMLElement | null): HTMLElement | null => {
+                let current: HTMLElement | null = element;
+
+                while (current) {
+                    if (
+                        current.tagName === 'DIV' &&
+                        current.id &&
+                        current.id.match(/^.+=>.+$/) &&
+                        !current.id.endsWith('-button')
+                    ) {
+                        return current;
+                    }
+
+                    current = current.parentElement;
+                }
+
+                return null;
+            };
+
             const isTargetNode = event.target instanceof HTMLElement;
             const isTargetEdge = event.target instanceof SVGElement;
 
             if (isTargetNode) {
                 const targetNodeElement = (event.target as HTMLElement).closest('.react-flow__node') as HTMLElement;
 
-                if (!targetNodeElement || targetNodeElement?.dataset.nodetype === 'trigger') {
-                    return;
-                }
+                if (targetNodeElement && targetNodeElement?.dataset.nodetype !== 'trigger') {
+                    const targetNodeId = targetNodeElement.dataset.id!;
 
-                const targetNodeId = targetNodeElement.dataset.id!;
+                    const {nodes} = useWorkflowDataStore.getState();
 
-                const {nodes} = useWorkflowDataStore.getState();
+                    const targetNode = nodes.find((node) => node.id === targetNodeId);
 
-                const targetNode = nodes.find((node) => node.id === targetNodeId);
-
-                if (targetNode && targetNode.type === 'placeholder') {
-                    if (targetNode?.position.x === 0 && targetNode?.position.y === 0) {
-                        return;
-                    }
-
-                    handleDropOnPlaceholderNode(targetNode, droppedNode);
-                }
-            } else if (isTargetEdge) {
-                const getClosestEdgeElement = (element: HTMLElement): HTMLElement | null => {
-                    let current: HTMLElement | null = element;
-
-                    while (current) {
-                        if (
-                            current.tagName === 'DIV' &&
-                            current.id &&
-                            current.id.match(/^.+=>.+$/) &&
-                            !current.id.endsWith('-button')
-                        ) {
-                            return current;
+                    if (targetNode && targetNode.type === 'placeholder') {
+                        if (targetNode?.position.x === 0 && targetNode?.position.y === 0) {
+                            return;
                         }
 
-                        current = current.parentElement;
-                    }
+                        handleDropOnPlaceholderNode(targetNode, droppedNode);
 
-                    return null;
-                };
+                        return;
+                    }
+                }
 
                 const edgeElement = getClosestEdgeElement(event.target as HTMLElement);
+
+                if (edgeElement) {
+                    const {edges} = useWorkflowDataStore.getState();
+
+                    const targetEdge = edges.find((edge) => edge.id === edgeElement.id);
+
+                    if (targetEdge) {
+                        handleDropOnWorkflowEdge(targetEdge, droppedNode);
+
+                        return;
+                    }
+                }
+            } else if (isTargetEdge) {
+                const closestDiv = (event.target as SVGElement).closest('div');
+                const edgeElement = closestDiv instanceof HTMLElement ? getClosestEdgeElement(closestDiv) : null;
 
                 if (!edgeElement) {
                     return;
@@ -258,52 +274,6 @@ const useWorkflowEditorCanvas = ({
     const childDragStartRef = useRef<Map<string, XYPosition>>(new Map());
     const draggingPlaceholderRef = useRef<DraggingPlaceholderStateType | null>(null);
 
-    const isChildNodeOfDispatcher = useCallback((node: Node, dispatcherId: string) => {
-        const nodeData = node.data as NodeDataType;
-
-        return (
-            node.id !== dispatcherId &&
-            (nodeData.taskDispatcherId === dispatcherId ||
-                nodeData.conditionData?.conditionId === dispatcherId ||
-                nodeData.loopData?.loopId === dispatcherId ||
-                nodeData.branchData?.branchId === dispatcherId ||
-                nodeData.eachData?.eachId === dispatcherId ||
-                nodeData.parallelData?.parallelId === dispatcherId ||
-                nodeData.forkJoinData?.forkJoinId === dispatcherId)
-        );
-    }, []);
-
-    const collectAllDescendantNodes = useCallback(
-        (dispatcherId: string, allNodes: Node[]): Map<string, XYPosition> => {
-            const collected = new Set<string>();
-            const startPositions = new Map<string, XYPosition>();
-
-            const collect = (currentDispatcherId: string) => {
-                allNodes.forEach((node) => {
-                    if (collected.has(node.id)) {
-                        return;
-                    }
-
-                    if (isChildNodeOfDispatcher(node, currentDispatcherId)) {
-                        collected.add(node.id);
-                        startPositions.set(node.id, {...node.position});
-
-                        const nodeData = node.data as NodeDataType;
-
-                        if (nodeData.taskDispatcher && nodeData.taskDispatcherId) {
-                            collect(nodeData.taskDispatcherId);
-                        }
-                    }
-                });
-            };
-
-            collect(dispatcherId);
-
-            return startPositions;
-        },
-        [isChildNodeOfDispatcher]
-    );
-
     const handleNodeDragStart = useCallback(
         (_event: React.MouseEvent, node: Node) => {
             setIsNodeDragging(true);
@@ -314,7 +284,19 @@ const useWorkflowEditorCanvas = ({
             if (nodeData.taskDispatcher) {
                 draggingDispatcherIdRef.current = node.id;
                 dispatcherDragStartRef.current = {...node.position};
-                childDragStartRef.current = collectAllDescendantNodes(node.id, currentNodes);
+
+                const descendants = collectAllDescendantNodes(node.id, currentNodes);
+
+                // Also collect chain successor nodes (tasks that follow the
+                // dispatcher's bottom ghost in the main flow)
+                const chainSuccessors = collectChainSuccessorNodes(
+                    node.id,
+                    currentNodes,
+                    currentEdges,
+                    new Set(descendants.keys())
+                );
+
+                childDragStartRef.current = new Map([...descendants, ...chainSuccessors]);
             }
 
             draggingPlaceholderRef.current = buildDraggingPlaceholderState(
@@ -326,7 +308,7 @@ const useWorkflowEditorCanvas = ({
                 childDragStartRef.current
             );
         },
-        [collectAllDescendantNodes, setIsNodeDragging]
+        [setIsNodeDragging]
     );
 
     const handleNodesChange = useCallback(
