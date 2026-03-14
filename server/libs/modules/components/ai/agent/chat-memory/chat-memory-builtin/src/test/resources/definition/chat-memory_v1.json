@@ -943,7 +943,7 @@
   "connection": null,
   "customAction": null,
   "customActionHelp": null,
-  "description": "Built-in Chat Memory using application database.",
+  "description": "Built-in chat memory.",
   "icon": "path:assets/chat-memory.svg",
   "metadata": null,
   "name": "chatMemory",
