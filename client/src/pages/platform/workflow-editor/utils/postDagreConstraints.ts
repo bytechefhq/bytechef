@@ -1272,6 +1272,7 @@ export function applySavedPositions(
                     const parentDispatcherId =
                         nodeData.conditionData?.conditionId ||
                         nodeData.loopData?.loopId ||
+                        nodeData.mapData?.mapId ||
                         nodeData.branchData?.branchId ||
                         nodeData.eachData?.eachId ||
                         nodeData.parallelData?.parallelId ||
@@ -1367,6 +1368,7 @@ export function adjustBottomGhostForMovedChildren(
         const parentDispatcherId =
             dispatcherData.conditionData?.conditionId ||
             dispatcherData.loopData?.loopId ||
+            dispatcherData.mapData?.mapId ||
             dispatcherData.branchData?.branchId ||
             dispatcherData.eachData?.eachId ||
             dispatcherData.parallelData?.parallelId ||
