@@ -20,6 +20,9 @@ import static com.bytechef.component.ai.chat.memory.VectorStoreChatMemoryCompone
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.chat.memory.action.VectorStoreChatMemoryAddMessagesAction;
+import com.bytechef.component.ai.chat.memory.action.VectorStoreChatMemoryDeleteAction;
+import com.bytechef.component.ai.chat.memory.action.VectorStoreChatMemoryGetMessagesAction;
 import com.bytechef.component.ai.chat.memory.cluster.VectorStoreChatMemory;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -45,6 +48,10 @@ public class VectorStoreChatMemoryComponentHandler implements ComponentHandler {
                 .description("Vector Store Chat Memory.")
                 .icon("path:assets/vector-store-chat-memory.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+                .actions(
+                    VectorStoreChatMemoryAddMessagesAction.getActionDefinition(clusterElementDefinitionService),
+                    VectorStoreChatMemoryGetMessagesAction.getActionDefinition(clusterElementDefinitionService),
+                    VectorStoreChatMemoryDeleteAction.getActionDefinition(clusterElementDefinitionService))
                 .clusterElements(
                     new VectorStoreChatMemory(clusterElementDefinitionService).clusterElementDefinition));
     }
