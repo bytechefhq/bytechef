@@ -1,6 +1,6 @@
 import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
+import {BranchCaseType, NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {clearTaskPositions} from './clearAllNodePositions';
@@ -155,6 +155,65 @@ export default function removeWorkflowNodePosition({
         workflowDefinition.tasks = clearSingleTaskPosition(workflowDefinition.tasks, nodeName);
     }
 
+    const updatedDefinition = JSON.stringify(workflowDefinition, null, SPACE);
+
+    const updatedTasks = workflow.tasks
+        ? clearSingleTaskPosition(workflow.tasks as WorkflowTask[], nodeName)
+        : workflow.tasks;
+
+    const updatedTriggers = workflow.triggers?.map((trigger) => {
+        if (trigger.name === nodeName && trigger.metadata?.ui?.nodePosition) {
+            return {
+                ...trigger,
+                metadata: {
+                    ...trigger.metadata,
+                    ui: {
+                        ...trigger.metadata.ui,
+                        nodePosition: undefined,
+                    },
+                },
+            };
+        }
+
+        return trigger;
+    });
+
+    const {nodes, setNodes} = useWorkflowDataStore.getState();
+
+    const previousWorkflow = workflow;
+    const previousNodes = nodes;
+
+    const updatedNodes = nodes.map((node) => {
+        if (node.id === nodeName) {
+            return {
+                ...node,
+                data: {
+                    ...node.data,
+                    metadata: {
+                        ...(node.data as NodeDataType).metadata,
+                        ui: {
+                            ...(node.data as NodeDataType).metadata?.ui,
+                            nodePosition: undefined,
+                        },
+                    },
+                },
+            };
+        }
+
+        return node;
+    });
+
+    setNodes(updatedNodes);
+
+    useWorkflowDataStore.getState().setWorkflow({
+        ...workflow,
+        definition: updatedDefinition,
+        tasks: updatedTasks,
+        triggers: updatedTriggers,
+    });
+
+    incrementLayoutResetCounter();
+
     if (isWorkflowMutating(workflow.id!)) {
         return;
     }
@@ -165,11 +224,18 @@ export default function removeWorkflowNodePosition({
         {
             id: workflow.id!,
             workflow: {
-                definition: JSON.stringify(workflowDefinition, null, SPACE),
+                definition: updatedDefinition,
                 version: workflow.version,
             },
         },
         {
+            onError: () => {
+                setNodes(previousNodes);
+
+                useWorkflowDataStore.getState().setWorkflow(previousWorkflow);
+
+                incrementLayoutResetCounter();
+            },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
             },
@@ -182,7 +248,6 @@ export default function removeWorkflowNodePosition({
                 });
 
                 invalidateWorkflowQueries();
-                incrementLayoutResetCounter();
             },
         }
     );
