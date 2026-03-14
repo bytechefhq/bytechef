@@ -46,6 +46,7 @@ import com.bytechef.platform.component.definition.ActionContextAdapater;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -436,20 +437,33 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         String componentName, Integer componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
 
-        ToolFunction toolFunction = getClusterElement(
+        Object clusterElement = getClusterElement(
             componentName, componentVersion, clusterElementName);
 
+        Parameters inputParams = ParametersFactory.create(inputParameters);
+        Parameters connectionParams = ParametersFactory.create(
+            componentConnection == null ? Map.of() : componentConnection.getParameters());
+
         try {
-            return toolFunction.apply(
-                ParametersFactory.create(inputParameters),
-                ParametersFactory.create(componentConnection == null ? Map.of() : componentConnection.getParameters()),
-                context);
-        } catch (Exception e) {
-            if (e instanceof ProviderException) {
-                throw (ProviderException) e;
+            if (clusterElement instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
+                return toolCallbackProviderFunction.apply(inputParams, connectionParams, context);
             }
 
-            throw new ExecutionException(e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
+            if (clusterElement instanceof ToolFunction toolFunction) {
+                return toolFunction.apply(inputParams, connectionParams, context);
+            }
+
+            throw new ExecutionException(
+                "Unsupported cluster element type: " + clusterElement.getClass()
+                    .getName(),
+                inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException) {
+                throw (ProviderException) exception;
+            }
+
+            throw new ExecutionException(
+                exception, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
         }
     }
 

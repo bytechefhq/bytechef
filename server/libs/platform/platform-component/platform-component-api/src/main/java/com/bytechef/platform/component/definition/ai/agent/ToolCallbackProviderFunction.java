@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.component.definition.ai.agent;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.ComponentConnection;
-import java.util.Map;
+import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * @author Igor Beslic
+ * @author Ivica Cardic
  */
-public class ParametersFactory {
+@FunctionalInterface
+public interface ToolCallbackProviderFunction extends BaseToolFunction {
 
-    public static Parameters create(ComponentConnection componentConnection) {
-        return create(componentConnection == null ? Map.of() : componentConnection.getParameters());
-    }
-
-    public static Parameters create(Map<String, ?> map) {
-        try {
-            return new ParametersImpl(map);
-        } catch (Exception exception) {
-            throw new RuntimeException("Unable to instantiate Parameters", exception);
-        }
-    }
+    ToolCallbackProvider apply(
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception;
 }
