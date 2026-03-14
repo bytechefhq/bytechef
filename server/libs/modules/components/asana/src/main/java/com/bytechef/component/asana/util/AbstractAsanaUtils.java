@@ -52,6 +52,14 @@ public abstract class AbstractAsanaUtils {
         return List.of();
     }
 
+    public static List<Option<String>> getTaskGidOptions(
+        Parameters inputParameters,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
+        Context context) {
+
+        return List.of();
+    }
+
     public static List<Option<String>> getTagsOptions(
         Parameters inputParameters,
         Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,

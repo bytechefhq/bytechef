@@ -40,75 +40,105 @@ public class AsanaUtils extends AbstractAsanaUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, List<Map<String, String>>> body = context
-            .http(http -> http
-                .get("/users?workspace=" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body);
+        return getPaginatedOptions(
+            context, "/users", "workspace", inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class));
     }
 
     public static List<Option<String>> getProjectOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, List<Map<String, String>>> body = context
-            .http(http -> http
-                .get("/projects?workspace=" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body);
+        return getPaginatedOptions(
+            context, "/projects", "workspace", inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class));
     }
 
     public static List<Option<String>> getTagsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, List<Map<String, String>>> body = context.http(http -> http.get("/tags"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body);
+        return getPaginatedOptions(context, "/tags");
     }
 
     public static List<Option<String>> getTeamOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get(
-                "/workspaces/" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class) + "/teams"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body);
+        return getPaginatedOptions(
+            context,
+            "/workspaces/" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class) + "/teams");
     }
 
     public static List<Option<String>> getWorkspaceOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, List<Map<String, String>>> body = context.http(http -> http.get("/workspaces"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body);
+        return getPaginatedOptions(context, "/workspaces");
     }
 
-    private static List<Option<String>> getOptions(Map<String, List<Map<String, String>>> body) {
-        List<Option<String>> options = new ArrayList<>();
+    public static List<Option<String>> getTaskGidOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        for (Map<String, String> map : body.get("data")) {
-            options.add(option(map.get("name"), map.get("gid")));
-        }
+        return getPaginatedOptions(
+            context,
+            "/projects/" + inputParameters.getRequiredFromPath("data.project", String.class) + "/tasks",
+            "opt_fields", "gid,name");
+    }
+
+    private static List<Option<String>> getPaginatedOptions(
+        Context context, String url, Object... additionalQueryParameters) {
+
+        List<Option<String>> options = new ArrayList<>();
+        String offset = null;
+        int limit = 100;
+
+        do {
+            List<Object> queryParameters = new ArrayList<>();
+
+            queryParameters.add("limit");
+            queryParameters.add(limit);
+            queryParameters.add("offset");
+            queryParameters.add(offset);
+
+            queryParameters.addAll(List.of(additionalQueryParameters));
+
+            Map<String, Object> body = context.http(http -> http.get(url))
+                .queryParameters(queryParameters.toArray())
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            Object dataObj = body.get("data");
+            addOptions(dataObj, options);
+
+            offset = extractNextOffset(body);
+
+        } while (offset != null);
 
         return options;
+    }
+
+    private static void addOptions(Object dataObj, List<Option<String>> options) {
+        if (dataObj instanceof List<?> dataList) {
+            for (Object obj : dataList) {
+                if (obj instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("name"), (String) map.get("gid")));
+                }
+            }
+        }
+    }
+
+    private static String extractNextOffset(Map<String, Object> response) {
+        Object nextPageObj = response.get("next_page");
+
+        if (nextPageObj instanceof Map<?, ?> nextPage) {
+            Object offsetObj = nextPage.get("offset");
+
+            if (offsetObj != null) {
+                return offsetObj.toString();
+            }
+        }
+
+        return null;
     }
 }

@@ -52,7 +52,7 @@ public class AsanaConnection {
                 scopeMap.put("attachments:read", false);
                 scopeMap.put("attachments:write", false);
                 scopeMap.put("custom_fields:read", false);
-                scopeMap.put("custom_fields:write", false);
+                scopeMap.put("custom_fields:write", true);
                 scopeMap.put("goals:read", false);
                 scopeMap.put("portfolios:read", false);
                 scopeMap.put("portfolios:write", false);
@@ -66,7 +66,7 @@ public class AsanaConnection {
                 scopeMap.put("tags:write", false);
                 scopeMap.put("task_templates:read", false);
                 scopeMap.put("tasks:delete", false);
-                scopeMap.put("tasks:read", false);
+                scopeMap.put("tasks:read", true);
                 scopeMap.put("tasks:write", true);
                 scopeMap.put("team_memberships:read", false);
                 scopeMap.put("teams:read", true);

@@ -53,7 +53,8 @@ public class AsanaCreateTaskAction {
             string("project").label("Project")
                 .description("Asana project to create the task in.")
                 .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getProjectOptions),
+                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getProjectOptions)
+                .optionsLookupDependsOn("data.workspace"),
             string("name").label("Name")
                 .description("Name of the task.")
                 .required(true),
@@ -72,7 +73,8 @@ public class AsanaCreateTaskAction {
             string("assignee").label("Assignee")
                 .description("User to assign the task to.")
                 .required(false)
-                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getAssigneeOptions))
+                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getAssigneeOptions)
+                .optionsLookupDependsOn("data.workspace"))
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))

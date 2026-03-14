@@ -57,7 +57,8 @@ public class AsanaCreateProjectAction {
             string("team").label("Team")
                 .description("The team that this project is shared with.")
                 .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getTeamOptions))
+                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getTeamOptions)
+                .optionsLookupDependsOn("data.workspace"))
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))
