@@ -36,6 +36,7 @@ public class GithubStarRepositoryAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("starRepository")
         .title("Star Repository")
         .description("Stars a repository for the authenticated user.")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#star-repository")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)

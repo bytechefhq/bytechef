@@ -20,20 +20,32 @@ import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.LABELS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
@@ -41,33 +53,46 @@ import org.mockito.MockedStatic;
  * @author Mayank Madan
  * @author Monika Kušter
  */
-class GithubAddLabelsToIssueActionTest extends AbstractGithubActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class GithubAddLabelsToIssueActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", LABELS, List.of("help-wanted", "docs")));
-    private final Object mockedObject = mock(Object.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() throws Exception {
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
             githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
                 .thenReturn("testOwner");
 
             when(mockedHttp.post(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
+            when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(mockedObject);
 
-            Object result = executePerformFunction(GithubAddLabelsToIssueAction.ACTION_DEFINITION, mockedParameters);
+            Object result = GithubAddLabelsToIssueAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(mockedObject, result);
-            assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
             assertEquals("/repos/testOwner/testRepo/issues/testIssue/labels", stringArgumentCaptor.getValue());
-
-            Http.Body body = bodyArgumentCaptor.getValue();
-
-            assertEquals(Map.of(LABELS, List.of("help-wanted", "docs")), body.getContent());
+            assertEquals(
+                Body.of(Map.of(LABELS, List.of("help-wanted", "docs")), BodyContentType.JSON),
+                bodyArgumentCaptor.getValue());
         }
     }
 }

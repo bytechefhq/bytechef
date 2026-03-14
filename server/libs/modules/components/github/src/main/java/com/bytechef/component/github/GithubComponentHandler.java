@@ -33,7 +33,9 @@ import com.bytechef.component.github.action.GithubGetIssueAction;
 import com.bytechef.component.github.action.GithubGetRepositoryContentAction;
 import com.bytechef.component.github.action.GithubListIssuesAction;
 import com.bytechef.component.github.action.GithubListRepositoryIssuesAction;
+import com.bytechef.component.github.action.GithubSearchCodeAction;
 import com.bytechef.component.github.action.GithubStarRepositoryAction;
+import com.bytechef.component.github.action.GithubUpdateIssueAction;
 import com.bytechef.component.github.trigger.GithubEventsTrigger;
 import com.bytechef.component.github.trigger.GithubNewIssueTrigger;
 import com.bytechef.component.github.trigger.GithubNewPullRequestTrigger;
@@ -49,6 +51,7 @@ public class GithubComponentHandler implements ComponentHandler {
         .title("GitHub")
         .description("GitHub is a web-based platform for version control and collaboration using Git.")
         .customAction(true)
+        .customActionHelp("Github API documentation", "https://docs.github.com/en")
         .categories(ComponentCategory.DEVELOPER_TOOLS)
         .connection(CONNECTION_DEFINITION)
         .actions(
@@ -62,7 +65,9 @@ public class GithubComponentHandler implements ComponentHandler {
             GithubGetRepositoryContentAction.ACTION_DEFINITION,
             GithubListIssuesAction.ACTION_DEFINITION,
             GithubListRepositoryIssuesAction.ACTION_DEFINITION,
-            GithubStarRepositoryAction.ACTION_DEFINITION)
+            GithubSearchCodeAction.ACTION_DEFINITION,
+            GithubStarRepositoryAction.ACTION_DEFINITION,
+            GithubUpdateIssueAction.ACTION_DEFINITION)
         .icon("path:assets/github.svg")
         .clusterElements(
             tool(GithubAddAssigneesToIssueAction.ACTION_DEFINITION),
@@ -75,11 +80,14 @@ public class GithubComponentHandler implements ComponentHandler {
             tool(GithubGetRepositoryContentAction.ACTION_DEFINITION),
             tool(GithubListIssuesAction.ACTION_DEFINITION),
             tool(GithubListRepositoryIssuesAction.ACTION_DEFINITION),
-            tool(GithubStarRepositoryAction.ACTION_DEFINITION))
+            tool(GithubSearchCodeAction.ACTION_DEFINITION),
+            tool(GithubStarRepositoryAction.ACTION_DEFINITION),
+            tool(GithubUpdateIssueAction.ACTION_DEFINITION))
         .triggers(
             GithubEventsTrigger.TRIGGER_DEFINITION,
             GithubNewIssueTrigger.TRIGGER_DEFINITION,
-            GithubNewPullRequestTrigger.TRIGGER_DEFINITION);
+            GithubNewPullRequestTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

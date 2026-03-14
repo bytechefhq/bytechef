@@ -40,6 +40,7 @@ public class GithubListRepositoryIssuesAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listRepositoryIssues")
         .title("List Repository Issues")
         .description("Lists issues in a repository. Only open issues will be listed.")
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#list-repository-issues")
         .properties(
             OWNER_PROPERTY,
             string(REPOSITORY)

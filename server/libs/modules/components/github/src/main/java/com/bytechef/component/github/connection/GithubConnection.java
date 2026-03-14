@@ -85,7 +85,9 @@ public class GithubConnection {
                     map.put("read:audit_log", false);
 
                     return map;
-                }));
+                }))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/github_v1#connection-setup");
 
     private GithubConnection() {
     }
