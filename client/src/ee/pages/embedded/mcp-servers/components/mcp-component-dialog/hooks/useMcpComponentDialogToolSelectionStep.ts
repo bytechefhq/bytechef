@@ -1,9 +1,6 @@
-import {Connection} from '@/ee/shared/middleware/embedded/configuration';
-import {useGetConnectionsQuery} from '@/ee/shared/queries/embedded/connections.queries';
-import {ComponentDefinition, McpComponent, McpTool, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
+import {ComponentDefinition, McpTool, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
 import {ClusterElementDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo, useRef} from 'react';
 
 export interface SelectedToolI {
@@ -16,23 +13,15 @@ export interface SelectedToolI {
 
 const useMcpComponentDialogToolSelectionStep = ({
     existingTools,
-    mcpComponent,
-    onConnectionChange,
     onToolsChange,
-    open,
     selectedComponent,
     selectedTools,
 }: {
     existingTools?: McpToolsByComponentIdQuery;
-    mcpComponent?: McpComponent;
-    onConnectionChange: (connection: Connection | null) => void;
     onToolsChange: (tools: SelectedToolI[]) => void;
-    open: boolean;
     selectedComponent: ComponentDefinition | null;
     selectedTools: SelectedToolI[];
 }) => {
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-
     const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
 
     const {data: componentDefinition, isLoading: isLoadingComponentDefinition} = useGetComponentDefinitionQuery(
@@ -41,15 +30,6 @@ const useMcpComponentDialogToolSelectionStep = ({
             componentVersion: selectedComponent?.version || 1,
         },
         !!selectedComponent
-    );
-
-    const {data: connections = [], isLoading: isLoadingConnections} = useGetConnectionsQuery(
-        {
-            componentName: selectedComponent?.name,
-            connectionVersion: selectedComponent?.version ?? undefined,
-            environmentId: currentEnvironmentId,
-        },
-        open
     );
 
     const toolElements = useMemo(
@@ -133,25 +113,11 @@ const useMcpComponentDialogToolSelectionStep = ({
         }
     }, [existingTools, toolElements, onToolsChange]);
 
-    useEffect(() => {
-        if (mcpComponent && connections.length > 0) {
-            const existingConnection = connections.find(
-                (connection) => connection.id?.toString() === mcpComponent.connectionId?.toString()
-            );
-
-            if (existingConnection) {
-                onConnectionChange(existingConnection);
-            }
-        }
-    }, [mcpComponent, connections, onConnectionChange]);
-
     return {
         allToolsSelected,
-        connections,
         handleSelectAllTools,
         handleToolToggle,
         isLoadingComponentDefinition,
-        isLoadingConnections,
         selectAllCheckboxRef,
         someToolsSelected,
         toolElements,

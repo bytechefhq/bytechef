@@ -39,9 +39,7 @@ const McpComponentDialog = ({
         handleOpenChange,
         handleSave,
         selectedComponent,
-        selectedConnection,
         selectedTools,
-        setSelectedConnection,
         setSelectedTools,
     } = useMcpComponentDialog({mcpComponent, mcpServerId, onOpenChange, open});
 
@@ -83,12 +81,8 @@ const McpComponentDialog = ({
                     {currentStep === 'tools' && (
                         <McpComponentDialogToolSelectionStep
                             existingTools={existingTools}
-                            mcpComponent={mcpComponent}
-                            onConnectionChange={setSelectedConnection}
                             onToolsChange={setSelectedTools}
-                            open={open ?? true}
                             selectedComponent={selectedComponent}
-                            selectedConnection={selectedConnection}
                             selectedTools={selectedTools}
                         />
                     )}

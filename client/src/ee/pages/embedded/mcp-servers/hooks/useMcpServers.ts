@@ -3,7 +3,7 @@ import {
     PlatformType,
     Tag,
     useEmbeddedMcpServersQuery,
-    useMcpIntegrationsQuery,
+    useMcpIntegrationInstanceConfigurationsQuery,
     useMcpServerTagsQuery,
 } from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
@@ -32,7 +32,7 @@ const useMcpServers = () => {
         isLoading: tagsIsLoading,
     } = useMcpServerTagsQuery({type: PlatformType.Embedded});
 
-    const {data: mcpIntegrationsData} = useMcpIntegrationsQuery();
+    const {data: mcpIntegrationInstanceConfigurationsData} = useMcpIntegrationInstanceConfigurationsQuery();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
@@ -49,15 +49,18 @@ const useMcpServers = () => {
         )
     );
 
-    const mcpIntegrations = mcpIntegrationsData?.mcpIntegrations?.filter((integration) => integration !== null) || [];
+    const mcpIntegrationInstanceConfigurations =
+        mcpIntegrationInstanceConfigurationsData?.mcpIntegrationInstanceConfigurations?.filter(
+            (integration) => integration !== null
+        ) || [];
 
-    const serverMcpIntegrations = mcpIntegrations.filter((integration) =>
+    const serverMcpIntegrationInstanceConfigurations = mcpIntegrationInstanceConfigurations.filter((integration) =>
         validMcpServerIds.has(integration.mcpServerId)
     );
 
     const uniqueIntegrations = Array.from(
         new Map(
-            serverMcpIntegrations
+            serverMcpIntegrationInstanceConfigurations
                 .filter((integration) => integration.integration?.id && integration.integration?.name)
                 .map((integration) => [
                     integration.integration!.id,
@@ -78,7 +81,7 @@ const useMcpServers = () => {
         }
 
         if (integrationId) {
-            const serverIntegrationIds = serverMcpIntegrations
+            const serverIntegrationIds = serverMcpIntegrationInstanceConfigurations
                 .filter((integration) => integration.mcpServerId === server.id)
                 .map((integration) => integration.integration?.id);
 
