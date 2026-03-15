@@ -227,7 +227,8 @@ class ClusterElementDefinitionServiceTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        lenient().when(componentDefinition.getName()).thenReturn(COMPONENT_NAME);
+        lenient().when(componentDefinition.getName())
+            .thenReturn(COMPONENT_NAME);
         when(componentDefinition.getClusterElements()).thenReturn(Optional.of(clusterElementDefinitions));
 
         return componentDefinition;

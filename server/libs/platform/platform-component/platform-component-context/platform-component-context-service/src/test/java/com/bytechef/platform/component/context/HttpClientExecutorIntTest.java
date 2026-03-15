@@ -982,7 +982,13 @@ class HttpClientExecutorIntTest {
             when(tempFileStorage.storeFileContent(
                 ArgumentMatchers.eq("image.png"),
                 ArgumentMatchers.any(InputStream.class)))
-                    .thenReturn(mockFileEntry);
+                    .thenAnswer(invocation -> {
+                        InputStream inputStream = invocation.getArgument(1);
+
+                        inputStream.readAllBytes();
+
+                        return mockFileEntry;
+                    });
 
             Configuration configuration = Http.responseType(Http.ResponseType.BINARY)
                 .build();
