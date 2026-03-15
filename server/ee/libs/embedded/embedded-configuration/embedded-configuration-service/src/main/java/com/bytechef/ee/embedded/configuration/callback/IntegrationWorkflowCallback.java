@@ -31,7 +31,7 @@ public class IntegrationWorkflowCallback implements BeforeConvertCallback<Integr
 
     @Override
     public IntegrationWorkflow onBeforeConvert(IntegrationWorkflow integrationWorkflow) {
-        if (integrationWorkflow.getId() == null) {
+        if (integrationWorkflow.getId() == null && integrationWorkflow.getUuid() == null) {
             integrationWorkflow.setUuid(UUID.randomUUID());
         }
 
