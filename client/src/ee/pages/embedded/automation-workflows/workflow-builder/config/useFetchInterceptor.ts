@@ -1,11 +1,34 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {shouldShowToast, showErrorToast} from '@/shared/util/toast-throttle';
 import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
+import {toast} from 'sonner';
 
-export {clearRecentToasts} from '@/shared/util/toast-throttle';
+const activeToastIds = new Set<string>();
+
+export function clearActiveToasts() {
+    activeToastIds.clear();
+}
+
+const TOAST_SAFETY_TIMEOUT_MS = 30000;
+
+function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
+    if (activeToastIds.has(toastId)) {
+        return;
+    }
+
+    activeToastIds.add(toastId);
+
+    setTimeout(() => activeToastIds.delete(toastId), TOAST_SAFETY_TIMEOUT_MS);
+
+    toast.error(title, {
+        ...options,
+        id: toastId,
+        onAutoClose: () => activeToastIds.delete(toastId),
+        onDismiss: () => activeToastIds.delete(toastId),
+    });
+}
 
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
@@ -63,13 +86,30 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
-                if (response.status < 200 || response.status > 299) {
-                    const toastId = `${new URL(response.url).pathname}-${response.status}`;
+                const toastId = `${new URL(response.url).pathname}-${response.status}`;
 
-                    if (!shouldShowToast(toastId)) {
-                        return response;
-                    }
+                if (response.url.includes('/graphql')) {
+                    const clonedResponse = response.clone();
 
+                    clonedResponse
+                        .json()
+                        .then((data: {errors?: Array<{message?: string}>}) => {
+                            if (data.errors?.length) {
+                                const errorMessage = [
+                                    ...new Set(data.errors.map((error) => error.message || 'Unknown error')),
+                                ].join('\n');
+
+                                showErrorToast(toastId, 'Error', {description: errorMessage});
+                            } else if (response.status < 200 || response.status > 299) {
+                                showErrorToast(toastId, `Request failed with status ${response.status}`);
+                            }
+                        })
+                        .catch(() => {
+                            if (response.status < 200 || response.status > 299) {
+                                showErrorToast(toastId, `Request failed with status ${response.status}`);
+                            }
+                        });
+                } else if (response.status < 200 || response.status > 299) {
                     const clonedResponse = response.clone();
 
                     clonedResponse
