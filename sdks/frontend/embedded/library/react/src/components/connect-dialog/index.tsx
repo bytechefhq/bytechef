@@ -9,6 +9,10 @@ import {
     IntegrationInstanceType,
     IntegrationInstanceWorkflowType,
     IntegrationType,
+    IntegrationWorkflowType,
+    McpIntegrationInstanceToolType,
+    McpToolType,
+    MergedMcpToolType,
     MergedWorkflowType,
     PropertyType,
     RegisterFormSubmitFunction,
@@ -117,6 +121,13 @@ export default function useConnectDialog({
     const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
     const [enabledOverrides, setEnabledOverrides] = useState<Record<string, boolean | undefined>>({});
     const [inputOverrides, setInputOverrides] = useState<Record<string, Record<string, string>>>({});
+    const [mcpToolEnabledOverrides, setMcpToolEnabledOverrides] = useState<Record<number, boolean | undefined>>({});
+    const [mcpWorkflowEnabledOverrides, setMcpWorkflowEnabledOverrides] = useState<
+        Record<string, boolean | undefined>
+    >({});
+    const [mcpWorkflowInputOverrides, setMcpWorkflowInputOverrides] = useState<
+        Record<string, Record<string, string>>
+    >({});
     const [isLoading, setIsLoading] = useState(false);
     const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
     const [currentIntegrationInstanceId, setCurrentIntegrationInstanceId] = useState<number | undefined>(
@@ -166,6 +177,68 @@ export default function useConnectDialog({
             } as MergedWorkflowType;
         });
     }, [integration, currentIntegrationInstanceId, enabledOverrides, inputOverrides]);
+
+    const mergedMcpTools: MergedMcpToolType[] = useMemo(() => {
+        if (!integration?.mcpTools) {
+            return [];
+        }
+
+        const currentInstance = integration.integrationInstances?.find(
+            (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
+        );
+
+        return integration.mcpTools.map((mcpTool: McpToolType) => {
+            const instanceTool = currentInstance?.mcpTools?.find(
+                (currentTool: McpIntegrationInstanceToolType) => currentTool.mcpToolId === mcpTool.id
+            );
+
+            const serverEnabled = instanceTool?.enabled ?? mcpTool.enabled ?? false;
+
+            const effectiveEnabled = mcpToolEnabledOverrides[mcpTool.id] ?? serverEnabled;
+
+            return {
+                ...mcpTool,
+                enabled: effectiveEnabled,
+            } as MergedMcpToolType;
+        });
+    }, [integration, currentIntegrationInstanceId, mcpToolEnabledOverrides]);
+
+    const mergedMcpWorkflows: MergedWorkflowType[] = useMemo(() => {
+        if (!integration?.mcpWorkflows) {
+            return [];
+        }
+
+        const currentInstance = integration.integrationInstances?.find(
+            (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
+        );
+
+        return integration.mcpWorkflows.map((workflow: IntegrationWorkflowType) => {
+            const instanceWorkflow = currentInstance?.mcpWorkflows?.find(
+                (currentWorkflow: IntegrationInstanceWorkflowType) =>
+                    currentWorkflow.workflowUuid === workflow.workflowUuid
+            );
+
+            const serverEnabled = instanceWorkflow?.enabled ?? workflow.enabled ?? false;
+
+            const effectiveEnabled = mcpWorkflowEnabledOverrides[workflow.workflowUuid] ?? serverEnabled;
+
+            const workflowInputOverrides = mcpWorkflowInputOverrides[workflow.workflowUuid];
+
+            return {
+                ...workflow,
+                enabled: effectiveEnabled,
+                inputs: Array.isArray(workflow.inputs)
+                    ? workflow.inputs.map((input: WorkflowInputType) => ({
+                          ...input,
+                          value:
+                              workflowInputOverrides?.[input.name] ??
+                              (instanceWorkflow?.inputs as Record<string, string> | undefined)?.[input.name] ??
+                              '',
+                      }))
+                    : [],
+            } as MergedWorkflowType;
+        });
+    }, [integration, currentIntegrationInstanceId, mcpWorkflowEnabledOverrides, mcpWorkflowInputOverrides]);
 
     const registerFormSubmit = useCallback<RegisterFormSubmitFunction>((submitFn) => {
         formSubmitRef.current = submitFn;
@@ -277,6 +350,68 @@ export default function useConnectDialog({
                 }));
 
                 console.error('Failed to toggle workflow:', error);
+            }
+        },
+        [fetch, currentIntegrationInstanceId]
+    );
+
+    const handleMcpToolToggle = useCallback(
+        async (mcpToolId: number, pressed: boolean) => {
+            if (!currentIntegrationInstanceId || isNaN(currentIntegrationInstanceId)) {
+                console.error('Invalid integration instance ID');
+
+                return;
+            }
+
+            try {
+                setMcpToolEnabledOverrides((previous) => ({...previous, [mcpToolId]: pressed}));
+
+                const method = pressed ? 'POST' : 'DELETE';
+
+                await fetch(
+                    `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/mcp-tools/${mcpToolId}/enable`,
+                    {
+                        method,
+                    }
+                );
+            } catch (error) {
+                setMcpToolEnabledOverrides((previous) => ({
+                    ...previous,
+                    [mcpToolId]: !pressed,
+                }));
+
+                console.error('Failed to toggle MCP tool:', error);
+            }
+        },
+        [fetch, currentIntegrationInstanceId]
+    );
+
+    const handleMcpWorkflowToggle = useCallback(
+        async (workflowUuid: string, pressed: boolean) => {
+            if (!currentIntegrationInstanceId || isNaN(currentIntegrationInstanceId)) {
+                console.error('Invalid integration instance ID');
+
+                return;
+            }
+
+            try {
+                setMcpWorkflowEnabledOverrides((previous) => ({...previous, [workflowUuid]: pressed}));
+
+                const method = pressed ? 'POST' : 'DELETE';
+
+                await fetch(
+                    `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/mcp-workflows/${workflowUuid}/enable`,
+                    {
+                        method,
+                    }
+                );
+            } catch (error) {
+                setMcpWorkflowEnabledOverrides((previous) => ({
+                    ...previous,
+                    [workflowUuid]: !pressed,
+                }));
+
+                console.error('Failed to toggle MCP workflow:', error);
             }
         },
         [fetch, currentIntegrationInstanceId]
@@ -434,6 +569,9 @@ export default function useConnectDialog({
         setIntegration(undefined);
         setEnabledOverrides({});
         setInputOverrides({});
+        setMcpToolEnabledOverrides({});
+        setMcpWorkflowEnabledOverrides({});
+        setMcpWorkflowInputOverrides({});
         setIsLoading(true);
         setIsOpen(true);
 
@@ -464,6 +602,10 @@ export default function useConnectDialog({
             }
 
             setIntegration(integrationData);
+        } catch (error) {
+            console.error('Failed to load integration data:', error);
+
+            setIsOpen(false);
         } finally {
             setIsLoading(false);
         }
@@ -482,16 +624,23 @@ export default function useConnectDialog({
             return;
         }
 
-        await fetch(`/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}`, {
-            method: 'DELETE',
-        });
+        try {
+            await fetch(`/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}`, {
+                method: 'DELETE',
+            });
 
-        setCurrentIntegrationInstanceId(undefined);
-        setFormValues({});
-        setInputOverrides({});
-        setEnabledOverrides({});
-        debouncedFetchesRef.current = {};
-        setWorkflowsView(false);
+            setCurrentIntegrationInstanceId(undefined);
+            setFormValues({});
+            setInputOverrides({});
+            setEnabledOverrides({});
+            setMcpToolEnabledOverrides({});
+            setMcpWorkflowEnabledOverrides({});
+            setMcpWorkflowInputOverrides({});
+            debouncedFetchesRef.current = {};
+            setWorkflowsView(false);
+        } catch (error) {
+            console.error('Failed to disconnect integration instance:', error);
+        }
     }, [fetch, currentIntegrationInstanceId]);
 
     const handleClick = useCallback(
@@ -518,10 +667,12 @@ export default function useConnectDialog({
     const currentIntegrationInstanceIdRef = useRef(currentIntegrationInstanceId);
     const inputOverridesRef = useRef(inputOverrides);
     const integrationRef = useRef(integration);
+    const mcpWorkflowInputOverridesRef = useRef(mcpWorkflowInputOverrides);
 
     currentIntegrationInstanceIdRef.current = currentIntegrationInstanceId;
     inputOverridesRef.current = inputOverrides;
     integrationRef.current = integration;
+    mcpWorkflowInputOverridesRef.current = mcpWorkflowInputOverrides;
 
     const handleWorkflowInputChange = useCallback(
         (workflowUuid: string, inputName: string, value: string) => {
@@ -587,6 +738,70 @@ export default function useConnectDialog({
         [fetch]
     );
 
+    const handleMcpWorkflowInputChange = useCallback(
+        (workflowUuid: string, inputName: string, value: string) => {
+            setMcpWorkflowInputOverrides((previous) => {
+                const updated = {
+                    ...previous,
+                    [workflowUuid]: {
+                        ...previous[workflowUuid],
+                        [inputName]: value,
+                    },
+                };
+
+                mcpWorkflowInputOverridesRef.current = updated;
+
+                return updated;
+            });
+
+            if (!currentIntegrationInstanceIdRef.current || isNaN(currentIntegrationInstanceIdRef.current)) {
+                console.error('Invalid integration instance ID');
+
+                return;
+            }
+
+            const debouncedFetchKey = `mcp-${workflowUuid}`;
+
+            if (!debouncedFetchesRef.current[debouncedFetchKey]) {
+                debouncedFetchesRef.current[debouncedFetchKey] = debounce(() => {
+                    const instanceId = currentIntegrationInstanceIdRef.current;
+
+                    if (!instanceId) {
+                        return;
+                    }
+
+                    const currentIntegration = integrationRef.current;
+                    const currentInstance = currentIntegration?.integrationInstances?.find(
+                        (instance: IntegrationInstanceType) => instance.id === instanceId
+                    );
+                    const serverInputs =
+                        (currentInstance?.mcpWorkflows?.find(
+                            (workflow: IntegrationInstanceWorkflowType) =>
+                                workflow.workflowUuid === workflowUuid
+                        )?.inputs as Record<string, string> | undefined) || {};
+
+                    const mergedInputs = {
+                        ...serverInputs,
+                        ...mcpWorkflowInputOverridesRef.current[workflowUuid],
+                    };
+
+                    void fetch(
+                        `/api/embedded/v1/integration-instances/${instanceId}/mcp-workflows/${workflowUuid}`,
+                        {
+                            body: {
+                                inputs: mergedInputs,
+                            },
+                            method: 'PUT',
+                        }
+                    ).catch((error) => console.error('Failed to save MCP workflow inputs:', error));
+                }, 600);
+            }
+
+            debouncedFetchesRef.current[debouncedFetchKey]();
+        },
+        [fetch]
+    );
+
     // Create portal container only once
     useEffect(() => {
         let container = document.getElementById('connect-dialog-portal');
@@ -632,17 +847,22 @@ export default function useConnectDialog({
                 <ConnectDialog
                     closeDialog={closeDialog}
                     form={form}
+                    handleClick={handleClick}
+                    handleMcpToolToggle={handleMcpToolToggle}
+                    handleMcpWorkflowToggle={handleMcpWorkflowToggle}
+                    handleMcpWorkflowInputChange={handleMcpWorkflowInputChange}
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
-                    handleClick={handleClick}
                     integration={integration}
                     isOAuth2={isOAuth2}
                     isOpen={isOpen}
                     loading={isLoading}
+                    mergedMcpTools={mergedMcpTools}
+                    mergedMcpWorkflows={mergedMcpWorkflows}
+                    mergedWorkflows={mergedWorkflows}
                     properties={integration?.connectionConfig?.inputs}
                     registerFormSubmit={registerFormSubmit}
                     workflowsView={workflowsView}
-                    mergedWorkflows={mergedWorkflows}
                 />
             );
         }
@@ -651,14 +871,19 @@ export default function useConnectDialog({
         form,
         formValues,
         handleClick,
-        integration,
-        isOAuth2,
-        registerFormSubmit,
+        handleMcpToolToggle,
+        handleMcpWorkflowToggle,
+        handleMcpWorkflowInputChange,
         handleWorkflowToggle,
         handleWorkflowInputChange,
+        integration,
         integrationInstanceId,
-        workflowsView,
+        isOAuth2,
+        mergedMcpTools,
+        mergedMcpWorkflows,
         mergedWorkflows,
+        registerFormSubmit,
+        workflowsView,
         currentIntegrationInstanceId,
     ]);
 
