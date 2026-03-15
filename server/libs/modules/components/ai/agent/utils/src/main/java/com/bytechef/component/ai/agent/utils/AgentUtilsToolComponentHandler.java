@@ -18,35 +18,42 @@ package com.bytechef.component.ai.agent.utils;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 
+import com.bytechef.ai.agent.skill.facade.AgentSkillFacade;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.google.auto.service.AutoService;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component("aiAgentUtils_v1_ComponentHandler")
 public class AgentUtilsToolComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("aiAgentUtils")
-        .title("AI Agent Utils")
-        .description("AI Agent Utils brings Claude Code-inspired tools and agent skills.")
-        .icon("path:assets/agent-utils.svg")
-        .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-        .clusterElements(
-            AgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
-            AgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
-            AgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
-            AgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
-            AgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
-            AgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
-            AgentUtilsSkillsTool.CLUSTER_ELEMENT_DEFINITION,
-            AgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
-            AgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION);
+    private final ComponentDefinition componentDefinition;
+
+    public AgentUtilsToolComponentHandler(AgentSkillFacade agentSkillFacade) {
+        AgentUtilsSkillsTool agentUtilsSkillsTool = new AgentUtilsSkillsTool(agentSkillFacade);
+
+        this.componentDefinition = component("aiAgentUtils")
+            .title("AI Agent Utils")
+            .description("AI Agent Utils brings Claude Code-inspired tools and agent skills.")
+            .icon("path:assets/agent-utils.svg")
+            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+            .clusterElements(
+                AgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
+                AgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
+                AgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
+                AgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
+                AgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
+                AgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
+                agentUtilsSkillsTool.clusterElementDefinition,
+                AgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
+                AgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION);
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
 }
