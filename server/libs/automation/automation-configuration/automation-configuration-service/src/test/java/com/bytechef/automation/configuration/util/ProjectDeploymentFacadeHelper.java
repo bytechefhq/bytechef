@@ -87,29 +87,29 @@ public class ProjectDeploymentFacadeHelper {
     }
 
     public ProjectDeploymentDTO createProjectDeployment(long workspaceId, ProjectDTO projectDTO) {
-        ProjectWorkflowDTO workflowDTO = addTestWorkflow(projectDTO);
-
-        ProjectWorkflow projectWorkflow = projectWorkflowRepository.findById(workflowDTO.getProjectWorkflowId())
-            .get();
+        addTestWorkflow(projectDTO);
 
         projectFacade.publishProject(projectDTO.id(), "Published for test", false);
 
-        ProjectDTO publishedProject = projectFacade.getProject(projectDTO.id());
-
-        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
-            new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
-                0,
-                workflowDTO.getId(), projectWorkflow.getUuidAsString());
-
-        Project dbProject = projectRepository.findById(publishedProject.id())
+        Project dbProject = projectRepository.findById(projectDTO.id())
             .orElseThrow();
 
-        // TODO this should be sorted and extracted to DTO to serve other callers
         ProjectVersion lastPublishedVersion = dbProject.getProjectVersions()
             .stream()
             .filter(projectVersion -> projectVersion.getStatus() == ProjectVersion.Status.PUBLISHED)
             .toList()
             .getLast();
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDTO.id(), lastPublishedVersion.getVersion())
+            .stream()
+            .findFirst()
+            .orElseThrow();
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
+            new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
+                0,
+                publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
             .projectId(projectDTO.id())
@@ -158,13 +158,59 @@ public class ProjectDeploymentFacadeHelper {
     }
 
     public ProjectWorkflowDTO addTestWorkflow(ProjectDTO projectDTO) {
+        return addTestWorkflow(
+            projectDTO,
+            "{\"label\": \"Test Workflow\", \"description\": \"Test Description\", \"tasks\": []}");
+    }
+
+    public ProjectWorkflowDTO addTestWorkflow(ProjectDTO projectDTO, String workflowDefinition) {
         Project project = projectDTO.toProject();
 
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
-            Validate.notNull(project.getId(), "id"),
-            "{\"label\": \"Test Workflow\", \"description\": \"Test Description\", \"tasks\": []}");
+            Validate.notNull(project.getId(), "id"), workflowDefinition);
 
         return projectWorkflowFacade.getProjectWorkflow(projectWorkflow.getId());
+    }
+
+    public ProjectDeploymentDTO createProjectDeploymentWithTriggers(long workspaceId, ProjectDTO projectDTO) {
+        addTestWorkflow(
+            projectDTO,
+            "{\"label\": \"Test Workflow\", \"description\": \"Test Description\", " +
+                "\"triggers\": [{\"label\": \"Schedule\", \"name\": \"trigger_1\", " +
+                "\"type\": \"schedule/v1/schedule\"}], \"tasks\": []}");
+
+        projectFacade.publishProject(projectDTO.id(), "Published for test", false);
+
+        Project dbProject = projectRepository.findById(projectDTO.id())
+            .orElseThrow();
+
+        ProjectVersion lastPublishedVersion = dbProject.getProjectVersions()
+            .stream()
+            .filter(projectVersion -> projectVersion.getStatus() == ProjectVersion.Status.PUBLISHED)
+            .toList()
+            .getLast();
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDTO.id(), lastPublishedVersion.getVersion())
+            .stream()
+            .findFirst()
+            .orElseThrow();
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
+            new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
+                0,
+                publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectDTO.id())
+            .name(PREFIX_PROJECT_DEPLOYMENT)
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(lastPublishedVersion.getVersion())
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        return projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO));
     }
 
     private List<Tag> randomTags() {
