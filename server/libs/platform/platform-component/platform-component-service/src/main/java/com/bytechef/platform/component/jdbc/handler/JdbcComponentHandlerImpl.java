@@ -73,9 +73,11 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.JdbcComponentDefinition;
 import com.bytechef.platform.component.definition.ai.agent.DataSourceFunction;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.datastream.JdbcItemWriter;
@@ -405,7 +407,8 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             String orderDirection = MapUtils.getRequiredString(inputParameters, ORDER_DIRECTION);
 
             if (!orderDirection.equals("ASC") && !orderDirection.equals("DESC")) {
-                throw new IllegalArgumentException("Invalid order direction: " + orderDirection);
+                throw new ConfigurationException(
+                    "Invalid order direction: " + orderDirection, ComponentErrorType.INVALID_ORDER_DIRECTION);
             }
 
             Object lastItem = closureParameters.get(LAST_ITEM);
