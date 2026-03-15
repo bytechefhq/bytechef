@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260314000001" author="Ivica Cardic">
+        <renameTable oldTableName="mcp_integration" newTableName="mcp_integration_instance_configuration"/>
+
+        <renameTable oldTableName="mcp_integration_workflow" newTableName="mcp_integration_instance_configuration_workflow"/>
+
+        <renameColumn tableName="mcp_integration_instance_configuration_workflow" oldColumnName="mcp_integration_id" newColumnName="mcp_integration_instance_configuration_id" columnDataType="BIGINT"/>
+
+        <addUniqueConstraint
+            tableName="mcp_integration_instance_configuration"
+            columnNames="mcp_server_id, integration_instance_configuration_id"
+            constraintName="uk_mcp_integration_instance_configuration"/>
+
+        <addUniqueConstraint
+            tableName="mcp_integration_instance_configuration_workflow"
+            columnNames="mcp_integration_instance_configuration_id, integration_instance_configuration_workflow_id"
+            constraintName="uk_mcp_iic_workflow"/>
+    </changeSet>
+</databaseChangeLog>
