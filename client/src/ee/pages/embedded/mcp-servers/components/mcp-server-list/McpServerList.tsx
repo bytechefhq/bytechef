@@ -2,7 +2,12 @@ import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
-import {McpIntegrationWorkflow, McpServer, Tag, useMcpIntegrationsByServerIdQuery} from '@/shared/middleware/graphql';
+import {
+    McpIntegrationInstanceConfigurationWorkflow,
+    McpServer,
+    Tag,
+    useMcpIntegrationInstanceConfigurationsByServerIdQuery,
+} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 
 import McpServerListItem from './McpServerListItem';
@@ -15,18 +20,27 @@ interface McpServerListProps {
 }
 
 const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer; tags?: Tag[]}) => {
-    const {data: mcpIntegrationsData} = useMcpIntegrationsByServerIdQuery({
+    const {data: mcpIntegrationInstanceConfigurationsData} = useMcpIntegrationInstanceConfigurationsByServerIdQuery({
         mcpServerId: mcpServer.id!,
     });
 
-    const mcpIntegrations =
-        mcpIntegrationsData?.mcpIntegrationsByServerId?.filter((integration) => integration !== null) || [];
+    const mcpIntegrationInstanceConfigurations =
+        mcpIntegrationInstanceConfigurationsData?.mcpIntegrationInstanceConfigurationsByServerId?.filter(
+            (integration) => integration !== null
+        ) || [];
 
-    const mcpIntegrationWorkflows: McpIntegrationWorkflow[] = mcpIntegrations
-        .flatMap((integration) => integration?.mcpIntegrationWorkflows || [])
-        .filter((workflow): workflow is McpIntegrationWorkflow => workflow !== null);
+    const mcpIntegrationInstanceConfigurationWorkflows: McpIntegrationInstanceConfigurationWorkflow[] =
+        mcpIntegrationInstanceConfigurations
+            .flatMap((integration) => integration?.mcpIntegrationInstanceConfigurationWorkflows || [])
+            .filter((workflow): workflow is McpIntegrationInstanceConfigurationWorkflow => workflow !== null);
 
-    return <McpServerListItem mcpIntegrationWorkflows={mcpIntegrationWorkflows} mcpServer={mcpServer} tags={tags} />;
+    return (
+        <McpServerListItem
+            mcpIntegrationInstanceConfigurationWorkflows={mcpIntegrationInstanceConfigurationWorkflows}
+            mcpServer={mcpServer}
+            tags={tags}
+        />
+    );
 };
 
 const McpServerList = ({mcpServers, tags}: McpServerListProps) => {

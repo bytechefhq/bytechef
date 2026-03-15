@@ -1,4 +1,3 @@
-import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {
     ComponentDefinition,
     McpComponent,
@@ -35,7 +34,6 @@ const useMcpComponentDialog = ({
             : null
     );
     const [selectedTools, setSelectedTools] = useState<SelectedToolI[]>([]);
-    const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null);
 
     const {data: existingTools} = useMcpToolsByComponentIdQuery(
         {
@@ -48,26 +46,22 @@ const useMcpComponentDialog = ({
 
     const queryClient = useQueryClient();
 
+    const invalidateMcpQueries = () => {
+        queryClient.invalidateQueries({queryKey: ['mcpComponentsByServerId']});
+        queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
+    };
+
     const createMcpComponentWithToolsMutation = useCreateMcpComponentWithToolsMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
-        },
+        onSuccess: invalidateMcpQueries,
     });
 
     const updateMcpComponentWithToolsMutation = useUpdateMcpComponentWithToolsMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
-        },
+        onSuccess: invalidateMcpQueries,
     });
 
     const handleComponentSelect = (component: ComponentDefinition) => {
         setSelectedComponent(component);
         setSelectedTools([]);
-        setSelectedConnection(null);
         setCurrentStep('tools');
     };
 
@@ -89,8 +83,21 @@ const useMcpComponentDialog = ({
 
         if (!mcpComponent) {
             setSelectedTools([]);
-            setSelectedConnection(null);
         }
+    };
+
+    const handleSaveSuccess = () => {
+        if (onOpenChange) {
+            onOpenChange(false);
+        }
+
+        setCurrentStep(mcpComponent ? 'tools' : 'components');
+
+        if (!mcpComponent) {
+            setSelectedComponent(null);
+        }
+
+        setSelectedTools([]);
     };
 
     const handleSave = () => {
@@ -98,14 +105,13 @@ const useMcpComponentDialog = ({
             return;
         }
 
-        try {
-            if (mcpComponent?.id) {
-                updateMcpComponentWithToolsMutation.mutate({
+        if (mcpComponent?.id) {
+            updateMcpComponentWithToolsMutation.mutate(
+                {
                     id: mcpComponent.id.toString(),
                     input: {
                         componentName: selectedComponent.name,
                         componentVersion: selectedComponent.version ?? 1,
-                        connectionId: selectedConnection?.id?.toString() || undefined,
                         mcpServerId,
                         tools: selectedTools.map((tool) => ({
                             name: tool.name,
@@ -113,46 +119,24 @@ const useMcpComponentDialog = ({
                         })),
                         version: mcpComponent.version,
                     },
-                });
-            } else {
-                createMcpComponentWithToolsMutation.mutate({
+                },
+                {onSuccess: handleSaveSuccess}
+            );
+        } else {
+            createMcpComponentWithToolsMutation.mutate(
+                {
                     input: {
                         componentName: selectedComponent.name,
                         componentVersion: selectedComponent.version ?? 1,
-                        connectionId: selectedConnection?.id?.toString() || undefined,
                         mcpServerId,
                         tools: selectedTools.map((tool) => ({
                             name: tool.name,
                             parameters: {},
                         })),
                     },
-                });
-            }
-
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponents'],
-            });
-            queryClient.invalidateQueries({
-                queryKey: ['mcpServers'],
-            });
-            queryClient.invalidateQueries({
-                queryKey: ['mcpComponentsByServerId'],
-            });
-
-            if (onOpenChange) {
-                onOpenChange(false);
-            }
-
-            setCurrentStep(mcpComponent ? 'tools' : 'components');
-
-            if (!mcpComponent) {
-                setSelectedComponent(null);
-            }
-
-            setSelectedTools([]);
-            setSelectedConnection(null);
-        } catch (error) {
-            console.error('Error saving MCP component and tools:', error);
+                },
+                {onSuccess: handleSaveSuccess}
+            );
         }
     };
 
@@ -163,7 +147,6 @@ const useMcpComponentDialog = ({
             setCurrentStep('components');
             setSelectedComponent(null);
             setSelectedTools([]);
-            setSelectedConnection(null);
         }
     };
 
@@ -186,7 +169,6 @@ const useMcpComponentDialog = ({
 
             if (!mcpComponent) {
                 setSelectedTools([]);
-                setSelectedConnection(null);
             }
         }
     };
@@ -200,9 +182,7 @@ const useMcpComponentDialog = ({
         handleOpenChange,
         handleSave,
         selectedComponent,
-        selectedConnection,
         selectedTools,
-        setSelectedConnection,
         setSelectedTools,
     };
 };
