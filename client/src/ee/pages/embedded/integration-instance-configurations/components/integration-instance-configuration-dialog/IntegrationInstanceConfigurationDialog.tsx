@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import LoadingDots from '@/components/LoadingDots';
 import LoadingIcon from '@/components/LoadingIcon';
 import {
     Dialog,
@@ -34,7 +35,7 @@ import {AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -43,13 +44,17 @@ import IntegrationInstanceConfigurationDialogBasicStep from './IntegrationInstan
 import IntegrationInstanceConfigurationDialogWorkflowsStep from './IntegrationInstanceConfigurationDialogWorkflowsStep';
 
 interface IntegrationInstanceConfigurationDialogProps {
-    onClose?: () => void;
+    excludeWorkflowIds?: Set<string>;
+    filterWorkflowUuids?: string[];
     integrationInstanceConfiguration?: IntegrationInstanceConfiguration;
+    onClose?: () => void;
     triggerNode?: ReactNode;
     updateIntegrationVersion?: boolean;
 }
 
 const IntegrationInstanceConfigurationDialog = ({
+    excludeWorkflowIds,
+    filterWorkflowUuids,
     integrationInstanceConfiguration,
     onClose,
     triggerNode,
@@ -62,6 +67,8 @@ const IntegrationInstanceConfigurationDialog = ({
     );
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
+
+    const initializedConfigKeyRef = useRef<string>('');
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
@@ -88,12 +95,36 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const {control, formState, getValues, handleSubmit, reset, setValue} = form;
 
-    const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
+    const {data: allWorkflows, isPending: isWorkflowsPending} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,
         curIntegrationVersion!,
         true,
         !!curIntegrationId && !!curIntegrationVersion
     );
+
+    const workflows = useMemo(() => {
+        if (!allWorkflows) {
+            return undefined;
+        }
+
+        let filteredWorkflows = allWorkflows;
+
+        if (excludeWorkflowIds?.size) {
+            filteredWorkflows = filteredWorkflows.filter((workflow) => !excludeWorkflowIds.has(workflow.id!));
+        }
+
+        if (filterWorkflowUuids === undefined) {
+            return filteredWorkflows;
+        }
+
+        if (filterWorkflowUuids.length === 0) {
+            return [];
+        }
+
+        return filteredWorkflows.filter(
+            (workflow) => workflow.workflowUuid && filterWorkflowUuids.includes(workflow.workflowUuid)
+        );
+    }, [allWorkflows, excludeWorkflowIds, filterWorkflowUuids]);
 
     const {data: integration} = useGetIntegrationQuery(curIntegrationId!, undefined, !!curIntegrationId);
 
@@ -175,11 +206,11 @@ const IntegrationInstanceConfigurationDialog = ({
         ];
     }
 
-    if (integration && workflows && workflows.length > 0) {
+    if (integration && (updateIntegrationVersion || (workflows && workflows.length > 0))) {
         integrationInstanceConfigurationDialogSteps = [
             ...integrationInstanceConfigurationDialogSteps,
             {
-                content: (
+                content: workflows ? (
                     <IntegrationInstanceConfigurationDialogWorkflowsStep
                         componentName={integration.componentName}
                         control={control}
@@ -187,6 +218,8 @@ const IntegrationInstanceConfigurationDialog = ({
                         setValue={setValue}
                         workflows={workflows}
                     />
+                ) : (
+                    <></>
                 ),
                 name: 'Workflows',
             },
@@ -266,68 +299,68 @@ const IntegrationInstanceConfigurationDialog = ({
         !!updateIntegrationInstanceConfigurationMutation.isPending;
 
     useEffect(() => {
-        if (workflows) {
-            let integrationInstanceConfigurationWorkflows: IntegrationInstanceConfigurationWorkflow[] = [];
+        if (!workflows?.length) {
+            return;
+        }
 
-            for (let i = 0; i < workflows.length; i++) {
-                const workflow = workflows[i];
+        const filterKey = filterWorkflowUuids ? filterWorkflowUuids.join(',') : '';
 
+        const configKey = `${curIntegrationId}-${curIntegrationVersion}-${filterKey}`;
+
+        if (initializedConfigKeyRef.current === configKey) {
+            return;
+        }
+
+        initializedConfigKeyRef.current = configKey;
+
+        const integrationInstanceConfigurationWorkflows: IntegrationInstanceConfigurationWorkflow[] = workflows.map(
+            (workflow) => {
                 const integrationInstanceConfigurationWorkflow =
                     integrationInstanceConfiguration?.integrationInstanceConfigurationWorkflows?.find(
-                        (integrationInstanceConfigurationWorkflow) =>
-                            integrationInstanceConfigurationWorkflow.workflowUuid === workflow.workflowUuid
+                        (configWorkflow) => configWorkflow.workflowUuid === workflow.workflowUuid
                     );
 
-                if (integrationInstanceConfigurationWorkflow && integrationInstanceConfigurationWorkflow.enabled) {
-                    setWorkflowEnabled(workflow.id!, true);
-                } else {
-                    setWorkflowEnabled(workflow.id!, false);
-                }
-
-                let newIntegrationInstanceConfigurationWorkflowConnections: IntegrationInstanceConfigurationWorkflowConnection[] =
-                    [];
+                setWorkflowEnabled(
+                    workflow.id!,
+                    !!(integrationInstanceConfigurationWorkflow && integrationInstanceConfigurationWorkflow.enabled)
+                );
 
                 const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
                     .flatMap((task) => task.connections ?? [])
                     .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
                     .filter((connection) => connection.componentName !== integration?.componentName);
 
-                for (const componentConnection of componentConnections) {
-                    const integrationInstanceConfigurationWorkflowConnection =
-                        integrationInstanceConfigurationWorkflow?.connections?.find(
-                            (integrationInstanceConfigurationWorkflowConnection) =>
-                                integrationInstanceConfigurationWorkflowConnection.workflowNodeName ===
-                                    componentConnection.workflowNodeName &&
-                                integrationInstanceConfigurationWorkflowConnection.workflowConnectionKey ===
-                                    componentConnection.key
+                const newIntegrationInstanceConfigurationWorkflowConnections: IntegrationInstanceConfigurationWorkflowConnection[] =
+                    componentConnections.map((componentConnection) => {
+                        const existingConnection = integrationInstanceConfigurationWorkflow?.connections?.find(
+                            (workflowConnection) =>
+                                workflowConnection.workflowNodeName === componentConnection.workflowNodeName &&
+                                workflowConnection.workflowConnectionKey === componentConnection.key
                         );
 
-                    newIntegrationInstanceConfigurationWorkflowConnections = [
-                        ...newIntegrationInstanceConfigurationWorkflowConnections,
-                        integrationInstanceConfigurationWorkflowConnection ??
+                        return (
+                            existingConnection ??
                             ({
                                 key: componentConnection.key,
                                 workflowNodeName: componentConnection.workflowNodeName,
-                            } as IntegrationInstanceConfigurationWorkflowConnection),
-                    ];
-                }
+                            } as IntegrationInstanceConfigurationWorkflowConnection)
+                        );
+                    });
 
-                integrationInstanceConfigurationWorkflows = [
-                    ...integrationInstanceConfigurationWorkflows,
-                    {
-                        ...(integrationInstanceConfigurationWorkflow ?? {}),
-                        connections: newIntegrationInstanceConfigurationWorkflowConnections,
-                        version: undefined,
-                        workflowId: workflow.id!,
-                    },
-                ];
+                return {
+                    ...(integrationInstanceConfigurationWorkflow ?? {}),
+                    connections: newIntegrationInstanceConfigurationWorkflowConnections,
+                    version: undefined,
+                    workflowId: workflow.id!,
+                    workflowUuid: workflow.workflowUuid,
+                };
             }
+        );
 
-            setValue('integrationInstanceConfigurationWorkflows', integrationInstanceConfigurationWorkflows);
-        }
+        setValue('integrationInstanceConfigurationWorkflows', integrationInstanceConfigurationWorkflows);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [getValues().integrationId, getValues().integrationVersion, workflows]);
+    }, [curIntegrationId, curIntegrationVersion, workflows]);
 
     return (
         <Dialog
@@ -389,7 +422,13 @@ const IntegrationInstanceConfigurationDialog = ({
                                     'max-h-integration-instance-configuration-dialog-height overflow-y-auto'
                             )}
                         >
-                            {integrationInstanceConfigurationDialogSteps[activeStepIndex].content}
+                            {activeStepIndex === 1 && isWorkflowsPending ? (
+                                <div className="flex justify-center py-12">
+                                    <LoadingDots />
+                                </div>
+                            ) : (
+                                integrationInstanceConfigurationDialogSteps[activeStepIndex].content
+                            )}
                         </div>
                     </WorkflowMockProvider>
 
@@ -412,16 +451,15 @@ const IntegrationInstanceConfigurationDialog = ({
                                     <Button label="Cancel" variant="outline" />
                                 </DialogClose>
 
-                                {(((!integrationInstanceConfiguration?.id ||
-                                    (workflows && workflows.length > 0 && updateIntegrationVersion)) &&
-                                    oAuth2Authorization) ||
-                                    (workflows && workflows.length > 0 && !oAuth2Authorization)) && (
-                                    <Button label="Next" onClick={handleSubmit(handleNextClick)} />
-                                )}
+                                {(!integrationInstanceConfiguration?.id || updateIntegrationVersion) &&
+                                    (updateIntegrationVersion ||
+                                        oAuth2Authorization ||
+                                        workflows === undefined ||
+                                        (workflows && workflows.length > 0)) && (
+                                        <Button label="Next" onClick={handleSubmit(handleNextClick)} />
+                                    )}
 
-                                {(((!workflows || workflows?.length == 0) && !oAuth2Authorization) ||
-                                    (integrationInstanceConfiguration?.id && !updateIntegrationVersion) ||
-                                    (workflows && workflows.length === 0 && updateIntegrationVersion)) && (
+                                {!updateIntegrationVersion && integrationInstanceConfiguration?.id && (
                                     <Button
                                         disabled={isSaving}
                                         icon={isSaving ? <LoadingIcon /> : undefined}
@@ -459,8 +497,7 @@ const IntegrationInstanceConfigurationDialog = ({
                         {((activeStepIndex === 1 && !oAuth2Authorization) ||
                             (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
                             (activeStepIndex === 2 && oAuth2Authorization)) &&
-                            workflows &&
-                            workflows?.length > 0 && (
+                            (updateIntegrationVersion || (workflows && workflows?.length > 0)) && (
                                 <>
                                     <Button
                                         label="Previous"
@@ -469,7 +506,7 @@ const IntegrationInstanceConfigurationDialog = ({
                                     />
 
                                     <Button
-                                        disabled={isSaving}
+                                        disabled={isSaving || isWorkflowsPending}
                                         icon={isSaving ? <LoadingIcon /> : undefined}
                                         label="Save"
                                         onClick={handleSubmit(handleSaveClick)}

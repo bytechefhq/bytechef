@@ -13,11 +13,10 @@ import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configurati
 import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
 import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
-import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
+import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {DownloadIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
