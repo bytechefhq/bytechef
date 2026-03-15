@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer;
 
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationProvider;
+import com.bytechef.ee.embedded.ai.mcp.server.service.ConnectTokenService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
@@ -24,10 +25,12 @@ public class EmbeddedMcpServerSecurityConfigurer extends AbstractApiKeyHttpConfi
     private static final String PATH_PATTERN = "^/api/embedded/.+/mcp";
 
     public EmbeddedMcpServerSecurityConfigurer(
-        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
+        ConnectTokenService connectTokenService, ConnectedUserService connectedUserService,
+        SigningKeyService signingKeyService) {
 
         super(
-            PATH_PATTERN, new EmbeddedMcpServerApiKeyAuthenticationConverter(signingKeyService),
+            PATH_PATTERN,
+            new EmbeddedMcpServerApiKeyAuthenticationConverter(connectTokenService, signingKeyService),
             new EmbeddedMcpServerApiKeyAuthenticationProvider(connectedUserService));
     }
 
