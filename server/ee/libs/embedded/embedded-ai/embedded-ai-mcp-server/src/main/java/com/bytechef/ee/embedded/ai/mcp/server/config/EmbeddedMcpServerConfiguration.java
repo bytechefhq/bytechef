@@ -33,10 +33,12 @@ import com.bytechef.ee.embedded.ai.mcp.server.service.ConnectTokenService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.ee.embedded.mcp.service.McpIntegrationService;
-import com.bytechef.ee.embedded.mcp.service.McpIntegrationWorkflowService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
@@ -151,7 +153,10 @@ public class EmbeddedMcpServerConfiguration {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
         JobService jobService, McpComponentService mcpComponentService,
-        McpIntegrationWorkflowService mcpIntegrationWorkflowService, McpServerService mcpServerService,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
+        McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
+        McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, SubflowResolver subflowResolver,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
@@ -180,13 +185,15 @@ public class EmbeddedMcpServerConfiguration {
             connectTokenService(), evaluator, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService,
             integrationInstanceService, integrationService, jobSyncExecutor, mcpComponentService,
-            mcpIntegrationWorkflowService, mcpServerService, principalJobFacade, applicationProperties.getPublicUrl(),
-            taskExecutionService, taskFileStorage, workflowService);
+            integrationInstanceWorkflowService, mcpIntegrationInstanceToolService,
+            mcpIntegrationInstanceConfigurationWorkflowService, mcpServerService, principalJobFacade,
+            applicationProperties.getPublicUrl(), taskExecutionService, taskFileStorage, workflowService);
     }
 
     @Bean
     FilterableMcpAsyncServer embeddedMcpAsyncServer(
-        McpComponentService mcpComponentService, McpIntegrationService mcpIntegrationService,
+        McpComponentService mcpComponentService,
+        McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpServerService mcpServerService, McpToolService mcpToolService,
         EmbeddedMcpToolFacade embeddedMcpToolFacade) {
 
@@ -216,16 +223,21 @@ public class EmbeddedMcpServerConfiguration {
                     .flatMap(
                         mcpComponent -> CollectionUtils.stream(
                             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
-                    .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(
-                        embeddedMcpToolFacade.getFunctionToolCallback(
-                            mcpTool, externalUserId, environment, tenantId)))
-                    .forEach(toolSpecifications::add);
+                    .forEach(mcpTool -> {
+                        var callback = embeddedMcpToolFacade.getFunctionToolCallback(
+                            mcpTool, externalUserId, environment, tenantId);
 
-                mcpIntegrationService.getMcpServerMcpIntegrations(mcpServer.getId())
+                        if (callback != null) {
+                            toolSpecifications.add(McpToolUtils.toAsyncToolSpecification(callback));
+                        }
+                    });
+
+                mcpIntegrationInstanceConfigurationService
+                    .getMcpServerMcpIntegrationInstanceConfigurations(mcpServer.getId())
                     .stream()
-                    .flatMap(mcpIntegration -> CollectionUtils.stream(
+                    .flatMap(mcpIntegrationInstanceConfiguration -> CollectionUtils.stream(
                         embeddedMcpToolFacade.getFunctionToolCallbacks(
-                            mcpIntegration, externalUserId, environment, tenantId)))
+                            mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId)))
                     .map(McpToolUtils::toAsyncToolSpecification)
                     .forEach(toolSpecifications::add);
 
@@ -236,7 +248,8 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     SecurityConfigurerContributor embeddedMcpServerSecurityConfigurerContributor(
-        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
+        ConnectTokenService connectTokenService, ConnectedUserService connectedUserService,
+        SigningKeyService signingKeyService) {
 
         return new SecurityConfigurerContributor() {
 
@@ -245,7 +258,8 @@ public class EmbeddedMcpServerConfiguration {
             public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
                 getSecurityConfigurerAdapter() {
 
-                return (T) new EmbeddedMcpServerSecurityConfigurer(connectedUserService, signingKeyService);
+                return (T) new EmbeddedMcpServerSecurityConfigurer(
+                    connectTokenService, connectedUserService, signingKeyService);
             }
         };
     }
