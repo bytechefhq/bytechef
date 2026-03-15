@@ -1,8 +1,0 @@
-mutation updateMcpIntegrationWorkflow($id: ID!, $input: McpIntegrationWorkflowUpdateInput!) {
-    updateMcpIntegrationWorkflow(id: $id, input: $input) {
-        id
-        mcpIntegrationId
-        integrationInstanceConfigurationWorkflowId
-        parameters
-    }
-}

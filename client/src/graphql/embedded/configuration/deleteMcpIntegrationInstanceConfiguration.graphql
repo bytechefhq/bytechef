@@ -1,0 +1,3 @@
+mutation deleteMcpIntegrationInstanceConfiguration($id: ID!) {
+    deleteMcpIntegrationInstanceConfiguration(id: $id)
+}

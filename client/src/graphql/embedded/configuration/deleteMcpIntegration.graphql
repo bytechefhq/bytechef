@@ -1,3 +1,0 @@
-mutation deleteMcpIntegration($id: ID!) {
-    deleteMcpIntegration(id: $id)
-}

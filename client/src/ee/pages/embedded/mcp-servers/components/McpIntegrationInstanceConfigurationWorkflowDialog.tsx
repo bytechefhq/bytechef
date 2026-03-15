@@ -13,65 +13,70 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect';
-import IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {
-    McpIntegration,
+    McpIntegrationInstanceConfiguration,
     McpServer,
-    useCreateMcpIntegrationMutation,
-    useToolEligibleIntegrationVersionWorkflowsQuery,
-    useUpdateMcpIntegrationMutation,
+    useCreateMcpIntegrationInstanceConfigurationMutation,
+    useToolEligibleIntegrationInstanceConfigurationWorkflowsQuery,
+    useUpdateMcpIntegrationInstanceConfigurationMutation,
 } from '@/shared/middleware/graphql';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useMemo, useState} from 'react';
+import {ComponentIcon} from 'lucide-react';
+import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import InlineSVG from 'react-inlinesvg';
 import {z} from 'zod';
 
 const formSchema = z.object({
-    integrationId: z.number().min(1, 'Please select an integration'),
-    integrationVersion: z.number().min(1, 'Please select a version'),
+    integrationInstanceConfigurationId: z.string().min(1, 'Please select an integration instance configuration'),
     mcpServerId: z.string().min(1),
     selectedWorkflowIds: z.array(z.string()).min(1, 'Please select at least one workflow'),
 });
 
-interface McpIntegrationDialogProps {
-    mcpIntegration?: McpIntegration;
+interface McpIntegrationInstanceConfigurationDialogProps {
+    mcpIntegrationInstanceConfiguration?: McpIntegrationInstanceConfiguration;
     mcpServer?: McpServer;
     onClose?: () => void;
     triggerNode?: ReactNode;
 }
 
-const McpIntegrationWorkflowDialog = ({mcpIntegration, mcpServer, onClose, triggerNode}: McpIntegrationDialogProps) => {
-    const isEditMode = !!mcpIntegration?.id;
+const McpIntegrationInstanceConfigurationWorkflowDialog = ({
+    mcpIntegrationInstanceConfiguration,
+    mcpServer,
+    onClose,
+    triggerNode,
+}: McpIntegrationInstanceConfigurationDialogProps) => {
+    const isEditMode = !!mcpIntegrationInstanceConfiguration?.id;
 
     const [isOpen, setIsOpen] = useState(!triggerNode);
-    const [currentIntegrationId, setCurrentIntegrationId] = useState<number | undefined>(
-        isEditMode ? Number(mcpIntegration.integration?.id) : undefined
-    );
-    const [currentIntegrationVersion, setCurrentIntegrationVersion] = useState<number | undefined>(
-        isEditMode ? (mcpIntegration.integrationVersion ?? undefined) : undefined
-    );
+    const [currentIntegrationInstanceConfigurationId, setCurrentIntegrationInstanceConfigurationId] = useState<
+        string | undefined
+    >(isEditMode ? mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationId : undefined);
 
-    const {data: eligibleWorkflowsData} = useToolEligibleIntegrationVersionWorkflowsQuery(
+    const {data: integrationInstanceConfigurations = []} = useGetIntegrationInstanceConfigurationsQuery({});
+
+    const {data: eligibleWorkflowsData} = useToolEligibleIntegrationInstanceConfigurationWorkflowsQuery(
         {
-            integrationId: String(currentIntegrationId || 0),
-            integrationVersion: currentIntegrationVersion || 0,
+            integrationInstanceConfigurationId: currentIntegrationInstanceConfigurationId || '0',
         },
-        {enabled: !!(currentIntegrationId && currentIntegrationVersion)}
+        {enabled: !!currentIntegrationInstanceConfigurationId}
     );
 
-    const eligibleWorkflows = eligibleWorkflowsData?.toolEligibleIntegrationVersionWorkflows;
+    const eligibleWorkflows = eligibleWorkflowsData?.toolEligibleIntegrationInstanceConfigurationWorkflows;
 
     const existingWorkflowLabels = useMemo(() => {
-        const mcpIntegrationWorkflows = mcpIntegration?.mcpIntegrationWorkflows ?? [];
+        const mcpIntegrationInstanceConfigurationWorkflows =
+            mcpIntegrationInstanceConfiguration?.mcpIntegrationInstanceConfigurationWorkflows ?? [];
 
         return new Set(
-            mcpIntegrationWorkflows
+            mcpIntegrationInstanceConfigurationWorkflows
                 .filter((workflow) => workflow?.workflow?.label != null)
                 .map((workflow) => workflow!.workflow!.label!)
         );
-    }, [mcpIntegration?.mcpIntegrationWorkflows]);
+    }, [mcpIntegrationInstanceConfiguration?.mcpIntegrationInstanceConfigurationWorkflows]);
 
     const initialSelectedWorkflowIds = useMemo(() => {
         if (!isEditMode || !eligibleWorkflows) {
@@ -85,53 +90,35 @@ const McpIntegrationWorkflowDialog = ({mcpIntegration, mcpServer, onClose, trigg
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
-            integrationId: isEditMode ? Number(mcpIntegration.integration?.id) : undefined,
-            integrationVersion: isEditMode ? (mcpIntegration.integrationVersion ?? undefined) : undefined,
-            mcpServerId: mcpIntegration?.mcpServerId || mcpServer?.id || '',
+            integrationInstanceConfigurationId: isEditMode
+                ? mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationId
+                : undefined,
+            mcpServerId: mcpIntegrationInstanceConfiguration?.mcpServerId || mcpServer?.id || '',
             selectedWorkflowIds: [],
         },
         resolver: zodResolver(formSchema),
     });
 
-    const {control, getValues, handleSubmit, reset, resetField, setValue} = form;
+    const {control, getValues, handleSubmit, reset, setValue} = form;
 
     const selectedWorkflowIds = form.watch('selectedWorkflowIds');
 
-    // Pre-populate selected workflow IDs once eligible workflows load in edit mode
-    useMemo(() => {
-        if (isEditMode && initialSelectedWorkflowIds.length > 0 && selectedWorkflowIds.length === 0) {
-            setValue('selectedWorkflowIds', initialSelectedWorkflowIds);
-        }
-    }, [initialSelectedWorkflowIds, isEditMode, selectedWorkflowIds.length, setValue]);
-
     const queryClient = useQueryClient();
 
-    const onCreateSuccess = () => {
-        queryClient.invalidateQueries({
-            queryKey: ['mcpIntegrationsByServerId'],
-        });
-
-        queryClient.invalidateQueries({
-            queryKey: ['mcpIntegrations'],
-        });
+    const invalidateAndClose = () => {
+        queryClient.invalidateQueries({queryKey: ['mcpIntegrationInstanceConfigurationsByServerId']});
+        queryClient.invalidateQueries({queryKey: ['mcpIntegrationInstanceConfigurations']});
+        queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
 
         closeDialog();
     };
 
-    const createMcpIntegrationMutation = useCreateMcpIntegrationMutation({onSuccess: onCreateSuccess});
+    const createMcpIntegrationInstanceConfigurationMutation = useCreateMcpIntegrationInstanceConfigurationMutation({
+        onSuccess: invalidateAndClose,
+    });
 
-    const updateMcpIntegrationMutation = useUpdateMcpIntegrationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpIntegrationsByServerId'],
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: ['mcpIntegrations'],
-            });
-
-            closeDialog();
-        },
+    const updateMcpIntegrationInstanceConfigurationMutation = useUpdateMcpIntegrationInstanceConfigurationMutation({
+        onSuccess: invalidateAndClose,
     });
 
     const closeDialog = () => {
@@ -144,27 +131,33 @@ const McpIntegrationWorkflowDialog = ({mcpIntegration, mcpServer, onClose, trigg
         reset();
     };
 
-    function saveMcpIntegration() {
+    const saveMcpIntegrationInstanceConfiguration = () => {
         const formValues = getValues();
 
         if (isEditMode) {
-            updateMcpIntegrationMutation.mutate({
-                id: mcpIntegration.id,
+            updateMcpIntegrationInstanceConfigurationMutation.mutate({
+                id: mcpIntegrationInstanceConfiguration.id,
                 input: {
                     selectedWorkflowIds: formValues.selectedWorkflowIds,
                 },
             });
         } else {
-            createMcpIntegrationMutation.mutate({
+            createMcpIntegrationInstanceConfigurationMutation.mutate({
                 input: {
-                    integrationId: formValues.integrationId.toString(),
-                    integrationVersion: formValues.integrationVersion,
+                    integrationInstanceConfigurationId: formValues.integrationInstanceConfigurationId,
                     mcpServerId: formValues.mcpServerId,
                     selectedWorkflowIds: formValues.selectedWorkflowIds,
                 },
             });
         }
-    }
+    };
+
+    // Pre-populate selected workflow IDs once eligible workflows load in edit mode
+    useEffect(() => {
+        if (isEditMode && initialSelectedWorkflowIds.length > 0 && selectedWorkflowIds.length === 0) {
+            setValue('selectedWorkflowIds', initialSelectedWorkflowIds);
+        }
+    }, [initialSelectedWorkflowIds, isEditMode, selectedWorkflowIds.length, setValue]);
 
     return (
         <Dialog
@@ -195,19 +188,28 @@ const McpIntegrationWorkflowDialog = ({mcpIntegration, mcpServer, onClose, trigg
                 </DialogHeader>
 
                 <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveMcpIntegration)}>
+                    <form
+                        className="flex flex-col gap-4"
+                        onSubmit={handleSubmit(saveMcpIntegrationInstanceConfiguration)}
+                    >
                         {isEditMode && (
                             <>
                                 <FormItem>
                                     <FormLabel>Integration</FormLabel>
 
-                                    <Input disabled value={mcpIntegration.integration?.name || ''} />
+                                    <Input
+                                        disabled
+                                        value={mcpIntegrationInstanceConfiguration.integration?.name || ''}
+                                    />
                                 </FormItem>
 
                                 <FormItem>
                                     <FormLabel>Integration Version</FormLabel>
 
-                                    <Input disabled value={`v${mcpIntegration.integrationVersion}`} />
+                                    <Input
+                                        disabled
+                                        value={`v${mcpIntegrationInstanceConfiguration.integrationVersion}`}
+                                    />
                                 </FormItem>
                             </>
                         )}
@@ -237,26 +239,50 @@ const McpIntegrationWorkflowDialog = ({mcpIntegration, mcpServer, onClose, trigg
 
                                 <FormField
                                     control={control}
-                                    name="integrationId"
+                                    name="integrationInstanceConfigurationId"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>Integration</FormLabel>
+                                            <FormLabel>Integration Instance Configuration</FormLabel>
 
                                             <FormControl>
-                                                <IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox
-                                                    onBlur={field.onBlur}
-                                                    onChange={(item) => {
-                                                        if (item) {
-                                                            setValue('integrationId', item.value as number);
-                                                            resetField('integrationVersion');
-                                                            setValue('selectedWorkflowIds', []);
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
 
-                                                            setCurrentIntegrationId(item.value as number);
-                                                            setCurrentIntegrationVersion(undefined);
-                                                        }
+                                                        setCurrentIntegrationInstanceConfigurationId(value);
+
+                                                        setValue('selectedWorkflowIds', []);
                                                     }}
                                                     value={field.value}
-                                                />
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a configuration..." />
+                                                    </SelectTrigger>
+
+                                                    <SelectContent>
+                                                        {integrationInstanceConfigurations.map((configuration) => (
+                                                            <SelectItem
+                                                                key={configuration.id}
+                                                                value={String(configuration.id)}
+                                                            >
+                                                                <div className="flex items-center gap-x-2">
+                                                                    {configuration.integration?.icon ? (
+                                                                        <InlineSVG
+                                                                            className="size-4 flex-none"
+                                                                            src={configuration.integration.icon}
+                                                                        />
+                                                                    ) : (
+                                                                        <ComponentIcon className="size-4 flex-none text-gray-500" />
+                                                                    )}
+
+                                                                    <span>
+                                                                        {`${configuration.name} (v${configuration.integrationVersion})`}
+                                                                    </span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                             </FormControl>
 
                                             <FormMessage />
@@ -264,33 +290,6 @@ const McpIntegrationWorkflowDialog = ({mcpIntegration, mcpServer, onClose, trigg
                                     )}
                                     shouldUnregister={false}
                                 />
-
-                                {currentIntegrationId && (
-                                    <FormField
-                                        control={control}
-                                        name="integrationVersion"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Integration Version</FormLabel>
-
-                                                <FormControl>
-                                                    <IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect
-                                                        integrationId={currentIntegrationId}
-                                                        integrationVersion={currentIntegrationVersion}
-                                                        onChange={(value) => {
-                                                            field.onChange(value);
-                                                            setCurrentIntegrationVersion(value);
-                                                            setValue('selectedWorkflowIds', []);
-                                                        }}
-                                                    />
-                                                </FormControl>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                        shouldUnregister={false}
-                                    />
-                                )}
                             </>
                         )}
 
@@ -357,4 +356,4 @@ const McpIntegrationWorkflowDialog = ({mcpIntegration, mcpServer, onClose, trigg
     );
 };
 
-export default McpIntegrationWorkflowDialog;
+export default McpIntegrationInstanceConfigurationWorkflowDialog;

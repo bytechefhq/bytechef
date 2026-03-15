@@ -1,39 +1,42 @@
 import {
-    McpIntegrationWorkflow,
-    useMcpIntegrationWorkflowPropertiesQuery,
-    useUpdateMcpIntegrationWorkflowMutation,
+    McpIntegrationInstanceConfigurationWorkflow,
+    useMcpIntegrationInstanceConfigurationWorkflowPropertiesQuery,
+    useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation,
 } from '@/shared/middleware/graphql';
 import {PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 
-export default function useMcpIntegrationWorkflowPropertiesPopover(
-    mcpIntegrationWorkflow: McpIntegrationWorkflow,
+export default function useMcpIntegrationInstanceConfigurationWorkflowPropertiesPopover(
+    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflow,
     onClose: () => void
 ) {
     const queryClient = useQueryClient();
 
-    const {data: propertiesData, isLoading} = useMcpIntegrationWorkflowPropertiesQuery({
-        mcpIntegrationWorkflowId: mcpIntegrationWorkflow.id,
+    const {data: propertiesData, isLoading} = useMcpIntegrationInstanceConfigurationWorkflowPropertiesQuery({
+        mcpIntegrationInstanceConfigurationWorkflowId: mcpIntegrationInstanceConfigurationWorkflow.id,
     });
 
-    const updateMcpIntegrationWorkflowMutation = useUpdateMcpIntegrationWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpIntegrationsByServerId'],
-            });
+    const updateMcpIntegrationInstanceConfigurationWorkflowMutation =
+        useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
+                });
 
-            onClose();
-        },
-    });
+                onClose();
+            },
+        });
 
     const properties = useMemo(() => {
-        if (!propertiesData?.mcpIntegrationWorkflowProperties) {
+        if (!propertiesData?.mcpIntegrationInstanceConfigurationWorkflowProperties) {
             return [];
         }
 
-        return propertiesData.mcpIntegrationWorkflowProperties.filter(Boolean) as unknown as PropertyAllType[];
+        return propertiesData.mcpIntegrationInstanceConfigurationWorkflowProperties.filter(
+            Boolean
+        ) as unknown as PropertyAllType[];
     }, [propertiesData]);
 
     const defaultValues = useMemo(() => {
@@ -55,10 +58,11 @@ export default function useMcpIntegrationWorkflowPropertiesPopover(
             }
         }
 
-        const savedParameters = (mcpIntegrationWorkflow.parameters as Record<string, unknown>) ?? {};
+        const savedParameters =
+            (mcpIntegrationInstanceConfigurationWorkflow.parameters as Record<string, unknown>) ?? {};
 
         return {...propertyDefaults, ...savedParameters};
-    }, [mcpIntegrationWorkflow.parameters, properties]);
+    }, [mcpIntegrationInstanceConfigurationWorkflow.parameters, properties]);
 
     const form = useForm({
         defaultValues,
@@ -86,8 +90,8 @@ export default function useMcpIntegrationWorkflowPropertiesPopover(
                 })
             );
 
-        updateMcpIntegrationWorkflowMutation.mutate({
-            id: mcpIntegrationWorkflow.id,
+        updateMcpIntegrationInstanceConfigurationWorkflowMutation.mutate({
+            id: mcpIntegrationInstanceConfigurationWorkflow.id,
             input: {
                 parameters: sanitize(values),
             },

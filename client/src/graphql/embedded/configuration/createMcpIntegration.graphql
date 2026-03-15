@@ -1,7 +1,0 @@
-mutation createMcpIntegration($input: CreateMcpIntegrationInput!) {
-    createMcpIntegration(input: $input) {
-        id
-        integrationInstanceConfigurationId
-        mcpServerId
-    }
-}

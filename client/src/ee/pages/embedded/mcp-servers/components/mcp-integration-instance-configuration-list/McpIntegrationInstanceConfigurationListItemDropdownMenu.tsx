@@ -7,25 +7,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {McpIntegration} from '@/shared/middleware/graphql';
+import {McpIntegrationInstanceConfiguration} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
-import useMcpIntegrationListItemDropdownMenu from './hooks/useMcpIntegrationListItemDropdownMenu';
+import useMcpIntegrationInstanceConfigurationListItemDropdownMenu from './hooks/useMcpIntegrationInstanceConfigurationListItemDropdownMenu';
 
-interface McpIntegrationListItemDropdownMenuProps {
-    mcpIntegration: McpIntegration;
+interface McpIntegrationInstanceConfigurationListItemDropdownMenuProps {
+    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfiguration;
     onEditWorkflowsClick: () => void;
     onUpdateIntegrationVersionClick: () => void;
 }
 
-const McpIntegrationListItemDropdownMenu = ({
-    mcpIntegration,
+const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
+    mcpIntegrationInstanceConfiguration,
     onEditWorkflowsClick,
     onUpdateIntegrationVersionClick,
-}: McpIntegrationListItemDropdownMenuProps) => {
-    const {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog} = useMcpIntegrationListItemDropdownMenu(
-        mcpIntegration.id.toString()
-    );
+}: McpIntegrationInstanceConfigurationListItemDropdownMenuProps) => {
+    const {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog} =
+        useMcpIntegrationInstanceConfigurationListItemDropdownMenu(mcpIntegrationInstanceConfiguration.id.toString());
 
     return (
         <>
@@ -58,4 +57,4 @@ const McpIntegrationListItemDropdownMenu = ({
     );
 };
 
-export default McpIntegrationListItemDropdownMenu;
+export default McpIntegrationInstanceConfigurationListItemDropdownMenu;

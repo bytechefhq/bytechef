@@ -1,0 +1,3 @@
+mutation deleteMcpIntegrationInstanceConfigurationWorkflow($id: ID!) {
+    deleteMcpIntegrationInstanceConfigurationWorkflow(id: $id)
+}
