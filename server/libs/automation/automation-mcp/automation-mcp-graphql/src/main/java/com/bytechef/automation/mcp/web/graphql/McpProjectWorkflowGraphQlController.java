@@ -47,8 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -107,23 +105,12 @@ public class McpProjectWorkflowGraphQlController {
 
     @QueryMapping
     List<ProjectWorkflow> toolEligibleProjectVersionWorkflows(@Argument long projectId, @Argument int projectVersion) {
-        List<String> workflowIds = projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
-            .stream()
-            .map(ProjectWorkflow::getWorkflowId)
-            .toList();
-
-        List<Workflow> workflows = workflowService.getWorkflows(workflowIds);
-
-        Map<String, Workflow> workflowMap = workflows
-            .stream()
-            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
-
         return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
             .stream()
             .filter(projectWorkflow -> {
-                Workflow workflow = workflowMap.get(projectWorkflow.getWorkflowId());
+                Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
-                return workflow != null && getToolCallableTrigger(workflow) != null;
+                return getToolCallableTrigger(workflow) != null;
             })
             .toList();
     }

@@ -77,7 +77,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        Long integrationInstanceId = principalJobService.getJobPrincipalId(
+        long integrationInstanceId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), "id"), PlatformType.EMBEDDED);
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, integrationInstanceId);
