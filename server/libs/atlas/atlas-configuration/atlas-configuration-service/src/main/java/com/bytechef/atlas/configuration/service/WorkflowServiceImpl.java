@@ -84,7 +84,11 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType),
             workflowCrudRepository -> workflowCrudRepository.save(workflow));
 
-        return getWorkflow(Validate.notNull(savedWorkflow.getId(), "id"));
+        String savedWorkflowId = Validate.notNull(savedWorkflow.getId(), "id");
+
+        refreshCache(savedWorkflowId);
+
+        return getWorkflow(savedWorkflowId);
     }
 
     @Override
