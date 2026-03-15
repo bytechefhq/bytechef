@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT;
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PROPERTIES;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
@@ -90,10 +91,14 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         List<ToolExecutionEvent> toolExecutionEvents = new ArrayList<>();
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
-            context.log(log -> log.info(
-                "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {}",
-                toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
-                toolExecutionEvent.inputs()));
+            Map<String, @Nullable Object> toolExecutionLogEntry = new LinkedHashMap<>();
+
+            toolExecutionLogEntry.put("confidence", toolExecutionEvent.confidence());
+            toolExecutionLogEntry.put("inputs", toolExecutionEvent.inputs());
+            toolExecutionLogEntry.put("reasoning", toolExecutionEvent.reasoning());
+            toolExecutionLogEntry.put("toolName", toolExecutionEvent.toolName());
+
+            context.log(log -> log.info(JsonUtils.write(toolExecutionLogEntry)));
 
             if (context.isEditorEnvironment() &&
                 (!(context instanceof ActionContextAware actionContextAware) ||

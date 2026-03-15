@@ -69,8 +69,9 @@ public class LogFileStorageImpl implements LogFileStorage {
         }
 
         FileEntry fileEntry = fileStorageService.getFileEntry(LOG_FILES_DIR, filename);
-        String content =
-            new String(fileStorageService.readFileToBytes(LOG_FILES_DIR, fileEntry), StandardCharsets.UTF_8);
+
+        String content = new String(
+            fileStorageService.readFileToBytes(LOG_FILES_DIR, fileEntry), StandardCharsets.UTF_8);
 
         return parseJsonLines(content);
     }
@@ -96,9 +97,9 @@ public class LogFileStorageImpl implements LogFileStorage {
         byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
 
         if (fileStorageService.fileExists(LOG_FILES_DIR, filename)) {
-            FileEntry existingFile = fileStorageService.getFileEntry(LOG_FILES_DIR, filename);
+            FileEntry fileEntry = fileStorageService.getFileEntry(LOG_FILES_DIR, filename);
 
-            byte[] existingContent = fileStorageService.readFileToBytes(LOG_FILES_DIR, existingFile);
+            byte[] existingContent = fileStorageService.readFileToBytes(LOG_FILES_DIR, fileEntry);
 
             byte[] newContent = new byte[existingContent.length + logLineBytes.length];
 
@@ -116,15 +117,15 @@ public class LogFileStorageImpl implements LogFileStorage {
             return List.of();
         }
 
-        List<LogEntry> entries = new ArrayList<>();
+        List<LogEntry> logEntries = new ArrayList<>();
         String[] lines = content.split("\n");
 
         for (String line : lines) {
             if (!line.isBlank()) {
-                entries.add(JsonUtils.read(line, new TypeReference<>() {}));
+                logEntries.add(JsonUtils.read(line, new TypeReference<>() {}));
             }
         }
 
-        return entries;
+        return logEntries;
     }
 }

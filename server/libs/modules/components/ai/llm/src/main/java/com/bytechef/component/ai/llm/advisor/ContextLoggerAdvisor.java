@@ -16,10 +16,16 @@
 
 package com.bytechef.component.ai.llm.advisor;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ActionContext;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 
 /**
  * Advisor that logs LLM request and response through ByteChef's {@link ActionContext#log} infrastructure, making
@@ -39,12 +45,25 @@ public class ContextLoggerAdvisor extends SimpleLoggerAdvisor {
 
     @Override
     protected void logRequest(ChatClientRequest request) {
-        context.log(log -> log.debug("LLM request: {}", DEFAULT_REQUEST_TO_STRING.apply(request)));
+        Map<String, @Nullable Object> requestLogEntry = new LinkedHashMap<>();
+
+        Prompt prompt = request.prompt();
+
+        requestLogEntry.put("messages", prompt.getInstructions());
+        requestLogEntry.put("chatOptions", prompt.getOptions());
+
+        context.log(log -> log.debug(JsonUtils.write(requestLogEntry)));
     }
 
     @Override
     protected void logResponse(ChatClientResponse chatClientResponse) {
-        context.log(
-            log -> log.debug("LLM response: {}", DEFAULT_RESPONSE_TO_STRING.apply(chatClientResponse.chatResponse())));
+        ChatResponse chatResponse = chatClientResponse.chatResponse();
+
+        Map<String, @Nullable Object> responseLogEntry = new LinkedHashMap<>();
+
+        responseLogEntry.put("metadata", chatResponse.getMetadata());
+        responseLogEntry.put("result", chatResponse.getResult());
+
+        context.log(log -> log.debug(JsonUtils.write(responseLogEntry)));
     }
 }
