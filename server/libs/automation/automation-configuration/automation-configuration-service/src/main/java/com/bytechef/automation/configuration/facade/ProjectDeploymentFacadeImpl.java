@@ -514,6 +514,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             } else {
                 String oldWorkflowId = oldProjectDeploymentWorkflow.getWorkflowId();
+                boolean wasEnabled = oldProjectDeploymentWorkflow.isEnabled();
 
                 oldProjectDeploymentWorkflow.setConnections(projectDeploymentWorkflow.getConnections());
                 oldProjectDeploymentWorkflow.setEnabled(projectDeploymentWorkflow.isEnabled());
@@ -521,21 +522,19 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 oldProjectDeploymentWorkflow.setWorkflowId(projectDeploymentWorkflow.getWorkflowId());
 
                 if (projectDeploymentWorkflow.isEnabled()) {
+                    if (projectDeployment.isEnabled() && wasEnabled) {
+                        doEnableProjectDeploymentWorkflow(
+                            projectDeployment.getId(), oldWorkflowId, false);
+                    }
+
                     projectDeploymentWorkflowService.update(oldProjectDeploymentWorkflow);
 
                     if (projectDeployment.isEnabled()) {
-                        if (oldProjectDeploymentWorkflow.isEnabled()) {
-                            doEnableProjectDeploymentWorkflow(
-                                projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), false);
-                            doEnableProjectDeploymentWorkflow(
-                                projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
-                        } else {
-                            doEnableProjectDeploymentWorkflow(
-                                projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
-                        }
+                        doEnableProjectDeploymentWorkflow(
+                            projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId(), true);
                     }
                 } else {
-                    if (oldProjectDeploymentWorkflow.isEnabled()) {
+                    if (wasEnabled) {
                         doEnableProjectDeploymentWorkflow(projectDeployment.getId(), oldWorkflowId, false);
                     }
 
