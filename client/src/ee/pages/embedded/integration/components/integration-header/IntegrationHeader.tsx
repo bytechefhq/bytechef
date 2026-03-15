@@ -12,7 +12,7 @@ import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/sto
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {RefObject} from 'react';
@@ -37,7 +37,7 @@ const IntegrationHeader = ({
     runDisabled,
     updateWorkflowMutation,
 }: IntegrationHeaderProps) => {
-    const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
+    const copilotLayoutShifted = useCopilotLayoutShifted();
     const {leftSidebarOpen, setLeftSidebarOpen} = useIntegrationsLeftSidebarStore(
         useShallow((state) => ({
             leftSidebarOpen: state.leftSidebarOpen,
@@ -81,7 +81,7 @@ const IntegrationHeader = ({
             className={twMerge(
                 'flex items-center justify-between bg-surface-main px-3 py-2.5',
                 leftSidebarOpen && 'pl-0 pr-3',
-                copilotPanelOpen && 'pr-0'
+                copilotLayoutShifted && 'pr-0'
             )}
         >
             <div className="flex items-center">
