@@ -2,6 +2,7 @@ import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect/Multi
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {GetClusterElementNodeOptionsRequest, OptionsDataSource} from '@/shared/middleware/platform/configuration';
 import {
     useGetClusterElementNodeOptionsQuery,
@@ -101,7 +102,9 @@ const PropertyMultiSelect = ({
         () => ({
             loadDependencyValueKey: lookupDependsOnValuesKey,
             request: {
-                clusterElementType: currentNode?.clusterElementType || '',
+                clusterElementType: currentNode?.clusterElementType
+                    ? convertNameToSnakeCase(currentNode.clusterElementType)
+                    : '',
                 clusterElementWorkflowNodeName: currentNode?.workflowNodeName || '',
                 environmentId: currentEnvironmentId,
                 id: workflowId,
