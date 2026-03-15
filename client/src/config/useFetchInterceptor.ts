@@ -1,12 +1,35 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getCookie} from '@/shared/util/cookie-utils';
-import {shouldShowToast, showErrorToast} from '@/shared/util/toast-throttle';
 import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
 
-export {clearRecentToasts} from '@/shared/util/toast-throttle';
+const activeToastIds = new Set<string>();
+
+export function clearActiveToasts() {
+    activeToastIds.clear();
+}
+
+const TOAST_SAFETY_TIMEOUT_MS = 30000;
+
+function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
+    if (activeToastIds.has(toastId)) {
+        return;
+    }
+
+    activeToastIds.add(toastId);
+
+    setTimeout(() => activeToastIds.delete(toastId), TOAST_SAFETY_TIMEOUT_MS);
+
+    toast.error(title, {
+        ...options,
+        id: toastId,
+        onAutoClose: () => activeToastIds.delete(toastId),
+        onDismiss: () => activeToastIds.delete(toastId),
+    });
+}
 
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
@@ -71,33 +94,21 @@ export default function useFetchInterceptor() {
                         .json()
                         .then((data: {errors?: Array<{message?: string}>}) => {
                             if (data.errors?.length) {
-                                if (!shouldShowToast(toastId)) {
-                                    return;
-                                }
-
                                 const errorMessage = [
                                     ...new Set(data.errors.map((error) => error.message || 'Unknown error')),
                                 ].join('\n');
 
                                 showErrorToast(toastId, 'Error', {description: errorMessage});
                             } else if (response.status < 200 || response.status > 299) {
-                                if (shouldShowToast(toastId)) {
-                                    showErrorToast(toastId, `Request failed with status ${response.status}`);
-                                }
+                                showErrorToast(toastId, `Request failed with status ${response.status}`);
                             }
                         })
                         .catch(() => {
                             if (response.status < 200 || response.status > 299) {
-                                if (shouldShowToast(toastId)) {
-                                    showErrorToast(toastId, `Request failed with status ${response.status}`);
-                                }
+                                showErrorToast(toastId, `Request failed with status ${response.status}`);
                             }
                         });
                 } else if (response.status < 200 || response.status > 299) {
-                    if (!shouldShowToast(toastId)) {
-                        return response;
-                    }
-
                     const clonedResponse = response.clone();
 
                     clonedResponse
