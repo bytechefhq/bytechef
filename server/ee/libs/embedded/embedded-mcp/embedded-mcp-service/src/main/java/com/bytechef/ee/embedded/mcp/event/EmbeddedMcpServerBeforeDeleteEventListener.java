@@ -9,10 +9,12 @@ package com.bytechef.ee.embedded.mcp.event;
 
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
-import com.bytechef.ee.embedded.mcp.domain.McpIntegration;
-import com.bytechef.ee.embedded.mcp.domain.McpIntegrationWorkflow;
-import com.bytechef.ee.embedded.mcp.service.McpIntegrationService;
-import com.bytechef.ee.embedded.mcp.service.McpIntegrationWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
+import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -29,51 +31,62 @@ import org.springframework.stereotype.Component;
  * @version ee
  */
 @Component
+@ConditionalOnEEVersion
 public class EmbeddedMcpServerBeforeDeleteEventListener extends AbstractRelationalEventListener<McpServer> {
 
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
-    private final McpIntegrationService mcpIntegrationService;
-    private final McpIntegrationWorkflowService mcpIntegrationWorkflowService;
+    private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
+    private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
+    private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
 
     @SuppressFBWarnings("EI")
     public EmbeddedMcpServerBeforeDeleteEventListener(
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        McpIntegrationService mcpIntegrationService,
-        McpIntegrationWorkflowService mcpIntegrationWorkflowService) {
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
+        McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
+        McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService) {
 
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
-        this.mcpIntegrationService = mcpIntegrationService;
-        this.mcpIntegrationWorkflowService = mcpIntegrationWorkflowService;
+        this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
+        this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
+        this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
     }
 
     @Override
     protected void onBeforeDelete(BeforeDeleteEvent<McpServer> beforeDeleteEvent) {
         Identifier identifier = beforeDeleteEvent.getId();
 
-        deleteMcpIntegrations((Long) identifier.getValue());
+        deleteMcpIntegrationInstanceConfigurations((Long) identifier.getValue());
     }
 
-    private void deleteMcpIntegrations(long mcpServerId) {
-        List<McpIntegration> mcpIntegrations = mcpIntegrationService.getMcpServerMcpIntegrations(mcpServerId);
+    private void deleteMcpIntegrationInstanceConfigurations(long mcpServerId) {
+        List<McpIntegrationInstanceConfiguration> mcpIntegrationInstanceConfigurations =
+            mcpIntegrationInstanceConfigurationService.getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId);
 
-        for (McpIntegration mcpIntegration : mcpIntegrations) {
-            List<McpIntegrationWorkflow> mcpIntegrationWorkflows =
-                mcpIntegrationWorkflowService.getMcpIntegrationMcpIntegrationWorkflows(mcpIntegration.getId());
+        for (McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration : mcpIntegrationInstanceConfigurations) {
+            List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows =
+                mcpIntegrationInstanceConfigurationWorkflowService
+                    .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
+                        mcpIntegrationInstanceConfiguration.getId());
 
-            for (McpIntegrationWorkflow mcpIntegrationWorkflow : mcpIntegrationWorkflows) {
-                mcpIntegrationWorkflowService.delete(mcpIntegrationWorkflow.getId());
+            for (McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow : mcpIntegrationInstanceConfigurationWorkflows) {
+                integrationInstanceWorkflowService.deleteByIntegrationInstanceConfigurationWorkflowId(
+                    mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+                mcpIntegrationInstanceConfigurationWorkflowService
+                    .delete(mcpIntegrationInstanceConfigurationWorkflow.getId());
 
                 integrationInstanceConfigurationWorkflowService.delete(
-                    mcpIntegrationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+                    mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
             }
 
-            mcpIntegrationService.delete(mcpIntegration.getId());
+            mcpIntegrationInstanceConfigurationService.delete(mcpIntegrationInstanceConfiguration.getId());
 
             integrationInstanceConfigurationService.delete(
-                mcpIntegration.getIntegrationInstanceConfigurationId());
+                mcpIntegrationInstanceConfiguration.getIntegrationInstanceConfigurationId());
         }
     }
 }
