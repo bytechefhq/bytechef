@@ -67,6 +67,17 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
+        long integrationInstanceId, long integrationInstanceConfigurationWorkflowId) {
+
+        return integrationInstanceWorkflowRepository
+            .findByIntegrationInstanceIdAndIntegrationInstanceConfigurationWorkflowId(
+                integrationInstanceId, integrationInstanceConfigurationWorkflowId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId) {
 
@@ -118,4 +129,5 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
 
         integrationInstanceWorkflowRepository.save(integrationInstanceWorkflow);
     }
+
 }

@@ -28,6 +28,9 @@ public interface IntegrationInstanceWorkflowService {
     void deleteByIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId);
 
     Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
+        long integrationInstanceId, long integrationInstanceConfigurationWorkflowId);
+
+    Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId);
 
     IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId);

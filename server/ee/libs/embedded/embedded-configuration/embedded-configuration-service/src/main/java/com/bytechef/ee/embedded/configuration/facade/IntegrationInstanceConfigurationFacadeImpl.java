@@ -561,14 +561,16 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     .setWorkflowId(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
                 if (integrationInstanceConfigurationWorkflow.isEnabled()) {
+                    if (integrationInstanceConfiguration.isEnabled() &&
+                        oldIntegrationInstanceConfigurationWorkflowEnabled) {
+
+                        doEnableIntegrationInstanceConfigurationWorkflow(
+                            integrationInstanceConfiguration.getId(), oldWorkflowId, false);
+                    }
+
                     integrationInstanceConfigurationWorkflowService.update(oldIntegrationInstanceConfigurationWorkflow);
 
                     if (integrationInstanceConfiguration.isEnabled()) {
-                        if (oldIntegrationInstanceConfigurationWorkflowEnabled) {
-                            doEnableIntegrationInstanceConfigurationWorkflow(
-                                integrationInstanceConfiguration.getId(), oldWorkflowId, false);
-                        }
-
                         doEnableIntegrationInstanceConfigurationWorkflow(
                             integrationInstanceConfiguration.getId(),
                             integrationInstanceConfigurationWorkflow.getWorkflowId(), true);

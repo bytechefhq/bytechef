@@ -4,5 +4,6 @@ extend type Query {
 
 type Integration {
     id: ID!
+    componentName: String!
     name: String!
 }
