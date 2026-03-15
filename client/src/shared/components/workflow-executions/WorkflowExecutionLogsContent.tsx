@@ -2,8 +2,10 @@ import Badge from '@/components/Badge/Badge';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import {LogEntry, LogLevel, useEditorJobFileLogsQuery, useJobFileLogsQuery} from '@/shared/middleware/graphql';
 import {AlertCircleIcon, AlertTriangleIcon, BugIcon, InfoIcon, MessageSquareIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {Suspense, lazy, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+const ReactJson = lazy(() => import('react-json-view'));
 
 interface WorkflowExecutionLogsContentProps {
     isEditorEnvironment?: boolean;
@@ -47,7 +49,37 @@ const LogLevelBadge = ({level}: {level: LogLevel}) => {
     );
 };
 
-const LogEntryRow = ({entry}: {entry: LogEntry}) => {
+const tryParseJson = (message: string): object | null => {
+    try {
+        const parsed = JSON.parse(message);
+
+        if (typeof parsed === 'object' && parsed !== null) {
+            return parsed;
+        }
+
+        return null;
+    } catch {
+        return null;
+    }
+};
+
+const LogEntryMessage = ({message}: {message: string}) => {
+    const parsedJson = useMemo(() => tryParseJson(message), [message]);
+
+    if (parsedJson) {
+        return (
+            <div className="flex-1 overflow-x-auto text-nowrap">
+                <Suspense fallback={<span className="text-sm">{message}</span>}>
+                    <ReactJson enableClipboard={false} name={false} src={parsedJson} />
+                </Suspense>
+            </div>
+        );
+    }
+
+    return <span className="flex-1 text-sm">{message}</span>;
+};
+
+const LogEntryRow = ({entry, showComponentName}: {entry: LogEntry; showComponentName: boolean}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const hasError = entry.exceptionType || entry.exceptionMessage || entry.stackTrace;
 
@@ -66,13 +98,15 @@ const LogEntryRow = ({entry}: {entry: LogEntry}) => {
 
                 <LogLevelBadge level={entry.level} />
 
-                <span className="shrink-0 rounded bg-surface-neutral-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
-                    {entry.componentName}
+                {showComponentName && (
+                    <span className="shrink-0 rounded bg-surface-neutral-secondary px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+                        {entry.componentName}
 
-                    {entry.componentOperationName && `:${entry.componentOperationName}`}
-                </span>
+                        {entry.componentOperationName && `:${entry.componentOperationName}`}
+                    </span>
+                )}
 
-                <span className="flex-1 text-sm">{entry.message}</span>
+                <LogEntryMessage message={entry.message} />
             </div>
 
             {isExpanded && hasError && (
@@ -182,7 +216,11 @@ const WorkflowExecutionLogsContent = ({
         <ScrollArea className="h-full">
             <div className="divide-y divide-stroke-neutral-secondary">
                 {logs.map((logEntry, index) => (
-                    <LogEntryRow entry={logEntry} key={`${logEntry.timestamp}-${index}`} />
+                    <LogEntryRow
+                        entry={logEntry}
+                        key={`${logEntry.timestamp}-${index}`}
+                        showComponentName={!taskExecutionId}
+                    />
                 ))}
             </div>
 
