@@ -63,7 +63,7 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        Long projectDeploymentId = principalJobService.getJobPrincipalId(
+        long projectDeploymentId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION);
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, projectDeploymentId);

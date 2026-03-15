@@ -58,6 +58,14 @@ public interface McpComponentService {
     McpComponent getMcpComponent(long mcpComponentId);
 
     /**
+     * Gets all MCP components with the specified component name.
+     *
+     * @param componentName the component name to search for
+     * @return a list of MCP components with the specified component name
+     */
+    List<McpComponent> getMcpComponentsByComponentName(String componentName);
+
+    /**
      * Gets all MCP components.
      *
      * @return a list of all MCP components
