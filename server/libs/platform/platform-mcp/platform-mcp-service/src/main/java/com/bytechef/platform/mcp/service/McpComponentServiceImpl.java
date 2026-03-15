@@ -64,6 +64,12 @@ public class McpComponentServiceImpl implements McpComponentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<McpComponent> getMcpComponentsByComponentName(String componentName) {
+        return mcpComponentRepository.findAllByComponentName(componentName);
+    }
+
+    @Override
     public List<McpComponent> getMcpComponents() {
         return mcpComponentRepository.findAll();
     }

@@ -71,7 +71,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
-        projectDeployment.setEnabled(false);
+        projectDeployment.setEnabled(true);
 
         projectDeployment = projectDeploymentService.create(projectDeployment);
 

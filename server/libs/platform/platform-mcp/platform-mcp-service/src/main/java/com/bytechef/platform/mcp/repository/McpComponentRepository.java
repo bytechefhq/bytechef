@@ -35,5 +35,7 @@ public interface McpComponentRepository extends ListCrudRepository<McpComponent,
      * @param mcpServerId the ID of the MCP server
      * @return list of components associated with the specified server
      */
+    List<McpComponent> findAllByComponentName(String componentName);
+
     List<McpComponent> findAllByMcpServerId(Long mcpServerId);
 }
