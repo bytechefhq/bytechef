@@ -56,7 +56,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     @Override
     public ResponseEntity<IntegrationInstanceModel> getIntegrationInstance(Long id) {
         return ResponseEntity.ok(
-            conversionService.convert(
-                integrationInstanceFacade.getIntegrationInstance(id), IntegrationInstanceModel.class));
+            conversionService.convert(integrationInstanceFacade.getIntegrationInstance(id),
+                IntegrationInstanceModel.class));
     }
 }

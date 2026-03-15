@@ -56,7 +56,7 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstanceDTO, IntegrationInstanceBasicModel> {
 
         @Override
-        @Mapping(target = "environmentId", source = "environment")
+        @Mapping(target = "environmentId", source = "integrationInstanceConfiguration.environment")
         IntegrationInstanceBasicModel convert(IntegrationInstanceDTO integrationInstanceDTO);
     }
 
@@ -65,7 +65,7 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstanceDTO, IntegrationInstanceModel> {
 
         @Override
-        @Mapping(target = "environmentId", source = "environment")
+        @Mapping(target = "environmentId", source = "integrationInstanceConfiguration.environment")
         IntegrationInstanceModel convert(IntegrationInstanceDTO integrationInstanceDTO);
     }
 }

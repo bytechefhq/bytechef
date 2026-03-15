@@ -59,6 +59,13 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
 
     @Override
     public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
+        long integrationInstanceId, long integrationInstanceConfigurationWorkflowId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId) {
 
         throw new UnsupportedOperationException();
@@ -95,4 +102,5 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
     public void updateEnabled(Long id, boolean enabled) {
         throw new UnsupportedOperationException();
     }
+
 }
