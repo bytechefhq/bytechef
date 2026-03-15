@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PRO
 import static com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -95,10 +96,14 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         Queue<Map<String, @Nullable Object>> bufferedEvents = new ConcurrentLinkedQueue<>();
 
         ToolExecutionListener toolExecutionListener = toolExecutionEvent -> {
-            context.log(log -> log.info(
-                "Tool execution: {} | Reasoning: {} | Confidence: {} | Inputs: {}",
-                toolExecutionEvent.toolName(), toolExecutionEvent.reasoning(), toolExecutionEvent.confidence(),
-                toolExecutionEvent.inputs()));
+            Map<String, @Nullable Object> toolExecutionLogEntry = new LinkedHashMap<>();
+
+            toolExecutionLogEntry.put("confidence", toolExecutionEvent.confidence());
+            toolExecutionLogEntry.put("inputs", toolExecutionEvent.inputs());
+            toolExecutionLogEntry.put("reasoning", toolExecutionEvent.reasoning());
+            toolExecutionLogEntry.put("toolName", toolExecutionEvent.toolName());
+
+            context.log(log -> log.info(JsonUtils.write(toolExecutionLogEntry)));
 
             Map<String, @Nullable Object> eventData = new LinkedHashMap<>();
 

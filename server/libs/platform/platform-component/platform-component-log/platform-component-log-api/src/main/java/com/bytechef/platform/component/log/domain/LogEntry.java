@@ -28,15 +28,8 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public record LogEntry(
-    Instant timestamp,
-    Level level,
-    String componentName,
-    @Nullable String componentOperationName,
-    long taskExecutionId,
-    String message,
-    @Nullable String exceptionType,
-    @Nullable String exceptionMessage,
-    @Nullable String stackTrace) {
+    Instant timestamp, Level level, String componentName, @Nullable String componentOperationName, long taskExecutionId,
+    String message, @Nullable String exceptionType, @Nullable String exceptionMessage, @Nullable String stackTrace) {
 
     public enum Level {
         TRACE(0),
