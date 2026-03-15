@@ -13,8 +13,17 @@ export interface IntegrationType {
     integrationInstances?: IntegrationInstanceType[];
     icon?: string;
     id?: number;
+    mcpTools?: McpToolType[];
+    mcpWorkflows?: IntegrationWorkflowType[];
     name?: string;
     workflows?: IntegrationWorkflowType[];
+}
+
+export interface MergedMcpToolType {
+    enabled?: boolean;
+    id: number;
+    label?: string;
+    name: string;
 }
 
 export interface MergedWorkflowType {
@@ -29,7 +38,22 @@ export interface IntegrationInstanceType {
     id: number;
     enabled: boolean;
     credentialStatus: string;
+    mcpTools?: McpIntegrationInstanceToolType[];
+    mcpWorkflows?: IntegrationInstanceWorkflowType[];
     workflows: IntegrationInstanceWorkflowType[];
+}
+
+export interface McpToolType {
+    enabled?: boolean;
+    id: number;
+    label?: string;
+    name: string;
+}
+
+export interface McpIntegrationInstanceToolType {
+    enabled?: boolean;
+    id?: number;
+    mcpToolId: number;
 }
 
 export interface IntegrationInstanceWorkflowType {

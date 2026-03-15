@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import Logo from './assets/logo.svg';
 import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
@@ -6,10 +6,11 @@ import styles from './styles.module.css';
 import {
     FormType,
     IntegrationType,
+    MergedMcpToolType,
+    MergedWorkflowType,
     PropertyType,
     RegisterFormSubmitFunction,
     WorkflowInputType,
-    MergedWorkflowType,
 } from './types';
 
 interface ToggleProps {
@@ -45,15 +46,20 @@ interface DialogProps {
     workflowsView?: boolean;
     form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    handleMcpToolToggle: (mcpToolId: number, pressed: boolean) => void;
+    handleMcpWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
+    handleMcpWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     integration?: IntegrationType;
     isOAuth2?: boolean;
     isOpen: boolean;
     loading?: boolean;
+    mergedMcpTools: MergedMcpToolType[];
+    mergedMcpWorkflows: MergedWorkflowType[];
+    mergedWorkflows: MergedWorkflowType[];
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
-    mergedWorkflows: MergedWorkflowType[];
 }
 
 const ConnectDialog = ({
@@ -61,15 +67,20 @@ const ConnectDialog = ({
     workflowsView = false,
     form,
     handleClick,
+    handleMcpToolToggle,
+    handleMcpWorkflowToggle,
+    handleMcpWorkflowInputChange,
     handleWorkflowToggle,
     handleWorkflowInputChange,
     integration,
     isOAuth2 = false,
     isOpen,
     loading = false,
+    mergedMcpTools,
+    mergedMcpWorkflows,
+    mergedWorkflows,
     properties,
     registerFormSubmit,
-    mergedWorkflows,
 }: DialogProps) => {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -105,12 +116,17 @@ const ConnectDialog = ({
                         closeDialog={closeDialog}
                         workflowsView={workflowsView}
                         form={form}
+                        handleMcpToolToggle={handleMcpToolToggle}
+                        handleMcpWorkflowToggle={handleMcpWorkflowToggle}
+                        handleMcpWorkflowInputChange={handleMcpWorkflowInputChange}
                         handleWorkflowToggle={handleWorkflowToggle}
                         handleWorkflowInputChange={handleWorkflowInputChange}
                         integration={integration}
+                        mergedMcpTools={mergedMcpTools}
+                        mergedMcpWorkflows={mergedMcpWorkflows}
+                        mergedWorkflows={mergedWorkflows}
                         properties={properties}
                         registerFormSubmit={registerFormSubmit}
-                        mergedWorkflows={mergedWorkflows}
                     />
                 ) : (
                     <main className={styles.dialogContentFallback}>
@@ -210,6 +226,7 @@ const DialogWorkflowsContainer = ({
                                                         }
                                                         label={input.label}
                                                         name={input.name}
+                                                        required={input.required}
                                                         field={{value: input.value}}
                                                     />
                                                 </li>
@@ -226,28 +243,145 @@ const DialogWorkflowsContainer = ({
     );
 };
 
+interface DialogToolsContainerProps {
+    handleMcpToolToggle: (mcpToolId: number, pressed: boolean) => void;
+    handleMcpWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
+    handleMcpWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
+    mergedMcpTools: MergedMcpToolType[];
+    mergedMcpWorkflows: MergedWorkflowType[];
+}
+
+const DialogToolsContainer = ({
+    handleMcpToolToggle,
+    handleMcpWorkflowToggle,
+    handleMcpWorkflowInputChange,
+    mergedMcpTools,
+    mergedMcpWorkflows,
+}: DialogToolsContainerProps) => {
+    return (
+        <div data-testid="tools-container" className={styles.workflowsContainer}>
+            {mergedMcpTools.length === 0 && mergedMcpWorkflows.length === 0 ? (
+                <p>No tools available for this integration.</p>
+            ) : (
+                <p>Enable, disable and manage your tools below</p>
+            )}
+
+            {mergedMcpTools.length > 0 && (
+                <ul className={styles.workflowsList}>
+                    {mergedMcpTools.map((mcpTool) => (
+                        <li key={mcpTool.id}>
+                            <div>
+                                <span>{mcpTool.label || mcpTool.name}</span>
+
+                                <Toggle
+                                    id={`mcp-tool-${mcpTool.id}`}
+                                    pressed={mcpTool.enabled ?? false}
+                                    onPressedChange={(pressed) => handleMcpToolToggle(mcpTool.id, pressed)}
+                                />
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {mergedMcpWorkflows.length > 0 && (
+                <ul className={styles.workflowsList}>
+                    {mergedMcpWorkflows.map((mergedWorkflow) => {
+                        const {enabled = false, inputs, label, workflowUuid} = mergedWorkflow;
+
+                        return (
+                            <li key={workflowUuid}>
+                                <div>
+                                    <span>{label}</span>
+
+                                    <Toggle
+                                        id={`mcp-workflow-${workflowUuid}`}
+                                        pressed={enabled}
+                                        onPressedChange={(pressed) =>
+                                            handleMcpWorkflowToggle(workflowUuid, pressed)
+                                        }
+                                    />
+                                </div>
+
+                                {enabled && (
+                                    <div className={styles.workflowInputsContainer}>
+                                        <span>INPUTS</span>
+
+                                        {inputs?.length === 0 ? (
+                                            <p className={styles.noInputsMessage}>
+                                                No inputs defined for this workflow.
+                                            </p>
+                                        ) : (
+                                            <ul>
+                                                {inputs?.map((input: WorkflowInputType) => (
+                                                    <li key={input.name}>
+                                                        <DialogInputField
+                                                            onChange={(event) =>
+                                                                handleMcpWorkflowInputChange(
+                                                                    workflowUuid,
+                                                                    input.name,
+                                                                    event.target.value
+                                                                )
+                                                            }
+                                                            label={input.label}
+                                                            name={input.name}
+                                                            required={input.required}
+                                                            field={{value: input.value}}
+                                                        />
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </div>
+    );
+};
+
 interface DialogContentProps {
     closeDialog: () => void;
     workflowsView?: boolean;
     form?: FormType;
+    handleMcpToolToggle: (mcpToolId: number, pressed: boolean) => void;
+    handleMcpWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
+    handleMcpWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     integration: IntegrationType;
+    mergedMcpTools: MergedMcpToolType[];
+    mergedMcpWorkflows: MergedWorkflowType[];
+    mergedWorkflows: MergedWorkflowType[];
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
-    mergedWorkflows: MergedWorkflowType[];
 }
+
+type TabType = 'tools' | 'workflows';
 
 const DialogContent = ({
     workflowsView = false,
     form,
+    handleMcpToolToggle,
+    handleMcpWorkflowToggle,
+    handleMcpWorkflowInputChange,
     handleWorkflowToggle,
     handleWorkflowInputChange,
     integration,
+    mergedMcpTools,
+    mergedMcpWorkflows,
+    mergedWorkflows,
     properties,
     registerFormSubmit,
-    mergedWorkflows,
 }: DialogContentProps) => {
+    const [activeTab, setActiveTab] = useState<TabType>('workflows');
+
+    const hasMcpContent = mergedMcpTools.length > 0 || mergedMcpWorkflows.length > 0;
+    const showTabs = mergedWorkflows.length > 0 && hasMcpContent;
+
     // Register the form's submit handler when the component mounts
     useEffect(() => {
         if (registerFormSubmit && form) {
@@ -282,11 +416,41 @@ const DialogContent = ({
                 </form>
             )}
 
-            {workflowsView && (
+            {workflowsView && showTabs && (
+                <div className={styles.tabContainer}>
+                    <button
+                        className={`${styles.tabButton} ${activeTab === 'workflows' ? styles.tabButtonActive : ''}`}
+                        onClick={() => setActiveTab('workflows')}
+                        type="button"
+                    >
+                        Workflows
+                    </button>
+
+                    <button
+                        className={`${styles.tabButton} ${activeTab === 'tools' ? styles.tabButtonActive : ''}`}
+                        onClick={() => setActiveTab('tools')}
+                        type="button"
+                    >
+                        Tools
+                    </button>
+                </div>
+            )}
+
+            {workflowsView && (!showTabs || activeTab === 'workflows') && mergedWorkflows.length > 0 && (
                 <DialogWorkflowsContainer
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
                     mergedWorkflows={mergedWorkflows}
+                />
+            )}
+
+            {workflowsView && (!showTabs || activeTab === 'tools') && hasMcpContent && (
+                <DialogToolsContainer
+                    handleMcpToolToggle={handleMcpToolToggle}
+                    handleMcpWorkflowToggle={handleMcpWorkflowToggle}
+                    handleMcpWorkflowInputChange={handleMcpWorkflowInputChange}
+                    mergedMcpTools={mergedMcpTools}
+                    mergedMcpWorkflows={mergedMcpWorkflows}
                 />
             )}
         </main>
