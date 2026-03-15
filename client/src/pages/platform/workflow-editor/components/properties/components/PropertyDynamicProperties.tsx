@@ -1,3 +1,4 @@
+import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {PropertyDynamicPropertiesSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -82,7 +83,9 @@ const PropertyDynamicProperties = ({
         () => ({
             lookupDependsOnValuesKey,
             request: {
-                clusterElementType: currentNode?.clusterElementType ?? '',
+                clusterElementType: currentNode?.clusterElementType
+                    ? convertNameToSnakeCase(currentNode.clusterElementType)
+                    : '',
                 clusterElementWorkflowNodeName: currentNode?.workflowNodeName ?? '',
                 environmentId: currentEnvironmentId,
                 id: workflow.id!,

@@ -1,3 +1,4 @@
+import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useSaveClusterElementTestOutputMutation} from '@/shared/middleware/graphql';
 import {TriggerType} from '@/shared/middleware/platform/configuration';
@@ -56,7 +57,7 @@ export default function useOutputTab({
         refetch: clusterElementOutputRefetch,
     } = useGetClusterElementOutputQuery(
         {
-            clusterElementType: clusterElementType ?? '',
+            clusterElementType: clusterElementType ? convertNameToSnakeCase(clusterElementType) : '',
             clusterElementWorkflowNodeName: currentNode?.workflowNodeName,
             environmentId: currentEnvironmentId,
             id: workflowId!,
