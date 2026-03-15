@@ -443,9 +443,8 @@ export type CreateEmbeddedMcpServerInput = {
   name: Scalars['String']['input'];
 };
 
-export type CreateMcpIntegrationInput = {
-  integrationId: Scalars['ID']['input'];
-  integrationVersion: Scalars['Int']['input'];
+export type CreateMcpIntegrationInstanceConfigurationInput = {
+  integrationInstanceConfigurationId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
 };
@@ -850,6 +849,7 @@ export type IntegerProperty = Property & {
 
 export type Integration = {
   __typename?: 'Integration';
+  componentName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
 };
@@ -1034,23 +1034,24 @@ export type McpComponentWithToolsInput = {
   version?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type McpIntegration = {
-  __typename?: 'McpIntegration';
+export type McpIntegrationInstanceConfiguration = {
+  __typename?: 'McpIntegrationInstanceConfiguration';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   id: Scalars['ID']['output'];
   integration?: Maybe<Integration>;
   integrationInstanceConfigurationId: Scalars['ID']['output'];
+  integrationInstanceConfigurationName?: Maybe<Scalars['String']['output']>;
   integrationVersion?: Maybe<Scalars['Int']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpIntegrationWorkflows?: Maybe<Array<Maybe<McpIntegrationWorkflow>>>;
+  mcpIntegrationInstanceConfigurationWorkflows?: Maybe<Array<Maybe<McpIntegrationInstanceConfigurationWorkflow>>>;
   mcpServerId: Scalars['ID']['output'];
   version?: Maybe<Scalars['Int']['output']>;
 };
 
-export type McpIntegrationWorkflow = {
-  __typename?: 'McpIntegrationWorkflow';
+export type McpIntegrationInstanceConfigurationWorkflow = {
+  __typename?: 'McpIntegrationInstanceConfigurationWorkflow';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   id: Scalars['ID']['output'];
@@ -1058,20 +1059,20 @@ export type McpIntegrationWorkflow = {
   integrationInstanceConfigurationWorkflowId: Scalars['Long']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpIntegrationId: Scalars['Long']['output'];
+  mcpIntegrationInstanceConfigurationId: Scalars['Long']['output'];
   parameters?: Maybe<Scalars['Map']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
   workflow?: Maybe<Workflow>;
 };
 
-export type McpIntegrationWorkflowInput = {
+export type McpIntegrationInstanceConfigurationWorkflowInput = {
   integrationInstanceConfigurationWorkflowId: Scalars['Long']['input'];
-  mcpIntegrationId: Scalars['Long']['input'];
+  mcpIntegrationInstanceConfigurationId: Scalars['Long']['input'];
 };
 
-export type McpIntegrationWorkflowUpdateInput = {
+export type McpIntegrationInstanceConfigurationWorkflowUpdateInput = {
   integrationInstanceConfigurationWorkflowId?: InputMaybe<Scalars['Long']['input']>;
-  mcpIntegrationId?: InputMaybe<Scalars['Long']['input']>;
+  mcpIntegrationInstanceConfigurationId?: InputMaybe<Scalars['Long']['input']>;
   parameters?: InputMaybe<Scalars['Map']['input']>;
 };
 
@@ -1195,8 +1196,8 @@ export type Mutation = {
   createKnowledgeBase?: Maybe<KnowledgeBase>;
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
-  createMcpIntegration?: Maybe<McpIntegration>;
-  createMcpIntegrationWorkflow?: Maybe<McpIntegrationWorkflow>;
+  createMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
+  createMcpIntegrationInstanceConfigurationWorkflow?: Maybe<McpIntegrationInstanceConfigurationWorkflow>;
   createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpServer?: Maybe<McpServer>;
@@ -1215,8 +1216,8 @@ export type Mutation = {
   deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpIntegration?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpIntegrationWorkflow?: Maybe<Scalars['Boolean']['output']>;
+  deleteMcpIntegrationInstanceConfiguration?: Maybe<Scalars['Boolean']['output']>;
+  deleteMcpIntegrationInstanceConfigurationWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProject?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -1264,8 +1265,9 @@ export type Mutation = {
   updateKnowledgeBaseTags: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
-  updateMcpIntegration?: Maybe<McpIntegration>;
-  updateMcpIntegrationWorkflow?: Maybe<McpIntegrationWorkflow>;
+  updateMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
+  updateMcpIntegrationInstanceConfigurationVersion?: Maybe<Scalars['Boolean']['output']>;
+  updateMcpIntegrationInstanceConfigurationWorkflow?: Maybe<McpIntegrationInstanceConfigurationWorkflow>;
   updateMcpProject?: Maybe<McpProject>;
   updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   updateMcpServer?: Maybe<McpServer>;
@@ -1336,13 +1338,13 @@ export type MutationCreateMcpComponentWithToolsArgs = {
 };
 
 
-export type MutationCreateMcpIntegrationArgs = {
-  input: CreateMcpIntegrationInput;
+export type MutationCreateMcpIntegrationInstanceConfigurationArgs = {
+  input: CreateMcpIntegrationInstanceConfigurationInput;
 };
 
 
-export type MutationCreateMcpIntegrationWorkflowArgs = {
-  input: McpIntegrationWorkflowInput;
+export type MutationCreateMcpIntegrationInstanceConfigurationWorkflowArgs = {
+  input: McpIntegrationInstanceConfigurationWorkflowInput;
 };
 
 
@@ -1438,12 +1440,12 @@ export type MutationDeleteMcpComponentArgs = {
 };
 
 
-export type MutationDeleteMcpIntegrationArgs = {
+export type MutationDeleteMcpIntegrationInstanceConfigurationArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type MutationDeleteMcpIntegrationWorkflowArgs = {
+export type MutationDeleteMcpIntegrationInstanceConfigurationWorkflowArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -1717,15 +1719,21 @@ export type MutationUpdateMcpComponentWithToolsArgs = {
 };
 
 
-export type MutationUpdateMcpIntegrationArgs = {
+export type MutationUpdateMcpIntegrationInstanceConfigurationArgs = {
   id: Scalars['ID']['input'];
-  input: UpdateMcpIntegrationInput;
+  input: UpdateMcpIntegrationInstanceConfigurationInput;
 };
 
 
-export type MutationUpdateMcpIntegrationWorkflowArgs = {
+export type MutationUpdateMcpIntegrationInstanceConfigurationVersionArgs = {
   id: Scalars['ID']['input'];
-  input: McpIntegrationWorkflowUpdateInput;
+  input: UpdateMcpIntegrationInstanceConfigurationVersionInput;
+};
+
+
+export type MutationUpdateMcpIntegrationInstanceConfigurationWorkflowArgs = {
+  id: Scalars['ID']['input'];
+  input: McpIntegrationInstanceConfigurationWorkflowUpdateInput;
 };
 
 
@@ -2083,13 +2091,13 @@ export type Query = {
   mcpComponentDefinitions: Array<ComponentDefinition>;
   mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
   mcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
-  mcpIntegration?: Maybe<McpIntegration>;
-  mcpIntegrationWorkflow?: Maybe<McpIntegrationWorkflow>;
-  mcpIntegrationWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
-  mcpIntegrationWorkflows?: Maybe<Array<Maybe<McpIntegrationWorkflow>>>;
-  mcpIntegrationWorkflowsByMcpIntegrationId?: Maybe<Array<Maybe<McpIntegrationWorkflow>>>;
-  mcpIntegrations?: Maybe<Array<Maybe<McpIntegration>>>;
-  mcpIntegrationsByServerId?: Maybe<Array<Maybe<McpIntegration>>>;
+  mcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
+  mcpIntegrationInstanceConfigurationWorkflow?: Maybe<McpIntegrationInstanceConfigurationWorkflow>;
+  mcpIntegrationInstanceConfigurationWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
+  mcpIntegrationInstanceConfigurationWorkflows?: Maybe<Array<Maybe<McpIntegrationInstanceConfigurationWorkflow>>>;
+  mcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationId?: Maybe<Array<Maybe<McpIntegrationInstanceConfigurationWorkflow>>>;
+  mcpIntegrationInstanceConfigurations?: Maybe<Array<Maybe<McpIntegrationInstanceConfiguration>>>;
+  mcpIntegrationInstanceConfigurationsByServerId?: Maybe<Array<Maybe<McpIntegrationInstanceConfiguration>>>;
   mcpProject?: Maybe<McpProject>;
   mcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   mcpProjectWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
@@ -2117,6 +2125,7 @@ export type Query = {
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
   taskExecutionFileLogs: Array<LogEntry>;
+  toolEligibleIntegrationInstanceConfigurationWorkflows: Array<IntegrationWorkflow>;
   toolEligibleIntegrationVersionWorkflows: Array<IntegrationWorkflow>;
   toolEligibleProjectVersionWorkflows: Array<ProjectWorkflow>;
   triggerDefinition: TriggerDefinition;
@@ -2194,6 +2203,7 @@ export type QueryClusterElementComponentConnectionsArgs = {
 
 export type QueryClusterElementDefinitionArgs = {
   clusterElementName: Scalars['String']['input'];
+  clusterElementType?: InputMaybe<Scalars['String']['input']>;
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
 };
@@ -2438,27 +2448,27 @@ export type QueryMcpComponentsByServerIdArgs = {
 };
 
 
-export type QueryMcpIntegrationArgs = {
+export type QueryMcpIntegrationInstanceConfigurationArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
-export type QueryMcpIntegrationWorkflowArgs = {
+export type QueryMcpIntegrationInstanceConfigurationWorkflowArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
-export type QueryMcpIntegrationWorkflowPropertiesArgs = {
-  mcpIntegrationWorkflowId: Scalars['ID']['input'];
+export type QueryMcpIntegrationInstanceConfigurationWorkflowPropertiesArgs = {
+  mcpIntegrationInstanceConfigurationWorkflowId: Scalars['ID']['input'];
 };
 
 
-export type QueryMcpIntegrationWorkflowsByMcpIntegrationIdArgs = {
-  mcpIntegrationId?: InputMaybe<Scalars['ID']['input']>;
+export type QueryMcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationIdArgs = {
+  mcpIntegrationInstanceConfigurationId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
-export type QueryMcpIntegrationsByServerIdArgs = {
+export type QueryMcpIntegrationInstanceConfigurationsByServerIdArgs = {
   mcpServerId?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -2578,6 +2588,11 @@ export type QueryTaskDispatcherDefinitionVersionsArgs = {
 export type QueryTaskExecutionFileLogsArgs = {
   jobId: Scalars['ID']['input'];
   taskExecutionId: Scalars['ID']['input'];
+};
+
+
+export type QueryToolEligibleIntegrationInstanceConfigurationWorkflowsArgs = {
+  integrationInstanceConfigurationId: Scalars['ID']['input'];
 };
 
 
@@ -2886,8 +2901,13 @@ export type UpdateKnowledgeBaseTagsInput = {
   tags?: InputMaybe<Array<TagInput>>;
 };
 
-export type UpdateMcpIntegrationInput = {
+export type UpdateMcpIntegrationInstanceConfigurationInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+};
+
+export type UpdateMcpIntegrationInstanceConfigurationVersionInput = {
+  integrationVersion: Scalars['Int']['input'];
+  workflowUuids: Array<Scalars['String']['input']>;
 };
 
 export type UpdateMcpProjectInput = {
@@ -3539,12 +3559,12 @@ export type CreateEmbeddedMcpServerMutationVariables = Exact<{
 
 export type CreateEmbeddedMcpServerMutation = { __typename?: 'Mutation', createEmbeddedMcpServer?: { __typename?: 'McpServer', enabled: boolean, environmentId: string, id: string, name: string, type: PlatformType } | null };
 
-export type CreateMcpIntegrationMutationVariables = Exact<{
-  input: CreateMcpIntegrationInput;
+export type CreateMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
+  input: CreateMcpIntegrationInstanceConfigurationInput;
 }>;
 
 
-export type CreateMcpIntegrationMutation = { __typename?: 'Mutation', createMcpIntegration?: { __typename?: 'McpIntegration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
+export type CreateMcpIntegrationInstanceConfigurationMutation = { __typename?: 'Mutation', createMcpIntegrationInstanceConfiguration?: { __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
 
 export type DeleteEmbeddedMcpServerMutationVariables = Exact<{
   mcpServerId: Scalars['ID']['input'];
@@ -3553,19 +3573,19 @@ export type DeleteEmbeddedMcpServerMutationVariables = Exact<{
 
 export type DeleteEmbeddedMcpServerMutation = { __typename?: 'Mutation', deleteEmbeddedMcpServer?: boolean | null };
 
-export type DeleteMcpIntegrationMutationVariables = Exact<{
+export type DeleteMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteMcpIntegrationMutation = { __typename?: 'Mutation', deleteMcpIntegration?: boolean | null };
+export type DeleteMcpIntegrationInstanceConfigurationMutation = { __typename?: 'Mutation', deleteMcpIntegrationInstanceConfiguration?: boolean | null };
 
-export type DeleteMcpIntegrationWorkflowMutationVariables = Exact<{
+export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteMcpIntegrationWorkflowMutation = { __typename?: 'Mutation', deleteMcpIntegrationWorkflow?: boolean | null };
+export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutation = { __typename?: 'Mutation', deleteMcpIntegrationInstanceConfigurationWorkflow?: boolean | null };
 
 export type EmbeddedMcpServersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3596,12 +3616,12 @@ export type McpComponentDefinitionsQueryVariables = Exact<{ [key: string]: never
 
 export type McpComponentDefinitionsQuery = { __typename?: 'Query', mcpComponentDefinitions: Array<{ __typename?: 'ComponentDefinition', clusterElementsCount?: any | null, description?: string | null, icon?: string | null, name: string, title?: string | null, version?: number | null }> };
 
-export type McpIntegrationWorkflowPropertiesQueryVariables = Exact<{
-  mcpIntegrationWorkflowId: Scalars['ID']['input'];
+export type McpIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables = Exact<{
+  mcpIntegrationInstanceConfigurationWorkflowId: Scalars['ID']['input'];
 }>;
 
 
-export type McpIntegrationWorkflowPropertiesQuery = { __typename?: 'Query', mcpIntegrationWorkflowProperties?: Array<
+export type McpIntegrationInstanceConfigurationWorkflowPropertiesQuery = { __typename?: 'Query', mcpIntegrationInstanceConfigurationWorkflowProperties?: Array<
     | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
     | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
     | { __typename?: 'DateProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
@@ -3616,17 +3636,24 @@ export type McpIntegrationWorkflowPropertiesQuery = { __typename?: 'Query', mcpI
     | { __typename?: 'TimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
    | null> | null };
 
-export type McpIntegrationsQueryVariables = Exact<{ [key: string]: never; }>;
+export type McpIntegrationInstanceConfigurationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type McpIntegrationsQuery = { __typename?: 'Query', mcpIntegrations?: Array<{ __typename?: 'McpIntegration', id: string, mcpServerId: string, integration?: { __typename?: 'Integration', id: string, name: string } | null } | null> | null };
+export type McpIntegrationInstanceConfigurationsQuery = { __typename?: 'Query', mcpIntegrationInstanceConfigurations?: Array<{ __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string, integration?: { __typename?: 'Integration', id: string, name: string } | null, mcpIntegrationInstanceConfigurationWorkflows?: Array<{ __typename?: 'McpIntegrationInstanceConfigurationWorkflow', integrationInstanceConfigurationWorkflow?: { __typename?: 'IntegrationInstanceConfigurationWorkflow', workflowId: string } | null } | null> | null } | null> | null };
 
-export type McpIntegrationsByServerIdQueryVariables = Exact<{
+export type McpIntegrationInstanceConfigurationsByServerIdQueryVariables = Exact<{
   mcpServerId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type McpIntegrationsByServerIdQuery = { __typename?: 'Query', mcpIntegrationsByServerId?: Array<{ __typename?: 'McpIntegration', id: string, integrationInstanceConfigurationId: string, integrationVersion?: number | null, mcpServerId: string, integration?: { __typename?: 'Integration', id: string, name: string } | null, mcpIntegrationWorkflows?: Array<{ __typename?: 'McpIntegrationWorkflow', id: string, integrationInstanceConfigurationWorkflowId: any, mcpIntegrationId: any, integrationInstanceConfigurationWorkflow?: { __typename?: 'IntegrationInstanceConfigurationWorkflow', id: string, enabled: boolean, inputs?: any | null, integrationInstanceConfigurationId: string, version: number, workflowId: string, connections: Array<{ __typename?: 'IntegrationInstanceConfigurationWorkflowConnection', connectionId?: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
+export type McpIntegrationInstanceConfigurationsByServerIdQuery = { __typename?: 'Query', mcpIntegrationInstanceConfigurationsByServerId?: Array<{ __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, integrationInstanceConfigurationName?: string | null, integrationVersion?: number | null, mcpServerId: string, integration?: { __typename?: 'Integration', componentName: string, id: string, name: string } | null, mcpIntegrationInstanceConfigurationWorkflows?: Array<{ __typename?: 'McpIntegrationInstanceConfigurationWorkflow', id: string, integrationInstanceConfigurationWorkflowId: any, mcpIntegrationInstanceConfigurationId: any, parameters?: any | null, integrationInstanceConfigurationWorkflow?: { __typename?: 'IntegrationInstanceConfigurationWorkflow', id: string, enabled: boolean, inputs?: any | null, integrationInstanceConfigurationId: string, version: number, workflowId: string, connections: Array<{ __typename?: 'IntegrationInstanceConfigurationWorkflowConnection', connectionId?: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
+
+export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
+  integrationInstanceConfigurationId: Scalars['ID']['input'];
+}>;
+
+
+export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery = { __typename?: 'Query', toolEligibleIntegrationInstanceConfigurationWorkflows: Array<{ __typename?: 'IntegrationWorkflow', id: string, integrationWorkflowId: string, label: string }> };
 
 export type ToolEligibleIntegrationVersionWorkflowsQueryVariables = Exact<{
   integrationId: Scalars['ID']['input'];
@@ -3636,21 +3663,29 @@ export type ToolEligibleIntegrationVersionWorkflowsQueryVariables = Exact<{
 
 export type ToolEligibleIntegrationVersionWorkflowsQuery = { __typename?: 'Query', toolEligibleIntegrationVersionWorkflows: Array<{ __typename?: 'IntegrationWorkflow', id: string, integrationWorkflowId: string, label: string }> };
 
-export type UpdateMcpIntegrationMutationVariables = Exact<{
+export type UpdateMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
   id: Scalars['ID']['input'];
-  input: UpdateMcpIntegrationInput;
+  input: UpdateMcpIntegrationInstanceConfigurationInput;
 }>;
 
 
-export type UpdateMcpIntegrationMutation = { __typename?: 'Mutation', updateMcpIntegration?: { __typename?: 'McpIntegration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
+export type UpdateMcpIntegrationInstanceConfigurationMutation = { __typename?: 'Mutation', updateMcpIntegrationInstanceConfiguration?: { __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
 
-export type UpdateMcpIntegrationWorkflowMutationVariables = Exact<{
+export type UpdateMcpIntegrationInstanceConfigurationVersionMutationVariables = Exact<{
   id: Scalars['ID']['input'];
-  input: McpIntegrationWorkflowUpdateInput;
+  input: UpdateMcpIntegrationInstanceConfigurationVersionInput;
 }>;
 
 
-export type UpdateMcpIntegrationWorkflowMutation = { __typename?: 'Mutation', updateMcpIntegrationWorkflow?: { __typename?: 'McpIntegrationWorkflow', id: string, mcpIntegrationId: any, integrationInstanceConfigurationWorkflowId: any, parameters?: any | null } | null };
+export type UpdateMcpIntegrationInstanceConfigurationVersionMutation = { __typename?: 'Mutation', updateMcpIntegrationInstanceConfigurationVersion?: boolean | null };
+
+export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: McpIntegrationInstanceConfigurationWorkflowUpdateInput;
+}>;
+
+
+export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { __typename?: 'Mutation', updateMcpIntegrationInstanceConfigurationWorkflow?: { __typename?: 'McpIntegrationInstanceConfigurationWorkflow', id: string, mcpIntegrationInstanceConfigurationId: any, integrationInstanceConfigurationWorkflowId: any, parameters?: any | null } | null };
 
 export type ApiConnectorQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -6313,9 +6348,9 @@ export const useCreateEmbeddedMcpServerMutation = <
   }
     )};
 
-export const CreateMcpIntegrationDocument = `
-    mutation createMcpIntegration($input: CreateMcpIntegrationInput!) {
-  createMcpIntegration(input: $input) {
+export const CreateMcpIntegrationInstanceConfigurationDocument = `
+    mutation createMcpIntegrationInstanceConfiguration($input: CreateMcpIntegrationInstanceConfigurationInput!) {
+  createMcpIntegrationInstanceConfiguration(input: $input) {
     id
     integrationInstanceConfigurationId
     mcpServerId
@@ -6323,15 +6358,15 @@ export const CreateMcpIntegrationDocument = `
 }
     `;
 
-export const useCreateMcpIntegrationMutation = <
+export const useCreateMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateMcpIntegrationMutation, TError, CreateMcpIntegrationMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateMcpIntegrationInstanceConfigurationMutation, TError, CreateMcpIntegrationInstanceConfigurationMutationVariables, TContext>) => {
     
-    return useMutation<CreateMcpIntegrationMutation, TError, CreateMcpIntegrationMutationVariables, TContext>(
+    return useMutation<CreateMcpIntegrationInstanceConfigurationMutation, TError, CreateMcpIntegrationInstanceConfigurationMutationVariables, TContext>(
       {
-    mutationKey: ['createMcpIntegration'],
-    mutationFn: (variables?: CreateMcpIntegrationMutationVariables) => fetcher<CreateMcpIntegrationMutation, CreateMcpIntegrationMutationVariables>(CreateMcpIntegrationDocument, variables)(),
+    mutationKey: ['createMcpIntegrationInstanceConfiguration'],
+    mutationFn: (variables?: CreateMcpIntegrationInstanceConfigurationMutationVariables) => fetcher<CreateMcpIntegrationInstanceConfigurationMutation, CreateMcpIntegrationInstanceConfigurationMutationVariables>(CreateMcpIntegrationInstanceConfigurationDocument, variables)(),
     ...options
   }
     )};
@@ -6355,40 +6390,40 @@ export const useDeleteEmbeddedMcpServerMutation = <
   }
     )};
 
-export const DeleteMcpIntegrationDocument = `
-    mutation deleteMcpIntegration($id: ID!) {
-  deleteMcpIntegration(id: $id)
+export const DeleteMcpIntegrationInstanceConfigurationDocument = `
+    mutation deleteMcpIntegrationInstanceConfiguration($id: ID!) {
+  deleteMcpIntegrationInstanceConfiguration(id: $id)
 }
     `;
 
-export const useDeleteMcpIntegrationMutation = <
+export const useDeleteMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteMcpIntegrationMutation, TError, DeleteMcpIntegrationMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteMcpIntegrationInstanceConfigurationMutation, TError, DeleteMcpIntegrationInstanceConfigurationMutationVariables, TContext>) => {
     
-    return useMutation<DeleteMcpIntegrationMutation, TError, DeleteMcpIntegrationMutationVariables, TContext>(
+    return useMutation<DeleteMcpIntegrationInstanceConfigurationMutation, TError, DeleteMcpIntegrationInstanceConfigurationMutationVariables, TContext>(
       {
-    mutationKey: ['deleteMcpIntegration'],
-    mutationFn: (variables?: DeleteMcpIntegrationMutationVariables) => fetcher<DeleteMcpIntegrationMutation, DeleteMcpIntegrationMutationVariables>(DeleteMcpIntegrationDocument, variables)(),
+    mutationKey: ['deleteMcpIntegrationInstanceConfiguration'],
+    mutationFn: (variables?: DeleteMcpIntegrationInstanceConfigurationMutationVariables) => fetcher<DeleteMcpIntegrationInstanceConfigurationMutation, DeleteMcpIntegrationInstanceConfigurationMutationVariables>(DeleteMcpIntegrationInstanceConfigurationDocument, variables)(),
     ...options
   }
     )};
 
-export const DeleteMcpIntegrationWorkflowDocument = `
-    mutation deleteMcpIntegrationWorkflow($id: ID!) {
-  deleteMcpIntegrationWorkflow(id: $id)
+export const DeleteMcpIntegrationInstanceConfigurationWorkflowDocument = `
+    mutation deleteMcpIntegrationInstanceConfigurationWorkflow($id: ID!) {
+  deleteMcpIntegrationInstanceConfigurationWorkflow(id: $id)
 }
     `;
 
-export const useDeleteMcpIntegrationWorkflowMutation = <
+export const useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteMcpIntegrationWorkflowMutation, TError, DeleteMcpIntegrationWorkflowMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteMcpIntegrationInstanceConfigurationWorkflowMutation, TError, DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables, TContext>) => {
     
-    return useMutation<DeleteMcpIntegrationWorkflowMutation, TError, DeleteMcpIntegrationWorkflowMutationVariables, TContext>(
+    return useMutation<DeleteMcpIntegrationInstanceConfigurationWorkflowMutation, TError, DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables, TContext>(
       {
-    mutationKey: ['deleteMcpIntegrationWorkflow'],
-    mutationFn: (variables?: DeleteMcpIntegrationWorkflowMutationVariables) => fetcher<DeleteMcpIntegrationWorkflowMutation, DeleteMcpIntegrationWorkflowMutationVariables>(DeleteMcpIntegrationWorkflowDocument, variables)(),
+    mutationKey: ['deleteMcpIntegrationInstanceConfigurationWorkflow'],
+    mutationFn: (variables?: DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables) => fetcher<DeleteMcpIntegrationInstanceConfigurationWorkflowMutation, DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables>(DeleteMcpIntegrationInstanceConfigurationWorkflowDocument, variables)(),
     ...options
   }
     )};
@@ -6565,10 +6600,10 @@ export const useMcpComponentDefinitionsQuery = <
   }
     )};
 
-export const McpIntegrationWorkflowPropertiesDocument = `
-    query mcpIntegrationWorkflowProperties($mcpIntegrationWorkflowId: ID!) {
-  mcpIntegrationWorkflowProperties(
-    mcpIntegrationWorkflowId: $mcpIntegrationWorkflowId
+export const McpIntegrationInstanceConfigurationWorkflowPropertiesDocument = `
+    query mcpIntegrationInstanceConfigurationWorkflowProperties($mcpIntegrationInstanceConfigurationWorkflowId: ID!) {
+  mcpIntegrationInstanceConfigurationWorkflowProperties(
+    mcpIntegrationInstanceConfigurationWorkflowId: $mcpIntegrationInstanceConfigurationWorkflowId
   ) {
     advancedOption
     description
@@ -6618,62 +6653,70 @@ export const McpIntegrationWorkflowPropertiesDocument = `
 }
     `;
 
-export const useMcpIntegrationWorkflowPropertiesQuery = <
-      TData = McpIntegrationWorkflowPropertiesQuery,
+export const useMcpIntegrationInstanceConfigurationWorkflowPropertiesQuery = <
+      TData = McpIntegrationInstanceConfigurationWorkflowPropertiesQuery,
       TError = unknown
     >(
-      variables: McpIntegrationWorkflowPropertiesQueryVariables,
-      options?: Omit<UseQueryOptions<McpIntegrationWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationWorkflowPropertiesQuery, TError, TData>['queryKey'] }
+      variables: McpIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<McpIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<McpIntegrationWorkflowPropertiesQuery, TError, TData>(
+    return useQuery<McpIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>(
       {
-    queryKey: ['mcpIntegrationWorkflowProperties', variables],
-    queryFn: fetcher<McpIntegrationWorkflowPropertiesQuery, McpIntegrationWorkflowPropertiesQueryVariables>(McpIntegrationWorkflowPropertiesDocument, variables),
+    queryKey: ['mcpIntegrationInstanceConfigurationWorkflowProperties', variables],
+    queryFn: fetcher<McpIntegrationInstanceConfigurationWorkflowPropertiesQuery, McpIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables>(McpIntegrationInstanceConfigurationWorkflowPropertiesDocument, variables),
     ...options
   }
     )};
 
-export const McpIntegrationsDocument = `
-    query mcpIntegrations {
-  mcpIntegrations {
+export const McpIntegrationInstanceConfigurationsDocument = `
+    query mcpIntegrationInstanceConfigurations {
+  mcpIntegrationInstanceConfigurations {
     id
+    integrationInstanceConfigurationId
     mcpServerId
     integration {
       id
       name
     }
+    mcpIntegrationInstanceConfigurationWorkflows {
+      integrationInstanceConfigurationWorkflow {
+        workflowId
+      }
+    }
   }
 }
     `;
 
-export const useMcpIntegrationsQuery = <
-      TData = McpIntegrationsQuery,
+export const useMcpIntegrationInstanceConfigurationsQuery = <
+      TData = McpIntegrationInstanceConfigurationsQuery,
       TError = unknown
     >(
-      variables?: McpIntegrationsQueryVariables,
-      options?: Omit<UseQueryOptions<McpIntegrationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationsQuery, TError, TData>['queryKey'] }
+      variables?: McpIntegrationInstanceConfigurationsQueryVariables,
+      options?: Omit<UseQueryOptions<McpIntegrationInstanceConfigurationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationInstanceConfigurationsQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<McpIntegrationsQuery, TError, TData>(
+    return useQuery<McpIntegrationInstanceConfigurationsQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['mcpIntegrations'] : ['mcpIntegrations', variables],
-    queryFn: fetcher<McpIntegrationsQuery, McpIntegrationsQueryVariables>(McpIntegrationsDocument, variables),
+    queryKey: variables === undefined ? ['mcpIntegrationInstanceConfigurations'] : ['mcpIntegrationInstanceConfigurations', variables],
+    queryFn: fetcher<McpIntegrationInstanceConfigurationsQuery, McpIntegrationInstanceConfigurationsQueryVariables>(McpIntegrationInstanceConfigurationsDocument, variables),
     ...options
   }
     )};
 
-export const McpIntegrationsByServerIdDocument = `
-    query mcpIntegrationsByServerId($mcpServerId: ID) {
-  mcpIntegrationsByServerId(mcpServerId: $mcpServerId) {
+export const McpIntegrationInstanceConfigurationsByServerIdDocument = `
+    query mcpIntegrationInstanceConfigurationsByServerId($mcpServerId: ID) {
+  mcpIntegrationInstanceConfigurationsByServerId(mcpServerId: $mcpServerId) {
     id
     integration {
+      componentName
       id
       name
     }
     integrationInstanceConfigurationId
+    integrationInstanceConfigurationName
     integrationVersion
-    mcpIntegrationWorkflows {
+    mcpIntegrationInstanceConfigurationWorkflows {
       id
       integrationInstanceConfigurationWorkflowId
       integrationInstanceConfigurationWorkflow {
@@ -6689,7 +6732,8 @@ export const McpIntegrationsByServerIdDocument = `
         version
         workflowId
       }
-      mcpIntegrationId
+      mcpIntegrationInstanceConfigurationId
+      parameters
       workflow {
         id
         label
@@ -6700,18 +6744,46 @@ export const McpIntegrationsByServerIdDocument = `
 }
     `;
 
-export const useMcpIntegrationsByServerIdQuery = <
-      TData = McpIntegrationsByServerIdQuery,
+export const useMcpIntegrationInstanceConfigurationsByServerIdQuery = <
+      TData = McpIntegrationInstanceConfigurationsByServerIdQuery,
       TError = unknown
     >(
-      variables?: McpIntegrationsByServerIdQueryVariables,
-      options?: Omit<UseQueryOptions<McpIntegrationsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationsByServerIdQuery, TError, TData>['queryKey'] }
+      variables?: McpIntegrationInstanceConfigurationsByServerIdQueryVariables,
+      options?: Omit<UseQueryOptions<McpIntegrationInstanceConfigurationsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationInstanceConfigurationsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<McpIntegrationsByServerIdQuery, TError, TData>(
+    return useQuery<McpIntegrationInstanceConfigurationsByServerIdQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['mcpIntegrationsByServerId'] : ['mcpIntegrationsByServerId', variables],
-    queryFn: fetcher<McpIntegrationsByServerIdQuery, McpIntegrationsByServerIdQueryVariables>(McpIntegrationsByServerIdDocument, variables),
+    queryKey: variables === undefined ? ['mcpIntegrationInstanceConfigurationsByServerId'] : ['mcpIntegrationInstanceConfigurationsByServerId', variables],
+    queryFn: fetcher<McpIntegrationInstanceConfigurationsByServerIdQuery, McpIntegrationInstanceConfigurationsByServerIdQueryVariables>(McpIntegrationInstanceConfigurationsByServerIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const ToolEligibleIntegrationInstanceConfigurationWorkflowsDocument = `
+    query toolEligibleIntegrationInstanceConfigurationWorkflows($integrationInstanceConfigurationId: ID!) {
+  toolEligibleIntegrationInstanceConfigurationWorkflows(
+    integrationInstanceConfigurationId: $integrationInstanceConfigurationId
+  ) {
+    id
+    integrationWorkflowId
+    label
+  }
+}
+    `;
+
+export const useToolEligibleIntegrationInstanceConfigurationWorkflowsQuery = <
+      TData = ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['toolEligibleIntegrationInstanceConfigurationWorkflows', variables],
+    queryFn: fetcher<ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery, ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables>(ToolEligibleIntegrationInstanceConfigurationWorkflowsDocument, variables),
     ...options
   }
     )};
@@ -6745,9 +6817,9 @@ export const useToolEligibleIntegrationVersionWorkflowsQuery = <
   }
     )};
 
-export const UpdateMcpIntegrationDocument = `
-    mutation updateMcpIntegration($id: ID!, $input: UpdateMcpIntegrationInput!) {
-  updateMcpIntegration(id: $id, input: $input) {
+export const UpdateMcpIntegrationInstanceConfigurationDocument = `
+    mutation updateMcpIntegrationInstanceConfiguration($id: ID!, $input: UpdateMcpIntegrationInstanceConfigurationInput!) {
+  updateMcpIntegrationInstanceConfiguration(id: $id, input: $input) {
     id
     integrationInstanceConfigurationId
     mcpServerId
@@ -6755,39 +6827,58 @@ export const UpdateMcpIntegrationDocument = `
 }
     `;
 
-export const useUpdateMcpIntegrationMutation = <
+export const useUpdateMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateMcpIntegrationMutation, TError, UpdateMcpIntegrationMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateMcpIntegrationInstanceConfigurationMutation, TError, UpdateMcpIntegrationInstanceConfigurationMutationVariables, TContext>) => {
     
-    return useMutation<UpdateMcpIntegrationMutation, TError, UpdateMcpIntegrationMutationVariables, TContext>(
+    return useMutation<UpdateMcpIntegrationInstanceConfigurationMutation, TError, UpdateMcpIntegrationInstanceConfigurationMutationVariables, TContext>(
       {
-    mutationKey: ['updateMcpIntegration'],
-    mutationFn: (variables?: UpdateMcpIntegrationMutationVariables) => fetcher<UpdateMcpIntegrationMutation, UpdateMcpIntegrationMutationVariables>(UpdateMcpIntegrationDocument, variables)(),
+    mutationKey: ['updateMcpIntegrationInstanceConfiguration'],
+    mutationFn: (variables?: UpdateMcpIntegrationInstanceConfigurationMutationVariables) => fetcher<UpdateMcpIntegrationInstanceConfigurationMutation, UpdateMcpIntegrationInstanceConfigurationMutationVariables>(UpdateMcpIntegrationInstanceConfigurationDocument, variables)(),
     ...options
   }
     )};
 
-export const UpdateMcpIntegrationWorkflowDocument = `
-    mutation updateMcpIntegrationWorkflow($id: ID!, $input: McpIntegrationWorkflowUpdateInput!) {
-  updateMcpIntegrationWorkflow(id: $id, input: $input) {
+export const UpdateMcpIntegrationInstanceConfigurationVersionDocument = `
+    mutation updateMcpIntegrationInstanceConfigurationVersion($id: ID!, $input: UpdateMcpIntegrationInstanceConfigurationVersionInput!) {
+  updateMcpIntegrationInstanceConfigurationVersion(id: $id, input: $input)
+}
+    `;
+
+export const useUpdateMcpIntegrationInstanceConfigurationVersionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpIntegrationInstanceConfigurationVersionMutation, TError, UpdateMcpIntegrationInstanceConfigurationVersionMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpIntegrationInstanceConfigurationVersionMutation, TError, UpdateMcpIntegrationInstanceConfigurationVersionMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpIntegrationInstanceConfigurationVersion'],
+    mutationFn: (variables?: UpdateMcpIntegrationInstanceConfigurationVersionMutationVariables) => fetcher<UpdateMcpIntegrationInstanceConfigurationVersionMutation, UpdateMcpIntegrationInstanceConfigurationVersionMutationVariables>(UpdateMcpIntegrationInstanceConfigurationVersionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateMcpIntegrationInstanceConfigurationWorkflowDocument = `
+    mutation updateMcpIntegrationInstanceConfigurationWorkflow($id: ID!, $input: McpIntegrationInstanceConfigurationWorkflowUpdateInput!) {
+  updateMcpIntegrationInstanceConfigurationWorkflow(id: $id, input: $input) {
     id
-    mcpIntegrationId
+    mcpIntegrationInstanceConfigurationId
     integrationInstanceConfigurationWorkflowId
     parameters
   }
 }
     `;
 
-export const useUpdateMcpIntegrationWorkflowMutation = <
+export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateMcpIntegrationWorkflowMutation, TError, UpdateMcpIntegrationWorkflowMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, TError, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables, TContext>) => {
     
-    return useMutation<UpdateMcpIntegrationWorkflowMutation, TError, UpdateMcpIntegrationWorkflowMutationVariables, TContext>(
+    return useMutation<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, TError, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables, TContext>(
       {
-    mutationKey: ['updateMcpIntegrationWorkflow'],
-    mutationFn: (variables?: UpdateMcpIntegrationWorkflowMutationVariables) => fetcher<UpdateMcpIntegrationWorkflowMutation, UpdateMcpIntegrationWorkflowMutationVariables>(UpdateMcpIntegrationWorkflowDocument, variables)(),
+    mutationKey: ['updateMcpIntegrationInstanceConfigurationWorkflow'],
+    mutationFn: (variables?: UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables) => fetcher<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables>(UpdateMcpIntegrationInstanceConfigurationWorkflowDocument, variables)(),
     ...options
   }
     )};
