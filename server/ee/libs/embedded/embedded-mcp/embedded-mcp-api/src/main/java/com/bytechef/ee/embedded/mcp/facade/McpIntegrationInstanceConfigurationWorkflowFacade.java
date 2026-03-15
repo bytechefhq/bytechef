@@ -13,12 +13,12 @@ package com.bytechef.ee.embedded.mcp.facade;
  * @author Ivica Cardic
  * @version ee
  */
-public interface McpIntegrationWorkflowFacade {
+public interface McpIntegrationInstanceConfigurationWorkflowFacade {
 
     /**
      * Deletes an MCP integration workflow and its associated integration instance configuration workflow.
      *
-     * @param mcpIntegrationWorkflowId the ID of the MCP integration workflow to delete
+     * @param mcpIntegrationInstanceConfigurationWorkflowId the ID of the MCP integration workflow to delete
      */
-    void deleteMcpIntegrationWorkflow(long mcpIntegrationWorkflowId);
+    void deleteMcpIntegrationInstanceConfigurationWorkflow(long mcpIntegrationInstanceConfigurationWorkflowId);
 }

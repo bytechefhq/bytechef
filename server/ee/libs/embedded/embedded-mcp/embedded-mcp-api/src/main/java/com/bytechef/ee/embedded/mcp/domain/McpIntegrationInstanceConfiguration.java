@@ -28,7 +28,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @version ee
  */
 @Table
-public final class McpIntegration {
+public final class McpIntegrationInstanceConfiguration {
 
     @Id
     private Long id;
@@ -58,19 +58,19 @@ public final class McpIntegration {
     @Version
     private int version;
 
-    public McpIntegration() {
+    public McpIntegrationInstanceConfiguration() {
     }
 
-    public McpIntegration(long id) {
+    public McpIntegrationInstanceConfiguration(long id) {
         this.id = id;
     }
 
-    public McpIntegration(long integrationInstanceConfigurationId, long mcpServerId) {
+    public McpIntegrationInstanceConfiguration(long integrationInstanceConfigurationId, long mcpServerId) {
         this.integrationInstanceConfigurationId = AggregateReference.to(integrationInstanceConfigurationId);
         this.mcpServerId = AggregateReference.to(mcpServerId);
     }
 
-    public McpIntegration(long id, long integrationInstanceConfigurationId, long mcpServerId) {
+    public McpIntegrationInstanceConfiguration(long id, long integrationInstanceConfigurationId, long mcpServerId) {
         this.id = id;
         this.integrationInstanceConfigurationId = AggregateReference.to(integrationInstanceConfigurationId);
         this.mcpServerId = AggregateReference.to(mcpServerId);
@@ -101,7 +101,7 @@ public final class McpIntegration {
     }
 
     public Long getMcpServerId() {
-        return mcpServerId.getId();
+        return mcpServerId != null ? mcpServerId.getId() : null;
     }
 
     public int getVersion() {
@@ -114,18 +114,16 @@ public final class McpIntegration {
             return true;
         }
 
-        if (object == null || getClass() != object.getClass()) {
+        if (!(object instanceof McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration)) {
             return false;
         }
 
-        McpIntegration mcpIntegration = (McpIntegration) object;
-
-        return Objects.equals(id, mcpIntegration.id);
+        return Objects.equals(id, mcpIntegrationInstanceConfiguration.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return getClass().hashCode();
     }
 
     public void setId(Long id) {
@@ -139,7 +137,9 @@ public final class McpIntegration {
     }
 
     public void setMcpServerId(Long mcpServerId) {
-        this.mcpServerId = AggregateReference.to(mcpServerId);
+        if (mcpServerId != null) {
+            this.mcpServerId = AggregateReference.to(mcpServerId);
+        }
     }
 
     public void setVersion(int version) {
@@ -148,7 +148,7 @@ public final class McpIntegration {
 
     @Override
     public String toString() {
-        return "McpIntegration{" +
+        return "McpIntegrationInstanceConfiguration{" +
             "id=" + id +
             ", integrationInstanceConfigurationId=" +
             (integrationInstanceConfigurationId != null ? integrationInstanceConfigurationId.getId() : null) +
