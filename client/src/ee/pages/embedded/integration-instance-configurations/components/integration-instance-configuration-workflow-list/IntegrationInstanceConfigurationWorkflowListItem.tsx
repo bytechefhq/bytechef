@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
@@ -7,6 +8,7 @@ import IntegrationInstanceConfigurationWorkflowListItemDropDownMenu from '@/ee/p
 import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
@@ -18,6 +20,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     filteredComponentNames,
     integrationInstanceConfigurationId,
     integrationInstanceConfigurationWorkflow,
+    isMcpWorkflow,
     workflow,
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
@@ -26,6 +29,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     filteredComponentNames?: string[];
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
+    isMcpWorkflow: boolean;
     workflow: Workflow;
     workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
@@ -35,6 +39,8 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     };
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+
+    const {data: fetchedWorkflow} = useGetWorkflowQuery(workflow.id!, showEditWorkflowDialog);
 
     const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
 
@@ -72,15 +78,23 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     };
 
     return (
-        <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50" key={workflow.id}>
+        <li
+            className={twMerge(
+                'flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50',
+                isMcpWorkflow && 'opacity-50'
+            )}
+            key={workflow.id}
+        >
             <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
                 <div
                     className={twMerge(
-                        'w-80 text-sm font-semibold',
+                        'flex w-80 items-center gap-2 text-sm font-semibold',
                         !integrationInstanceConfigurationWorkflow.enabled && 'text-muted-foreground'
                     )}
                 >
                     {workflow.label}
+
+                    {isMcpWorkflow && <Badge label="MCP" styleType="secondary-outline" />}
                 </div>
 
                 <div className="ml-6 flex space-x-1">
@@ -135,24 +149,26 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                         <Switch
                             checked={integrationInstanceConfigurationWorkflow.enabled}
                             className="mr-2"
-                            disabled={enableIntegrationInstanceConfigurationWorkflowMutation.isPending}
+                            disabled={isMcpWorkflow || enableIntegrationInstanceConfigurationWorkflowMutation.isPending}
                             onCheckedChange={handleEnableIntegrationInstanceConfigurationWorkflow}
                         />
                     </div>
                 </div>
 
-                <IntegrationInstanceConfigurationWorkflowListItemDropDownMenu
-                    onEditClick={() => setShowEditWorkflowDialog(true)}
-                    workflow={workflow}
-                />
+                {!isMcpWorkflow && (
+                    <IntegrationInstanceConfigurationWorkflowListItemDropDownMenu
+                        onEditClick={() => setShowEditWorkflowDialog(true)}
+                        workflow={workflow}
+                    />
+                )}
             </div>
 
-            {showEditWorkflowDialog && integrationInstanceConfigurationWorkflow && (
+            {showEditWorkflowDialog && integrationInstanceConfigurationWorkflow && fetchedWorkflow && (
                 <IntegrationInstanceConfigurationEditWorkflowDialog
                     componentName={componentName}
                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                     onClose={() => setShowEditWorkflowDialog(false)}
-                    workflow={workflow}
+                    workflow={fetchedWorkflow}
                 />
             )}
         </li>

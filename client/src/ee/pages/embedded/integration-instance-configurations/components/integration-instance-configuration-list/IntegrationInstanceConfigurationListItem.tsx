@@ -25,11 +25,13 @@ import IntegrationInstanceConfigurationDialog from '../integration-instance-conf
 
 interface IntegrationInstanceConfigurationListItemProps {
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
+    mcpWorkflowIds?: Set<string>;
     remainingTags?: Tag[];
 }
 
 const IntegrationInstanceConfigurationListItem = ({
     integrationInstanceConfiguration,
+    mcpWorkflowIds,
     remainingTags,
 }: IntegrationInstanceConfigurationListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
@@ -38,6 +40,8 @@ const IntegrationInstanceConfigurationListItem = ({
     const setIntegrationInstanceConfigurationEnabled = useIntegrationInstanceConfigurationsEnabledStore(
         ({setIntegrationInstanceConfigurationEnabled}) => setIntegrationInstanceConfigurationEnabled
     );
+
+    const workflowCount = integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows?.length ?? 0;
 
     const {captureIntegrationInstanceConfigurationEnabled} = useAnalytics();
 
@@ -120,20 +124,13 @@ const IntegrationInstanceConfigurationListItem = ({
                                 {integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows && (
                                     <CollapsibleTrigger
                                         className="group mr-4 flex text-xs font-semibold text-muted-foreground"
-                                        disabled={
-                                            integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows
-                                                .length === 0
-                                        }
+                                        disabled={workflowCount === 0}
                                     >
                                         <span className="mr-1">
-                                            {integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows
-                                                ?.length === 1
-                                                ? `1 workflow`
-                                                : `${integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows?.length} workflows`}
+                                            {workflowCount === 1 ? `1 workflow` : `${workflowCount} workflows`}
                                         </span>
 
-                                        {integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows
-                                            .length > 1 && (
+                                        {workflowCount > 1 && (
                                             <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                         )}
                                     </CollapsibleTrigger>
@@ -221,6 +218,7 @@ const IntegrationInstanceConfigurationListItem = ({
 
             {showEditDialog && (
                 <IntegrationInstanceConfigurationDialog
+                    excludeWorkflowIds={mcpWorkflowIds}
                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                     onClose={() => setShowEditDialog(false)}
                 />
@@ -228,6 +226,7 @@ const IntegrationInstanceConfigurationListItem = ({
 
             {showUpdateIntegrationVersionDialog && (
                 <IntegrationInstanceConfigurationDialog
+                    excludeWorkflowIds={mcpWorkflowIds}
                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                     onClose={() => setShowUpdateIntegrationVersionDialog(false)}
                     updateIntegrationVersion={true}

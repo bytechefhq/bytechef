@@ -11,6 +11,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     integrationInstanceConfigurationId,
     integrationInstanceConfigurationWorkflows,
     integrationVersion,
+    mcpWorkflowIds,
     taskDispatcherDefinitions,
 }: {
     componentDefinitions?: ComponentDefinitionBasic[];
@@ -19,6 +20,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflow>;
     integrationVersion: number;
+    mcpWorkflowIds?: Set<string>;
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
     const {data: workflows, isLoading: isIntegrationWorkflowsLoading} = useGetIntegrationVersionWorkflowsQuery(
@@ -102,6 +104,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
                                     filteredComponentNames={filteredComponentNames}
                                     integrationInstanceConfigurationId={integrationInstanceConfigurationId}
                                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                                    isMcpWorkflow={mcpWorkflowIds?.has(workflow.id!) ?? false}
                                     key={workflow.id}
                                     workflow={workflow}
                                     workflowComponentDefinitions={workflowComponentDefinitions}
