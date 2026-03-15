@@ -93,9 +93,11 @@ p {
     left: 50%;
     top: 50%;
     z-index: 50;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    max-width: 32rem;
+    max-width: 36rem;
+    max-height: 70vh;
     transform: translate(-50%, -50%);
     gap: 1rem;
     border: 1px solid #e5e7eb;
@@ -167,6 +169,8 @@ p {
     gap: 1rem;
     text-align: left;
     font-size: 1rem;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 .dialogContent p {
@@ -292,6 +296,35 @@ p {
 
 .poweredByContainer a:hover {
     text-decoration: underline;
+}
+
+/* Tab Container */
+.tabContainer {
+    display: flex;
+    border-bottom: 1px solid var(--gray-300);
+    gap: 0;
+}
+
+.tabButton {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tabButton:hover {
+    color: var(--bytechef-blue);
+}
+
+.tabButtonActive {
+    color: var(--bytechef-blue);
+    border-bottom-color: var(--bytechef-blue);
 }
 
 /* Workflows Container */
