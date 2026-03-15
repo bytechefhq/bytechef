@@ -1340,6 +1340,18 @@ components:
           properties:
             connectionConfig:
               $ref: "#/components/schemas/ConnectionConfig"
+            mcpWorkflows:
+              description: "The list of MCP workflows defined for this integration."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/IntegrationWorkflow"
+              readOnly: true
+            mcpTools:
+              description: "The list of MCP tools defined for this integration's component."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/McpTool"
+              readOnly: true
             workflows:
               description: "The list of workflows."
               type: "array"
@@ -1367,6 +1379,18 @@ components:
         - $ref: "#/components/schemas/IntegrationInstanceBasic"
         - type: "object"
           properties:
+            mcpTools:
+              description: "The array of MCP tools for this integration instance."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/McpIntegrationInstanceTool"
+              readOnly: true
+            mcpWorkflows:
+              description: "The array of MCP workflows for this integration instance."
+              type: "array"
+              items:
+                $ref: '#/components/schemas/IntegrationInstanceWorkflow'
+              readOnly: true
             workflows:
               type: "array"
               items:
@@ -1383,6 +1407,35 @@ components:
           additionalProperties: true
         workflowUuid:
           description: "The reference code of a workflow."
+          type: "string"
+    McpIntegrationInstanceTool:
+      description: "Contains user configurations for the execution of a particular MCP tool."
+      type: "object"
+      required:
+        - "enabled"
+        - "mcpToolId"
+      properties:
+        enabled:
+          description: "If an MCP tool is enabled or not."
+          type: "boolean"
+        mcpToolId:
+          description: "The id of an MCP tool."
+          type: "integer"
+          format: "int64"
+    McpTool:
+      description: "An MCP tool definition."
+      type: "object"
+      properties:
+        description:
+          description: "The description of the MCP tool."
+          type: "string"
+        id:
+          description: "The id of an MCP tool."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        name:
+          description: "The display name of the MCP tool, formatted as 'MCP Component name - McpTool name'."
           type: "string"
     IntegrationWorkflow:
       description: "A group of tasks that make one logical workflow."
