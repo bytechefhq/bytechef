@@ -1,0 +1,42 @@
+extend type Query {
+    mcpIntegrationInstanceConfiguration(id: ID): McpIntegrationInstanceConfiguration
+    mcpIntegrationInstanceConfigurations: [McpIntegrationInstanceConfiguration]
+    mcpIntegrationInstanceConfigurationsByServerId(mcpServerId: ID): [McpIntegrationInstanceConfiguration]
+}
+
+extend type Mutation {
+    createMcpIntegrationInstanceConfiguration(input: CreateMcpIntegrationInstanceConfigurationInput!): McpIntegrationInstanceConfiguration
+    deleteMcpIntegrationInstanceConfiguration(id: ID!): Boolean
+    updateMcpIntegrationInstanceConfiguration(id: ID!, input: UpdateMcpIntegrationInstanceConfigurationInput!): McpIntegrationInstanceConfiguration
+    updateMcpIntegrationInstanceConfigurationVersion(id: ID!, input: UpdateMcpIntegrationInstanceConfigurationVersionInput!): Boolean
+}
+
+type McpIntegrationInstanceConfiguration {
+    id: ID!
+    integrationInstanceConfigurationId: ID!
+    integrationInstanceConfigurationName: String
+    mcpServerId: ID!
+    mcpIntegrationInstanceConfigurationWorkflows: [McpIntegrationInstanceConfigurationWorkflow]
+    integration: Integration
+    integrationVersion: Int
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+input CreateMcpIntegrationInstanceConfigurationInput {
+    mcpServerId: ID!
+    integrationInstanceConfigurationId: ID!
+    selectedWorkflowIds: [String!]!
+}
+
+input UpdateMcpIntegrationInstanceConfigurationInput {
+    selectedWorkflowIds: [String!]!
+}
+
+input UpdateMcpIntegrationInstanceConfigurationVersionInput {
+    integrationVersion: Int!
+    workflowUuids: [String!]!
+}

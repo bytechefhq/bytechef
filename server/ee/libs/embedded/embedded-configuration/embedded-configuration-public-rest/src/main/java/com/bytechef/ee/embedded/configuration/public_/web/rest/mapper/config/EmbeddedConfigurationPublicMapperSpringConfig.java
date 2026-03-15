@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config;
 
 import com.bytechef.ee.embedded.configuration.public_.web.rest.adapter.EmbeddedConfigurationPublicConversionServiceAdapter;
 import com.bytechef.platform.configuration.web.rest.mapper.EnvironmentMapper;
+import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -18,7 +19,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    EnvironmentMapper.class, EmbeddedConfigurationPublicConversionServiceAdapter.class
+    DateTimeMapper.class, EnvironmentMapper.class, EmbeddedConfigurationPublicConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.ee.embedded.configuration.public_.web.rest.adapter",

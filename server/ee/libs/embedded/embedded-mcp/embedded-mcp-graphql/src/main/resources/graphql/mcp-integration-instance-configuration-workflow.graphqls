@@ -1,0 +1,39 @@
+extend type Query {
+    mcpIntegrationInstanceConfigurationWorkflow(id: ID): McpIntegrationInstanceConfigurationWorkflow
+    mcpIntegrationInstanceConfigurationWorkflows: [McpIntegrationInstanceConfigurationWorkflow]
+    mcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationId(mcpIntegrationInstanceConfigurationId: ID): [McpIntegrationInstanceConfigurationWorkflow]
+    toolEligibleIntegrationVersionWorkflows(integrationId: ID!, integrationVersion: Int!): [IntegrationWorkflow!]!
+    toolEligibleIntegrationInstanceConfigurationWorkflows(integrationInstanceConfigurationId: ID!): [IntegrationWorkflow!]!
+    mcpIntegrationInstanceConfigurationWorkflowProperties(mcpIntegrationInstanceConfigurationWorkflowId: ID!): [Property]
+}
+
+extend type Mutation {
+    createMcpIntegrationInstanceConfigurationWorkflow(input: McpIntegrationInstanceConfigurationWorkflowInput!): McpIntegrationInstanceConfigurationWorkflow
+    updateMcpIntegrationInstanceConfigurationWorkflow(id: ID!, input: McpIntegrationInstanceConfigurationWorkflowUpdateInput!): McpIntegrationInstanceConfigurationWorkflow
+    deleteMcpIntegrationInstanceConfigurationWorkflow(id: ID!): Boolean
+}
+
+type McpIntegrationInstanceConfigurationWorkflow {
+    id: ID!
+    mcpIntegrationInstanceConfigurationId: Long!
+    integrationInstanceConfigurationWorkflowId: Long!
+    parameters: Map
+    integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow
+    workflow: Workflow
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+input McpIntegrationInstanceConfigurationWorkflowInput {
+    mcpIntegrationInstanceConfigurationId: Long!
+    integrationInstanceConfigurationWorkflowId: Long!
+}
+
+input McpIntegrationInstanceConfigurationWorkflowUpdateInput {
+    mcpIntegrationInstanceConfigurationId: Long
+    integrationInstanceConfigurationWorkflowId: Long
+    parameters: Map
+}
