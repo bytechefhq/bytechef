@@ -746,6 +746,20 @@ export default function useLayout({
         // Snapshot positions right after cancelling — these are where nodes visually are right now
         const frozenNodes = useWorkflowDataStore.getState().nodes;
 
+        // Immediately remove nodes that are no longer part of the layout so that
+        // deleted task dispatcher children disappear at the same time as the parent,
+        // rather than lingering until the async layout calculation resolves.
+        const newNodeIds = new Set(layoutNodes.map((node) => node.id));
+        const prunedNodes = frozenNodes.filter((node) => newNodeIds.has(node.id));
+
+        if (prunedNodes.length < frozenNodes.length) {
+            setNodes(prunedNodes);
+
+            const currentEdges = useWorkflowDataStore.getState().edges;
+
+            setEdges(currentEdges.filter((edge) => newNodeIds.has(edge.source) && newNodeIds.has(edge.target)));
+        }
+
         getLayoutElements({
             canvasHeight: canvasHeightRef.current,
             canvasWidth: canvasWidthRef.current,

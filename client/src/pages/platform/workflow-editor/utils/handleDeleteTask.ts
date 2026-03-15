@@ -400,7 +400,7 @@ export function buildOptimisticTasks(
     const updatedParametersByName = collectAllTaskParameters(updatedTasks);
 
     return workflowTasks
-        .filter((task) => task.name !== deletedTaskName)
+        .filter((task) => task.name !== deletedTaskName && updatedParametersByName.has(task.name))
         .map((task) => {
             const updatedParameters = updatedParametersByName.get(task.name);
 
