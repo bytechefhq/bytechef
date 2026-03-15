@@ -2,22 +2,25 @@ import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {PopoverContent} from '@/components/ui/popover';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
-import {McpIntegrationWorkflow} from '@/shared/middleware/graphql';
+import {McpIntegrationInstanceConfigurationWorkflow} from '@/shared/middleware/graphql';
 import {XIcon} from 'lucide-react';
 
-import useMcpIntegrationWorkflowPropertiesPopover from './hooks/useMcpIntegrationWorkflowPropertiesPopover';
+import useMcpIntegrationInstanceConfigurationWorkflowPropertiesPopover from './hooks/useMcpIntegrationInstanceConfigurationWorkflowPropertiesPopover';
 
-interface McpIntegrationWorkflowPropertiesPopoverProps {
-    mcpIntegrationWorkflow: McpIntegrationWorkflow;
+interface McpIntegrationInstanceConfigurationWorkflowPropertiesPopoverProps {
+    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflow;
     onClose: () => void;
 }
 
-const McpIntegrationWorkflowPropertiesPopover = ({
-    mcpIntegrationWorkflow,
+const McpIntegrationInstanceConfigurationWorkflowPropertiesPopover = ({
+    mcpIntegrationInstanceConfigurationWorkflow,
     onClose,
-}: McpIntegrationWorkflowPropertiesPopoverProps) => {
+}: McpIntegrationInstanceConfigurationWorkflowPropertiesPopoverProps) => {
     const {control, form, formState, handleFormSubmit, handleSubmit, isLoading, properties} =
-        useMcpIntegrationWorkflowPropertiesPopover(mcpIntegrationWorkflow, onClose);
+        useMcpIntegrationInstanceConfigurationWorkflowPropertiesPopover(
+            mcpIntegrationInstanceConfigurationWorkflow,
+            onClose
+        );
 
     return (
         <PopoverContent
@@ -28,7 +31,7 @@ const McpIntegrationWorkflowPropertiesPopover = ({
         >
             <div className="flex items-center justify-between p-3">
                 <div>
-                    <h4 className="text-sm font-medium">{`Edit ${mcpIntegrationWorkflow.workflow?.label || 'Workflow'} Tool`}</h4>
+                    <h4 className="text-sm font-medium">{`Edit ${mcpIntegrationInstanceConfigurationWorkflow.workflow?.label || 'Workflow'} Tool`}</h4>
 
                     <p className="text-xs text-muted-foreground">Configure property values for this workflow tool.</p>
                 </div>
@@ -75,4 +78,4 @@ const McpIntegrationWorkflowPropertiesPopover = ({
     );
 };
 
-export default McpIntegrationWorkflowPropertiesPopover;
+export default McpIntegrationInstanceConfigurationWorkflowPropertiesPopover;

@@ -1,5 +1,5 @@
-query mcpIntegrationWorkflowProperties($mcpIntegrationWorkflowId: ID!) {
-    mcpIntegrationWorkflowProperties(mcpIntegrationWorkflowId: $mcpIntegrationWorkflowId) {
+query mcpIntegrationInstanceConfigurationWorkflowProperties($mcpIntegrationInstanceConfigurationWorkflowId: ID!) {
+    mcpIntegrationInstanceConfigurationWorkflowProperties(mcpIntegrationInstanceConfigurationWorkflowId: $mcpIntegrationInstanceConfigurationWorkflowId) {
         advancedOption
         description
         displayCondition

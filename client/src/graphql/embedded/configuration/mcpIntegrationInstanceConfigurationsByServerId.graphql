@@ -1,13 +1,15 @@
-query mcpIntegrationsByServerId($mcpServerId: ID) {
-    mcpIntegrationsByServerId(mcpServerId: $mcpServerId) {
+query mcpIntegrationInstanceConfigurationsByServerId($mcpServerId: ID) {
+    mcpIntegrationInstanceConfigurationsByServerId(mcpServerId: $mcpServerId) {
         id
         integration {
+            componentName
             id
             name
         }
         integrationInstanceConfigurationId
+        integrationInstanceConfigurationName
         integrationVersion
-        mcpIntegrationWorkflows {
+        mcpIntegrationInstanceConfigurationWorkflows {
             id
             integrationInstanceConfigurationWorkflowId
             integrationInstanceConfigurationWorkflow {
@@ -23,7 +25,8 @@ query mcpIntegrationsByServerId($mcpServerId: ID) {
                 version
                 workflowId
             }
-            mcpIntegrationId
+            mcpIntegrationInstanceConfigurationId
+            parameters
             workflow {
                 id
                 label
