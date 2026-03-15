@@ -1,9 +1,9 @@
 import {Type} from '@/ee/pages/embedded/mcp-servers/McpServers';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {
-    McpIntegration,
+    McpIntegrationInstanceConfiguration,
     PlatformType,
-    useMcpIntegrationsQuery,
+    useMcpIntegrationInstanceConfigurationsQuery,
     useMcpServerTagsQuery,
 } from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -31,24 +31,25 @@ const McpServersLeftSidebarNav = ({allComponentNames, validMcpServerIds}: McpSer
 
     const {data: componentDefinitions, isLoading: componentDefinitionsIsLoading} = useGetComponentDefinitionsQuery({});
 
-    const {data: mcpIntegrationsData, isLoading: mcpIntegrationsIsLoading} = useMcpIntegrationsQuery();
+    const {data: mcpIntegrationInstanceConfigurationsData, isLoading: mcpIntegrationInstanceConfigurationsIsLoading} =
+        useMcpIntegrationInstanceConfigurationsQuery();
 
     const {data: tagsData, isLoading: tagsIsLoading} = useMcpServerTagsQuery({type: PlatformType.Embedded});
 
     const tags = tagsData?.mcpServerTags;
 
-    const mcpIntegrations =
-        mcpIntegrationsData?.mcpIntegrations?.filter(
-            (integration): integration is McpIntegration => integration !== null
+    const mcpIntegrationInstanceConfigurations =
+        mcpIntegrationInstanceConfigurationsData?.mcpIntegrationInstanceConfigurations?.filter(
+            (integration): integration is McpIntegrationInstanceConfiguration => integration !== null
         ) || [];
 
-    const serverMcpIntegrations = mcpIntegrations.filter((integration) =>
+    const serverMcpIntegrationInstanceConfigurations = mcpIntegrationInstanceConfigurations.filter((integration) =>
         validMcpServerIds.has(integration.mcpServerId)
     );
 
     const uniqueIntegrations = Array.from(
         new Map(
-            serverMcpIntegrations
+            serverMcpIntegrationInstanceConfigurations
                 .filter((integration) => integration.integration?.id && integration.integration?.name)
                 .map((integration) => [
                     integration.integration!.id,
@@ -100,11 +101,11 @@ const McpServersLeftSidebarNav = ({allComponentNames, validMcpServerIds}: McpSer
             <LeftSidebarNav
                 body={
                     <>
-                        {!mcpIntegrationsIsLoading && uniqueIntegrations.length === 0 && (
+                        {!mcpIntegrationInstanceConfigurationsIsLoading && uniqueIntegrations.length === 0 && (
                             <span className="px-3 text-xs">No integrations.</span>
                         )}
 
-                        {!mcpIntegrationsIsLoading &&
+                        {!mcpIntegrationInstanceConfigurationsIsLoading &&
                             uniqueIntegrations.map((integration) => (
                                 <LeftSidebarNavItem
                                     item={{

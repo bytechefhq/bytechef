@@ -1,22 +1,23 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import useMcpComponentList from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
-import useMcpIntegrationList from '@/ee/pages/embedded/mcp-servers/components/mcp-integration-list/hooks/useMcpIntegrationList';
+import useMcpIntegrationInstanceConfigurationList from '@/ee/pages/embedded/mcp-servers/components/mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
 import {McpActivePopoverProvider} from '@/shared/contexts/McpActivePopoverContext';
 import {McpServer} from '@/shared/middleware/graphql';
 import {WrenchIcon} from 'lucide-react';
 
-import McpIntegrationWorkflowDialog from '../McpIntegrationWorkflowDialog';
+import McpIntegrationInstanceConfigurationWorkflowDialog from '../McpIntegrationInstanceConfigurationWorkflowDialog';
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 import McpComponentList from '../mcp-component-list/McpComponentList';
-import McpIntegrationList from '../mcp-integration-list/McpIntegrationList';
+import McpIntegrationInstanceConfigurationList from '../mcp-integration-instance-configuration-list/McpIntegrationInstanceConfigurationList';
 
 const McpServerToolsContent = ({mcpServer}: {mcpServer: McpServer}) => {
     const {data: componentData, isMcpComponentsLoading} = useMcpComponentList(mcpServer.id!);
-    const {isLoading: isIntegrationsLoading, mcpIntegrations} = useMcpIntegrationList(mcpServer.id!);
+    const {isLoading: isIntegrationsLoading, mcpIntegrationInstanceConfigurations} =
+        useMcpIntegrationInstanceConfigurationList(mcpServer.id!);
 
     const hasNoComponents = !componentData?.mcpComponentsByServerId?.length;
-    const hasNoIntegrations = !mcpIntegrations?.length;
+    const hasNoIntegrations = !mcpIntegrationInstanceConfigurations?.length;
     const isLoading = isMcpComponentsLoading || isIntegrationsLoading;
 
     if (!isLoading && hasNoComponents && hasNoIntegrations) {
@@ -33,7 +34,7 @@ const McpServerToolsContent = ({mcpServer}: {mcpServer: McpServer}) => {
 
                             <span className="text-sm text-muted-foreground">or</span>
 
-                            <McpIntegrationWorkflowDialog
+                            <McpIntegrationInstanceConfigurationWorkflowDialog
                                 mcpServer={mcpServer}
                                 triggerNode={<Button label="Add Workflows" />}
                             />
@@ -51,7 +52,7 @@ const McpServerToolsContent = ({mcpServer}: {mcpServer: McpServer}) => {
         <McpActivePopoverProvider>
             <McpComponentList mcpServer={mcpServer} />
 
-            <McpIntegrationList mcpServer={mcpServer} />
+            <McpIntegrationInstanceConfigurationList mcpServer={mcpServer} />
         </McpActivePopoverProvider>
     );
 };

@@ -3,23 +3,23 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import McpIntegrationWorkflowDialog from '@/ee/pages/embedded/mcp-servers/components/McpIntegrationWorkflowDialog';
+import McpIntegrationInstanceConfigurationWorkflowDialog from '@/ee/pages/embedded/mcp-servers/components/McpIntegrationInstanceConfigurationWorkflowDialog';
 import McpServerDialog from '@/ee/pages/embedded/mcp-servers/components/McpServerDialog';
 import McpComponentDialog from '@/ee/pages/embedded/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItemDropdownMenu from '@/ee/pages/embedded/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
 import TagList from '@/shared/components/TagList';
-import {McpIntegrationWorkflow, McpServer, Tag} from '@/shared/middleware/graphql';
+import {McpIntegrationInstanceConfigurationWorkflow, McpServer, Tag} from '@/shared/middleware/graphql';
 import {ChevronDown, ServerIcon} from 'lucide-react';
 
 import useMcpServerListItem from './hooks/useMcpServerListItem';
 
 interface McpServerListItemProps {
     mcpServer: McpServer;
-    mcpIntegrationWorkflows?: McpIntegrationWorkflow[];
+    mcpIntegrationInstanceConfigurationWorkflows?: McpIntegrationInstanceConfigurationWorkflow[];
     tags?: Tag[];
 }
 
-const McpServerListItem = ({mcpIntegrationWorkflows, mcpServer, tags}: McpServerListItemProps) => {
+const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpServer, tags}: McpServerListItemProps) => {
     const {
         handleDeleteClick,
         handleOnCheckedChange,
@@ -63,9 +63,9 @@ const McpServerListItem = ({mcpIntegrationWorkflows, mcpServer, tags}: McpServer
                                     <span className="mx-1">-</span>
 
                                     <span className="mr-1">
-                                        {mcpIntegrationWorkflows?.length === 1
+                                        {mcpIntegrationInstanceConfigurationWorkflows?.length === 1
                                             ? `1 workflow`
-                                            : `${mcpIntegrationWorkflows?.length || 0} workflows`}
+                                            : `${mcpIntegrationInstanceConfigurationWorkflows?.length || 0} workflows`}
                                     </span>
 
                                     <ChevronDown className="size-4 duration-300 group-data-[state=open]:rotate-180" />
@@ -155,7 +155,10 @@ const McpServerListItem = ({mcpIntegrationWorkflows, mcpServer, tags}: McpServer
             )}
 
             {showWorkflowDialog && (
-                <McpIntegrationWorkflowDialog mcpServer={mcpServer} onClose={() => setShowWorkflowDialog(false)} />
+                <McpIntegrationInstanceConfigurationWorkflowDialog
+                    mcpServer={mcpServer}
+                    onClose={() => setShowWorkflowDialog(false)}
+                />
             )}
         </>
     );

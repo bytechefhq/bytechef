@@ -1,95 +1,38 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Checkbox} from '@/components/ui/checkbox';
-import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Connection} from '@/ee/shared/middleware/embedded/configuration';
-import {ComponentDefinition, McpComponent, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
+import {ComponentDefinition, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
 
 import useMcpComponentDialogToolSelectionStep, {SelectedToolI} from './hooks/useMcpComponentDialogToolSelectionStep';
 
 interface ToolSelectionStepProps {
     existingTools?: McpToolsByComponentIdQuery;
-    mcpComponent?: McpComponent;
-    onConnectionChange: (connection: Connection | null) => void;
     onToolsChange: (tools: SelectedToolI[]) => void;
-    open: boolean;
     selectedComponent: ComponentDefinition | null;
-    selectedConnection: Connection | null;
     selectedTools: SelectedToolI[];
 }
 
 const McpComponentDialogToolSelectionStep = ({
     existingTools,
-    mcpComponent,
-    onConnectionChange,
     onToolsChange,
-    open,
     selectedComponent,
-    selectedConnection,
     selectedTools,
 }: ToolSelectionStepProps) => {
     const {
         allToolsSelected,
-        connections,
         handleSelectAllTools,
         handleToolToggle,
         isLoadingComponentDefinition,
-        isLoadingConnections,
         selectAllCheckboxRef,
         toolElements,
     } = useMcpComponentDialogToolSelectionStep({
         existingTools,
-        mcpComponent,
-        onConnectionChange,
         onToolsChange,
-        open,
         selectedComponent,
         selectedTools,
     });
 
     return (
         <div className="space-y-4 py-4">
-            <div className="space-y-2">
-                <Label className="text-sm font-medium" htmlFor="connection-select">
-                    Select Connection
-                </Label>
-
-                <Select
-                    onValueChange={(value) => {
-                        if (value === 'no-connection') {
-                            onConnectionChange(null);
-                        } else {
-                            const connection = connections.find(
-                                (connectionItem) => connectionItem.id?.toString() === value
-                            );
-
-                            onConnectionChange(connection || null);
-                        }
-                    }}
-                    value={selectedConnection?.id?.toString() || 'no-connection'}
-                >
-                    <SelectTrigger id="connection-select">
-                        <SelectValue placeholder="Choose a connection..." />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                        <SelectItem value="no-connection">No connection</SelectItem>
-
-                        {isLoadingConnections ? (
-                            <SelectItem disabled value="loading">
-                                Loading connections...
-                            </SelectItem>
-                        ) : (
-                            connections.map((connection) => (
-                                <SelectItem key={connection.id} value={connection.id?.toString() || 'no-connection'}>
-                                    {connection.name}
-                                </SelectItem>
-                            ))
-                        )}
-                    </SelectContent>
-                </Select>
-            </div>
-
             {isLoadingComponentDefinition ? (
                 <div className="flex items-center justify-center py-8">
                     <LoadingIcon className="size-6" />
