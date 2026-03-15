@@ -40,6 +40,7 @@ export default defineConfig({
                     })
             ),
             output: {
+                banner: "'use client';",
                 entryFileNames: '[name].js',
                 assetFileNames: 'assets/[name][extname]',
                 globals: {

@@ -1,5 +1,7 @@
 'use client';
 
+import {useEffect, useRef} from 'react';
+
 /**
  * Props for the EmbeddedWorkflowBuilder component.
  * This interface defines all the configuration options needed to initialize and render
@@ -9,7 +11,7 @@ interface EmbeddedWorkflowBuilderProps {
     /**
      * The base URL of the ByteChef application.
      * This URL is used to construct the iframe src attribute.
-     * @default 'http://127.0.0.1:5173'
+     * @default 'https://app.bytechef.io'
      */
     baseUrl?: string;
 
@@ -60,13 +62,12 @@ interface EmbeddedWorkflowBuilderProps {
  * A component that embeds the ByteChef Workflow Builder in an iframe.
  *
  * This component creates an iframe that loads the ByteChef Workflow Builder UI and
- * initializes it with the provided configuration. When the iframe loads, it sends
- * a postMessage to the iframe with the initialization parameters.
+ * initializes it with the provided configuration. When the iframe signals it is ready
+ * via a postMessage, the parent sends the initialization parameters back.
  *
  * @param props - The configuration options for the embedded workflow builder
  * @returns A React component that renders the embedded workflow builder
  */
-
 const EmbeddedWorkflowBuilder = ({
     baseUrl = 'https://app.bytechef.io',
     connectionDialogAllowed,
@@ -76,18 +77,11 @@ const EmbeddedWorkflowBuilder = ({
     sharedConnectionIds,
     workflowUuid,
 }: EmbeddedWorkflowBuilderProps) => {
-    /**
-     * Handles the iframe load event.
-     *
-     * When the iframe is loaded, this function sends a postMessage to the iframe
-     * with the initialization parameters needed by the ByteChef Workflow Builder.
-     * This establishes communication between the parent application and the embedded iframe.
-     */
-    const handleIframeLoad = () => {
-        const iframe = document.querySelector('iframe');
+    const iframeRef = useRef<HTMLIFrameElement>(null);
 
-        if (iframe && iframe.contentWindow) {
-            iframe.contentWindow.postMessage(
+    const sendInitMessage = () => {
+        if (iframeRef.current && iframeRef.current.contentWindow) {
+            iframeRef.current.contentWindow.postMessage(
                 {
                     type: 'EMBED_INIT',
                     params: {
@@ -103,15 +97,30 @@ const EmbeddedWorkflowBuilder = ({
         }
     };
 
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data.type === 'EMBED_READY') {
+                sendInitMessage();
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+
+        return () => {
+            window.removeEventListener('message', handleMessage);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <div className="absolute inset-0 lg:pl-72">
             <iframe
+                ref={iframeRef}
                 src={`${baseUrl}/embedded/workflow-builder/${workflowUuid}`}
                 width="100%"
                 height="100%"
                 style={{border: 'none'}}
                 title="Workflow Builder"
-                onLoad={handleIframeLoad}
             />
         </div>
     );
