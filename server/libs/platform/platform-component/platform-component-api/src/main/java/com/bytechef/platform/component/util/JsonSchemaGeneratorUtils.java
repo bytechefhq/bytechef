@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.util;
 
 import com.bytechef.platform.component.domain.Property;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.victools.jsonschema.generator.Module;
@@ -68,6 +69,7 @@ public class JsonSchemaGeneratorUtils {
         ObjectNode schemaObjectNode = objectMapper.createObjectNode();
 
         schemaObjectNode.put("type", "object");
+        schemaObjectNode.put("additionalProperties", false);
 
         ObjectNode propertiesObjectNode = schemaObjectNode.putObject("properties");
         Set<String> required = new HashSet<>();
@@ -82,15 +84,14 @@ public class JsonSchemaGeneratorUtils {
             // TODO check array and object, it seems schema is not generated correctly
             ObjectNode parameterObjectNode = TYPE_SCHEMA_GENERATOR.generateSchema(getType(property.getType()));
 
-            parameterObjectNode.remove("$schema");
-
             if (!parameterObjectNode.has("type")) {
                 parameterObjectNode.put("type", "string");
             }
 
-            if (parameterObjectNode.has("items") && parameterObjectNode.get("items")
-                .isEmpty()) {
-                ((ObjectNode) parameterObjectNode.get("items")).put("type", "string");
+            JsonNode itemsJsonNode = parameterObjectNode.get("items");
+
+            if (parameterObjectNode.has("items") && itemsJsonNode.isEmpty()) {
+                ((ObjectNode) itemsJsonNode).put("type", "string");
             }
 
             String parameterDescription = property.getDescription();
