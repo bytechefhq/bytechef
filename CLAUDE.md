@@ -217,8 +217,12 @@ public class ExampleComponentHandler implements ComponentHandler {
 - `@typescript-eslint/no-non-null-asserted-optional-chain` forbids `obj?.prop!`
 - Instead, filter nulls first, then assert: `.filter((item) => item?.id != null).map((item) => { const id = item!.id!; ... })`
 
+### Ref Name Suffix (Client)
+- `useRef` variables must end with `Ref` suffix (enforced by `bytechef/ref-name-suffix`) — e.g., `fileInputRef`, `totalToUploadRef`
+
 ### Variable Naming
 - Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
+- Do not prefix private methods with `_` — use plain method names (e.g., `extractFrontmatter` not `_extractFrontmatter`)
 - This applies everywhere, including arrow function parameters and loop variables.
 - Examples:
   ```typescript
@@ -469,6 +473,22 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Use Liquibase for schema migrations
 - Migration files are in `server/libs/config/liquibase-config/`
 - Database changes are applied automatically on startup
+- After renaming migration files, delete stale copies from `build/resources/` — Liquibase sees both old and new on classpath
+
+### New Spring Data JDBC Modules
+- Create `@AutoConfiguration` class with `@EnableJdbcRepositories(basePackages = "...")` + `@ConditionalOnBean(AbstractJdbcConfiguration.class)`
+- Register in `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+- Add `spring-boot-autoconfigure` dependency to `build.gradle.kts`
+
+### Agent Component Handlers
+- `@AutoService(ComponentHandler.class)` — ServiceLoader discovery, no Spring DI available
+- `@Component("name_v1_ComponentHandler")` — Spring discovery, supports constructor injection (used by guardrails, RAG, chat-memory, and agent utils when Spring beans are needed)
+
+### GraphQL Development Workflow
+- Add schema path to `client/codegen.ts` `schema` array
+- Create operation `.graphql` files in `client/src/graphql/<domain>/`
+- Run `cd client && npx graphql-codegen` to regenerate `src/shared/middleware/graphql.ts`
+- Commit operations and generated file separately
 
 ### Running Integration Tests
 Integration tests use Testcontainers to spin up real services:
