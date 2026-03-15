@@ -17,13 +17,15 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
-import com.bytechef.ee.embedded.mcp.domain.McpIntegrationWorkflow;
-import com.bytechef.ee.embedded.mcp.facade.McpIntegrationWorkflowFacade;
-import com.bytechef.ee.embedded.mcp.service.McpIntegrationWorkflowService;
+import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.mcp.facade.McpIntegrationInstanceConfigurationWorkflowFacade;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.Property;
@@ -36,8 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -45,95 +45,110 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller for managing {@link McpIntegrationWorkflow} entities.
+ * GraphQL controller for managing {@link McpIntegrationInstanceConfigurationWorkflow} entities.
  *
  * @author Ivica Cardic
  * @version ee
  */
 @Controller
 @ConditionalOnCoordinator
-class McpIntegrationWorkflowGraphQlController {
+class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
+    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
-    private final McpIntegrationWorkflowFacade mcpIntegrationWorkflowFacade;
-    private final McpIntegrationWorkflowService mcpIntegrationWorkflowService;
+    private final McpIntegrationInstanceConfigurationWorkflowFacade mcpIntegrationInstanceConfigurationWorkflowFacade;
+    private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
     private final WorkflowService workflowService;
 
-    McpIntegrationWorkflowGraphQlController(
+    McpIntegrationInstanceConfigurationWorkflowGraphQlController(
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationWorkflowService integrationWorkflowService,
-        McpIntegrationWorkflowFacade mcpIntegrationWorkflowFacade,
-        McpIntegrationWorkflowService mcpIntegrationWorkflowService, WorkflowService workflowService) {
+        McpIntegrationInstanceConfigurationWorkflowFacade mcpIntegrationInstanceConfigurationWorkflowFacade,
+        McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
+        WorkflowService workflowService) {
 
+        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
-        this.mcpIntegrationWorkflowFacade = mcpIntegrationWorkflowFacade;
-        this.mcpIntegrationWorkflowService = mcpIntegrationWorkflowService;
+        this.mcpIntegrationInstanceConfigurationWorkflowFacade = mcpIntegrationInstanceConfigurationWorkflowFacade;
+        this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
         this.workflowService = workflowService;
     }
 
     @QueryMapping
-    McpIntegrationWorkflow mcpIntegrationWorkflow(@Argument long id) {
-        return mcpIntegrationWorkflowService.fetchMcpIntegrationWorkflow(id)
+    McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow(@Argument long id) {
+        return mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(id)
             .orElse(null);
     }
 
     @QueryMapping
-    List<McpIntegrationWorkflow> mcpIntegrationWorkflows() {
-        return mcpIntegrationWorkflowService.getMcpIntegrationWorkflows();
+    List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows() {
+        return mcpIntegrationInstanceConfigurationWorkflowService.getMcpIntegrationInstanceConfigurationWorkflows();
     }
 
     @QueryMapping
-    List<McpIntegrationWorkflow> mcpIntegrationWorkflowsByMcpIntegrationId(@Argument long mcpIntegrationId) {
-        return mcpIntegrationWorkflowService.getMcpIntegrationMcpIntegrationWorkflows(mcpIntegrationId);
+    List<McpIntegrationInstanceConfigurationWorkflow>
+        mcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationId(
+            @Argument long mcpIntegrationInstanceConfigurationId) {
+        return mcpIntegrationInstanceConfigurationWorkflowService
+            .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
+                mcpIntegrationInstanceConfigurationId);
     }
 
     @QueryMapping
     List<IntegrationWorkflowDTO> toolEligibleIntegrationVersionWorkflows(
         @Argument long integrationId, @Argument int integrationVersion) {
 
-        List<String> workflowIds = integrationWorkflowService.getIntegrationWorkflows(
-            integrationId, integrationVersion)
-            .stream()
-            .map(integrationWorkflow -> integrationWorkflow.getWorkflowId())
-            .toList();
-
-        List<Workflow> workflows = workflowService.getWorkflows(workflowIds);
-
-        Map<String, Workflow> workflowMap = workflows
-            .stream()
-            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
-
         return integrationWorkflowService.getIntegrationWorkflows(integrationId, integrationVersion)
             .stream()
-            .filter(integrationWorkflow -> {
-                Workflow workflow = workflowMap.get(integrationWorkflow.getWorkflowId());
-
-                return workflow != null && getToolCallableTrigger(workflow) != null;
-            })
             .map(integrationWorkflow -> {
-                Workflow workflow = workflowMap.get(integrationWorkflow.getWorkflowId());
+                Workflow workflow = workflowService.getWorkflow(integrationWorkflow.getWorkflowId());
 
                 return new IntegrationWorkflowDTO(workflow, integrationWorkflow);
             })
+            .filter(integrationWorkflowDTO -> getToolCallableTrigger(integrationWorkflowDTO.getWorkflow()) != null)
+            .toList();
+    }
+
+    @QueryMapping
+    List<IntegrationWorkflowDTO> toolEligibleIntegrationInstanceConfigurationWorkflows(
+        @Argument long integrationInstanceConfigurationId) {
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId);
+
+        return integrationWorkflowService.getIntegrationWorkflows(
+            integrationInstanceConfiguration.getIntegrationId(),
+            integrationInstanceConfiguration.getIntegrationVersion())
+            .stream()
+            .map(integrationWorkflow -> {
+                Workflow workflow = workflowService.getWorkflow(integrationWorkflow.getWorkflowId());
+
+                return new IntegrationWorkflowDTO(workflow, integrationWorkflow);
+            })
+            .filter(integrationWorkflowDTO -> getToolCallableTrigger(integrationWorkflowDTO.getWorkflow()) != null)
             .toList();
     }
 
     @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
     @QueryMapping
-    List<Property> mcpIntegrationWorkflowProperties(@Argument long mcpIntegrationWorkflowId) {
-        McpIntegrationWorkflow mcpIntegrationWorkflow =
-            mcpIntegrationWorkflowService.fetchMcpIntegrationWorkflow(mcpIntegrationWorkflowId)
+    List<Property> mcpIntegrationInstanceConfigurationWorkflowProperties(
+        @Argument long mcpIntegrationInstanceConfigurationWorkflowId) {
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+            mcpIntegrationInstanceConfigurationWorkflowService
+                .fetchMcpIntegrationInstanceConfigurationWorkflow(mcpIntegrationInstanceConfigurationWorkflowId)
                 .orElse(null);
 
-        if (mcpIntegrationWorkflow == null) {
+        if (mcpIntegrationInstanceConfigurationWorkflow == null) {
             return List.of();
         }
 
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                mcpIntegrationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+                mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
 
         Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
@@ -191,23 +206,27 @@ class McpIntegrationWorkflowGraphQlController {
     }
 
     @MutationMapping
-    McpIntegrationWorkflow createMcpIntegrationWorkflow(@Argument("input") Map<String, Object> input) {
-        Long mcpIntegrationId = Long.valueOf(String.valueOf(input.get("mcpIntegrationId")));
+    McpIntegrationInstanceConfigurationWorkflow
+        createMcpIntegrationInstanceConfigurationWorkflow(@Argument("input") Map<String, Object> input) {
+        Long mcpIntegrationInstanceConfigurationId =
+            Long.valueOf(String.valueOf(input.get("mcpIntegrationInstanceConfigurationId")));
         Long integrationInstanceConfigurationWorkflowId = Long.valueOf(
             String.valueOf(input.get("integrationInstanceConfigurationWorkflowId")));
 
-        return mcpIntegrationWorkflowService.create(mcpIntegrationId, integrationInstanceConfigurationWorkflowId);
+        return mcpIntegrationInstanceConfigurationWorkflowService.create(mcpIntegrationInstanceConfigurationId,
+            integrationInstanceConfigurationWorkflowId);
     }
 
     @SuppressWarnings("unchecked")
     @MutationMapping
-    McpIntegrationWorkflow updateMcpIntegrationWorkflow(
+    McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflow(
         @Argument("id") long id, @Argument("input") Map<String, Object> input) {
 
-        Long mcpIntegrationId = null;
+        Long mcpIntegrationInstanceConfigurationId = null;
 
-        if (input.containsKey("mcpIntegrationId")) {
-            mcpIntegrationId = Long.valueOf(String.valueOf(input.get("mcpIntegrationId")));
+        if (input.containsKey("mcpIntegrationInstanceConfigurationId")) {
+            mcpIntegrationInstanceConfigurationId =
+                Long.valueOf(String.valueOf(input.get("mcpIntegrationInstanceConfigurationId")));
         }
 
         Long integrationInstanceConfigurationWorkflowId = null;
@@ -217,8 +236,9 @@ class McpIntegrationWorkflowGraphQlController {
                 String.valueOf(input.get("integrationInstanceConfigurationWorkflowId")));
         }
 
-        McpIntegrationWorkflow mcpIntegrationWorkflow = mcpIntegrationWorkflowService.update(
-            id, mcpIntegrationId, integrationInstanceConfigurationWorkflowId);
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+            mcpIntegrationInstanceConfigurationWorkflowService.update(
+                id, mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId);
 
         if (input.containsKey("parameters")) {
             Object parametersObject = input.get("parameters");
@@ -231,32 +251,33 @@ class McpIntegrationWorkflowGraphQlController {
 
             Map<String, ?> parameters = parametersObject != null ? (Map<String, ?>) parametersObject : Map.of();
 
-            mcpIntegrationWorkflow = mcpIntegrationWorkflowService.updateParameters(id, parameters);
+            mcpIntegrationInstanceConfigurationWorkflow =
+                mcpIntegrationInstanceConfigurationWorkflowService.updateParameters(id, parameters);
         }
 
-        return mcpIntegrationWorkflow;
+        return mcpIntegrationInstanceConfigurationWorkflow;
     }
 
     @MutationMapping
-    boolean deleteMcpIntegrationWorkflow(@Argument("id") long id) {
-        mcpIntegrationWorkflowFacade.deleteMcpIntegrationWorkflow(id);
+    boolean deleteMcpIntegrationInstanceConfigurationWorkflow(@Argument("id") long id) {
+        mcpIntegrationInstanceConfigurationWorkflowFacade.deleteMcpIntegrationInstanceConfigurationWorkflow(id);
 
         return true;
     }
 
     @SchemaMapping
     IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow(
-        McpIntegrationWorkflow mcpIntegrationWorkflow) {
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow) {
 
         return integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-            mcpIntegrationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+            mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
     }
 
     @SchemaMapping
-    WorkflowDTO workflow(McpIntegrationWorkflow mcpIntegrationWorkflow) {
+    WorkflowDTO workflow(McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                mcpIntegrationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+                mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
 
         Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
