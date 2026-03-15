@@ -24,6 +24,8 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Inte
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationInstanceWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationWorkflowModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/McpIntegrationInstanceToolModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/McpToolModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/OAuth2Model.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/PublishFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendIntegrationInstanceWorkflowRequestModel.java
