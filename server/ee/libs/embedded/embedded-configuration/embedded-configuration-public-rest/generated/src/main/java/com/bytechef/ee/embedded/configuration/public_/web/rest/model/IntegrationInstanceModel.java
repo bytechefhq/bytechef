@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpIntegrationInstanceToolModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-02-12T08:42:40.890500807+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 public class IntegrationInstanceModel {
 
   private @Nullable Long id;
@@ -36,6 +37,12 @@ public class IntegrationInstanceModel {
   private @Nullable CredentialStatusModel credentialStatus;
 
   private Boolean enabled;
+
+  @Valid
+  private List<@Valid McpIntegrationInstanceToolModel> mcpTools = new ArrayList<>();
+
+  @Valid
+  private List<@Valid IntegrationInstanceWorkflowModel> mcpWorkflows = new ArrayList<>();
 
   @Valid
   private List<@Valid IntegrationInstanceWorkflowModel> workflows = new ArrayList<>();
@@ -111,6 +118,62 @@ public class IntegrationInstanceModel {
     this.enabled = enabled;
   }
 
+  public IntegrationInstanceModel mcpTools(List<@Valid McpIntegrationInstanceToolModel> mcpTools) {
+    this.mcpTools = mcpTools;
+    return this;
+  }
+
+  public IntegrationInstanceModel addMcpToolsItem(McpIntegrationInstanceToolModel mcpToolsItem) {
+    if (this.mcpTools == null) {
+      this.mcpTools = new ArrayList<>();
+    }
+    this.mcpTools.add(mcpToolsItem);
+    return this;
+  }
+
+  /**
+   * The array of MCP tools for this integration instance.
+   * @return mcpTools
+   */
+  @Valid 
+  @Schema(name = "mcpTools", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of MCP tools for this integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("mcpTools")
+  public List<@Valid McpIntegrationInstanceToolModel> getMcpTools() {
+    return mcpTools;
+  }
+
+  public void setMcpTools(List<@Valid McpIntegrationInstanceToolModel> mcpTools) {
+    this.mcpTools = mcpTools;
+  }
+
+  public IntegrationInstanceModel mcpWorkflows(List<@Valid IntegrationInstanceWorkflowModel> mcpWorkflows) {
+    this.mcpWorkflows = mcpWorkflows;
+    return this;
+  }
+
+  public IntegrationInstanceModel addMcpWorkflowsItem(IntegrationInstanceWorkflowModel mcpWorkflowsItem) {
+    if (this.mcpWorkflows == null) {
+      this.mcpWorkflows = new ArrayList<>();
+    }
+    this.mcpWorkflows.add(mcpWorkflowsItem);
+    return this;
+  }
+
+  /**
+   * The array of MCP workflows for this integration instance.
+   * @return mcpWorkflows
+   */
+  @Valid 
+  @Schema(name = "mcpWorkflows", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of MCP workflows for this integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("mcpWorkflows")
+  public List<@Valid IntegrationInstanceWorkflowModel> getMcpWorkflows() {
+    return mcpWorkflows;
+  }
+
+  public void setMcpWorkflows(List<@Valid IntegrationInstanceWorkflowModel> mcpWorkflows) {
+    this.mcpWorkflows = mcpWorkflows;
+  }
+
   public IntegrationInstanceModel workflows(List<@Valid IntegrationInstanceWorkflowModel> workflows) {
     this.workflows = workflows;
     return this;
@@ -151,12 +214,14 @@ public class IntegrationInstanceModel {
     return Objects.equals(this.id, integrationInstance.id) &&
         Objects.equals(this.credentialStatus, integrationInstance.credentialStatus) &&
         Objects.equals(this.enabled, integrationInstance.enabled) &&
+        Objects.equals(this.mcpTools, integrationInstance.mcpTools) &&
+        Objects.equals(this.mcpWorkflows, integrationInstance.mcpWorkflows) &&
         Objects.equals(this.workflows, integrationInstance.workflows);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, credentialStatus, enabled, workflows);
+    return Objects.hash(id, credentialStatus, enabled, mcpTools, mcpWorkflows, workflows);
   }
 
   @Override
@@ -166,6 +231,8 @@ public class IntegrationInstanceModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    mcpTools: ").append(toIndentedString(mcpTools)).append("\n");
+    sb.append("    mcpWorkflows: ").append(toIndentedString(mcpWorkflows)).append("\n");
     sb.append("    workflows: ").append(toIndentedString(workflows)).append("\n");
     sb.append("}");
     return sb.toString();
