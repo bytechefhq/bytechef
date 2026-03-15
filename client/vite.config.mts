@@ -1,6 +1,7 @@
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react';
 import * as path from 'node:path';
+import {resolve} from 'node:path';
 import {defineConfig, loadEnv} from 'vite';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -17,6 +18,10 @@ export default ({mode}) => {
     return defineConfig({
         build: {
             rollupOptions: {
+                input: {
+                    connect: resolve(__dirname, 'connect.html'),
+                    main: resolve(__dirname, 'index.html'),
+                },
                 output: {
                     manualChunks: {
                         'vendor-analytics': ['posthog-js'],
