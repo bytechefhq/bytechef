@@ -1,10 +1,12 @@
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
+import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface AiAgentPromptFieldProps {
@@ -30,6 +32,26 @@ export default function AiAgentPromptField({
     title,
     workflow,
 }: AiAgentPromptFieldProps) {
+    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
+
+    const parameterValue = useMemo(() => {
+        if (!workflow.definition || !rootClusterElementNodeData?.workflowNodeName) {
+            return undefined;
+        }
+
+        try {
+            const definition = JSON.parse(workflow.definition);
+            const tasks = definition.tasks || [];
+            const rootTask = tasks.find(
+                (task: {name: string}) => task.name === rootClusterElementNodeData.workflowNodeName
+            );
+
+            return rootTask?.parameters?.[path] as string | undefined;
+        } catch {
+            return undefined;
+        }
+    }, [path, rootClusterElementNodeData?.workflowNodeName, workflow.definition]);
+
     return (
         <div className={twMerge('flex flex-col', containerClassName)}>
             <h2 className="mb-2">{title}</h2>
@@ -49,6 +71,7 @@ export default function AiAgentPromptField({
                     placeholder={placeholder}
                     taskDispatcherDefinitions={taskDispatcherDefinitions}
                     type="STRING"
+                    value={parameterValue}
                     workflow={workflow}
                 />
             </div>
