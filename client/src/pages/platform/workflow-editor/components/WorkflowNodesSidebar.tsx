@@ -1,17 +1,20 @@
 import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useMemo} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import {useFilteredComponentDefinitions} from '../hooks/useFilteredComponentDefinitions';
 import WorkflowNodesTabs from './workflow-nodes-tabs/WorkflowNodesTabs';
 
 const WorkflowNodesSidebar = ({
     data,
+    visible,
 }: {
     data: {
         componentDefinitions: Array<ComponentDefinitionBasic>;
         taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     };
+    visible: boolean;
 }) => {
     const {componentsWithActions, filter, setFilter, trimmedFilter} = useFilteredComponentDefinitions(
         data.componentDefinitions
@@ -44,7 +47,12 @@ const WorkflowNodesSidebar = ({
     );
 
     return (
-        <aside className="absolute inset-y-2 right-14 flex w-96 flex-col overflow-hidden rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary pb-4">
+        <aside
+            className={twMerge(
+                'absolute inset-y-2 right-14 flex w-96 flex-col overflow-hidden rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary pb-4 transition-[transform,opacity] duration-300 ease-in-out',
+                visible ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
+            )}
+        >
             <div className="px-3 pt-3 text-center text-content-neutral-secondary">
                 <Input
                     className="bg-white shadow-none"
