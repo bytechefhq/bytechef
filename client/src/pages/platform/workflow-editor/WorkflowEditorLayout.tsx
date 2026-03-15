@@ -50,6 +50,8 @@ const WorkflowEditorLayout = ({
     showWorkflowInputs,
 }: WorkflowEditorLayoutProps) => {
     const [clusterDialogMounted, setClusterDialogMounted] = useState(false);
+    const [rightSidebarMounted, setRightSidebarMounted] = useState(false);
+    const [rightSidebarVisible, setRightSidebarVisible] = useState(false);
 
     const copilotLayoutShifted = useCopilotLayoutShifted();
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
@@ -96,6 +98,40 @@ const WorkflowEditorLayout = ({
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     useEffect(() => {
+        let outerRafId: number | undefined;
+        let innerRafId: number | undefined;
+        let timerId: ReturnType<typeof setTimeout> | undefined;
+
+        if (rightSidebarOpen) {
+            setRightSidebarMounted(true);
+
+            outerRafId = requestAnimationFrame(() => {
+                innerRafId = requestAnimationFrame(() => {
+                    setRightSidebarVisible(true);
+                });
+            });
+        } else {
+            setRightSidebarVisible(false);
+
+            timerId = setTimeout(() => setRightSidebarMounted(false), 300);
+        }
+
+        return () => {
+            if (outerRafId !== undefined) {
+                cancelAnimationFrame(outerRafId);
+            }
+
+            if (innerRafId !== undefined) {
+                cancelAnimationFrame(innerRafId);
+            }
+
+            if (timerId !== undefined) {
+                clearTimeout(timerId);
+            }
+        };
+    }, [rightSidebarOpen]);
+
+    useEffect(() => {
         if (clusterElementsCanvasOpen) {
             setClusterDialogMounted(true);
         } else {
@@ -130,13 +166,14 @@ const WorkflowEditorLayout = ({
                     </Suspense>
                 )}
 
-                {rightSidebarOpen && componentDefinitions && taskDispatcherDefinitions && (
+                {rightSidebarMounted && componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense fallback={<WorkflowNodesSidebarSkeleton />}>
                         <WorkflowNodesSidebar
                             data={{
                                 componentDefinitions,
                                 taskDispatcherDefinitions,
                             }}
+                            visible={rightSidebarVisible}
                         />
                     </Suspense>
                 )}
