@@ -434,31 +434,31 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     private Object doExecuteTool(
-        String componentName, Integer componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        String componentName, Integer componentVersion, String clusterElementName, Map<String, ?> inputParameterMap,
         @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
 
         Object clusterElement = getClusterElement(
             componentName, componentVersion, clusterElementName);
 
-        Parameters inputParams = ParametersFactory.create(inputParameters);
-        Parameters connectionParams = ParametersFactory.create(
+        Parameters inputParameters = ParametersFactory.create(inputParameterMap);
+        Parameters connectionParameters = ParametersFactory.create(
             componentConnection == null ? Map.of() : componentConnection.getParameters());
 
         try {
             if (clusterElement instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
-                return toolCallbackProviderFunction.apply(inputParams, connectionParams, context);
+                return toolCallbackProviderFunction.apply(inputParameters, connectionParameters, context);
             }
 
             ToolFunction toolFunction = (ToolFunction) clusterElement;
 
-            return toolFunction.apply(inputParams, connectionParams, context);
+            return toolFunction.apply(inputParameters, connectionParameters, context);
         } catch (Exception exception) {
             if (exception instanceof ProviderException) {
                 throw (ProviderException) exception;
             }
 
             throw new ExecutionException(
-                exception, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
+                exception, inputParameterMap, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
         }
     }
 
