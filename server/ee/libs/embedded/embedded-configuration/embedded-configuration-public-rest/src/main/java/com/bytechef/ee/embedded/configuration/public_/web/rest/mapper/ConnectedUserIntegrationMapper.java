@@ -52,6 +52,8 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")
         @Mapping(target = "id", source = "integrationInstance.id")
+        @Mapping(target = "mcpTools", ignore = true)
+        @Mapping(target = "mcpWorkflows", ignore = true)
         IntegrationInstanceModel map(ConnectedUserIntegrationInstance integrationInstance);
 
         @Mapping(target = "enabled", source = "integrationInstanceWorkflow.enabled")
@@ -66,13 +68,15 @@ public interface ConnectedUserIntegrationMapper {
         extends Converter<ConnectedUserIntegrationDTO, IntegrationModel> {
 
         @Override
-        @Mapping(
-            target = "multipleInstances", source = "integrationInstanceConfiguration.integration.multipleInstances")
         @Mapping(target = "componentName", source = "integrationInstanceConfiguration.integration.componentName")
         @Mapping(target = "description", source = "integrationInstanceConfiguration.integration.description")
         @Mapping(target = "icon", source = "integrationInstanceConfiguration.integration.icon")
         @Mapping(target = "id", source = "integrationInstanceConfiguration.integrationId")
         @Mapping(target = "integrationVersion", source = "integrationInstanceConfiguration.integrationVersion")
+        @Mapping(target = "mcpTools", ignore = true)
+        @Mapping(target = "mcpWorkflows", ignore = true)
+        @Mapping(
+            target = "multipleInstances", source = "integrationInstanceConfiguration.integration.multipleInstances")
         @Mapping(target = "name", source = "integrationInstanceConfiguration.integration.title")
         @Mapping(
             target = "workflows", source = "integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows")
@@ -93,6 +97,8 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")
         @Mapping(target = "id", source = "integrationInstance.id")
+        @Mapping(target = "mcpTools", ignore = true)
+        @Mapping(target = "mcpWorkflows", ignore = true)
         IntegrationInstanceModel map(ConnectedUserIntegrationInstance integrationInstance);
 
         @Mapping(target = "enabled", source = "integrationInstanceWorkflow.enabled")

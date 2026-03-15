@@ -551,6 +551,7 @@ include("server:ee:libs:embedded:embedded-execution:embedded-execution-public-re
 include("server:ee:libs:embedded:embedded-execution:embedded-execution-service")
 include("server:ee:libs:embedded:embedded-mcp:embedded-mcp-api")
 include("server:ee:libs:embedded:embedded-mcp:embedded-mcp-graphql")
+include("server:ee:libs:embedded:embedded-mcp:embedded-mcp-remote-client")
 include("server:ee:libs:embedded:embedded-mcp:embedded-mcp-service")
 include("server:ee:libs:embedded:embedded-webhook:embedded-webhook-rest")
 include("server:ee:libs:embedded:embedded-security:embedded-security-api")
