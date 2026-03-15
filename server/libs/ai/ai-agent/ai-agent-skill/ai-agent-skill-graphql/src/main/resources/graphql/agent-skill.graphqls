@@ -1,0 +1,23 @@
+extend type Query {
+    agentSkills: [AgentSkill!]!
+    agentSkill(id: ID!): AgentSkill!
+    agentSkillFilePaths(id: ID!): [String!]!
+    agentSkillFileContent(id: ID!, path: String!): String!
+}
+
+extend type Mutation {
+    createAgentSkill(name: String!, description: String, filename: String!, "Base64-encoded bytes of the skill archive" fileBytes: String!): AgentSkill!
+    createAgentSkillFromInstructions(name: String!, description: String, "Markdown instructions for the skill" instructions: String!): AgentSkill!
+    updateAgentSkill(id: ID!, name: String!, description: String): AgentSkill!
+    deleteAgentSkill(id: ID!): Boolean!
+}
+
+type AgentSkill {
+    id: ID!
+    name: String!
+    description: String
+    "Epoch milliseconds (UTC)"
+    createdDate: Long
+    "Epoch milliseconds (UTC)"
+    lastModifiedDate: Long
+}
