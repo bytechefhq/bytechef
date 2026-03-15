@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useFetchInterceptor, {clearRecentToasts} from '../useFetchInterceptor';
+import useFetchInterceptor, {clearActiveToasts} from '../useFetchInterceptor';
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -73,7 +73,7 @@ function createMockResponse(overrides: Record<string, unknown> = {}) {
 describe('useFetchInterceptor', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        clearRecentToasts();
+        clearActiveToasts();
         hoisted.registeredHandlers = null;
         import.meta.env.VITE_API_BASE_PATH = '';
     });
@@ -204,6 +204,8 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something went wrong',
                 id: '/internal/api/test-500',
+                onAutoClose: expect.any(Function),
+                onDismiss: expect.any(Function),
             });
         });
 
@@ -224,7 +226,7 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
-        it('suppresses duplicate error toasts within cooldown period', async () => {
+        it('suppresses duplicate error toasts while toast is active', async () => {
             renderHook(() => useFetchInterceptor());
 
             const createResponse = () =>
@@ -250,6 +252,36 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).toHaveBeenCalledTimes(1);
         });
 
+        it('allows new toast after previous toast is dismissed', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const createResponse = () =>
+                createMockResponse({
+                    jsonData: {detail: 'Something went wrong', title: 'Error'},
+                    status: 500,
+                });
+
+            hoisted.registeredHandlers!.response(createResponse());
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledTimes(1);
+
+            const onDismiss = hoisted.toastError.mock.calls[0][1].onDismiss;
+
+            onDismiss();
+
+            hoisted.registeredHandlers!.response(createResponse());
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledTimes(2);
+        });
+
         it('shows fallback error toast when response body is not JSON', async () => {
             renderHook(() => useFetchInterceptor());
 
@@ -266,6 +298,8 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 502', {
                 id: '/internal/api/test-502',
+                onAutoClose: expect.any(Function),
+                onDismiss: expect.any(Function),
             });
         });
     });
@@ -289,6 +323,8 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Field not found\nPermission denied',
                 id: '/graphql-200',
+                onAutoClose: expect.any(Function),
+                onDismiss: expect.any(Function),
             });
         });
 
@@ -346,6 +382,8 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Unknown error\nValid error',
                 id: '/graphql-200',
+                onAutoClose: expect.any(Function),
+                onDismiss: expect.any(Function),
             });
         });
 
@@ -366,6 +404,8 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 500', {
                 id: '/graphql-500',
+                onAutoClose: expect.any(Function),
+                onDismiss: expect.any(Function),
             });
         });
 
@@ -401,6 +441,8 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something broke',
                 id: '/graphql-200',
+                onAutoClose: expect.any(Function),
+                onDismiss: expect.any(Function),
             });
         });
 
