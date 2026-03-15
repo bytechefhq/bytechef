@@ -232,7 +232,7 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
 
             const getClusterElementDefinitionRequest = {
                 clusterElementName: operationName,
-                clusterElementType: elementType.toUpperCase(),
+                clusterElementType: convertNameToSnakeCase(elementType),
                 componentName,
                 componentVersion: version,
             };
@@ -369,13 +369,13 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
                     queryFn: () =>
                         new ClusterElementDefinitionApi().getComponentClusterElementDefinition({
                             clusterElementName,
-                            clusterElementType: elementType.toUpperCase(),
+                            clusterElementType: convertNameToSnakeCase(elementType),
                             componentName: elementItem.componentName,
                             componentVersion: componentVersion,
                         }),
                     queryKey: ClusterElementDefinitionKeys.clusterElementDefinition({
                         clusterElementName,
-                        clusterElementType: elementType.toUpperCase(),
+                        clusterElementType: convertNameToSnakeCase(elementType),
                         componentName: elementItem.componentName,
                         componentVersion: componentVersion,
                     }),

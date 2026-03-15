@@ -5,7 +5,9 @@ import {
     calculateNodeWidth,
     convertNameToCamelCase,
     convertNameToSnakeCase,
+    getClusterElementsLabel,
     getHandlePosition,
+    isPlainObject,
 } from './clusterElementsUtils';
 
 describe('calculateNodeWidth', () => {
@@ -104,6 +106,15 @@ describe('convertNameToCamelCase', () => {
         expect(convertNameToCamelCase('QUERY_TRANSFORMER')).toBe('queryTransformer');
         expect(convertNameToCamelCase('DOCUMENT_JOINER')).toBe('documentJoiner');
     });
+
+    it('should convert all ClusterElementType keys to their camelCase names', () => {
+        expect(convertNameToCamelCase('CHAT_MEMORY')).toBe('chatMemory');
+        expect(convertNameToCamelCase('DATA_SOURCE')).toBe('dataSource');
+        expect(convertNameToCamelCase('TOOLS')).toBe('tools');
+        expect(convertNameToCamelCase('PROCESSOR')).toBe('processor');
+        expect(convertNameToCamelCase('SOURCE')).toBe('source');
+        expect(convertNameToCamelCase('DESTINATION')).toBe('destination');
+    });
 });
 
 describe('convertNameToSnakeCase', () => {
@@ -114,5 +125,68 @@ describe('convertNameToSnakeCase', () => {
 
     it('should handle single-word lowercase', () => {
         expect(convertNameToSnakeCase('model')).toBe('MODEL');
+    });
+
+    it('should convert all ClusterElementType camelCase names to their SCREAMING_SNAKE_CASE keys', () => {
+        expect(convertNameToSnakeCase('chatMemory')).toBe('CHAT_MEMORY');
+        expect(convertNameToSnakeCase('vectorStore')).toBe('VECTOR_STORE');
+        expect(convertNameToSnakeCase('dataSource')).toBe('DATA_SOURCE');
+        expect(convertNameToSnakeCase('tools')).toBe('TOOLS');
+        expect(convertNameToSnakeCase('model')).toBe('MODEL');
+        expect(convertNameToSnakeCase('processor')).toBe('PROCESSOR');
+        expect(convertNameToSnakeCase('source')).toBe('SOURCE');
+        expect(convertNameToSnakeCase('destination')).toBe('DESTINATION');
+    });
+
+    it('should be the inverse of convertNameToCamelCase for all ClusterElementType values', () => {
+        const clusterElementTypeKeys = [
+            'CHAT_MEMORY',
+            'VECTOR_STORE',
+            'DATA_SOURCE',
+            'TOOLS',
+            'MODEL',
+            'PROCESSOR',
+            'SOURCE',
+            'DESTINATION',
+            'DOCUMENT_RETRIEVER',
+            'QUERY_EXPANDER',
+        ];
+
+        for (const key of clusterElementTypeKeys) {
+            expect(convertNameToSnakeCase(convertNameToCamelCase(key))).toBe(key);
+        }
+    });
+});
+
+describe('getClusterElementsLabel', () => {
+    it('should convert camelCase to a human-readable label', () => {
+        expect(getClusterElementsLabel('chatMemory')).toBe('Chat Memory');
+        expect(getClusterElementsLabel('vectorStore')).toBe('Vector Store');
+        expect(getClusterElementsLabel('dataSource')).toBe('Data Source');
+    });
+
+    it('should capitalize single-word types', () => {
+        expect(getClusterElementsLabel('tools')).toBe('Tools');
+        expect(getClusterElementsLabel('model')).toBe('Model');
+    });
+});
+
+describe('isPlainObject', () => {
+    it('should return true for plain objects', () => {
+        expect(isPlainObject({})).toBe(true);
+        expect(isPlainObject({name: 'test'})).toBe(true);
+    });
+
+    it('should return false for arrays', () => {
+        expect(isPlainObject([])).toBe(false);
+        expect(isPlainObject([1, 2])).toBe(false);
+    });
+
+    it('should return false for null and primitives', () => {
+        expect(isPlainObject(null)).toBe(false);
+        expect(isPlainObject(undefined)).toBe(false);
+        expect(isPlainObject('string')).toBe(false);
+        expect(isPlainObject(42)).toBe(false);
+        expect(isPlainObject(true)).toBe(false);
     });
 });

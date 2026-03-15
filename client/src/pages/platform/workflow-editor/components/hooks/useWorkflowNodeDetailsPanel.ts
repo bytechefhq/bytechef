@@ -185,7 +185,9 @@ export default function useWorkflowNodeDetailsPanel({
     const {data: currentClusterElementDefinition} = useGetClusterElementDefinitionQuery(
         {
             clusterElementName: currentNode?.clusterElementName as string,
-            clusterElementType: currentNode?.clusterElementType?.toUpperCase(),
+            clusterElementType: currentNode?.clusterElementType
+                ? convertNameToSnakeCase(currentNode.clusterElementType)
+                : undefined,
             componentName: currentNode?.componentName as string,
             componentVersion: currentNode?.version as number,
         },
@@ -233,7 +235,9 @@ export default function useWorkflowNodeDetailsPanel({
         async (operationName?: string) => {
             const clusterElementDefinitionRequest: GetComponentClusterElementDefinitionRequest = {
                 clusterElementName: operationName ?? currentOperationName ?? currentNode?.operationName,
-                clusterElementType: currentNode?.clusterElementType?.toUpperCase(),
+                clusterElementType: currentNode?.clusterElementType
+                    ? convertNameToSnakeCase(currentNode.clusterElementType)
+                    : undefined,
                 componentName: currentComponentDefinition?.name as string,
                 componentVersion: currentComponentDefinition?.version as number,
             };
