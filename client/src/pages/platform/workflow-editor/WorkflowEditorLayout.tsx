@@ -10,6 +10,7 @@ import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkf
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -49,6 +50,8 @@ const WorkflowEditorLayout = ({
     showWorkflowInputs,
 }: WorkflowEditorLayoutProps) => {
     const [clusterDialogMounted, setClusterDialogMounted] = useState(false);
+
+    const copilotLayoutShifted = useCopilotLayoutShifted();
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -114,7 +117,7 @@ const WorkflowEditorLayout = ({
                 className={twMerge(
                     'relative mx-3 mb-3 flex w-full',
                     leftSidebarOpen && 'ml-0',
-                    copilotPanelOpen && 'mr-0'
+                    copilotLayoutShifted && 'mr-0'
                 )}
             >
                 {componentDefinitions && taskDispatcherDefinitions && (

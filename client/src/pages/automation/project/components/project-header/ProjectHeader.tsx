@@ -11,7 +11,7 @@ import {useProjectHeader} from '@/pages/automation/project/components/project-he
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {RefObject} from 'react';
@@ -36,7 +36,7 @@ const ProjectHeader = ({
     runDisabled,
     updateWorkflowMutation,
 }: ProjectHeaderProps) => {
-    const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
+    const copilotLayoutShifted = useCopilotLayoutShifted();
     const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore(
         useShallow((state) => ({
             projectLeftSidebarOpen: state.projectLeftSidebarOpen,
@@ -81,7 +81,7 @@ const ProjectHeader = ({
             className={twMerge(
                 'flex items-center justify-between bg-surface-main px-3 py-2.5',
                 projectLeftSidebarOpen && 'pl-0 pr-3',
-                copilotPanelOpen && 'pr-0'
+                copilotLayoutShifted && 'pr-0'
             )}
         >
             <div className="flex items-center">
