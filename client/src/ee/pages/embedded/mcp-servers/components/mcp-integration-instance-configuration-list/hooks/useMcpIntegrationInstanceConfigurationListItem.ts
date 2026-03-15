@@ -1,14 +1,16 @@
 import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
-import {McpIntegration} from '@/shared/middleware/graphql';
+import {McpIntegrationInstanceConfiguration} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
 
-const useMcpIntegrationListItem = (mcpIntegration: McpIntegration) => {
+const useMcpIntegrationInstanceConfigurationListItem = (
+    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfiguration
+) => {
     const [showEditWorkflowsDialog, setShowEditWorkflowsDialog] = useState(false);
     const [showUpdateIntegrationVersionDialog, setShowUpdateIntegrationVersionDialog] = useState(false);
 
     const {data: integrationInstanceConfiguration} = useGetIntegrationInstanceConfigurationQuery(
-        +mcpIntegration.integrationInstanceConfigurationId!
+        +mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationId!
     );
 
     const queryClient = useQueryClient();
@@ -16,11 +18,11 @@ const useMcpIntegrationListItem = (mcpIntegration: McpIntegration) => {
     const mcpConfigurationWorkflowIds = useMemo(
         () =>
             new Set(
-                mcpIntegration.mcpIntegrationWorkflows
+                mcpIntegrationInstanceConfiguration.mcpIntegrationInstanceConfigurationWorkflows
                     ?.filter((workflow) => workflow != null)
                     .map((workflow) => String(workflow.integrationInstanceConfigurationWorkflowId)) || []
             ),
-        [mcpIntegration.mcpIntegrationWorkflows]
+        [mcpIntegrationInstanceConfiguration.mcpIntegrationInstanceConfigurationWorkflows]
     );
 
     const mcpWorkflowUuids = useMemo(
@@ -38,7 +40,7 @@ const useMcpIntegrationListItem = (mcpIntegration: McpIntegration) => {
     const handleOnIntegrationInstanceConfigurationDialogClose = () => {
         queryClient
             .invalidateQueries({
-                queryKey: ['mcpIntegrationsByServerId'],
+                queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
             })
             .then(() => setShowUpdateIntegrationVersionDialog(false));
     };
@@ -54,4 +56,4 @@ const useMcpIntegrationListItem = (mcpIntegration: McpIntegration) => {
     };
 };
 
-export default useMcpIntegrationListItem;
+export default useMcpIntegrationInstanceConfigurationListItem;

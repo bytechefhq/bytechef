@@ -1,0 +1,7 @@
+mutation updateMcpIntegrationInstanceConfiguration($id: ID!, $input: UpdateMcpIntegrationInstanceConfigurationInput!) {
+    updateMcpIntegrationInstanceConfiguration(id: $id, input: $input) {
+        id
+        integrationInstanceConfigurationId
+        mcpServerId
+    }
+}

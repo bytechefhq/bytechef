@@ -1,16 +1,22 @@
 import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
-import {McpIntegrationWorkflow, useDeleteMcpIntegrationWorkflowMutation} from '@/shared/middleware/graphql';
+import {
+    McpIntegrationInstanceConfigurationWorkflow,
+    useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation,
+} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
 
-export default function useMcpIntegrationWorkflowListItem(mcpIntegrationWorkflow: McpIntegrationWorkflow) {
+export default function useMcpIntegrationInstanceConfigurationWorkflowListItem(
+    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflow
+) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
     const queryClient = useQueryClient();
 
     const integrationInstanceConfigurationId =
-        mcpIntegrationWorkflow.integrationInstanceConfigurationWorkflow?.integrationInstanceConfigurationId;
+        mcpIntegrationInstanceConfigurationWorkflow.integrationInstanceConfigurationWorkflow
+            ?.integrationInstanceConfigurationId;
 
     const {data: integrationInstanceConfiguration} = useGetIntegrationInstanceConfigurationQuery(
         integrationInstanceConfigurationId ? +integrationInstanceConfigurationId : 0,
@@ -21,11 +27,12 @@ export default function useMcpIntegrationWorkflowListItem(mcpIntegrationWorkflow
         () =>
             integrationInstanceConfiguration?.integrationInstanceConfigurationWorkflows?.find(
                 (configurationWorkflow) =>
-                    configurationWorkflow.id === +mcpIntegrationWorkflow.integrationInstanceConfigurationWorkflowId
+                    configurationWorkflow.id ===
+                    +mcpIntegrationInstanceConfigurationWorkflow.integrationInstanceConfigurationWorkflowId
             ),
         [
             integrationInstanceConfiguration?.integrationInstanceConfigurationWorkflows,
-            mcpIntegrationWorkflow.integrationInstanceConfigurationWorkflowId,
+            mcpIntegrationInstanceConfigurationWorkflow.integrationInstanceConfigurationWorkflowId,
         ]
     );
 
@@ -34,27 +41,28 @@ export default function useMcpIntegrationWorkflowListItem(mcpIntegrationWorkflow
         !!integrationInstanceConfigurationWorkflow?.workflowId
     );
 
-    const deleteMcpIntegrationWorkflowMutation = useDeleteMcpIntegrationWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['mcpIntegrationsByServerId'],
-            });
+    const deleteMcpIntegrationInstanceConfigurationWorkflowMutation =
+        useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
+                });
 
-            setShowDeleteDialog(false);
-        },
-    });
+                setShowDeleteDialog(false);
+            },
+        });
 
     const handleCloseEditDialog = () => {
         setShowEditWorkflowDialog(false);
 
         queryClient.invalidateQueries({
-            queryKey: ['mcpIntegrationsByServerId'],
+            queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
         });
     };
 
     const handleConfirmDelete = () => {
-        deleteMcpIntegrationWorkflowMutation.mutate({
-            id: mcpIntegrationWorkflow.id,
+        deleteMcpIntegrationInstanceConfigurationWorkflowMutation.mutate({
+            id: mcpIntegrationInstanceConfigurationWorkflow.id,
         });
     };
 

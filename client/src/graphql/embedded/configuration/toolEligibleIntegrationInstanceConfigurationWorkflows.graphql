@@ -1,0 +1,9 @@
+query toolEligibleIntegrationInstanceConfigurationWorkflows($integrationInstanceConfigurationId: ID!) {
+    toolEligibleIntegrationInstanceConfigurationWorkflows(
+        integrationInstanceConfigurationId: $integrationInstanceConfigurationId
+    ) {
+        id
+        integrationWorkflowId
+        label
+    }
+}

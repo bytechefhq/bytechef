@@ -4,21 +4,21 @@ import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import {useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {McpIntegrationWorkflow} from '@/shared/middleware/graphql';
+import {McpIntegrationInstanceConfigurationWorkflow} from '@/shared/middleware/graphql';
 import {BoltIcon, PencilIcon, XIcon} from 'lucide-react';
 
-import McpIntegrationWorkflowPropertiesPopover from './McpIntegrationWorkflowPropertiesPopover';
-import useMcpIntegrationWorkflowListItem from './hooks/useMcpIntegrationWorkflowListItem';
+import McpIntegrationInstanceConfigurationWorkflowPropertiesPopover from './McpIntegrationInstanceConfigurationWorkflowPropertiesPopover';
+import useMcpIntegrationInstanceConfigurationWorkflowListItem from './hooks/useMcpIntegrationInstanceConfigurationWorkflowListItem';
 
-interface McpIntegrationWorkflowListItemProps {
+interface McpIntegrationInstanceConfigurationWorkflowListItemProps {
     componentName: string;
-    mcpIntegrationWorkflow: McpIntegrationWorkflow;
+    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflow;
 }
 
-const McpIntegrationWorkflowListItem = ({
+const McpIntegrationInstanceConfigurationWorkflowListItem = ({
     componentName,
-    mcpIntegrationWorkflow,
-}: McpIntegrationWorkflowListItemProps) => {
+    mcpIntegrationInstanceConfigurationWorkflow,
+}: McpIntegrationInstanceConfigurationWorkflowListItemProps) => {
     const {
         handleCloseEditDialog,
         handleConfirmDelete,
@@ -28,13 +28,13 @@ const McpIntegrationWorkflowListItem = ({
         showDeleteDialog,
         showEditWorkflowDialog,
         workflow,
-    } = useMcpIntegrationWorkflowListItem(mcpIntegrationWorkflow);
+    } = useMcpIntegrationInstanceConfigurationWorkflowListItem(mcpIntegrationInstanceConfigurationWorkflow);
 
     const {activePopoverId, closePopover, openPopover} = useMcpActivePopover();
 
-    const popoverId = `integration-workflow-${mcpIntegrationWorkflow.id}`;
+    const popoverId = `integration-workflow-${mcpIntegrationInstanceConfigurationWorkflow.id}`;
     const isPopoverOpen = activePopoverId === popoverId;
-    const workflowLabel = mcpIntegrationWorkflow.workflow?.label || 'Unnamed Workflow';
+    const workflowLabel = mcpIntegrationInstanceConfigurationWorkflow.workflow?.label || 'Unnamed Workflow';
 
     return (
         <>
@@ -78,8 +78,8 @@ const McpIntegrationWorkflowListItem = ({
                 </PopoverAnchor>
 
                 {isPopoverOpen && (
-                    <McpIntegrationWorkflowPropertiesPopover
-                        mcpIntegrationWorkflow={mcpIntegrationWorkflow}
+                    <McpIntegrationInstanceConfigurationWorkflowPropertiesPopover
+                        mcpIntegrationInstanceConfigurationWorkflow={mcpIntegrationInstanceConfigurationWorkflow}
                         onClose={closePopover}
                     />
                 )}
@@ -103,4 +103,4 @@ const McpIntegrationWorkflowListItem = ({
     );
 };
 
-export default McpIntegrationWorkflowListItem;
+export default McpIntegrationInstanceConfigurationWorkflowListItem;
