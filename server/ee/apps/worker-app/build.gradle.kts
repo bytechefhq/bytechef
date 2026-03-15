@@ -59,6 +59,7 @@ dependencies {
             .forEach { implementation(project(it.path)) }
     }
 
+    implementation(project(":server:ee:libs:ai:ai-agent:ai-agent-skill:ai-agent-skill-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))

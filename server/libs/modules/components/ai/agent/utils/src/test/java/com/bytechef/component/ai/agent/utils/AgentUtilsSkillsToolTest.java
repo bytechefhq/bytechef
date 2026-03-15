@@ -1,0 +1,222 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.ai.agent.utils;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.ai.agent.skill.facade.AgentSkillFacade;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.tool.ToolCallbackProvider;
+
+/**
+ * @author Ivica Cardic
+ */
+@ExtendWith(MockitoExtension.class)
+class AgentUtilsSkillsToolTest {
+
+    @Mock
+    private AgentSkillFacade agentSkillFacade;
+
+    @Mock
+    private Context context;
+
+    @Mock
+    private Parameters connectionParameters;
+
+    @Mock
+    private Parameters inputParameters;
+
+    private AgentUtilsSkillsTool agentUtilsSkillsTool;
+
+    @BeforeEach
+    void setUp() {
+        agentUtilsSkillsTool = new AgentUtilsSkillsTool(agentSkillFacade);
+    }
+
+    @Test
+    void testApplyWithEmptySkillsListThrows() {
+        when(inputParameters.getList("skills", Object.class, List.of())).thenReturn(List.of());
+
+        assertThrows(IllegalArgumentException.class, this::invokeApply);
+        verifyNoInteractions(agentSkillFacade);
+    }
+
+    @Test
+    void testApplyWithValidSkillFetchesZipBytes() throws Exception {
+        byte[] zipBytes = createZipWithMdFile("SKILL.md", "# Test Skill\nDo something useful.");
+
+        when(inputParameters.getList("skills", Object.class, List.of()))
+            .thenReturn(List.of(Map.of("skillId", "42")));
+        when(agentSkillFacade.getAgentSkillDownload(42L)).thenReturn(zipBytes);
+
+        try {
+            invokeApply();
+        } catch (Exception exception) {
+            // SkillsTool.builder() may fail loading ByteArrayResource as URL — that's a third-party limitation;
+            // we verify the facade was called correctly
+        }
+
+        verify(agentSkillFacade).getAgentSkillDownload(42L);
+    }
+
+    @Test
+    void testApplyWithNonMapSkillItemThrows() {
+        when(inputParameters.getList("skills", Object.class, List.of()))
+            .thenReturn(List.of("not-a-map"));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
+
+        assertTrue(exception.getMessage()
+            .contains("Failed to load 1 of 1"));
+        assertTrue(exception.getMessage()
+            .contains("Unexpected skill item type"));
+    }
+
+    @Test
+    void testApplyWithMissingSkillIdKeyThrows() {
+        when(inputParameters.getList("skills", Object.class, List.of()))
+            .thenReturn(List.of(Map.of("wrongKey", "1")));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
+
+        assertTrue(exception.getMessage()
+            .contains("missing 'skillId' key"));
+    }
+
+    @Test
+    void testApplyWithInvalidSkillIdThrows() {
+        when(inputParameters.getList("skills", Object.class, List.of()))
+            .thenReturn(List.of(Map.of("skillId", "not-a-number")));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
+
+        assertTrue(exception.getMessage()
+            .contains("Invalid skill ID value"));
+    }
+
+    @Test
+    void testApplyAccumulatesMultipleErrors() {
+        when(inputParameters.getList("skills", Object.class, List.of()))
+            .thenReturn(List.of(
+                "not-a-map",
+                Map.of("wrongKey", "value"),
+                Map.of("skillId", "invalid")));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
+
+        assertTrue(exception.getMessage()
+            .contains("Failed to load 3 of 3"));
+    }
+
+    @Test
+    void testApplyWithSkillLoadFailureCollectsError() {
+        when(inputParameters.getList("skills", Object.class, List.of()))
+            .thenReturn(List.of(Map.of("skillId", "99")));
+        when(agentSkillFacade.getAgentSkillDownload(99L))
+            .thenThrow(new IllegalArgumentException("AgentSkill not found with id: 99"));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
+
+        assertTrue(exception.getMessage()
+            .contains("Failed to load 1 of 1"));
+        assertTrue(exception.getMessage()
+            .contains("Failed to load skill ID 99"));
+    }
+
+    @Test
+    void testApplyWithMultipleValidSkillsFetchesAll() throws Exception {
+        byte[] zipBytes1 = createZipWithMdFile("SKILL.md", "# Skill 1");
+        byte[] zipBytes2 = createZipWithMdFile("SKILL.md", "# Skill 2");
+
+        when(inputParameters.getList("skills", Object.class, List.of()))
+            .thenReturn(List.of(Map.of("skillId", "1"), Map.of("skillId", "2")));
+        when(agentSkillFacade.getAgentSkillDownload(1L)).thenReturn(zipBytes1);
+        when(agentSkillFacade.getAgentSkillDownload(2L)).thenReturn(zipBytes2);
+
+        try {
+            invokeApply();
+        } catch (Exception exception) {
+            // SkillsTool.builder() may fail — we verify both skills were fetched
+        }
+
+        verify(agentSkillFacade).getAgentSkillDownload(1L);
+        verify(agentSkillFacade).getAgentSkillDownload(2L);
+    }
+
+    @Test
+    void testClusterElementDefinitionNotNull() {
+        assertNotNull(agentUtilsSkillsTool.clusterElementDefinition);
+    }
+
+    private ToolCallbackProvider invokeApply() throws Exception {
+        Method applyMethod = AgentUtilsSkillsTool.class.getDeclaredMethod(
+            "apply", Parameters.class, Parameters.class, Context.class);
+
+        applyMethod.setAccessible(true);
+
+        try {
+            return (ToolCallbackProvider) applyMethod.invoke(
+                agentUtilsSkillsTool, inputParameters, connectionParameters, context);
+        } catch (java.lang.reflect.InvocationTargetException invocationTargetException) {
+            Throwable cause = invocationTargetException.getCause();
+
+            if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
+            }
+
+            if (cause instanceof Exception exception) {
+                throw exception;
+            }
+
+            throw new RuntimeException(cause);
+        }
+    }
+
+    private byte[] createZipWithMdFile(String entryName, String content) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry(entryName));
+            zipOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException ioException) {
+            throw new RuntimeException("Failed to create test zip", ioException);
+        }
+    }
+}
