@@ -11,7 +11,7 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {Suspense, lazy, useEffect} from 'react';
+import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
@@ -48,6 +48,7 @@ const WorkflowEditorLayout = ({
     showCopilot = true,
     showWorkflowInputs,
 }: WorkflowEditorLayoutProps) => {
+    const [clusterDialogMounted, setClusterDialogMounted] = useState(false);
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -90,6 +91,16 @@ const WorkflowEditorLayout = ({
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
+
+    useEffect(() => {
+        if (clusterElementsCanvasOpen) {
+            setClusterDialogMounted(true);
+        } else {
+            const timerId = setTimeout(() => setClusterDialogMounted(false), 300);
+
+            return () => clearTimeout(timerId);
+        }
+    }, [clusterElementsCanvasOpen]);
 
     useEffect(() => {
         return () => {
@@ -156,7 +167,7 @@ const WorkflowEditorLayout = ({
                 />
             )}
 
-            {clusterElementsCanvasOpen && (
+            {clusterDialogMounted && (
                 <ClusterElementsCanvasDialog
                     onOpenChange={handleClusterElementsCanvasOpenChange}
                     open={clusterElementsCanvasOpen}
