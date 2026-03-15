@@ -254,8 +254,22 @@ public final class ComponentDsl {
                 .title(title.orElse(null))
                 .description(description.orElse(null))
                 .type(TOOLS)
-                .properties(properties.orElse(List.of()))
-                .output(outputDefinition.orElse(null));
+                .properties(properties.orElse(List.of()));
+
+        outputDefinition.ifPresent(definition -> {
+            Optional<? extends BaseOutputFunction> outputFunction = definition.getOutput();
+
+            if (outputFunction.isPresent() &&
+                outputFunction.get() instanceof ActionDefinition.OutputFunction actionOutputFunction) {
+
+                clusterElementDefinition.output(
+                    (ClusterElementDefinition.OutputFunction) (
+                        inputParameters, connectionParameters, context) -> actionOutputFunction.apply(
+                            inputParameters, connectionParameters, new ActionContextAdapater(context)));
+            } else {
+                clusterElementDefinition.output(definition);
+            }
+        });
 
         actionDefinition.getPerform()
             .ifPresent(basePerformFunction -> {
