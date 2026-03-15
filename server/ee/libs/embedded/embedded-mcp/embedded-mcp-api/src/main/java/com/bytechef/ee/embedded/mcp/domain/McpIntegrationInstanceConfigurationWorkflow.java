@@ -8,15 +8,18 @@
 package com.bytechef.ee.embedded.mcp.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -26,17 +29,17 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  * @version ee
  */
-@Table("mcp_integration_workflow")
-public final class McpIntegrationWorkflow {
+@Table("mcp_integration_instance_configuration_workflow")
+public final class McpIntegrationInstanceConfigurationWorkflow {
 
     @Id
     private Long id;
 
-    @Column("mcp_integration_id")
-    private Long mcpIntegrationId;
+    @Column("mcp_integration_instance_configuration_id")
+    private AggregateReference<McpIntegrationInstanceConfiguration, Long> mcpIntegrationInstanceConfigurationId;
 
     @Column("integration_instance_configuration_workflow_id")
-    private Long integrationInstanceConfigurationWorkflowId;
+    private AggregateReference<IntegrationInstanceConfigurationWorkflow, Long> integrationInstanceConfigurationWorkflowId;
 
     @Column
     private MapWrapper parameters = new MapWrapper();
@@ -60,12 +63,14 @@ public final class McpIntegrationWorkflow {
     @Version
     private int version;
 
-    public McpIntegrationWorkflow() {
+    public McpIntegrationInstanceConfigurationWorkflow() {
     }
 
-    public McpIntegrationWorkflow(long mcpIntegrationId, long integrationInstanceConfigurationWorkflowId) {
-        this.mcpIntegrationId = mcpIntegrationId;
-        this.integrationInstanceConfigurationWorkflowId = integrationInstanceConfigurationWorkflowId;
+    public McpIntegrationInstanceConfigurationWorkflow(long mcpIntegrationInstanceConfigurationId,
+        long integrationInstanceConfigurationWorkflowId) {
+        this.mcpIntegrationInstanceConfigurationId = AggregateReference.to(mcpIntegrationInstanceConfigurationId);
+        this.integrationInstanceConfigurationWorkflowId = AggregateReference.to(
+            integrationInstanceConfigurationWorkflowId);
     }
 
     public Long getId() {
@@ -76,20 +81,24 @@ public final class McpIntegrationWorkflow {
         this.id = id;
     }
 
-    public Long getMcpIntegrationId() {
-        return mcpIntegrationId;
+    public Long getMcpIntegrationInstanceConfigurationId() {
+        return Validate.notNull(mcpIntegrationInstanceConfigurationId, "mcpIntegrationInstanceConfigurationId")
+            .getId();
     }
 
-    public void setMcpIntegrationId(Long mcpIntegrationId) {
-        this.mcpIntegrationId = mcpIntegrationId;
+    public void setMcpIntegrationInstanceConfigurationId(long mcpIntegrationInstanceConfigurationId) {
+        this.mcpIntegrationInstanceConfigurationId = AggregateReference.to(mcpIntegrationInstanceConfigurationId);
     }
 
     public Long getIntegrationInstanceConfigurationWorkflowId() {
-        return integrationInstanceConfigurationWorkflowId;
+        return Validate.notNull(
+            integrationInstanceConfigurationWorkflowId, "integrationInstanceConfigurationWorkflowId")
+            .getId();
     }
 
-    public void setIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId) {
-        this.integrationInstanceConfigurationWorkflowId = integrationInstanceConfigurationWorkflowId;
+    public void setIntegrationInstanceConfigurationWorkflowId(long integrationInstanceConfigurationWorkflowId) {
+        this.integrationInstanceConfigurationWorkflowId = AggregateReference.to(
+            integrationInstanceConfigurationWorkflowId);
     }
 
     public Map<String, ?> getParameters() {
@@ -104,32 +113,16 @@ public final class McpIntegrationWorkflow {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
     public Instant getCreatedDate() {
         return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
     }
 
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
     public Instant getLastModifiedDate() {
         return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public int getVersion() {
@@ -146,11 +139,11 @@ public final class McpIntegrationWorkflow {
             return true;
         }
 
-        if (!(object instanceof McpIntegrationWorkflow mcpIntegrationWorkflow)) {
+        if (!(object instanceof McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow)) {
             return false;
         }
 
-        return Objects.equals(id, mcpIntegrationWorkflow.id);
+        return Objects.equals(id, mcpIntegrationInstanceConfigurationWorkflow.id);
     }
 
     @Override
@@ -160,9 +153,9 @@ public final class McpIntegrationWorkflow {
 
     @Override
     public String toString() {
-        return "McpIntegrationWorkflow{" +
+        return "McpIntegrationInstanceConfigurationWorkflow{" +
             "id=" + id +
-            ", mcpIntegrationId=" + mcpIntegrationId +
+            ", mcpIntegrationInstanceConfigurationId=" + mcpIntegrationInstanceConfigurationId +
             ", integrationInstanceConfigurationWorkflowId=" + integrationInstanceConfigurationWorkflowId +
             ", parameters=" + parameters +
             ", createdBy='" + createdBy + '\'' +
