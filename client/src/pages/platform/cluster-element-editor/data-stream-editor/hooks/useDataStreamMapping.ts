@@ -1,9 +1,17 @@
-import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
+import {
+    getClusterElementByName,
+    initializeClusterElementsObject,
+} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormattedName';
+import getParametersWithDefaultValues from '@/pages/platform/workflow-editor/utils/getParametersWithDefaultValues';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
+import handleComponentAddedSuccess from '@/pages/platform/workflow-editor/utils/handleComponentAddedSuccess';
+import processClusterElementsHierarchy from '@/pages/platform/workflow-editor/utils/processClusterElementsHierarchy';
+import saveWorkflowDefinition from '@/pages/platform/workflow-editor/utils/saveWorkflowDefinition';
 import {
     ClusterElementDefinitionApi,
     WorkflowNodeOptionApi,
@@ -14,7 +22,8 @@ import {useGetClusterElementParameterDisplayConditionsQuery} from '@/shared/quer
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {toast} from 'sonner';
 import {useShallow} from 'zustand/shallow';
 
 interface ProcessorItemI {
@@ -30,21 +39,31 @@ export default function useDataStreamMapping() {
     const [processorProperties, setProcessorProperties] = useState<PropertyAllType[]>([]);
     const [propertiesKey, setPropertiesKey] = useState(0);
 
+    const processorCreationInProgressRef = useRef(false);
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
+    const {mainClusterRootComponentDefinition, rootClusterElementNodeData, setRootClusterElementNodeData} =
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
+                rootClusterElementNodeData: state.rootClusterElementNodeData,
+                setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+            }))
+        );
 
     const componentDefinitions = useWorkflowDataStore((state) => state.componentDefinitions);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+    const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
+            currentNode: state.currentNode,
             setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
         }))
     );
 
-    const {invalidateWorkflowQueries} = useWorkflowEditor();
+    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
     const queryClient = useQueryClient();
 
@@ -69,11 +88,12 @@ export default function useDataStreamMapping() {
 
         const componentName = processorElement.componentName || typeSegments[0] || '';
         const operationName = processorElement.operationName || typeSegments[2] || '';
+        const workflowNodeName = processorElement.workflowNodeName || processorElement.name || '';
 
         return {
             componentName,
-            label: processorElement.label || processorElement.workflowNodeName || '',
-            name: processorElement.workflowNodeName || '',
+            label: processorElement.label || workflowNodeName,
+            name: workflowNodeName,
             operationName,
             type: processorElement.type || '',
         };
@@ -149,7 +169,7 @@ export default function useDataStreamMapping() {
             id: workflow.id!,
             workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
         },
-        !!processor && !!workflow.id && !!rootClusterElementNodeData?.workflowNodeName
+        !!processor?.name && !!workflow.id && !!rootClusterElementNodeData?.workflowNodeName
     );
 
     const setupNodeDetailsPanelForProcessor = useCallback(
@@ -257,6 +277,8 @@ export default function useDataStreamMapping() {
                 }));
 
             if (matchedMappings.length === 0) {
+                toast.info('No matching fields found between source and destination');
+
                 return;
             }
 
@@ -284,8 +306,8 @@ export default function useDataStreamMapping() {
             setPropertiesKey((previousKey) => previousKey + 1);
 
             invalidateWorkflowQueries();
-        } catch (error) {
-            console.warn('Auto-map failed:', error);
+        } catch {
+            toast.error('Auto-map failed');
         } finally {
             setAutoMapping(false);
         }
@@ -296,6 +318,139 @@ export default function useDataStreamMapping() {
         rootClusterElementNodeData?.workflowNodeName,
         setCurrentComponent,
         workflow.id,
+    ]);
+
+    useEffect(() => {
+        if (processor || !hasSourceAndDestination || processorCreationInProgressRef.current) {
+            return;
+        }
+
+        if (
+            !workflow.definition ||
+            !mainClusterRootComponentDefinition ||
+            !rootClusterElementNodeData?.workflowNodeName ||
+            !rootClusterElementNodeData?.componentName ||
+            !updateWorkflowMutation
+        ) {
+            return;
+        }
+
+        processorCreationInProgressRef.current = true;
+
+        const createDefaultProcessor = async () => {
+            try {
+                const componentName = 'dataStreamProcessor';
+                const operationName = 'fieldMapper';
+                const componentVersion = 1;
+
+                const clusterElementDefinition = await queryClient.fetchQuery({
+                    queryFn: () =>
+                        new ClusterElementDefinitionApi().getComponentClusterElementDefinition({
+                            clusterElementName: operationName,
+                            clusterElementType: 'PROCESSOR',
+                            componentName,
+                            componentVersion,
+                        }),
+                    queryKey: ClusterElementDefinitionKeys.clusterElementDefinition({
+                        clusterElementName: operationName,
+                        clusterElementType: 'PROCESSOR',
+                        componentName,
+                        componentVersion,
+                    }),
+                });
+
+                const clusterElementData = {
+                    label: 'Processor',
+                    metadata: {},
+                    name: getFormattedName(componentName),
+                    parameters:
+                        getParametersWithDefaultValues({
+                            properties: (clusterElementDefinition?.properties as PropertyAllType[]) || [],
+                        }) || {},
+                    type: `${componentName}/v${componentVersion}/${operationName}`,
+                };
+
+                const workflowDefinitionTasks = JSON.parse(workflow.definition!).tasks;
+
+                const mainClusterRootTask = getTask({
+                    tasks: workflowDefinitionTasks,
+                    workflowNodeName: rootClusterElementNodeData.workflowNodeName!,
+                });
+
+                if (!mainClusterRootTask) {
+                    return;
+                }
+
+                const clusterElements = initializeClusterElementsObject({
+                    clusterElementsData: mainClusterRootTask.clusterElements || {},
+                    mainClusterRootComponentDefinition,
+                    mainClusterRootTask,
+                });
+
+                const updatedClusterElements = processClusterElementsHierarchy({
+                    clusterElementData,
+                    clusterElements,
+                    elementType: 'processor',
+                    isMultipleElements: false,
+                    mainRootId: rootClusterElementNodeData.workflowNodeName!,
+                    sourceNodeId: rootClusterElementNodeData.workflowNodeName!,
+                });
+
+                const updatedNodeData = {
+                    ...mainClusterRootTask,
+                    clusterElements: updatedClusterElements.nestedClusterElements,
+                };
+
+                saveWorkflowDefinition({
+                    nodeData: {
+                        ...updatedNodeData,
+                        componentName: rootClusterElementNodeData.componentName!,
+                        workflowNodeName: rootClusterElementNodeData.workflowNodeName!,
+                    },
+                    onSuccess: () => {
+                        setRootClusterElementNodeData({
+                            ...rootClusterElementNodeData,
+                            clusterElements: updatedClusterElements.nestedClusterElements,
+                        } as typeof rootClusterElementNodeData);
+
+                        if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
+                            setCurrentNode({
+                                ...currentNode,
+                                clusterElements: updatedClusterElements.nestedClusterElements,
+                            });
+                        }
+
+                        handleComponentAddedSuccess({
+                            nodeData: {
+                                ...updatedNodeData,
+                                componentName: rootClusterElementNodeData.componentName!,
+                                workflowNodeName: rootClusterElementNodeData.workflowNodeName!,
+                            },
+                            queryClient,
+                            workflow,
+                        });
+                    },
+                    updateWorkflowMutation,
+                });
+            } catch {
+                toast.error('Failed to create default processor');
+            } finally {
+                processorCreationInProgressRef.current = false;
+            }
+        };
+
+        createDefaultProcessor();
+    }, [
+        currentNode,
+        hasSourceAndDestination,
+        mainClusterRootComponentDefinition,
+        processor,
+        queryClient,
+        rootClusterElementNodeData,
+        setCurrentNode,
+        setRootClusterElementNodeData,
+        updateWorkflowMutation,
+        workflow,
     ]);
 
     useEffect(() => {
@@ -328,8 +483,8 @@ export default function useDataStreamMapping() {
                 });
 
                 setProcessorProperties((definition.properties as PropertyAllType[]) || []);
-            } catch (error) {
-                console.warn('Failed to fetch processor cluster element definition:', error);
+            } catch {
+                toast.error('Failed to load processor properties');
 
                 setProcessorProperties([]);
             }
@@ -339,14 +494,16 @@ export default function useDataStreamMapping() {
         setupNodeDetailsPanelForProcessor(processor);
     }, [processor, queryClient, setupNodeDetailsPanelForProcessor]);
 
+    const isProcessorReady = !!processor?.name && currentNode?.workflowNodeName === processor.name;
+
     return {
         autoMapping,
         destinationLabel,
         displayConditionsQuery,
         handleAutoMap,
         hasSourceAndDestination,
-        processor,
-        processorProperties,
+        processor: isProcessorReady ? processor : null,
+        processorProperties: isProcessorReady ? processorProperties : [],
         propertiesKey,
         sourceLabel,
     };

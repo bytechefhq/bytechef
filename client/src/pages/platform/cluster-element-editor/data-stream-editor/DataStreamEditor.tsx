@@ -5,11 +5,12 @@ import DataStreamHeader from './components/DataStreamHeader';
 import DataStreamMappingStep from './components/DataStreamMappingStep';
 import DataStreamSourceStep from './components/DataStreamSourceStep';
 import DataStreamStepNav from './components/DataStreamStepNav';
+import DataStreamTestStep from './components/DataStreamTestStep';
 import DataStreamWizardFooter from './components/DataStreamWizardFooter';
 import useDataStreamDataPills from './hooks/useDataStreamDataPills';
 import useDataStreamEditor from './hooks/useDataStreamEditor';
 
-const STEP_LABELS = ['Source', 'Destination', 'Mapping'];
+const STEP_LABELS = ['Source', 'Destination', 'Mapping', 'Test'];
 
 interface DataStreamEditorProps {
     className?: string;
@@ -30,6 +31,8 @@ export default function DataStreamEditor({className, onClose, onToggleEditor}: D
                 return <DataStreamDestinationStep />;
             case 2:
                 return <DataStreamMappingStep />;
+            case 3:
+                return <DataStreamTestStep />;
             default:
                 return null;
         }
@@ -50,7 +53,12 @@ export default function DataStreamEditor({className, onClose, onToggleEditor}: D
                 <div className="mx-auto w-full max-w-2xl px-4">{renderCurrentStep()}</div>
             </div>
 
-            <DataStreamWizardFooter currentStep={currentStep} onNext={handleNext} onPrevious={handlePrevious} />
+            <DataStreamWizardFooter
+                currentStep={currentStep}
+                onFinish={onClose}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+            />
         </div>
     );
 }
