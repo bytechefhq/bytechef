@@ -68,7 +68,8 @@ public class GoogleCalendarConstants {
     public static final String USE_DEFAULT = "useDefault";
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR_ID)
-        .label("Calendar Identifier")
+        .label("Calendar ID")
+        .description("Unique identifier of the calendar.")
         .options(GoogleCalendarUtils.getCalendarIdOptions("writer"))
         .required(true);
 

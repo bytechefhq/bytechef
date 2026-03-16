@@ -50,6 +50,8 @@ public class GoogleCalendarAddAttendeesToEventAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addAttendeesToEvent")
         .title("Add Attendees to Event")
         .description("Invites one or more person to an existing event.")
+        .help(
+            "", "https://docs.bytechef.io/reference/components/google-calendar_v1#add-attendees-to-event")
         .properties(
             CALENDAR_ID_PROPERTY,
             string(EVENT_ID)
