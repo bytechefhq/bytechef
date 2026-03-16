@@ -1506,7 +1506,7 @@ public class HttpClientExecutorTest {
 
             Http.Response response = httpClientExecutor.handleResponse(testHttpResponse, configuration, context);
 
-            assertEquals(Map.of("key", "value"), (response.getBody()));
+            assertEquals(Map.of("key", "value"), response.getBody());
         }
 
         @Test
