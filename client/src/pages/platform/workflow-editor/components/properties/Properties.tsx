@@ -89,9 +89,9 @@ const Properties = ({
             </ul>
 
             {!!advancedProperties.length && (
-                <Collapsible className="group mt-2 flex w-full flex-col justify-center">
+                <Collapsible className={twMerge('group mt-2 flex w-full flex-col justify-center', customClassName)}>
                     <CollapsibleTrigger asChild>
-                        <Button className="mx-4" variant="outline">
+                        <Button variant="outline">
                             <span>Show Advanced Properties</span>
 
                             <ChevronDownIcon className="size-4 transition-all group-data-[state=open]:rotate-180" />
@@ -99,7 +99,7 @@ const Properties = ({
                     </CollapsibleTrigger>
 
                     <CollapsibleContent>
-                        <ul className="space-y-4 p-4" key={`${currentNode?.operationName}_advancedProperties`}>
+                        <ul className="space-y-4 pt-4" key={`${currentNode?.operationName}_advancedProperties`}>
                             {advancedProperties.map((property, index) => (
                                 <Property
                                     control={control}
