@@ -77,7 +77,7 @@ class InMemoryDataStorage {
 
         if (size > 409600) {
             throw new ConfigurationException(
-                "Value size exceeds 400KB limit per key. Actual: " + size + " bytes)",
+                "Value size exceeds 400KB limit per key. Actual: " + size + " bytes",
                 ComponentErrorType.DATA_STORAGE_SIZE_EXCEEDED);
         }
 

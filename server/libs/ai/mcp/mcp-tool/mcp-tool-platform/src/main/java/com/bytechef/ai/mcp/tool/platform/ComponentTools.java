@@ -207,6 +207,8 @@ public class ComponentTools {
                 .orElseThrow(() -> new ExecutionException(
                     String.format(TRIGGER_NOT_FOUND, triggerName, componentName), ComponentToolErrorType.GET_TRIGGER));
 
+        } catch (ExecutionException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Failed to get trigger '{}' from component '{}'", triggerName, componentName, e);
 
@@ -251,6 +253,8 @@ public class ComponentTools {
             }
 
             return triggerDefinition;
+        } catch (ExecutionException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Failed to generate trigger definition for '{}:{}'", componentName, triggerName, e);
 
@@ -432,6 +436,8 @@ public class ComponentTools {
                 .orElseThrow(() -> new ExecutionException(
                     String.format(ACTION_NOT_FOUND, actionName, componentName), ComponentToolErrorType.GET_ACTION));
 
+        } catch (ExecutionException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Failed to get action '{}' from component '{}'", actionName, componentName, e);
 
@@ -507,6 +513,8 @@ public class ComponentTools {
             }
 
             return actionDefinition;
+        } catch (ExecutionException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Failed to generate action definition for '{}:{}'", componentName, actionName, e);
 
@@ -611,6 +619,8 @@ public class ComponentTools {
             }
 
             return ToolUtils.convertToPropertyInfo(outputResponse.outputSchema());
+        } catch (ExecutionException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Failed to get output properties for '{}:{}'", componentName, operationName, e);
 
@@ -675,6 +685,8 @@ public class ComponentTools {
             }
 
             return ToolUtils.convertToPropertyInfoList(properties);
+        } catch (ExecutionException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Failed to get properties for '{}:{}'", componentName, operationName, e);
 
