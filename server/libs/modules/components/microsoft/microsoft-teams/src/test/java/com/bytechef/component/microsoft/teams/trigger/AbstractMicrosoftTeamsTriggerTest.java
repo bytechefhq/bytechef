@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mockStatic;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils;
+import com.bytechef.microsoft.commons.MicrosoftTriggerUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
@@ -32,7 +32,7 @@ import org.mockito.MockedStatic;
  * @author Nikolina Spehar
  */
 public class AbstractMicrosoftTeamsTriggerTest {
-    protected MockedStatic<MicrosoftTeamsUtils> microsoftTeamsUtilsMockedStatic;
+    protected MockedStatic<MicrosoftTriggerUtils> microsoftTriggerUtilsMockedStatic;
     protected PollOutput mockedPollOutput = mock(PollOutput.class);
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
@@ -42,11 +42,11 @@ public class AbstractMicrosoftTeamsTriggerTest {
 
     @BeforeEach
     void beforeEach() {
-        microsoftTeamsUtilsMockedStatic = mockStatic(MicrosoftTeamsUtils.class);
+        microsoftTriggerUtilsMockedStatic = mockStatic(MicrosoftTriggerUtils.class);
     }
 
     @AfterEach
     void afterEach() {
-        microsoftTeamsUtilsMockedStatic.close();
+        microsoftTriggerUtilsMockedStatic.close();
     }
 }

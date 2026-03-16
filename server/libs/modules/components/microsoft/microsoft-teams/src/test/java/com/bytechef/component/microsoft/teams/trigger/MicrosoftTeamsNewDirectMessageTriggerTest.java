@@ -21,8 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.microsoft.commons.MicrosoftTriggerUtils;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -35,8 +36,9 @@ class MicrosoftTeamsNewDirectMessageTriggerTest extends AbstractMicrosoftTeamsTr
 
     @Test
     void testPoll() {
-        microsoftTeamsUtilsMockedStatic.when(
-            () -> MicrosoftTeamsUtils.pollMicrosoftTeamsMessage(
+        microsoftTriggerUtilsMockedStatic.when(
+            () -> MicrosoftTriggerUtils.poll(
+                stringArgumentCaptor.capture(),
                 stringArgumentCaptor.capture(),
                 parametersArgumentCaptor.capture(),
                 triggerContextArgumentCaptor.capture()))
@@ -46,8 +48,9 @@ class MicrosoftTeamsNewDirectMessageTriggerTest extends AbstractMicrosoftTeamsTr
             mockedParameters, null, mockedParameters, mockedTriggerContext);
 
         assertEquals(mockedPollOutput, result);
-        assertEquals("/me/chats/chatId/messages", stringArgumentCaptor.getValue());
         assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
+        assertEquals(
+            List.of("/me/chats/chatId/messages", "messageType"), stringArgumentCaptor.getAllValues());
     }
 }
