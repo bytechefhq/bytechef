@@ -180,6 +180,45 @@ This action does not produce any output.
 
 
 
+### Forward Email
+Name: forwardEmail
+
+`Forwards an email message to another recipient.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Message ID | STRING | The ID of the message to forward. | true |
+| toRecipients | To Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The To: recipients for the message. | true |
+| contentType | Content Type | STRING <details> <summary> Options </summary> <span>TEXT</span>, <span>HTML</span> </details> | The type of the content. | false |
+| content | HTML Content | STRING | Body text of the email in HTML format. | false |
+| content | Text Content | STRING | Body text of the email. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Forward Email",
+  "name" : "forwardEmail",
+  "parameters" : {
+    "id" : "",
+    "toRecipients" : [ "" ],
+    "contentType" : "",
+    "content" : ""
+  },
+  "type" : "microsoftOutlook365/v1/forwardEmail"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
 ### Get Email
 Name: getEmail
 
