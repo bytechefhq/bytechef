@@ -30,8 +30,6 @@ import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Luka Ljubić
@@ -120,27 +118,23 @@ public class NiftyUtils extends AbstractNiftyUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<String>> options = new ArrayList<>();
         int offset = 0;
-        final int limit = 100;
-        List<Option<String>> options = null;
+        int limit = 100;
+        boolean hasMore;
 
-        while (true) {
-            String url = "/labels?limit=" + limit + "&offset=" + offset;
-
-            Map<String, Object> response = context.http(http -> http.get(url))
+        do {
+            Map<String, Object> body = context.http(http -> http.get("/labels"))
+                .queryParameters("limit", 100, "offset", offset)
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
-                .getBody(new TypeReference<Map<String, Object>>() {});
+                .getBody(new TypeReference<>() {});
 
-            List<Option<String>> pageOptions = getOptions(response, "items");
-
-            options = options == null ? pageOptions : Stream.concat(options.stream(), pageOptions.stream())
-                .collect(Collectors.toList());
-            if (pageOptions.size() < limit)
-                break;
+            options.addAll(getOptions(body, "items"));
 
             offset += limit;
-        }
+            hasMore = body != null && Boolean.TRUE.equals(body.get("hasMore"));
+        } while (hasMore);
 
         return options;
     }
