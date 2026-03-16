@@ -40,6 +40,7 @@ public class MicrosoftToDoGetTaskAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getTask")
         .title("Get Task")
         .description("Gets task by ID.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-to-do_v1#get-task")
         .properties(
             string(TASK_LIST_ID)
                 .label("Task List ID")

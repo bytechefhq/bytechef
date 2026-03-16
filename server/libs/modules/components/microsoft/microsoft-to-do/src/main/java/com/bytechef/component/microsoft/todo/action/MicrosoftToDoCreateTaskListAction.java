@@ -40,6 +40,7 @@ public class MicrosoftToDoCreateTaskListAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTaskList")
         .title("Create Task List")
         .description("Creates a new task list.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-to-do_v1#create-task-list")
         .properties(
             string(DISPLAY_NAME)
                 .label("Title")
