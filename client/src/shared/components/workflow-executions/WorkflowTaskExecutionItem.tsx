@@ -17,7 +17,7 @@ const WorkflowTaskExecutionItem = ({taskExecution}: {taskExecution: TaskExecutio
                     {icon && <LazyLoadSVG className="size-5" src={icon} />}
 
                     <div className="flex flex-col items-start">
-                        <span>{workflowTask?.label || title}</span>
+                        <span className="font-medium">{workflowTask?.label || title}</span>
 
                         <span className="text-xs text-muted-foreground">
                             ({workflowTask?.name || workflowTask?.type})
