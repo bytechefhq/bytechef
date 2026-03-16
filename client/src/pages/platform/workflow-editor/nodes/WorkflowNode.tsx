@@ -472,7 +472,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     )}
                 >
                     {isRenaming ? (
-                        <div className="z-10 flex items-center rounded-md border-2 p-1 shadow-sm">
+                        <div className="z-10 flex items-center rounded-md border-2 bg-surface-neutral-primary p-1 shadow-sm">
                             <div className="flex items-center">
                                 <input
                                     autoFocus
