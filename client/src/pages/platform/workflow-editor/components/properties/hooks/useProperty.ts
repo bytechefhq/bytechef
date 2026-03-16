@@ -119,7 +119,7 @@ type UsePropertyReturnType = {
     handleControlledBlur: (value: unknown) => void;
     handleControlledModeSwitch: (toDynamic: boolean) => void;
     handleDeleteCustomPropertyClick: (path: string) => void;
-    handleFromAiClick: (fromAi: boolean) => void;
+    handleFromAiClick: ((fromAi: boolean) => void) | undefined;
     handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
     handleInputTypeSwitchButtonClick: () => void;
@@ -177,6 +177,7 @@ interface UsePropertyProps {
     displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
     dynamicPropertySource?: string;
     formState?: FormState<FieldValues>;
+    hideFromAi?: boolean;
     objectName?: string;
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -194,6 +195,7 @@ export const useProperty = ({
     displayConditionsQuery,
     dynamicPropertySource,
     formState,
+    hideFromAi,
     objectName,
     parameterValue,
     path,
@@ -245,7 +247,7 @@ export const useProperty = ({
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const isToolsClusterElement = toolsMode || currentNode?.clusterElementType === 'tools';
+    const isToolsClusterElement = !hideFromAi && (toolsMode || currentNode?.clusterElementType === 'tools');
 
     const {isPending: isDisplayConditionsPending, isSuccess: isDisplayConditionsSuccess} = displayConditionsQuery ?? {
         isPending: false,
@@ -1552,7 +1554,7 @@ export const useProperty = ({
         handleControlledBlur,
         handleControlledModeSwitch,
         handleDeleteCustomPropertyClick,
-        handleFromAiClick,
+        handleFromAiClick: hideFromAi ? undefined : handleFromAiClick,
         handleFromAiToggle,
         handleInputChange,
         handleInputTypeSwitchButtonClick,
