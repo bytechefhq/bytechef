@@ -422,7 +422,10 @@ const IntegrationInstanceConfigurationDialog = ({
                                     'max-h-integration-instance-configuration-dialog-height overflow-y-auto'
                             )}
                         >
-                            {activeStepIndex === 1 && isWorkflowsPending ? (
+                            {((activeStepIndex === 1 && !oAuth2Authorization) ||
+                                (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
+                                (activeStepIndex === 2 && oAuth2Authorization)) &&
+                            isWorkflowsPending ? (
                                 <div className="flex justify-center py-12">
                                     <LoadingDots />
                                 </div>
@@ -496,23 +499,22 @@ const IntegrationInstanceConfigurationDialog = ({
 
                         {((activeStepIndex === 1 && !oAuth2Authorization) ||
                             (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
-                            (activeStepIndex === 2 && oAuth2Authorization)) &&
-                            (updateIntegrationVersion || (workflows && workflows?.length > 0)) && (
-                                <>
-                                    <Button
-                                        label="Previous"
-                                        onClick={() => setActiveStepIndex(activeStepIndex - 1)}
-                                        variant="outline"
-                                    />
+                            (activeStepIndex === 2 && oAuth2Authorization)) && (
+                            <>
+                                <Button
+                                    label="Previous"
+                                    onClick={() => setActiveStepIndex(activeStepIndex - 1)}
+                                    variant="outline"
+                                />
 
-                                    <Button
-                                        disabled={isSaving || isWorkflowsPending}
-                                        icon={isSaving ? <LoadingIcon /> : undefined}
-                                        label="Save"
-                                        onClick={handleSubmit(handleSaveClick)}
-                                    />
-                                </>
-                            )}
+                                <Button
+                                    disabled={isSaving || isWorkflowsPending}
+                                    icon={isSaving ? <LoadingIcon /> : undefined}
+                                    label="Save"
+                                    onClick={handleSubmit(handleSaveClick)}
+                                />
+                            </>
+                        )}
                     </DialogFooter>
                 </Form>
             </DialogContent>
