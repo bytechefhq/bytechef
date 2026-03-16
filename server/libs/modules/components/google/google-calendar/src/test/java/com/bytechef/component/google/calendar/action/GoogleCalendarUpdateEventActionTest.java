@@ -19,6 +19,7 @@ package com.bytechef.component.google.calendar.action;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTENDEES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESCRIPTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -44,16 +45,16 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarUpdateEventActionTest {
 
-    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
-    private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = forClass(Calendar.class);
+    private final ArgumentCaptor<Event> eventArgumentCaptor = forClass(Event.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final Event mockedEvent = mock(Event.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(DESCRIPTION, "desc", ATTENDEES, List.of("attendee1", "attendee2")));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() {

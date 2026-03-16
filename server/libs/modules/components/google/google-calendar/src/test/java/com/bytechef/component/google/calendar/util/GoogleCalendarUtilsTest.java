@@ -32,6 +32,7 @@ import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.cr
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -74,10 +75,10 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarUtilsTest {
 
-    private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<Event> eventArgumentCaptor = forClass(Event.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     @SuppressWarnings("rawtypes")
-    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Calendar.Events mockedCalendarEvents = mock(Calendar.Events.class);
@@ -91,8 +92,8 @@ class GoogleCalendarUtilsTest {
     private final Calendar.Settings mockedSettings = mock(Calendar.Settings.class);
     private final Calendar.Settings.List mockedSettingsList = mock(Calendar.Settings.List.class);
     private final Calendar.Events.Update mockedUpdate = mock(Calendar.Events.Update.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testConvertLocalDateTimeToDateInTimezone() {

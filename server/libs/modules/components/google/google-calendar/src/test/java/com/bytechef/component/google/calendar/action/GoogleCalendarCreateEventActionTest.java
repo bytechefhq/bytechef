@@ -31,6 +31,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SUMMARY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.USE_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -43,6 +44,8 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.Calendar.Events;
+import com.google.api.services.calendar.Calendar.Events.Insert;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
@@ -59,16 +62,16 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarCreateEventActionTest {
 
-    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
-    private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = forClass(Calendar.class);
+    private final ArgumentCaptor<Event> eventArgumentCaptor = forClass(Event.class);
     private final EventDateTime eventDateTime = new EventDateTime();
     private final Calendar mockedCalendar = mock(Calendar.class);
-    private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
+    private final Events mockedEvents = mock(Events.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final Event mockedEvent = mock(Event.class);
-    private final Calendar.Events.Insert mockedInsert = mock(Calendar.Events.Insert.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Insert mockedInsert = mock(Insert.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() throws IOException {

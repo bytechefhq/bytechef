@@ -21,6 +21,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
 import static com.bytechef.component.google.calendar.trigger.GoogleCalendarEventTrigger.webhookRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -62,13 +63,13 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarEventTriggerTest {
 
-    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
-    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
-    private final ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
-    private final ArgumentCaptor<DateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(DateTime.class);
-    private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = forClass(Boolean.class);
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = forClass(Calendar.class);
+    private final ArgumentCaptor<Channel> channelArgumentCaptor = forClass(Channel.class);
+    private final ArgumentCaptor<DateTime> dateTimeArgumentCaptor = forClass(DateTime.class);
+    private final ArgumentCaptor<Event> eventArgumentCaptor = forClass(Event.class);
     private final ArgumentCaptor<LocalDateTime> localDateTimeArgumentCaptor =
-        ArgumentCaptor.forClass(LocalDateTime.class);
+        forClass(LocalDateTime.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Events mockedCalendarEvents = mock(Events.class);
     private final Channels mockedChannels = mock(Channels.class);
@@ -83,8 +84,8 @@ class GoogleCalendarEventTriggerTest {
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private static final String workflowExecutionId = "testWorkflowExecutionId";
 
     @Test

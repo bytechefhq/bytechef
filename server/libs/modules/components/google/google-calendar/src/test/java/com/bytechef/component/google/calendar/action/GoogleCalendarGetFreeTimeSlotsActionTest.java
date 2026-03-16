@@ -21,6 +21,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -48,8 +49,10 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(DATE_RANGE,
-            Map.of(FROM, LocalDateTime.of(2000, 1, 14, 8, 0, 0), TO, LocalDateTime.of(2000, 1, 20, 8, 0, 0))));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+            Map.of(
+                FROM, LocalDateTime.of(2000, 1, 14, 8, 0, 0),
+                TO, LocalDateTime.of(2000, 1, 20, 8, 0, 0))));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() {
