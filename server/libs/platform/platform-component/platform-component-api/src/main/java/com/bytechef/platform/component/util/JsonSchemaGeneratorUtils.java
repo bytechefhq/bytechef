@@ -84,6 +84,8 @@ public class JsonSchemaGeneratorUtils {
             // TODO check array and object, it seems schema is not generated correctly
             ObjectNode parameterObjectNode = TYPE_SCHEMA_GENERATOR.generateSchema(getType(property.getType()));
 
+            parameterObjectNode.remove("$schema");
+
             if (!parameterObjectNode.has("type")) {
                 parameterObjectNode.put("type", "string");
             }
