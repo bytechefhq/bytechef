@@ -61,11 +61,14 @@ public class GoogleCalendarEventTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newOrUpdatedEvent")
         .title("New or Updated Event")
-        .description("Triggers when an event is added or updated")
+        .description("Triggers when an event is added or updated.")
+        .help(
+            "", "https://docs.bytechef.io/reference/components/google-calendar_v1#new-or-updated-event")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(CALENDAR_ID)
-                .label("Calendar Identifier")
+                .label("Calendar ID")
+                .description("Unique identifier of the calendar.")
                 .options((OptionsFunction<String>) GoogleCalendarUtils::getCalendarIdOptions)
                 .required(true))
         .output(outputSchema(EVENT_OUTPUT_PROPERTY))

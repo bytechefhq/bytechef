@@ -46,6 +46,7 @@ public class GoogleCalendarCreateQuickEventAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createQuickEvent")
         .title("Create Quick Event")
         .description("Creates a quick event in Google Calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/google-calendar_v1#create-quick-event")
         .properties(
             CALENDAR_ID_PROPERTY,
             string(TEXT)

@@ -45,6 +45,7 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
             "Google Calendar is a web-based application that allows users to schedule and organize events, " +
                 "appointments, and reminders, synchronizing across multiple devices.")
         .customAction(true)
+        .customActionHelp("", "https://developers.google.com/workspace/calendar/api/v3/reference")
         .icon("path:assets/google-calendar.svg")
         .categories(ComponentCategory.CALENDARS_AND_SCHEDULING)
         .connection(CONNECTION_DEFINITION)
@@ -64,7 +65,8 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
             tool(GoogleCalendarGetEventsAction.ACTION_DEFINITION),
             tool(GoogleCalendarGetFreeTimeSlotsAction.ACTION_DEFINITION),
             tool(GoogleCalendarUpdateEventAction.ACTION_DEFINITION))
-        .triggers(GoogleCalendarEventTrigger.TRIGGER_DEFINITION);
+        .triggers(GoogleCalendarEventTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

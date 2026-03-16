@@ -75,6 +75,7 @@ public class GoogleCalendarCreateEventAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEvent")
         .title("Create Event")
         .description("Creates a new event in Google Calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/google-calendar_v1#create-event")
         .properties(
             CALENDAR_ID_PROPERTY,
             string(SUMMARY)
@@ -83,6 +84,7 @@ public class GoogleCalendarCreateEventAction {
                 .required(false),
             bool(ALL_DAY)
                 .label("All Day Event?")
+                .description("Whether it is an all day event.")
                 .defaultValue(false)
                 .required(true),
             date(START)
@@ -119,6 +121,7 @@ public class GoogleCalendarCreateEventAction {
                 .required(false),
             array(ATTACHMENTS)
                 .label("Attachments")
+                .description("The attachments to the event.")
                 .items(fileEntry())
                 .required(false),
             array(ATTENDEES)
@@ -152,6 +155,7 @@ public class GoogleCalendarCreateEventAction {
                 .required(true),
             array(REMINDERS)
                 .label("Reminders")
+                .description("The reminders that will be sent about the event.")
                 .displayCondition("%s == false".formatted(USE_DEFAULT))
                 .items(
                     object()
