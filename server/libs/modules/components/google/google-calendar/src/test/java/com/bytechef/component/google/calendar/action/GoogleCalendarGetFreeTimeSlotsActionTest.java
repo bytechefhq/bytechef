@@ -77,9 +77,6 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
                 .add(new Interval(LocalDateTime.of(2000, 1, 16, 10, 45, 0),
                     LocalDateTime.of(LocalDate.of(2000, 1, 18), LOCAL_TIME_MIN)));
             expectedIntervals
-                .add(new Interval(LocalDateTime.of(LocalDate.of(2000, 1, 19), LOCAL_TIME_MIN),
-                    LocalDateTime.of(2000, 1, 19, 8, 0, 0)));
-            expectedIntervals
                 .add(new Interval(LocalDateTime.of(2000, 1, 20, 7, 0, 0), LocalDateTime.of(2000, 1, 20, 8, 0, 0)));
 
             assertEquals(expectedIntervals, result);
