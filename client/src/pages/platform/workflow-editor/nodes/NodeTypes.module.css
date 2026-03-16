@@ -11,5 +11,5 @@
     @apply h-2;
     @apply w-2;
     @apply border-0;
-    @apply bg-stroke-neutral-tertiary;
+    @apply bg-stroke-neutral-tertiary !important;
 }
