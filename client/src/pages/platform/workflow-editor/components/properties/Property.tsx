@@ -46,6 +46,7 @@ interface PropertyProps {
     displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
     dynamicPropertySource?: string;
     formState?: FormState<FieldValues>;
+    hideFromAi?: boolean;
     objectName?: string;
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -66,6 +67,7 @@ const Property = ({
     displayConditionsQuery,
     dynamicPropertySource,
     formState,
+    hideFromAi,
     objectName,
     operationName,
     parameterValue,
@@ -146,6 +148,7 @@ const Property = ({
         displayConditionsQuery,
         dynamicPropertySource,
         formState,
+        hideFromAi,
         objectName,
         operationName,
         parameterValue,

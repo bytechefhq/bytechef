@@ -71,6 +71,7 @@ const ClusterElementTestPropertiesPopover = ({
                                     control={control}
                                     controlPath=""
                                     formState={formState}
+                                    hideFromAi
                                     properties={propertiesWithDefaults}
                                 />
                             </fieldset>

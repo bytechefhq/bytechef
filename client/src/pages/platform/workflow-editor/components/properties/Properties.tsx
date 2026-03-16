@@ -16,6 +16,7 @@ interface PropertiesProps {
     controlPath?: string;
     displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
     customClassName?: string;
+    hideFromAi?: boolean;
     operationName?: string;
     formState?: FormState<FieldValues>;
     path?: string;
@@ -29,6 +30,7 @@ const Properties = ({
     customClassName,
     displayConditionsQuery,
     formState,
+    hideFromAi,
     operationName,
     path,
     properties,
@@ -76,6 +78,7 @@ const Properties = ({
                         controlPath={controlPath}
                         displayConditionsQuery={displayConditionsQuery}
                         formState={formState}
+                        hideFromAi={hideFromAi}
                         key={`${currentNode?.workflowNodeName}_${currentNode?.operationName}_${property.name}_${index}`}
                         operationName={operationName}
                         path={path}
@@ -103,6 +106,7 @@ const Properties = ({
                                     controlPath={controlPath}
                                     displayConditionsQuery={displayConditionsQuery}
                                     formState={formState}
+                                    hideFromAi={hideFromAi}
                                     key={`${property.name}_${currentNode?.operationName}_${index}`}
                                     operationName={operationName}
                                     path={path}
