@@ -319,8 +319,9 @@ class ComponentToolsTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> componentTools.getOutputProperty(componentName, operationName, version));
 
-        assertEquals("Failed to get output properties: Operation '" + operationName + "' not found in component '"
-            + componentName + "'", exception.getMessage());
+        assertEquals(
+            "Operation '" + operationName + "' not found in component '" + componentName + "'",
+            exception.getMessage());
     }
 
     @Test
