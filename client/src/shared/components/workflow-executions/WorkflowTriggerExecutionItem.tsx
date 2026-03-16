@@ -17,7 +17,7 @@ const WorkflowTriggerExecutionItem = ({triggerExecution}: {triggerExecution: Tri
                     {icon && <LazyLoadSVG className="size-5" src={icon} />}
 
                     <div className="flex flex-col items-start">
-                        <span>{workflowTrigger?.label || title}</span>
+                        <span className="font-medium">{workflowTrigger?.label || title}</span>
 
                         <span className="text-xs text-muted-foreground">
                             ({workflowTrigger?.name || workflowTrigger?.type})
