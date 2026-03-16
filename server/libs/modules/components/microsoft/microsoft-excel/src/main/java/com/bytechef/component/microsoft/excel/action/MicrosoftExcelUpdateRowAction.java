@@ -45,7 +45,8 @@ public class MicrosoftExcelUpdateRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
         .title("Update Row")
-        .description("Update a row in a worksheet.")
+        .description("Update a row in an existing worksheet.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-excel_v1#update-row")
         .properties(
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
