@@ -46,17 +46,17 @@ interface DialogProps {
     workflowsView?: boolean;
     form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-    handleMcpToolToggle: (mcpToolId: number, pressed: boolean) => void;
-    handleMcpWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
-    handleMcpWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
+    handleMcpToolToggle?: (mcpToolId: number, pressed: boolean) => void;
+    handleMcpWorkflowToggle?: (workflowUuid: string, pressed: boolean) => void;
+    handleMcpWorkflowInputChange?: (workflowUuid: string, inputName: string, value: string) => void;
     handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     integration?: IntegrationType;
     isOAuth2?: boolean;
     isOpen: boolean;
     loading?: boolean;
-    mergedMcpTools: MergedMcpToolType[];
-    mergedMcpWorkflows: MergedWorkflowType[];
+    mergedMcpTools?: MergedMcpToolType[];
+    mergedMcpWorkflows?: MergedWorkflowType[];
     mergedWorkflows: MergedWorkflowType[];
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
@@ -67,17 +67,17 @@ const ConnectDialog = ({
     workflowsView = false,
     form,
     handleClick,
-    handleMcpToolToggle,
-    handleMcpWorkflowToggle,
-    handleMcpWorkflowInputChange,
+    handleMcpToolToggle = () => {},
+    handleMcpWorkflowToggle = () => {},
+    handleMcpWorkflowInputChange = () => {},
     handleWorkflowToggle,
     handleWorkflowInputChange,
     integration,
     isOAuth2 = false,
     isOpen,
     loading = false,
-    mergedMcpTools,
-    mergedMcpWorkflows,
+    mergedMcpTools = [],
+    mergedMcpWorkflows = [],
     mergedWorkflows,
     properties,
     registerFormSubmit,
@@ -353,8 +353,8 @@ interface DialogContentProps {
     handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
     integration: IntegrationType;
-    mergedMcpTools: MergedMcpToolType[];
-    mergedMcpWorkflows: MergedWorkflowType[];
+    mergedMcpTools?: MergedMcpToolType[];
+    mergedMcpWorkflows?: MergedWorkflowType[];
     mergedWorkflows: MergedWorkflowType[];
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
@@ -371,8 +371,8 @@ const DialogContent = ({
     handleWorkflowToggle,
     handleWorkflowInputChange,
     integration,
-    mergedMcpTools,
-    mergedMcpWorkflows,
+    mergedMcpTools = [],
+    mergedMcpWorkflows = [],
     mergedWorkflows,
     properties,
     registerFormSubmit,
@@ -417,18 +417,22 @@ const DialogContent = ({
             )}
 
             {workflowsView && showTabs && (
-                <div className={styles.tabContainer}>
+                <div className={styles.tabContainer} role="tablist">
                     <button
+                        aria-selected={activeTab === 'workflows'}
                         className={`${styles.tabButton} ${activeTab === 'workflows' ? styles.tabButtonActive : ''}`}
                         onClick={() => setActiveTab('workflows')}
+                        role="tab"
                         type="button"
                     >
                         Workflows
                     </button>
 
                     <button
+                        aria-selected={activeTab === 'tools'}
                         className={`${styles.tabButton} ${activeTab === 'tools' ? styles.tabButtonActive : ''}`}
                         onClick={() => setActiveTab('tools')}
+                        role="tab"
                         type="button"
                     >
                         Tools
@@ -436,7 +440,7 @@ const DialogContent = ({
                 </div>
             )}
 
-            {workflowsView && (!showTabs || activeTab === 'workflows') && mergedWorkflows.length > 0 && (
+            {workflowsView && (!showTabs || activeTab === 'workflows') && (
                 <DialogWorkflowsContainer
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
