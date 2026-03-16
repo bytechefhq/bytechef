@@ -40,6 +40,7 @@ public class GoogleCalendarDeleteEventAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteEvent")
         .title("Delete Event")
         .description("Deletes an event from Google Calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/google-calendar_v1#delete-event")
         .properties(
             CALENDAR_ID_PROPERTY,
             string(EVENT_ID)

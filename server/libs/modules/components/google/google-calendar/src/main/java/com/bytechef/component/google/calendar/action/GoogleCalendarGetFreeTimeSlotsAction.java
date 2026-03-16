@@ -50,9 +50,12 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFreeTimeSlots")
         .title("Get Free Time Slots")
         .description("Get free time slots from Google Calendar.")
+        .help(
+            "", "https://docs.bytechef.io/reference/components/google-calendar_v1#get-free-time-slots")
         .properties(
             string(CALENDAR_ID)
-                .label("Calendar Identifier")
+                .label("Calendar ID")
+                .description("Unique identifier of the calendar.")
                 .options(GoogleCalendarUtils.getCalendarIdOptions(null))
                 .required(true),
             object(DATE_RANGE)

@@ -48,9 +48,11 @@ public class GoogleCalendarGetEventsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getEvents")
         .title("Get Events")
         .description("List events from the specified Google Calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/google-calendar_v1#get-events")
         .properties(
             string(CALENDAR_ID)
-                .label("Calendar Identifier")
+                .label("Calendar ID")
+                .description("Unique identifier of the calendar.")
                 .options(GoogleCalendarUtils.getCalendarIdOptions(null))
                 .required(true),
             array(EVENT_TYPE)

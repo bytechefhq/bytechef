@@ -59,6 +59,7 @@ public class GoogleCalendarUpdateEventAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateEvent")
         .title("Update Event")
         .description("Updates event in Google Calendar.")
+        .help("", "https://docs.bytechef.io/reference/components/google-calendar_v1#update-event")
         .properties(
             CALENDAR_ID_PROPERTY,
             string(EVENT_ID)
@@ -73,6 +74,7 @@ public class GoogleCalendarUpdateEventAction {
                 .required(false),
             bool(ALL_DAY)
                 .label("All Day Event?")
+                .description("Whether it is an all day event.")
                 .required(false),
             date(START)
                 .label("Start Date")
