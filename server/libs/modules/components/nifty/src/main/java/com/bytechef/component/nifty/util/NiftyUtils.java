@@ -44,79 +44,48 @@ public class NiftyUtils extends AbstractNiftyUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, TriggerContext triggerContext) {
 
-        Map<String, Object> body = triggerContext.http(http -> http.get("/apps"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .queryParameters("limit", 100, "offset", 0)
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body != null && body.get("apps") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
-            }
-        }
-
-        return options;
+        return getAllOptions(triggerContext, "/apps", "apps");
     }
 
     public static List<Option<String>> getTaskGroupIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get(
-                "/taskgroups?project_id=" + inputParameters.getRequiredString(PROJECT) + "&archived=false"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body, "items");
+        return getAllOptions(
+            context, "/taskgroups", "items",
+            "project_id", inputParameters.getRequiredString(PROJECT), "archived", "false");
     }
 
     public static List<Option<String>> getProjectIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("/projects"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body, "projects");
+        return getAllOptions(context, "/projects", "projects");
     }
 
     public static List<Option<String>> getTemplateIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("/templates"))
-            .queryParameter("type", "project")
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body, "items");
+        return getAllOptions(context, "/templates", "items", "type", "project");
     }
 
     public static List<Option<String>> getTaskIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("/tasks"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body, "tasks");
+        return getAllOptions(context, "/tasks", "tasks");
     }
 
     public static List<Option<String>> getLabelsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        return getAllOptions(context, "/labels", "items");
+    }
+
+    private static List<Option<String>> getAllOptions(
+        Context context, String resourcePath, String resourceName, Object... additionalQueryParameters) {
 
         List<Option<String>> options = new ArrayList<>();
         int offset = 0;
@@ -124,13 +93,22 @@ public class NiftyUtils extends AbstractNiftyUtils {
         boolean hasMore;
 
         do {
-            Map<String, Object> body = context.http(http -> http.get("/labels"))
-                .queryParameters("limit", 100, "offset", offset)
+            List<Object> queryParameters = new ArrayList<>();
+
+            queryParameters.add("limit");
+            queryParameters.add(limit);
+            queryParameters.add("offset");
+            queryParameters.add(offset);
+
+            queryParameters.addAll(List.of(additionalQueryParameters));
+
+            Map<String, Object> body = context.http(http -> http.get(resourcePath))
+                .queryParameters(queryParameters.toArray())
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
 
-            options.addAll(getOptions(body, "items"));
+            options.addAll(getOptions(body, resourceName));
 
             offset += limit;
             hasMore = body != null && Boolean.TRUE.equals(body.get("hasMore"));
