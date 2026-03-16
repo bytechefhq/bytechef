@@ -1,5 +1,7 @@
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {useCallback, useMemo, useState} from 'react';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useShallow} from 'zustand/shallow';
 
 const TOTAL_STEPS = 3;
 
@@ -14,7 +16,38 @@ interface UseDataStreamEditorResultI {
 export default function useDataStreamEditor(): UseDataStreamEditorResultI {
     const [currentStep, setCurrentStep] = useState(0);
 
-    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
+    const {rootClusterElementNodeData, setMainClusterRootComponentDefinition} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+            setMainClusterRootComponentDefinition: state.setMainClusterRootComponentDefinition,
+        }))
+    );
+
+    const mainClusterRootQueryParameters = useMemo(() => {
+        if (!rootClusterElementNodeData?.type || !rootClusterElementNodeData?.componentName) {
+            return {componentName: '', componentVersion: 1};
+        }
+
+        return {
+            componentName: rootClusterElementNodeData.componentName,
+            componentVersion: Number(rootClusterElementNodeData.type?.split('/')[1]?.replace(/^v/, '')) || 1,
+        };
+    }, [rootClusterElementNodeData?.type, rootClusterElementNodeData?.componentName]);
+
+    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
+        mainClusterRootQueryParameters,
+        !!rootClusterElementNodeData?.workflowNodeName
+    );
+
+    useEffect(() => {
+        if (rootClusterElementDefinition && rootClusterElementNodeData?.workflowNodeName) {
+            setMainClusterRootComponentDefinition(rootClusterElementDefinition);
+        }
+    }, [
+        rootClusterElementDefinition,
+        rootClusterElementNodeData?.workflowNodeName,
+        setMainClusterRootComponentDefinition,
+    ]);
 
     const configuredSteps = useMemo(() => {
         const clusterElements = rootClusterElementNodeData?.clusterElements;

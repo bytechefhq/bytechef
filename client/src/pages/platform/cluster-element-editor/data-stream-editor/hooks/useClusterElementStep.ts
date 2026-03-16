@@ -89,11 +89,13 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
 
         const componentDefinition = definitionsMap.get(componentName);
 
+        const workflowNodeName = element.workflowNodeName || element.name || '';
+
         return {
             componentName,
             icon: componentDefinition?.icon,
-            label: element.label || element.workflowNodeName || '',
-            name: element.workflowNodeName || '',
+            label: element.label || workflowNodeName,
+            name: workflowNodeName,
             operationName,
             title: componentDefinition?.title || componentName,
             type: element.type || '',
@@ -151,7 +153,7 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
 
     const displayConditionsQuery = useGetClusterElementParameterDisplayConditionsQuery(
         {
-            clusterElementType: elementType,
+            clusterElementType: elementTypeKey,
             clusterElementWorkflowNodeName: elementItem?.name || '',
             environmentId: currentEnvironmentId,
             id: workflow.id!,
