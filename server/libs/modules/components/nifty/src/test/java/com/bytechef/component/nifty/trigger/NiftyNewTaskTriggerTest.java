@@ -19,11 +19,21 @@ package com.bytechef.component.nifty.trigger;
 import static com.bytechef.component.nifty.constant.NiftyConstants.APP_ID;
 import static com.bytechef.component.nifty.constant.NiftyConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -33,71 +43,80 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class NiftyNewTaskTriggerTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
-    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(APP_ID, "app"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(APP_ID, "app"));
+    private final Parameters mockedParameters = mock(Parameters.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
-    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testWebhookEnable() {
-        String webhookUrl = "testWebhookUrl";
-        String workflowExecutionId = "testWorkflowExecutionId";
+    void testWebhookEnable(
+        TriggerContext mockedTriggerContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedTriggerContext.http(any()))
+        String webhookUrl = "testWebhookUrl";
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("webhook", Map.of(ID, "123")));
 
         WebhookEnableOutput result = NiftyNewTaskTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            mockedInputParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
 
         WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
         assertEquals(expectedWebhookEnableOutput, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/webhooks", stringArgumentCaptor.getValue());
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Map.of("endpoint", webhookUrl, "event", List.of("taskCreated"), APP_ID, "app"), body.getContent());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            Body.of(
+                Map.of("endpoint", webhookUrl, "event", List.of("taskCreated"), APP_ID, "app"),
+                BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 
     @Test
-    void testWebhookDisable() {
-        String workflowExecutionId = "testWorkflowExecutionId";
+    void testWebhookDisable(
+        TriggerContext mockedTriggerContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
-        when(mockedTriggerContext.http(any()))
+        Parameters mockedOutputParameters = MockParametersFactory.create(Map.of(ID, "xy"));
+
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
         NiftyNewTaskTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            mockedInputParameters, mockedParameters, mockedOutputParameters, "testWorkflowExecutionId",
+            mockedTriggerContext);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of(APP_ID, "app"), body.getContent());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/webhooks/xy", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(Map.of(APP_ID, "app"), BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 
     @Test
@@ -106,8 +125,8 @@ class NiftyNewTaskTriggerTest {
             .thenReturn(Map.of("data", mockedObject));
 
         Object result = NiftyNewTaskTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedInputParameters, mockedParameters, mock(HttpHeaders.class), mock(HttpParameters.class),
+            mockedWebhookBody, mock(WebhookMethod.class), mock(Parameters.class), mock(TriggerContext.class));
 
         assertEquals(mockedObject, result);
     }
