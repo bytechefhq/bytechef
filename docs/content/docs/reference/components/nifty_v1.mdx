@@ -61,6 +61,66 @@ Version: 1
 ## Actions
 
 
+### Add Labels
+Name: addLabels
+
+`Add labels to the task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| taskId | Task ID | STRING | ID of the task to add label to. | true |
+| labels | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels to add to the task. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Labels",
+  "name" : "addLabels",
+  "parameters" : {
+    "taskId" : "",
+    "labels" : [ "" ]
+  },
+  "type" : "nifty/v1/addLabels"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| message | STRING | A confirmation message indicating whether the labels where added successfully. |
+| labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels added to the task. |
+
+
+
+
+#### Output Example
+```json
+{
+  "message" : "",
+  "labels" : [ "" ]
+}
+```
+
+#### Find Task ID
+
+To find your task ID, click [here](/reference/components/nifty_v1#how-to-find-your-task-id).
+
+#### Find Task Status
+
+To find your task Status, click [here](/reference/components/nifty_v1#how-to-find-task-status).
+
+
+
 ### Create Project
 Name: createProject
 
@@ -117,6 +177,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Template ID
+
+To find your template ID, click [here](/reference/components/nifty_v1#how-to-find-your-template-id).
 
 
 
@@ -177,6 +240,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Project ID
+
+To find your project ID, click [here](/reference/components/nifty_v1#how-to-find-your-project-id).
 
 
 
@@ -242,6 +308,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Project ID
+
+To find your project ID, click [here](/reference/components/nifty_v1#how-to-find-your-project-id).
+
+#### Find Task Status
+
+To find your task Status, click [here](/reference/components/nifty_v1#how-to-find-task-status).
 
 
 
@@ -297,6 +370,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Task ID
+
+To find your task ID, click [here](/reference/components/nifty_v1#how-to-find-your-task-id).
 
 
 
@@ -360,6 +436,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Project ID
+
+To find your project ID, click [here](/reference/components/nifty_v1#how-to-find-your-project-id).
 
 
 
@@ -421,4 +500,100 @@ Type: OBJECT
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find your Project ID
+
+You have several methods to find your Nifty project ID:
+
+* **Method 1: Through the Project URL**
+
+1. Open the project in **Nifty**.
+
+2. Look at the URL in your browser. It will look similar to:
+
+    https://nifty.pm/projects/12345/tasks
+
+3. The number in the URL (`12345` in this example) is your **project ID**.
+
+* **Method 2: Through the Nifty API**
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `WORKSPACE_ID` with your workspace ID):
+
+    https://api.nifty.pm/v1/workspaces/WORKSPACE_ID/projects
+
+3. Find the project in the JSON response.
+
+4. The value under `id` is the **project ID**.
+
+
+### How to find your Project Status
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `PROJECT_ID` with your project ID):
+
+    https://api.nifty.pm/v1/projects/PROJECT_ID
+
+3. Look for the `status` field in the JSON response.
+
+4. The value under `status` is your **project status**.
+
+
+### How to find your Task ID
+
+You have several methods to find your Nifty task ID:
+
+* **Method 1: Through the Task URL**
+
+1. Open the task in **Nifty**.
+
+2. Look at the URL in your browser. It will look similar to:
+
+    https://nifty.pm/projects/12345/tasks/67890
+
+3. The **last number** (`67890` in this example) is the **task ID**.
+
+* **Method 2: Through the Nifty API**
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `PROJECT_ID` with your project ID):
+
+    https://api.nifty.pm/v1/projects/PROJECT_ID/tasks
+
+3. Find the task in the JSON response.
+
+4. The value under `id` is the **task ID**.
+
+
+### How to find your Template ID
+
+1. Open your browser or API client.
+
+2. Run the following request:
+
+    https://api.nifty.pm/v1/templates
+
+3. Find the template you want in the JSON response.
+
+4. The value under `id` is the **template ID**.
+
+
+### How to find Task Status
+
+1. Open your browser or API client.
+
+2. Run the following request (replace `TASK_ID` with your task ID):
+
+    https://api.nifty.pm/v1/tasks/TASK_ID
+
+3. Look for the `status` field in the JSON response.
+
+4. The value under `status` is your **task status**.
 
