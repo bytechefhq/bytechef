@@ -143,7 +143,7 @@ export default function useDataStreamMapping() {
 
     const displayConditionsQuery = useGetClusterElementParameterDisplayConditionsQuery(
         {
-            clusterElementType: 'processor',
+            clusterElementType: 'PROCESSOR',
             clusterElementWorkflowNodeName: processor?.name || '',
             environmentId: currentEnvironmentId,
             id: workflow.id!,
@@ -227,7 +227,7 @@ export default function useDataStreamMapping() {
             const optionApi = new WorkflowNodeOptionApi();
 
             const baseRequest = {
-                clusterElementType: 'processor',
+                clusterElementType: 'PROCESSOR',
                 clusterElementWorkflowNodeName: processor.name,
                 environmentId: currentEnvironmentId,
                 id: workflow.id,
@@ -261,7 +261,7 @@ export default function useDataStreamMapping() {
             }
 
             await new WorkflowNodeParameterApi().updateClusterElementParameter({
-                clusterElementType: 'processor',
+                clusterElementType: 'PROCESSOR',
                 clusterElementWorkflowNodeName: processor.name,
                 environmentId: currentEnvironmentId,
                 id: workflow.id,
