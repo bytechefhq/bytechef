@@ -141,9 +141,14 @@ public class OpenApiClientUtils {
                     Property.Type type = bodyProperty.getType();
 
                     if (type == Property.Type.ARRAY) {
-                        yield Http.Body.of(
-                            Map.of(name, MapUtils.getList(inputParameters, name, Object.class, List.of())),
-                            bodyContentType);
+                        List<Object> list = MapUtils.getList(
+                            inputParameters, name, Object.class, List.of());
+
+                        if ("__items".equals(name)) {
+                            yield Http.Body.of(list, bodyContentType);
+                        }
+
+                        yield Http.Body.of(Map.of(name, list), bodyContentType);
                     } else if (type == Property.Type.DYNAMIC_PROPERTIES) {
                         yield Http.Body.of(MapUtils.getMap(inputParameters, name, Map.of()), bodyContentType);
                     } else {
