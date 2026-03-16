@@ -561,7 +561,7 @@ public class ComponentDefinitionRegistry {
                 if (triggerDefinition.getType() == null) {
                     throw new ConfigurationException(
                         "Trigger type for trigger=%s is not defined".formatted(triggerDefinition.getName()),
-                        ComponentErrorType.COMPONENT_NOT_FOUND);
+                        ComponentErrorType.UNKNOWN_TRIGGER_TYPE);
                 }
             }
         }
