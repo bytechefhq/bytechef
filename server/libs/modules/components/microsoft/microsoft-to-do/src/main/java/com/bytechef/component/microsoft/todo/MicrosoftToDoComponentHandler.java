@@ -42,6 +42,8 @@ public class MicrosoftToDoComponentHandler implements ComponentHandler {
         .icon("path:assets/microsoft-to-do.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(MicrosoftToDoConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("","https://learn.microsoft.com/en-us/graph/api/resources/todo-overview?view=graph-rest-1.0")
         .actions(
             MicrosoftToDoCreateTaskAction.ACTION_DEFINITION,
             MicrosoftToDoCreateTaskListAction.ACTION_DEFINITION,
@@ -49,7 +51,8 @@ public class MicrosoftToDoComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(MicrosoftToDoCreateTaskAction.ACTION_DEFINITION),
             tool(MicrosoftToDoCreateTaskListAction.ACTION_DEFINITION),
-            tool(MicrosoftToDoGetTaskAction.ACTION_DEFINITION));
+            tool(MicrosoftToDoGetTaskAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
