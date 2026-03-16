@@ -401,6 +401,8 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
             } catch {
                 setSelectedOperationName(previousOperationName);
                 setElementProperties([]);
+
+                toast.error('Failed to change operation');
             }
         },
         [

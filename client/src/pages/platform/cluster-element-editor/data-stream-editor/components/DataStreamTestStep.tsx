@@ -73,7 +73,7 @@ export default function DataStreamTestStep() {
                         label={rootWorkflowNodeName}
                         property={outputSchema}
                         sampleOutput={sampleOutput}
-                        valueToCopy={`$\{${rootWorkflowNodeName}}`}
+                        valueToCopy={'${' + rootWorkflowNodeName + '}'}
                         workflowNodeName={rootWorkflowNodeName}
                     />
 

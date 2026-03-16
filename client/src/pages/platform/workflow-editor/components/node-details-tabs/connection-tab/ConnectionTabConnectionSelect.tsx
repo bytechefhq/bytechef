@@ -134,6 +134,10 @@ const ConnectionTabConnectionSelect = ({
                 },
                 {
                     onError: () => {
+                        if (connectionIdRef.current !== connectionId) {
+                            return;
+                        }
+
                         setConnectionId(previousConnectionId);
 
                         connectionIdRef.current = previousConnectionId;
@@ -141,12 +145,20 @@ const ConnectionTabConnectionSelect = ({
                         toast.error('Failed to save connection');
                     },
                     onSuccess: () => {
-                        if (currentNode) {
-                            setCurrentNode({...currentNode, connectionId});
+                        if (connectionIdRef.current !== connectionId) {
+                            return;
                         }
 
-                        if (currentComponent) {
-                            setCurrentComponent({...currentComponent, connectionId});
+                        const latestState = useWorkflowNodeDetailsPanelStore.getState();
+                        const latestNode = latestState.currentNode;
+                        const latestComponent = latestState.currentComponent;
+
+                        if (latestNode) {
+                            latestState.setCurrentNode({...latestNode, connectionId});
+                        }
+
+                        if (latestComponent) {
+                            latestState.setCurrentComponent({...latestComponent, connectionId});
                         }
 
                         queryClient.removeQueries({
@@ -165,14 +177,10 @@ const ConnectionTabConnectionSelect = ({
             );
         },
         [
-            currentComponent,
             currentEnvironmentId,
-            currentNode,
             queryClient,
             rootClusterElementNodeData?.workflowNodeName,
             saveWorkflowTestConfigurationConnectionMutation,
-            setCurrentComponent,
-            setCurrentNode,
             workflowId,
             workflowNodeName,
         ]
