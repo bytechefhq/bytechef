@@ -14,9 +14,13 @@ vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () 
     useWorkflowEditor: () => mockUseWorkflowEditor(),
 }));
 
-vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
-    default: (selector: unknown) => mockUseWorkflowNodeDetailsPanelStore(selector),
-}));
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => {
+    const hook = (selector: unknown) => mockUseWorkflowNodeDetailsPanelStore(selector);
+
+    hook.getState = () => mockUseWorkflowNodeDetailsPanelStore();
+
+    return {default: hook};
+});
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
     default: (selector: unknown) => mockUseWorkflowEditorStore(selector),
