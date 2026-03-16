@@ -6,16 +6,12 @@ import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowExecutionsTaskAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsTaskAccordionItem';
 import WorkflowExecutionsTriggerAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsTriggerAccordionItem';
-import {
-    getErrorItem,
-    getInitialSelectedItem,
-    getTasksTree,
-} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
+import {getErrorItem, getInitialSelectedItem} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {TabValueType} from '@/shared/types';
 import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 const WorkflowExecutionsTestOutput = ({
     onCloseClick,
@@ -58,7 +54,7 @@ const WorkflowExecutionsTestOutput = ({
         }
     }, [workflowTestExecution, currentWorkflowId]);
 
-    const tasksTree = useMemo(() => (job ? getTasksTree(job) : []), [job]);
+    const taskExecutions = job?.taskExecutions || [];
 
     const onTaskClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
         setActiveTab(taskExecution.error ? 'error' : 'input');
@@ -103,13 +99,12 @@ const WorkflowExecutionsTestOutput = ({
                                         <ScrollArea className="h-full pl-1 pr-4">
                                             <Accordion
                                                 className="space-y-2"
-                                                collapsible
                                                 defaultValue={
                                                     isTriggerExecution
-                                                        ? triggerExecution?.id || ''
-                                                        : selectedItem?.id || ''
+                                                        ? [triggerExecution?.id || '']
+                                                        : [selectedItem?.id || '']
                                                 }
-                                                type="single"
+                                                type="multiple"
                                             >
                                                 {triggerExecution && (
                                                     <WorkflowExecutionsTriggerAccordionItem
@@ -119,12 +114,12 @@ const WorkflowExecutionsTestOutput = ({
                                                     />
                                                 )}
 
-                                                {tasksTree.map((taskTreeItem) => (
+                                                {taskExecutions.map((taskExecution) => (
                                                     <WorkflowExecutionsTaskAccordionItem
-                                                        key={taskTreeItem.task.id}
+                                                        key={taskExecution.id}
                                                         onTaskClick={onTaskClick}
                                                         selectedTaskExecutionId={selectedItem?.id || ''}
-                                                        taskTreeItem={taskTreeItem}
+                                                        taskExecution={taskExecution}
                                                     />
                                                 ))}
                                             </Accordion>
