@@ -28,7 +28,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.todo.util.MicrosoftToDoUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
@@ -44,7 +43,7 @@ public class MicrosoftToDoGetTaskAction {
         .properties(
             string(TASK_LIST_ID)
                 .label("Task List ID")
-                .description("ID of the task list where the task will be created.")
+                .description("ID of the task list where the task is located.")
                 .options((OptionsFunction<String>) MicrosoftToDoUtils::getTaskListIdOptions)
                 .required(true),
             string(TASK_ID)
@@ -67,6 +66,6 @@ public class MicrosoftToDoGetTaskAction {
                     inputParameters.getRequiredString(TASK_LIST_ID), inputParameters.getRequiredString(TASK_ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
