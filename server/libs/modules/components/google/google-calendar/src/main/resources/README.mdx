@@ -1,3 +1,21 @@
+### How to find Calendar ID
+
+To find a Calendar ID, open the calendar in your browser. On the left sidebar, find **My calendars** or **Other calendars**. Click the three dots next to the calendar you want to use. Click **Settings and sharing**. Scroll to the section **Integrate calendar** and there you will find **Calendar ID**.
+
+### How to find Event ID
+
+#### Via API
+* Use the `GET https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events` endpoint.
+* Lists the events in the user's calendar.
+
+The Event ID can also be found in the output of the following actions and triggers:
+* **Add Attendees To Event**
+* **Create Event**
+* **Create Quick Event**
+* **Get Events**
+* **Update Event**
+* **New Or Updated Event** trigger
+
 ## Troubleshooting
 
 ### Access Blocked: Verification Process Not Completed
