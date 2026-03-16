@@ -139,8 +139,8 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
                         intervals.add(new Interval(previousEndTime, LocalDateTime.of(start, LOCAL_TIME_MIN)));
                     }
 
-                    previousEndTime = previousEndTime.isAfter(LocalDateTime.of(end, LOCAL_TIME_MIN))
-                        ? previousEndTime : LocalDateTime.of(end, LOCAL_TIME_MIN);
+                    previousEndTime = previousEndTime.isAfter(LocalDateTime.of(end.plusDays(1), LOCAL_TIME_MIN))
+                        ? previousEndTime : LocalDateTime.of(end.plusDays(1), LOCAL_TIME_MIN);
                 }
             }
 
