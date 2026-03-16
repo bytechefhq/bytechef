@@ -18,9 +18,11 @@ package com.bytechef.ai.mcp.tool.automation.impl;
 
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
+import com.bytechef.ai.mcp.tool.platform.exception.ScriptToolErrorType;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.exception.ExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +101,8 @@ public class ScriptTools {
         } catch (Exception e) {
             logger.error("Failed to update Script component in workflow {}", workflowId, e);
 
-            throw new RuntimeException("Failed to update workflow: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to update workflow: " + e.getMessage(), e,
+                ScriptToolErrorType.UPDATE_SCRIPT);
         }
     }
 }

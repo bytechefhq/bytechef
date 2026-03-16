@@ -17,7 +17,9 @@
 package com.bytechef.ai.mcp.tool.platform;
 
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
+import com.bytechef.ai.mcp.tool.platform.exception.TaskDispatcherToolErrorType;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
@@ -84,7 +86,8 @@ public class TaskDispatcherTools {
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_TASK_DISPATCHERS, e);
 
-            throw new RuntimeException(FAILED_TO_LIST_TASK_DISPATCHERS, e);
+            throw new ExecutionException(FAILED_TO_LIST_TASK_DISPATCHERS, e,
+                TaskDispatcherToolErrorType.LIST_TASK_DISPATCHERS);
         }
     }
 
@@ -123,7 +126,8 @@ public class TaskDispatcherTools {
         } catch (Exception e) {
             logger.error("Failed to get task dispatcher {}", name, e);
 
-            throw new RuntimeException(FAILED_TO_GET_TASK_DISPATCHER, e);
+            throw new ExecutionException(FAILED_TO_GET_TASK_DISPATCHER, e,
+                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER);
         }
     }
 
@@ -161,7 +165,8 @@ public class TaskDispatcherTools {
         } catch (Exception e) {
             logger.error("Failed to get output properties for task dispatcher '{}'", name, e);
 
-            throw new RuntimeException("Failed to get output properties", e);
+            throw new ExecutionException("Failed to get output properties", e,
+                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_OUTPUT);
         }
     }
 
@@ -191,7 +196,8 @@ public class TaskDispatcherTools {
         } catch (Exception e) {
             logger.error("Failed to get properties for task dispatcher '{}'", name, e);
 
-            throw new RuntimeException("Failed to get properties", e);
+            throw new ExecutionException("Failed to get properties", e,
+                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_PROPERTIES);
         }
     }
 
@@ -226,7 +232,8 @@ public class TaskDispatcherTools {
         } catch (Exception e) {
             logger.error("Failed to search task dispatchers with query '{}'", query, e);
 
-            throw new RuntimeException(FAILED_TO_SEARCH_TASK_DISPATCHERS, e);
+            throw new ExecutionException(FAILED_TO_SEARCH_TASK_DISPATCHERS, e,
+                TaskDispatcherToolErrorType.SEARCH_TASK_DISPATCHERS);
         }
     }
 
@@ -261,7 +268,8 @@ public class TaskDispatcherTools {
         } catch (Exception e) {
             logger.error("Failed to generate task dispatcher definition for '{}'", name, e);
 
-            throw new RuntimeException("Failed to generate task dispatcher definition", e);
+            throw new ExecutionException("Failed to generate task dispatcher definition", e,
+                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_DEFINITION);
         }
     }
 

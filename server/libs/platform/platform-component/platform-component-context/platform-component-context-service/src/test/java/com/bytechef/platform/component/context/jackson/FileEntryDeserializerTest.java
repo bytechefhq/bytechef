@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.exception.ConfigurationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
@@ -93,7 +94,7 @@ class FileEntryDeserializerTest {
             }
             """;
 
-        assertThrows(IllegalArgumentException.class, () -> objectMapper.readValue(json, FileEntry.class));
+        assertThrows(ConfigurationException.class, () -> objectMapper.readValue(json, FileEntry.class));
     }
 
     @Test
@@ -105,14 +106,14 @@ class FileEntryDeserializerTest {
             }
             """;
 
-        assertThrows(IllegalArgumentException.class, () -> objectMapper.readValue(json, FileEntry.class));
+        assertThrows(ConfigurationException.class, () -> objectMapper.readValue(json, FileEntry.class));
     }
 
     @Test
     void testDeserializeWithEmptyObjectThrowsException() {
         String json = "{}";
 
-        assertThrows(IllegalArgumentException.class, () -> objectMapper.readValue(json, FileEntry.class));
+        assertThrows(ConfigurationException.class, () -> objectMapper.readValue(json, FileEntry.class));
     }
 
     @Test

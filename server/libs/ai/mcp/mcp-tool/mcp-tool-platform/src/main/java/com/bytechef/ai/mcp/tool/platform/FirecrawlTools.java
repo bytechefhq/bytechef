@@ -17,7 +17,9 @@
 package com.bytechef.ai.mcp.tool.platform;
 
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
+import com.bytechef.ai.mcp.tool.platform.exception.FirecrawlToolErrorType;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.exception.ExecutionException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -119,7 +121,8 @@ public class FirecrawlTools {
         } catch (Exception e) {
             logger.error("Failed to perform Firecrawl search for query: {}", query, e);
 
-            throw new RuntimeException("Failed to perform Firecrawl search: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to perform Firecrawl search: " + e.getMessage(), e,
+                FirecrawlToolErrorType.WEB_SEARCH);
         }
     }
 
@@ -173,7 +176,8 @@ public class FirecrawlTools {
         } catch (Exception e) {
             logger.error("Failed to scrape URL with Firecrawl: {}", url, e);
 
-            throw new RuntimeException("Failed to scrape URL: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to scrape URL: " + e.getMessage(), e,
+                FirecrawlToolErrorType.WEBPAGE_SCRAPE);
         }
     }
 
@@ -247,7 +251,8 @@ public class FirecrawlTools {
         } catch (Exception e) {
             logger.error("Failed to map website URLs for: {}", url, e);
 
-            throw new RuntimeException("Failed to map website: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to map website: " + e.getMessage(), e,
+                FirecrawlToolErrorType.WEBSITE_MAP);
         }
     }
 
