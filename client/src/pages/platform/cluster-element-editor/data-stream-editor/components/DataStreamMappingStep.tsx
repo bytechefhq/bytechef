@@ -17,12 +17,14 @@ export default function DataStreamMappingStep() {
     } = useDataStreamMapping();
 
     return (
-        <div className="space-y-4 py-4">
-            <h2 className="text-lg font-semibold">Field Mapping</h2>
+        <div className="space-y-6 py-4">
+            <div>
+                <h2 className="text-lg font-semibold">Field Mapping</h2>
 
-            <p className="mb-4 text-sm text-muted-foreground">
-                Map fields from {sourceLabel} to {destinationLabel}. Configure the field mappings for the processor.
-            </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    Map fields from {sourceLabel} to {destinationLabel}. Configure the field mappings for the processor.
+                </p>
+            </div>
 
             {processor && hasSourceAndDestination && (
                 <Button

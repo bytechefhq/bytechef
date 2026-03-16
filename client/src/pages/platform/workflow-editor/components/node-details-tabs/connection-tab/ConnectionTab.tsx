@@ -5,11 +5,13 @@ import {
     WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
 import {XIcon} from 'lucide-react';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useConnectionNoteStore} from '../../../stores/useConnectionNoteStore';
 
 type ConnectionTabPropsType = {
+    className?: string;
     componentConnections: Array<ComponentConnection>;
     currentComponentDefinition?: ComponentDefinition;
     workflowNodeName: string;
@@ -18,6 +20,7 @@ type ConnectionTabPropsType = {
 };
 
 const ConnectionTab = ({
+    className,
     componentConnections,
     currentComponentDefinition,
     workflowId,
@@ -32,7 +35,7 @@ const ConnectionTab = ({
     );
 
     return (
-        <div className="flex h-full flex-col gap-6 overflow-y-auto overflow-x-hidden p-4">
+        <div className={twMerge('flex h-full flex-col gap-6 overflow-y-auto overflow-x-hidden p-4', className)}>
             {componentConnections.map((componentConnection) => {
                 const workflowTestConfigurationConnection = workflowTestConfigurationConnections?.find(
                     (testConfigConnection) => testConfigConnection.workflowConnectionKey === componentConnection.key
