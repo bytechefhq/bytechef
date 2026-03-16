@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
@@ -40,81 +41,84 @@ const WorkflowExecutionSheet = () => {
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <div className="flex min-w-0 flex-1 flex-col">
+                    <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
+                        <div className="flex items-center gap-x-2">
+                            <WorkflowIcon />
+
+                            {workflowExecutionLoading ? (
+                                <Skeleton className="h-6 w-48" />
+                            ) : (
+                                <span className="flex gap-x-1 text-base text-content-neutral-secondary">
+                                    {`${workflowExecution?.project?.name} /`}
+
+                                    <strong className="text-content-neutral-primary">
+                                        {workflowExecution?.workflow?.label}
+                                    </strong>
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                            {ff_4077 && copilotEnabled && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            className="[&_svg]:size-5"
+                                            disabled={workflowExecutionLoading}
+                                            icon={<SparklesIcon />}
+                                            onClick={handleCopilotClick}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Open Copilot panel</TooltipContent>
+                                </Tooltip>
+                            )}
+
+                            <SheetCloseButton />
+                        </div>
+                    </header>
+
                     {workflowExecutionLoading ? (
                         <div className="flex size-full items-center justify-center">
                             <LoadingIcon className="size-6" />
                         </div>
                     ) : (
-                        <>
-                            <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
-                                <div className="flex items-center gap-x-2">
-                                    <WorkflowIcon />
-
-                                    <span className="flex gap-x-1 text-base text-content-neutral-secondary">
-                                        {`${workflowExecution?.project?.name} /`}
-
-                                        <strong className="text-content-neutral-primary">
-                                            {workflowExecution?.workflow?.label}
-                                        </strong>
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-1">
-                                    {ff_4077 && copilotEnabled && (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    className="[&_svg]:size-5"
-                                                    icon={<SparklesIcon />}
-                                                    onClick={handleCopilotClick}
-                                                    size="icon"
-                                                    variant="ghost"
-                                                />
-                                            </TooltipTrigger>
-
-                                            <TooltipContent>Open Copilot panel</TooltipContent>
-                                        </Tooltip>
+                        <div className="flex min-h-0 flex-1 p-3">
+                            <ResizablePanelGroup className="h-full" orientation="horizontal">
+                                <ResizablePanel
+                                    className="flex min-h-0 w-1/2 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
+                                    defaultSize={50}
+                                >
+                                    {workflowExecution?.job && (
+                                        <WorkflowExecutionSheetContent
+                                            job={workflowExecution.job}
+                                            triggerExecution={workflowExecution?.triggerExecution}
+                                        />
                                     )}
+                                </ResizablePanel>
 
-                                    <SheetCloseButton />
-                                </div>
-                            </header>
+                                <ResizableHandle className="mx-2.5" withHandle />
 
-                            <div className="flex min-h-0 flex-1 p-3">
-                                <ResizablePanelGroup className="h-full" orientation="horizontal">
-                                    <ResizablePanel
-                                        className="flex min-h-0 w-1/2 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
-                                        defaultSize={50}
-                                    >
-                                        {workflowExecution?.job && (
-                                            <WorkflowExecutionSheetContent
-                                                job={workflowExecution.job}
-                                                triggerExecution={workflowExecution?.triggerExecution}
+                                <ResizablePanel
+                                    className="flex min-h-0 w-1/2 flex-col overflow-hidden"
+                                    defaultSize={50}
+                                >
+                                    {workflowExecution && (
+                                        <WorkflowReadOnlyProvider
+                                            value={{
+                                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                                            }}
+                                        >
+                                            <WorkflowExecutionSheetWorkflowPanel
+                                                workflowExecution={workflowExecution}
                                             />
-                                        )}
-                                    </ResizablePanel>
-
-                                    <ResizableHandle className="mx-2.5" withHandle />
-
-                                    <ResizablePanel
-                                        className="flex min-h-0 w-1/2 flex-col overflow-hidden"
-                                        defaultSize={50}
-                                    >
-                                        {workflowExecution && (
-                                            <WorkflowReadOnlyProvider
-                                                value={{
-                                                    useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                                }}
-                                            >
-                                                <WorkflowExecutionSheetWorkflowPanel
-                                                    workflowExecution={workflowExecution}
-                                                />
-                                            </WorkflowReadOnlyProvider>
-                                        )}
-                                    </ResizablePanel>
-                                </ResizablePanelGroup>
-                            </div>
-                        </>
+                                        </WorkflowReadOnlyProvider>
+                                    )}
+                                </ResizablePanel>
+                            </ResizablePanelGroup>
+                        </div>
                     )}
                 </div>
 
