@@ -30,6 +30,7 @@ import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils;
+import com.bytechef.microsoft.commons.MicrosoftTriggerUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
@@ -71,6 +72,6 @@ public class MicrosoftTeamsNewChannelMessageTrigger {
             inputParameters.getRequiredString(TEAM_ID),
             inputParameters.getRequiredString(CHANNEL_ID));
 
-        return MicrosoftTeamsUtils.pollMicrosoftTeamsMessage(url, closureParameters, context);
+        return MicrosoftTriggerUtils.poll(url, "messageType", closureParameters, context);
     }
 }
