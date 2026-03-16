@@ -17,12 +17,12 @@
 package com.bytechef.component.microsoft.todo.util;
 
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.DISPLAY_NAME;
-import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.ID;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_LIST_ID;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TITLE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -40,28 +40,28 @@ public class MicrosoftToDoUtils {
 
     public static List<Option<String>> getTaskIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext actionContext) {
+        String searchText, Context context) {
 
-        Map<String, ?> body = actionContext
+        Map<String, ?> body = context
             .http(http -> http.get(
                 "/me/todo/lists/%s/tasks".formatted(inputParameters.getRequiredString(TASK_LIST_ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(actionContext, body, TITLE, ID);
+        return getOptions(context, body, TITLE, ID);
     }
 
     public static List<Option<String>> getTaskListIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext actionContext) {
+        String searchText, Context context) {
 
-        Map<String, ?> body = actionContext
+        Map<String, ?> body = context
             .http(http -> http.get("/me/todo/lists"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(actionContext, body, DISPLAY_NAME, ID);
+        return getOptions(context, body, DISPLAY_NAME, ID);
     }
 }
