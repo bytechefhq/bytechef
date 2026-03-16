@@ -20,6 +20,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
@@ -31,6 +32,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.Calendar.Events;
+import com.google.api.services.calendar.Calendar.Events.Delete;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +47,12 @@ import org.mockito.MockedStatic;
 class GoogleCalendarDeleteEventActionTest {
 
     private final Calendar mockedCalendar = mock(Calendar.class);
-    private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
-    private final Calendar.Events.Delete mockedDelete = mock(Calendar.Events.Delete.class);
+    private final Events mockedEvents = mock(Events.class);
+    private final Delete mockedDelete = mock(Delete.class);
     private final Parameters parameters = MockParametersFactory.create(
         Map.of(CALENDAR_ID, "calendarId", EVENT_ID, "id"));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
