@@ -20,6 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property.Type;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -147,6 +149,7 @@ public class SqlUtils {
             }
         }
 
-        throw new IllegalArgumentException("Unable to parse date string: " + dateString);
+        throw new ConfigurationException(
+            "Unable to parse date string: " + dateString, ComponentErrorType.INVALID_DATE_STRING);
     }
 }

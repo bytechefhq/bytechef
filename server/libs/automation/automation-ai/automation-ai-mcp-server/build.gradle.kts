@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-mcp:automation-mcp-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-api"))
+    implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:modules:components:map"))

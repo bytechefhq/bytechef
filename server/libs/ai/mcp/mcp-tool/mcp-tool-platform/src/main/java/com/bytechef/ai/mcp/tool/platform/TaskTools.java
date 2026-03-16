@@ -23,7 +23,9 @@ import com.bytechef.ai.mcp.tool.platform.ComponentTools.TriggerDetailedInfo;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools.TriggerMinimalInfo;
 import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools.TaskDispatcherInfo;
 import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools.TaskDispatcherMinimalInfo;
+import com.bytechef.ai.mcp.tool.platform.exception.TaskToolErrorType;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.workflow.validator.WorkflowValidator;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -110,7 +112,7 @@ public class TaskTools {
         } catch (Exception e) {
             logger.error("Failed to get task '{}' of type '{}'", name, type, e);
 
-            throw new RuntimeException(FAILED_TO_GET_TASK, e);
+            throw new ExecutionException(FAILED_TO_GET_TASK, e, TaskToolErrorType.GET_TASK);
         }
     }
 
@@ -137,7 +139,7 @@ public class TaskTools {
         } catch (Exception e) {
             logger.error("Failed to get properties for task '{}' of type '{}'", name, type, e);
 
-            throw new RuntimeException("Failed to get properties", e);
+            throw new ExecutionException("Failed to get properties", e, TaskToolErrorType.GET_TASK_PROPERTIES);
         }
     }
 
@@ -197,7 +199,7 @@ public class TaskTools {
         } catch (Exception e) {
             logger.error("Failed to get definition for task '{}' of type '{}'", name, type, e);
 
-            throw new RuntimeException("Failed to get task definition", e);
+            throw new ExecutionException("Failed to get task definition", e, TaskToolErrorType.GET_TASK_DEFINITION);
         }
     }
 
@@ -295,7 +297,7 @@ public class TaskTools {
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_TASKS, e);
 
-            throw new RuntimeException(FAILED_TO_LIST_TASKS, e);
+            throw new ExecutionException(FAILED_TO_LIST_TASKS, e, TaskToolErrorType.LIST_TASKS);
         }
     }
 
@@ -380,7 +382,7 @@ public class TaskTools {
         } catch (Exception e) {
             logger.error("Failed to search tasks with query '{}'", query, e);
 
-            throw new RuntimeException(FAILED_TO_SEARCH_TASKS, e);
+            throw new ExecutionException(FAILED_TO_SEARCH_TASKS, e, TaskToolErrorType.SEARCH_TASKS);
         }
     }
 
@@ -423,7 +425,7 @@ public class TaskTools {
         } catch (Exception e) {
             logger.error("Failed to validate task '{}' of type '{}'", name, type, e);
 
-            throw new RuntimeException("Failed to validate task", e);
+            throw new ExecutionException("Failed to validate task", e, TaskToolErrorType.VALIDATE_TASK);
         }
     }
 

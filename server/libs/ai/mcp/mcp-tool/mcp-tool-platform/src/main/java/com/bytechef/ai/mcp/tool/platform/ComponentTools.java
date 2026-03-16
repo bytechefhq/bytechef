@@ -17,8 +17,10 @@
 package com.bytechef.ai.mcp.tool.platform;
 
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
+import com.bytechef.ai.mcp.tool.platform.exception.ComponentToolErrorType;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -168,7 +170,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to get component {}", componentName, e);
 
-            throw new RuntimeException(FAILED_TO_GET_COMPONENT, e);
+            throw new ExecutionException(FAILED_TO_GET_COMPONENT, e, ComponentToolErrorType.GET_COMPONENT);
         }
     }
 
@@ -202,12 +204,13 @@ public class ComponentTools {
                         trigger.getName(), trigger.getTitle(), trigger.getDescription(), componentDefinition.getName(),
                         type.name(), ToolUtils.generateParametersJson(trigger.getProperties()), outputPropertiesJson);
                 })
-                .orElseThrow(() -> new RuntimeException(String.format(TRIGGER_NOT_FOUND, triggerName, componentName)));
+                .orElseThrow(() -> new ExecutionException(
+                    String.format(TRIGGER_NOT_FOUND, triggerName, componentName), ComponentToolErrorType.GET_TRIGGER));
 
         } catch (Exception e) {
             logger.error("Failed to get trigger '{}' from component '{}'", triggerName, componentName, e);
 
-            throw new RuntimeException(FAILED_TO_GET_TRIGGER, e);
+            throw new ExecutionException(FAILED_TO_GET_TRIGGER, e, ComponentToolErrorType.GET_TRIGGER);
         }
     }
 
@@ -231,7 +234,9 @@ public class ComponentTools {
                     return name.equals(triggerName);
                 })
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format(TRIGGER_NOT_FOUND, triggerName, componentName)));
+                .orElseThrow(() -> new ExecutionException(
+                    String.format(TRIGGER_NOT_FOUND, triggerName, componentName),
+                    ComponentToolErrorType.GENERATE_TRIGGER_DEFINITION));
             String parametersJson = ToolUtils.generateParametersJson(trigger.getProperties());
 
             // Generate the trigger definition using the template with actual parameters
@@ -249,7 +254,8 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to generate trigger definition for '{}:{}'", componentName, triggerName, e);
 
-            throw new RuntimeException(FAILED_TO_GENERATE_TRIGGER_DEFINITION, e);
+            throw new ExecutionException(
+                FAILED_TO_GENERATE_TRIGGER_DEFINITION, e, ComponentToolErrorType.GENERATE_TRIGGER_DEFINITION);
         }
     }
 
@@ -274,7 +280,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_ACTIONS, e);
 
-            throw new RuntimeException(FAILED_TO_LIST_ACTIONS, e);
+            throw new ExecutionException(FAILED_TO_LIST_ACTIONS, e, ComponentToolErrorType.LIST_ACTIONS);
         }
     }
 
@@ -295,7 +301,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_COMPONENTS, e);
 
-            throw new RuntimeException(FAILED_TO_LIST_COMPONENTS, e);
+            throw new ExecutionException(FAILED_TO_LIST_COMPONENTS, e, ComponentToolErrorType.LIST_COMPONENTS);
         }
     }
 
@@ -320,7 +326,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error(FAILED_TO_LIST_TRIGGERS, e);
 
-            throw new RuntimeException(FAILED_TO_LIST_TRIGGERS, e);
+            throw new ExecutionException(FAILED_TO_LIST_TRIGGERS, e, ComponentToolErrorType.LIST_TRIGGERS);
         }
     }
 
@@ -352,7 +358,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to search components with query '{}'", query, e);
 
-            throw new RuntimeException(FAILED_TO_SEARCH_COMPONENTS, e);
+            throw new ExecutionException(FAILED_TO_SEARCH_COMPONENTS, e, ComponentToolErrorType.SEARCH_COMPONENTS);
         }
     }
 
@@ -388,7 +394,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to search triggers with query '{}'", query, e);
 
-            throw new RuntimeException(FAILED_TO_SEARCH_TRIGGERS, e);
+            throw new ExecutionException(FAILED_TO_SEARCH_TRIGGERS, e, ComponentToolErrorType.SEARCH_TRIGGERS);
         }
     }
 
@@ -423,12 +429,13 @@ public class ComponentTools {
                         action.getName(), action.getTitle(), action.getDescription(), componentDefinition.getName(),
                         ToolUtils.generateParametersJson(action.getProperties()), outputPropertiesJson);
                 })
-                .orElseThrow(() -> new RuntimeException(String.format(ACTION_NOT_FOUND, actionName, componentName)));
+                .orElseThrow(() -> new ExecutionException(
+                    String.format(ACTION_NOT_FOUND, actionName, componentName), ComponentToolErrorType.GET_ACTION));
 
         } catch (Exception e) {
             logger.error("Failed to get action '{}' from component '{}'", actionName, componentName, e);
 
-            throw new RuntimeException(FAILED_TO_GET_ACTION, e);
+            throw new ExecutionException(FAILED_TO_GET_ACTION, e, ComponentToolErrorType.GET_ACTION);
         }
     }
 
@@ -463,7 +470,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to search actions with query '{}'", query, e);
 
-            throw new RuntimeException(FAILED_TO_SEARCH_ACTIONS, e);
+            throw new ExecutionException(FAILED_TO_SEARCH_ACTIONS, e, ComponentToolErrorType.SEARCH_ACTIONS);
         }
     }
 
@@ -483,7 +490,9 @@ public class ComponentTools {
                 .stream()
                 .filter(actionDefinition -> Objects.equals(actionDefinition.getName(), actionName))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format(ACTION_NOT_FOUND, actionName, componentName)));
+                .orElseThrow(() -> new ExecutionException(
+                    String.format(ACTION_NOT_FOUND, actionName, componentName),
+                    ComponentToolErrorType.GENERATE_ACTION_DEFINITION));
             String parametersJson = ToolUtils.generateParametersJson(action.getProperties());
 
             // Generate the action definition using the template with actual parameters
@@ -501,7 +510,8 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to generate action definition for '{}:{}'", componentName, actionName, e);
 
-            throw new RuntimeException(FAILED_TO_GENERATE_ACTION_DEFINITION, e);
+            throw new ExecutionException(
+                FAILED_TO_GENERATE_ACTION_DEFINITION, e, ComponentToolErrorType.GENERATE_ACTION_DEFINITION);
         }
     }
 
@@ -586,7 +596,9 @@ public class ComponentTools {
                         }
                     }
                 } else {
-                    throw new RuntimeException(String.format(OPERATION_NOT_FOUND, operationName, componentName));
+                    throw new ExecutionException(
+                        String.format(OPERATION_NOT_FOUND, operationName, componentName),
+                        ComponentToolErrorType.OPERATION_NOT_FOUND);
                 }
             }
 
@@ -602,7 +614,9 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to get output properties for '{}:{}'", componentName, operationName, e);
 
-            throw new RuntimeException(FAILED_TO_GET_OUTPUT_PROPERTIES + ": " + e.getMessage(), e);
+            throw new ExecutionException(
+                FAILED_TO_GET_OUTPUT_PROPERTIES + ": " + e.getMessage(), e,
+                ComponentToolErrorType.GET_OUTPUT_PROPERTIES);
         }
     }
 
@@ -650,7 +664,9 @@ public class ComponentTools {
 
                     properties = actionDefinition.getProperties();
                 } else {
-                    throw new RuntimeException(String.format(OPERATION_NOT_FOUND, operationName, componentName));
+                    throw new ExecutionException(
+                        String.format(OPERATION_NOT_FOUND, operationName, componentName),
+                        ComponentToolErrorType.OPERATION_NOT_FOUND);
                 }
             }
 
@@ -662,7 +678,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to get properties for '{}:{}'", componentName, operationName, e);
 
-            throw new RuntimeException(FAILED_TO_GET_PROPERTIES, e);
+            throw new ExecutionException(FAILED_TO_GET_PROPERTIES, e, ComponentToolErrorType.GET_PROPERTIES);
         }
     }
 

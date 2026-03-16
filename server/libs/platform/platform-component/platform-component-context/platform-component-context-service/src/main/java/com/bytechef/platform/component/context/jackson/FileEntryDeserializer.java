@@ -17,7 +17,9 @@
 package com.bytechef.platform.component.context.jackson;
 
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.context.FileEntryImpl;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import org.springframework.boot.jackson.JacksonComponent;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -38,7 +40,8 @@ public class FileEntryDeserializer extends ValueDeserializer<FileEntry> {
         String url = asText("url", jsonNode);
 
         if (name == null || url == null) {
-            throw new IllegalArgumentException("FileEntry 'name' and 'url' are required");
+            throw new ConfigurationException(
+                "FileEntry 'name' and 'url' are required", ComponentErrorType.INVALID_FILE_ENTRY);
         }
 
         return new FileEntryImpl(name, asText("extension", jsonNode), asText("mimeType", jsonNode), url);

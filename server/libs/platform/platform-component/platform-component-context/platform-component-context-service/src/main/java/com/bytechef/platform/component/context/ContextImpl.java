@@ -26,8 +26,10 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -308,7 +310,9 @@ class ContextImpl implements Context {
                 Objects.requireNonNull(keyValueArray);
 
                 if (keyValueArray.length % 2 != 0) {
-                    throw new IllegalArgumentException();
+                    throw new ConfigurationException(
+                        "Query parameters key-value array must have an even number of elements",
+                        ComponentErrorType.INVALID_CONTEXT_ARGUMENT);
                 }
 
                 this.queryParameters = IntStream

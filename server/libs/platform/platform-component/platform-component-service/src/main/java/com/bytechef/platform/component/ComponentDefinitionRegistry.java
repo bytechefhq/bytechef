@@ -43,6 +43,8 @@ import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
 import com.bytechef.platform.util.PropertyUtils;
@@ -557,8 +559,9 @@ public class ComponentDefinitionRegistry {
                         .orElse(null));
 
                 if (triggerDefinition.getType() == null) {
-                    throw new IllegalArgumentException(
-                        "Trigger type for trigger=%s is not defined".formatted(triggerDefinition.getName()));
+                    throw new ConfigurationException(
+                        "Trigger type for trigger=%s is not defined".formatted(triggerDefinition.getName()),
+                        ComponentErrorType.COMPONENT_NOT_FOUND);
                 }
             }
         }
