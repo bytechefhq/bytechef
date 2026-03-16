@@ -20,6 +20,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -48,8 +49,8 @@ import org.mockito.MockedStatic;
 class GoogleCalendarAddAttendeesToEventActionTest {
 
     private static final String CALENDAR_TIMEZONE = "Europe/Zagreb";
-    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
-    private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = forClass(Calendar.class);
+    private final ArgumentCaptor<Event> eventArgumentCaptor = forClass(Event.class);
     private MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic;
     private MockedStatic<GoogleServices> googleServicesMockedStatic;
     private MockedStatic<GoogleUtils> googleUtilsMockedStatic;
@@ -59,8 +60,8 @@ class GoogleCalendarAddAttendeesToEventActionTest {
     private final Event mockedEvent = mock(Event.class);
     private final Parameters parameters = MockParametersFactory.create(
         Map.of(CALENDAR_ID, "calendarId", EVENT_ID, "eventId", ATTENDEES, List.of("attendee1", "attendee2")));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach
     void beforeEach() {

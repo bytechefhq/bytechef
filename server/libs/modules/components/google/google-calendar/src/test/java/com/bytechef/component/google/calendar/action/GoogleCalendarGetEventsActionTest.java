@@ -17,6 +17,7 @@
 package com.bytechef.component.google.calendar.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -36,7 +37,7 @@ class GoogleCalendarGetEventsActionTest {
 
     private final Parameters mockedParameters = mock(Parameters.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() {
