@@ -42,31 +42,6 @@ body {
     color: #0f172a;
 }
 
-.connect-status {
-    text-align: center;
-    padding: 16px;
-}
-
-.connect-spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid #e2e8f0;
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: connect-spin 0.8s linear infinite;
-    margin: 0 auto 12px;
-}
-
-@keyframes connect-spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.connect-status-text {
-    font-size: 14px;
-    color: #64748b;
-}
 
 .connect-expired {
     text-align: center;

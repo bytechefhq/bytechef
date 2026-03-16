@@ -25,9 +25,15 @@ type ParseResultType =
 
 function decodeJwtPayload(jwtToken: string): JwtPayloadI | null {
     try {
-        const payloadBase64 = jwtToken.split('.')[1];
+        let payloadBase64 = jwtToken.split('.')[1];
 
-        const payloadJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+        payloadBase64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+
+        const paddingNeeded = (4 - (payloadBase64.length % 4)) % 4;
+
+        payloadBase64 += '='.repeat(paddingNeeded);
+
+        const payloadJson = atob(payloadBase64);
 
         return JSON.parse(payloadJson) as JwtPayloadI;
     } catch (error) {
@@ -41,6 +47,10 @@ function parseTokenData(jwtToken: string): ParseResultType {
     const payload = decodeJwtPayload(jwtToken);
 
     if (!payload) {
+        return {reason: 'corrupted', status: 'error'};
+    }
+
+    if (!Number.isFinite(payload.exp) || !Number.isFinite(payload.integrationId)) {
         return {reason: 'corrupted', status: 'error'};
     }
 
