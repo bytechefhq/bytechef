@@ -26,6 +26,7 @@ import com.bytechef.component.microsoft.todo.action.MicrosoftToDoCreateTaskActio
 import com.bytechef.component.microsoft.todo.action.MicrosoftToDoCreateTaskListAction;
 import com.bytechef.component.microsoft.todo.action.MicrosoftToDoGetTaskAction;
 import com.bytechef.component.microsoft.todo.connection.MicrosoftToDoConnection;
+import com.bytechef.component.microsoft.todo.trigger.MicrosoftToDoNewTaskTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -43,7 +44,7 @@ public class MicrosoftToDoComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(MicrosoftToDoConnection.CONNECTION_DEFINITION)
         .customAction(true)
-        .customActionHelp("","https://learn.microsoft.com/en-us/graph/api/resources/todo-overview?view=graph-rest-1.0")
+        .customActionHelp("", "https://learn.microsoft.com/en-us/graph/api/resources/todo-overview?view=graph-rest-1.0")
         .actions(
             MicrosoftToDoCreateTaskAction.ACTION_DEFINITION,
             MicrosoftToDoCreateTaskListAction.ACTION_DEFINITION,
@@ -52,6 +53,7 @@ public class MicrosoftToDoComponentHandler implements ComponentHandler {
             tool(MicrosoftToDoCreateTaskAction.ACTION_DEFINITION),
             tool(MicrosoftToDoCreateTaskListAction.ACTION_DEFINITION),
             tool(MicrosoftToDoGetTaskAction.ACTION_DEFINITION))
+        .triggers(MicrosoftToDoNewTaskTrigger.TRIGGER_DEFINITION)
         .version(1);
 
     @Override

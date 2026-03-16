@@ -19,6 +19,7 @@ package com.bytechef.component.microsoft.todo.constant;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 
@@ -28,13 +29,11 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 public class MicrosoftToDoConstants {
 
     public static final String DISPLAY_NAME = "displayName";
-    public static final String ID = "id";
     public static final String IMPORTANCE = "importance";
     public static final String IS_REMINDER_ON = "isReminderOn";
     public static final String TASK_ID = "taskId";
     public static final String TASK_LIST_ID = "taskListId";
     public static final String TITLE = "title";
-    public static final String VALUE = "value";
 
     public static final ModifiableObjectProperty OUTPUT_TASK_PROPERTY = object()
         .properties(
