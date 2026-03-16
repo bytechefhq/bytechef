@@ -16,12 +16,13 @@
 
 package com.bytechef.component.microsoft.excel.util;
 
+import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class MicrosoftExcelRowUtils {
                     .formatted(
                         inputParameters.getRequiredString(WORKBOOK_ID),
                         inputParameters.getRequiredString(WORKSHEET_NAME), range)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 

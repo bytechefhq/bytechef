@@ -39,6 +39,7 @@ public class MicrosoftExcelFindRowByNumAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRowByNum")
         .title("Find Row by Number")
         .description("Get row values from the worksheet by the row number.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-excel_v1#find-row-by-num")
         .properties(
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,

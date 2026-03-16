@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.COLUMN;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
@@ -40,7 +41,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -150,7 +151,7 @@ public class MicrosoftExcelUtils {
                     .formatted(
                         inputParameters.getRequiredString(WORKBOOK_ID),
                         inputParameters.getRequiredString(WORKSHEET_NAME))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -166,7 +167,7 @@ public class MicrosoftExcelUtils {
             .http(http -> http.get("/me/drive/items/%s/workbook/worksheets/%s/usedRange"
                 .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
                     inputParameters.getRequiredString(WORKSHEET_NAME))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -297,7 +298,7 @@ public class MicrosoftExcelUtils {
 
         Map<String, Object> body = context
             .http(http -> http.get("/me/drive/items/root/search(q='.xlsx')"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -312,7 +313,7 @@ public class MicrosoftExcelUtils {
             .http(http -> http
                 .get("/me/drive/items/%s//workbook/worksheets/"
                     .formatted(inputParameters.getRequiredString(WORKBOOK_ID))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
