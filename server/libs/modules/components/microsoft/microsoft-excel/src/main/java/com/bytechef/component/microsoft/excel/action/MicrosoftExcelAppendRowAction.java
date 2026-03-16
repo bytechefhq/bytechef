@@ -43,6 +43,7 @@ public class MicrosoftExcelAppendRowAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("appendRow")
         .title("Append Row")
         .description("Append a row of values to an existing worksheet.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-excel_v1#append-row")
         .properties(
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,

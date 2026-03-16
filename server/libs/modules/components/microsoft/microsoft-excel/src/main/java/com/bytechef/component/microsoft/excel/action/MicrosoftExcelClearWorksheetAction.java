@@ -29,6 +29,7 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.ge
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
@@ -41,6 +42,7 @@ public class MicrosoftExcelClearWorksheetAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("clearWorksheet")
         .title("Clear Worksheet")
         .description("Clear a worksheet of all values.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-excel_v1#clear-worksheet")
         .properties(
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
@@ -64,7 +66,7 @@ public class MicrosoftExcelClearWorksheetAction {
                         inputParameters.getRequiredString(WORKBOOK_ID),
                         inputParameters.getRequiredString(WORKSHEET_NAME), range)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .body(Http.Body.of(
+            .body(Body.of(
                 List.of("applyTo", "Contents")
                     .toArray()))
             .execute();

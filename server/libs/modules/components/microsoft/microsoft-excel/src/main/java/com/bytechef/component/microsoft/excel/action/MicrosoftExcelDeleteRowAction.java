@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
@@ -27,7 +28,8 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.ge
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
@@ -40,6 +42,7 @@ public class MicrosoftExcelDeleteRowAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
         .title("Delete Row")
         .description("Delete row on an existing sheet.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-excel_v1#delete-row")
         .properties(
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
@@ -63,8 +66,8 @@ public class MicrosoftExcelDeleteRowAction {
                 "/me/drive/items/%s/workbook/worksheets/%s/range(address='%s')/delete"
                     .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
                         inputParameters.getRequiredString(WORKSHEET_NAME), range)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .body(Http.Body.of(List.of("shift", "Up")
+            .configuration(responseType(ResponseType.JSON))
+            .body(Body.of(List.of("shift", "Up")
                 .toArray()))
             .execute();
 

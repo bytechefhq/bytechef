@@ -16,6 +16,7 @@
 
 package com.bytechef.component.microsoft.excel.util;
 
+import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
@@ -23,7 +24,8 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.co
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getMapOfValuesForRow;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +48,8 @@ public class MicrosoftExcelUpdateWorksheetUtils {
                 "/me/drive/items/%s/workbook/worksheets/%s/range(address='%s')"
                     .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
                         inputParameters.getRequiredString(WORKSHEET_NAME), range)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .body(Http.Body.of(VALUES, List.of(rowValues)))
+            .configuration(responseType(ResponseType.JSON))
+            .body(Body.of(VALUES, List.of(rowValues)))
             .execute();
 
         return getMapOfValuesForRow(inputParameters, context, rowValues);

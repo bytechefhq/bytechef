@@ -42,6 +42,9 @@ public class MicrosoftExcelComponentHandler implements ComponentHandler {
             "Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in " +
                 "tabular form.")
         .customAction(true)
+        .customActionHelp(
+            "",
+            "https://learn.microsoft.com/en-us/graph/api/resources/excel?view=graph-rest-1.0")
         .icon("path:assets/microsoft-excel.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(MicrosoftExcelConnection.CONNECTION_DEFINITION)
@@ -56,7 +59,8 @@ public class MicrosoftExcelComponentHandler implements ComponentHandler {
             tool(MicrosoftExcelClearWorksheetAction.ACTION_DEFINITION),
             tool(MicrosoftExcelDeleteRowAction.ACTION_DEFINITION),
             tool(MicrosoftExcelFindRowByNumAction.ACTION_DEFINITION),
-            tool(MicrosoftExcelUpdateRowAction.ACTION_DEFINITION));
+            tool(MicrosoftExcelUpdateRowAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -49,11 +49,13 @@ public class MicrosoftExcelConstants {
 
     public static final ModifiableStringProperty WORKBOOK_ID_PROPERTY = string(WORKBOOK_ID)
         .label("Workbook ID")
+        .description("The ID of the workbook.")
         .options((OptionsFunction<String>) MicrosoftExcelUtils::getWorkbookIdOptions)
         .required(true);
 
     public static final ModifiableStringProperty WORKSHEET_NAME_PROPERTY = string(WORKSHEET_NAME)
         .label("Worksheet")
+        .description("The name of the worksheet.")
         .options((OptionsFunction<String>) MicrosoftExcelUtils::getWorksheetNameOptions)
         .optionsLookupDependsOn(WORKBOOK_ID)
         .required(true);
