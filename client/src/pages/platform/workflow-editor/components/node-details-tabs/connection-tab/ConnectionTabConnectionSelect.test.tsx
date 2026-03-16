@@ -32,7 +32,9 @@ const mockDeleteWorkflowTestConfigurationConnectionMutation = vi.fn();
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useSaveWorkflowTestConfigurationConnectionMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
-        mutate: mockSaveWorkflowTestConfigurationConnectionMutation,
+        mutate: (...args: unknown[]) => {
+            mockSaveWorkflowTestConfigurationConnectionMutation(...args);
+        },
         onSuccess,
     }),
 }));
@@ -132,6 +134,14 @@ describe('ConnectionTabConnectionSelect', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+
+        mockSaveWorkflowTestConfigurationConnectionMutation.mockImplementation(
+            (mutationData: unknown, options?: {onSuccess?: () => void}) => {
+                if (options?.onSuccess) {
+                    options.onSuccess();
+                }
+            }
+        );
 
         mockInvalidateQueries = vi.fn().mockResolvedValue(undefined);
         mockRemoveQueries = vi.fn();
@@ -299,13 +309,16 @@ describe('ConnectionTabConnectionSelect', () => {
                 expect(mockInvalidateQueries).toHaveBeenCalledWith({
                     queryKey: ['connections'],
                 });
-                expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith({
-                    connectionId: 123,
-                    environmentId: 1,
-                    workflowConnectionKey: 'connection_1',
-                    workflowId: 'workflow-1',
-                    workflowNodeName: 'node-1',
-                });
+                expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith(
+                    {
+                        connectionId: 123,
+                        environmentId: 1,
+                        workflowConnectionKey: 'connection_1',
+                        workflowId: 'workflow-1',
+                        workflowNodeName: 'node-1',
+                    },
+                    expect.objectContaining({onSuccess: expect.any(Function)})
+                );
             });
         });
 
@@ -390,13 +403,16 @@ describe('ConnectionTabConnectionSelect', () => {
             fireEvent.click(createConnectionButton);
 
             await waitFor(() => {
-                expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith({
-                    connectionId: 123,
-                    environmentId: 1,
-                    workflowConnectionKey: 'connection_1',
-                    workflowId: 'workflow-1',
-                    workflowNodeName: 'node-1',
-                });
+                expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith(
+                    {
+                        connectionId: 123,
+                        environmentId: 1,
+                        workflowConnectionKey: 'connection_1',
+                        workflowId: 'workflow-1',
+                        workflowNodeName: 'node-1',
+                    },
+                    expect.objectContaining({onSuccess: expect.any(Function)})
+                );
             });
         });
     });
@@ -467,13 +483,16 @@ describe('ConnectionTabConnectionSelect', () => {
         fireEvent.click(connection1Option);
 
         await waitFor(() => {
-            expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith({
-                connectionId: 1,
-                environmentId: 1,
-                workflowConnectionKey: 'connection_1',
-                workflowId: 'workflow-1',
-                workflowNodeName: 'node-1',
-            });
+            expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith(
+                {
+                    connectionId: 1,
+                    environmentId: 1,
+                    workflowConnectionKey: 'connection_1',
+                    workflowId: 'workflow-1',
+                    workflowNodeName: 'node-1',
+                },
+                expect.objectContaining({onSuccess: expect.any(Function)})
+            );
         });
     });
 
@@ -510,6 +529,139 @@ describe('ConnectionTabConnectionSelect', () => {
         );
 
         expect(screen.getByText('*')).toBeInTheDocument();
+    });
+
+    describe('deferred connectionId behavior on handleValueChange', () => {
+        it('should not update currentNode synchronously when selecting a connection', async () => {
+            mockSaveWorkflowTestConfigurationConnectionMutation.mockImplementation(() => {
+                // Do not call onSuccess - simulates pending mutation
+            });
+
+            render(
+                <ConnectionTabConnectionSelect
+                    componentConnection={mockComponentConnection}
+                    componentConnectionsCount={1}
+                    componentDefinition={mockComponentDefinition}
+                    workflowId="workflow-1"
+                    workflowNodeName="node-1"
+                />
+            );
+
+            const selectTrigger = screen.getByRole('combobox');
+
+            fireEvent.click(selectTrigger);
+
+            const connection1Option = screen.getByText('Test Connection 1');
+
+            fireEvent.click(connection1Option);
+
+            await waitFor(() => {
+                expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalled();
+            });
+
+            expect(mockSetCurrentNode).not.toHaveBeenCalled();
+        });
+
+        it('should update currentNode in mutation onSuccess callback', async () => {
+            mockSaveWorkflowTestConfigurationConnectionMutation.mockImplementation(
+                (mutationData: unknown, options?: {onSuccess?: () => void}) => {
+                    if (options?.onSuccess) {
+                        options.onSuccess();
+                    }
+                }
+            );
+
+            render(
+                <ConnectionTabConnectionSelect
+                    componentConnection={mockComponentConnection}
+                    componentConnectionsCount={1}
+                    componentDefinition={mockComponentDefinition}
+                    workflowId="workflow-1"
+                    workflowNodeName="node-1"
+                />
+            );
+
+            const selectTrigger = screen.getByRole('combobox');
+
+            fireEvent.click(selectTrigger);
+
+            const connection1Option = screen.getByText('Test Connection 1');
+
+            fireEvent.click(connection1Option);
+
+            await waitFor(() => {
+                expect(mockSetCurrentNode).toHaveBeenCalledWith({
+                    connectionId: 1,
+                    id: 'node1',
+                });
+                expect(mockSetCurrentComponent).toHaveBeenCalledWith({
+                    connectionId: 1,
+                    id: 'comp1',
+                });
+            });
+        });
+
+        it('should not remove queries synchronously when selecting a connection', async () => {
+            mockSaveWorkflowTestConfigurationConnectionMutation.mockImplementation(() => {
+                // Do not call onSuccess - simulates pending mutation
+            });
+
+            render(
+                <ConnectionTabConnectionSelect
+                    componentConnection={mockComponentConnection}
+                    componentConnectionsCount={1}
+                    componentDefinition={mockComponentDefinition}
+                    workflowId="workflow-1"
+                    workflowNodeName="node-1"
+                />
+            );
+
+            const selectTrigger = screen.getByRole('combobox');
+
+            fireEvent.click(selectTrigger);
+
+            const connection1Option = screen.getByText('Test Connection 1');
+
+            fireEvent.click(connection1Option);
+
+            await waitFor(() => {
+                expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalled();
+            });
+
+            expect(mockRemoveQueries).not.toHaveBeenCalled();
+        });
+
+        it('should remove queries in mutation onSuccess callback', async () => {
+            mockSaveWorkflowTestConfigurationConnectionMutation.mockImplementation(
+                (mutationData: unknown, options?: {onSuccess?: () => void}) => {
+                    if (options?.onSuccess) {
+                        options.onSuccess();
+                    }
+                }
+            );
+
+            render(
+                <ConnectionTabConnectionSelect
+                    componentConnection={mockComponentConnection}
+                    componentConnectionsCount={1}
+                    componentDefinition={mockComponentDefinition}
+                    workflowId="workflow-1"
+                    workflowNodeName="node-1"
+                />
+            );
+
+            const selectTrigger = screen.getByRole('combobox');
+
+            fireEvent.click(selectTrigger);
+
+            const connection1Option = screen.getByText('Test Connection 1');
+
+            fireEvent.click(connection1Option);
+
+            await waitFor(() => {
+                expect(mockRemoveQueries).toHaveBeenCalledTimes(3);
+            });
+        });
     });
 
     it('should not show create connection button when dialog is not allowed', () => {

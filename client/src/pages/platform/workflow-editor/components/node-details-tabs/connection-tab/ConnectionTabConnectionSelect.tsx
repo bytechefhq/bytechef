@@ -22,6 +22,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon, XIcon} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
+import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
@@ -117,37 +118,51 @@ const ConnectionTabConnectionSelect = ({
                 return;
             }
 
-            saveWorkflowTestConfigurationConnectionMutation.mutate({
-                connectionId,
-                environmentId: currentEnvironmentId,
-                workflowConnectionKey,
-                workflowId,
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
-            });
+            const previousConnectionId = connectionIdRef.current;
 
             setConnectionId(connectionId);
 
             connectionIdRef.current = connectionId;
 
-            if (currentNode) {
-                setCurrentNode({...currentNode, connectionId});
-            }
+            saveWorkflowTestConfigurationConnectionMutation.mutate(
+                {
+                    connectionId,
+                    environmentId: currentEnvironmentId,
+                    workflowConnectionKey,
+                    workflowId,
+                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
+                },
+                {
+                    onError: () => {
+                        setConnectionId(previousConnectionId);
 
-            if (currentComponent) {
-                setCurrentComponent({...currentComponent, connectionId});
-            }
+                        connectionIdRef.current = previousConnectionId;
 
-            queryClient.removeQueries({
-                queryKey: [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
-            });
+                        toast.error('Failed to save connection');
+                    },
+                    onSuccess: () => {
+                        if (currentNode) {
+                            setCurrentNode({...currentNode, connectionId});
+                        }
 
-            queryClient.removeQueries({
-                queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
-            });
+                        if (currentComponent) {
+                            setCurrentComponent({...currentComponent, connectionId});
+                        }
 
-            queryClient.removeQueries({
-                queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions, workflowId],
-            });
+                        queryClient.removeQueries({
+                            queryKey: [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
+                        });
+
+                        queryClient.removeQueries({
+                            queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
+                        });
+
+                        queryClient.removeQueries({
+                            queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions, workflowId],
+                        });
+                    },
+                }
+            );
         },
         [
             currentComponent,

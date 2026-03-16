@@ -22,12 +22,14 @@ export default function DataStreamSourceStep() {
     } = useClusterElementStep('source');
 
     return (
-        <div className="space-y-4 py-4">
-            <h2 className="text-lg font-semibold">Select Source</h2>
+        <div className="space-y-6 py-4">
+            <div>
+                <h2 className="text-lg font-semibold">Select Source</h2>
 
-            <p className="mb-4 text-sm text-muted-foreground">
-                Choose a data source component and configure its connection and parameters.
-            </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    Choose a data source component and configure its connection and parameters.
+                </p>
+            </div>
 
             {rootWorkflowNodeName && (
                 <>
@@ -78,6 +80,7 @@ export default function DataStreamSourceStep() {
                             <h3 className="text-sm font-medium">Connection</h3>
 
                             <ConnectionTab
+                                className="p-0"
                                 componentConnections={componentConnections}
                                 currentComponentDefinition={elementComponentDefinition}
                                 workflowId={workflowId!}

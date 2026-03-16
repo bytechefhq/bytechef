@@ -3,7 +3,7 @@ import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componen
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/shallow';
 
-const TOTAL_STEPS = 3;
+export const TOTAL_STEPS = 4;
 
 interface UseDataStreamEditorResultI {
     configuredSteps: Set<number>;
