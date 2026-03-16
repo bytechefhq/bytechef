@@ -78,28 +78,27 @@ const EmbeddedWorkflowBuilder = ({
     workflowUuid,
 }: EmbeddedWorkflowBuilderProps) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    const propsRef = useRef({connectionDialogAllowed, environment, includeComponents, jwtToken, sharedConnectionIds});
 
-    const sendInitMessage = () => {
-        if (iframeRef.current && iframeRef.current.contentWindow) {
-            iframeRef.current.contentWindow.postMessage(
-                {
-                    type: 'EMBED_INIT',
-                    params: {
-                        connectionDialogAllowed,
-                        environment,
-                        includeComponents,
-                        jwtToken,
-                        sharedConnectionIds,
-                    },
-                },
-                '*'
-            );
-        }
-    };
+    propsRef.current = {connectionDialogAllowed, environment, includeComponents, jwtToken, sharedConnectionIds};
 
     useEffect(() => {
+        const targetOrigin = new URL(baseUrl).origin;
+
+        const sendInitMessage = () => {
+            if (iframeRef.current && iframeRef.current.contentWindow) {
+                iframeRef.current.contentWindow.postMessage(
+                    {
+                        type: 'EMBED_INIT',
+                        params: propsRef.current,
+                    },
+                    targetOrigin
+                );
+            }
+        };
+
         const handleMessage = (event: MessageEvent) => {
-            if (event.data.type === 'EMBED_READY') {
+            if (event.origin === targetOrigin && event.data.type === 'EMBED_READY') {
                 sendInitMessage();
             }
         };
@@ -109,8 +108,7 @@ const EmbeddedWorkflowBuilder = ({
         return () => {
             window.removeEventListener('message', handleMessage);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [baseUrl]);
 
     return (
         <div className="absolute inset-0 lg:pl-72">
