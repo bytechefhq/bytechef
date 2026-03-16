@@ -32,7 +32,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.todo.util.MicrosoftToDoUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
@@ -57,7 +56,7 @@ public class MicrosoftToDoCreateTaskAction {
                 .required(true),
             string(IMPORTANCE)
                 .label("Importance")
-                .description("Importance of the task")
+                .description("Importance of the task.")
                 .options(
                     option("Low", "low"),
                     option("Normal", "normal"),
@@ -85,6 +84,6 @@ public class MicrosoftToDoCreateTaskAction {
                     IMPORTANCE, inputParameters.getString(IMPORTANCE),
                     IS_REMINDER_ON, inputParameters.getBoolean(IS_REMINDER_ON)))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

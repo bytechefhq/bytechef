@@ -28,7 +28,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
 
@@ -52,11 +51,19 @@ public class MicrosoftToDoCreateTaskListAction {
                     .properties(
                         string("@odata.context"),
                         string("@odata.etag"),
-                        string(ID),
-                        string(DISPLAY_NAME),
-                        bool("isOwner"),
-                        bool("isShared"),
-                        string("wellKnownListName"))))
+                        string(ID)
+                            .description("ID of the task list."),
+                        string(DISPLAY_NAME)
+                            .description("The name of the task list."),
+                        bool("isOwner")
+                            .description("Indicates whether the user is the owner of the task list."),
+                        bool("isShared")
+                            .description("Indicates whether the task list is shared with other users."),
+                        string("wellKnownListName")
+                            .description(
+                                "Property indicating the list name if the given list is a well-known " +
+                                    "list. The possible values are: none, defaultList, flaggedEmails, " +
+                                    "unknownFutureValue."))))
         .perform(MicrosoftToDoCreateTaskListAction::perform)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
@@ -69,6 +76,6 @@ public class MicrosoftToDoCreateTaskListAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(Map.of(DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME))))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
