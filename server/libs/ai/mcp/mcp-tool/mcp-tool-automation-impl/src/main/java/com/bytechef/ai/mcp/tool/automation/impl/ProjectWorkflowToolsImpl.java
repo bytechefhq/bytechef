@@ -22,9 +22,11 @@ import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowValidationResult;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
+import com.bytechef.ai.mcp.tool.platform.exception.ProjectWorkflowToolErrorType;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.workflow.validator.WorkflowValidator;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -115,7 +117,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("Failed to get workflow {}", workflowId, e);
 
-            throw new RuntimeException("Failed to get workflow: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to get workflow: " + e.getMessage(), e,
+                ProjectWorkflowToolErrorType.GET_WORKFLOW);
         }
     }
 
@@ -166,7 +169,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("Failed to list project workflows", e);
 
-            throw new RuntimeException("Failed to list project workflows: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to list project workflows: " + e.getMessage(), e,
+                ProjectWorkflowToolErrorType.LIST_WORKFLOWS);
         }
     }
 
@@ -210,7 +214,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             return matchingWorkflow;
         } catch (Exception e) {
             logger.error("Failed to search workflows with query '{}'", query, e);
-            throw new RuntimeException("Failed to search workflows: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to search workflows: " + e.getMessage(), e,
+                ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
         }
     }
 
@@ -247,7 +252,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("Failed to validate workflow", e);
 
-            throw new RuntimeException("Failed to validate workflow", e);
+            throw new ExecutionException("Failed to validate workflow", e,
+                ProjectWorkflowToolErrorType.VALIDATE_WORKFLOW);
         }
     }
 
@@ -276,7 +282,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             logger.error(
                 "Failed to create workflow {} for project {}", definition, projectId, e);
 
-            throw new RuntimeException("Failed to create project workflow: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to create project workflow: " + e.getMessage(), e,
+                ProjectWorkflowToolErrorType.CREATE_WORKFLOW);
         }
     }
 
@@ -299,7 +306,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("Failed to delete workflow {}", workflowId, e);
 
-            throw new RuntimeException("Failed to delete workflow: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to delete workflow: " + e.getMessage(), e,
+                ProjectWorkflowToolErrorType.DELETE_WORKFLOW);
         }
     }
 
@@ -333,7 +341,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("Failed to update workflow {}", workflowId, e);
 
-            throw new RuntimeException("Failed to update workflow: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to update workflow: " + e.getMessage(), e,
+                ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
         }
     }
 

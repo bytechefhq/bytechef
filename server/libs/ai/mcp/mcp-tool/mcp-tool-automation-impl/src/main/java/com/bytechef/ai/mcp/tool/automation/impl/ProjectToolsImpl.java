@@ -24,6 +24,7 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectStatusInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectVersionInfo;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
+import com.bytechef.ai.mcp.tool.platform.exception.ProjectToolErrorType;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
@@ -31,6 +32,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -84,7 +86,8 @@ public class ProjectToolsImpl implements ProjectTools {
         } catch (Exception e) {
             logger.error("Failed to list projects", e);
 
-            throw new RuntimeException("Failed to list projects: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to list projects: " + e.getMessage(), e,
+                ProjectToolErrorType.LIST_PROJECTS);
         }
     }
 
@@ -121,7 +124,8 @@ public class ProjectToolsImpl implements ProjectTools {
         } catch (Exception e) {
             logger.error("Failed to get project {}", projectId, e);
 
-            throw new RuntimeException("Failed to get project: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to get project: " + e.getMessage(), e,
+                ProjectToolErrorType.GET_PROJECT);
         }
     }
 
@@ -159,7 +163,8 @@ public class ProjectToolsImpl implements ProjectTools {
             return matchingProjects;
         } catch (Exception e) {
             logger.error("Failed to search projects with query '{}'", query, e);
-            throw new RuntimeException("Failed to search projects: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to search projects: " + e.getMessage(), e,
+                ProjectToolErrorType.SEARCH_PROJECTS);
         }
     }
 
@@ -198,7 +203,8 @@ public class ProjectToolsImpl implements ProjectTools {
                 project.getLastPublishedDate() != null ? project.getLastPublishedDate() : null, deploymentStatuses);
         } catch (Exception e) {
             logger.error("Failed to get status for project {}", projectId, e);
-            throw new RuntimeException("Failed to get project status: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to get project status: " + e.getMessage(), e,
+                ProjectToolErrorType.GET_PROJECT_STATUS);
         }
     }
 
@@ -252,7 +258,8 @@ public class ProjectToolsImpl implements ProjectTools {
         } catch (Exception e) {
             logger.error("Failed to create project with name '{}'", name, e);
 
-            throw new RuntimeException("Failed to create project: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to create project: " + e.getMessage(), e,
+                ProjectToolErrorType.CREATE_PROJECT);
         }
     }
 
@@ -295,7 +302,8 @@ public class ProjectToolsImpl implements ProjectTools {
         } catch (Exception e) {
             logger.error("Failed to update project {}", projectId, e);
 
-            throw new RuntimeException("Failed to update project: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to update project: " + e.getMessage(), e,
+                ProjectToolErrorType.UPDATE_PROJECT);
         }
     }
 
@@ -320,7 +328,8 @@ public class ProjectToolsImpl implements ProjectTools {
         } catch (Exception e) {
             logger.error("Failed to delete project {}", projectId, e);
 
-            throw new RuntimeException("Failed to delete project: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to delete project: " + e.getMessage(), e,
+                ProjectToolErrorType.DELETE_PROJECT);
         }
     }
 
@@ -346,7 +355,8 @@ public class ProjectToolsImpl implements ProjectTools {
                 updatedProject.getLastPublishedDate() != null ? updatedProject.getLastPublishedDate() : null);
         } catch (Exception e) {
             logger.error("Failed to publish project {}", projectId, e);
-            throw new RuntimeException("Failed to publish project: " + e.getMessage(), e);
+            throw new ExecutionException("Failed to publish project: " + e.getMessage(), e,
+                ProjectToolErrorType.PUBLISH_PROJECT);
         }
     }
 

@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.nio.charset.StandardCharsets;
@@ -74,7 +76,9 @@ class InMemoryDataStorage {
         int size = getSizeInBytes(value);
 
         if (size > 409600) {
-            throw new IllegalArgumentException("Value size exceeds 400KB limit per key. Actual: " + size + " bytes)");
+            throw new ConfigurationException(
+                "Value size exceeds 400KB limit per key. Actual: " + size + " bytes)",
+                ComponentErrorType.DATA_STORAGE_SIZE_EXCEEDED);
         }
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId);

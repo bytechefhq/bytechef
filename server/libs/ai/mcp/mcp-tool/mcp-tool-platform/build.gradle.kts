@@ -1,4 +1,6 @@
 dependencies {
+    api(project(":server:libs:core:exception:exception-api"))
+
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")

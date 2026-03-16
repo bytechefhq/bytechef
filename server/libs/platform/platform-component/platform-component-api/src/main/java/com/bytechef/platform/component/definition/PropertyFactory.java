@@ -25,7 +25,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.SchemaUtils.JsonSchemaPropertyFactory;
@@ -69,7 +71,8 @@ public record PropertyFactory() implements SchemaPropertyFactory {
                 case "number" -> ComponentDsl.number(name);
                 case "object" -> object(name);
                 case "string" -> ComponentDsl.string(name);
-                default -> throw new IllegalArgumentException("Unsupported JSON schema type: " + type);
+                default -> throw new ConfigurationException(
+                    "Unsupported JSON schema type: " + type, ComponentErrorType.UNSUPPORTED_PROPERTY_TYPE);
             };
         }
 

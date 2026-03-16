@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.ai.mcp.server.exception.McpServerErrorType;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.mcp.domain.McpProject;
@@ -35,6 +36,7 @@ import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -190,7 +192,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
             if (!mcpServer.isEnabled()) {
-                throw new IllegalStateException("MCP server is disabled");
+                throw new ConfigurationException("MCP server is disabled", McpServerErrorType.MCP_SERVER_DISABLED);
             }
 
             Map<String, Object> resolvedParameters = new HashMap<>();
@@ -213,7 +215,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
             if (!mcpServer.isEnabled()) {
-                throw new IllegalStateException("MCP server is disabled");
+                throw new ConfigurationException("MCP server is disabled", McpServerErrorType.MCP_SERVER_DISABLED);
             }
 
             Map<String, Object> inputs = new HashMap<>(projectDeploymentWorkflow.getInputs());

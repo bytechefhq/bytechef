@@ -59,6 +59,7 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -515,7 +516,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     triggerState == null ? Map.of() : (Map<String, ?>) triggerState, context, pollFunction))
                 .orElseThrow();
         } else {
-            throw new IllegalArgumentException("Unknown trigger type: " + triggerType);
+            throw new ConfigurationException(
+                "Unknown trigger type: " + triggerType, ComponentErrorType.UNKNOWN_TRIGGER_TYPE);
         }
 
         return triggerOutput;
