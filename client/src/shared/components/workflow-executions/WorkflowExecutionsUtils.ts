@@ -2,66 +2,6 @@ import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automati
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {TabValueType} from '@/shared/types';
 
-export interface TaskTreeItemProps {
-    children: TaskTreeItemProps[];
-    iterations?: TaskTreeItemProps[][];
-    task: TaskExecution;
-}
-
-export const getTasksTree = (job: Job): TaskTreeItemProps[] => {
-    if (!job?.taskExecutions) {
-        return [];
-    }
-
-    const taskExecutions = job.taskExecutions;
-
-    const tasksMap = taskExecutions.reduce((map, task) => {
-        if (task.parentId) {
-            const existing = map.get(task.parentId) || [];
-
-            return new Map(map).set(task.parentId, [...existing, task]);
-        }
-
-        return map;
-    }, new Map<string, TaskExecution[]>());
-
-    const buildTasksTree = (task: TaskExecution): TaskTreeItemProps => {
-        const matchingChildrenFromTasksMap = tasksMap.get(task.id || '') || [];
-        const isLoopTask = typeof task.type === 'string' && task.type.toLowerCase().includes('loop');
-
-        if (isLoopTask) {
-            const iterationItems: TaskTreeItemProps[][] = [];
-            let currentIterationItems: TaskTreeItemProps[] = [];
-            let previousTaskNumber: number | undefined;
-
-            matchingChildrenFromTasksMap.forEach((child) => {
-                if (child.taskNumber === 0 && previousTaskNumber !== undefined && currentIterationItems.length > 0) {
-                    iterationItems.push([...currentIterationItems]);
-
-                    currentIterationItems = [];
-                }
-
-                currentIterationItems = [...currentIterationItems, buildTasksTree(child)];
-                previousTaskNumber = child.taskNumber;
-            });
-
-            if (currentIterationItems.length > 0) {
-                iterationItems.push([...currentIterationItems]);
-            }
-
-            return {children: [], iterations: iterationItems, task};
-        }
-
-        const children = matchingChildrenFromTasksMap.map((child) => buildTasksTree(child));
-
-        return {children, task};
-    };
-
-    const topLevelTasks = taskExecutions.filter((task) => !task.parentId);
-
-    return topLevelTasks.map((task) => buildTasksTree(task));
-};
-
 export const getFilteredOutput = (
     output: object | undefined,
     jobInputs: {[key: string]: object} | undefined,
