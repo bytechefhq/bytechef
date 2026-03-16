@@ -1,5 +1,6 @@
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -41,10 +42,9 @@ export default function AiAgentPromptField({
 
         try {
             const definition = JSON.parse(workflow.definition);
-            const tasks = definition.tasks || [];
-            const rootTask = tasks.find(
-                (task: {name: string}) => task.name === rootClusterElementNodeData.workflowNodeName
-            );
+            const tasks = definition.tasks ?? [];
+
+            const rootTask = getTask({tasks, workflowNodeName: rootClusterElementNodeData.workflowNodeName});
 
             return rootTask?.parameters?.[path] as string | undefined;
         } catch {

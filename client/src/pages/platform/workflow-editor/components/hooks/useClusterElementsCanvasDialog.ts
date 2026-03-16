@@ -111,7 +111,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
 
                 useTestingModeStore.getState().resetTestingMode();
 
-                useClusterElementsCanvasDialogStore.getState().setTestingPanelOpen(false);
+                setTestingPanelOpen(false);
 
                 useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
             } else if (isDataStreamClusterRoot) {
@@ -151,6 +151,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
             setEditorPreference,
             setShowAiAgentEditor,
             setShowDataStreamEditor,
+            setTestingPanelOpen,
         ]
     );
 
