@@ -19,26 +19,29 @@ package com.bytechef.component.nifty.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.nifty.constant.NiftyConstants.ID;
 import static com.bytechef.component.nifty.constant.NiftyConstants.NAME;
+import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,116 +56,113 @@ import org.mockito.ArgumentCaptor;
 class NiftyUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(
-            "project", "project"));
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
     @BeforeEach
-    void beforeEach(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
-
+    void beforeEach(Executor mockedExecutor, Http mockedHttp) {
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
     }
 
     @Test
     void testGetTaskAppIdOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        TriggerContext mockedTriggerContext, Response mockedResponse,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedHttp);
-            });
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("apps", List.of(Map.of(NAME, "abc", ID, "123"))));
+            .thenReturn(Map.of(
+                "apps", List.of(Map.of(NAME, "abc", ID, "123")),
+                "hasMore", false));
 
         assertEquals(
             expectedOptions,
             NiftyUtils.getAppIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedTriggerContext));
 
-        Object[] query = queryArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertEquals(List.of("limit", 100, "offset", 0), Arrays.asList(query));
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        verify(mockedHttp).get(stringArgumentCaptor.capture());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/apps", stringArgumentCaptor.getValue());
+
+        Object[] query = {
+            "limit", 100, "offset", 0
+        };
+
+        assertArrayEquals(query, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetTaskGroupIdOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        Context mockedContext, Response mockedResponse,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
+        Parameters mockedInputParameters = MockParametersFactory.create(Map.of(PROJECT, "123"));
+
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("items", List.of(Map.of(NAME, "abc", ID, "123"))));
+            .thenReturn(Map.of(
+                "items", List.of(Map.of(NAME, "abc", ID, "123")),
+                "hasMore", false));
 
         assertEquals(
             expectedOptions,
-            NiftyUtils.getTaskGroupIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            NiftyUtils.getTaskGroupIdOptions(mockedInputParameters, mockedParameters, Map.of(), "", mockedContext));
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/taskgroups", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/taskgroups?project_id=project&archived=false", stringArgumentCaptor.getValue());
+        Object[] query = {
+            "limit", 100, "offset", 0, "project_id", "123", "archived", "false"
+        };
+
+        assertArrayEquals(query, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetProjectIdOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        Context mockedContext, Response mockedResponse,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("projects", List.of(Map.of(NAME, "abc", ID, "123"))));
+            .thenReturn(Map.of(
+                "projects", List.of(Map.of(NAME, "abc", ID, "123")),
+                "hasMore", false));
 
         assertEquals(
             expectedOptions,
             NiftyUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/projects", stringArgumentCaptor.getValue());
+
+        Object[] query = {
+            "limit", 100, "offset", 0
+        };
+
+        assertArrayEquals(query, objectsArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetProjectTemplateOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+    void testGetTemplateIdOptions(
+        Context mockedContext, Response mockedResponse,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
@@ -173,65 +173,78 @@ class NiftyUtilsTest {
             expectedOptions,
             NiftyUtils.getTemplateIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/templates", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(List.of("/templates", "type", "project"), stringArgumentCaptor.getAllValues());
+        Object[] query = {
+            "limit", 100, "offset", 0, "type", "project"
+        };
+
+        assertArrayEquals(query, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetTaskIdOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        Context mockedContext, Response mockedResponse,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("tasks", List.of(Map.of(NAME, "abc", ID, "123"))));
+            .thenReturn(Map.of(
+                "tasks", List.of(Map.of(NAME, "abc", ID, "123")),
+                "hasMore", false));
 
         assertEquals(
             expectedOptions,
             NiftyUtils.getTaskIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/tasks", stringArgumentCaptor.getValue());
+
+        Object[] query = {
+            "limit", 100, "offset", 0
+        };
+
+        assertArrayEquals(query, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetLabelsOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        Context mockedContext, Response mockedResponse,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("items", List.of(Map.of(NAME, "abc", ID, "123"))));
+            .thenReturn(Map.of(
+                "items", List.of(Map.of(NAME, "abc", ID, "123")),
+                "hasMore", false));
 
         assertEquals(
             expectedOptions,
             NiftyUtils.getLabelsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/labels", stringArgumentCaptor.getValue());
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/labels?limit=100&offset=0", stringArgumentCaptor.getValue());
+        Object[] query = {
+            "limit", 100, "offset", 0
+        };
+
+        assertArrayEquals(query, objectsArgumentCaptor.getValue());
     }
 }
