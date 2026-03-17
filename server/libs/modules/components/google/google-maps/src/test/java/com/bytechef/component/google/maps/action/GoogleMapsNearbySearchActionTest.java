@@ -32,6 +32,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -93,8 +94,6 @@ class GoogleMapsNearbySearchActionTest {
                     "mockedAddress", "https://places.googleapis.com/v1/places:searchNearby", "X-Goog-FieldMask", "*"),
                 stringArgumentCaptor.getAllValues());
 
-            Body body = bodyArgumentCaptor.getValue();
-
             Map<String, Object> expectedBody = Map.of(
                 "includedTypes", List.of("keyword"),
                 "locationRestriction", Map.of(
@@ -104,17 +103,13 @@ class GoogleMapsNearbySearchActionTest {
                             LONGITUDE, 0.0),
                         RADIUS, 0.0)));
 
-            assertEquals(expectedBody, body.getContent());
-
-            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-            assertNotNull(capturedFunction);
+            assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
             Configuration configuration = configurationBuilder.build();
-            ResponseType responseType = configuration.getResponseType();
 
-            assertEquals(ResponseType.Type.JSON, responseType.getType());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
         }
     }
 }
