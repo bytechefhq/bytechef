@@ -370,7 +370,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         setHoveredNodeName(undefined);
                     }
                 }}
-                open={suppressHover ? false : undefined}
+                open={false}
             >
                 <HoverCardTrigger>
                     <Button
@@ -472,11 +472,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     )}
                 >
                     {isRenaming ? (
-                        <div className="z-10 flex items-center rounded-md border-2 bg-surface-neutral-primary p-1 shadow-sm">
+                        <div className="z-10 flex max-h-7 items-center rounded-md border-2 bg-surface-neutral-primary p-1">
                             <div className="flex items-center">
                                 <input
                                     autoFocus
-                                    className="nodrag w-48 cursor-text select-text rounded border border-stroke-neutral-secondary bg-surface-neutral-secondary px-2 py-1 text-sm font-semibold outline-none hover:bg-surface-neutral-secondary-hover"
+                                    className="nodrag max-h-5 w-40 cursor-text select-text rounded border border-stroke-neutral-secondary bg-surface-neutral-secondary px-2 py-1 text-sm font-semibold outline-none hover:bg-surface-neutral-secondary-hover"
                                     onBlur={(event) => handleRenameSubmit(event.target.value)}
                                     onChange={(event) => setRenameValue(event.target.value)}
                                     onKeyDown={handleRenameKeyDown}
@@ -485,7 +485,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 />
 
                                 <Button
-                                    className="ml-1 size-8 shrink-0 cursor-pointer [&_svg]:size-5"
+                                    className="ml-1 size-5 shrink-0 cursor-pointer [&_svg]:size-4"
                                     icon={<CheckIcon className="text-content-brand-primary" />}
                                     onClick={() => handleRenameSubmit(renameValue)}
                                     size="icon"
