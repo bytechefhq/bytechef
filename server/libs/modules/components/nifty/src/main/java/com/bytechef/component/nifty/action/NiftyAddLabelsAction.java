@@ -78,7 +78,8 @@ public class NiftyAddLabelsAction {
                             .required(false))
                     .metadata(
                         Map.of(
-                            "responseType", ResponseType.JSON))));
+                            "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/nifty_v1#add-labels");
 
     private NiftyAddLabelsAction() {
     }

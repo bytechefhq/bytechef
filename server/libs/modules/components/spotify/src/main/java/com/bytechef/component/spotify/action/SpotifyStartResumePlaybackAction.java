@@ -73,7 +73,8 @@ public class SpotifyStartResumePlaybackAction {
                     "type", PropertyType.BODY))
                 .label("Position")
                 .description("The position in milliseconds to start playback from.")
-                .required(false));
+                .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/spotify_v1#playresume-playback");
 
     private SpotifyStartResumePlaybackAction() {
     }

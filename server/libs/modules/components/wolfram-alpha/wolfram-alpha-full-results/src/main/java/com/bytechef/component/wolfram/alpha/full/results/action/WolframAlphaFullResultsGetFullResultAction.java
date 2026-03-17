@@ -211,7 +211,8 @@ public class WolframAlphaFullResultsGetFullResultAction {
         .output(outputSchema(object().properties(WolframAlphaFullResultsWolframQueryResponseProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.XML))));
+                    "responseType", ResponseType.XML))))
+        .help("", "https://docs.bytechef.io/reference/components/wolfram-alpha-full-results_v1#get-full-result");
 
     private WolframAlphaFullResultsGetFullResultAction() {
     }
