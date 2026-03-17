@@ -294,14 +294,21 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                     parameterItemType = getParameterItemType(parameterItemValue);
                 }
 
-                const controlType: ControlType =
-                    parameterItemType && parameterItemType in VALUE_PROPERTY_CONTROL_TYPES
-                        ? (VALUE_PROPERTY_CONTROL_TYPES[
-                              parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                          ] as ControlType)
-                        : ('STRING' as ControlType);
+                const matchingItem: ArrayPropertyType | undefined = items?.find(
+                    (item) => item.type === parameterItemType || item.name === parameterItemType
+                );
 
-                let label = `Item ${index}`;
+                let controlType = 'STRING' as ControlType;
+
+                if (matchingItem) {
+                    controlType = matchingItem.controlType as ControlType;
+                } else if (parameterItemType && parameterItemType in VALUE_PROPERTY_CONTROL_TYPES) {
+                    controlType = VALUE_PROPERTY_CONTROL_TYPES[
+                        parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                    ] as ControlType;
+                }
+
+                let label = matchingItem?.label ? `${matchingItem.label} ${index}` : `Item ${index}`;
 
                 if (property.name === 'conditions') {
                     label = `AND Condition ${index}`;
@@ -309,6 +316,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
                 const newSubProperty = {
                     ...subProperty,
+                    ...matchingItem,
                     arrayName: name,
                     controlType,
                     custom: true,
