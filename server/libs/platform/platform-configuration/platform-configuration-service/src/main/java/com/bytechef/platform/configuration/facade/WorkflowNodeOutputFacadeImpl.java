@@ -150,7 +150,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
             for (WorkflowTask workflowTask : workflowTasks) {
                 if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
-                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTask, null, environmentId);
+                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(
+                        workflowId, workflowTask, null, environmentId, new HashMap<>());
 
                     break;
                 }
@@ -165,7 +166,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(
         String workflowId, String lastWorkflowNodeName, long environmentId) {
 
-        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId);
+        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId, new HashMap<>());
     }
 
     @Override
@@ -173,7 +174,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(
         String workflowId, String lastWorkflowNodeName, long environmentId) {
 
-        return doGetPreviousWorkflowNodeSampleOutputs(workflowId, lastWorkflowNodeName, environmentId);
+        return doGetPreviousWorkflowNodeSampleOutputs(workflowId, lastWorkflowNodeName, environmentId, new HashMap<>());
     }
 
     @Override
@@ -259,7 +260,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private List<WorkflowNodeOutputDTO> doGetPreviousWorkflowNodeOutputs(
-        String workflowId, String lastWorkflowNodeName, long environmentId) {
+        String workflowId, String lastWorkflowNodeName, long environmentId,
+        Map<String, Map<String, ?>> sampleOutputsCache) {
 
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
 
@@ -304,13 +306,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
                 if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
                     workflowNodeOutputDTOs.add(
-                        getWorkflowNodeOutputDTO(workflowId, workflowTask, false, environmentId));
+                        getWorkflowNodeOutputDTO(workflowId, workflowTask, false, environmentId, sampleOutputsCache));
                 } else {
                     workflowNodeOutputDTOs.add(
-                        getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId));
+                        getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId, sampleOutputsCache));
                 }
             } else {
-                workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId));
+                workflowNodeOutputDTOs.add(
+                    getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId, sampleOutputsCache));
             }
         }
 
@@ -318,22 +321,34 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private Map<String, ?> doGetPreviousWorkflowNodeSampleOutputs(
-        String workflowId, String lastWorkflowNodeName, long environmentId) {
+        String workflowId, String lastWorkflowNodeName, long environmentId,
+        Map<String, Map<String, ?>> sampleOutputsCache) {
 
-        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId)
-            .stream()
-            .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.getSampleOutput() != null ||
-                workflowNodeOutputDTO.getVariableSampleOutput() != null)
-            .collect(
-                Collectors.toMap(
-                    WorkflowNodeOutputDTO::workflowNodeName,
-                    workflowNodeOutputDTO -> {
-                        if (workflowNodeOutputDTO.getSampleOutput() != null) {
-                            return workflowNodeOutputDTO.getSampleOutput();
-                        }
+        Map<String, ?> cached = sampleOutputsCache.get(lastWorkflowNodeName);
 
-                        return workflowNodeOutputDTO.getVariableSampleOutput();
-                    }));
+        if (cached != null) {
+            return cached;
+        }
+
+        Map<String, ?> result =
+            doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId, sampleOutputsCache)
+                .stream()
+                .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.getSampleOutput() != null ||
+                    workflowNodeOutputDTO.getVariableSampleOutput() != null)
+                .collect(
+                    Collectors.toMap(
+                        WorkflowNodeOutputDTO::workflowNodeName,
+                        workflowNodeOutputDTO -> {
+                            if (workflowNodeOutputDTO.getSampleOutput() != null) {
+                                return workflowNodeOutputDTO.getSampleOutput();
+                            }
+
+                            return workflowNodeOutputDTO.getVariableSampleOutput();
+                        }));
+
+        sampleOutputsCache.put(lastWorkflowNodeName, result);
+
+        return result;
     }
 
     private ClusterElementOutputDTO getClusterElementOutputDTO(
@@ -401,7 +416,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
-        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId) {
+        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId,
+        Map<String, Map<String, ?>> sampleOutputsCache) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
@@ -430,7 +446,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             if (workflowNodeType.operation() == null) {
                 WorkflowTaskDispatcherDynamicOutputResponse workflowTaskDispatcherDynamicOutputResponse =
                     getWorkflowTaskDispatcherDynamicOutputResponse(
-                        workflowId, workflowTask, taskDispatcherOutput, environmentId);
+                        workflowId, workflowTask, taskDispatcherOutput, environmentId, sampleOutputsCache);
 
                 if (workflowTaskDispatcherDynamicOutputResponse == null) {
                     outputResponse = taskDispatcherDefinition.getOutputResponse();
@@ -443,7 +459,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 outputResponse = checkOutputSchemaIsFileEntryProperty(actionDefinition.getOutputResponse());
 
                 if (outputResponse == null) {
-                    outputResponse = getWorkflowTaskDynamicOutputResponse(workflowId, workflowTask, environmentId);
+                    outputResponse = getWorkflowTaskDynamicOutputResponse(
+                        workflowId, workflowTask, environmentId, sampleOutputsCache);
                 }
             }
         } else {
@@ -493,7 +510,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @SuppressWarnings("unchecked")
     private OutputResponse getWorkflowTaskDynamicOutputResponse(
-        String workflowId, WorkflowTask workflowTask, long environmentId) {
+        String workflowId, WorkflowTask workflowTask, long environmentId,
+        Map<String, Map<String, ?>> sampleOutputsCache) {
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
@@ -509,7 +527,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName(), environmentId);
+            workflowId, workflowTask.getName(), environmentId, sampleOutputsCache);
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
@@ -532,7 +550,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @SuppressWarnings("unchecked")
     private WorkflowTaskDispatcherDynamicOutputResponse getWorkflowTaskDispatcherDynamicOutputResponse(
-        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId) {
+        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId,
+        Map<String, Map<String, ?>> sampleOutputsCache) {
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
@@ -548,7 +567,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName(), environmentId);
+            workflowId, workflowTask.getName(), environmentId, sampleOutputsCache);
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
