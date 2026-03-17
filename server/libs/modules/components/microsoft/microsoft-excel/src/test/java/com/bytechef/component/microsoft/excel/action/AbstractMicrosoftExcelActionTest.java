@@ -16,11 +16,11 @@
 
 package com.bytechef.component.microsoft.excel.action;
 
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUpdateWorksheetUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
@@ -35,15 +35,14 @@ import org.mockito.MockedStatic;
  */
 abstract class AbstractMicrosoftExcelActionTest {
 
-    protected ArgumentCaptor<ActionContext> actionContextArgumentCaptor = ArgumentCaptor.forClass(ActionContext.class);
-    protected ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    protected ArgumentCaptor<ActionContext> actionContextArgumentCaptor = forClass(ActionContext.class);
+    protected ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     @SuppressWarnings("rawtypes")
-    protected ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    protected ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
     protected MockedStatic<MicrosoftExcelUtils> microsoftExcelUtilsMockedStatic;
     protected MockedStatic<MicrosoftExcelUpdateWorksheetUtils> updateWorksheetUtilsMockedStatic;
     protected ActionContext mockedActionContext = mock(ActionContext.class);
-    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @BeforeEach
     void beforeEach() {
