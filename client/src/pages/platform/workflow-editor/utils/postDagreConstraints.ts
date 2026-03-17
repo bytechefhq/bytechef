@@ -1903,6 +1903,85 @@ export function alignChainNodesCrossAxis(
         }
     }
 
+    // Backward propagation: if a node's successor is anchored but the node
+    // itself is not (e.g. newly inserted node before a saved-position node),
+    // position the node relative to its successor's position minus the gap.
+    const successorMap = new Map<string, string>();
+
+    for (const [targetId, sourceId] of predecessorMap.entries()) {
+        successorMap.set(sourceId, targetId);
+    }
+
+    let backwardChanged = true;
+
+    while (backwardChanged) {
+        backwardChanged = false;
+
+        for (let nodeIndex = 0; nodeIndex < allNodes.length; nodeIndex++) {
+            const node = allNodes[nodeIndex];
+            const nodeData = node.data as NodeDataType;
+
+            if (anchored.has(node.id) || skipped.has(node.id) || AUXILIARY_TYPES.has(node.type!)) {
+                continue;
+            }
+
+            const successorId = successorMap.get(node.id);
+
+            if (!successorId || !anchored.has(successorId)) {
+                continue;
+            }
+
+            const successorNode = allNodes.find((searchNode) => searchNode.id === successorId);
+
+            if (!successorNode) {
+                continue;
+            }
+
+            const successorData = successorNode.data as NodeDataType;
+
+            if (nodeData.taskDispatcher && !containsNodePosition(successorData.metadata)) {
+                skipped.add(node.id);
+
+                continue;
+            }
+
+            const clusterCrossOffset =
+                getClusterRootCrossOffset(node, direction) - getClusterRootCrossOffset(successorNode, direction);
+
+            const mainAxisGap = computeMainAxisGap(node, successorNode, direction);
+
+            const newPosition = {
+                [crossAxis]: successorNode.position[crossAxis] + clusterCrossOffset,
+                [mainAxis]: successorNode.position[mainAxis] - mainAxisGap,
+            } as {x: number; y: number};
+
+            allNodes[nodeIndex] = {
+                ...node,
+                data: {
+                    ...nodeData,
+                    metadata: {
+                        ...nodeData.metadata,
+                        ui: {
+                            ...nodeData.metadata?.ui,
+                            nodePosition: newPosition,
+                        },
+                    },
+                },
+                position: newPosition,
+            };
+
+            if (nodeData.taskDispatcher) {
+                dispatcherDeltas.set(node.id, {
+                    x: newPosition.x - node.position.x,
+                    y: newPosition.y - node.position.y,
+                });
+            }
+
+            anchored.add(node.id);
+            backwardChanged = true;
+        }
+    }
+
     // Shift dispatcher descendants when a dispatcher was aligned
     if (dispatcherDeltas.size > 0) {
         const shifted = new Set<string>();
