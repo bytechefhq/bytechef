@@ -18,7 +18,7 @@ package com.bytechef.component.google.mail.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +34,7 @@ public class GoogleMailConnection {
         1,
         "https://docs.bytechef.io/reference/components/google-mail_v1#connection-setup",
         (connection, context) -> {
-            Map<String, Boolean> map = new HashMap<>();
+            Map<String, Boolean> map = new LinkedHashMap<>();
 
             map.put("https://mail.google.com/", true);
             map.put("https://www.googleapis.com/auth/gmail.addons.current.action.compose", false);

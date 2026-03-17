@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -47,7 +47,7 @@ public class SlackConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://slack.com/oauth/authorize")
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> scopeMap = new HashMap<>();
+                    Map<String, Boolean> scopeMap = new LinkedHashMap<>();
 
                     scopeMap.put("admin", false);
                     scopeMap.put("admin.analytics:read", false);

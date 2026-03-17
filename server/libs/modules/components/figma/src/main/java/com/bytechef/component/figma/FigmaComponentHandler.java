@@ -33,7 +33,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.figma.trigger.FigmaNewCommentTrigger;
 import com.google.auto.service.AutoService;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -107,7 +107,7 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
                     return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
                 })
                 .scopes((connectionParameters, context) -> {
-                    Map<String, Boolean> scopeMap = new HashMap<>();
+                    Map<String, Boolean> scopeMap = new LinkedHashMap<>();
 
                     scopeMap.put("current_user:read", false);
                     scopeMap.put("file_comments:read", true);

@@ -19,7 +19,7 @@ package com.bytechef.component.zoho.books.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.component.zoho.commons.ZohoConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +34,7 @@ public class ZohoBooksConnection {
     }
 
     private static Map<String, Boolean> createScopesMap() {
-        Map<String, Boolean> map = new HashMap<>();
+        Map<String, Boolean> map = new LinkedHashMap<>();
 
         map.put("ZohoBooks.contacts.CREATE", true);
         map.put("ZohoBooks.contacts.UPDATE", false);

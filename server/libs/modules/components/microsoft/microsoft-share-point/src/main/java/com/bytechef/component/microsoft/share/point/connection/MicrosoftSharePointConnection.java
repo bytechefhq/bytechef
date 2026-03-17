@@ -19,7 +19,7 @@ package com.bytechef.component.microsoft.share.point.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -31,7 +31,7 @@ public class MicrosoftSharePointConnection {
         1,
         "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#connection-setup",
         (connection, context) -> {
-            Map<String, Boolean> map = new HashMap<>();
+            Map<String, Boolean> map = new LinkedHashMap<>();
 
             map.put("Files.Read", false);
             map.put("Files.Read.All", false);

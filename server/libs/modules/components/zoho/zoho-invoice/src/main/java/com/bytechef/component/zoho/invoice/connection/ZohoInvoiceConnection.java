@@ -18,7 +18,7 @@ package com.bytechef.component.zoho.invoice.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.zoho.commons.ZohoConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +30,7 @@ public class ZohoInvoiceConnection {
         "/invoice/v3", createScopesMap(), true);
 
     private static Map<String, Boolean> createScopesMap() {
-        Map<String, Boolean> map = new HashMap<>();
+        Map<String, Boolean> map = new LinkedHashMap<>();
 
         map.put("ZohoInvoice.contacts.Create", true);
         map.put("ZohoInvoice.contacts.UPDATE", false);
