@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -46,7 +46,7 @@ public class FigmaConnection {
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://www.figma.com/oauth")
             .scopes((connectionParameters, context) -> {
-                Map<String, Boolean> scopeMap = new HashMap<>();
+                Map<String, Boolean> scopeMap = new LinkedHashMap<>();
 
                 scopeMap.put("current_user:read", false);
                 scopeMap.put("file_comments:read", true);
