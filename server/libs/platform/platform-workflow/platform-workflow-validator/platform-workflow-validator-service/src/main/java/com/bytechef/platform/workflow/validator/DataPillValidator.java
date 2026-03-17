@@ -475,7 +475,7 @@ class DataPillValidator {
             boolean isLoopItemReference = (propertyName.equals("item") || propertyName.startsWith("item.")) &&
                 isLoopTask(referencedTaskName, taskNameToTypeMap);
 
-            if (referencedTaskIndex == -1 || (referencedTaskIndex >= currentTaskIndex && !isLoopItemReference)) {
+            if (referencedTaskIndex >= currentTaskIndex && !isLoopItemReference) {
                 StringUtils.appendWithNewline(
                     "Wrong task order: You can't reference '" + dataPillExpression + "' in " + currentTaskName, errors);
                 context.stopProcessing = true;
