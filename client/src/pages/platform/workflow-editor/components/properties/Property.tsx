@@ -531,7 +531,7 @@ const Property = ({
                                                     isNumericalInput && minValue && maxValue
                                                         ? `From ${minValue} to ${maxValue}`
                                                         : placeholder ||
-                                                          `Type a ${isNumericalInput ? 'number' : 'something'} ...`
+                                                          `Type ${isNumericalInput ? 'a number' : 'something'}...`
                                                 }
                                                 required={required}
                                                 showInputTypeSwitchButton={showControlledSwitch}
@@ -739,7 +739,7 @@ const Property = ({
                             placeholder={
                                 isNumericalInput && minValue && maxValue
                                     ? `From ${minValue} to ${maxValue}`
-                                    : placeholder || `Type a ${isNumericalInput ? 'number' : 'something'} ...`
+                                    : placeholder || `Type ${isNumericalInput ? 'a number' : 'something'}...`
                             }
                             ref={inputRef}
                             required={required}
