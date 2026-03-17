@@ -14044,43 +14044,6 @@
     }, {
       "advancedOption": null,
       "controlType": "SELECT",
-      "defaultValue": "DRIVE",
-      "description": "Desired travel mode.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Travel Mode",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "travelMode",
-      "options": [ {
-        "description": null,
-        "label": "Drive",
-        "value": "DRIVE"
-      }, {
-        "description": null,
-        "label": "Bicycle",
-        "value": "BICYCLE"
-      }, {
-        "description": null,
-        "label": "Walk",
-        "value": "WALK"
-      }, {
-        "description": null,
-        "label": "Transit",
-        "value": "TRANSIT"
-      } ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": false,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
       "defaultValue": "TRAFFIC_UNAWARE",
       "description": "Routing preference of the route.",
       "displayCondition": null,
@@ -28377,43 +28340,6 @@
       "placeholder": null,
       "regex": null,
       "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": "DRIVE",
-      "description": "Desired travel mode.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Travel Mode",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "travelMode",
-      "options": [ {
-        "description": null,
-        "label": "Drive",
-        "value": "DRIVE"
-      }, {
-        "description": null,
-        "label": "Bicycle",
-        "value": "BICYCLE"
-      }, {
-        "description": null,
-        "label": "Walk",
-        "value": "WALK"
-      }, {
-        "description": null,
-        "label": "Transit",
-        "value": "TRANSIT"
-      } ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "regex": null,
-      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
