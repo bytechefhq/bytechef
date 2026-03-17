@@ -18,63 +18,93 @@ package com.bytechef.component.microsoft.todo.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.DISPLAY_NAME;
-import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.ID;
+import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_LIST_ID;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TITLE;
-import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class MicrosoftToDoUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("some name", "abc"));
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Parameters parameters = MockParametersFactory.create(Map.of());
-
-    @BeforeEach
-    void beforeEach() {
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-    }
+    private final Parameters parameters = mock(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetTaskIdOptions() {
+    void testGetTaskIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedInputParameters = MockParametersFactory.create(Map.of(TASK_LIST_ID, "xy"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, List.of(Map.of(TITLE, "some name", ID, "abc"))));
 
-        assertEquals(
-            expectedOptions,
-            MicrosoftToDoUtils.getTaskIdOptions(parameters, parameters, Map.of(), "", mockedActionContext));
+        List<Option<String>> taskIdOptions = MicrosoftToDoUtils.getTaskIdOptions(
+            mockedInputParameters, parameters, Map.of(), "", mockedContext);
+
+        assertEquals(expectedOptions, taskIdOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/me/todo/lists/xy/tasks", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetTaskListIdOptions() {
+    void testGetTaskListIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(VALUE, List.of(Map.of(DISPLAY_NAME, "some name", ID, "abc"))));
 
-        assertEquals(
-            expectedOptions,
-            MicrosoftToDoUtils.getTaskListIdOptions(parameters, parameters, Map.of(), "", mockedActionContext));
+        List<Option<String>> taskListIdOptions = MicrosoftToDoUtils.getTaskListIdOptions(
+            parameters, parameters, Map.of(), "", mockedContext);
+
+        assertEquals(expectedOptions, taskListIdOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/me/todo/lists", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
