@@ -56,39 +56,6 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
             modifiableActionDefinition.properties(properties);
         }
 
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            switch (name) {
-                case "addLabels" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/nifty_v1#add-labels");
-                case "createProject" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/nifty_v1#create-project");
-                case "createStatus" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/nifty_v1#create-status");
-                case "createTask" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/nifty_v1#create-task");
-                case "getTask" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/nifty_v1#get-task");
-                case "getTrackedTimeReport" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/nifty_v1#get-tracked-time-report");
-                default -> {
-                }
-            }
-        }
-
         return super.modifyActions(actionDefinitions);
     }
 

@@ -24,7 +24,6 @@ import static com.bytechef.component.insightly.constant.InsightlyConstants.URL;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
@@ -35,28 +34,6 @@ import java.util.List;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class InsightlyComponentHandler extends AbstractInsightlyComponentHandler {
-
-    @Override
-    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            switch (name) {
-                case "createContact" ->
-                    actionDefinition.help("",
-                        "https://docs.bytechef.io/reference/components/insightly_v1#create-contact");
-                case "createOrganization" ->
-                    actionDefinition.help("",
-                        "https://docs.bytechef.io/reference/components/insightly_v1#create-organization");
-                case "createTask" ->
-                    actionDefinition.help("", "https://docs.bytechef.io/reference/components/insightly_v1#create-task");
-
-                default -> {
-                }
-            }
-        }
-        return super.modifyActions(actionDefinitions);
-    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {

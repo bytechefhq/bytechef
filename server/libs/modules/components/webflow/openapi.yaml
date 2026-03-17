@@ -13,6 +13,7 @@ paths:
       description: "Updates an order's status to fulfilled."
       operationId: "fulfillOrder"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/webflow_v1#fulfill-order"
       security:
         - "oauth2":
             - "ecommerce:write"
@@ -57,6 +58,7 @@ paths:
       description: "Get collection item in a collection."
       operationId: "getCollectionItem"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/webflow_v1#get-collection-item"
       security:
         - "oauth2":
             - "cms:read"

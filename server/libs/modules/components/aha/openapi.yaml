@@ -12,6 +12,7 @@ paths:
       summary: "Create Feature"
       description: "Creates a new feature."
       operationId: "createFeature"
+      x-help: "https://docs.bytechef.io/reference/components/aha_v1#create-feature"
       parameters:
         - name: "releaseId"
           description: "Numeric ID or key of the release."
@@ -139,6 +140,7 @@ paths:
       summary: "Create Idea"
       description: "Creates a new idea."
       operationId: "createIdea"
+      x-help: "https://docs.bytechef.io/reference/components/aha_v1#create-idea"
       parameters:
         - name: "productId"
           description: "Numeric ID or key of the product."

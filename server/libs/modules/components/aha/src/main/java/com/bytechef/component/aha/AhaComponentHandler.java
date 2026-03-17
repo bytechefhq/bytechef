@@ -60,10 +60,6 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
                         .required(false));
 
                 modifiableActionDefinition.properties(properties);
-                modifiableActionDefinition.help(
-                    "", "https://docs.bytechef.io/reference/components/aha_v1#create-feature");
-            } else if (Objects.equals(name, "createIdea")) {
-                modifiableActionDefinition.help("", "https://docs.bytechef.io/reference/components/aha_v1#create-idea");
             }
         }
 

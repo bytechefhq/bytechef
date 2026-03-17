@@ -13,6 +13,7 @@ paths:
       description: "Returns a short answer for your query."
       operationId: "getShortAnswer"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/wolfram-alpha-shortanswers_v1#get-short-answer"
       parameters:
         - name: "i"
           in: "query"
