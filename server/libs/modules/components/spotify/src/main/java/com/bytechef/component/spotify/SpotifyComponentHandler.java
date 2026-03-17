@@ -45,28 +45,6 @@ public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
     }
 
     @Override
-    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            switch (name) {
-                case "addItemsToPlaylist" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/spotify_v1#add-items-to-a-playlist");
-                case "startResumePlayback" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/spotify_v1#playresume-playback");
-                default -> {
-                }
-            }
-        }
-
-        return super.modifyActions(actionDefinitions);
-    }
-
-    @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)

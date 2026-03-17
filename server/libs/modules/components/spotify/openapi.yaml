@@ -16,6 +16,7 @@ paths:
         - "oauth2":
             - "user-modify-playback-state"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/spotify_v1#playresume-playback"
       parameters:
         - name: "deviceId"
           in: "query"
@@ -54,6 +55,7 @@ paths:
       description: "Adds one or more items to your playlist."
       operationId: "addItemsToPlaylist"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/spotify_v1#add-items-to-a-playlist"
       security:
         - "oauth2":
             - "playlist-modify-public"

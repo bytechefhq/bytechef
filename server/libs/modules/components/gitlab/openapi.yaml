@@ -13,6 +13,7 @@ paths:
       description: "Creates a new project issue."
       operationId: "createIssue"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/gitlab_v1#create-issue"
       parameters:
         - name: "projectId"
           description: "ID of the project where new issue will be created."
@@ -67,6 +68,7 @@ paths:
       description: "Adds a comment to the specified issue."
       operationId: "createCommentOnIssue"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/gitlab_v1#create-comment-on-issue"
       parameters:
         - name: "projectId"
           in: "path"

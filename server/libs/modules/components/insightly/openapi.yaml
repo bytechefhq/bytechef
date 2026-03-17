@@ -14,6 +14,7 @@ paths:
       summary: "Create Contact"
       description: "Creates new contact."
       operationId: "createContact"
+      x-help: "https://docs.bytechef.io/reference/components/insightly_v1#create-contact"
       requestBody:
         description: "data of new contact"
         required: true
@@ -84,6 +85,7 @@ paths:
       summary: "Create Organization"
       description: "Creates new organization."
       operationId: "createOrganization"
+      x-help: "https://docs.bytechef.io/reference/components/insightly_v1#create-organization"
       requestBody:
         description: "data of new organization"
         required: true
@@ -138,6 +140,7 @@ paths:
       summary: "Create Task"
       description: "Creates new task."
       operationId: "createTask"
+      x-help: "https://docs.bytechef.io/reference/components/insightly_v1#create-task"
       requestBody:
         description: "data of new task"
         required: true

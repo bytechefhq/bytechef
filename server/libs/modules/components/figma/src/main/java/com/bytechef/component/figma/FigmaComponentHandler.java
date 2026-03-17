@@ -24,7 +24,6 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -49,21 +48,6 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(FigmaNewCommentTrigger.TRIGGER_DEFINITION);
-    }
-
-    @Override
-    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            if (name.equals("getComments")) {
-                actionDefinition.help("", "https://docs.bytechef.io/reference/components/figma_v1#get-comments");
-            } else if (name.equals("createComment")) {
-                actionDefinition.help("", "https://docs.bytechef.io/reference/components/figma_v1#post-comment");
-            }
-        }
-
-        return super.modifyActions(actionDefinitions);
     }
 
     @Override

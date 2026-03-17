@@ -13,6 +13,7 @@ paths:
       description: "Gets a list of comments left on the file."
       operationId: "getComments"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/figma_v1#get-comments"
       security:
         - oauth2:
             - "file_comments:read"
@@ -67,6 +68,7 @@ paths:
       summary: "Post Comment"
       description: "Posts a new comment on the file."
       operationId: "postComment"
+      x-help: "https://docs.bytechef.io/reference/components/figma_v1#post-comment"
       x-ai-agent-tool: true
       security:
         - oauth2:

@@ -11,6 +11,7 @@ paths:
       summary: "Create Article"
       description: "Creates a new article."
       operationId: "createArticle"
+      x-help: "https://docs.bytechef.io/reference/components/devto_v1#create-article"
       responses:
         201:
           description: "An Article"
@@ -48,6 +49,7 @@ paths:
       summary: "Get Article"
       description: "Get article by id."
       operationId: "getArticle"
+      x-help: "https://docs.bytechef.io/reference/components/devto_v1#get-article"
       parameters:
         - name: articleId
           in: path
@@ -68,6 +70,7 @@ paths:
       summary: "Update Article"
       description: "Updates an existing article."
       operationId: "updateArticle"
+      x-help: "https://docs.bytechef.io/reference/components/devto_v1#update-article"
       parameters:
         - name: articleId
           in: path
