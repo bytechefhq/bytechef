@@ -19,7 +19,7 @@ package com.bytechef.component.microsoft.outlook.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +32,7 @@ public class MicrosoftOutlook365Connection {
         1,
         "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#connection-setup",
         (connection, context) -> {
-            Map<String, Boolean> map = new HashMap<>();
+            Map<String, Boolean> map = new LinkedHashMap<>();
 
             map.put("Calendars.Read", false);
             map.put("Calendars.Read.Shared", false);

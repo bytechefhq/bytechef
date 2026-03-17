@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -44,7 +44,7 @@ public class MondayConnection {
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/authorize")
             .scopes((connection, context) -> {
-                Map<String, Boolean> map = new HashMap<>();
+                Map<String, Boolean> map = new LinkedHashMap<>();
 
                 map.put("account:read", false);
                 map.put("assets:read", false);

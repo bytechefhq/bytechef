@@ -18,7 +18,7 @@ package com.bytechef.component.zoho.crm.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.zoho.commons.ZohoConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -31,7 +31,7 @@ public class ZohoCrmConnection {
         "/crm/v7", getScopes(), false);
 
     private static Map<String, Boolean> getScopes() {
-        Map<String, Boolean> map = new HashMap<>();
+        Map<String, Boolean> map = new LinkedHashMap<>();
 
         map.put("ZohoCRM.org.ALL", false);
         map.put("ZohoCRM.org.CREATE", false);

@@ -27,7 +27,7 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +59,7 @@ public class ShopifyConnection {
                 .authorizationUrl((connectionParameters, context) -> "https://%s/admin/oauth/authorize"
                     .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("read_all_orders", false);
                     map.put("write_app_proxy", false);

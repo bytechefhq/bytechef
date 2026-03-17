@@ -30,7 +30,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.TypeReference;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.naming.ConfigurationException;
@@ -55,7 +55,7 @@ public class RedditConnection {
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://www.reddit.com/api/v1/authorize")
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("identity", true);
                     map.put("edit", false);

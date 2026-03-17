@@ -19,7 +19,7 @@ package com.bytechef.component.microsoft.teams.connection;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 import com.bytechef.microsoft.commons.MicrosoftConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -31,7 +31,7 @@ public class MicrosoftTeamsConnection {
         1,
         "https://docs.bytechef.io/reference/components/microsoft-teams_v1#connection-setup",
         (connection, context) -> {
-            Map<String, Boolean> map = new HashMap<>();
+            Map<String, Boolean> map = new LinkedHashMap<>();
 
             map.put("AgentIdUser.ReadWrite.All", false);
             map.put("AgentIdUser.ReadWrite.IdentityParentedBy", false);

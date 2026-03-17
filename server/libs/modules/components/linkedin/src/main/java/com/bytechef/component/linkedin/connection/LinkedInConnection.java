@@ -28,7 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +51,7 @@ public class LinkedInConnection {
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://www.linkedin.com/oauth/v2/authorization")
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("email", true);
                     map.put("openid", true);
