@@ -18,32 +18,15 @@ package com.bytechef.component.wolfram.alpha.full.results;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
-import java.util.List;
 
 /**
  * @author Nikolina Spehar
  */
 @AutoService(OpenApiComponentHandler.class)
 public class WolframAlphaFullResultsComponentHandler extends AbstractWolframAlphaFullResultsComponentHandler {
-
-    @Override
-    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            if (name.equals("getFullResult")) {
-                actionDefinition.help(
-                    "",
-                    "https://docs.bytechef.io/reference/components/wolfram-alpha-full-results_v1#get-full-result");
-            }
-        }
-
-        return super.modifyActions(actionDefinitions);
-    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {

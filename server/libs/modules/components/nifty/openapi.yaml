@@ -12,6 +12,7 @@ paths:
       summary: "Create Project"
       description: "Creates new project."
       operationId: "createProject"
+      x-help: "https://docs.bytechef.io/reference/components/nifty_v1#create-project"
       requestBody:
         required: true
         content:
@@ -59,6 +60,7 @@ paths:
       summary: "Create Task"
       description: "Creates new task"
       operationId: "createTask"
+      x-help: "https://docs.bytechef.io/reference/components/nifty_v1#create-task"
       requestBody:
         required: true
         content:
@@ -118,6 +120,7 @@ paths:
       summary: "Get Task"
       description: "Gets task details."
       operationId: "getTask"
+      x-help: "https://docs.bytechef.io/reference/components/nifty_v1#get-task"
       parameters:
         - name: "taskId"
           in: "path"
@@ -152,6 +155,7 @@ paths:
       summary: "Add Labels"
       description: "Add labels to the task."
       operationId: "addLabels"
+      x-help: "https://docs.bytechef.io/reference/components/nifty_v1#add-labels"
       parameters:
         - name: "taskId"
           in: "path"
@@ -198,6 +202,7 @@ paths:
       summary: "Create Status"
       description: "Creates new status"
       operationId: "createStatus"
+      x-help: "https://docs.bytechef.io/reference/components/nifty_v1#create-status"
       requestBody:
         required: true
         content:
@@ -253,6 +258,7 @@ paths:
       summary: "Get Tracked Time Report"
       description: "Gets tracked time report information."
       operationId: "getTrackedTimeReport"
+      x-help: "https://docs.bytechef.io/reference/components/nifty_v1#get-tracked-time-report"
       parameters:
         - name: "project_id"
           in: "query"

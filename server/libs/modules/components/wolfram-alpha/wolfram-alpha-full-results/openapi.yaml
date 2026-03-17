@@ -13,6 +13,7 @@ paths:
       description: "Returns a full result of your query."
       operationId: "getFullResult"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/wolfram-alpha-full-results_v1#get-full-result"
       parameters:
         - name: "input"
           in: "query"

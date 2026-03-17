@@ -18,12 +18,10 @@ package com.bytechef.component.google.search.console;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
 import com.google.auto.service.AutoService;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,41 +29,6 @@ import java.util.Map;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class GoogleSearchConsoleComponentHandler extends AbstractGoogleSearchConsoleComponentHandler {
-
-    @Override
-    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            switch (name) {
-                case "addSite" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/google-search-console_v1#add-site");
-                case "deleteSite" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/google-search-console_v1#delete-site");
-                case "getSite" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/google-search-console_v1#get-site");
-                case "listSites" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/google-search-console_v1#list-sites");
-                case "searchAnalytics" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/google-search-console_v1" +
-                            "#search-analytics");
-                default -> {
-
-                }
-            }
-        }
-        return super.modifyActions(actionDefinitions);
-    }
 
     @Override
     public ModifiableConnectionDefinition modifyConnection(

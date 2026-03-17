@@ -18,7 +18,6 @@ package com.bytechef.component.gitlab;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -35,25 +34,6 @@ public class GitlabComponentHandler extends AbstractGitlabComponentHandler {
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(GitlabNewIssueTrigger.TRIGGER_DEFINITION);
-    }
-
-    @Override
-    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            switch (name) {
-                case "createCommentOnIssue" ->
-                    actionDefinition.help("",
-                        "https://docs.bytechef.io/reference/components/gitlab_v1#create-comment-on-issue");
-                case "createIssue" ->
-                    actionDefinition.help("",
-                        "https://docs.bytechef.io/reference/components/gitlab_v1#create-issue");
-                default -> {
-                }
-            }
-        }
-        return super.modifyActions(actionDefinitions);
     }
 
     @Override

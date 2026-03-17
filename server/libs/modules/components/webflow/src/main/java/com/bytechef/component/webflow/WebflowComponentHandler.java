@@ -58,11 +58,6 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
                         .required(false));
 
                 modifiableActionDefinition.properties(properties);
-                modifiableActionDefinition.help(
-                    "", "https://docs.bytechef.io/reference/components/webflow_v1#get-collection-item");
-            } else if (Objects.equals(name, "fulfillOrder")) {
-                modifiableActionDefinition.help(
-                    "", "https://docs.bytechef.io/reference/components/webflow_v1#fulfill-order");
             }
         }
 

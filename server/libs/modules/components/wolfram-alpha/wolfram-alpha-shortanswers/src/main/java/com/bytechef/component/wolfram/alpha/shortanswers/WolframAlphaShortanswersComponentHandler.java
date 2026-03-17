@@ -18,32 +18,15 @@ package com.bytechef.component.wolfram.alpha.shortanswers;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
-import java.util.List;
 
 /**
  * @author Nikolina Spehar
  */
 @AutoService(OpenApiComponentHandler.class)
 public class WolframAlphaShortanswersComponentHandler extends AbstractWolframAlphaShortanswersComponentHandler {
-
-    @Override
-    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            if (name.equals("getShortAnswer")) {
-                actionDefinition.help(
-                    "",
-                    "https://docs.bytechef.io/reference/components/wolfram-alpha-shortanswers_v1#get-short-answer");
-            }
-        }
-
-        return super.modifyActions(actionDefinitions);
-    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
