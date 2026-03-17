@@ -33,6 +33,8 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -41,12 +43,19 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,22 +63,22 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class MicrosoftExcelUtilsTest {
 
-    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
-        ArgumentCaptor.forClass(ActionContext.class);
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor = forClass(ActionContext.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testCreatePropertiesForNewRowWhereFirstNewRowIsHeader() {
@@ -258,84 +267,132 @@ class MicrosoftExcelUtilsTest {
     }
 
     @Test
-    void testGetLastUsedColumnLabel() {
+    void testGetLastUsedColumnLabel(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters =
+            MockParametersFactory.create(Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
         Map<String, Object> map = Map.of("columnCount", 3);
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
-        String result = MicrosoftExcelUtils.getLastUsedColumnLabel(mockedParameters, mockedActionContext);
+        String result = MicrosoftExcelUtils.getLastUsedColumnLabel(mockedParameters, mockedContext);
 
         assertEquals("C", result);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            "/me/drive/items/1/workbook/worksheets/test/usedRange",
+            stringArgumentCaptor.getValue());
     }
 
     @Test
-    void getLastUsedRowIndex() {
+    void getLastUsedRowIndex(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters =
+            MockParametersFactory.create(Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
         Map<String, Object> map = new HashMap<>();
 
         map.put("rowCount", 2);
         map.put(VALUES, List.of(List.of("A", "B", "C"), List.of("D", "E", "F")));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
-        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedActionContext);
+        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedContext);
 
         assertEquals(2, result);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            "/me/drive/items/1/workbook/worksheets/test/usedRange",
+            stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetLastUsedRowIndexWithEmptySheet() {
+    void testGetLastUsedRowIndexWithEmptySheet(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters =
+            MockParametersFactory.create(Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
         Map<String, Object> map = new HashMap<>();
 
         map.put("rowCount", 1);
         map.put(VALUES, List.of(List.of()));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
-        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedActionContext);
+        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedContext);
 
         assertEquals(0, result);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            "/me/drive/items/1/workbook/worksheets/test/usedRange",
+            stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetLastUsedRowIndexWithOneRow() {
+    void testGetLastUsedRowIndexWithOneRow(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters =
+            MockParametersFactory.create(Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
         Map<String, Object> map = new HashMap<>();
 
         map.put("rowCount", 1);
         map.put(VALUES, List.of(List.of("A", "B")));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
-        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedActionContext);
+        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedContext);
 
         assertEquals(1, result);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            "/me/drive/items/1/workbook/worksheets/test/usedRange",
+            stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -404,15 +461,15 @@ class MicrosoftExcelUtilsTest {
     }
 
     @Test
-    void testGetWorkbookIdOptions() {
+    void testGetWorkbookIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> map = Map.of(VALUE, List.of(Map.of(NAME, "abc", ID, "123")));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
@@ -421,21 +478,32 @@ class MicrosoftExcelUtilsTest {
         expectedOptions.add(option("abc", "123"));
 
         List<Option<String>> result = MicrosoftExcelUtils.getWorkbookIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(expectedOptions, result);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            "/me/drive/items/root/search(q='.xlsx')",
+            stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetWorksheetNameOptions() {
+    void testGetWorksheetNameOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters = MockParametersFactory.create(Map.of(WORKBOOK_ID, 1));
         Map<String, Object> map = Map.of(VALUE, List.of(Map.of(NAME, "abc")));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
@@ -444,9 +512,19 @@ class MicrosoftExcelUtilsTest {
         expectedOptions.add(option("abc", "abc"));
 
         List<Option<String>> result = MicrosoftExcelUtils.getWorksheetNameOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(expectedOptions, result);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            "/me/drive/items/1//workbook/worksheets/",
+            stringArgumentCaptor.getValue());
     }
 
 }
