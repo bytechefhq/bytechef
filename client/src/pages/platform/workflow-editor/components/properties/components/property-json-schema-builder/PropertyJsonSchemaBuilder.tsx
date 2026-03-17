@@ -6,7 +6,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import PropertyJsonSchemaBuilderSheet from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilderSheet';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
-import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, FullscreenIcon, TriangleAlertIcon} from 'lucide-react';
 import {ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -85,11 +85,14 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
 
                             <Button
                                 className="ml-10 flex-1 rounded-l-none"
-                                label="Open JSON Schema Builder"
                                 onClick={() => setShowPropertyJsonSchemaBuilder(true)}
                                 ref={ref}
                                 variant="outline"
-                            />
+                            >
+                                <FullscreenIcon className="text-content-neutral-secondary" />
+
+                                <span>Open Response Template</span>
+                            </Button>
 
                             {error && (
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
