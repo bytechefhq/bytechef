@@ -55,7 +55,8 @@ public class DevtoGetArticleAction {
         .output(outputSchema(object().properties(DevtoArticleResponseProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/devto_v1#get-article");
 
     private DevtoGetArticleAction() {
     }

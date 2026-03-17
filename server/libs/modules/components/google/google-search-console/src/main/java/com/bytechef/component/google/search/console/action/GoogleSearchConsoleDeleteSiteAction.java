@@ -47,7 +47,8 @@ public class GoogleSearchConsoleDeleteSiteAction {
             .options((ActionDefinition.OptionsFunction<String>) GoogleSearchConsoleUtils::getSiteUrlOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)));
+                    "type", PropertyType.PATH)))
+        .help("", "https://docs.bytechef.io/reference/components/google-search-console_v1#delete-site");
 
     private GoogleSearchConsoleDeleteSiteAction() {
     }

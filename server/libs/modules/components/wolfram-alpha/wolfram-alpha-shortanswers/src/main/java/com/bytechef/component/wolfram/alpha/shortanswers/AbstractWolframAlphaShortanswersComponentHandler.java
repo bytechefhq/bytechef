@@ -31,9 +31,10 @@ import com.bytechef.component.wolfram.alpha.shortanswers.connection.WolframAlpha
  */
 public abstract class AbstractWolframAlphaShortanswersComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
-        component("wolfram-alpha-shortanswers")
+        component("wolframAlphaShortanswers")
             .title("Wolfram Alpha Short Answers")
-            .description("Wolfram Alpha Short Answers returns a single plain text result as an answer to your query."))
+            .description("Wolfram Alpha Short Answers returns a single plain text result as an answer to your query.")
+            .version(1))
                 .actions(modifyActions(WolframAlphaShortanswersGetShortAnswerAction.ACTION_DEFINITION))
                 .connection(modifyConnection(WolframAlphaShortanswersConnection.CONNECTION_DEFINITION))
                 .clusterElements(

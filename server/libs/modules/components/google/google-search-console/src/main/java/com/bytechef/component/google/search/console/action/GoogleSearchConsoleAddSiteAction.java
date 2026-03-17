@@ -43,7 +43,8 @@ public class GoogleSearchConsoleAddSiteAction {
             .required(true)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)));
+                    "type", PropertyType.PATH)))
+        .help("", "https://docs.bytechef.io/reference/components/google-search-console_v1#add-site");
 
     private GoogleSearchConsoleAddSiteAction() {
     }

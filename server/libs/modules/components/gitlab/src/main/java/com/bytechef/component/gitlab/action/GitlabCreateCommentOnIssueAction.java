@@ -71,7 +71,8 @@ public class GitlabCreateCommentOnIssueAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/gitlab_v1#create-comment-on-issue");
 
     private GitlabCreateCommentOnIssueAction() {
     }

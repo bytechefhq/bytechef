@@ -73,7 +73,8 @@ public class FigmaGetCommentsAction {
                         .required(false))
                     .metadata(
                         Map.of(
-                            "responseType", ResponseType.JSON))));
+                            "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/figma_v1#get-comments");
 
     private FigmaGetCommentsAction() {
     }

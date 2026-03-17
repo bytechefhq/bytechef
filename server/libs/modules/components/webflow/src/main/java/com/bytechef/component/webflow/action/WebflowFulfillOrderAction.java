@@ -64,7 +64,8 @@ public class WebflowFulfillOrderAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/webflow_v1#fulfill-order");
 
     private WebflowFulfillOrderAction() {
     }
