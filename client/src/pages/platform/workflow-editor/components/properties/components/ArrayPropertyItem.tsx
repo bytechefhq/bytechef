@@ -28,9 +28,28 @@ const ArrayPropertyItem = ({
     const handleOnDeleteClick = () => {
         onDeleteClick(path);
 
-        setArrayItems((subProperties) =>
-            subProperties.filter((_subProperty, subPropertyIndex) => subPropertyIndex !== index)
-        );
+        const basePath = path.replace(/\[\d+\]$/, '');
+
+        setArrayItems((previousItems) => {
+            const remainingItems = previousItems.filter(
+                (_previousItem, previousItemIndex) => previousItemIndex !== index
+            );
+
+            const reindexedItems = remainingItems.map((remainingItem, newIndex) => {
+                if (Array.isArray(remainingItem)) {
+                    return remainingItem;
+                }
+
+                return {
+                    ...remainingItem,
+                    defaultValue: undefined,
+                    name: newIndex.toString(),
+                    path: `${basePath}[${newIndex}]`,
+                };
+            });
+
+            return reindexedItems;
+        });
     };
 
     return (
