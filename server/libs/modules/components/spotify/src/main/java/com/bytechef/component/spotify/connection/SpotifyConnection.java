@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -46,7 +46,7 @@ public class SpotifyConnection {
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://accounts.spotify.com/authorize")
             .scopes((connectionParameters, context) -> {
-                Map<String, Boolean> scopeMap = new HashMap<>();
+                Map<String, Boolean> scopeMap = new LinkedHashMap<>();
 
                 scopeMap.put("ugc-image-upload", false);
                 scopeMap.put("user-read-playback-state", false);

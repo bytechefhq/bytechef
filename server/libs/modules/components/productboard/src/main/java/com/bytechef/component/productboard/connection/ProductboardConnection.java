@@ -25,7 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -53,7 +53,7 @@ public class ProductboardConnection {
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/authorize")
                 .scopes((connectionParameters, context) -> {
-                    Map<String, Boolean> scopeMap = new HashMap<>();
+                    Map<String, Boolean> scopeMap = new LinkedHashMap<>();
 
                     scopeMap.put("custom_fields:read", false);
                     scopeMap.put("members_pii:read", false);
