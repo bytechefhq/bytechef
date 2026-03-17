@@ -716,6 +716,14 @@ public class ComponentInitOpenApiGenerator {
             }
         }
 
+        Map<String, Object> extensions = operation.getExtensions();
+
+        if (extensions != null && !extensions.isEmpty()) {
+            if (extensions.containsKey("x-help")) {
+                builder.add(".help(\"\", $S)", extensions.get("x-help"));
+            }
+        }
+
         return builder.build();
     }
 
