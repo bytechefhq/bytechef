@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.todo.action.MicrosoftToDoCreateTaskAction;
 import com.bytechef.component.microsoft.todo.action.MicrosoftToDoCreateTaskListAction;
+import com.bytechef.component.microsoft.todo.action.MicrosoftToDoDeleteTaskAction;
 import com.bytechef.component.microsoft.todo.action.MicrosoftToDoGetTaskAction;
 import com.bytechef.component.microsoft.todo.connection.MicrosoftToDoConnection;
 import com.bytechef.component.microsoft.todo.trigger.MicrosoftToDoNewTaskTrigger;
@@ -48,10 +49,12 @@ public class MicrosoftToDoComponentHandler implements ComponentHandler {
         .actions(
             MicrosoftToDoCreateTaskAction.ACTION_DEFINITION,
             MicrosoftToDoCreateTaskListAction.ACTION_DEFINITION,
+            MicrosoftToDoDeleteTaskAction.ACTION_DEFINITION,
             MicrosoftToDoGetTaskAction.ACTION_DEFINITION)
         .clusterElements(
             tool(MicrosoftToDoCreateTaskAction.ACTION_DEFINITION),
             tool(MicrosoftToDoCreateTaskListAction.ACTION_DEFINITION),
+            tool(MicrosoftToDoDeleteTaskAction.ACTION_DEFINITION),
             tool(MicrosoftToDoGetTaskAction.ACTION_DEFINITION))
         .triggers(MicrosoftToDoNewTaskTrigger.TRIGGER_DEFINITION)
         .version(1);
