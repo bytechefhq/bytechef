@@ -20,18 +20,14 @@ import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConsta
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_LIST_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.Configuration;
-import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -44,33 +40,24 @@ import org.mockito.ArgumentCaptor;
  * @author Monika Kušter
  */
 @ExtendWith(MockContextSetupExtension.class)
-class MicrosoftToDoGetTaskActionTest {
+class MicrosoftToDoDeleteTaskActionTest {
 
-    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(TASK_LIST_ID, "list", TASK_ID, "xy"));
+        MockParametersFactory.create(Map.of(TASK_LIST_ID, "xy", TASK_ID, "abc"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
-        when(mockedHttp.get(stringArgumentCaptor.capture()))
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody())
-            .thenReturn(mockedObject);
 
-        Object result = MicrosoftToDoGetTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = MicrosoftToDoDeleteTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(mockedObject, result);
+        assertNull(result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
-
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Configuration configuration = configurationBuilder.build();
-
-        assertEquals(ResponseType.JSON, configuration.getResponseType());
-        assertEquals("/me/todo/lists/list/tasks/xy", stringArgumentCaptor.getValue());
+        assertEquals("/me/todo/lists/xy/tasks/abc", stringArgumentCaptor.getValue());
     }
 }
