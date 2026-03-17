@@ -40,6 +40,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -89,8 +90,8 @@ class GoogleMapsGetRouteActionTest {
 
         try (MockedStatic<GoogleMapsUtils> mockedGoogleMapsUtils = mockStatic(GoogleMapsUtils.class)) {
             mockedGoogleMapsUtils
-                .when(() -> GoogleMapsUtils.getAddressGeolocation(contextArgumentCaptor.capture(),
-                    stringArgumentCaptor.capture()))
+                .when(() -> GoogleMapsUtils.getAddressGeolocation(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(Map.of(LATITUDE, 0.0, LONGITUDE, 0.0));
 
             Map<String, Object> result = GoogleMapsGetRouteAction.perform(
@@ -103,8 +104,6 @@ class GoogleMapsGetRouteActionTest {
                     "origin", "destination", "https://routes.googleapis.com/directions/v2:computeRoutes",
                     "X-Goog-FieldMask", "*"),
                 stringArgumentCaptor.getAllValues());
-
-            Body body = bodyArgumentCaptor.getValue();
 
             Map<String, Object> expectedBody = Map.of(
                 ORIGIN, Map.of(
@@ -126,17 +125,14 @@ class GoogleMapsGetRouteActionTest {
                     AVOID_FERRIES, false),
                 UNITS, "METRIC");
 
-            assertEquals(expectedBody, body.getContent());
+            assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
 
-            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-            assertNotNull(capturedFunction);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
             Configuration configuration = configurationBuilder.build();
-            ResponseType responseType = configuration.getResponseType();
 
-            assertEquals(ResponseType.Type.JSON, responseType.getType());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
         }
     }
 }

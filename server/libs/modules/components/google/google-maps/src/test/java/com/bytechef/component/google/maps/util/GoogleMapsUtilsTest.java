@@ -28,9 +28,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
@@ -71,15 +73,12 @@ class GoogleMapsUtilsTest {
             List.of("https://maps.googleapis.com/maps/api/geocode/json", mockedKey, mockedValue),
             stringArgumentCaptor.getAllValues());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -100,21 +99,17 @@ class GoogleMapsUtilsTest {
             .thenReturn(urlEncodedAddress);
 
         Map<String, Object> result = GoogleMapsUtils.getAddressGeolocation(mockedContext, "mockedAddress");
-        Map<String, Object> expected = Map.of(LATITUDE, 0.0, LONGITUDE, 0.0);
 
-        assertEquals(expected, result);
+        assertEquals(Map.of(LATITUDE, 0.0, LONGITUDE, 0.0), result);
         assertEquals(
             List.of("https://maps.googleapis.com/maps/api/geocode/json", ADDRESS, urlEncodedAddress),
             stringArgumentCaptor.getAllValues());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertNotNull(capturedFunction);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
