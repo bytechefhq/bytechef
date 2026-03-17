@@ -68,7 +68,8 @@ public class WebflowGetCollectionItemAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/webflow_v1#get-collection-item");
 
     private WebflowGetCollectionItemAction() {
     }

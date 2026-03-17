@@ -57,7 +57,8 @@ public class GoogleSearchConsoleGetSiteAction {
                 "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999).")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/google-search-console_v1#get-site");
 
     private GoogleSearchConsoleGetSiteAction() {
     }

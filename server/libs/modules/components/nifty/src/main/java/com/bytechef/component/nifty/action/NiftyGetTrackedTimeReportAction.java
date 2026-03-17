@@ -88,7 +88,8 @@ public class NiftyGetTrackedTimeReportAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/nifty_v1#get-tracked-time-report");
 
     private NiftyGetTrackedTimeReportAction() {
     }

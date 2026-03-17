@@ -71,7 +71,8 @@ public class SpotifyAddItemsToPlaylistAction {
             .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/spotify_v1#add-items-to-a-playlist");
 
     private SpotifyAddItemsToPlaylistAction() {
     }

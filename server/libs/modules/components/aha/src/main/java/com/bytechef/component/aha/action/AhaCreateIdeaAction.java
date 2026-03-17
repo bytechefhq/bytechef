@@ -161,7 +161,8 @@ public class AhaCreateIdeaAction {
             .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/aha_v1#create-idea");
 
     private AhaCreateIdeaAction() {
     }

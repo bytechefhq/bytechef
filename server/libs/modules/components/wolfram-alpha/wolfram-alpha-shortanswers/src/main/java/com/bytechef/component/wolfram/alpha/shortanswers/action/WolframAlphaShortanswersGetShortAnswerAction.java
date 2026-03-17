@@ -57,7 +57,8 @@ public class WolframAlphaShortanswersGetShortAnswerAction {
         .output(outputSchema(string().description("Short answer for query.")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.TEXT))));
+                    "responseType", ResponseType.TEXT))))
+        .help("", "https://docs.bytechef.io/reference/components/wolfram-alpha-shortanswers_v1#get-short-answer");
 
     private WolframAlphaShortanswersGetShortAnswerAction() {
     }

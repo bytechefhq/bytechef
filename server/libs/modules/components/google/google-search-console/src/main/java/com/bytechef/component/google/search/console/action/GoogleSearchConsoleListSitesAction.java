@@ -45,7 +45,8 @@ public class GoogleSearchConsoleListSitesAction {
             .description("List of sites with access level information.")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/google-search-console_v1#list-sites");
 
     private GoogleSearchConsoleListSitesAction() {
     }
