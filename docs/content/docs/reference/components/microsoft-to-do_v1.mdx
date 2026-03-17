@@ -73,7 +73,7 @@ Name: createTask
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | taskListId | Task List ID | STRING | ID of the task list where the task will be created. | true |
 | title | Title | STRING | Title of the task. | true |
-| importance | Importance | STRING <details> <summary> Options </summary> <span>low</span>, <span>normal</span>, <span>high</span> </details> | Importance of the task | false |
+| importance | Importance | STRING <details> <summary> Options </summary> <span>low</span>, <span>normal</span>, <span>high</span> </details> | Importance of the task. | false |
 | isReminderOn | Reminder | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Set to true if an alert is set to remind the user of the task. | false |
 
 #### Example JSON Structure
@@ -177,11 +177,11 @@ Type: OBJECT
 |:------------:|:------------:|:-------------------:|
 | @odata.context | STRING |  |
 | @odata.etag | STRING |  |
-| id | STRING |  |
-| displayName | STRING |  |
-| isOwner | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
-| isShared | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
-| wellKnownListName | STRING |  |
+| id | STRING | ID of the task list. |
+| displayName | STRING | The name of the task list. |
+| isOwner | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the user is the owner of the task list. |
+| isShared | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the task list is shared with other users. |
+| wellKnownListName | STRING | Property indicating the list name if the given list is a well-known list. The possible values are: none, defaultList, flaggedEmails, unknownFutureValue. |
 
 
 
@@ -202,6 +202,40 @@ Type: OBJECT
 
 
 
+### Delete Task
+Name: deleteTask
+
+`Deletes a task by ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| taskListId | Task List ID | STRING | ID of the task list where the task is located. | true |
+| taskId | Task ID | STRING <details> <summary> Depends On </summary> taskListId </details> | ID of the task to delete. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Task",
+  "name" : "deleteTask",
+  "parameters" : {
+    "taskListId" : "",
+    "taskId" : ""
+  },
+  "type" : "microsoftToDo/v1/deleteTask"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
 ### Get Task
 Name: getTask
 
@@ -211,7 +245,7 @@ Name: getTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| taskListId | Task List ID | STRING | ID of the task list where the task will be created. | true |
+| taskListId | Task List ID | STRING | ID of the task list where the task is located. | true |
 | taskId | Task ID | STRING <details> <summary> Depends On </summary> taskListId </details> | ID of the task to retrieve. | true |
 
 #### Example JSON Structure
@@ -278,4 +312,66 @@ Type: OBJECT
 
 
 
+## Triggers
+
+
+### New Task
+Name: newTask
+
+`Triggers when a new task is created in a specified task list.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| taskListId | Task List ID | STRING | ID of the task list to monitor for new tasks. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| @odata.etag | STRING |  |
+| importance | STRING | Importance of the task. |
+| isReminderOn | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether an alert is set to reminder the user of the task. |
+| status | STRING | State or progress of the task. |
+| title | STRING | Title of the task. |
+| categories | STRING | The categories associated with the task. |
+| id | STRING | ID of the task. |
+| body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(content), STRING\(contentType)&#125; </details> | Body of the task containing information about the task. |
+| linkedResources | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)&#125; </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Task",
+  "name" : "newTask",
+  "parameters" : {
+    "taskListId" : ""
+  },
+  "type" : "microsoftToDo/v1/newTask"
+}
+```
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
