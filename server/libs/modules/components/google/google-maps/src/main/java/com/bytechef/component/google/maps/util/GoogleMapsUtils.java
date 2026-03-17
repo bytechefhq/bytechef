@@ -42,7 +42,6 @@ public class GoogleMapsUtils {
     }
 
     public static Map<String, Object> getAddressGeolocation(Context context, String address) {
-
         Map<String, Object> geocoderInformation = context.http(
             http -> http.get("https://maps.googleapis.com/maps/api/geocode/json"))
             .queryParameter(ADDRESS, context.encoder(encoder -> encoder.base64UrlEncode(address)))
