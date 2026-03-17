@@ -28,7 +28,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class JiraConnection {
                 .tokenUrl((parameters, context) -> "https://auth.atlassian.com/oauth/token")
                 .refreshUrl((parameters, context) -> "https://auth.atlassian.com/oauth/token")
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("read:jira-user", true);
                     map.put("read:jira-work", true);

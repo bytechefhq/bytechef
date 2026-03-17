@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -47,7 +47,7 @@ public class GithubConnection {
                 .authorizationUrl((connection, context) -> "https://github.com/login/oauth/authorize")
                 .tokenUrl((connection, context) -> "https://github.com/login/oauth/access_token")
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("repo", true);
                     map.put("repo:status", false);

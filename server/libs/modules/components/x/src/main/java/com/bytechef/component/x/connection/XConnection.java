@@ -25,7 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -48,7 +48,7 @@ public class XConnection {
                 .authorizationUrl((connection, context) -> "https://x.com/i/oauth2/authorize")
                 .refreshUrl((connection, context) -> "https://api.x.com/2/oauth2/token")
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("tweet.read", true);
                     map.put("tweet.write", true);

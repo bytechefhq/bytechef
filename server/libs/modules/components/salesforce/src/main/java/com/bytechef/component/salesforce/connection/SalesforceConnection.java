@@ -26,7 +26,7 @@ import static com.bytechef.component.salesforce.constant.SalesforceConstants.SUB
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -55,7 +55,7 @@ public class SalesforceConnection {
                     (connectionParameters, context) -> getUrl(connectionParameters, "oauth2/authorize"))
                 .refreshUrl((connectionParameters, context) -> getUrl(connectionParameters, "oauth2/token"))
                 .scopes((connectionParameters, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("cdp_query_api", false);
                     map.put("pardot_api", false);

@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -46,7 +46,7 @@ public class BoxConnection {
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://account.box.com/api/oauth2/authorize")
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("root_readonly", true);
                     map.put("root_readwrite", true);

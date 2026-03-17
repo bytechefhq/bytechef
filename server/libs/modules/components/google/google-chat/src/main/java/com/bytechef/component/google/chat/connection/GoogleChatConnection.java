@@ -18,7 +18,7 @@ package com.bytechef.component.google.chat.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -31,7 +31,7 @@ public class GoogleChatConnection {
         1,
         "https://docs.bytechef.io/reference/components/google-chat_v1#connection-setup",
         (connection, context) -> {
-            Map<String, Boolean> map = new HashMap<>();
+            Map<String, Boolean> map = new LinkedHashMap<>();
 
             map.put("https://www.googleapis.com/auth/chat.admin.delete", false);
             map.put("https://www.googleapis.com/auth/chat.admin.memberships", false);

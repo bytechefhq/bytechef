@@ -33,7 +33,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +57,7 @@ public class XeroConnection {
                 .apply(XeroConnection::getApplyResponse)
                 .authorizationUrl((connection, context) -> "https://login.xero.com/identity/connect/authorize")
                 .scopes((connection, context) -> {
-                    Map<String, Boolean> map = new HashMap<>();
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
                     map.put("offline_access", true);
                     map.put("openid", false);
