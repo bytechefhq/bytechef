@@ -527,7 +527,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Posts a new comment on the file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/figma_v1#post-comment"
+    },
     "metadata": {
       "path": "/v1/files/{fileKey}/comments",
       "mimeType": "application/json",
