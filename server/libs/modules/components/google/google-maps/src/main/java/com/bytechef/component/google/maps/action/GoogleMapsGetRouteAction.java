@@ -74,16 +74,6 @@ public class GoogleMapsGetRouteAction {
                         "unit, suite or floor numbers should be avoided. Street address elements should be delimited " +
                         "by spaces.")
                 .required(true),
-            string(TRAVEL_MODE)
-                .label("Travel Mode")
-                .description("Desired travel mode.")
-                .defaultValue("DRIVE")
-                .options(
-                    option("Drive", "DRIVE"),
-                    option("Bicycle", "BICYCLE"),
-                    option("Walk", "WALK"),
-                    option("Transit", "TRANSIT"))
-                .required(false),
             string(ROUTING_PREFERENCE)
                 .label("Routing Preference")
                 .description("Routing preference of the route.")
@@ -160,7 +150,7 @@ public class GoogleMapsGetRouteAction {
                             LAT_LNG, Map.of(
                                 LATITUDE, destinationGeoLocation.get(LATITUDE),
                                 LONGITUDE, destinationGeoLocation.get(LONGITUDE)))),
-                    TRAVEL_MODE, inputParameters.getString(TRAVEL_MODE),
+                    TRAVEL_MODE, "DRIVE",
                     ROUTING_PREFERENCE, inputParameters.getString(ROUTING_PREFERENCE),
                     COMPUTE_ALT_ROUTES, inputParameters.getBoolean(COMPUTE_ALT_ROUTES),
                     "routeModifiers", Map.of(
