@@ -1448,7 +1448,7 @@ public class ComponentInitOpenApiGenerator {
             CodeBlock.Builder builder = CodeBlock.builder();
 
             builder.add("{\n");
-            builder.addStatement("$T<String, Boolean> scopeMap = new $T<>()", Map.class, HashMap.class);
+            builder.addStatement("$T<String, Boolean> scopeMap = new $T<>()", Map.class, LinkedHashMap.class);
             builder.add("\n");
 
             for (String scopeName : scopeNames) {
