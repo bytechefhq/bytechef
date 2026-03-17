@@ -380,7 +380,7 @@
   "description": "Wolfram Alpha Short Answers returns a single plain text result as an answer to your query.",
   "icon": "path:assets/wolfram-alpha.svg",
   "metadata": null,
-  "name": "wolfram-alpha-shortanswers",
+  "name": "wolframAlphaShortanswers",
   "resources": null,
   "tags": null,
   "title": "Wolfram Alpha Short Answers",
