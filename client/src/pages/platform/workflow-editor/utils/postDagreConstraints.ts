@@ -1779,6 +1779,13 @@ export function alignChainNodesCrossAxis(
     const dispatcherDeltas = new Map<string, {x: number; y: number}>();
     const mainAxis = crossAxis === 'x' ? 'y' : 'x';
 
+    // Precompute id→index map to avoid O(N) find() calls inside fixpoint loops
+    const nodeIndexById = new Map<string, number>();
+
+    for (let nodeIndex = 0; nodeIndex < allNodes.length; nodeIndex++) {
+        nodeIndexById.set(allNodes[nodeIndex].id, nodeIndex);
+    }
+
     // Seed anchored set with nodes that have saved positions
     for (const node of allNodes) {
         if (containsNodePosition((node.data as NodeDataType).metadata)) {
@@ -1805,11 +1812,13 @@ export function alignChainNodesCrossAxis(
                 continue;
             }
 
-            const predecessorNode = allNodes.find((searchNode) => searchNode.id === predecessorId);
+            const predecessorIndex = nodeIndexById.get(predecessorId);
 
-            if (!predecessorNode) {
+            if (predecessorIndex === undefined) {
                 continue;
             }
+
+            const predecessorNode = allNodes[predecessorIndex];
 
             const predecessorData = predecessorNode.data as NodeDataType;
             const predecessorHasPosition = containsNodePosition(predecessorData.metadata);
@@ -1906,10 +1915,17 @@ export function alignChainNodesCrossAxis(
     // Backward propagation: if a node's successor is anchored but the node
     // itself is not (e.g. newly inserted node before a saved-position node),
     // position the node relative to its successor's position minus the gap.
-    const successorMap = new Map<string, string>();
+    // Track all successors per source since a node can have multiple outgoing edges.
+    const successorMap = new Map<string, string[]>();
 
     for (const [targetId, sourceId] of predecessorMap.entries()) {
-        successorMap.set(sourceId, targetId);
+        const existing = successorMap.get(sourceId);
+
+        if (existing) {
+            existing.push(targetId);
+        } else {
+            successorMap.set(sourceId, [targetId]);
+        }
     }
 
     let backwardChanged = true;
@@ -1925,25 +1941,35 @@ export function alignChainNodesCrossAxis(
                 continue;
             }
 
-            const successorId = successorMap.get(node.id);
-
-            if (!successorId || !anchored.has(successorId)) {
+            // Task dispatchers should not be repositioned by backward propagation —
+            // their position governs branch layout and must only be set by forward
+            // propagation or their own saved position.
+            if (nodeData.taskDispatcher) {
                 continue;
             }
 
-            const successorNode = allNodes.find((searchNode) => searchNode.id === successorId);
+            const successorIds = successorMap.get(node.id);
 
-            if (!successorNode) {
+            if (!successorIds) {
                 continue;
             }
 
-            const successorData = successorNode.data as NodeDataType;
+            // Only backward-propagate when exactly one successor is anchored,
+            // to avoid ambiguous positioning when multiple branches diverge.
+            const anchoredSuccessorIds = successorIds.filter((successorId) => anchored.has(successorId));
 
-            if (nodeData.taskDispatcher && !containsNodePosition(successorData.metadata)) {
-                skipped.add(node.id);
-
+            if (anchoredSuccessorIds.length !== 1) {
                 continue;
             }
+
+            const successorId = anchoredSuccessorIds[0];
+            const successorIndex = nodeIndexById.get(successorId);
+
+            if (successorIndex === undefined) {
+                continue;
+            }
+
+            const successorNode = allNodes[successorIndex];
 
             const clusterCrossOffset =
                 getClusterRootCrossOffset(node, direction) - getClusterRootCrossOffset(successorNode, direction);
@@ -1969,13 +1995,6 @@ export function alignChainNodesCrossAxis(
                 },
                 position: newPosition,
             };
-
-            if (nodeData.taskDispatcher) {
-                dispatcherDeltas.set(node.id, {
-                    x: newPosition.x - node.position.x,
-                    y: newPosition.y - node.position.y,
-                });
-            }
 
             anchored.add(node.id);
             backwardChanged = true;

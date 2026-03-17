@@ -2856,6 +2856,72 @@ describe('alignChainNodesCrossAxis', () => {
         // accelo_1 should be at 750 - 150 = 600
         expect(allNodes[0].position.y).toBe(900 - 150 - 150);
     });
+
+    it('should NOT backward-propagate task dispatcher nodes', () => {
+        const dispatcherNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, workflowNodeName: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 500, y: 200},
+            type: 'workflow',
+        };
+        const savedNode: Node = {
+            data: {
+                componentName: 'httpClient',
+                metadata: {ui: {nodePosition: {x: 500, y: 600}}},
+                workflowNodeName: 'httpClient_1',
+            },
+            id: 'httpClient_1',
+            position: {x: 500, y: 600},
+            type: 'workflow',
+        };
+        const edges: Edge[] = [{id: 'condition_1=>httpClient_1', source: 'condition_1', target: 'httpClient_1'}];
+        const allNodes = [dispatcherNode, savedNode];
+
+        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
+
+        // Task dispatcher should NOT be repositioned by backward propagation
+        expect(allNodes[0].position).toEqual({x: 500, y: 200});
+    });
+
+    it('should NOT backward-propagate when node has multiple anchored successors', () => {
+        const sourceNode: Node = {
+            data: {componentName: 'accelo', workflowNodeName: 'accelo_1'},
+            id: 'accelo_1',
+            position: {x: 500, y: 100},
+            type: 'workflow',
+        };
+        const savedNodeA: Node = {
+            data: {
+                componentName: 'httpClient',
+                metadata: {ui: {nodePosition: {x: 300, y: 400}}},
+                workflowNodeName: 'httpClient_1',
+            },
+            id: 'httpClient_1',
+            position: {x: 300, y: 400},
+            type: 'workflow',
+        };
+        const savedNodeB: Node = {
+            data: {
+                componentName: 'slack',
+                metadata: {ui: {nodePosition: {x: 700, y: 400}}},
+                workflowNodeName: 'slack_1',
+            },
+            id: 'slack_1',
+            position: {x: 700, y: 400},
+            type: 'workflow',
+        };
+        const edges: Edge[] = [
+            {id: 'accelo_1=>httpClient_1', source: 'accelo_1', target: 'httpClient_1'},
+            {id: 'accelo_1=>slack_1', source: 'accelo_1', target: 'slack_1'},
+        ];
+        const allNodes = [sourceNode, savedNodeA, savedNodeB];
+
+        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
+
+        // With multiple anchored successors, backward propagation should be skipped
+        // to avoid ambiguous positioning
+        expect(allNodes[0].position).toEqual({x: 500, y: 100});
+    });
 });
 
 describe('alignTrailingPlaceholder', () => {
