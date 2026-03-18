@@ -18,33 +18,35 @@ interface DeleteAlertDialogProps {
 }
 
 const DeleteAlertDialog = ({nodeName, onCancel, onDelete, open}: DeleteAlertDialogProps) => {
-    const isNodeDelete = !!nodeName;
+    const isNodeDeleteDialog = !!nodeName;
 
     return (
         <AlertDialog open={open}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        {isNodeDelete ? `Delete node ${nodeName}?` : 'Are you absolutely sure?'}
+                        {isNodeDeleteDialog ? `Delete node ${nodeName}?` : 'Are you absolutely sure?'}
                     </AlertDialogTitle>
 
                     <AlertDialogDescription>
-                        {isNodeDelete
+                        {isNodeDeleteDialog
                             ? 'This action cannot be undone. This will permanently delete the node and properties it contains.'
                             : 'This action cannot be undone. This will permanently delete data.'}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancel}>{isNodeDelete ? 'Keep node' : 'Cancel'}</AlertDialogCancel>
+                    <AlertDialogCancel onClick={onCancel}>
+                        {isNodeDeleteDialog ? 'Keep node' : 'Cancel'}
+                    </AlertDialogCancel>
 
                     <AlertDialogAction
                         className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                         onClick={onDelete}
                     >
-                        {isNodeDelete && <Trash2Icon />}
+                        {isNodeDeleteDialog && <Trash2Icon />}
 
-                        {isNodeDelete ? 'Delete node' : 'Delete'}
+                        {isNodeDeleteDialog ? 'Delete node' : 'Delete'}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
