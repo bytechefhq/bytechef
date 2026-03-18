@@ -21,6 +21,9 @@ package com.bytechef.component.asana.constant;
  */
 public class AsanaConstants {
 
+    public static final String GID = "gid";
+    public static final String RESOURCE = "resource";
+    public static final String TARGET = "target";
     public static final String WORKSPACE = "workspace";
 
     private AsanaConstants() {
