@@ -13,7 +13,7 @@ import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {ArrowLeftRightIcon, CheckIcon, ComponentIcon, PinOffIcon, Trash2Icon} from 'lucide-react';
-import {memo, useMemo, useState} from 'react';
+import {forwardRef, memo, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -36,230 +36,92 @@ import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPos
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import styles from './NodeTypes.module.css';
 
-const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
-    const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
-    const [renameValue, setRenameValue] = useState('');
-    const [switchPopoverOpen, setSwitchPopoverOpen] = useState(false);
+type EffectiveDirectionType = Parameters<typeof mapHandlePosition>[1];
+type NodePositionType = {x: number; y: number} | undefined;
 
-    const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
-    const isHorizontal = layoutDirection === 'LR';
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            currentNode: state.currentNode,
-            setCurrentNode: state.setCurrentNode,
-            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
-        }))
-    );
-    const {incrementLayoutResetCounter, workflow} = useWorkflowDataStore(
-        useShallow((state) => ({
-            incrementLayoutResetCounter: state.incrementLayoutResetCounter,
-            workflow: state.workflow,
-        }))
-    );
-    const {
-        clusterElementsCanvasOpen,
-        contextMenuOpen,
-        mainClusterRootComponentDefinition,
-        nestedClusterRootsComponentDefinitions,
-        renamingNodeName,
-        rootClusterElementNodeData,
-        setRenamingNodeName,
-        setRootClusterElementNodeData,
-    } = useWorkflowEditorStore(
-        useShallow((state) => ({
-            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
-            contextMenuOpen: state.contextMenuOpen,
-            mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
-            nestedClusterRootsComponentDefinitions: state.nestedClusterRootsComponentDefinitions,
-            renamingNodeName: state.renamingNodeName,
-            rootClusterElementNodeData: state.rootClusterElementNodeData,
-            setRenamingNodeName: state.setRenamingNodeName,
-            setRootClusterElementNodeData: state.setRootClusterElementNodeData,
-        }))
-    );
+interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'id'> {
+    clusterElementTypesCount: number;
+    data: NodeDataType;
+    effectiveDirection: EffectiveDirectionType;
+    filteredClusterElementTypes: ReturnType<typeof getFilteredClusterElementTypes>;
+    handleDeleteNodeClick: (data: NodeDataType) => void;
+    handleNodeClick: () => void;
+    handleRemoveNodePosition: (nodeName: string) => void;
+    handleRemoveSavedClusterElementPosition: (clickedNodeName: string) => void;
+    handleRenameKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+    handleRenameSubmit: (newLabel: string) => void;
+    hasSavedClusterElementPosition: NodePositionType;
+    hasSavedNodePosition: false | NodePositionType;
+    id: string;
+    isClusterElement: string | undefined;
+    isHorizontal: boolean;
+    isMainRootClusterElement: boolean;
+    isNestedClusterRoot: boolean | undefined;
+    isRegularNode: boolean;
+    isRenaming: boolean;
+    isSelected: boolean;
+    nodeDescription: string | undefined;
+    nodeLabel: string | undefined;
+    nodeWidth: number;
+    onHoveredNodeNameChange: (name: string | undefined) => void;
+    parentClusterRootId: string | undefined;
+    renameValue: string;
+    setRenameValue: (value: string) => void;
+    setSwitchPopoverOpen: (open: boolean) => void;
+    suppressHover: boolean;
+    switchPopoverOpen: boolean;
+    workflowNodeDetailsPanelOpen: boolean;
+}
 
-    const {invalidateWorkflowQueries} = useWorkflowEditor();
-
-    const handleNodeClick = useNodeClickHandler(data, id);
-
-    const isSelected = currentNode?.name === data.name;
-
-    const isMainRootClusterElement = !!data.clusterRoot && !data.isNestedClusterRoot;
-    const isClusterElement = data.clusterElementType;
-    const isNestedClusterRoot = data.isNestedClusterRoot;
-    const isRegularNode = !isClusterElement && !isMainRootClusterElement && !isNestedClusterRoot;
-    const isClusterCanvasNode = !isRegularNode;
-    const effectiveDirection = isClusterCanvasNode ? 'TB' : layoutDirection;
-    const parentClusterRootId = data.parentClusterRootId;
-    const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
-    const hasSavedNodePosition = isRegularNode && !data.trigger && data.metadata?.ui?.nodePosition;
-
-    const {tasks: workflowTasks, triggers: workflowTriggers} = workflow;
-
-    const nodeLabel = useMemo(
-        () =>
-            getNodeLabel({
-                fallbackLabel: data.title || data.label,
-                workflow,
-                workflowNodeName: data.workflowNodeName,
-            }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [data.label, data.title, data.workflowNodeName, workflowTasks, workflowTriggers]
-    );
-
-    const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
+const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>(
+    (
         {
-            environmentId: currentEnvironmentId,
-            id: workflow.id!,
-            workflowNodeName: hoveredNodeName!,
-        },
-        hoveredNodeName !== undefined && !data.clusterElementType
-    );
-
-    const {data: clusterElementDefinitionData} = useGetClusterElementDefinitionQuery(
-        {
-            clusterElementName: data.clusterElementName as string,
-            componentName: data.componentName,
-            componentVersion: data.version as number,
-        },
-        hoveredNodeName !== undefined && !!data.clusterElementType
-    );
-
-    const filteredClusterElementTypes = useMemo(() => {
-        const clusterRootRequirementMet =
-            clusterElementsCanvasOpen &&
-            (isMainRootClusterElement || isNestedClusterRoot) &&
-            mainClusterRootComponentDefinition;
-
-        if (!clusterRootRequirementMet) {
-            return [];
-        }
-
-        const nestedClusterRootDefinition = nestedClusterRootsComponentDefinitions[data.componentName];
-
-        return getFilteredClusterElementTypes({
-            clusterRootComponentDefinition: nestedClusterRootDefinition || mainClusterRootComponentDefinition,
-            currentClusterElementsType: data.clusterElementType,
+            clusterElementTypesCount,
+            data,
+            effectiveDirection,
+            filteredClusterElementTypes,
+            handleDeleteNodeClick,
+            handleNodeClick,
+            handleRemoveNodePosition,
+            handleRemoveSavedClusterElementPosition,
+            handleRenameKeyDown,
+            handleRenameSubmit,
+            hasSavedClusterElementPosition,
+            hasSavedNodePosition,
+            id,
+            isClusterElement,
+            isHorizontal,
+            isMainRootClusterElement,
             isNestedClusterRoot,
-            operationName: data.operationName,
-        });
-    }, [
-        clusterElementsCanvasOpen,
-        isMainRootClusterElement,
-        isNestedClusterRoot,
-        mainClusterRootComponentDefinition,
-        nestedClusterRootsComponentDefinitions,
-        data.componentName,
-        data.clusterElementType,
-        data.operationName,
-    ]);
-
-    const clusterElementTypesCount = useMemo(() => {
-        return filteredClusterElementTypes.length;
-    }, [filteredClusterElementTypes]);
-
-    const nodeWidth = useMemo(
-        () =>
-            clusterElementsCanvasOpen && (isMainRootClusterElement || isNestedClusterRoot)
-                ? calculateNodeWidth(clusterElementTypesCount)
-                : NODE_WIDTH,
-        [clusterElementsCanvasOpen, isMainRootClusterElement, isNestedClusterRoot, clusterElementTypesCount]
-    );
-
-    const queryClient = useQueryClient();
-
-    const {updateWorkflowMutation} = useWorkflowEditor();
-
-    const handleDeleteNodeClick = (data: NodeDataType) => {
-        if (data) {
-            handleDeleteTask({
-                clusterElementsCanvasOpen,
-                currentNode,
-                data,
-                invalidateWorkflowQueries: invalidateWorkflowQueries!,
-                queryClient,
-                rootClusterElementNodeData,
-                setCurrentNode,
-                setRootClusterElementNodeData,
-                updateWorkflowMutation: updateWorkflowMutation!,
-                workflow,
-            });
-        }
-    };
-
-    const handleRemoveSavedClusterElementPosition = (clickedNodeName: string) => {
-        if (!rootClusterElementNodeData) {
-            return;
-        }
-
-        saveClusterElementNodesPosition({
-            clickedNodeName,
-            updateWorkflowMutation,
-            workflow,
-        });
-    };
-
-    const handleRemoveNodePosition = (nodeName: string) => {
-        removeWorkflowNodePosition({
-            incrementLayoutResetCounter,
-            invalidateWorkflowQueries: invalidateWorkflowQueries!,
-            nodeName,
-            updateWorkflowMutation: updateWorkflowMutation!,
-        });
-    };
-
-    const handleRenameSubmit = (newLabel: string) => {
-        const trimmed = newLabel.trim();
-
-        if (trimmed && trimmed !== nodeLabel) {
-            saveWorkflowDefinition({
-                decorative: true,
-                nodeData: {
-                    ...data,
-                    label: trimmed,
-                    name: data.workflowNodeName,
-                },
-                updateWorkflowMutation: updateWorkflowMutation!,
-            });
-        }
-
-        setRenamingNodeName(undefined);
-    };
-
-    const handleRenameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            handleRenameSubmit(renameValue);
-        }
-
-        if (event.key === 'Escape') {
-            setRenamingNodeName(undefined);
-        }
-    };
-
-    const handleStartRename = () => {
-        setRenameValue(nodeLabel ?? '');
-        setRenamingNodeName(data.name);
-    };
-
-    const isRenaming = renamingNodeName === data.name;
-
-    const suppressHover = contextMenuOpen || isRenaming || switchPopoverOpen;
-
-    const nodeDescription =
-        workflowNodeDescription?.description && !data.clusterElementType
-            ? workflowNodeDescription.description
-            : clusterElementDefinitionData?.description;
-
-    const nodeContent = (
+            isRegularNode,
+            isRenaming,
+            isSelected,
+            nodeDescription,
+            nodeLabel,
+            nodeWidth,
+            onHoveredNodeNameChange,
+            parentClusterRootId,
+            renameValue,
+            setRenameValue,
+            setSwitchPopoverOpen,
+            suppressHover,
+            switchPopoverOpen,
+            workflowNodeDetailsPanelOpen,
+            ...rest
+        },
+        ref
+    ) => (
         <div
+            ref={ref}
+            {...rest}
             className={twMerge(
                 'relative flex min-w-60 cursor-pointer justify-center',
                 !suppressHover && 'group',
                 !data.taskDispatcher && 'items-center',
                 (data.trigger || isMainRootClusterElement) && 'nodrag',
                 isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center gap-1',
-                isHorizontal && isRegularNode && 'min-w-0'
+                isHorizontal && isRegularNode && 'min-w-0',
+                rest.className
             )}
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
@@ -364,11 +226,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             <HoverCard
                 key={id}
                 onOpenChange={(open) => {
-                    if (open) {
-                        setHoveredNodeName(data.name);
-                    } else {
-                        setHoveredNodeName(undefined);
-                    }
+                    onHoveredNodeNameChange(open ? data.name : undefined);
                 }}
                 open={false}
             >
@@ -603,7 +461,257 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             )}
         </div>
+    )
+);
+
+WorkflowNodeContent.displayName = 'WorkflowNodeContent';
+
+const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
+    const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
+    const [renameValue, setRenameValue] = useState('');
+    const [switchPopoverOpen, setSwitchPopoverOpen] = useState(false);
+
+    const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
+    const isHorizontal = layoutDirection === 'LR';
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentNode: state.currentNode,
+            setCurrentNode: state.setCurrentNode,
+            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+        }))
     );
+    const {incrementLayoutResetCounter, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            incrementLayoutResetCounter: state.incrementLayoutResetCounter,
+            workflow: state.workflow,
+        }))
+    );
+    const {
+        clusterElementsCanvasOpen,
+        contextMenuOpen,
+        mainClusterRootComponentDefinition,
+        nestedClusterRootsComponentDefinitions,
+        renamingNodeName,
+        rootClusterElementNodeData,
+        setRenamingNodeName,
+        setRootClusterElementNodeData,
+    } = useWorkflowEditorStore(
+        useShallow((state) => ({
+            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            contextMenuOpen: state.contextMenuOpen,
+            mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
+            nestedClusterRootsComponentDefinitions: state.nestedClusterRootsComponentDefinitions,
+            renamingNodeName: state.renamingNodeName,
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+            setRenamingNodeName: state.setRenamingNodeName,
+            setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+        }))
+    );
+
+    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+
+    const handleNodeClick = useNodeClickHandler(data, id);
+
+    const queryClient = useQueryClient();
+
+    const isSelected = currentNode?.name === data.name;
+
+    const isMainRootClusterElement = !!data.clusterRoot && !data.isNestedClusterRoot;
+    const isClusterElement = data.clusterElementType;
+    const isNestedClusterRoot = data.isNestedClusterRoot;
+    const isRegularNode = !isClusterElement && !isMainRootClusterElement && !isNestedClusterRoot;
+    const isClusterCanvasNode = !isRegularNode;
+    const effectiveDirection: EffectiveDirectionType = isClusterCanvasNode ? 'TB' : layoutDirection;
+    const parentClusterRootId = data.parentClusterRootId;
+    const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
+    const hasSavedNodePosition = isRegularNode && !data.trigger && data.metadata?.ui?.nodePosition;
+
+    const {tasks: workflowTasks, triggers: workflowTriggers} = workflow;
+
+    const nodeLabel = useMemo(
+        () =>
+            getNodeLabel({
+                fallbackLabel: data.title || data.label,
+                workflow,
+                workflowNodeName: data.workflowNodeName,
+            }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [data.label, data.title, data.workflowNodeName, workflowTasks, workflowTriggers]
+    );
+
+    const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
+        {
+            environmentId: currentEnvironmentId,
+            id: workflow.id!,
+            workflowNodeName: hoveredNodeName!,
+        },
+        hoveredNodeName !== undefined && !data.clusterElementType
+    );
+
+    const {data: clusterElementDefinitionData} = useGetClusterElementDefinitionQuery(
+        {
+            clusterElementName: data.clusterElementName as string,
+            componentName: data.componentName,
+            componentVersion: data.version as number,
+        },
+        hoveredNodeName !== undefined && !!data.clusterElementType
+    );
+
+    const filteredClusterElementTypes = useMemo(() => {
+        const clusterRootRequirementMet =
+            clusterElementsCanvasOpen &&
+            (isMainRootClusterElement || isNestedClusterRoot) &&
+            mainClusterRootComponentDefinition;
+
+        if (!clusterRootRequirementMet) {
+            return [];
+        }
+
+        const nestedClusterRootDefinition = nestedClusterRootsComponentDefinitions[data.componentName];
+
+        return getFilteredClusterElementTypes({
+            clusterRootComponentDefinition: nestedClusterRootDefinition || mainClusterRootComponentDefinition,
+            currentClusterElementsType: data.clusterElementType,
+            isNestedClusterRoot,
+            operationName: data.operationName,
+        });
+    }, [
+        clusterElementsCanvasOpen,
+        isMainRootClusterElement,
+        isNestedClusterRoot,
+        mainClusterRootComponentDefinition,
+        nestedClusterRootsComponentDefinitions,
+        data.componentName,
+        data.clusterElementType,
+        data.operationName,
+    ]);
+
+    const clusterElementTypesCount = useMemo(() => {
+        return filteredClusterElementTypes.length;
+    }, [filteredClusterElementTypes]);
+
+    const nodeWidth = useMemo(
+        () =>
+            clusterElementsCanvasOpen && (isMainRootClusterElement || isNestedClusterRoot)
+                ? calculateNodeWidth(clusterElementTypesCount)
+                : NODE_WIDTH,
+        [clusterElementsCanvasOpen, isMainRootClusterElement, isNestedClusterRoot, clusterElementTypesCount]
+    );
+
+    const handleDeleteNodeClick = (data: NodeDataType) => {
+        if (data) {
+            handleDeleteTask({
+                clusterElementsCanvasOpen,
+                currentNode,
+                data,
+                invalidateWorkflowQueries: invalidateWorkflowQueries!,
+                queryClient,
+                rootClusterElementNodeData,
+                setCurrentNode,
+                setRootClusterElementNodeData,
+                updateWorkflowMutation: updateWorkflowMutation!,
+                workflow,
+            });
+        }
+    };
+
+    const handleRemoveSavedClusterElementPosition = (clickedNodeName: string) => {
+        if (!rootClusterElementNodeData) {
+            return;
+        }
+
+        saveClusterElementNodesPosition({
+            clickedNodeName,
+            updateWorkflowMutation,
+            workflow,
+        });
+    };
+
+    const handleRemoveNodePosition = (nodeName: string) => {
+        removeWorkflowNodePosition({
+            incrementLayoutResetCounter,
+            invalidateWorkflowQueries: invalidateWorkflowQueries!,
+            nodeName,
+            updateWorkflowMutation: updateWorkflowMutation!,
+        });
+    };
+
+    const handleRenameSubmit = (newLabel: string) => {
+        const trimmed = newLabel.trim();
+
+        if (trimmed && trimmed !== nodeLabel) {
+            saveWorkflowDefinition({
+                decorative: true,
+                nodeData: {
+                    ...data,
+                    label: trimmed,
+                    name: data.workflowNodeName,
+                },
+                updateWorkflowMutation: updateWorkflowMutation!,
+            });
+        }
+
+        setRenamingNodeName(undefined);
+    };
+
+    const handleRenameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            handleRenameSubmit(renameValue);
+        }
+
+        if (event.key === 'Escape') {
+            setRenamingNodeName(undefined);
+        }
+    };
+
+    const handleStartRename = () => {
+        setRenameValue(nodeLabel ?? '');
+        setRenamingNodeName(data.name);
+    };
+
+    const isRenaming = renamingNodeName === data.name;
+
+    const suppressHover = contextMenuOpen || isRenaming || switchPopoverOpen;
+
+    const nodeDescription =
+        workflowNodeDescription?.description && !data.clusterElementType
+            ? workflowNodeDescription.description
+            : clusterElementDefinitionData?.description;
+
+    const sharedContentProps = {
+        clusterElementTypesCount,
+        data,
+        effectiveDirection,
+        filteredClusterElementTypes,
+        handleDeleteNodeClick,
+        handleNodeClick,
+        handleRemoveNodePosition,
+        handleRemoveSavedClusterElementPosition,
+        handleRenameKeyDown,
+        handleRenameSubmit,
+        hasSavedClusterElementPosition,
+        hasSavedNodePosition,
+        id,
+        isClusterElement,
+        isHorizontal,
+        isMainRootClusterElement,
+        isNestedClusterRoot,
+        isRegularNode,
+        isRenaming,
+        isSelected,
+        nodeDescription,
+        nodeLabel,
+        nodeWidth,
+        onHoveredNodeNameChange: setHoveredNodeName,
+        parentClusterRootId,
+        renameValue,
+        setRenameValue,
+        setSwitchPopoverOpen,
+        suppressHover,
+        switchPopoverOpen,
+        workflowNodeDetailsPanelOpen,
+    } satisfies WorkflowNodeContentProps;
 
     if (isRegularNode) {
         return (
@@ -615,12 +723,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 onResetPosition={() => handleRemoveNodePosition(data.name)}
                 onSwitch={() => setSwitchPopoverOpen(true)}
             >
-                {nodeContent}
+                <WorkflowNodeContent {...sharedContentProps} />
             </WorkflowNodeContextMenu>
         );
     }
 
-    return nodeContent;
+    return <WorkflowNodeContent {...sharedContentProps} />;
 };
 
 export default memo(WorkflowNode);
