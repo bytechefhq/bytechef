@@ -230,8 +230,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             StringBuilder warnings = new StringBuilder("[");
 
             WorkflowValidator.validateWorkflow(
-                workflow, this::getTaskProperties, this::getTaskOutputProperty, new HashMap<>(),
-                new HashMap<>(), errors, warnings);
+                workflow, this::getTaskProperties, this::getTaskOutputProperty, null, new HashMap<>(),
+                new HashMap<>(), new HashMap<>(), errors, warnings);
 
             errors.append("]");
 

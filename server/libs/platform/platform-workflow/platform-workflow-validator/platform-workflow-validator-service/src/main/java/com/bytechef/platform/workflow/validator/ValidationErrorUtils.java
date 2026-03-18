@@ -57,4 +57,18 @@ class ValidationErrorUtils {
     public static String notDefined(String propertyPath) {
         return "Property '" + propertyPath + "' is not defined in task definition";
     }
+
+    /**
+     * Creates a missing cluster element error message.
+     */
+    public static String missingClusterElement(String elementKey, String taskName) {
+        return "Cluster element '" + elementKey + "' is missing from task " + taskName;
+    }
+
+    /**
+     * Creates an undefined cluster element warning message.
+     */
+    public static String undefinedClusterElement(String elementKey, String taskName) {
+        return "Cluster element '" + elementKey + "' are not defined in task " + taskName;
+    }
 }

@@ -34,6 +34,7 @@ class ValidationContext {
     private final List<JsonNode> taskJsonNodes;
     private final Map<String, List<PropertyInfo>> taskDefinitionMap;
     private final Map<String, PropertyInfo> taskOutputMap;
+    private final Map<String, List<String>> clusterTypesProviderMap;
     private final StringBuilder errors;
     private final StringBuilder warnings;
     private final List<String> taskNames = new ArrayList<>();
@@ -42,11 +43,13 @@ class ValidationContext {
 
     private ValidationContext(
         List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
-        Map<String, PropertyInfo> taskOutputMap, StringBuilder errors, StringBuilder warnings) {
+        Map<String, PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesProviderMap,
+        StringBuilder errors, StringBuilder warnings) {
 
         this.taskJsonNodes = taskJsonNodes;
         this.taskDefinitionMap = taskDefinitionMap;
         this.taskOutputMap = taskOutputMap;
+        this.clusterTypesProviderMap = clusterTypesProviderMap;
         this.errors = errors;
         this.warnings = warnings;
 
@@ -55,9 +58,11 @@ class ValidationContext {
 
     public static ValidationContext of(
         List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
-        Map<String, PropertyInfo> taskOutputMap, StringBuilder errors, StringBuilder warnings) {
+        Map<String, PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesProviderMap,
+        StringBuilder errors, StringBuilder warnings) {
 
-        return new ValidationContext(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+        return new ValidationContext(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterTypesProviderMap, errors,
+            warnings);
     }
 
     private void buildTaskMaps() {
@@ -109,5 +114,9 @@ class ValidationContext {
 
     public Map<String, JsonNode> getAllTasksMap() {
         return allTasksMap;
+    }
+
+    public Map<String, List<String>> getClusterTypesProviderMap() {
+        return clusterTypesProviderMap;
     }
 }
