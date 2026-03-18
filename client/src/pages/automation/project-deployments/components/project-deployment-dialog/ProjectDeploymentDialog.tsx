@@ -401,11 +401,11 @@ const ProjectDeploymentDialog = ({
                                     <div className="mr-auto flex items-center gap-2">
                                         <Switch checked={groupConnections} onCheckedChange={setGroupConnections} />
 
-                                        <span className="text-sm text-gray-700">Group Connections</span>
+                                        <span className="text-sm font-semibold">Group Connections</span>
 
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <InfoIcon className="size-4 cursor-default text-gray-400" />
+                                                <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
                                             </TooltipTrigger>
 
                                             <TooltipContent>Connections grouped by their app.</TooltipContent>

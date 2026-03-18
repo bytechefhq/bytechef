@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import Switch from '@/components/Switch/Switch';
 import {
     Dialog,
     DialogClose,
@@ -12,6 +13,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -30,7 +32,7 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import {PropertyAllType} from '@/shared/types';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
-import {PlusIcon} from 'lucide-react';
+import {InfoIcon, PlusIcon} from 'lucide-react';
 import {Dispatch, SetStateAction, useState} from 'react';
 import {UseFormReturn, useForm} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
@@ -41,23 +43,27 @@ interface WorkflowTestConfigurationDialogProps {
     workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
+interface WorkflowTestConfigurationFormFieldProps {
+    componentConnection: ComponentConnection;
+    connectionDialogAllowed: boolean;
+    connections: ConnectionI[];
+    form: UseFormReturn<WorkflowTestConfiguration>;
+    groupedIndices?: number[];
+    index: number;
+    setComponentConnection: Dispatch<SetStateAction<ComponentConnection | undefined>>;
+    setShowNewConnectionDialog: Dispatch<SetStateAction<boolean>>;
+}
+
 const WorkflowTestConfigurationFormField = ({
     componentConnection,
     connectionDialogAllowed,
     connections,
     form,
+    groupedIndices,
     index,
     setComponentConnection,
     setShowNewConnectionDialog,
-}: {
-    componentConnection: ComponentConnection;
-    connectionDialogAllowed: boolean;
-    connections: ConnectionI[];
-    form: UseFormReturn<WorkflowTestConfiguration>;
-    index: number;
-    setShowNewConnectionDialog: Dispatch<SetStateAction<boolean>>;
-    setComponentConnection: Dispatch<SetStateAction<ComponentConnection | undefined>>;
-}) => {
+}: WorkflowTestConfigurationFormFieldProps) => {
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: componentConnection.componentName,
         componentVersion: componentConnection.componentVersion,
@@ -78,13 +84,32 @@ const WorkflowTestConfigurationFormField = ({
 
                                 <span className="ml-1">{componentDefinition?.title} Connection</span>
 
-                                <span className="ml-0.5 text-xs text-gray-500">
-                                    {`(${componentConnection.workflowNodeName} - ${componentConnection.key})`}
-                                </span>
+                                {groupedIndices ? (
+                                    <span className="ml-0.5 text-xs text-content-neutral-secondary">
+                                        (applies to {groupedIndices.length} nodes)
+                                    </span>
+                                ) : (
+                                    <span className="ml-0.5 text-xs text-content-neutral-secondary">
+                                        {`(${componentConnection.workflowNodeName} - ${componentConnection.key})`}
+                                    </span>
+                                )}
                             </FormLabel>
 
                             <Select
-                                onValueChange={field.onChange}
+                                onValueChange={(value) => {
+                                    field.onChange(value);
+
+                                    if (groupedIndices) {
+                                        for (const groupedIndex of groupedIndices) {
+                                            if (groupedIndex !== index) {
+                                                form.setValue(
+                                                    `connections.${groupedIndex}.connectionId`,
+                                                    Number(value)
+                                                );
+                                            }
+                                        }
+                                    }
+                                }}
                                 value={field.value ? field.value.toString() : undefined}
                             >
                                 <FormControl>
@@ -151,6 +176,7 @@ const WorkflowTestConfigurationDialog = ({
 }: WorkflowTestConfigurationDialogProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
     const [componentConnection, setComponentConnection] = useState<ComponentConnection | undefined>();
+    const [groupConnections, setGroupConnections] = useState(false);
 
     const connectionDialogAllowed = useWorkflowNodeDetailsPanelStore((state) => state.connectionDialogAllowed);
 
@@ -229,6 +255,36 @@ const WorkflowTestConfigurationDialog = ({
         });
     }
 
+    const getConnectionsToRender = (): Array<{
+        connection: ComponentConnection;
+        groupedIndices?: number[];
+        index: number;
+    }> => {
+        if (!groupConnections) {
+            return componentConnections.map((connection, index) => ({connection, index}));
+        }
+
+        const connectionGroupMap = new Map<string, number[]>();
+
+        for (const [index, connection] of componentConnections.entries()) {
+            const componentName = connection.componentName;
+
+            if (!connectionGroupMap.has(componentName)) {
+                connectionGroupMap.set(componentName, []);
+            }
+
+            connectionGroupMap.get(componentName)!.push(index);
+        }
+
+        return Array.from(connectionGroupMap.values()).map((indices) => ({
+            connection: componentConnections[indices[0]],
+            groupedIndices: indices.length > 1 ? indices : undefined,
+            index: indices[0],
+        }));
+    };
+
+    const connectionsToRender = getConnectionsToRender();
+
     return (
         <Dialog onOpenChange={onClose} open={true}>
             <DialogContent
@@ -253,7 +309,7 @@ const WorkflowTestConfigurationDialog = ({
                             <div className="space-y-4 py-4">
                                 {inputs && inputs.length > 0 && (
                                     <div className="space-y-2">
-                                        <Label className="text-gray-500">Inputs</Label>
+                                        <Label className="text-content-neutral-secondary">Inputs</Label>
 
                                         <Properties
                                             control={control}
@@ -285,21 +341,20 @@ const WorkflowTestConfigurationDialog = ({
 
                                 {componentConnections && componentConnections.length > 0 && (
                                     <div className="space-y-2">
-                                        <Label className="text-gray-500">Connections</Label>
+                                        <Label className="text-content-neutral-secondary">Connections</Label>
 
                                         <div className="space-y-4">
-                                            {componentConnections.map(
-                                                (workflowConnection, index) =>
+                                            {connectionsToRender.map(
+                                                ({connection, groupedIndices, index}) =>
                                                     connections && (
                                                         <WorkflowTestConfigurationFormField
-                                                            componentConnection={workflowConnection}
+                                                            componentConnection={connection}
                                                             connectionDialogAllowed={connectionDialogAllowed}
                                                             connections={connections}
                                                             form={form}
+                                                            groupedIndices={groupedIndices}
                                                             index={index}
-                                                            key={`${workflowConnection.workflowNodeName}_${
-                                                                workflowConnection.key
-                                                            }`}
+                                                            key={`${connection.workflowNodeName}_${connection.key}`}
                                                             setComponentConnection={setComponentConnection}
                                                             setShowNewConnectionDialog={setShowNewConnectionDialog}
                                                         />
@@ -311,7 +366,25 @@ const WorkflowTestConfigurationDialog = ({
                             </div>
                         </div>
 
-                        <DialogFooter>
+                        <DialogFooter className="flex items-center">
+                            <div className="mr-auto flex items-center gap-2">
+                                {componentConnections.length > 1 && (
+                                    <>
+                                        <Switch checked={groupConnections} onCheckedChange={setGroupConnections} />
+
+                                        <span className="text-sm font-semibold">Group Connections</span>
+
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>Connections grouped by their app.</TooltipContent>
+                                        </Tooltip>
+                                    </>
+                                )}
+                            </div>
+
                             <DialogClose asChild>
                                 <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
