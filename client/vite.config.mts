@@ -55,6 +55,7 @@ export default ({mode}) => {
         resolve: {
             alias: {
                 '@': path.resolve(__dirname, './src'),
+                '@bytechef/embedded-react': path.resolve(__dirname, '../sdks/frontend/embedded/library/react/src/main.ts'),
                 '@dagrejs/dagre': path.resolve(__dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs.js'),
             },
         },
