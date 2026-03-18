@@ -80,7 +80,9 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                         </span>
 
                         {!connectionGrouping && (
-                            <span className="text-xs text-gray-500">({componentConnection.workflowNodeName})</span>
+                            <span className="text-xs text-content-neutral-secondary">
+                                ({componentConnection.workflowNodeName})
+                            </span>
                         )}
                     </FormLabel>
 
@@ -146,7 +148,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                                         <div className="flex items-center space-x-1">
                                             <span>{connection.name}</span>
 
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-content-neutral-secondary">
                                                 {connection?.tags?.map((tag) => tag.name).join(', ')}
                                             </span>
 
@@ -162,17 +164,17 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                             <span>Loading component details…</span>
                         ) : componentDefinition?.title ? (
                             <>
-                                <span>{`Choose connection for the ${componentDefinition.title}`}</span>
+                                <span>{`Choose connection for the ${componentDefinition.title}`} component</span>
 
                                 {connectionGrouping ? (
-                                    <span className="mx-1 text-xs text-gray-500">
-                                        (applies to {connectionGrouping.indices.length} nodes)
+                                    <span className="mx-1 text-xs text-content-neutral-secondary">
+                                        (applies to {connectionGrouping.indices.length} nodes).
                                     </span>
                                 ) : (
-                                    <span className="mx-1 text-xs text-gray-500">({componentConnection.key})</span>
+                                    <span className="mx-1 text-xs text-content-neutral-secondary">
+                                        ({componentConnection.key})
+                                    </span>
                                 )}
-
-                                <span> component.</span>
                             </>
                         ) : (
                             <span>Choose a connection for this component.</span>
