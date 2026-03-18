@@ -103,7 +103,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -159,7 +160,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("Property 'active' has incorrect type. Expected: boolean, but got: string", errors.toString());
             assertEquals("", warnings.toString());
@@ -222,7 +224,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -276,7 +279,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("Task 'invalidformat' doesn't exits.", errors.toString());
             assertEquals("", warnings.toString());
@@ -327,7 +331,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'",
@@ -398,7 +403,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -454,7 +460,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -518,7 +525,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals(
@@ -1861,6 +1869,49 @@ class WorkflowValidatorTest {
     }
 
     @Test
+    void validateTaskParametersComplexNestedConditionsDeepDifferentTypeError() {
+        String taskParameters = """
+            {
+                "level1": "enabled",
+                "config1": {
+                    "level2": "active",
+                    "config2": {
+                        "level3": true,
+                        "config3": {
+                            "finalValue": 55
+                        }
+                    }
+                }
+            }
+            """;
+
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "config1", "OBJECT", null, false, true, null,
+                List.of(
+                    new PropertyInfo("level2", "STRING", null, true, true, null, null),
+                    new PropertyInfo(
+                        "config2", "OBJECT", null, false, true, "config1.level2 == 'active'",
+                        List.of(
+                            new PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo(
+                                "config3", "OBJECT", null, false, true, "config1.config2.level3 == true",
+                                List.of(
+                                    new PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+
+        assertEquals(
+            "Property 'config1.config2.config3.finalValue' has incorrect type. Expected: string, but got: integer",
+            errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    @Test
     void validateTaskParametersComplexNestedConditionsDeepWarning() {
         String taskParameters = """
             {
@@ -2828,7 +2879,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -2865,7 +2917,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("Missing required field: label", errors.toString());
             assertEquals("", warnings.toString());
@@ -2908,7 +2961,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("""
                 Property 'name' has incorrect type. Expected: string, but got: integer
@@ -2966,7 +3020,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals(
@@ -3024,7 +3079,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals(
                 "Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
@@ -3094,7 +3150,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2",
                 errors.toString());
@@ -3134,7 +3191,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             String string = errors.toString();
 
@@ -3189,7 +3247,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("""
                 Missing required field: label
@@ -3276,7 +3335,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("""
                 Property 'loop1.item[0]' in output of 'loop/v1' is of type string, not number
@@ -3357,7 +3417,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals(
                 "Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
@@ -3473,7 +3534,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -3593,7 +3655,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("Missing required property: name", errors.toString());
             assertEquals("""
@@ -3735,7 +3798,8 @@ class WorkflowValidatorTest {
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
+                errors, warnings);
 
             assertEquals("Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
                 errors.toString());
@@ -3780,11 +3844,14 @@ class WorkflowValidatorTest {
             new PropertyInfo("name", "STRING", null, false, true, null, null));
 
         WorkflowValidator.TaskOutputProvider taskOutputProvider =
-            (taskType, kind, warningsBuilder) -> new PropertyInfo("result", "STRING", null, false, false,
-                null, null);
+            (taskType, kind, warningsBuilder) -> new PropertyInfo("result", "STRING", null, false, false, null, null);
 
-        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(),
-            new HashMap<>(), errors, warnings);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+            (taskType) -> null;
+
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            new HashMap<>(),
+            new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -3805,9 +3872,11 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
 
-        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(),
-            new HashMap<>(), errors, warnings);
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            new HashMap<>(),
+            new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("Missing required field: label", errors.toString());
         assertEquals("", warnings.toString());
@@ -3849,9 +3918,12 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+            (taskType) -> null;
 
-        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(),
-            new HashMap<>(), errors, warnings);
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            new HashMap<>(),
+            new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("Tasks cannot have repeating names: duplicate_name", errors.toString());
         assertEquals("", warnings.toString());
@@ -3867,9 +3939,11 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
 
-        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(),
-            new HashMap<>(), errors, warnings);
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            new HashMap<>(),
+            new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -3939,11 +4013,14 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
+
         Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
         Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
+        Map<String, List<String>> clientTypesMap = new HashMap<>();
 
-        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitionMap,
-            taskOutputMap, errors, warnings);
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            taskDefinitionMap, taskOutputMap, clientTypesMap, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -4006,11 +4083,14 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
+
         Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
         Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
+        Map<String, List<String>> clusterTypesMap = new HashMap<>();
 
-        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitionMap,
-            taskOutputMap, errors, warnings);
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -4111,11 +4191,13 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
         Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
         Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
+        Map<String, List<String>> clusterTypesMap = new HashMap<>();
 
-        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitionMap,
-            taskOutputMap, errors, warnings);
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());

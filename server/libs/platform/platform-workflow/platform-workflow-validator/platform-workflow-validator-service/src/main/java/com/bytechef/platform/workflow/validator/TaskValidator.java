@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -57,6 +58,111 @@ class TaskValidator {
 
             processTaskDispatcher(taskJsonNode, context);
             validateDataPills(taskJsonNode, taskDefinition, context);
+
+            String taskName = taskJsonNode.has("name") ? taskJsonNode.get("name")
+                .asString() : "";
+
+            validateRequiredClusterElements(taskJsonNode, taskName, context);
+            validateClusterElements(taskJsonNode, taskName, context);
+        }
+    }
+
+    private static void validateRequiredClusterElements(
+        JsonNode taskJsonNode, String taskName, ValidationContext context) {
+
+        if (!taskJsonNode.has("type")) {
+            return;
+        }
+
+        String taskType = taskJsonNode.get("type")
+            .asString();
+
+        Map<String, List<String>> clusterTypesProviderMap = context.getClusterTypesProviderMap();
+        List<String> requiredKeys = clusterTypesProviderMap.get(taskType);
+
+        if (requiredKeys == null || requiredKeys.isEmpty()) {
+            return;
+        }
+
+        JsonNode clusterElementsJsonNode = taskJsonNode.has("clusterElements")
+            ? taskJsonNode.get("clusterElements") : null;
+
+        for (String requiredKey : requiredKeys) {
+            if (clusterElementsJsonNode == null || !clusterElementsJsonNode.has(requiredKey)) {
+                StringUtils.appendWithNewline(
+                    ValidationErrorUtils.missingClusterElement(requiredKey, taskName),
+                    context.getErrors());
+            }
+        }
+
+        if (clusterElementsJsonNode != null && clusterElementsJsonNode.isObject()) {
+            for (String presentKey : clusterElementsJsonNode.propertyNames()) {
+                if (!requiredKeys.contains(presentKey)) {
+                    StringUtils.appendWithNewline(
+                        ValidationErrorUtils.undefinedClusterElement(presentKey, taskName),
+                        context.getWarnings());
+                }
+            }
+        }
+    }
+
+    private static void validateClusterElements(JsonNode taskJsonNode, String parentPath, ValidationContext context) {
+        if (!taskJsonNode.has("clusterElements")) {
+            return;
+        }
+
+        JsonNode clusterElementsJsonNode = taskJsonNode.get("clusterElements");
+
+        if (!clusterElementsJsonNode.isObject()) {
+            return;
+        }
+
+        Iterator<String> fieldNames = clusterElementsJsonNode.propertyNames()
+            .iterator();
+
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            JsonNode clusterElementJsonNode = clusterElementsJsonNode.get(fieldName);
+
+            if (clusterElementJsonNode == null || !clusterElementJsonNode.isObject()) {
+                continue;
+            }
+
+            if (!clusterElementJsonNode.has("type") || !clusterElementJsonNode.has("name")) {
+                continue;
+            }
+
+            String elementType = clusterElementJsonNode.get("type")
+                .asString();
+            String elementName = clusterElementJsonNode.get("name")
+                .asString();
+            String elementPath = PropertyUtils.buildPropertyPath(parentPath, elementName);
+
+            Map<String, List<PropertyInfo>> taskDefinitionsMap = context.getTaskDefinitions();
+            List<PropertyInfo> elementDefinition = taskDefinitionsMap.get(elementType);
+
+            if (elementDefinition != null && !elementDefinition.isEmpty()) {
+                String parameters = "{}";
+                JsonNode parametersJsonNode = clusterElementJsonNode.get("parameters");
+
+                if (parametersJsonNode != null && parametersJsonNode.isObject()) {
+                    parameters = parametersJsonNode.toString();
+                }
+
+                JsonNode parametersNode = JsonUtils.parseJsonWithErrorHandling(parameters, context.getErrors());
+
+                if (parametersNode != null && parametersNode.isObject()) {
+                    PropertyValidator.validatePropertiesFromPropertyInfo(
+                        parametersNode, elementDefinition, elementPath, parameters,
+                        context.getErrors(), new StringBuilder());
+                }
+            }
+
+            if (clusterElementJsonNode.has("clusterElements")) {
+                validateRequiredClusterElements(clusterElementJsonNode, elementName, context);
+            }
+
+            validateClusterElements(clusterElementJsonNode, elementPath, context);
         }
     }
 
