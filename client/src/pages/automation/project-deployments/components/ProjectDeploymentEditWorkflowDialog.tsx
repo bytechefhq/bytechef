@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import Switch from '@/components/Switch/Switch';
 import {
     Dialog,
     DialogClose,
@@ -9,9 +10,10 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
+import getWorkflowComponentConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/projectDeploymentDialog-utils';
 import {
-    ComponentConnection,
     ProjectDeployment,
     ProjectDeploymentWorkflow,
     ProjectDeploymentWorkflowConnection,
@@ -20,6 +22,7 @@ import {
 import {useUpdateProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
+import {InfoIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
@@ -35,6 +38,9 @@ const ProjectDeploymentEditWorkflowDialog = ({
     workflow,
 }: ProjectDeploymentEditWorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(true);
+    const [groupConnections, setGroupConnections] = useState(false);
+
+    const componentConnections = getWorkflowComponentConnections(workflow);
 
     const form = useForm<ProjectDeployment>({
         defaultValues: {
@@ -79,10 +85,6 @@ const ProjectDeploymentEditWorkflowDialog = ({
 
     useEffect(() => {
         let newProjectDeploymentWorkflowConnections: ProjectDeploymentWorkflowConnection[] = [];
-
-        const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
-            .flatMap((task) => task.connections ?? [])
-            .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
         for (const workflowConnection of componentConnections) {
             let projectDeploymentWorkflowConnection = projectDeploymentWorkflow?.connections?.find(
@@ -143,6 +145,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
                         <ProjectDeploymentDialogWorkflowsStepItem
                             control={control}
                             formState={formState}
+                            groupConnections={groupConnections}
                             key={workflow.id!}
                             setValue={setValue}
                             switchHidden={true}
@@ -151,7 +154,23 @@ const ProjectDeploymentEditWorkflowDialog = ({
                         />
                     </div>
 
-                    <DialogFooter className="px-6 pb-6 pt-4">
+                    <DialogFooter className="flex items-center px-6 pb-6 pt-4">
+                        {componentConnections.length > 1 && (
+                            <div className="mr-auto flex items-center gap-2">
+                                <Switch checked={groupConnections} onCheckedChange={setGroupConnections} />
+
+                                <span className="text-sm font-semibold">Group Connections</span>
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <InfoIcon className="size-4 cursor-default text-gray-400" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Connections grouped by their app.</TooltipContent>
+                                </Tooltip>
+                            </div>
+                        )}
+
                         <DialogClose asChild>
                             <Button label="Cancel" variant="outline" />
                         </DialogClose>
