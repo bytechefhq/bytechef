@@ -17,13 +17,16 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
@@ -46,15 +49,17 @@ import org.springframework.stereotype.Service;
 public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
     private final ActionDefinitionService actionDefinitionService;
+    private final ComponentDefinitionService componentDefinitionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
 
     public WorkflowValidatorFacadeImpl(
-        ActionDefinitionService actionDefinitionService,
+        ActionDefinitionService actionDefinitionService, ComponentDefinitionService componentDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionService triggerDefinitionService) {
 
         this.actionDefinitionService = actionDefinitionService;
+        this.componentDefinitionService = componentDefinitionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionService = triggerDefinitionService;
     }
@@ -65,7 +70,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         StringBuilder warnings = new StringBuilder();
 
         WorkflowValidator.validateWorkflow(
-            workflow, this::getTaskProperties, this::getTaskOutputProperty, new HashMap<>(), new HashMap<>(),
+            workflow, this::getTaskProperties, this::getTaskOutputProperty, this::getClusterElementTypes,
+            new HashMap<>(), new HashMap<>(), new HashMap<>(),
             errors, warnings);
 
         String errorsString = errors.toString();
@@ -100,10 +106,12 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
 
-                return actionDefinition.getProperties()
+                List<PropertyInfo> propertyInfos = actionDefinition.getProperties()
                     .stream()
                     .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
                     .toList();
+
+                return propertyInfos;
             } else {
                 TaskDispatcherDefinition taskDispatcherDefinition =
                     taskDispatcherDefinitionService.getTaskDispatcherDefinition(
@@ -158,6 +166,23 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
             return null;
         }
+    }
+
+    @Nullable
+    private List<String> getClusterElementTypes(String taskType) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskType);
+
+        ComponentDefinition componentDefinition =
+            componentDefinitionService.getComponentDefinition(workflowNodeType.name(), workflowNodeType.version());
+
+        if (componentDefinition.isClusterElement()) {
+            return componentDefinition.getClusterElementTypes()
+                .stream()
+                .map(ClusterElementDefinition.ClusterElementType::key)
+                .toList();
+        }
+
+        return null;
     }
 
     private static PropertyInfo toPropertyInfo(BaseProperty baseProperty) {
