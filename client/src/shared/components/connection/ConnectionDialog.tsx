@@ -97,6 +97,7 @@ const ConnectionDialog = ({
     useUpdateConnectionMutation,
 }: ConnectionDialogProps) => {
     const [authorizationType, setAuthorizationType] = useState<string>();
+    const [connectionVersion, setConnectionVersion] = useState(1);
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [wizardStep, setWizardStep] = useState<'configuration_step' | 'oauth_step'>('configuration_step');
@@ -299,7 +300,7 @@ const ConnectionDialog = ({
         return {
             authorizationType,
             componentName,
-            connectionVersion: 1,
+            connectionVersion,
             environmentId: currentEnvironmentId,
             name,
             parameters: {
@@ -316,7 +317,7 @@ const ConnectionDialog = ({
         return {
             authorizationType: authorizationType as AuthorizationType,
             componentName,
-            connectionVersion: 1,
+            connectionVersion,
             parameters: {
                 ...parameters,
             },
@@ -748,7 +749,22 @@ const ConnectionDialog = ({
                             </Link>
                         )}
 
-                        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:space-x-2">
+                        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:space-x-2">
+                            <Select
+                                defaultValue={String(connectionDefinition?.version ?? 1)}
+                                onValueChange={(value) => setConnectionVersion(Number(value))}
+                            >
+                                <SelectTrigger className="w-auto border-none shadow-none">
+                                    <SelectValue placeholder="Choose version..." />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    <SelectItem value={String(connectionDefinition?.version ?? 1)}>
+                                        v{connectionDefinition?.version ?? 1}
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+
                             {wizardStep === 'oauth_step' && (
                                 <Button
                                     label="Previous"
