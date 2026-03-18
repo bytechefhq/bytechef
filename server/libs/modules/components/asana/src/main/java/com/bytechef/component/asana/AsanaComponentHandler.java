@@ -17,6 +17,7 @@
 package com.bytechef.component.asana;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.asana.trigger.AsanaNewTaskTrigger;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -28,6 +29,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -40,6 +42,11 @@ import java.util.Optional;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(AsanaNewTaskTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
