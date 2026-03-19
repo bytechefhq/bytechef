@@ -20,7 +20,6 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.asana.trigger.AsanaNewTaskTrigger;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -56,36 +55,6 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
             .categories(ComponentCategory.PROJECT_MANAGEMENT)
             .customActionHelp("Asana Web API documentation", "https://developers.asana.com/docs/api-explorer")
             .version(1);
-    }
-
-    @Override
-    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-        for (ModifiableActionDefinition actionDefinition : actionDefinitions) {
-            String name = actionDefinition.getName();
-
-            switch (name) {
-                case "createCustomField" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/asana_v1#create-custom-field");
-                case "createProject" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/asana_v1#create-project");
-                case "createSubtask" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/asana_v1#create-subtask");
-                case "createTask" ->
-                    actionDefinition.help(
-                        "",
-                        "https://docs.bytechef.io/reference/components/asana_v1#create-task");
-                default -> {
-                }
-            }
-        }
-
-        return super.modifyActions(actionDefinitions);
     }
 
     @Override
