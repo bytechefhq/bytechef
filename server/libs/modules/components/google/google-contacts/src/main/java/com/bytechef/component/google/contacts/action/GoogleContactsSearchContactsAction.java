@@ -20,30 +20,24 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CONTACT_OUTPUT_PROPERTY;
+import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PAGE_SIZE;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.QUERY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.READ_MASK;
-import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.people.v1.PeopleService;
-import com.google.api.services.people.v1.model.Person;
-import com.google.api.services.people.v1.model.SearchResponse;
-import com.google.api.services.people.v1.model.SearchResult;
-import java.io.IOException;
-import java.util.Collections;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 /**
  * @author Erhan Tunçel
  * @author Monika Kušter
+ * @author Nikolina Spehar
  */
 public class GoogleContactsSearchContactsAction {
 
@@ -99,33 +93,23 @@ public class GoogleContactsSearchContactsAction {
                 .description("The number of results to return per page.")
                 .defaultValue(10)
                 .maxValue(30)
-                .required(true))
-        .output(outputSchema(array().items(CONTACT_OUTPUT_PROPERTY)))
+                .required(false))
+        .output()
         .perform(GoogleContactsSearchContactsAction::perform);
 
     private GoogleContactsSearchContactsAction() {
     }
 
-    public static List<Person> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
+    public static List<Object> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Map<String, List<Object>> response = context.http(http -> http.get("/people:searchContacts"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .queryParameters(
+                QUERY, inputParameters.getRequiredString(QUERY),
+                PAGE_SIZE, inputParameters.getInteger(PAGE_SIZE),
+                READ_MASK, String.join(",", inputParameters.getRequiredList(READ_MASK, String.class)))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-        SearchResponse searchResponse;
-        try {
-            searchResponse = peopleService.people()
-                .searchContacts()
-                .setQuery(inputParameters.getRequiredString(QUERY))
-                .setReadMask(
-                    String.join(",", inputParameters.getRequiredList(READ_MASK, String.class)))
-                .setPageSize(inputParameters.getRequiredInteger(PAGE_SIZE))
-                .execute();
-        } catch (IOException e) {
-            throw translateGoogleIOException(e);
-        }
-
-        return Optional.ofNullable(searchResponse.getResults())
-            .orElse(Collections.emptyList())
-            .stream()
-            .map(SearchResult::getPerson)
-            .toList();
+        return response.get("results");
     }
 }

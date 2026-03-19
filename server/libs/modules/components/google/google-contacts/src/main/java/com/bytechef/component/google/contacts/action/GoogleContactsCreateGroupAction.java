@@ -20,20 +20,19 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
-import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.people.v1.PeopleService;
-import com.google.api.services.people.v1.model.ContactGroup;
-import com.google.api.services.people.v1.model.CreateContactGroupRequest;
-import java.io.IOException;
+import com.bytechef.component.definition.TypeReference;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class GoogleContactsCreateGroupAction {
 
@@ -49,30 +48,34 @@ public class GoogleContactsCreateGroupAction {
             outputSchema(
                 object()
                     .properties(
+                        string("resourceName")
+                            .description(
+                                "The resource name for the contact group, assigned by the server. An ASCII string, " +
+                                    "in the form of contactGroups/{contactGroupId}."),
+                        string("etag")
+                            .description("The HTTP entity tag of the resource. Used for web cache validation."),
                         string(NAME)
                             .description(
                                 "The contact group name set by the group owner or a system provided name for " +
-                                    "system groups."))))
+                                    "system groups."),
+                        string("formattedName")
+                            .description(
+                                "The name translated and formatted in the viewer's account locale or the Accept-" +
+                                    "Language HTTP header locale for system groups names. Group names set by the " +
+                                    "owner are the same as name."))))
         .perform(GoogleContactsCreateGroupAction::perform);
 
     private GoogleContactsCreateGroupAction() {
     }
 
-    public static ContactGroup perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
-
-        CreateContactGroupRequest createContactGroupRequest = new CreateContactGroupRequest()
-            .setContactGroup(
-                new ContactGroup()
-                    .setName(inputParameters.getRequiredString(NAME)));
-
-        try {
-            return peopleService
-                .contactGroups()
-                .create(createContactGroupRequest)
-                .execute();
-        } catch (IOException e) {
-            throw translateGoogleIOException(e);
-        }
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context.http(http -> http.post("/contactGroups"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .body(Http.Body.of(
+                "contactGroup", Map.of(
+                    NAME, inputParameters.getRequiredString(NAME)),
+                "readGroupFields", "name"))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
