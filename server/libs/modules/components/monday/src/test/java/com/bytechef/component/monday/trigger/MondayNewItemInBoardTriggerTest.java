@@ -23,6 +23,7 @@ import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static com.bytechef.component.monday.constant.MondayConstants.TEXT;
 import static com.bytechef.component.monday.constant.MondayConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -52,7 +53,7 @@ import org.mockito.MockedStatic;
  */
 class MondayNewItemInBoardTriggerTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final Parameters mockedDynamicWebhookEnableOutput = mock(Parameters.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
@@ -60,7 +61,7 @@ class MondayNewItemInBoardTriggerTest {
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Parameters parameters = MockParametersFactory.create(Map.of(BOARD_ID, "12345"));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testWebhookEnable() {
@@ -71,9 +72,11 @@ class MondayNewItemInBoardTriggerTest {
                 .thenReturn(Map.of(DATA, Map.of("create_webhook", Map.of(ID, "123"))));
 
             WebhookEnableOutput webhookEnableOutput = MondayNewItemInBoardTrigger.webhookEnable(
-                parameters, parameters, "testWebhookUrl", "testWorkflowExecutionId", mockedTriggerContext);
+                parameters, parameters, "testWebhookUrl", "testWorkflowExecutionId",
+                mockedTriggerContext);
 
-            WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
+            WebhookEnableOutput expectedWebhookEnableOutput =
+                new WebhookEnableOutput(Map.of(ID, "123"), null);
 
             assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
             assertEquals(
@@ -112,14 +115,16 @@ class MondayNewItemInBoardTriggerTest {
                                                 List.of(
                                                     Map.of(
                                                         TYPE, "date",
-                                                        TEXT, "2024-05-05", "column", Map.of(ID, "date_id")))))))))));
+                                                        TEXT, "2024-05-05", "column",
+                                                        Map.of(ID, "date_id")))))))))));
 
             Map<String, Object> result = MondayNewItemInBoardTrigger.webhookRequest(
                 parameters, parameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
                 mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
 
             Map<String, Object> expectedResult = Map.of(
-                "boardId", 345, "pulseId", 123, "columnValues", Map.of("date_id", LocalDate.of(2024, 5, 5)));
+                "boardId", 345, "pulseId", 123, "columnValues",
+                Map.of("date_id", LocalDate.of(2024, 5, 5)));
 
             assertEquals(expectedResult, result);
             assertEquals("query{boards(ids:" + 345 + ")" +

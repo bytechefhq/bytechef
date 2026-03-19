@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -47,11 +48,12 @@ import org.mockito.MockedStatic;
  */
 class MondayOptionUtilsTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final List<Option<String>> expectedOptions = List.of(option("name", "123"));
     private final Context mockedContext = mock(Context.class);
-    private final Parameters parameters = MockParametersFactory.create(Map.of(WORKSPACE_ID, "abc", BOARD_ID, "abc"));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Parameters parameters = MockParametersFactory.create(
+        Map.of(WORKSPACE_ID, "abc", BOARD_ID, "abc"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testGetBoardIdOptions() {
@@ -77,7 +79,9 @@ class MondayOptionUtilsTest {
     @Test
     void testGetBoardItemsOptions() {
         Map<String, Object> body = Map.of(DATA,
-            Map.of(BOARDS, List.of(Map.of("items_page", Map.of("items", List.of(Map.of(ID, "123", NAME, "name")))))));
+            Map.of(
+                BOARDS,
+                List.of(Map.of("items_page", Map.of("items", List.of(Map.of(ID, "123", NAME, "name")))))));
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
             mondayUtilsMockedStatic
@@ -89,7 +93,8 @@ class MondayOptionUtilsTest {
                 MondayOptionUtils.getBoardItemsOptions(parameters, parameters, Map.of(), "", mockedContext);
 
             assertEquals(expectedOptions, boardIdOptions);
-            assertEquals("query{boards(ids: [abc]){items_page{items{id name}}}}", stringArgumentCaptor.getValue());
+            assertEquals(
+                "query{boards(ids: [abc]){items_page{items{id name}}}}", stringArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }
@@ -130,7 +135,8 @@ class MondayOptionUtilsTest {
 
     @Test
     void testGetWorkspaceIdOptions() {
-        Map<String, Object> body = Map.of(DATA, Map.of("workspaces", List.of(Map.of(ID, "123", NAME, "name"))));
+        Map<String, Object> body =
+            Map.of(DATA, Map.of("workspaces", List.of(Map.of(ID, "123", NAME, "name"))));
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
             mondayUtilsMockedStatic
