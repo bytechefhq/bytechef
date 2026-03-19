@@ -19,32 +19,35 @@ package com.bytechef.component.google.contacts.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.EMAIL;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.EMAIL_ADDRESSES;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FAMILY_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GIVEN_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.MIDDLE_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAMES;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.ORGANIZATIONS;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PERSON_FIELDS;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBER;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBERS;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
-import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createName;
-import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createOrganization;
-import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TYPE;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.VALUE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.people.v1.PeopleService;
-import com.google.api.services.people.v1.model.EmailAddress;
-import com.google.api.services.people.v1.model.Person;
-import com.google.api.services.people.v1.model.PhoneNumber;
-import java.io.IOException;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
+ * @author Nikolina Spehar
  */
 public class GoogleContactsCreateContactAction {
 
@@ -88,22 +91,31 @@ public class GoogleContactsCreateContactAction {
     private GoogleContactsCreateContactAction() {
     }
 
-    public static Person perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
-
-        Person person = new Person()
-            .setNames(List.of(createName(inputParameters)))
-            .setEmailAddresses(List.of(new EmailAddress().setValue(inputParameters.getString(EMAIL))))
-            .setPhoneNumbers(List.of(new PhoneNumber().setValue(inputParameters.getString(PHONE_NUMBER))))
-            .setOrganizations(List.of(createOrganization(inputParameters)));
-
-        try {
-            return peopleService
-                .people()
-                .createContact(person)
-                .execute();
-        } catch (IOException e) {
-            throw translateGoogleIOException(e);
-        }
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context.http(http -> http.post("/people:createContact"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .queryParameter(PERSON_FIELDS, "emailAddresses,names,phoneNumbers,organizations")
+            .body(
+                Http.Body.of(
+                    NAMES, List.of(
+                        Map.of(
+                            GIVEN_NAME, inputParameters.getRequiredString(GIVEN_NAME),
+                            MIDDLE_NAME, inputParameters.getString(MIDDLE_NAME, ""),
+                            FAMILY_NAME, inputParameters.getRequiredString(FAMILY_NAME))),
+                    ORGANIZATIONS, List.of(
+                        Map.of(
+                            NAME, inputParameters.getString(NAME, ""),
+                            TITLE, inputParameters.getString(TITLE, ""),
+                            TYPE, "work")),
+                    EMAIL_ADDRESSES, List.of(
+                        Map.of(
+                            VALUE, inputParameters.getString(EMAIL, ""),
+                            TYPE, "work")),
+                    PHONE_NUMBERS, List.of(
+                        Map.of(
+                            VALUE, inputParameters.getString(PHONE_NUMBER, ""),
+                            TYPE, "mobile"))))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
