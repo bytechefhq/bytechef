@@ -91,7 +91,7 @@ class TaskValidator {
             if (clusterElementsJsonNode == null || !clusterElementsJsonNode.has(requiredKey)) {
                 StringUtils.appendWithNewline(
                     ValidationErrorUtils.missingClusterElement(requiredKey, taskName),
-                    context.getErrors());
+                    context.getWarnings());
             }
         }
 

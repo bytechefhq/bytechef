@@ -342,8 +342,10 @@ class WorkflowValidatorClusterElementsTest {
             WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterElements,
                 errors, warnings);
 
-            assertEquals("Cluster element 'guardrails' is missing from task aiAgent_1", errors.toString());
-            assertEquals("Cluster element 'guardsnails' are not defined in task aiAgent_1", warnings.toString());
+            assertEquals("", errors.toString());
+            assertEquals("""
+                Cluster element 'guardrails' is missing from task aiAgent_1
+                Cluster element 'guardsnails' are not defined in task aiAgent_1""", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -445,8 +447,11 @@ class WorkflowValidatorClusterElementsTest {
             WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterElements,
                 errors, warnings);
 
-            assertEquals("Cluster element 'embedding' is missing from task couchbase_1", errors.toString());
-            assertEquals("Cluster element 'model' are not defined in task couchbase_1", warnings.toString());
+            assertEquals("", errors.toString());
+            assertEquals("""
+                Cluster element 'embedding' is missing from task couchbase_1
+                Cluster element 'model' are not defined in task couchbase_1""", warnings.toString());
+
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
