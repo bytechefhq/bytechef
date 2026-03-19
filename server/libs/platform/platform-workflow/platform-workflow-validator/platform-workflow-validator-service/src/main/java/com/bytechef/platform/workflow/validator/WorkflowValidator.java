@@ -180,6 +180,19 @@ public class WorkflowValidator {
                                 getType(taskDefinitionMap, taskOutputMap, taskJsonNodes,
                                     taskDefinitionProvider, taskOutputProvider, errors, warnings, nestedTaskJsonNode);
 
+                            if (nestedTaskJsonNode.has("clusterElements")) {
+                                List<String> clusterElementTypes =
+                                    clusterTypesProvider.getClusterElementTypes(type);
+
+                                if (clusterElementTypes != null) {
+                                    clusterTypesMap.putIfAbsent(type, clusterElementTypes);
+                                }
+
+                                processClusterElements(nestedTaskJsonNode, taskDefinitionMap, taskOutputMap,
+                                    clusterTypesMap, taskDefinitionProvider, taskOutputProvider,
+                                    clusterTypesProvider, warnings);
+                            }
+
                             if (nestedTaskJsonNode.has("parameters")) {
                                 List<PropertyInfo> nestedTaskDefinition = taskDefinitionMap.get(type);
 
@@ -406,9 +419,13 @@ public class WorkflowValidator {
 
                 taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, ""));
                 taskOutputMap.putIfAbsent(type, taskOutputProvider.getTaskOutputProperty(type, "", warnings));
-                List<String> clusterElementTypes = clusterTypesProvider.getClusterElementTypes(type);
-                if (clusterElementTypes != null) {
-                    clusterTypesMap.putIfAbsent(type, clusterElementTypes);
+
+                if (taskJsonNode.has("clusterElements")) {
+                    List<String> clusterElementTypes = clusterTypesProvider.getClusterElementTypes(type);
+
+                    if (clusterElementTypes != null) {
+                        clusterTypesMap.putIfAbsent(type, clusterElementTypes);
+                    }
                 }
 
                 processNestedTasks(
