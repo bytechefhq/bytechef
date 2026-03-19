@@ -41,6 +41,8 @@ import tools.jackson.databind.JsonNode;
 class TaskValidator {
 
     private static final Pattern TYPE_PATTERN = Pattern.compile("^[a-zA-Z0-9]+/v[0-9]+(/[a-zA-Z0-9]+)?$");
+    private static final List<String> VECTOR_STORE_OPTIONAL_CLUSTER_KEYS =
+        List.of("documentReader", "documentTransformer");
 
     private TaskValidator() {
     }
@@ -108,12 +110,17 @@ class TaskValidator {
             return;
         }
 
+        boolean isVectorStore = taskType.endsWith("/vectorStore");
         String taskName = taskJsonNode.has("name") ? taskJsonNode.get("name")
             .asString() : "";
         JsonNode clusterElementsJsonNode = taskJsonNode.has("clusterElements")
             ? taskJsonNode.get("clusterElements") : null;
 
         for (String requiredKey : requiredKeys) {
+            if (isVectorStore && VECTOR_STORE_OPTIONAL_CLUSTER_KEYS.contains(requiredKey)) {
+                continue;
+            }
+
             if (clusterElementsJsonNode == null || !clusterElementsJsonNode.has(requiredKey)) {
                 StringUtils.appendWithNewline(
                     ValidationErrorUtils.missingClusterElement(requiredKey, taskName),
@@ -158,6 +165,8 @@ class TaskValidator {
                 parametersNode, elementDefinition, elementPath, parameters,
                 context.getErrors(), new StringBuilder());
         }
+
+        DataPillValidator.validateTaskDataPills(clusterElementJsonNode, context, elementDefinition, true);
     }
 
     /**

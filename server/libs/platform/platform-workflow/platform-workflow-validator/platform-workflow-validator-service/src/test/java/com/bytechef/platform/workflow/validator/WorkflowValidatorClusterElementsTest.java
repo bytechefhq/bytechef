@@ -326,8 +326,8 @@ class WorkflowValidatorClusterElementsTest {
 
         Map<String, List<String>> clusterElements = Map.of(
             "aiAgent/v1/chat", List.of("model", "chatMemory", "rag", "guardrails", "tools"),
-            "openAi/v1/embedding", List.of(),
-            "couchbase/v1/vectorStore", List.of("embedding"));
+            "questionAnswerRag/v1/rag", List.of("vectorStore"),
+            "couchbase/v1/vectorStore", List.of("documentReader", "documentTransformer", "embedding"));
 
         try {
             JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
@@ -431,8 +431,8 @@ class WorkflowValidatorClusterElementsTest {
 
         Map<String, List<String>> clusterElements = Map.of(
             "aiAgent/v1/chat", List.of("model", "chatMemory", "rag", "guardrails", "tools"),
-            "openAi/v1/embedding", List.of(),
-            "couchbase/v1/vectorStore", List.of("embedding"));
+            "questionAnswerRag/v1/rag", List.of("vectorStore"),
+            "couchbase/v1/vectorStore", List.of("documentReader", "documentTransformer", "embedding"));
 
         try {
             JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
@@ -670,7 +670,7 @@ class WorkflowValidatorClusterElementsTest {
         Map<String, List<String>> expectedClusterTypesMap = Map.of(
             "aiAgent/v1/chat", List.of("model", "chatMemory", "rag", "guardrails", "tools"),
             "questionAnswerRag/v1/rag", List.of("vectorStore"),
-            "couchbase/v1/vectorStore", List.of("embedding"));
+            "couchbase/v1/vectorStore", List.of("documentReader", "documentTransformer", "embedding"));
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
         WorkflowValidator.TaskOutputProvider taskOutputProvider =
@@ -684,7 +684,7 @@ class WorkflowValidatorClusterElementsTest {
             new HashMap<>(), new HashMap<>(), clusterElementTypesMap, errors, warnings);
 
         assertEquals(
-            "{questionAnswerRag/v1/rag=[vectorStore], aiAgent/v1/chat=[model, chatMemory, rag, guardrails, tools], couchbase/v1/vectorStore=[embedding]}",
+            "{questionAnswerRag/v1/rag=[vectorStore], aiAgent/v1/chat=[model, chatMemory, rag, guardrails, tools], couchbase/v1/vectorStore=[documentReader, documentTransformer, embedding]}",
             clusterElementTypesMap.toString());
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -800,5 +800,127 @@ class WorkflowValidatorClusterElementsTest {
             Cluster element 'rag' is missing from task aiAgent_1
             Cluster element 'guardrails' is missing from task aiAgent_1
             Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
+    }
+
+    @Test
+    void validateWorkflowClusterElementsDataPillTypeError() {
+        String workflow = """
+            {
+                "label": "test",
+                "description": "",
+                "inputs": [],
+                "triggers": [
+                    {
+                        "label": "Task 1",
+                        "name": "trigger_1",
+                        "type": "component/v1/trigger1",
+                        "parameters": {
+                            "name": "John"
+                        }
+                    }
+                ],
+                "tasks": [
+                    {
+                        "clusterElements": {
+                            "model": null,
+                            "chatMemory": null,
+                            "rag": {
+                                "clusterElements": {
+                                    "vectorStore": {
+                                        "clusterElements": {
+                                            "embedding": {
+                                                "label": "OpenAI",
+                                                "name": "openAi_3",
+                                                "parameters": {
+                                                    "model": "text-embedding-3-small"
+                                                },
+                                                "type": "openAi/v1/embedding"
+                                            }
+                                        },
+                                        "label": "Couchbase",
+                                        "name": "couchbase_1",
+                                        "parameters": {},
+                                        "type": "couchbase/v1/vectorStore"
+                                    }
+                                },
+                                "label": "Question Answer RAG",
+                                "name": "questionAnswerRag_1",
+                                "parameters": {
+                                    "similarityThreshold": 0,
+                                    "topK": 4
+                                },
+                                "type": "questionAnswerRag/v1/rag"
+                            },
+                            "guardrails": null,
+                            "tools": []
+                        },
+                        "label": "AI Agent",
+                        "name": "aiAgent_1",
+                        "parameters": {
+                            "userPrompt": "${trigger_1.message}",
+                            "conversationId": "${trigger_1.propString}"
+                        },
+                        "type": "aiAgent/v1/chat"
+                    },
+                    {
+                        "clusterElements": {
+                            "documentReader": null,
+                            "documentTransformer": [],
+                            "embedding": null
+                        },
+                        "description": "",
+                        "label": "MariaDB Vector Store",
+                        "name": "mariaDbVectorStore_1",
+                        "parameters": {},
+                        "type": "mariaDbVectorStore/v1/load"
+                    }
+                ]
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "questionAnswerRag/v1/rag", List.of(
+                new PropertyInfo("similarityThreshold", "INTEGER", null, false, true, null, null),
+                new PropertyInfo("topK", "INTEGER", null, false, true, null, null)),
+            "component/v1/trigger1", List.of(
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "aiAgent/v1/chat", List.of(
+                new PropertyInfo("userPrompt", "STRING", null, true, true, null, null),
+                new PropertyInfo("conversationId", "BOOLEAN", null, true, true, null, null)),
+            "openAi/v1/embedding", List.of(
+                new PropertyInfo("model", "STRING", null, true, true, null, null)));
+
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
+            "component/v1/trigger1", trigger1,
+            "aiAgent/v1/chat", action1);
+
+        Map<String, List<String>> expectedClusterTypesMap = Map.of(
+            "aiAgent/v1/chat", List.of("model", "chatMemory", "rag", "guardrails", "tools"),
+            "questionAnswerRag/v1/rag", List.of("vectorStore"),
+            "couchbase/v1/vectorStore", List.of("documentReader", "documentTransformer", "embedding"),
+            "mariaDbVectorStore/v1/load", List.of("documentReader", "documentTransformer", "embedding"));
+
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+            (taskType) -> expectedClusterTypesMap.get(taskType);
+
+        Map<String, List<String>> clusterElementTypesMap = new HashMap<>();
+
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            new HashMap<>(), new HashMap<>(), clusterElementTypesMap, errors, warnings);
+
+        assertEquals(
+            "{mariaDbVectorStore/v1/load=[documentReader, documentTransformer, embedding], questionAnswerRag/v1/rag=[vectorStore], aiAgent/v1/chat=[model, chatMemory, rag, guardrails, tools], couchbase/v1/vectorStore=[documentReader, documentTransformer, embedding]}",
+            clusterElementTypesMap.toString());
+        assertEquals(
+            "Property 'trigger_1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
+            errors.toString());
+        assertEquals("Property 'trigger_1.message' might not exist in the output of 'component/v1/trigger1'",
+            warnings.toString());
     }
 }
