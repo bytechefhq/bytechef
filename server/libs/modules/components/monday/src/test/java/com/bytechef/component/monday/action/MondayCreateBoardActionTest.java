@@ -21,6 +21,7 @@ import static com.bytechef.component.monday.constant.MondayConstants.BOARD_NAME;
 import static com.bytechef.component.monday.constant.MondayConstants.DESCRIPTION;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -39,9 +40,9 @@ import org.mockito.MockedStatic;
  */
 class MondayCreateBoardActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() {
@@ -58,7 +59,7 @@ class MondayCreateBoardActionTest {
 
             assertEquals(Map.of(ID, "abc"), result);
             assertEquals(
-                "mutation{create_board(board_name: \"Test Board\", description: \"Sample Description\", board_kind: public){id board_name}}",
+                "mutation{create_board(board_name: \"Test Board\", description: \"Sample Description\", board_kind: public){id name}}",
                 stringArgumentCaptor.getValue());
             assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
         }
