@@ -311,11 +311,7 @@ public class WorkflowValidator {
             return;
         }
 
-        Iterator<String> fieldNames = clusterElementsJsonNode.propertyNames()
-            .iterator();
-
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
+        for (String fieldName : clusterElementsJsonNode.propertyNames()) {
             JsonNode clusterElementJsonNode = clusterElementsJsonNode.get(fieldName);
 
             if (clusterElementJsonNode == null) {
@@ -372,21 +368,10 @@ public class WorkflowValidator {
         }
 
         JsonNode parametersJsonNode = taskJsonNode.get("parameters");
-        JsonNode typeJsonNode = taskJsonNode.get("type");
 
-        String type = typeJsonNode.asString();
-
-        List<PropertyInfo> taskDefinition = taskDefinitionsMap.get(type);
-
-        if (taskDefinition != null && !taskDefinition.isEmpty()) {
-            extractNestedTasksFromParameters(
-                parametersJsonNode, taskDefinition, taskDefinitionsMap, taskOutputMap, clusterTypesMap, taskJsonNodes,
-                taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, errors, warnings);
-        } else {
-            discoverNestedTasksFromJsonStructure(
-                parametersJsonNode, taskDefinitionsMap, taskOutputMap, clusterTypesMap, taskJsonNodes,
-                taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, errors, warnings);
-        }
+        discoverNestedTasksFromJsonStructure(
+            parametersJsonNode, taskDefinitionsMap, taskOutputMap, clusterTypesMap, taskJsonNodes,
+            taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, errors, warnings);
     }
 
     private static void processTasks(
