@@ -27,81 +27,80 @@ import static com.bytechef.component.pushover.constant.PushoverConstants.URL;
 import static com.bytechef.component.pushover.constant.PushoverConstants.URL_TITLE;
 import static com.bytechef.component.pushover.constant.PushoverConstants.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class PushoverSendNotificationActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Executor mockedExecutor = mock(Http.Executor.class);
-    private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Response mockedResponse = mock(Response.class);
     private final byte[] fileContent = new byte[] {
         1, 2, 3
     };
+    private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
+        TITLE, "testTitle", MESSAGE, "This is a test message", TOKEN, "testToken", USER, "testUserKey",
+        PRIORITY, "2", RETRY, 30, EXPIRE, 1800, URL, "testUrl", URL_TITLE, "testUrlTitle",
+        ATTACHMENT_BASE_64, mockedFileEntry));
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         String encodedToString = EncodingUtils.base64EncodeToString(fileContent);
 
-        when(mockedParameters.getString(TITLE))
-            .thenReturn("testTitle");
-        when(mockedParameters.getRequiredString(MESSAGE))
-            .thenReturn("This is a test message");
-        when(mockedParameters.getRequiredString(TOKEN))
-            .thenReturn("testToken");
-        when(mockedParameters.getRequiredString(USER))
-            .thenReturn("testUserKey");
-        when(mockedParameters.getString(PRIORITY))
-            .thenReturn("2");
-        when(mockedParameters.getInteger(RETRY))
-            .thenReturn(30);
-        when(mockedParameters.getInteger(EXPIRE))
-            .thenReturn(1800);
-        when(mockedParameters.getString(URL))
-            .thenReturn("testUrl");
-        when(mockedParameters.getString(URL_TITLE))
-            .thenReturn("testUrlTitle");
-        when(mockedParameters.getFileEntry(ATTACHMENT_BASE_64))
-            .thenReturn(mockedFileEntry);
-        when(mockedActionContext.encoder(any()))
+        when(mockedContext.encoder(any()))
             .thenReturn(encodedToString);
-
-        when(mockedActionContext.file(any()))
+        when(mockedContext.file(any()))
             .thenReturn(fileContent);
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of());
 
-        Object result = PushoverSendNotificationAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = PushoverSendNotificationAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/messages.json", stringArgumentCaptor.getValue());
 
         Body body = bodyArgumentCaptor.getValue();
 
