@@ -33,7 +33,7 @@ import {PropertyAllType} from '@/shared/types';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, PlusIcon} from 'lucide-react';
-import {Dispatch, SetStateAction, useState} from 'react';
+import {Dispatch, SetStateAction, useCallback, useState} from 'react';
 import {UseFormReturn, useForm} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
@@ -69,6 +69,21 @@ const WorkflowTestConfigurationFormField = ({
         componentVersion: componentConnection.componentVersion,
     });
 
+    const handleConnectionValueChange = useCallback(
+        (value: string) => {
+            form.setValue(`connections.${index}.connectionId`, Number(value));
+
+            if (groupedIndices) {
+                for (const groupedIndex of groupedIndices) {
+                    if (groupedIndex !== index) {
+                        form.setValue(`connections.${groupedIndex}.connectionId`, Number(value));
+                    }
+                }
+            }
+        },
+        [form, groupedIndices, index]
+    );
+
     return (
         <div key={index}>
             <FormField
@@ -96,20 +111,7 @@ const WorkflowTestConfigurationFormField = ({
                             </FormLabel>
 
                             <Select
-                                onValueChange={(value) => {
-                                    field.onChange(value);
-
-                                    if (groupedIndices) {
-                                        for (const groupedIndex of groupedIndices) {
-                                            if (groupedIndex !== index) {
-                                                form.setValue(
-                                                    `connections.${groupedIndex}.connectionId`,
-                                                    Number(value)
-                                                );
-                                            }
-                                        }
-                                    }
-                                }}
+                                onValueChange={handleConnectionValueChange}
                                 value={field.value ? field.value.toString() : undefined}
                             >
                                 <FormControl>
@@ -176,7 +178,7 @@ const WorkflowTestConfigurationDialog = ({
 }: WorkflowTestConfigurationDialogProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
     const [componentConnection, setComponentConnection] = useState<ComponentConnection | undefined>();
-    const [groupConnections, setGroupConnections] = useState(false);
+    const [connectionsGrouped, setConnectionsGrouped] = useState(false);
 
     const connectionDialogAllowed = useWorkflowNodeDetailsPanelStore((state) => state.connectionDialogAllowed);
 
@@ -260,8 +262,10 @@ const WorkflowTestConfigurationDialog = ({
         groupedIndices?: number[];
         index: number;
     }> => {
-        if (!groupConnections) {
-            return componentConnections.map((connection, index) => ({connection, index}));
+        if (!connectionsGrouped) {
+            const ungroupedConnections = componentConnections.map((connection, index) => ({connection, index}));
+
+            return ungroupedConnections;
         }
 
         const connectionGroupMap = new Map<string, number[]>();
@@ -276,11 +280,13 @@ const WorkflowTestConfigurationDialog = ({
             connectionGroupMap.get(componentName)!.push(index);
         }
 
-        return Array.from(connectionGroupMap.values()).map((indices) => ({
+        const groupedConnections = Array.from(connectionGroupMap.values()).map((indices) => ({
             connection: componentConnections[indices[0]],
             groupedIndices: indices.length > 1 ? indices : undefined,
             index: indices[0],
         }));
+
+        return groupedConnections;
     };
 
     const connectionsToRender = getConnectionsToRender();
@@ -370,7 +376,7 @@ const WorkflowTestConfigurationDialog = ({
                             <div className="mr-auto flex items-center gap-2">
                                 {componentConnections.length > 1 && (
                                     <>
-                                        <Switch checked={groupConnections} onCheckedChange={setGroupConnections} />
+                                        <Switch checked={connectionsGrouped} onCheckedChange={setConnectionsGrouped} />
 
                                         <span className="text-sm font-semibold">Group Connections</span>
 

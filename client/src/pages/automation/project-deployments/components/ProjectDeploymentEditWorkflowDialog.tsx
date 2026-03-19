@@ -38,7 +38,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
     workflow,
 }: ProjectDeploymentEditWorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(true);
-    const [groupConnections, setGroupConnections] = useState(false);
+    const [connectionsGrouped, setConnectionsGrouped] = useState(false);
 
     const componentConnections = getWorkflowComponentConnections(workflow);
 
@@ -145,7 +145,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
                         <ProjectDeploymentDialogWorkflowsStepItem
                             control={control}
                             formState={formState}
-                            groupConnections={groupConnections}
+                            groupConnections={connectionsGrouped}
                             key={workflow.id!}
                             setValue={setValue}
                             switchHidden={true}
@@ -157,7 +157,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
                     <DialogFooter className="flex items-center px-6 pb-6 pt-4">
                         {componentConnections.length > 1 && (
                             <div className="mr-auto flex items-center gap-2">
-                                <Switch checked={groupConnections} onCheckedChange={setGroupConnections} />
+                                <Switch checked={connectionsGrouped} onCheckedChange={setConnectionsGrouped} />
 
                                 <span className="text-sm font-semibold">Group Connections</span>
 
