@@ -28,6 +28,7 @@ import com.bytechef.component.microsoft.excel.action.MicrosoftExcelDeleteRowActi
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelFindRowByNumAction;
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelUpdateRowAction;
 import com.bytechef.component.microsoft.excel.connection.MicrosoftExcelConnection;
+import com.bytechef.component.microsoft.excel.trigger.MicrosoftExcelNewRowTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -60,6 +61,7 @@ public class MicrosoftExcelComponentHandler implements ComponentHandler {
             tool(MicrosoftExcelDeleteRowAction.ACTION_DEFINITION),
             tool(MicrosoftExcelFindRowByNumAction.ACTION_DEFINITION),
             tool(MicrosoftExcelUpdateRowAction.ACTION_DEFINITION))
+        .triggers(MicrosoftExcelNewRowTrigger.TRIGGER_DEFINITION)
         .version(1);
 
     @Override
