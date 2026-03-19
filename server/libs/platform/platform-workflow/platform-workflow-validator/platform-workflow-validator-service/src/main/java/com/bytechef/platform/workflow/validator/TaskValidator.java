@@ -305,11 +305,6 @@ class TaskValidator {
         validateNestedTaskParameters(nestedTask, context);
         validateNestedTaskDataPills(nestedTask, context);
         processTaskDispatcher(nestedTask, context);
-
-        String nestedTaskName = nestedTask.has("name") ? nestedTask.get("name")
-            .asString() : "";
-
-        validateClusterElements(nestedTask, nestedTaskName, context);
     }
 
     /**
@@ -320,7 +315,16 @@ class TaskValidator {
             JsonNode nestedTaskJsonNode = taskArrayJsonNode.get(i);
 
             if (nestedTaskJsonNode.has("type")) {
+                String nestedTaskName = nestedTaskJsonNode.has("name") ? nestedTaskJsonNode.get("name")
+                    .asString() : "";
+                boolean isInMainLoop = context.getAllTasksMap()
+                    .containsKey(nestedTaskName);
+
                 processIndividualNestedTask(nestedTaskJsonNode, context);
+
+                if (!isInMainLoop) {
+                    validateClusterElements(nestedTaskJsonNode, nestedTaskName, context);
+                }
             }
         }
     }

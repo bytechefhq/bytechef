@@ -652,27 +652,42 @@ class WorkflowValidatorClusterElementsTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> List.of();
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "questionAnswerRag/v1/rag", List.of(
+                new PropertyInfo("similarityThreshold", "INTEGER", null, false, true, null, null),
+                new PropertyInfo("topK", "INTEGER", null, false, true, null, null)),
+            "component/v1/trigger1", List.of(
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "aiAgent/v1/chat", List.of(
+                new PropertyInfo("userPrompt", "STRING", null, true, true, null, null)),
+            "openAi/v1/embedding", List.of(
+                new PropertyInfo("model", "STRING", null, true, true, null, null)));
 
-        Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
-        Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
-        Map<String, List<String>> clusterTypesMap = new HashMap<>();
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
+            "component/v1/trigger1", trigger1,
+            "aiAgent/v1/chat", action1);
+
+        Map<String, List<String>> expectedClusterTypesMap = Map.of(
+            "aiAgent/v1/chat", List.of("model", "chatMemory", "rag", "guardrails", "tools"),
+            "questionAnswerRag/v1/rag", List.of("vectorStore"),
+            "couchbase/v1/vectorStore", List.of("embedding"));
+
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+            (taskType) -> expectedClusterTypesMap.get(taskType);
+
+        Map<String, List<String>> clusterElementTypesMap = new HashMap<>();
 
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
-            taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
+            new HashMap<>(), new HashMap<>(), clusterElementTypesMap, errors, warnings);
 
+        assertEquals(
+            "{questionAnswerRag/v1/rag=[vectorStore], aiAgent/v1/chat=[model, chatMemory, rag, guardrails, tools], couchbase/v1/vectorStore=[embedding]}",
+            clusterElementTypesMap.toString());
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
-        assertEquals(
-            "{component/v1/action2=[], questionAnswerRag/v1/rag=[], component/v1/action1=[], aiAgent/v1/chat=[], component/v1/trigger1=[], couchbase/v1/vectorStore=[]}",
-            taskDefinitionMap.toString());
-        assertEquals(
-            "{component/v1/action2=null, questionAnswerRag/v1/rag=null, component/v1/action1=null, aiAgent/v1/chat=null, component/v1/trigger1=null, couchbase/v1/vectorStore=null}",
-            taskOutputMap.toString());
-        assertEquals("{questionAnswerRag/v1/rag=[], aiAgent/v1/chat=[], couchbase/v1/vectorStore=[]}",
-            clusterTypesMap.toString());
     }
 
     @Test
@@ -720,26 +735,70 @@ class WorkflowValidatorClusterElementsTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> List.of();
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "component/v1/trigger1", List.of(
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "aiAgent/v1/chat", List.of(
+                new PropertyInfo("userPrompt", "STRING", null, true, true, null, null)),
+            "condition/v1", List.of(
+                new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
+                    new PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
+                        new PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                        new PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                        new PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "NUMBER", null, true, true,
+                                "conditions[index][index].operation != 'EMPTY'", null))),
+                        new PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "STRING", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "STRING", null, true, true,
+                                "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
+                new PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+                new PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null))),
+                new PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null)))));
 
-        Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
-        Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
-        Map<String, List<String>> clusterTypesMap = new HashMap<>();
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
+            "component/v1/trigger1", trigger1,
+            "aiAgent/v1/chat", action1);
+
+        Map<String, List<String>> expectedClusterTypesMap = Map.of(
+            "aiAgent/v1/chat", List.of("model", "chatMemory", "rag", "guardrails", "tools"));
+
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+            (taskType) -> expectedClusterTypesMap.get(taskType);
+
+        Map<String, List<String>> clusterElementTypesMap = new HashMap<>();
 
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
-            taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
+            new HashMap<>(), new HashMap<>(), clusterElementTypesMap, errors, warnings);
 
+        assertEquals("{aiAgent/v1/chat=[model, chatMemory, rag, guardrails, tools]}",
+            clusterElementTypesMap.toString());
         assertEquals("", errors.toString());
-        assertEquals("", warnings.toString());
-        assertEquals(
-            "{aiAgent/v1/chat=[], component/v1/trigger1=[], condition/v1=[]}",
-            taskDefinitionMap.toString());
-        assertEquals(
-            "{aiAgent/v1/chat=null, component/v1/trigger1=null, condition/v1=null}",
-            taskOutputMap.toString());
-        assertEquals("{aiAgent/v1/chat=[]}",
-            clusterTypesMap.toString());
+        assertEquals("""
+            Property 'expression' is not defined in task definition
+            Cluster element 'model' is missing from task aiAgent_1
+            Cluster element 'chatMemory' is missing from task aiAgent_1
+            Cluster element 'rag' is missing from task aiAgent_1
+            Cluster element 'guardrails' is missing from task aiAgent_1
+            Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
     }
 }

@@ -3837,21 +3837,26 @@ class WorkflowValidatorTest {
             }
             """;
 
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "component/v1/action1", List.of(new PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "manual/v1/manual", List.of(new PropertyInfo("name", "STRING", null, false, true, null, null)));
+
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
+            "component/v1/action1", new PropertyInfo("result", "STRING", null, false, false, null, null),
+            "manual/v1/manual", new PropertyInfo("result", "STRING", null, false, false, null, null));
+
+        Map<String, List<String>> clusterTypesMap = Map.of();
+
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of(
-            new PropertyInfo("name", "STRING", null, false, true, null, null));
-
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
         WorkflowValidator.TaskOutputProvider taskOutputProvider =
-            (taskType, kind, warningsBuilder) -> new PropertyInfo("result", "STRING", null, false, false, null, null);
-
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
-            (taskType) -> null;
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> clusterTypesMap.get(taskType);
 
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
-            new HashMap<>(),
-            new HashMap<>(), new HashMap<>(), errors, warnings);
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -3867,16 +3872,20 @@ class WorkflowValidatorTest {
             }
             """;
 
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of();
+        Map<String, PropertyInfo> taskOutputMap = Map.of();
+        Map<String, List<String>> clusterTypesMap = Map.of();
+
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> clusterTypesMap.get(taskType);
 
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
-            new HashMap<>(),
-            new HashMap<>(), new HashMap<>(), errors, warnings);
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("Missing required field: label", errors.toString());
         assertEquals("", warnings.toString());
@@ -3913,17 +3922,23 @@ class WorkflowValidatorTest {
             }
             """;
 
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "manual/v1/manual", List.of(),
+            "component/v1/action1", List.of(),
+            "component/v1/action2", List.of());
+        Map<String, PropertyInfo> taskOutputMap = Map.of();
+        Map<String, List<String>> clusterTypesMap = Map.of();
+
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
-            (taskType) -> null;
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> clusterTypesMap.get(taskType);
 
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
-            new HashMap<>(),
-            new HashMap<>(), new HashMap<>(), errors, warnings);
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("Tasks cannot have repeating names: duplicate_name", errors.toString());
         assertEquals("", warnings.toString());
@@ -3934,16 +3949,20 @@ class WorkflowValidatorTest {
         String workflow =
             "{\n  \"label\": \"Productboard Feature Update to Box Document Sync\",\n  \"description\": \"When a feature is updated on Productboard, this workflow lists 10 published documents with Coda, fetches their content, processes them with OpenAI to match Productboard attributes, and uploads the updated documents to Box.\",\n  \"inputs\": [],\n  \"triggers\": [\n    {\n      \"label\": \"Productboard Feature Updated\",\n      \"name\": \"productboard_1\",\n      \"type\": \"productboard/v1/updatedFeature\",\n      \"parameters\": {}\n    }\n  ],\n  \"tasks\": [\n    {\n      \"label\": \"List Published Coda Documents\",\n      \"name\": \"coda_1\",\n      \"type\": \"coda/v1/listDocs\",\n      \"parameters\": {\n        \"isPublished\": true,\n        \"limit\": 10\n      }\n    },\n    {\n      \"label\": \"Loop Through Documents\",\n      \"name\": \"loop_1\",\n      \"type\": \"loop/v1\",\n      \"parameters\": {\n        \"items\": \"${coda_1.items}\",\n        \"iteratee\": [\n          {\n            \"label\": \"Fetch Document Content\",\n            \"name\": \"httpClient_1\",\n            \"type\": \"httpClient/v1/get\",\n            \"parameters\": {\n              \"uri\": \"${loop_1.item.href}\"\n            }\n          },\n          {\n            \"label\": \"Process Document with OpenAI\",\n            \"name\": \"openAi_1\", \n            \"type\": \"openAi/v1/ask\",\n            \"parameters\": {\n              \"model\": \"gpt-4o\",\n              \"format\": \"SIMPLE\",\n              \"userPrompt\": \"Please analyze the following document content and the Productboard feature attributes, then update the document attributes to match the Productboard attributes where applicable. Document content: ${httpClient_1.body}. Productboard updated attributes: ${productboard_1.updatedAttributes}. Productboard feature ID: ${productboard_1.id}. Please return an updated version of the document with matching attributes.\",\n              \"systemPrompt\": \"You are an expert at analyzing documents and matching attributes between systems. Your task is to update document attributes to align with Productboard feature data while preserving the original document structure and content where possible.\"\n            }\n          },\n          {\n            \"label\": \"Upload Updated Document to Box\",\n            \"name\": \"box_1\",\n            \"type\": \"box/v1/uploadFile\", \n            \"parameters\": {\n              \"id\": \"0\",\n              \"file\": {\n                \"name\": \"${loop_1.item.name}_updated_${productboard_1.id}.txt\",\n                \"extension\": \"txt\",\n                \"mimeType\": \"text/plain\",\n                \"url\": \"data:text/plain;charset=utf-8,${openAi_1}\"\n              }\n            }\n          }\n        ]\n      }\n    }\n  ]\n}";
 
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of();
+        Map<String, PropertyInfo> taskOutputMap = Map.of();
+        Map<String, List<String>> clusterTypesMap = Map.of();
+
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> taskDefinitionMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> clusterTypesMap.get(taskType);
 
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
-            new HashMap<>(),
-            new HashMap<>(), new HashMap<>(), errors, warnings);
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -4008,19 +4027,29 @@ class WorkflowValidatorTest {
             }
             """;
 
+        Map<String, List<PropertyInfo>> taskDefinitionLookupMap = Map.of(
+            "component/v1/trigger1", List.of(),
+            "component/v1/action1", List.of(),
+            "condition/v1", List.of());
+        Map<String, PropertyInfo> taskOutputLookupMap = Map.of();
+        Map<String, List<String>> clusterTypesLookupMap = Map.of();
+
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider =
+            (taskType, kind) -> taskDefinitionLookupMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputLookupMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+            (taskType) -> clusterTypesLookupMap.get(taskType);
 
         Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
         Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
-        Map<String, List<String>> clientTypesMap = new HashMap<>();
+        Map<String, List<String>> clusterTypesMap = new HashMap<>();
 
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
-            taskDefinitionMap, taskOutputMap, clientTypesMap, errors, warnings);
+            taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -4078,12 +4107,23 @@ class WorkflowValidatorTest {
             }
             """;
 
+        Map<String, List<PropertyInfo>> taskDefinitionLookupMap = Map.of(
+            "component/v1/trigger1", List.of(),
+            "loop/v1", List.of(),
+            "component/v1/action1", List.of(),
+            "component/v1/action2", List.of());
+        Map<String, PropertyInfo> taskOutputLookupMap = Map.of();
+        Map<String, List<String>> clusterTypesLookupMap = Map.of();
+
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider =
+            (taskType, kind) -> taskDefinitionLookupMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputLookupMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+            (taskType) -> clusterTypesLookupMap.get(taskType);
 
         Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
         Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
@@ -4186,12 +4226,25 @@ class WorkflowValidatorTest {
             }
             """;
 
+        Map<String, List<PropertyInfo>> taskDefinitionLookupMap = Map.of(
+            "component/v1/trigger1", List.of(),
+            "loop/v1", List.of(),
+            "condition/v1", List.of(),
+            "component/v1/action1", List.of(),
+            "component/v1/action2", List.of());
+        Map<String, PropertyInfo> taskOutputLookupMap = Map.of();
+        Map<String, List<String>> clusterTypesLookupMap = Map.of();
+
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
-        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> null;
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider =
+            (taskType, kind) -> taskDefinitionLookupMap.get(taskType);
+        WorkflowValidator.TaskOutputProvider taskOutputProvider =
+            (taskType, kind, warningsBuilder) -> taskOutputLookupMap.get(taskType);
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+            (taskType) -> clusterTypesLookupMap.get(taskType);
+
         Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
         Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
         Map<String, List<String>> clusterTypesMap = new HashMap<>();
