@@ -98,7 +98,7 @@ const WorkflowExecutionsTestOutput = ({
                                     <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
                                         <ScrollArea className="h-full pl-1 pr-4">
                                             <Accordion
-                                                className="space-y-2"
+                                                className="ml-2 space-y-2"
                                                 defaultValue={
                                                     isTriggerExecution
                                                         ? [triggerExecution?.id || '']

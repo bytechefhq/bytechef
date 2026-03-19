@@ -13,7 +13,7 @@ const WorkflowTaskExecutionItem = ({taskExecution}: {taskExecution: TaskExecutio
             <div className="flex items-center gap-x-2 text-sm">
                 {statusIcon}
 
-                <div className="flex items-center gap-x-1">
+                <div className="flex items-center gap-x-2">
                     {icon && <LazyLoadSVG className="size-5" src={icon} />}
 
                     <div className="flex flex-col items-start">

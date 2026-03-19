@@ -10,7 +10,7 @@ const WorkflowTriggerExecutionItem = ({triggerExecution}: {triggerExecution: Tri
 
     return (
         <li className="flex w-full cursor-pointer items-center justify-between rounded-lg p-0 hover:bg-inherit">
-            <div className="flex items-center gap-x-2 text-sm">
+            <div className="flex items-center gap-x-1 text-sm">
                 {statusIcon}
 
                 <div className="flex items-center gap-x-1">

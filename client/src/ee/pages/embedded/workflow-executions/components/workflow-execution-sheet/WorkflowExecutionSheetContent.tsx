@@ -33,7 +33,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
                 <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
                     <ScrollArea className="mb-4 h-full pr-4">
                         <Accordion
-                            className="space-y-2"
+                            className="ml-2 space-y-2"
                             defaultValue={isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || '']}
                             type="multiple"
                         >
