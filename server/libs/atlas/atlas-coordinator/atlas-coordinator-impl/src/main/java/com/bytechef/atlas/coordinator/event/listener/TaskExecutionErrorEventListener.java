@@ -83,13 +83,19 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
             // if the task is retryable, then retry it
             if (taskExecution.getRetryAttempts() < taskExecution.getMaxRetries()) {
-                taskExecution.setStatus(TaskExecution.Status.CREATED);
-                taskExecution.setError(null);
-                taskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);
 
-                taskExecution = taskExecutionService.create(taskExecution);
+                TaskExecution retryTaskExecution = TaskExecution.builder()
+                    .jobId(taskExecution.getJobId())
+                    .maxRetries(taskExecution.getMaxRetries())
+                    .priority(taskExecution.getPriority())
+                    .retryAttempts(taskExecution.getRetryAttempts() + 1)
+                    .status(TaskExecution.Status.CREATED)
+                    .workflowTask(taskExecution.getWorkflowTask())
+                    .build();
 
-                taskDispatcher.dispatch(taskExecution);
+                retryTaskExecution = taskExecutionService.create(retryTaskExecution);
+
+                taskDispatcher.dispatch(retryTaskExecution);
             }
             // if it's not retryable then we're going fail the job
             else {
