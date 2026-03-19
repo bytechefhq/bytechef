@@ -24,24 +24,40 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 
 /**
  * @author Monika Kušter
+ * @author Nikolina Spehar
  */
 public class GoogleContactsConstants {
 
+    public static final int DEFAULT_PAGE_SIZE = 1000;
     public static final String EMAIL = "email";
+    public static final String EMAIL_ADDRESSES = "emailAddresses";
+    public static final String E_TAG = "etag";
     public static final String FAMILY_NAME = "familyName";
     public static final String GIVEN_NAME = "givenName";
     public static final String MIDDLE_NAME = "middleName";
     public static final String NAME = "name";
+    public static final String NAMES = "names";
+    public static final String ORGANIZATIONS = "organizations";
     public static final String PAGE_SIZE = "pageSize";
+    public static final String PERSON_FIELDS = "personFields";
     public static final String PHONE_NUMBER = "phoneNumber";
+    public static final String PHONE_NUMBERS = "phoneNumbers";
     public static final String QUERY = "query";
     public static final String READ_MASK = "readMask";
     public static final String RESOURCE_NAME = "resourceName";
     public static final String TITLE = "title";
+    public static final String TYPE = "type";
+    public static final String VALUE = "value";
 
     public static final ModifiableObjectProperty CONTACT_OUTPUT_PROPERTY =
         object()
             .properties(
+                string("resourceName")
+                    .description(
+                        "The resource name for the person, assigned by the server. An ASCII string in the form of " +
+                            "people/{person_id}."),
+                string("etag")
+                    .description("The HTTP entity tag of the resource. Used for web cache validation."),
                 array("names")
                     .description("The person's names.")
                     .items(

@@ -23,6 +23,7 @@ import java.util.Map;
 
 /**
  * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class GoogleContactsConnection {
 
@@ -30,7 +31,7 @@ public class GoogleContactsConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        null,
+        "https://people.googleapis.com/v1",
         1,
         "https://docs.bytechef.io/reference/components/google-contacts_v1#connection-setup",
         (connection, context) -> {
