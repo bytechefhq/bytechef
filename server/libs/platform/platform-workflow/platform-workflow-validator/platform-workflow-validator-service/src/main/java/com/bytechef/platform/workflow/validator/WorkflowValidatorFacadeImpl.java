@@ -172,14 +172,16 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     private List<String> getClusterElementTypes(String taskType) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskType);
 
-        ComponentDefinition componentDefinition =
-            componentDefinitionService.getComponentDefinition(workflowNodeType.name(), workflowNodeType.version());
+        if (workflowNodeType.operation() != null) {
+            ComponentDefinition componentDefinition =
+                componentDefinitionService.getComponentDefinition(workflowNodeType.name(), workflowNodeType.version());
 
-        if (componentDefinition.isClusterElement()) {
-            return componentDefinition.getClusterElementTypes()
-                .stream()
-                .map(ClusterElementDefinition.ClusterElementType::key)
-                .toList();
+            if (componentDefinition.isClusterElement()) {
+                return componentDefinition.getClusterElementTypes()
+                    .stream()
+                    .map(ClusterElementDefinition.ClusterElementType::key)
+                    .toList();
+            }
         }
 
         return null;

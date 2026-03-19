@@ -458,89 +458,195 @@ class WorkflowValidatorClusterElementsTest {
     }
 
     @Test
+    void validateWorkflowTasksClusterElementsInConditionNoError() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                     "label": "Condition",
+                     "name": "condition_1",
+                     "parameters": {
+                         "rawExpression": false,
+                         "expression": "=",
+                         "caseFalse": [
+                             {
+                                 "label": "AI Agent",
+                                 "name": "aiAgent_1",
+                                 "parameters": {
+                                     "userPrompt": "hi"
+                                 },
+                                 "clusterElements": {},
+                                 "type": "aiAgent/v1/chat"
+                             }
+                         ],
+                         "caseTrue": []
+                     },
+                     "type": "condition/v1"
+                 }
+            ]
+            """;
+
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "component/v1/trigger1", List.of(
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "aiAgent/v1/chat", List.of(
+                new PropertyInfo("userPrompt", "STRING", null, true, true, null, null)),
+            "condition/v1", List.of(
+                new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
+                    new PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
+                        new PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                        new PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                        new PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "NUMBER", null, true, true,
+                                "conditions[index][index].operation != 'EMPTY'", null))),
+                        new PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "STRING", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "STRING", null, true, true,
+                                "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
+                new PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+                new PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null))),
+                new PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null)))));
+
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
+            "component/v1/trigger1", trigger1,
+            "aiAgent/v1/chat", action1);
+
+        Map<String, List<String>> clusterElements = Map.of(
+            "aiAgent/v1/chat", List.of("model", "chatMemory", "rag", "guardrails", "tools"));
+
+        try {
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
+            }
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterElements,
+                errors, warnings);
+
+            assertEquals("", errors.toString());
+            assertEquals("""
+                Property 'expression' is not defined in task definition
+                Cluster element 'model' is missing from task aiAgent_1
+                Cluster element 'chatMemory' is missing from task aiAgent_1
+                Cluster element 'rag' is missing from task aiAgent_1
+                Cluster element 'guardrails' is missing from task aiAgent_1
+                Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
     void validateWorkflowClusterElementsNoErrors() {
         String workflow = """
-                {
-                    "label": "Test Workflow",
-                    "description": "Test workflow description",
-                    "triggers": [
-                        {
-                            "label": "Task 1",
-                            "name": "task1",
-                            "type": "component/v1/trigger1",
-                            "parameters": {
-                                "name": "John"
-                            }
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "triggers": [
+                    {
+                        "label": "Task 1",
+                        "name": "task1",
+                        "type": "component/v1/trigger1",
+                        "parameters": {
+                            "name": "John"
                         }
-                    ],
-                    "tasks": [
-                        {
-                            "clusterElements": {
-                                "model": {
-                                    "label": "OpenAI",
-                                    "name": "openAi_2",
-                                    "parameters": {
-                                        "model": "gpt-5-nano"
-                                    },
-                                "type": "openAi/v1/model"
+                    }
+                ],
+                "tasks": [
+                    {
+                        "clusterElements": {
+                            "model": {
+                                "label": "OpenAI",
+                                "name": "openAi_2",
+                                "parameters": {
+                                    "model": "gpt-5-nano"
                                 },
-                                "chatMemory": null,
-                                "rag": {
-                                   "clusterElements": {
-                                       "vectorStore": {
-                                           "clusterElements": {
-                                               "embedding": {
-                                                   "label": "OpenAI",
-                                                   "name": "openAi_3",
-                                                   "parameters": {
-                                                        "model": "text-embedding-3-small"
-                                                   },
-                                                   "type": "openAi/v1/embedding"
-                                               }
-                                           },
-                                           "label": "Couchbase",
-                                           "name": "couchbase_1",
-                                           "parameters": {},
-                                           "type": "couchbase/v1/vectorStore"
-                                       }
-                                   },
-                                   "label": "Question Answer RAG",
-                                   "name": "questionAnswerRag_1",
-                                   "parameters": {
-                                       "similarityThreshold": 0,
-                                       "topK": 4
-                                   },
-                                   "type": "questionAnswerRag/v1/rag"
+                            "type": "openAi/v1/model"
+                            },
+                            "chatMemory": null,
+                            "rag": {
+                               "clusterElements": {
+                                   "vectorStore": {
+                                       "clusterElements": {
+                                           "embedding": {
+                                               "label": "OpenAI",
+                                               "name": "openAi_3",
+                                               "parameters": {
+                                                    "model": "text-embedding-3-small"
+                                               },
+                                               "type": "openAi/v1/embedding"
+                                           }
+                                       },
+                                       "label": "Couchbase",
+                                       "name": "couchbase_1",
+                                       "parameters": {},
+                                       "type": "couchbase/v1/vectorStore"
+                                   }
                                },
-                                "guardrails": null,
-                                "tools": [
-                                    {
-                                        "label": "Test 2",
-                                        "name": "testTask2",
-                                        "type": "component/v1/action1",
-                                        "parameters": {
-                                            "name": "John"
-                                        }
-                                    },
-                                    {
-                                        "label": "Test 3",
-                                        "name": "testTask3",
-                                        "type": "component/v1/action2",
-                                        "parameters": {
-                                            "name": "Bruno"
-                                        }
+                               "label": "Question Answer RAG",
+                               "name": "questionAnswerRag_1",
+                               "parameters": {
+                                   "similarityThreshold": 0,
+                                   "topK": 4
+                               },
+                               "type": "questionAnswerRag/v1/rag"
+                           },
+                            "guardrails": null,
+                            "tools": [
+                                {
+                                    "label": "Test 2",
+                                    "name": "testTask2",
+                                    "type": "component/v1/action1",
+                                    "parameters": {
+                                        "name": "John"
                                     }
-                                ]
-                            },
-                            "name": "aiAgent_1",
-                            "label": "AI Agent",
-                            "parameters": {
-                                "userPrompt": "${trigger_1.propString}"
-                            },
-                            "type": "aiAgent/v1/chat"
-                        }
-                    ]
-                }
+                                },
+                                {
+                                    "label": "Test 3",
+                                    "name": "testTask3",
+                                    "type": "component/v1/action2",
+                                    "parameters": {
+                                        "name": "Bruno"
+                                    }
+                                }
+                            ]
+                        },
+                        "name": "aiAgent_1",
+                        "label": "AI Agent",
+                        "parameters": {
+                            "userPrompt": "${trigger_1.propString}"
+                        },
+                        "type": "aiAgent/v1/chat"
+                    }
+                ]
+            }
             """;
 
         StringBuilder errors = new StringBuilder();
@@ -566,6 +672,74 @@ class WorkflowValidatorClusterElementsTest {
             "{component/v1/action2=null, questionAnswerRag/v1/rag=null, component/v1/action1=null, aiAgent/v1/chat=null, component/v1/trigger1=null, couchbase/v1/vectorStore=null}",
             taskOutputMap.toString());
         assertEquals("{questionAnswerRag/v1/rag=[], aiAgent/v1/chat=[], couchbase/v1/vectorStore=[]}",
+            clusterTypesMap.toString());
+    }
+
+    @Test
+    void validateWorkflowClusterElementsInCondition() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "triggers": [
+                    {
+                        "label": "Task 1",
+                        "name": "task1",
+                        "type": "component/v1/trigger1",
+                        "parameters": {
+                            "name": "John"
+                        }
+                    }
+                ],
+                "tasks": [
+                    {
+                        "label": "Condition",
+                        "name": "condition_1",
+                        "parameters": {
+                            "rawExpression": false,
+                            "expression": "=",
+                            "caseFalse": [
+                                {
+                                    "label": "AI Agent",
+                                    "name": "aiAgent_1",
+                                    "parameters": {
+                                        "userPrompt": "hi"
+                                    },
+                                    "clusterElements": {},
+                                    "type": "aiAgent/v1/chat"
+                                }
+                            ],
+                            "caseTrue": []
+                        },
+                        "type": "condition/v1"
+                    }
+                ]
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
+        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = (taskType) -> List.of();
+
+        Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
+        Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
+        Map<String, List<String>> clusterTypesMap = new HashMap<>();
+
+        WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
+            taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+        assertEquals(
+            "{aiAgent/v1/chat=[], component/v1/trigger1=[], condition/v1=[]}",
+            taskDefinitionMap.toString());
+        assertEquals(
+            "{aiAgent/v1/chat=null, component/v1/trigger1=null, condition/v1=null}",
+            taskOutputMap.toString());
+        assertEquals("{aiAgent/v1/chat=[]}",
             clusterTypesMap.toString());
     }
 }
