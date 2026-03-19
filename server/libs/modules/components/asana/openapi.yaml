@@ -14,6 +14,7 @@ paths:
       summary: "Create Project"
       description: "Creates a new project in a workspace or team."
       operationId: "createProject"
+      x-help: "https://docs.bytechef.io/reference/components/asana_v1#create-project"
       security:
         - oauth2:
             - "projects:write"
@@ -99,6 +100,7 @@ paths:
       description: "Creates a new task"
       operationId: "createTask"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/asana_v1#create-task"
       security:
         - oauth2:
             - "tasks:write"
@@ -218,6 +220,7 @@ paths:
       description: "Creates a new subtask and adds it to the parent task."
       operationId: "createSubtask"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/asana_v1#create-subtask"
       security:
         - oauth2:
             - "tasks:read"
@@ -351,6 +354,7 @@ paths:
       description: "Creates a custom field for a task."
       operationId: "createCustomField"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/asana_v1#create-custom-field"
       security:
         - oauth2:
             - "tasks:write"
