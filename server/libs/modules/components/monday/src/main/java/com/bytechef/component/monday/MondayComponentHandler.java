@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.monday.action.MondayCreateBoardAction;
 import com.bytechef.component.monday.action.MondayCreateColumnAction;
@@ -40,6 +41,9 @@ public class MondayComponentHandler implements ComponentHandler {
         .title("monday.com")
         .description(
             "Monday.com is a work operating system that powers teams to run projects and workflows with confidence.")
+        .customAction(true)
+        .customActionHelp("", "https://developer.monday.com/api-reference/reference/about-the-api-reference")
+        .categories(ComponentCategory.PROJECT_MANAGEMENT)
         .connection(MondayConnection.CONNECTION_DEFINITION)
         .icon("path:assets/monday.svg")
         .actions(
@@ -54,7 +58,8 @@ public class MondayComponentHandler implements ComponentHandler {
             tool(MondayCreateGroupAction.ACTION_DEFINITION),
             tool(MondayCreateItemAction.ACTION_DEFINITION),
             tool(MondayDeleteItemAction.ACTION_DEFINITION))
-        .triggers(MondayNewItemInBoardTrigger.TRIGGER_DEFINITION);
+        .triggers(MondayNewItemInBoardTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

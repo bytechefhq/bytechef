@@ -70,7 +70,9 @@ public class MondayConnection {
             })
             .tokenUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token")
             .refreshUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token"))
-        .baseUri((connectionParameters, context) -> "https://api.monday.com/v2");
+        .baseUri((connectionParameters, context) -> "https://api.monday.com/v2")
+        .help("", "https://docs.bytechef.io/reference/components/monday_v1#connection-setup")
+        .version(1);
 
     private MondayConnection() {
     }

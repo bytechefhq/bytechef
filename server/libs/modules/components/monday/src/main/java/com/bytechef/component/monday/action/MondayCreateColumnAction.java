@@ -43,15 +43,17 @@ public class MondayCreateColumnAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createColumn")
         .title("Create Column")
-        .description("Create a new column in board.")
+        .description("Create a new column in an existing board.")
+        .help("", "https://docs.bytechef.io/reference/components/monday_v1#create-column")
         .properties(
             string(WORKSPACE_ID)
                 .label("Workspace ID")
+                .description("ID of the workspace where the board is located.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(false),
             string(BOARD_ID)
                 .label("Board ID")
-                .description("Id of the board where the new column should be created.")
+                .description("ID of the board where the new column should be created.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true),
