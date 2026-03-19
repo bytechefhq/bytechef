@@ -19,8 +19,12 @@ package com.bytechef.component.asana;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.asana.trigger.AsanaNewTaskTrigger;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization.ScopesFunction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
@@ -32,7 +36,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinitio
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -60,6 +66,33 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
     @Override
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+
+            for (Authorization authorization : authorizations) {
+                AuthorizationType authorizationType = authorization.getType();
+                if (authorizationType.equals(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)) {
+                    Optional<ScopesFunction> optionalScopesFunction = authorization.getScopes();
+
+                    optionalScopesFunction.ifPresent(scopesFunction -> ((ModifiableAuthorization) authorization)
+                        .scopes((connectionParameters, context) -> {
+
+                            Map<String, Boolean> scopes = new LinkedHashMap<>(
+                                scopesFunction.apply(connectionParameters, context));
+
+                            scopes.put("webhooks:read", true);
+                            scopes.put("webhooks:write", true);
+                            scopes.put("webhooks:delete", true);
+
+                            return scopes;
+                        }));
+                }
+            }
+        }
 
         return modifiableConnectionDefinition
             .help("", "https://docs.bytechef.io/reference/components/asana_v1#connection-setup")
