@@ -32,6 +32,8 @@ public class PushoverConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.pushover.net/1")
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/pushover_v1#connection-setup")
         .authorizations(
             authorization(AuthorizationType.CUSTOM)
                 .properties(

@@ -99,6 +99,7 @@ public class PushoverSendNotificationAction {
                 .properties(
                     integer(STATUS),
                     string(REQUEST))))
+        .help("", "https://docs.bytechef.io/reference/components/pushover_v1#send-notification")
         .perform(PushoverSendNotificationAction::perform);
 
     private PushoverSendNotificationAction() {
