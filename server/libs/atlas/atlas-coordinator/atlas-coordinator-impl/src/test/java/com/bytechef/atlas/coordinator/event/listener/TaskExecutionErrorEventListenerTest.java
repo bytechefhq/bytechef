@@ -25,16 +25,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Task;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.error.ExecutionError;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Arik Cohen
@@ -46,6 +51,13 @@ public class TaskExecutionErrorEventListenerTest {
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+    static {
+        ObjectMapper objectMapper = JsonMapper.builder()
+            .build();
+
+        MapUtils.setObjectMapper(objectMapper);
+    }
 
     @Test
     public void test1() {
@@ -82,6 +94,11 @@ public class TaskExecutionErrorEventListenerTest {
         erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
         erroredTaskExecution.setId(1234L);
         erroredTaskExecution.setMaxRetries(1);
+        erroredTaskExecution.setWorkflowTask(
+            new WorkflowTask(
+                Map.of(
+                    "name", "workflowTaskName",
+                    "type", "workflowTaskType")));
 
         when(taskExecutionService.update(any()))
             .thenReturn(erroredTaskExecution);
