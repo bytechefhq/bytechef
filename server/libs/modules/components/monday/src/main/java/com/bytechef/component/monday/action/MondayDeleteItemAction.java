@@ -36,10 +36,12 @@ public class MondayDeleteItemAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteItem")
         .title("Delete Item")
-        .description("Deletes an item from a board.")
+        .description("Deletes an item from an existing board.")
+        .help("", "https://docs.bytechef.io/reference/components/monday_v1#delete-item")
         .properties(
             string(WORKSPACE_ID)
                 .label("Workspace ID")
+                .description("ID of the workspace where the board is located.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(false),
             string(BOARD_ID)
