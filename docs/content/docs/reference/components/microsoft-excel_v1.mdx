@@ -71,8 +71,8 @@ Name: appendRow
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| workbookId | Workbook ID | STRING | The ID of the workbook. | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | The name of the worksheet. | true |
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
 
@@ -97,6 +97,13 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Workbook ID
+
+To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#how-to-find-workbook-id).
+
+#### Find Worksheet Name
+
+To find the Worksheet name, click [here](/reference/components/microsoft-excel_v1#how-to-find-worksheet-name).
 
 
 
@@ -109,8 +116,8 @@ Name: clearWorksheet
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| workbookId | Workbook ID | STRING | The ID of the workbook. | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | The name of the worksheet. | true |
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 
 #### Example JSON Structure
@@ -133,6 +140,13 @@ This action does not produce any output.
 
 
 
+#### Find Workbook ID
+
+To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#how-to-find-workbook-id).
+
+#### Find Worksheet Name
+
+To find the Worksheet name, click [here](/reference/components/microsoft-excel_v1#how-to-find-worksheet-name).
 
 
 
@@ -145,8 +159,8 @@ Name: deleteRow
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| workbookId | Workbook ID | STRING | The ID of the workbook. | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | The name of the worksheet. | true |
 | rowNumber | Row Number | INTEGER | The row number to delete. | true |
 
 #### Example JSON Structure
@@ -169,6 +183,13 @@ This action does not produce any output.
 
 
 
+#### Find Workbook ID
+
+To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#how-to-find-workbook-id).
+
+#### Find Worksheet Name
+
+To find the Worksheet name, click [here](/reference/components/microsoft-excel_v1#how-to-find-worksheet-name).
 
 
 
@@ -181,8 +202,8 @@ Name: findRowByNum
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| workbookId | Workbook ID | STRING | The ID of the workbook. | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | The name of the worksheet. | true |
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 | rowNumber | Row Number | INTEGER | The row number to get the values from. | true |
 
@@ -207,20 +228,27 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Workbook ID
+
+To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#how-to-find-workbook-id).
+
+#### Find Worksheet Name
+
+To find the Worksheet name, click [here](/reference/components/microsoft-excel_v1#how-to-find-worksheet-name).
 
 
 
 ### Update Row
 Name: updateRow
 
-`Update a row in a worksheet.`
+`Update a row in an existing worksheet.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| workbookId | Workbook ID | STRING | The ID of the workbook. | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | The name of the worksheet. | true |
 | rowNumber | Row Number | INTEGER | The row number to update. | true |
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 | updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to update the whole row or just specific columns. | true |
@@ -249,6 +277,60 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Workbook ID
+
+To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#how-to-find-workbook-id).
+
+#### Find Worksheet Name
+
+To find the Worksheet name, click [here](/reference/components/microsoft-excel_v1#how-to-find-worksheet-name).
+
+
+
+
+## Triggers
+
+
+### New Row
+Name: newRow
+
+`Triggers when a new row is added.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workbookId | Workbook ID | STRING | The ID of the workbook. | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | The name of the worksheet. | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Row",
+  "name" : "newRow",
+  "parameters" : {
+    "workbookId" : "",
+    "worksheetName" : "",
+    "isTheFirstRowHeader" : false
+  },
+  "type" : "microsoftExcel/v1/newRow"
+}
+```
+#### Find Workbook ID
+
+To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#how-to-find-workbook-id).
+
+#### Find Worksheet Name
+
+To find the Worksheet name, click [here](/reference/components/microsoft-excel_v1#how-to-find-worksheet-name).
 
 
 
@@ -260,3 +342,15 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find Workbook ID
+
+#### Via API
+Use the `GET https://graph.microsoft.com/v1.0/me/drive/items/root/search(q='.xlsx')` endpoint.
+
+### How to find Worksheet Name
+
+To find a Worksheet Name, open the workbook. Below the worksheet you will find a bar with worksheet names.
