@@ -86,6 +86,7 @@ public class GoogleContactsCreateContactAction {
                 .controlType(ControlType.PHONE)
                 .required(false))
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/google-contacts_v1#create-contact")
         .perform(GoogleContactsCreateContactAction::perform);
 
     private GoogleContactsCreateContactAction() {

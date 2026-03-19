@@ -95,6 +95,7 @@ public class GoogleContactsSearchContactsAction {
                 .maxValue(30)
                 .required(false))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/google-contacts_v1#search-contacts")
         .perform(GoogleContactsSearchContactsAction::perform);
 
     private GoogleContactsSearchContactsAction() {
