@@ -103,6 +103,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| resourceName | STRING | The resource name for the person, assigned by the server. An ASCII string in the form of people/&#123;person_id&#125;. |
+| etag | STRING | The HTTP entity tag of the resource. Used for web cache validation. |
 | names | ARRAY <details> <summary> Items </summary> [&#123;STRING\(familyName), STRING\(givenName), STRING\(middleName)&#125;] </details> | The person's names. |
 | organizations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(title)&#125;] </details> | The person's past or current organizations. |
 | emailAddresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value)&#125;] </details> | The person's email addresses. |
@@ -114,6 +116,8 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "resourceName" : "",
+  "etag" : "",
   "names" : [ {
     "familyName" : "",
     "givenName" : "",
@@ -169,7 +173,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| resourceName | STRING | The resource name for the contact group, assigned by the server. An ASCII string, in the form of contactGroups/&#123;contactGroupId&#125;. |
+| etag | STRING | The HTTP entity tag of the resource. Used for web cache validation. |
 | name | STRING | The contact group name set by the group owner or a system provided name for system groups. |
+| formattedName | STRING | The name translated and formatted in the viewer's account locale or the Accept-Language HTTP header locale for system groups names. Group names set by the owner are the same as name. |
 
 
 
@@ -177,7 +184,10 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "name" : ""
+  "resourceName" : "",
+  "etag" : "",
+  "name" : "",
+  "formattedName" : ""
 }
 ```
 
@@ -194,9 +204,9 @@ Name: updateContact
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | resourceName | Resource Name | STRING | Resource name of the contact to be updated. | true |
-| givenName | First Name | STRING | New first name of the contact. | true |
+| givenName | First Name | STRING | New first name of the contact. | false |
 | middleName | Middle Name | STRING | New middle name of the contact. | false |
-| familyName | Last Name | STRING | Updated last name of the contact. | true |
+| familyName | Last Name | STRING | Updated last name of the contact. | false |
 | title | Job Title | STRING | Updated job title of the contact. | false |
 | name | Company | STRING | Updated name of the company where the contact is employed. | false |
 | email | Email Address | STRING | Updated email address of the contact. | false |
@@ -232,6 +242,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| resourceName | STRING | The resource name for the person, assigned by the server. An ASCII string in the form of people/&#123;person_id&#125;. |
+| etag | STRING | The HTTP entity tag of the resource. Used for web cache validation. |
 | names | ARRAY <details> <summary> Items </summary> [&#123;STRING\(familyName), STRING\(givenName), STRING\(middleName)&#125;] </details> | The person's names. |
 | organizations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(title)&#125;] </details> | The person's past or current organizations. |
 | emailAddresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value)&#125;] </details> | The person's email addresses. |
@@ -243,6 +255,8 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "resourceName" : "",
+  "etag" : "",
   "names" : [ {
     "familyName" : "",
     "givenName" : "",
@@ -275,7 +289,7 @@ Name: searchContacts
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | query | Query | STRING | The plain-text query for the request.The query is used to match prefix phrases of the fields on a person. For example, a person with name "foo name" matches queries such as "f", "fo", "foo", "foo n", "nam", etc., but not "oo n". | true |
 | readMask | Read Mask | ARRAY <details> <summary> Items </summary> [STRING] </details> | A field mask to restrict which fields on each person are returned. | true |
-| pageSize | Page Size | INTEGER | The number of results to return per page. | true |
+| pageSize | Page Size | INTEGER | The number of results to return per page. | false |
 
 #### Example JSON Structure
 ```json
@@ -293,46 +307,9 @@ Name: searchContacts
 
 #### Output
 
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
-Type: ARRAY
-
-
-Items Type: OBJECT
-
-
-#### Properties
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| names | ARRAY <details> <summary> Items </summary> [&#123;STRING\(familyName), STRING\(givenName), STRING\(middleName)&#125;] </details> | The person's names. |
-| organizations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(title)&#125;] </details> | The person's past or current organizations. |
-| emailAddresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value)&#125;] </details> | The person's email addresses. |
-| phoneNumbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value)&#125;] </details> | The person's phone numbers. |
-
-
-
-
-
-#### Output Example
-```json
-[ {
-  "names" : [ {
-    "familyName" : "",
-    "givenName" : "",
-    "middleName" : ""
-  } ],
-  "organizations" : [ {
-    "name" : "",
-    "title" : ""
-  } ],
-  "emailAddresses" : [ {
-    "value" : ""
-  } ],
-  "phoneNumbers" : [ {
-    "value" : ""
-  } ]
-} ]
-```
 
 
 
