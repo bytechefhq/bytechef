@@ -67,7 +67,7 @@ public class MondayCreateBoardAction {
                             .properties(
                                 string(ID)
                                     .description("ID of the board"),
-                                string(BOARD_NAME)
+                                string("name")
                                     .description("Name of the board.")))))
         .perform(MondayCreateBoardAction::perform);
 
@@ -75,7 +75,7 @@ public class MondayCreateBoardAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String query = "mutation{create_board(board_name: \"%s\", description: \"%s\", board_kind: %s){id board_name}}"
+        String query = "mutation{create_board(board_name: \"%s\", description: \"%s\", board_kind: %s){id name}}"
             .formatted(inputParameters.getRequiredString(BOARD_NAME), inputParameters.getString(DESCRIPTION, ""),
                 inputParameters.getRequiredString(BOARD_KIND));
 
