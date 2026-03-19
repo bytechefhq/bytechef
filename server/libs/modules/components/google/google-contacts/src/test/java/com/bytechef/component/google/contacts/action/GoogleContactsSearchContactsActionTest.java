@@ -21,76 +21,76 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.READ_MASK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.people.v1.PeopleService.People;
-import com.google.api.services.people.v1.model.EmailAddress;
-import com.google.api.services.people.v1.model.Name;
-import com.google.api.services.people.v1.model.Person;
-import com.google.api.services.people.v1.model.SearchResponse;
-import com.google.api.services.people.v1.model.SearchResult;
-import java.io.IOException;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 
 /**
  * @author Erhan Tunçel
  * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-class GoogleContactsSearchContactsActionTest extends AbstractGoogleContactsActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class GoogleContactsSearchContactsActionTest {
 
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final People mockedPeople = mock(People.class);
-    private final People.SearchContacts mockedSearchContacts = mock(People.SearchContacts.class);
-    private final SearchResponse mockedSearchResponse = mock(SearchResponse.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
+        QUERY, "query", READ_MASK, List.of("addresses", "names"), PAGE_SIZE, 10));
+    private final Map<String, Object> responseMap = Map.of("results", List.of());
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() throws IOException {
-        mockedParameters = MockParametersFactory.create(
-            Map.of(QUERY, "Name", READ_MASK, List.of("names", "organizations"), PAGE_SIZE, 5));
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        Person person = new Person()
-            .setNames(List.of(new Name().setGivenName("Name")))
-            .setEmailAddresses(List.of(new EmailAddress().setValue("name@localhost.com")));
-        SearchResult searchResult = new SearchResult();
-        searchResult.setPerson(person);
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(
+            stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture(), integerArgumentCaptor.capture(),
+            stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
 
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getPeopleService(mockedParameters))
-                .thenReturn(mockedPeopleService);
+        Object result = GoogleContactsSearchContactsAction.perform(
+            mockedParameters, null, mockedContext);
 
-            when(mockedPeopleService.people())
-                .thenReturn(mockedPeople);
-            when(mockedPeople.searchContacts())
-                .thenReturn(mockedSearchContacts);
-            when(mockedSearchContacts.setQuery(stringArgumentCaptor.capture()))
-                .thenReturn(mockedSearchContacts);
-            when(mockedSearchContacts.setReadMask(stringArgumentCaptor.capture()))
-                .thenReturn(mockedSearchContacts);
-            when(mockedSearchContacts.setPageSize(integerArgumentCaptor.capture()))
-                .thenReturn(mockedSearchContacts);
-            when(mockedSearchContacts.execute())
-                .thenReturn(mockedSearchResponse);
-            when(mockedSearchResponse.getResults())
-                .thenReturn(List.of(searchResult));
+        assertEquals(List.of(), result);
 
-            List<Person> result = GoogleContactsSearchContactsAction
-                .perform(mockedParameters, mockedParameters, mockedActionContext);
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-            assertNotNull(result);
-            assertEquals(List.of(person), result);
+        assertNotNull(capturedFunction);
 
-            assertEquals(List.of("Name", "names,organizations"), stringArgumentCaptor.getAllValues());
-            assertEquals(5, integerArgumentCaptor.getValue());
-        }
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
+
+        List<String> expectedStrings = List.of(
+            "/people:searchContacts", QUERY, "query", PAGE_SIZE, READ_MASK, "addresses,names");
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
+        assertEquals(10, integerArgumentCaptor.getValue());
     }
 }
