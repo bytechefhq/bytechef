@@ -38,10 +38,13 @@ public class PushoverComponentHandler implements ComponentHandler {
             "Pushover is a notification service that sends real-time alerts to mobile and desktop devices, " +
                 "integrating with apps, scripts, and services.")
         .icon("path:assets/pushover.svg")
+        .customAction(true)
+        .customActionHelp("", "https://pushover.net/api")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(PushoverConnection.CONNECTION_DEFINITION)
         .actions(PushoverSendNotificationAction.ACTION_DEFINITION)
-        .clusterElements(tool(PushoverSendNotificationAction.ACTION_DEFINITION));
+        .clusterElements(tool(PushoverSendNotificationAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
