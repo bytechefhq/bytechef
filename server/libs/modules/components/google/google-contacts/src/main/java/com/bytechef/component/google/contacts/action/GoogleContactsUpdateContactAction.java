@@ -95,6 +95,7 @@ public class GoogleContactsUpdateContactAction {
                 .controlType(ControlType.PHONE)
                 .required(false))
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/google-contacts_v1#update-contact")
         .perform(GoogleContactsUpdateContactAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
