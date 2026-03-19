@@ -63,6 +63,7 @@ public class GoogleContactsCreateGroupAction {
                                 "The name translated and formatted in the viewer's account locale or the Accept-" +
                                     "Language HTTP header locale for system groups names. Group names set by the " +
                                     "owner are the same as name."))))
+        .help("", "https://docs.bytechef.io/reference/components/google-contacts_v1#create-group")
         .perform(GoogleContactsCreateGroupAction::perform);
 
     private GoogleContactsCreateGroupAction() {

@@ -31,6 +31,7 @@ import com.google.auto.service.AutoService;
 
 /**
  * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 @AutoService(ComponentHandler.class)
 public class GoogleContactsComponentHandler implements ComponentHandler {
@@ -41,6 +42,8 @@ public class GoogleContactsComponentHandler implements ComponentHandler {
             "Google Contacts is a cloud-based address book service provided by Google, allowing users to store, " +
                 "manage, and synchronize their contact information across multiple devices and platforms.")
         .customAction(true)
+        .customActionHelp("", "https://developers.google.com/people")
+        .version(1)
         .icon("path:assets/google-contacts.svg")
         .categories(ComponentCategory.CRM)
         .connection(CONNECTION_DEFINITION)
