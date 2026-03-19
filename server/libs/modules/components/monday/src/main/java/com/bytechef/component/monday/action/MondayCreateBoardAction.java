@@ -41,6 +41,7 @@ public class MondayCreateBoardAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createBoard")
         .title("Create Board")
         .description("Create a new board.")
+        .help("", "https://docs.bytechef.io/reference/components/monday_v1#create-board")
         .properties(
             string(BOARD_NAME)
                 .label("Board Name")

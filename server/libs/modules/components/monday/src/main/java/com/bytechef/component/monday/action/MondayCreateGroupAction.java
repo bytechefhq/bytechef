@@ -42,20 +42,23 @@ public class MondayCreateGroupAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createGroup")
         .title("Create Group")
-        .description("Creates a new group in board.")
+        .description("Creates a new group in an existing board.")
+        .help("", "https://docs.bytechef.io/reference/components/monday_v1#create-group")
         .properties(
             string(WORKSPACE_ID)
                 .label("Workspace ID")
+                .description("ID of the workspace where the board is located.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(false),
             string(BOARD_ID)
                 .label("Board ID")
-                .description("Id of the board where new item will be created.")
+                .description("ID of the board where new item will be created.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true),
             string(GROUP_NAME)
                 .label("Group Name")
+                .description("The new group's name.")
                 .required(true))
         .output(
             outputSchema(

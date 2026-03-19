@@ -46,10 +46,12 @@ public class MondayCreateItemAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createItem")
         .title("Create Item")
-        .description("Create a new item in a board.")
+        .description("Create a new item in an existing board.")
+        .help("", "https://docs.bytechef.io/reference/components/monday_v1#create-item")
         .properties(
             string(WORKSPACE_ID)
                 .label("Workspace ID")
+                .description("ID of the workspace where the board is located.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(false),
             string(BOARD_ID)
