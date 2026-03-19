@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a notification.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pushover_v1#send-notification"
+    },
     "metadata": null,
     "name": "sendNotification",
     "outputDefinition": {
@@ -890,14 +893,20 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/pushover_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://pushover.net/api"
+  },
   "description": "Pushover is a notification service that sends real-time alerts to mobile and desktop devices, integrating with apps, scripts, and services.",
   "icon": "path:assets/pushover.svg",
   "metadata": null,
