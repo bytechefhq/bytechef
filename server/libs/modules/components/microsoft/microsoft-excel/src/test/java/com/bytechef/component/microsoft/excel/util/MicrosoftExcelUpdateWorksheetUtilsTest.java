@@ -29,9 +29,11 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -78,17 +80,13 @@ class MicrosoftExcelUpdateWorksheetUtilsTest {
                 .thenReturn(mockedExecutor);
 
             assertEquals(map, MicrosoftExcelUpdateWorksheetUtils.updateRange(mockedParameters, mockedContext, 2, row));
-
-            Body body = bodyArgumentCaptor.getValue();
-
-            assertEquals(Map.of(VALUES, List.of(row)), body.getContent());
-
+            assertEquals(Body.of(Map.of(VALUES, List.of(row)), BodyContentType.JSON), bodyArgumentCaptor.getValue());
             assertNotNull(httpFunctionArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
             Configuration configuration = configurationBuilder.build();
 
-            assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
             assertEquals(
                 "/me/drive/items/1/workbook/worksheets/test/range(address='A2:C2')",
                 stringArgumentCaptor.getValue());

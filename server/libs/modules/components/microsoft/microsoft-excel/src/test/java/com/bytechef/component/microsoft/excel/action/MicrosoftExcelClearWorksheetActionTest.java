@@ -29,8 +29,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.Configuration;
-import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
@@ -49,16 +48,14 @@ import org.mockito.ArgumentCaptor;
 class MicrosoftExcelClearWorksheetActionTest extends AbstractMicrosoftExcelActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(
-            Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test", IS_THE_FIRST_ROW_HEADER, true));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test", IS_THE_FIRST_ROW_HEADER, true));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
         Context mockedContext, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -74,23 +71,16 @@ class MicrosoftExcelClearWorksheetActionTest extends AbstractMicrosoftExcelActio
                 parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
             .thenReturn(3);
 
-        Object result =
-            MicrosoftExcelClearWorksheetAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = MicrosoftExcelClearWorksheetAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
         assertNull(result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
-
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Configuration configuration = configurationBuilder.build();
-
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
         assertEquals(
             "/me/drive/items/1/workbook/worksheets/test/range(address='A2:C3')/clear",
             stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of("applyTo", "Contents"), body.getContent());
+        assertEquals(
+            Body.of(Map.of("applyTo", "Contents"), BodyContentType.JSON), bodyArgumentCaptor.getValue());
         assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
         assertEquals(List.of(mockedContext, mockedContext), actionContextArgumentCaptor.getAllValues());
     }

@@ -28,11 +28,10 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.ge
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -65,10 +64,7 @@ public class MicrosoftExcelClearWorksheetAction {
                     .formatted(
                         inputParameters.getRequiredString(WORKBOOK_ID),
                         inputParameters.getRequiredString(WORKSHEET_NAME), range)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .body(Body.of(
-                List.of("applyTo", "Contents")
-                    .toArray()))
+            .body(Body.of(Map.of("applyTo", "Contents")))
             .execute();
 
         return null;

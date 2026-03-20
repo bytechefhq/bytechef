@@ -29,10 +29,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.Configuration;
-import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -49,16 +46,14 @@ import org.mockito.ArgumentCaptor;
 class MicrosoftExcelDeleteRowActionTest extends AbstractMicrosoftExcelActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(
-            Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test", ROW_NUMBER, 2));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test", ROW_NUMBER, 2));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
         Context mockedContext, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -74,11 +69,6 @@ class MicrosoftExcelDeleteRowActionTest extends AbstractMicrosoftExcelActionTest
 
         assertNull(result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
-
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Configuration configuration = configurationBuilder.build();
-
-        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals(
             "/me/drive/items/1/workbook/worksheets/test/range(address='A2:C2')/delete",
             stringArgumentCaptor.getValue());
