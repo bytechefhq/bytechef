@@ -14,17 +14,19 @@ import {TabValueType} from '@/shared/types';
 import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 
+interface WorkflowExecutionsTestOutputProps {
+    onCloseClick?: () => void;
+    resizablePanelSize?: number;
+    workflowIsRunning: boolean;
+    workflowTestExecution?: WorkflowTestExecution;
+}
+
 const WorkflowExecutionsTestOutput = ({
     onCloseClick,
     resizablePanelSize = 350,
     workflowIsRunning,
     workflowTestExecution,
-}: {
-    resizablePanelSize?: number;
-    workflowIsRunning: boolean;
-    workflowTestExecution?: WorkflowTestExecution;
-    onCloseClick?: () => void;
-}) => {
+}: WorkflowExecutionsTestOutputProps) => {
     const [activeTab, setActiveTab] = useState<TabValueType>('input');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
