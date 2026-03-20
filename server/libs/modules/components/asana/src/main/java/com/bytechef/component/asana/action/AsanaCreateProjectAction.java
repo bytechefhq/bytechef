@@ -18,6 +18,8 @@ package com.bytechef.component.asana.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -44,8 +46,8 @@ public class AsanaCreateProjectAction {
                 "path", "/projects", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("data").properties(string("workspace").label("Workspace")
-            .description("The workspace to create the project in.")
+        .properties(object("data").properties(string("workspace").label("Workspace GID")
+            .description("The GID of the workspace to create the project in.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getWorkspaceOptions),
             string("name").label("Name")
@@ -54,8 +56,8 @@ public class AsanaCreateProjectAction {
             string("notes").label("Notes")
                 .description("Free-form textual information associated with the project (ie., its description).")
                 .required(true),
-            string("team").label("Team")
-                .description("The team that this project is shared with.")
+            string("team").label("Team GID")
+                .description("The GID of the team that this project is shared with.")
                 .required(true)
                 .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getTeamOptions)
                 .optionsLookupDependsOn("data.workspace"))
@@ -65,35 +67,65 @@ public class AsanaCreateProjectAction {
             .label("Data")
             .required(false))
         .output(
-            outputSchema(
-                object()
-                    .properties(object("data")
-                        .properties(string("gid").description("Globally unique identifier for the project.")
+            outputSchema(object()
+                .properties(object("data")
+                    .properties(string("gid").description("Globally unique identifier for the project.")
+                        .required(false),
+                        string("resource_type").description("The base type of this resource.")
                             .required(false),
-                            string("name").description("Name of the project.")
+                        bool("archived").description("Whether the project is archived.")
+                            .required(false),
+                        string("color").description("The color of the project.")
+                            .required(false),
+                        string("icon").description("The icon of the project.")
+                            .required(false),
+                        dateTime("created_at").description("The time at which this project was created.")
+                            .required(false),
+                        object("current_status_update")
+                            .properties(
+                                string("gid").description("Globally unique identifier of the resource, as a string.")
+                                    .required(false),
+                                string("resource_type").description("The base type of this resource.")
+                                    .required(false),
+                                string("title").description("The title of the status update.")
+                                    .required(false),
+                                string("resource_subtype").description("The subtype of this resource.")
+                                    .required(false))
+                            .description("The latest status_update posted to this project.")
+                            .required(false),
+                        string("default_view").description("The default view of a project.")
+                            .required(false),
+                        string(
+                            "due_on")
+                                .description(
+                                    "The day on which this project is due. This takes a date with format YYYY-MM-DD.")
                                 .required(false),
-                            string("notes")
+                        string("html_notes").description("The notes of the project with formatting as HTML.")
+                            .required(false),
+                        string("name").description("Name of the project.")
+                            .required(false),
+                        string(
+                            "notes")
                                 .description(
                                     "Free-form textual information associated with the project (ie., its description).")
                                 .required(false),
-                            object("team")
-                                .properties(string("gid").description("Globally unique identifier for the team.")
-                                    .required(false),
-                                    string("name").description("Name of the team.")
-                                        .required(false))
-                                .description("The team that this project is shared with.")
-                                .required(false),
-                            object("workspace")
-                                .properties(string("gid").description("Globally unique identifier for the workspace.")
-                                    .required(false),
-                                    string("name").description("Name of the workspace.")
-                                        .required(false))
-                                .description("The workspace or organization that the project is associated with.")
+                        object("team").properties(string("gid").description("Globally unique identifier for the team.")
+                            .required(false),
+                            string("name").description("Name of the team.")
                                 .required(false))
-                        .required(false))
-                    .metadata(
-                        Map.of(
-                            "responseType", ResponseType.JSON))))
+                            .description("The team that this project is shared with.")
+                            .required(false),
+                        object("workspace")
+                            .properties(string("gid").description("Globally unique identifier for the workspace.")
+                                .required(false),
+                                string("name").description("Name of the workspace.")
+                                    .required(false))
+                            .description("The workspace or organization that the project is associated with.")
+                            .required(false))
+                    .required(false))
+                .metadata(
+                    Map.of(
+                        "responseType", ResponseType.JSON))))
         .help("", "https://docs.bytechef.io/reference/components/asana_v1#create-project");
 
     private AsanaCreateProjectAction() {
