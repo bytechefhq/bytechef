@@ -1,10 +1,11 @@
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
 import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/WorkflowExecutionsHeader';
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
-import WorkflowExecutionsTaskAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsTaskAccordionItem';
-import WorkflowExecutionsTriggerAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsTriggerAccordionItem';
+import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
+import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {useCallback, useState} from 'react';
@@ -38,20 +39,24 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
                             type="multiple"
                         >
                             {triggerExecution && (
-                                <WorkflowExecutionsTriggerAccordionItem
-                                    onTaskClick={onTaskClick}
-                                    selectedItem={selectedItem}
-                                    triggerExecution={triggerExecution}
-                                />
+                                <WorkflowExecutionsAccordionItem
+                                    execution={triggerExecution}
+                                    onExecutionClick={onTaskClick}
+                                    selectedExecutionId={selectedItem?.id || ''}
+                                >
+                                    <WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />
+                                </WorkflowExecutionsAccordionItem>
                             )}
 
                             {taskExecutions.map((taskExecution) => (
-                                <WorkflowExecutionsTaskAccordionItem
+                                <WorkflowExecutionsAccordionItem
+                                    execution={taskExecution}
                                     key={taskExecution.id}
-                                    onTaskClick={onTaskClick}
-                                    selectedTaskExecutionId={selectedItem?.id || ''}
-                                    taskExecution={taskExecution}
-                                />
+                                    onExecutionClick={onTaskClick}
+                                    selectedExecutionId={selectedItem?.id || ''}
+                                >
+                                    <WorkflowTaskExecutionItem taskExecution={taskExecution} />
+                                </WorkflowExecutionsAccordionItem>
                             ))}
                         </Accordion>
                     </ScrollArea>
