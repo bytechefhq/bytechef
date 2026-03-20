@@ -1,50 +1,60 @@
-import Button from '@/components/Button/Button';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
+import ExecutionAccordionButton from '@/shared/components/workflow-executions/ExecutionAccordionButton';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
-import {TaskExecution, TaskExecutionFromJSON} from '@/shared/middleware/automation/workflow/execution';
+import {
+    TaskExecution,
+    TaskExecutionFromJSON,
+    TriggerExecution,
+} from '@/shared/middleware/automation/workflow/execution';
+import {type ReactNode} from 'react';
 import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
 
-const WorkflowExecutionsTaskAccordionItem = ({
-    onTaskClick,
-    selectedTaskExecutionId,
-    taskExecution,
+const isTaskExecution = (execution: TaskExecution | TriggerExecution): execution is TaskExecution =>
+    'jobId' in execution;
+
+const WorkflowExecutionsAccordionItem = ({
+    children,
+    execution,
+    onExecutionClick,
+    selectedExecutionId,
 }: {
-    onTaskClick: (taskExecution: TaskExecution) => void;
-    selectedTaskExecutionId: string;
-    taskExecution: TaskExecution;
+    children: ReactNode;
+    execution: TaskExecution | TriggerExecution;
+    onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
+    selectedExecutionId: string;
 }) => {
-    const hasChildren = taskExecution.children && taskExecution.children.length > 0;
-    const hasIterations = taskExecution.iterations && taskExecution.iterations.length > 0;
+    const taskExecution = isTaskExecution(execution) ? execution : undefined;
+
+    const hasChildren = taskExecution?.children && taskExecution.children.length > 0;
+    const hasIterations = taskExecution?.iterations && taskExecution.iterations.length > 0;
 
     const isExpandable = hasChildren || hasIterations;
-    const isSelected = selectedTaskExecutionId === taskExecution.id;
+    const isSelected = selectedExecutionId === execution.id;
 
     if (!isExpandable) {
         return (
-            <Button
-                className={twMerge(
-                    'active:text-content-primary h-auto w-full justify-between rounded-md border border-stroke-neutral-primary p-2 text-left transition-colors hover:border-stroke-brand-primary hover:bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-stroke-brand-focus focus-visible:ring-0 focus-visible:transition-colors active:bg-transparent [&_svg]:size-5',
-                    isSelected &&
-                        'border-stroke-brand-primary bg-surface-neutral-secondary hover:bg-surface-neutral-secondary active:bg-surface-neutral-secondary'
-                )}
+            <ExecutionAccordionButton
+                isSelected={isSelected}
                 onClick={() => {
                     if (!isSelected) {
-                        onTaskClick(taskExecution);
+                        onExecutionClick(execution);
                     }
                 }}
-                type="button"
-                variant="ghost"
             >
-                <WorkflowTaskExecutionItem taskExecution={taskExecution} />
-            </Button>
+                {children}
+            </ExecutionAccordionButton>
         );
     }
 
+    if (!taskExecution) {
+        return;
+    }
+
     return (
-        <AccordionItem className="border-b-0" key={taskExecution.id} value={taskExecution.id || ''}>
+        <AccordionItem className="border-b-0" key={execution.id} value={execution.id || ''}>
             <AccordionTrigger
                 className={twMerge(
                     'group flex w-full items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline focus-visible:outline-stroke-brand-focus focus-visible:transition-colors [&_svg]:size-5',
@@ -53,11 +63,11 @@ const WorkflowExecutionsTaskAccordionItem = ({
                 )}
                 onClick={() => {
                     if (!isSelected) {
-                        onTaskClick(taskExecution);
+                        onExecutionClick(execution);
                     }
                 }}
             >
-                <WorkflowTaskExecutionItem taskExecution={taskExecution} />
+                {children}
             </AccordionTrigger>
 
             <AccordionContent
@@ -129,12 +139,16 @@ const WorkflowExecutionsTaskAccordionItem = ({
                                         <AccordionContent className="border-l border-stroke-neutral-secondary p-0 pl-4">
                                             <Accordion className="mt-2 space-y-2" type="multiple">
                                                 {convertedIterationItems.map((convertedIterationItem) => (
-                                                    <WorkflowExecutionsTaskAccordionItem
+                                                    <WorkflowExecutionsAccordionItem
+                                                        execution={convertedIterationItem}
                                                         key={convertedIterationItem.id}
-                                                        onTaskClick={onTaskClick}
-                                                        selectedTaskExecutionId={selectedTaskExecutionId}
-                                                        taskExecution={convertedIterationItem}
-                                                    />
+                                                        onExecutionClick={onExecutionClick}
+                                                        selectedExecutionId={selectedExecutionId}
+                                                    >
+                                                        <WorkflowTaskExecutionItem
+                                                            taskExecution={convertedIterationItem}
+                                                        />
+                                                    </WorkflowExecutionsAccordionItem>
                                                 ))}
                                             </Accordion>
                                         </AccordionContent>
@@ -146,12 +160,14 @@ const WorkflowExecutionsTaskAccordionItem = ({
                 ) : (
                     <Accordion className="mt-2 space-y-2" type="multiple">
                         {taskExecution.children?.map((childTaskExecution) => (
-                            <WorkflowExecutionsTaskAccordionItem
+                            <WorkflowExecutionsAccordionItem
+                                execution={childTaskExecution}
                                 key={childTaskExecution.id}
-                                onTaskClick={onTaskClick}
-                                selectedTaskExecutionId={selectedTaskExecutionId}
-                                taskExecution={childTaskExecution}
-                            />
+                                onExecutionClick={onExecutionClick}
+                                selectedExecutionId={selectedExecutionId}
+                            >
+                                <WorkflowTaskExecutionItem taskExecution={childTaskExecution} />
+                            </WorkflowExecutionsAccordionItem>
                         ))}
                     </Accordion>
                 )}
@@ -160,4 +176,4 @@ const WorkflowExecutionsTaskAccordionItem = ({
     );
 };
 
-export default WorkflowExecutionsTaskAccordionItem;
+export default WorkflowExecutionsAccordionItem;
