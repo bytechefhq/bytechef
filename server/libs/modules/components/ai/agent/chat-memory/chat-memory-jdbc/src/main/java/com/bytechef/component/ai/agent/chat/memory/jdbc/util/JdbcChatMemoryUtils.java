@@ -25,12 +25,17 @@ import com.bytechef.platform.component.definition.ai.agent.DataSourceFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import java.sql.DatabaseMetaData;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.support.JdbcUtils;
 
 /**
  * @author Ivica Cardic
@@ -43,6 +48,8 @@ public class JdbcChatMemoryUtils {
 
         DataSource dataSource = getDataSource(extensions, componentConnections, clusterElementDefinitionService);
 
+        initializeSchema(dataSource);
+
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
         JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
@@ -51,6 +58,34 @@ public class JdbcChatMemoryUtils {
             .jdbcTemplate(jdbcTemplate)
             .dialect(dialect)
             .build();
+    }
+
+    private static void initializeSchema(DataSource dataSource) {
+        String schemaScript = resolveSchemaScript(dataSource);
+
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(new ClassPathResource(schemaScript));
+
+        populator.setContinueOnError(true);
+
+        DatabasePopulatorUtils.execute(populator, dataSource);
+    }
+
+    private static String resolveSchemaScript(DataSource dataSource) {
+        String productName = null;
+
+        try {
+            productName = JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductName);
+        } catch (Exception ignored) {
+        }
+
+        String schemaName = switch (productName != null ? productName : "") {
+            case "MySQL" -> "schema-mysql.sql";
+            case "MariaDB" -> "schema-mariadb.sql";
+            case "Oracle" -> "schema-oracle.sql";
+            default -> "schema-postgresql.sql";
+        };
+
+        return "org/springframework/ai/chat/memory/repository/jdbc/" + schemaName;
     }
 
     public static DataSource getDataSource(
