@@ -33,7 +33,7 @@ import {PropertyAllType} from '@/shared/types';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, PlusIcon} from 'lucide-react';
-import {Dispatch, SetStateAction, useCallback, useState} from 'react';
+import {Dispatch, SetStateAction, useCallback, useMemo, useState} from 'react';
 import {UseFormReturn, useForm} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
@@ -257,7 +257,7 @@ const WorkflowTestConfigurationDialog = ({
         });
     }
 
-    const getConnectionsToRender = (): Array<{
+    const connectionsToRender = useMemo((): Array<{
         connection: ComponentConnection;
         groupedIndices?: number[];
         index: number;
@@ -272,12 +272,13 @@ const WorkflowTestConfigurationDialog = ({
 
         for (const [index, connection] of componentConnections.entries()) {
             const componentName = connection.componentName;
+            const existingIndices = connectionGroupMap.get(componentName);
 
-            if (!connectionGroupMap.has(componentName)) {
-                connectionGroupMap.set(componentName, []);
+            if (existingIndices) {
+                existingIndices.push(index);
+            } else {
+                connectionGroupMap.set(componentName, [index]);
             }
-
-            connectionGroupMap.get(componentName)!.push(index);
         }
 
         const groupedConnections = Array.from(connectionGroupMap.values()).map((indices) => ({
@@ -287,9 +288,7 @@ const WorkflowTestConfigurationDialog = ({
         }));
 
         return groupedConnections;
-    };
-
-    const connectionsToRender = getConnectionsToRender();
+    }, [componentConnections, connectionsGrouped]);
 
     return (
         <Dialog onOpenChange={onClose} open={true}>
