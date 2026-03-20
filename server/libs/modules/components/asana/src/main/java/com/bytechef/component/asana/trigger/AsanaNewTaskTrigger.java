@@ -53,18 +53,16 @@ public class AsanaNewTaskTrigger {
         .title("New Task")
         .description("Triggers when new task is created.")
         .properties(
-            object("data")
-                .properties(
-                    string(WORKSPACE)
-                        .label("Workspace")
-                        .description("The workspace where the project is located.")
-                        .required(true)
-                        .options((OptionsFunction<String>) AsanaUtils::getWorkspaceOptions)),
+            string(WORKSPACE)
+                .label("Workspace")
+                .description("The workspace where the project is located.")
+                .required(true)
+                .options((OptionsFunction<String>) AsanaUtils::getWorkspaceOptions),
             string(RESOURCE)
                 .label("Project")
                 .description("The project to monitor for newly created tasks.")
-                .options((OptionsFunction<String>) AsanaUtils::getProjectOptions)
-                .optionsLookupDependsOn("data.workspace")
+                .options((OptionsFunction<String>) AsanaUtils::getProjectsOptions)
+                .optionsLookupDependsOn(WORKSPACE)
                 .required(true))
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
@@ -72,38 +70,29 @@ public class AsanaNewTaskTrigger {
                 object()
                     .properties(
                         string(GID)
-                            .label("Task ID")
                             .description("Globally unique identifier of the task."),
                         string("name")
-                            .label("Name")
                             .description("Name of the task."),
                         string("resource_type")
-                            .label("Resource Type")
                             .description("Type of the resource (task)."),
                         string("created_at")
-                            .label("Created At")
                             .description("Timestamp when the task was created."),
                         string("modified_at")
-                            .label("Modified At")
                             .description("Timestamp when the task was last modified."),
                         string("completed")
-                            .label("Completed")
                             .description("Indicates whether the task is completed."),
                         string("notes")
-                            .label("Notes")
                             .description("Description or notes of the task."),
                         object("assignee")
-                            .label("Assignee")
                             .description("User assigned to the task.")
                             .properties(
-                                string(GID).label("User ID"),
-                                string("name").label("Name")),
+                                string(GID),
+                                string("name")),
                         object("project")
-                            .label("Project")
                             .description("Project the task belongs to.")
                             .properties(
-                                string(GID).label("Project ID"),
-                                string("name").label("Name")))))
+                                string(GID),
+                                string("name")))))
         .webhookEnable(AsanaNewTaskTrigger::webhookEnable)
         .webhookValidateOnEnable(AsanaNewTaskTrigger::webhookValidateOnEnable)
         .webhookDisable(AsanaNewTaskTrigger::webhookDisable)
@@ -113,21 +102,27 @@ public class AsanaNewTaskTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
         String resource = inputParameters.getRequiredString(RESOURCE);
 
         Map<String, ?> newWebhook = context.http(http -> http.post("/webhooks"))
-            .body(Http.Body.of("data",
-                Map.of(RESOURCE, resource, TARGET, webhookUrl, "filters",
-                    List.of(Map.of("action", "added", "resource_type", "task")))))
+            .body(
+                Http.Body.of(
+                    "data",
+                    Map.of(
+                        RESOURCE, resource,
+                        TARGET, webhookUrl,
+                        "filters", List.of(Map.of("action", "added", "resource_type", "task")))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
         if (newWebhook.get("data") instanceof Map<?, ?> map) {
             return new WebhookEnableOutput(Map.of(GID, map.get("gid")), null);
         }
+
         throw new ProviderException("Failed to start Asana webhook.");
     }
 
@@ -143,15 +138,36 @@ public class AsanaNewTaskTrigger {
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
-        Map<String, Object> payload = body.getContent(new TypeReference<>() {});
+        Map<String, List<Map<String, ?>>> payload = body.getContent(new TypeReference<>() {});
 
-        Object eventsObj = payload.get("events");
+        List<Map<String, ?>> events = payload.get("events");
 
-        if (eventsObj instanceof List<?> events && events.isEmpty()) {
-            throw new ProviderException("Skipping execution due to empty events");
+        if (events.isEmpty()) {
+            context.log(log -> log.debug("A heartbeat webhook to verify that the endpoint is still available."));
+
+            if (context.isEditorEnvironment()) {
+                throw new ProviderException("Heartbeat webhook received.");
+            }
+
+            return null;
+        } else {
+            for (Map<String, ?> event : events) {
+                if (event.get("parent") instanceof Map<?, ?> parent) {
+                    Object resourceType = parent.get("resource_type");
+
+                    if (resourceType.equals("project") && event.get("resource") instanceof Map<?, ?> resource) {
+                        String taskGid = (String) resource.get("gid");
+
+                        return context.http(http -> http.get("/tasks/%s".formatted(taskGid)))
+                            .configuration(Http.responseType(Http.ResponseType.JSON))
+                            .execute()
+                            .getBody();
+                    }
+                }
+            }
         }
 
-        return payload;
+        throw new ProviderException("Asana webhook received an unexpected event.");
     }
 
     public static WebhookValidateResponse webhookValidateOnEnable(
@@ -163,9 +179,7 @@ public class AsanaNewTaskTrigger {
 
         if (hookSecret != null) {
             return new WebhookValidateResponse(
-                "",
-                Map.of("X-Hook-Secret", List.of(hookSecret)),
-                HttpStatus.OK.getValue());
+                null, Map.of("X-Hook-Secret", List.of(hookSecret)), HttpStatus.OK.getValue());
         }
 
         return WebhookValidateResponse.badRequest();
