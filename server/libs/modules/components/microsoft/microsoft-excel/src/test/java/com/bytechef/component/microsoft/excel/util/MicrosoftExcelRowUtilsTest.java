@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
@@ -49,9 +50,8 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 class MicrosoftExcelRowUtilsTest {
 
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(
-            Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -79,7 +79,7 @@ class MicrosoftExcelRowUtilsTest {
             assertNotNull(httpFunctionArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-            Http.Configuration configuration = configurationBuilder.build();
+            Configuration configuration = configurationBuilder.build();
 
             assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
             assertEquals(

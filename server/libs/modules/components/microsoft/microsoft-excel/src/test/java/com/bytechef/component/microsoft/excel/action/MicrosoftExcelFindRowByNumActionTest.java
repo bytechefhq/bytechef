@@ -56,8 +56,8 @@ class MicrosoftExcelFindRowByNumActionTest extends AbstractMicrosoftExcelActionT
                     listArgumentCaptor.capture()))
                 .thenReturn(map);
 
-            Object result =
-                MicrosoftExcelFindRowByNumAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            Object result = MicrosoftExcelFindRowByNumAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(map, result);
             assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
