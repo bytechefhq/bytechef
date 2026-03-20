@@ -1,4 +1,3 @@
-import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {
     DeleteClusterElementParameter200Response,
     UpdateClusterElementParameterOperationRequest,
@@ -96,7 +95,7 @@ export default function saveProperty({
             return;
         }
 
-        const clusterElementType = convertNameToSnakeCase(currentNode.clusterElementType as string);
+        const clusterElementType = currentNode.clusterElementType as string;
         const clusterElementWorkflowNodeName = currentNode.workflowNodeName;
 
         enqueueWorkflowMutation(() =>

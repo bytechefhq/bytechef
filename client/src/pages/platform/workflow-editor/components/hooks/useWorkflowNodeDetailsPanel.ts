@@ -357,9 +357,7 @@ export default function useWorkflowNodeDetailsPanel({
 
     const clusterElementDisplayConditionsQuery = useGetClusterElementParameterDisplayConditionsQuery(
         {
-            clusterElementType: currentNode?.clusterElementType
-                ? convertNameToSnakeCase(currentNode.clusterElementType)
-                : '',
+            clusterElementType: currentNode?.clusterElementType || '',
             clusterElementWorkflowNodeName: currentNode?.workflowNodeName || '',
             environmentId: currentEnvironmentId,
             id: workflow.id!,

@@ -5,7 +5,6 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import {useClusterElementOptionsQuery} from '@/shared/middleware/graphql';
 import {
@@ -153,9 +152,7 @@ const PropertyComboBox = ({
         () => ({
             loadDependencyValueKey: lookupDependsOnValuesKey,
             request: {
-                clusterElementType: currentNode?.clusterElementType
-                    ? convertNameToSnakeCase(currentNode.clusterElementType)
-                    : '',
+                clusterElementType: currentNode?.clusterElementType || '',
                 clusterElementWorkflowNodeName: currentNode?.workflowNodeName || '',
                 environmentId: currentEnvironmentId,
                 id: workflowId,
