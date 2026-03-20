@@ -15,17 +15,19 @@ import {twMerge} from 'tailwind-merge';
 const isTaskExecution = (execution: TaskExecution | TriggerExecution): execution is TaskExecution =>
     'jobId' in execution;
 
+interface WorkflowExecutionsAccordionItemProps {
+    children: ReactNode;
+    execution: TaskExecution | TriggerExecution;
+    onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
+    selectedExecutionId: string;
+}
+
 const WorkflowExecutionsAccordionItem = ({
     children,
     execution,
     onExecutionClick,
     selectedExecutionId,
-}: {
-    children: ReactNode;
-    execution: TaskExecution | TriggerExecution;
-    onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
-    selectedExecutionId: string;
-}) => {
+}: WorkflowExecutionsAccordionItemProps) => {
     const taskExecution = isTaskExecution(execution) ? execution : undefined;
 
     const hasChildren = taskExecution?.children && taskExecution.children.length > 0;
