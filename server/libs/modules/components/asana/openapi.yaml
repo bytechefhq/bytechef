@@ -38,7 +38,8 @@ paths:
                   properties:
                     workspace:
                       type: "string"
-                      description: "The workspace to create the project in."
+                      title: "Workspace GID"
+                      description: "The GID of the workspace to create the project in."
                       x-dynamic-options: true
                     name:
                       type: "string"
@@ -48,7 +49,8 @@ paths:
                       description: "Free-form textual information associated with the project (ie., its description)."
                     team:
                       type: "string"
-                      description: "The team that this project is shared with."
+                      title: "Team GID"
+                      description: "The GID of the team that this project is shared with."
                       x-dynamic-options: true
                       x-dynamic-options-dependency:
                         - "data.workspace"
@@ -66,6 +68,47 @@ paths:
                       gid:
                         type: "string"
                         description: "Globally unique identifier for the project."
+                      resource_type:
+                        type: "string"
+                        description: "The base type of this resource."
+                      archived:
+                        type: "boolean"
+                        description: "Whether the project is archived."
+                      color:
+                        type: "string"
+                        description: "The color of the project."
+                      icon:
+                        type: "string"
+                        description: "The icon of the project."
+                      created_at:
+                        type: "string"
+                        format: "date-time"
+                        description: "The time at which this project was created."
+                      current_status_update:
+                        description: "The latest status_update posted to this project."
+                        type: "object"
+                        properties:
+                          gid:
+                            type: "string"
+                            description: "Globally unique identifier of the resource, as a string."
+                          resource_type:
+                            type: "string"
+                            description: "The base type of this resource."
+                          title:
+                            type: "string"
+                            description: "The title of the status update."
+                          resource_subtype:
+                            type: "string"
+                            description: "The subtype of this resource."
+                      default_view:
+                        type: "string"
+                        description: "The default view of a project."
+                      due_on:
+                        type: "string"
+                        description: "The day on which this project is due. This takes a date with format YYYY-MM-DD."
+                      html_notes:
+                        type: "string"
+                        description: "The notes of the project with formatting as HTML."
                       name:
                         type: "string"
                         description: "Name of the project."
@@ -97,7 +140,7 @@ paths:
       tags:
         - "Tasks"
       summary: "Create Task"
-      description: "Creates a new task"
+      description: "Creates a new task in a workspace."
       operationId: "createTask"
       x-ai-agent-tool: true
       x-help: "https://docs.bytechef.io/reference/components/asana_v1#create-task"
@@ -125,14 +168,18 @@ paths:
                   properties:
                     workspace:
                       type: "string"
-                      description: "The workspace to create the task in."
+                      title: "Workspace GID"
+                      description: "The GID of the workspace to create the task in."
                       x-dynamic-options: true
-                    project:
-                      type: "string"
-                      description: "Asana project to create the task in."
+                    projects:
+                      type: "array"
+                      items:
+                        type: "string"
                       x-dynamic-options: true
                       x-dynamic-options-dependency:
                         - "data.workspace"
+                      title: "Projects GID"
+                      description: "The GID of the project to create the task in."
                     name:
                       type: "string"
                       description: "Name of the task."
@@ -146,13 +193,17 @@ paths:
                       description: "The date on which this task is due."
                     tags:
                       type: "array"
+                      title: "Tags GID"
                       items:
                         type: "string"
-                      description: "Tags to add to the task."
+                      description: "The GID of the tags to add to the task."
                       x-dynamic-options: true
+                      x-dynamic-options-dependency:
+                        - "data.workspace"
                     assignee:
                       type: "string"
-                      description: "User to assign the task to."
+                      title: "Assignee GID"
+                      description: "GID of the user to assign the task to."
                       x-dynamic-options: true
                       x-dynamic-options-dependency:
                         - "data.workspace"
@@ -233,14 +284,13 @@ paths:
         - name: "taskGid"
           in: "path"
           required: true
-          description: "The task gID of the task that will be the parent of the subtask."
+          description: "The task GID of the task that will be the parent of the subtask."
           schema:
-            title: "Task gID"
+            title: "Parent Task GID"
             type: "string"
             x-dynamic-options: true
             x-dynamic-options-dependency:
               - "data.workspace"
-              - "data.project"
       requestBody:
         content:
           application/json:
@@ -256,12 +306,16 @@ paths:
                     - "name"
                   properties:
                     workspace:
+                      title: "Workspace GID"
                       type: "string"
-                      description: "The workspace to create the subtask in."
+                      description: "The GID of the workspace to create the subtask in."
                       x-dynamic-options: true
-                    project:
-                      type: "string"
-                      description: "The project to create the subtask in."
+                    projects:
+                      title: "Project GID"
+                      type: "array"
+                      items:
+                        type: "string"
+                      description: "The GID of the project to create the subtask in."
                       x-dynamic-options: true
                       x-dynamic-options-dependency:
                         - "data.workspace"
@@ -379,7 +433,8 @@ paths:
                   properties:
                     workspace:
                       type: "string"
-                      description: "The workspace to create a custom field in."
+                      title: "Workspace GID"
+                      description: "The GID of the workspace to create a custom field in."
                       x-dynamic-options: true
                     name:
                       type: "string"
