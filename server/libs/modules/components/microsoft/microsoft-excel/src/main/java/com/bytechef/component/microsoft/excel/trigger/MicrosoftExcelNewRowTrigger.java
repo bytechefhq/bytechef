@@ -69,8 +69,7 @@ public class MicrosoftExcelNewRowTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        int lastRowIndex = closureParameters.get("lastRowIndex") != null
-            ? (Integer) closureParameters.get("lastRowIndex") : 0;
+        int lastRowIndex = closureParameters.getInteger("lastRowIndex", 0);
 
         int currentRowCount = MicrosoftExcelUtils.getLastUsedRowIndex(inputParameters, context);
 
@@ -84,8 +83,8 @@ public class MicrosoftExcelNewRowTrigger {
             List<Object> row = MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters, context, rowNum);
 
             if (!row.isEmpty()) {
-                Map<String, Object> mappedRow =
-                    MicrosoftExcelUtils.getMapOfValuesForRow(inputParameters, context, row);
+                Map<String, Object> mappedRow = MicrosoftExcelUtils.getMapOfValuesForRow(inputParameters, context, row);
+
                 newRows.add(mappedRow);
             }
         }

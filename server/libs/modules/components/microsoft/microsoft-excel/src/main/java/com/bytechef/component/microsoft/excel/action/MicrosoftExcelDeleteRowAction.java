@@ -18,7 +18,6 @@ package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
@@ -29,10 +28,9 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.ge
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -64,11 +62,10 @@ public class MicrosoftExcelDeleteRowAction {
         context.http(http -> http
             .post(
                 "/me/drive/items/%s/workbook/worksheets/%s/range(address='%s')/delete"
-                    .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
+                    .formatted(
+                        inputParameters.getRequiredString(WORKBOOK_ID),
                         inputParameters.getRequiredString(WORKSHEET_NAME), range)))
-            .configuration(responseType(ResponseType.JSON))
-            .body(Body.of(List.of("shift", "Up")
-                .toArray()))
+            .body(Body.of(Map.of("shift", "Up")))
             .execute();
 
         return null;

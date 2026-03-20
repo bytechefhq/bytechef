@@ -21,6 +21,7 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Parameters;
@@ -29,33 +30,29 @@ import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelRowUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
  */
-@ExtendWith(MockContextSetupExtension.class)
 class MicrosoftExcelNewRowTriggerTest {
 
-    private final Parameters mockedClosureParameters = MockParametersFactory.create(Map.of("lastRowIndex", 1));
-    private final Parameters mockedInputParameters =
-        MockParametersFactory.create(
-            Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test", IS_THE_FIRST_ROW_HEADER, true));
     private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
+    private final Parameters mockedClosureParameters = MockParametersFactory.create(Map.of("lastRowIndex", 1));
+    private final Parameters mockedInputParameters = MockParametersFactory.create(
+        Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test", IS_THE_FIRST_ROW_HEADER, true));
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
     private final ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = forClass(TriggerContext.class);
 
     @Test
-    void testPoll(TriggerContext mockedTriggerContext) {
-
+    void testPoll() {
         List<Object> row = List.of("abc", "sheetName", false);
         Map<String, Object> map = Map.of("key", "value");
 
@@ -82,9 +79,11 @@ class MicrosoftExcelNewRowTriggerTest {
                 mockedInputParameters, null, mockedClosureParameters, mockedTriggerContext);
 
             assertEquals(new PollOutput(List.of(map), Map.of("lastRowIndex", 2), false), result);
-            assertEquals(List.of(mockedInputParameters, mockedInputParameters, mockedInputParameters),
+            assertEquals(
+                List.of(mockedInputParameters, mockedInputParameters, mockedInputParameters),
                 parametersArgumentCaptor.getAllValues());
-            assertEquals(List.of(mockedTriggerContext, mockedTriggerContext, mockedTriggerContext),
+            assertEquals(
+                List.of(mockedTriggerContext, mockedTriggerContext, mockedTriggerContext),
                 triggerContextArgumentCaptor.getAllValues());
             assertEquals(2, integerArgumentCaptor.getValue());
             assertEquals(row, listArgumentCaptor.getValue());
