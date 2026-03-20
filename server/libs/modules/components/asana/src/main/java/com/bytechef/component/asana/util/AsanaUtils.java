@@ -19,6 +19,7 @@ package com.bytechef.component.asana.util;
 import static com.bytechef.component.asana.constant.AsanaConstants.WORKSPACE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -44,19 +45,27 @@ public class AsanaUtils extends AbstractAsanaUtils {
             context, "/users", "workspace", inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class));
     }
 
-    public static List<Option<String>> getProjectOptions(
+    public static List<Option<String>> getProjectsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        return getPaginatedOptions(
-            context, "/projects", "workspace", inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class));
+        String workspace;
+
+        if (context instanceof ActionContext) {
+            workspace = inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class);
+        } else {
+            workspace = inputParameters.getRequiredString(WORKSPACE);
+        }
+
+        return getPaginatedOptions(context, "/projects", "workspace", workspace);
     }
 
     public static List<Option<String>> getTagsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        return getPaginatedOptions(context, "/tags");
+        return getPaginatedOptions(
+            context, "/tags", WORKSPACE, inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class));
     }
 
     public static List<Option<String>> getTeamOptions(
@@ -81,7 +90,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
 
         return getPaginatedOptions(
             context,
-            "/projects/" + inputParameters.getRequiredFromPath("data.project", String.class) + "/tasks",
+            "/workspaces/" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class) + "/tasks/search",
             "opt_fields", "gid,name");
     }
 
