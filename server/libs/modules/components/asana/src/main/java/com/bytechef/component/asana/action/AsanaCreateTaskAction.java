@@ -39,21 +39,23 @@ import java.util.Map;
 public class AsanaCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
-        .description("Creates a new task")
+        .description("Creates a new task in a workspace.")
         .metadata(
             Map.of(
                 "method", "POST",
                 "path", "/tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("data").properties(string("workspace").label("Workspace")
-            .description("The workspace to create the task in.")
+        .properties(object("data").properties(string("workspace").label("Workspace GID")
+            .description("The GID of the workspace to create the task in.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getWorkspaceOptions),
-            string("project").label("Project")
-                .description("Asana project to create the task in.")
-                .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getProjectOptions)
+            array("projects").items(string().description("The GID of the project to create the task in."))
+                .placeholder("Add to Projects")
+                .label("Projects GID")
+                .description("The GID of the project to create the task in.")
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getProjectsOptions)
                 .optionsLookupDependsOn("data.workspace"),
             string("name").label("Name")
                 .description("Name of the task.")
@@ -64,14 +66,15 @@ public class AsanaCreateTaskAction {
             date("due_on").label("Due Date")
                 .description("The date on which this task is due.")
                 .required(false),
-            array("tags").items(string().description("Tags to add to the task."))
+            array("tags").items(string().description("The GID of the tags to add to the task."))
                 .placeholder("Add to Tags")
-                .label("Tags")
-                .description("Tags to add to the task.")
+                .label("Tags GID")
+                .description("The GID of the tags to add to the task.")
                 .required(false)
-                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getTagsOptions),
-            string("assignee").label("Assignee")
-                .description("User to assign the task to.")
+                .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getTagsOptions)
+                .optionsLookupDependsOn("data.workspace"),
+            string("assignee").label("Assignee GID")
+                .description("GID of the user to assign the task to.")
                 .required(false)
                 .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getAssigneeOptions)
                 .optionsLookupDependsOn("data.workspace"))
