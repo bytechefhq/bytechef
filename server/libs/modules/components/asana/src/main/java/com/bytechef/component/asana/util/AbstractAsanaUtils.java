@@ -28,7 +28,7 @@ import java.util.Map;
  * @generated
  */
 public abstract class AbstractAsanaUtils {
-    public static List<Option<String>> getProjectOptions(
+    public static List<Option<String>> getAssigneeOptions(
         Parameters inputParameters,
         Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
@@ -36,7 +36,7 @@ public abstract class AbstractAsanaUtils {
         return List.of();
     }
 
-    public static List<Option<String>> getAssigneeOptions(
+    public static List<Option<String>> getProjectsOptions(
         Parameters inputParameters,
         Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {

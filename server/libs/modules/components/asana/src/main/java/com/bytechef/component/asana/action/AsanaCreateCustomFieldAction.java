@@ -51,8 +51,8 @@ public class AsanaCreateCustomFieldAction {
                 "path", "/custom_fields", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("data").properties(string("workspace").label("Workspace")
-            .description("The workspace to create a custom field in.")
+        .properties(object("data").properties(string("workspace").label("Workspace GID")
+            .description("The GID of the workspace to create a custom field in.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getWorkspaceOptions),
             string("name").label("Name")

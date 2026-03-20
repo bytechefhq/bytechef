@@ -18,6 +18,7 @@ package com.bytechef.component.asana.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -46,22 +47,24 @@ public class AsanaCreateSubtaskAction {
                 "application/json"
 
             ))
-        .properties(string("taskGid").label("Task gID")
-            .description("The task gID of the task that will be the parent of the subtask.")
+        .properties(string("taskGid").label("Parent Task GID")
+            .description("The task GID of the task that will be the parent of the subtask.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getTaskGidOptions)
-            .optionsLookupDependsOn("data.workspace", "data.project")
+            .optionsLookupDependsOn("data.workspace")
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("data").properties(string("workspace").label("Workspace")
-                .description("The workspace to create the subtask in.")
+            object("data").properties(string("workspace").label("Workspace GID")
+                .description("The GID of the workspace to create the subtask in.")
                 .required(true)
                 .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getWorkspaceOptions),
-                string("project").label("Project")
-                    .description("The project to create the subtask in.")
-                    .required(true)
-                    .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getProjectOptions)
+                array("projects").items(string().description("The GID of the project to create the subtask in."))
+                    .placeholder("Add to Projects")
+                    .label("Project GID")
+                    .description("The GID of the project to create the subtask in.")
+                    .required(false)
+                    .options((ActionDefinition.OptionsFunction<String>) AsanaUtils::getProjectsOptions)
                     .optionsLookupDependsOn("data.workspace"),
                 string("name").label("Name")
                     .description("Name of the subtask.")
