@@ -83,7 +83,8 @@ public abstract class AbstractLoadAction {
 
         vectorStore.load(
             inputParameters,
-            ParametersFactory.create(vectorStoreComponentConnection.getParameters()),
+            ParametersFactory.create(
+                vectorStoreComponentConnection == null ? Map.of() : vectorStoreComponentConnection.getParameters()),
             VectorStoreUtils.getEmbeddingModel(extensions, componentConnections, clusterElementDefinitionService),
             getDocumentReader(extensions, componentConnections, context),
             getDocumentTransformers(extensions, componentConnections));
