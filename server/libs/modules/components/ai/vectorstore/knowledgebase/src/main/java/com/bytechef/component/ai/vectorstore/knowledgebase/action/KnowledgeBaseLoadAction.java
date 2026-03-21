@@ -23,6 +23,9 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.definition.ActionDefinition;
@@ -43,11 +46,18 @@ public final class KnowledgeBaseLoadAction {
     }
 
     public static ActionDefinition of(
-        ClusterElementDefinitionService clusterElementDefinitionService, KnowledgeBaseService knowledgeBaseService,
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
+        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
+        KnowledgeBaseService knowledgeBaseService,
         VectorStore vectorStore) {
 
         return AbstractLoadAction.of(
-            KNOWLEDGE_BASE, createVectorStore(vectorStore),
+            KNOWLEDGE_BASE,
+            createVectorStore(
+                vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
+                knowledgeBaseFileStorage, knowledgeBaseService),
             List.of(
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
