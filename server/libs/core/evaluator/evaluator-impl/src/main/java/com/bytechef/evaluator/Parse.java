@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -43,20 +44,25 @@ class Parse implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        if (type == Type.DATE) {
-            if (arguments.length == 2) {
-                return new TypedValue(
-                    ZonedDateTime.parse((String) arguments[0], DateTimeFormatter.ofPattern((String) arguments[1])));
+        try {
+            if (type == Type.DATE) {
+                if (arguments.length == 2) {
+                    return new TypedValue(
+                        ZonedDateTime.parse((String) arguments[0], DateTimeFormatter.ofPattern((String) arguments[1])));
+                } else {
+                    return new TypedValue(LocalDate.parse((String) arguments[0]));
+                }
             } else {
-                return new TypedValue(LocalDate.parse((String) arguments[0]));
+                if (arguments.length == 2) {
+                    return new TypedValue(
+                        LocalDateTime.parse(
+                            (String) arguments[0], DateTimeFormatter.ofPattern((String) arguments[1])));
+                } else {
+                    return new TypedValue(LocalDateTime.parse((String) arguments[0]));
+                }
             }
-        } else {
-            if (arguments.length == 2) {
-                return new TypedValue(
-                    LocalDateTime.parse((String) arguments[0], DateTimeFormatter.ofPattern((String) arguments[1])));
-            } else {
-                return new TypedValue(LocalDateTime.parse((String) arguments[0]));
-            }
+        } catch (DateTimeParseException e) {
+            return TypedValue.NULL;
         }
     }
 }
