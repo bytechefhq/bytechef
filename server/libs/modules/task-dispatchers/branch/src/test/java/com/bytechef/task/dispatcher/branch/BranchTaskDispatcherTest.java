@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
@@ -74,6 +75,8 @@ public class BranchTaskDispatcherTest {
 
         JsonUtils.setObjectMapper(objectMapper);
         MapUtils.setObjectMapper(objectMapper);
+
+        DeferredEvaluationParameterKeys.register("branch/", "cases", "default");
     }
 
     @Test
@@ -220,6 +223,96 @@ public class BranchTaskDispatcherTest {
         TaskExecution value = argument.getValue();
 
         Assertions.assertEquals("sleep", value.getType());
+    }
+
+    @Test
+    public void testDeferredEvaluationDoesNotCorruptSubTaskExpressions() {
+        when(contextService.peek(anyLong(), any()))
+            .thenReturn(
+                taskFileStorage.storeContextValue(
+                    1, Context.Classname.TASK_EXECUTION, Map.of("selectedCase", "caseA")));
+        when(taskExecutionService.create(any()))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(2L)
+                    .workflowTask(
+                        new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "print")))
+                    .build());
+
+        BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
+            contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage);
+
+        // Use branch/v1 type so deferred evaluation kicks in.
+        // The key "${selectedCase}" should be evaluated to "caseA" by the dispatcher,
+        // while the tasks inside cases should NOT be pre-evaluated.
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(
+                        WorkflowConstants.NAME, "branchTask",
+                        WorkflowConstants.TYPE, "branch/v1",
+                        WorkflowConstants.PARAMETERS,
+                        Map.of(
+                            "cases", List.of(
+                                Map.of(
+                                    "key", "${selectedCase}",
+                                    "tasks", List.of(
+                                        Map.of(
+                                            WorkflowConstants.NAME, "matchedTask",
+                                            WorkflowConstants.TYPE, "print",
+                                            WorkflowConstants.PARAMETERS, Map.of("msg", "${someVar}")))),
+                                Map.of(
+                                    "key", "caseB",
+                                    "tasks", List.of(
+                                        Map.of(
+                                            WorkflowConstants.NAME, "unmatchedTask",
+                                            WorkflowConstants.TYPE, "sleep",
+                                            WorkflowConstants.PARAMETERS, Map.of("msg", "${otherVar}"))))),
+                            "expression", "${selectedCase}"))))
+            .build();
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(2L);
+
+        // Pre-evaluate with context (simulates what JobExecutor does)
+        Map<String, ?> context = taskFileStorage.readContextValue(
+            contextService.peek(1L, Context.Classname.TASK_EXECUTION));
+
+        taskExecution.evaluate(context, EVALUATOR);
+
+        // Verify that caseTrue/caseFalse sub-task expressions are NOT resolved
+        @SuppressWarnings("unchecked")
+        List<Map<String, ?>> cases = (List<Map<String, ?>>) taskExecution.getParameters()
+            .get("cases");
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, ?>> firstCaseTasks = (List<Map<String, ?>>) cases.get(0)
+            .get("tasks");
+
+        @SuppressWarnings("unchecked")
+        Map<String, ?> firstTaskParams = (Map<String, ?>) firstCaseTasks.get(0)
+            .get(WorkflowConstants.PARAMETERS);
+
+        Assertions.assertEquals(
+            "${someVar}", firstTaskParams.get("msg"),
+            "Sub-task expressions inside deferred cases should NOT be pre-evaluated");
+
+        // But the expression parameter (non-deferred) should be evaluated
+        Assertions.assertEquals("caseA", taskExecution.getParameters()
+            .get("expression"));
+
+        // Now verify dispatch still works — the dispatcher evaluates keys itself
+        when(taskExecutionService.update(any()))
+            .thenReturn(taskExecution);
+
+        branchTaskDispatcher.dispatch(taskExecution);
+
+        ArgumentCaptor<TaskExecution> argument = ArgumentCaptor.forClass(TaskExecution.class);
+
+        verify(taskDispatcher, times(1)).dispatch(argument.capture());
+
+        Assertions.assertEquals("print", argument.getValue()
+            .getType());
     }
 
     @Test
