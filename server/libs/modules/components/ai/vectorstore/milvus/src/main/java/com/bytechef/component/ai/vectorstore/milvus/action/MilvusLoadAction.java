@@ -30,7 +30,6 @@ import java.util.List;
 public class MilvusLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(
-            MILVUS, MilvusConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractLoadAction.of(MILVUS, List.of(), MilvusConstants.VECTOR_STORE, clusterElementDefinitionService);
     }
 }

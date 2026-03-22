@@ -31,7 +31,6 @@ public class WeaviateVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return VectorStoreDefinition.of(
-            "Weaviate", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("Weaviate", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

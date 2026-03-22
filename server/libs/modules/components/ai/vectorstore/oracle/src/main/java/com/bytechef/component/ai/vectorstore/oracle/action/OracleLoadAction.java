@@ -30,6 +30,6 @@ import java.util.List;
 public class OracleLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(ORACLE_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractLoadAction.of(ORACLE_VECTOR_STORE, List.of(), VECTOR_STORE, clusterElementDefinitionService);
     }
 }

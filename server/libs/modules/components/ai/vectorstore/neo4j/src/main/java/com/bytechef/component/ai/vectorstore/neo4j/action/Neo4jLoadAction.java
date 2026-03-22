@@ -33,6 +33,6 @@ public final class Neo4jLoadAction {
     }
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(NEO4J, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractLoadAction.of(NEO4J, List.of(), VECTOR_STORE, clusterElementDefinitionService);
     }
 }

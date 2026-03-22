@@ -30,7 +30,6 @@ import java.util.List;
 public class RedisLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(
-            REDIS, RedisConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractLoadAction.of(REDIS, List.of(), RedisConstants.VECTOR_STORE, clusterElementDefinitionService);
     }
 }

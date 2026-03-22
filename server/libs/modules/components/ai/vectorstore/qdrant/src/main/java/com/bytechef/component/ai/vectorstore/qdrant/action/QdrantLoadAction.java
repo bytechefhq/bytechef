@@ -30,6 +30,6 @@ import java.util.List;
 public class QdrantLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(QDRANT, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractLoadAction.of(QDRANT, List.of(), VECTOR_STORE, clusterElementDefinitionService);
     }
 }

@@ -33,6 +33,6 @@ public class S3LoadAction {
     }
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(S3_VECTOR_STORE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractLoadAction.of(S3_VECTOR_STORE, List.of(), VECTOR_STORE, clusterElementDefinitionService);
     }
 }

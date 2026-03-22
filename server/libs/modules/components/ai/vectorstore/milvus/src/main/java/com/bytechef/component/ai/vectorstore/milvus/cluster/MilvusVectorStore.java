@@ -31,7 +31,6 @@ public class MilvusVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return VectorStoreDefinition.of(
-            "Milvus", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("Milvus", VECTOR_STORE, clusterElementDefinitionService);
     }
 }
