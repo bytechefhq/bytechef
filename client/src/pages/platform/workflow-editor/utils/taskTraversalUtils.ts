@@ -13,7 +13,7 @@ export function forEachNestedTaskGroup(
     parameters: Record<string, unknown>,
     callback: (tasks: WorkflowTask[], key: string) => void
 ): void {
-    for (const key of ['caseTrue', 'caseFalse', 'default', 'tasks']) {
+    for (const key of ['caseTrue', 'caseFalse', 'default', 'main-branch', 'on-error-branch', 'tasks']) {
         const value = parameters[key];
 
         if (Array.isArray(value) && value.length > 0 && value[0]?.name) {

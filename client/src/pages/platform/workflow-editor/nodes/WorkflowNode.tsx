@@ -460,6 +460,22 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     <span className="absolute -right-16 top-20">FALSE</span>
                 </div>
             )}
+
+            {data.componentName === 'on-error' && effectiveDirection === 'TB' && (
+                <div className="absolute bottom-0 left-0 font-bold text-muted-foreground">
+                    <span className="absolute -bottom-10 -left-16">TRY</span>
+
+                    <span className="absolute -bottom-10 left-24">CATCH</span>
+                </div>
+            )}
+
+            {data.componentName === 'on-error' && effectiveDirection === 'LR' && (
+                <div className="absolute right-0 top-0 font-bold text-muted-foreground">
+                    <span className="absolute -right-16 -top-8">TRY</span>
+
+                    <span className="absolute -right-16 top-20">CATCH</span>
+                </div>
+            )}
         </div>
     )
 );

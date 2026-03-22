@@ -3,6 +3,9 @@ import {
     CLUSTER_ELEMENT_TYPE_TOOLS,
     CONDITION_CASE_FALSE,
     CONDITION_CASE_TRUE,
+    ON_ERROR_MAIN_BRANCH,
+    ON_ERROR_WIRE_KEY_ERROR_BRANCH,
+    ON_ERROR_WIRE_KEY_MAIN_BRANCH,
     TASK_DISPATCHER_DATA_KEY_MAP,
 } from '@/shared/constants';
 import {
@@ -730,6 +733,33 @@ export default function useWorkflowNodeDetailsPanel({
         [workflow.tasks]
     );
 
+    const filterNodeNamesForOnError = useCallback(
+        (nodeNames: string[], onErrorData: {onErrorCase: string; onErrorId: string}) => {
+            const parentOnErrorTask = getTaskDispatcherTask({
+                taskDispatcherId: onErrorData.onErrorId,
+                tasks: workflow.tasks || [],
+            });
+
+            if (!parentOnErrorTask) {
+                return null;
+            }
+
+            const oppositeWireKey =
+                onErrorData.onErrorCase === ON_ERROR_MAIN_BRANCH
+                    ? ON_ERROR_WIRE_KEY_ERROR_BRANCH
+                    : ON_ERROR_WIRE_KEY_MAIN_BRANCH;
+
+            const oppositeBranchTasks = parentOnErrorTask.parameters?.[oppositeWireKey];
+
+            const oppositeBranchNodeNames = Array.isArray(oppositeBranchTasks)
+                ? oppositeBranchTasks.map((task: WorkflowTask) => task.name)
+                : [];
+
+            return nodeNames.filter((nodeName) => !oppositeBranchNodeNames.includes(nodeName));
+        },
+        [workflow.tasks]
+    );
+
     const filterNodeNamesForBranch = useCallback(
         (nodeNames: string[], branchData: {branchId: string; caseKey: string | number}) => {
             const parentBranchTask = getTaskDispatcherTask({
@@ -782,6 +812,10 @@ export default function useWorkflowNodeDetailsPanel({
             const filtered = filterNodeNamesForBranch(filteredNodeNames, currentNode.branchData);
             if (filtered === null) return [];
             filteredNodeNames = filtered;
+        } else if (currentNode?.onErrorData) {
+            const filtered = filterNodeNamesForOnError(filteredNodeNames, currentNode.onErrorData);
+            if (filtered === null) return [];
+            filteredNodeNames = filtered;
         }
 
         const componentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions.map(
@@ -806,8 +840,10 @@ export default function useWorkflowNodeDetailsPanel({
     }, [
         currentNode?.branchData,
         currentNode?.conditionData,
+        currentNode?.onErrorData,
         filterNodeNamesForBranch,
         filterNodeNamesForCondition,
+        filterNodeNamesForOnError,
         previousComponentDefinitions,
         workflowNodeOutputs,
     ]);

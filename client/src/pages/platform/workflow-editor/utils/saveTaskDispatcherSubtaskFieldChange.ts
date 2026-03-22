@@ -51,6 +51,7 @@ export default function saveTaskDispatcherSubtaskFieldChange({
         | 'each'
         | 'fork-join'
         | 'loop'
+        | 'on-error'
         | 'parallel'
         | 'terminate'
         | undefined = undefined;
@@ -111,6 +112,22 @@ export default function saveTaskDispatcherSubtaskFieldChange({
             };
 
             taskDispatcherComponentName = 'loop';
+
+            break;
+        }
+        case 'onErrorData': {
+            if (!currentNode.onErrorData) {
+                break;
+            }
+
+            taskDispatcherContext = {
+                index: currentNodeIndex,
+                onErrorCase: currentNode.onErrorData.onErrorCase,
+                onErrorId: currentNode.onErrorData.onErrorId,
+                taskDispatcherId: currentNode.onErrorData.onErrorId,
+            };
+
+            taskDispatcherComponentName = 'on-error';
 
             break;
         }

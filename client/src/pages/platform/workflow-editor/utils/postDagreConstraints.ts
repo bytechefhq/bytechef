@@ -30,8 +30,21 @@ function getParentDispatcherId(nodeData: NodeDataType): string | undefined {
         nodeData.parallelData?.parallelId ||
         nodeData.eachData?.eachId ||
         nodeData.forkJoinData?.forkJoinId ||
+        nodeData.onErrorData?.onErrorId ||
         nodeData.taskDispatcherId
     );
+}
+
+function bottomGhostIdForDispatcherTask(componentName: string, taskDispatcherId: string): string {
+    if (componentName === 'fork-join') {
+        return `${taskDispatcherId}-forkJoin-bottom-ghost`;
+    }
+
+    if (componentName === 'on-error') {
+        return `${taskDispatcherId}-onError-bottom-ghost`;
+    }
+
+    return `${taskDispatcherId}-${componentName}-bottom-ghost`;
 }
 
 /**
@@ -78,7 +91,8 @@ function collectNestedDispatcherNodes(dispatcherId: string, allNodes: Node[], co
             data.branchData?.branchId === dispatcherId ||
             data.eachData?.eachId === dispatcherId ||
             data.parallelData?.parallelId === dispatcherId ||
-            data.forkJoinData?.forkJoinId === dispatcherId;
+            data.forkJoinData?.forkJoinId === dispatcherId ||
+            data.onErrorData?.onErrorId === dispatcherId;
 
         if (belongsToDispatcher) {
             collected.add(node.id);
@@ -130,6 +144,38 @@ export function constrainConditionGhostsCrossAxis(allNodes: Node[], crossAxis: '
         ghostNode.position = {
             ...ghostNode.position,
             [crossAxis]: conditionNode.position[crossAxis],
+        };
+    });
+}
+
+/**
+ * Constrains on-error ghost nodes (top and bottom) so their cross-axis
+ * aligns with the on-error dispatcher node (mirrors condition ghosts).
+ */
+export function constrainOnErrorGhostsCrossAxis(allNodes: Node[], crossAxis: 'x' | 'y'): void {
+    allNodes.forEach((ghostNode) => {
+        const ghostData = ghostNode.data as NodeDataType;
+
+        if (!ghostData.onErrorId) {
+            return;
+        }
+
+        const isTopGhost = ghostNode.type === 'taskDispatcherTopGhostNode';
+        const isBottomGhost = ghostNode.type === 'taskDispatcherBottomGhostNode';
+
+        if (!isTopGhost && !isBottomGhost) {
+            return;
+        }
+
+        const onErrorNode = allNodes.find((node) => node.id === ghostData.onErrorId);
+
+        if (!onErrorNode) {
+            return;
+        }
+
+        ghostNode.position = {
+            ...ghostNode.position,
+            [crossAxis]: onErrorNode.position[crossAxis],
         };
     });
 }
@@ -330,8 +376,8 @@ export function alignDispatcherGhostsCrossAxis(allNodes: Node[], crossAxis: 'x' 
 
         const ghostData = ghostNode.data as NodeDataType;
 
-        // Skip condition and branch ghosts (already handled by earlier constraints)
-        if (ghostData.conditionId || ghostData.branchId) {
+        // Skip condition, on-error, and branch ghosts (already handled by earlier constraints)
+        if (ghostData.branchId || ghostData.conditionId || ghostData.onErrorId) {
             return;
         }
 
@@ -478,6 +524,131 @@ export function separateOverlappingConditionChildren(allNodes: Node[], edges: Ed
 
                     const chainComponentName = chainNodeData.componentName as string;
                     const chainBottomGhostId = `${chainNodeData.taskDispatcherId}-${chainComponentName}-bottom-ghost`;
+
+                    chainNodeId = edges.find((chainEdge) => chainEdge.source === chainBottomGhostId)?.target || '';
+                } else {
+                    chainNodeId = edges.find((chainEdge) => chainEdge.source === chainNodeId)?.target || '';
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Separates overlapping frames when an on-error dispatcher is nested inside
+ * another on-error branch (mirrors separateOverlappingConditionChildren).
+ */
+export function separateOverlappingOnErrorChildren(allNodes: Node[], edges: Edge[], crossAxis: 'x' | 'y'): void {
+    allNodes.forEach((onErrorNode) => {
+        const onErrorNodeData = onErrorNode.data as NodeDataType;
+
+        if (onErrorNodeData.componentName !== 'on-error') {
+            return;
+        }
+
+        const parentOnErrorId = onErrorNodeData.onErrorData?.onErrorId;
+
+        if (!parentOnErrorId) {
+            return;
+        }
+
+        const parentOnError = allNodes.find((node) => node.id === parentOnErrorId);
+
+        if (!parentOnError) {
+            return;
+        }
+
+        const onErrorId = onErrorNode.id;
+        const topGhostId = `${onErrorId}-onError-top-ghost`;
+        const onErrorCross = onErrorNode.position[crossAxis];
+        const parentCross = parentOnError.position[crossAxis];
+        const onErrorToParent = parentCross - onErrorCross;
+
+        for (const edge of edges) {
+            if (edge.source !== topGhostId || !edge.sourceHandle) {
+                continue;
+            }
+
+            const childNode = allNodes.find((node) => node.id === edge.target);
+
+            if (!childNode) {
+                continue;
+            }
+
+            const childData = childNode.data as NodeDataType;
+
+            if (!childData.taskDispatcher || !childData.taskDispatcherId) {
+                continue;
+            }
+
+            const childCross = childNode.position[crossAxis];
+            const onErrorToChild = childCross - onErrorCross;
+
+            const sameDirection = onErrorToParent * onErrorToChild > 0;
+            const atOrBeyondParent = Math.abs(onErrorToChild) >= Math.abs(onErrorToParent) - 1;
+
+            if (!sameDirection || !atOrBeyondParent) {
+                continue;
+            }
+
+            const targetCross = onErrorCross + onErrorToParent * 0.5;
+            const shiftDelta = targetCross - childCross;
+
+            childNode.position = {
+                ...childNode.position,
+                [crossAxis]: targetCross,
+            };
+
+            const descendantIds = new Set<string>();
+
+            collectNestedDispatcherNodes(childData.taskDispatcherId, allNodes, descendantIds);
+
+            allNodes.forEach((descendantNode) => {
+                if (descendantIds.has(descendantNode.id) && descendantNode.id !== childNode.id) {
+                    descendantNode.position = {
+                        ...descendantNode.position,
+                        [crossAxis]: descendantNode.position[crossAxis] + shiftDelta,
+                    };
+                }
+            });
+
+            const componentName = childData.componentName as string;
+            const bottomGhostId = bottomGhostIdForDispatcherTask(componentName, childData.taskDispatcherId);
+            let chainNodeId = edges.find((chainEdge) => chainEdge.source === bottomGhostId)?.target || '';
+
+            while (chainNodeId) {
+                const chainNode = allNodes.find((node) => node.id === chainNodeId);
+
+                if (!chainNode || chainNode.type === 'taskDispatcherBottomGhostNode') {
+                    break;
+                }
+
+                chainNode.position = {
+                    ...chainNode.position,
+                    [crossAxis]: chainNode.position[crossAxis] + shiftDelta,
+                };
+
+                const chainNodeData = chainNode.data as NodeDataType;
+
+                if (chainNodeData.taskDispatcher && chainNodeData.taskDispatcherId) {
+                    const chainDescendantIds = new Set<string>();
+
+                    collectNestedDispatcherNodes(chainNodeData.taskDispatcherId, allNodes, chainDescendantIds);
+
+                    allNodes.forEach((descendantNode) => {
+                        if (chainDescendantIds.has(descendantNode.id) && descendantNode.id !== chainNodeId) {
+                            descendantNode.position = {
+                                ...descendantNode.position,
+                                [crossAxis]: descendantNode.position[crossAxis] + shiftDelta,
+                            };
+                        }
+                    });
+
+                    const chainComponentName = chainNodeData.componentName as string;
+                    const chainBottomGhostId = bottomGhostIdForDispatcherTask(
+                        chainComponentName,
+                        chainNodeData.taskDispatcherId
+                    );
 
                     chainNodeId = edges.find((chainEdge) => chainEdge.source === chainBottomGhostId)?.target || '';
                 } else {
@@ -814,6 +985,105 @@ export function pullSimpleConditionChildrenInward(
     });
 }
 
+/**
+ * Pulls on-error branch children inward (mirrors pullSimpleConditionChildrenInward).
+ */
+export function pullSimpleOnErrorChildrenInward(
+    allNodes: Node[],
+    edges: Edge[],
+    options: {
+        conditionCaseOffset: number;
+        crossAxis: 'x' | 'y';
+    }
+): void {
+    const {conditionCaseOffset, crossAxis} = options;
+
+    const simpleOnErrors = new Set<string>();
+
+    allNodes.forEach((onErrorNode) => {
+        const onErrorNodeData = onErrorNode.data as NodeDataType;
+
+        if (onErrorNodeData.componentName !== 'on-error') {
+            return;
+        }
+
+        const onErrorId = onErrorNode.id;
+
+        const topGhostId = `${onErrorId}-onError-top-ghost`;
+        const bottomGhostId = `${onErrorId}-onError-bottom-ghost`;
+
+        const branchStartEdges = edges.filter(
+            (edge) =>
+                edge.source === topGhostId &&
+                edge.sourceHandle &&
+                (edge.sourceHandle.endsWith('-left') || edge.sourceHandle.endsWith('-right'))
+        );
+
+        const allBranchesSimple = branchStartEdges.every((startEdge) =>
+            isBranchSimple(startEdge.target, bottomGhostId, allNodes, edges)
+        );
+
+        if (allBranchesSimple && branchStartEdges.length === 2) {
+            simpleOnErrors.add(onErrorId);
+        }
+    });
+
+    edges.forEach((edge) => {
+        if (!edge.sourceHandle) {
+            return;
+        }
+
+        const isLeftCase = edge.sourceHandle.endsWith('-left');
+        const isRightCase = edge.sourceHandle.endsWith('-right');
+
+        if (!isLeftCase && !isRightCase) {
+            return;
+        }
+
+        const sourceNode = allNodes.find((node) => node.id === edge.source);
+
+        if (!sourceNode || sourceNode.type !== 'taskDispatcherTopGhostNode') {
+            return;
+        }
+
+        const sourceData = sourceNode.data as NodeDataType;
+
+        if (!sourceData.onErrorId || !simpleOnErrors.has(sourceData.onErrorId)) {
+            return;
+        }
+
+        const targetNode = allNodes.find((node) => node.id === edge.target);
+
+        if (!targetNode || targetNode.type === 'placeholder') {
+            return;
+        }
+
+        const onErrorDispatcherNode = allNodes.find((node) => node.id === sourceData.onErrorId);
+
+        if (!onErrorDispatcherNode) {
+            return;
+        }
+
+        const onErrorCross = onErrorDispatcherNode.position[crossAxis];
+
+        const expectedCross = isLeftCase ? onErrorCross - conditionCaseOffset : onErrorCross + conditionCaseOffset;
+        const currentCross = targetNode.position[crossAxis];
+
+        const isFartherThanExpected = isLeftCase ? currentCross < expectedCross : currentCross > expectedCross;
+
+        if (!isFartherThanExpected) {
+            return;
+        }
+
+        targetNode.position = {
+            ...targetNode.position,
+            [crossAxis]: expectedCross,
+        };
+
+        alignCaseChainNodes(allNodes, edges, targetNode, expectedCross, crossAxis);
+    });
+}
+
 interface ConditionPlaceholderI {
     conditionCaseOffset: number;
     crossAxis: 'x' | 'y';
@@ -990,6 +1260,220 @@ export function shiftConditionBranchContent(allNodes: Node[], options: ShiftCond
 
         const isInternalDescendant = (nodeId: string) =>
             descendantIds.has(nodeId) && nodeId !== conditionId && !nodeId.startsWith(`${conditionId}-condition-`);
+
+        if (leftPlaceholder) {
+            const leftBound = leftPlaceholder.position[crossAxis];
+
+            let minDescendantCross = Infinity;
+
+            allNodes.forEach((descendantNode) => {
+                if (isInternalDescendant(descendantNode.id)) {
+                    minDescendantCross = Math.min(minDescendantCross, descendantNode.position[crossAxis]);
+                }
+            });
+
+            if (minDescendantCross < leftBound) {
+                const shift = leftBound - minDescendantCross + nodesep / 2;
+
+                allNodes.forEach((descendantNode) => {
+                    if (isInternalDescendant(descendantNode.id)) {
+                        descendantNode.position = {
+                            ...descendantNode.position,
+                            [crossAxis]: descendantNode.position[crossAxis] + shift,
+                        };
+                    }
+                });
+            }
+        }
+
+        if (rightPlaceholder) {
+            const rightBound = rightPlaceholder.position[crossAxis];
+
+            let maxDescendantCross = -Infinity;
+
+            allNodes.forEach((descendantNode) => {
+                if (isInternalDescendant(descendantNode.id)) {
+                    maxDescendantCross = Math.max(maxDescendantCross, descendantNode.position[crossAxis]);
+                }
+            });
+
+            if (maxDescendantCross > rightBound) {
+                const shift = rightBound - maxDescendantCross - nodesep / 2;
+
+                allNodes.forEach((descendantNode) => {
+                    if (isInternalDescendant(descendantNode.id)) {
+                        descendantNode.position = {
+                            ...descendantNode.position,
+                            [crossAxis]: descendantNode.position[crossAxis] + shift,
+                        };
+                    }
+                });
+            }
+        }
+    });
+}
+
+/**
+ * Positions on-error branch placeholders (mirrors positionConditionCasePlaceholders).
+ */
+export function positionOnErrorCasePlaceholders(allNodes: Node[], options: ConditionPlaceholderI): void {
+    const {conditionCaseOffset, crossAxis} = options;
+
+    allNodes.forEach((onErrorNode) => {
+        const onErrorNodeData = onErrorNode.data as NodeDataType;
+
+        if (onErrorNodeData.componentName !== 'on-error') {
+            return;
+        }
+
+        const onErrorId = onErrorNode.id;
+        const onErrorCross = onErrorNode.position[crossAxis];
+
+        const leftPlaceholder = allNodes.find((node) => node.id === `${onErrorId}-onError-left-placeholder-0`);
+
+        const rightPlaceholder = allNodes.find((node) => node.id === `${onErrorId}-onError-right-placeholder-0`);
+
+        const descendantIds = new Set<string>();
+
+        collectNestedDispatcherNodes(onErrorId, allNodes, descendantIds);
+
+        if (leftPlaceholder) {
+            const maxLeftCross = onErrorCross - conditionCaseOffset;
+
+            let leftmostDescendantCross = Infinity;
+
+            allNodes.forEach((descendantNode) => {
+                if (
+                    descendantIds.has(descendantNode.id) &&
+                    descendantNode.type !== 'taskDispatcherLeftGhostNode' &&
+                    descendantNode.type !== 'placeholder'
+                ) {
+                    leftmostDescendantCross = Math.min(leftmostDescendantCross, descendantNode.position[crossAxis]);
+                }
+            });
+
+            const neededLeftCross =
+                leftmostDescendantCross !== Infinity ? leftmostDescendantCross - conditionCaseOffset : maxLeftCross;
+
+            leftPlaceholder.position = {
+                ...leftPlaceholder.position,
+                [crossAxis]: Math.min(maxLeftCross, neededLeftCross),
+            };
+        }
+
+        if (rightPlaceholder) {
+            const minRightCross = onErrorCross + conditionCaseOffset;
+
+            let rightmostDescendantCross = -Infinity;
+
+            allNodes.forEach((descendantNode) => {
+                if (
+                    descendantIds.has(descendantNode.id) &&
+                    descendantNode.type !== 'taskDispatcherLeftGhostNode' &&
+                    descendantNode.type !== 'placeholder'
+                ) {
+                    rightmostDescendantCross = Math.max(rightmostDescendantCross, descendantNode.position[crossAxis]);
+                }
+            });
+
+            const neededRightCross =
+                rightmostDescendantCross !== -Infinity ? rightmostDescendantCross + conditionCaseOffset : minRightCross;
+
+            rightPlaceholder.position = {
+                ...rightPlaceholder.position,
+                [crossAxis]: Math.max(minRightCross, neededRightCross),
+            };
+        }
+    });
+
+    const nestedFramePadding = conditionCaseOffset / 2;
+
+    let frameChanged = true;
+
+    while (frameChanged) {
+        frameChanged = false;
+
+        allNodes.forEach((onErrorNode) => {
+            const onErrorNodeData = onErrorNode.data as NodeDataType;
+
+            if (onErrorNodeData.componentName !== 'on-error') {
+                return;
+            }
+
+            const onErrorId = onErrorNode.id;
+            const rightPlaceholder = allNodes.find((node) => node.id === `${onErrorId}-onError-right-placeholder-0`);
+
+            const leftPlaceholder = allNodes.find((node) => node.id === `${onErrorId}-onError-left-placeholder-0`);
+
+            if (!rightPlaceholder && !leftPlaceholder) {
+                return;
+            }
+
+            const descendantIds = new Set<string>();
+
+            collectNestedDispatcherNodes(onErrorId, allNodes, descendantIds);
+
+            allNodes.forEach((descendantNode) => {
+                if (
+                    !descendantIds.has(descendantNode.id) ||
+                    descendantNode.type !== 'placeholder' ||
+                    descendantNode.id.startsWith(`${onErrorId}-onError-`)
+                ) {
+                    return;
+                }
+
+                const descendantCross = descendantNode.position[crossAxis];
+
+                if (rightPlaceholder && descendantCross + nestedFramePadding > rightPlaceholder.position[crossAxis]) {
+                    rightPlaceholder.position = {
+                        ...rightPlaceholder.position,
+                        [crossAxis]: descendantCross + nestedFramePadding,
+                    };
+
+                    frameChanged = true;
+                }
+
+                if (leftPlaceholder && descendantCross - nestedFramePadding < leftPlaceholder.position[crossAxis]) {
+                    leftPlaceholder.position = {
+                        ...leftPlaceholder.position,
+                        [crossAxis]: descendantCross - nestedFramePadding,
+                    };
+
+                    frameChanged = true;
+                }
+            });
+        });
+    }
+}
+
+interface ShiftOnErrorBranchContentI {
+    crossAxis: 'x' | 'y';
+    nodesep: number;
+}
+
+/**
+ * Shifts on-error branch content so nested dispatchers stay within the frame.
+ */
+export function shiftOnErrorBranchContent(allNodes: Node[], options: ShiftOnErrorBranchContentI): void {
+    const {crossAxis, nodesep} = options;
+
+    allNodes.forEach((onErrorNode) => {
+        const onErrorNodeData = onErrorNode.data as NodeDataType;
+
+        if (onErrorNodeData.componentName !== 'on-error') {
+            return;
+        }
+
+        const onErrorId = onErrorNode.id;
+        const leftPlaceholder = allNodes.find((node) => node.id === `${onErrorId}-onError-left-placeholder-0`);
+        const rightPlaceholder = allNodes.find((node) => node.id === `${onErrorId}-onError-right-placeholder-0`);
+
+        const descendantIds = new Set<string>();
+
+        collectNestedDispatcherNodes(onErrorId, allNodes, descendantIds);
+
+        const isInternalDescendant = (nodeId: string) =>
+            descendantIds.has(nodeId) && nodeId !== onErrorId && !nodeId.startsWith(`${onErrorId}-onError-`);
 
         if (leftPlaceholder) {
             const leftBound = leftPlaceholder.position[crossAxis];
@@ -1276,7 +1760,8 @@ export function applySavedPositions(
                         nodeData.branchData?.branchId ||
                         nodeData.eachData?.eachId ||
                         nodeData.parallelData?.parallelId ||
-                        nodeData.forkJoinData?.forkJoinId;
+                        nodeData.forkJoinData?.forkJoinId ||
+                        nodeData.onErrorData?.onErrorId;
 
                     if (!parentDispatcherId) {
                         continue;
@@ -1372,7 +1857,8 @@ export function adjustBottomGhostForMovedChildren(
             dispatcherData.branchData?.branchId ||
             dispatcherData.eachData?.eachId ||
             dispatcherData.parallelData?.parallelId ||
-            dispatcherData.forkJoinData?.forkJoinId;
+            dispatcherData.forkJoinData?.forkJoinId ||
+            dispatcherData.onErrorData?.onErrorId;
 
         const parentMainAxisDelta = parentDispatcherId
             ? (savedDispatcherDeltas.get(parentDispatcherId)?.[mainAxis] ?? 0)

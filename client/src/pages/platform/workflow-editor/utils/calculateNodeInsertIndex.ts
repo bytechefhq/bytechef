@@ -1,3 +1,4 @@
+import {ON_ERROR_WIRE_KEY_ERROR_BRANCH, ON_ERROR_WIRE_KEY_MAIN_BRANCH} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType} from '@/shared/types';
 
@@ -12,6 +13,7 @@ export function calculateNodeInsertIndexFromTasks(targetId: string, tasks: Workf
     const eachTasks = tasks.slice(0, nextTaskIndex).filter((task) => task?.type.includes('each/')) || [];
     const forkJoinTasks = tasks.slice(0, nextTaskIndex).filter((task) => task?.type.includes('fork-join/')) || [];
     const mapTasks = tasks.slice(0, nextTaskIndex).filter((task) => task?.type.includes('map/')) || [];
+    const onErrorTasks = tasks.slice(0, nextTaskIndex).filter((task) => task?.type.split('/')[0] === 'on-error') || [];
 
     let tasksInConditions = 0;
     let tasksInLoops = 0;
@@ -19,6 +21,7 @@ export function calculateNodeInsertIndexFromTasks(targetId: string, tasks: Workf
     let tasksInEach = 0;
     let tasksInForkJoins = 0;
     let tasksInMaps = 0;
+    let tasksInOnError = 0;
 
     if (conditionTasks.length) {
         tasksInConditions = conditionTasks.reduce((count, conditionTask) => {
@@ -67,6 +70,19 @@ export function calculateNodeInsertIndexFromTasks(targetId: string, tasks: Workf
         tasksInMaps = mapTasks.reduce((count, mapTask) => count + (mapTask.parameters?.iteratee?.length || 0), 0);
     }
 
+    if (onErrorTasks.length) {
+        tasksInOnError = onErrorTasks.reduce((count, onErrorTask) => {
+            const mainCount = Array.isArray(onErrorTask.parameters?.[ON_ERROR_WIRE_KEY_MAIN_BRANCH])
+                ? onErrorTask.parameters[ON_ERROR_WIRE_KEY_MAIN_BRANCH].length
+                : 0;
+            const errorCount = Array.isArray(onErrorTask.parameters?.[ON_ERROR_WIRE_KEY_ERROR_BRANCH])
+                ? onErrorTask.parameters[ON_ERROR_WIRE_KEY_ERROR_BRANCH].length
+                : 0;
+
+            return count + mainCount + errorCount;
+        }, 0);
+    }
+
     return (
         nextTaskIndex -
         tasksInConditions -
@@ -74,7 +90,8 @@ export function calculateNodeInsertIndexFromTasks(targetId: string, tasks: Workf
         tasksInBranches -
         tasksInEach -
         tasksInForkJoins -
-        tasksInMaps
+        tasksInMaps -
+        tasksInOnError
     );
 }
 

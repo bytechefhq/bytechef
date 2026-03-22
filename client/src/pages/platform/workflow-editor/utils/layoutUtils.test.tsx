@@ -7,6 +7,7 @@ import {
     ForkJoinChildTasksType,
     LoopChildTasksType,
     MapChildTasksType,
+    OnErrorChildTasksType,
     ParallelChildTasksType,
 } from '@/shared/types';
 import {Node} from '@xyflow/react';
@@ -49,6 +50,7 @@ describe('collectTaskDispatcherData', () => {
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
+        const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
         // This should not throw an error
@@ -61,6 +63,7 @@ describe('collectTaskDispatcherData', () => {
                 forkJoinChildTasks,
                 loopChildTasks,
                 mapChildTasks,
+                onErrorChildTasks,
                 parallelChildTasks
             );
         }).not.toThrow();
@@ -86,6 +89,7 @@ describe('collectTaskDispatcherData', () => {
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
+        const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
         // This should not throw an error
@@ -98,6 +102,7 @@ describe('collectTaskDispatcherData', () => {
                 forkJoinChildTasks,
                 loopChildTasks,
                 mapChildTasks,
+                onErrorChildTasks,
                 parallelChildTasks
             );
         }).not.toThrow();
@@ -123,6 +128,7 @@ describe('collectTaskDispatcherData', () => {
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
+        const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
         collectTaskDispatcherData(
@@ -133,6 +139,7 @@ describe('collectTaskDispatcherData', () => {
             forkJoinChildTasks,
             loopChildTasks,
             mapChildTasks,
+            onErrorChildTasks,
             parallelChildTasks
         );
 
@@ -145,6 +152,7 @@ describe('collectTaskDispatcherData', () => {
         expect(forkJoinChildTasks).toEqual({});
         expect(loopChildTasks).toEqual({});
         expect(mapChildTasks).toEqual({});
+        expect(onErrorChildTasks).toEqual({});
         expect(parallelChildTasks).toEqual({});
     });
 
@@ -166,6 +174,7 @@ describe('collectTaskDispatcherData', () => {
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
+        const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
         collectTaskDispatcherData(
@@ -176,6 +185,7 @@ describe('collectTaskDispatcherData', () => {
             forkJoinChildTasks,
             loopChildTasks,
             mapChildTasks,
+            onErrorChildTasks,
             parallelChildTasks
         );
 
@@ -201,6 +211,7 @@ describe('collectTaskDispatcherData', () => {
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
+        const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
         collectTaskDispatcherData(
@@ -211,6 +222,7 @@ describe('collectTaskDispatcherData', () => {
             forkJoinChildTasks,
             loopChildTasks,
             mapChildTasks,
+            onErrorChildTasks,
             parallelChildTasks
         );
 
@@ -232,6 +244,7 @@ describe('collectTaskDispatcherData', () => {
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
+        const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
         collectTaskDispatcherData(
@@ -242,6 +255,7 @@ describe('collectTaskDispatcherData', () => {
             forkJoinChildTasks,
             loopChildTasks,
             mapChildTasks,
+            onErrorChildTasks,
             parallelChildTasks
         );
 
@@ -267,6 +281,7 @@ describe('collectTaskDispatcherData', () => {
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
+        const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
         collectTaskDispatcherData(
@@ -277,6 +292,7 @@ describe('collectTaskDispatcherData', () => {
             forkJoinChildTasks,
             loopChildTasks,
             mapChildTasks,
+            onErrorChildTasks,
             parallelChildTasks
         );
 
@@ -315,6 +331,7 @@ describe('collectTaskDispatcherData', () => {
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
+        const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
         // These should not throw errors
@@ -327,6 +344,7 @@ describe('collectTaskDispatcherData', () => {
                 forkJoinChildTasks,
                 loopChildTasks,
                 mapChildTasks,
+                onErrorChildTasks,
                 parallelChildTasks
             );
         }).not.toThrow();
@@ -340,6 +358,7 @@ describe('collectTaskDispatcherData', () => {
                 forkJoinChildTasks,
                 loopChildTasks,
                 mapChildTasks,
+                onErrorChildTasks,
                 parallelChildTasks
             );
         }).not.toThrow();
@@ -353,6 +372,7 @@ describe('collectTaskDispatcherData', () => {
                 forkJoinChildTasks,
                 loopChildTasks,
                 mapChildTasks,
+                onErrorChildTasks,
                 parallelChildTasks
             );
         }).not.toThrow();

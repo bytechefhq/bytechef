@@ -190,6 +190,7 @@ const isTaskDispatcherSubtask = (node?: Node) =>
     !!node?.data?.parallelData ||
     !!node?.data?.eachData ||
     !!node?.data?.forkJoinData ||
+    !!node?.data?.onErrorData ||
     !!node?.data?.terminateData;
 
 const filterTaskDispatcherDefinitions = (
@@ -239,9 +240,12 @@ const filterTaskDispatcherDefinitions = (
             const currentNodeData = currentNode.data as NodeDataType;
 
             if (currentNode.data.workflowNodeName) {
-                parentId = currentNodeData.conditionData?.conditionId || currentNodeData.branchData?.branchId;
+                parentId =
+                    currentNodeData.conditionData?.conditionId ||
+                    currentNodeData.onErrorData?.onErrorId ||
+                    currentNodeData.branchData?.branchId;
             } else {
-                parentId = currentNodeData.conditionId || currentNodeData.branchId;
+                parentId = currentNodeData.conditionId || currentNodeData.onErrorId || currentNodeData.branchId;
             }
 
             const parentNode = nodes.find((node) => node.id === parentId);
