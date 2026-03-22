@@ -1,3 +1,4 @@
+import {ON_ERROR_MAIN_BRANCH} from '@/shared/constants';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {
     ClickedDefinitionType,
@@ -102,6 +103,12 @@ export default async function handleTaskDispatcherClick({
         } else if (taskDispatcherContext.terminateId) {
             newNodeData.terminateData = {
                 terminateId: taskDispatcherContext.terminateId as string,
+            };
+        } else if (taskDispatcherContext.onErrorId) {
+            newNodeData.onErrorData = {
+                index: (taskDispatcherContext.index ?? 0) as number,
+                onErrorCase: taskDispatcherContext.onErrorCase ?? ON_ERROR_MAIN_BRANCH,
+                onErrorId: taskDispatcherContext.onErrorId as string,
             };
         }
     }

@@ -45,6 +45,12 @@ export const VALUE_PROPERTY_CONTROL_TYPES = {
 export const CONDITION_CASE_TRUE = 'caseTrue';
 export const CONDITION_CASE_FALSE = 'caseFalse';
 
+export const ON_ERROR_MAIN_BRANCH = 'mainBranch';
+export const ON_ERROR_ERROR_BRANCH = 'onErrorBranch';
+
+export const ON_ERROR_WIRE_KEY_MAIN_BRANCH = 'main-branch';
+export const ON_ERROR_WIRE_KEY_ERROR_BRANCH = 'on-error-branch';
+
 export const DEVELOPMENT_ENVIRONMENT = 0;
 export const STAGING_ENVIRONMENT = 1;
 export const PRODUCTION_ENVIRONMENT = 2;
@@ -124,6 +130,7 @@ export const TASK_DISPATCHER_NAMES = [
     'loop',
     'loopBreak',
     'map',
+    'on-error',
     'parallel',
     'subflow',
     'terminate',
@@ -159,6 +166,7 @@ export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
     each: ['iteratee'],
     'fork-join': ['branches'],
     loop: ['iteratee'],
+    'on-error': ['main-branch', 'on-error-branch'],
     parallel: ['tasks'],
 };
 
@@ -192,6 +200,7 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
     loop: 'loopData',
     loopBreak: 'loopBreakData',
     map: 'mapData',
+    'on-error': 'onErrorData',
     parallel: 'parallelData',
     subflow: 'subflowData',
     terminate: 'terminateData',

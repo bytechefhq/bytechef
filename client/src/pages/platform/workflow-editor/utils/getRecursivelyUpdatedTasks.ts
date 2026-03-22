@@ -1,3 +1,4 @@
+import {ON_ERROR_WIRE_KEY_ERROR_BRANCH, ON_ERROR_WIRE_KEY_MAIN_BRANCH} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType} from '@/shared/types';
 
@@ -43,6 +44,20 @@ export default function getRecursivelyUpdatedTasks(
 
             if (task.parameters.caseFalse) {
                 updatedTask = updateTaskArray(updatedTask, 'caseFalse', taskToReplace);
+            }
+
+            return updatedTask;
+        }
+
+        if (task.parameters?.[ON_ERROR_WIRE_KEY_MAIN_BRANCH] || task.parameters?.[ON_ERROR_WIRE_KEY_ERROR_BRANCH]) {
+            let updatedTask = {...task};
+
+            if (task.parameters[ON_ERROR_WIRE_KEY_MAIN_BRANCH]) {
+                updatedTask = updateTaskArray(updatedTask, ON_ERROR_WIRE_KEY_MAIN_BRANCH, taskToReplace);
+            }
+
+            if (task.parameters[ON_ERROR_WIRE_KEY_ERROR_BRANCH]) {
+                updatedTask = updateTaskArray(updatedTask, ON_ERROR_WIRE_KEY_ERROR_BRANCH, taskToReplace);
             }
 
             return updatedTask;

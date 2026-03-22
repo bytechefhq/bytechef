@@ -1,6 +1,10 @@
 import {
     CONDITION_CASE_FALSE,
     CONDITION_CASE_TRUE,
+    ON_ERROR_ERROR_BRANCH,
+    ON_ERROR_MAIN_BRANCH,
+    ON_ERROR_WIRE_KEY_ERROR_BRANCH,
+    ON_ERROR_WIRE_KEY_MAIN_BRANCH,
     TASK_DISPATCHER_NAMES,
     TASK_DISPATCHER_SUBTASK_COLLECTIONS,
 } from '@/shared/constants';
@@ -86,6 +90,12 @@ export function buildGenericNodeData(
                     branchIndex: taskDispatcherContext.branchIndex ?? 0,
                     forkJoinId: taskDispatcherId,
                     index: taskDispatcherContext.index ?? 0,
+                };
+            } else if (type === 'on-error') {
+                newNodeData.onErrorData = {
+                    index: taskDispatcherContext.index ?? 0,
+                    onErrorCase: taskDispatcherContext.onErrorCase || ON_ERROR_MAIN_BRANCH,
+                    onErrorId: taskDispatcherId,
                 };
             }
 
@@ -496,6 +506,84 @@ export const TASK_DISPATCHER_CONFIG = {
                 iteratee: updatedSubtasks,
             },
         }),
+    },
+    'on-error': {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'on-error'),
+        contextIdentifier: 'onErrorId',
+        dataKey: 'onErrorData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const marker = '-onError-';
+            const markerIndex = placeholderId.indexOf(marker);
+
+            if (markerIndex === -1) {
+                return {index: 0, taskDispatcherId: ''};
+            }
+
+            const onErrorId = placeholderId.slice(0, markerIndex);
+            const rest = placeholderId.slice(markerIndex + marker.length);
+            const onErrorCase = rest.startsWith('left') ? ON_ERROR_MAIN_BRANCH : ON_ERROR_ERROR_BRANCH;
+            const index = parseInt(rest.split('-').pop() || '0', 10);
+
+            return {
+                index,
+                onErrorCase,
+                onErrorId,
+                taskDispatcherId: onErrorId,
+            };
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.onErrorId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+            [ON_ERROR_WIRE_KEY_ERROR_BRANCH]: [],
+            [ON_ERROR_WIRE_KEY_MAIN_BRANCH]: [],
+        }),
+        getSubtasks: ({
+            context,
+            getAllSubtasks = false,
+            node,
+            task,
+        }: {
+            context?: TaskDispatcherContextType;
+            getAllSubtasks?: boolean;
+            node?: Node;
+            task?: WorkflowTask;
+        }): Array<WorkflowTask> => {
+            const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
+
+            if (!parameters) {
+                return [];
+            }
+
+            const mainBranch = parameters[ON_ERROR_WIRE_KEY_MAIN_BRANCH] as WorkflowTask[] | undefined;
+            const errorBranch = parameters[ON_ERROR_WIRE_KEY_ERROR_BRANCH] as WorkflowTask[] | undefined;
+
+            if (getAllSubtasks) {
+                return [...(mainBranch || []), ...(errorBranch || [])];
+            }
+
+            const onErrorCase = context?.onErrorCase || ON_ERROR_MAIN_BRANCH;
+
+            return onErrorCase === ON_ERROR_MAIN_BRANCH ? mainBranch || [] : errorBranch || [];
+        },
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({
+            [ON_ERROR_WIRE_KEY_ERROR_BRANCH]: [],
+            [ON_ERROR_WIRE_KEY_MAIN_BRANCH]: [],
+        }),
+        updateTaskParameters: ({context, task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => {
+            const onErrorCase = context?.onErrorCase || ON_ERROR_MAIN_BRANCH;
+            const wireKey =
+                onErrorCase === ON_ERROR_MAIN_BRANCH ? ON_ERROR_WIRE_KEY_MAIN_BRANCH : ON_ERROR_WIRE_KEY_ERROR_BRANCH;
+
+            return {
+                ...task,
+                parameters: {
+                    ...task.parameters,
+                    [wireKey]: updatedSubtasks,
+                },
+            };
+        },
     },
     parallel: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>

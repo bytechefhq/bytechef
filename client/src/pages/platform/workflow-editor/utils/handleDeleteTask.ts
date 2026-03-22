@@ -1,5 +1,10 @@
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {SPACE} from '@/shared/constants';
+import {
+    ON_ERROR_MAIN_BRANCH,
+    ON_ERROR_WIRE_KEY_ERROR_BRANCH,
+    ON_ERROR_WIRE_KEY_MAIN_BRANCH,
+    SPACE,
+} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -222,6 +227,32 @@ export default function handleDeleteTask({
             }
 
             return parentForkJoinTask;
+        }) as Array<WorkflowTaskType>;
+    } else if (data.onErrorData) {
+        const parentOnErrorTask = TASK_DISPATCHER_CONFIG['on-error'].getTask({
+            taskDispatcherId: data.onErrorData.onErrorId,
+            tasks: workflowTasks,
+        });
+
+        const taskOnErrorCase = data.onErrorData.onErrorCase;
+
+        if (!parentOnErrorTask?.parameters) {
+            return;
+        }
+
+        const wireKey =
+            taskOnErrorCase === ON_ERROR_MAIN_BRANCH ? ON_ERROR_WIRE_KEY_MAIN_BRANCH : ON_ERROR_WIRE_KEY_ERROR_BRANCH;
+
+        parentOnErrorTask.parameters[wireKey] = (parentOnErrorTask.parameters[wireKey] as Array<WorkflowTask>).filter(
+            (childTask) => childTask.name !== data.name
+        );
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentOnErrorTask.name) {
+                return task;
+            }
+
+            return parentOnErrorTask;
         }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
         const mainRootClusterElementTask = getTask({

@@ -18,7 +18,8 @@ export function isChildNodeOfDispatcher(node: Node, dispatcherId: string): boole
             nodeData.branchData?.branchId === dispatcherId ||
             nodeData.eachData?.eachId === dispatcherId ||
             nodeData.parallelData?.parallelId === dispatcherId ||
-            nodeData.forkJoinData?.forkJoinId === dispatcherId)
+            nodeData.forkJoinData?.forkJoinId === dispatcherId ||
+            nodeData.onErrorData?.onErrorId === dispatcherId)
     );
 }
 

@@ -4,6 +4,8 @@ import {
     FINAL_PLACEHOLDER_NODE_ID,
     LayoutDirectionType,
     NODE_DETAILS_PANEL_WIDTH,
+    ON_ERROR_WIRE_KEY_ERROR_BRANCH,
+    ON_ERROR_WIRE_KEY_MAIN_BRANCH,
     PROJECT_LEFT_SIDEBAR_WIDTH,
     TASK_DISPATCHER_NAMES,
 } from '@/shared/constants';
@@ -38,6 +40,8 @@ import createLoopEdges from '../utils/createLoopEdges';
 import createLoopNode from '../utils/createLoopNode';
 import createMapEdges from '../utils/createMapEdges';
 import createMapNode from '../utils/createMapNode';
+import createOnErrorEdges, {hasTaskInOnErrorBranches} from '../utils/createOnErrorEdges';
+import createOnErrorNode from '../utils/createOnErrorNode';
 import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
@@ -210,6 +214,7 @@ export default function useLayout({
         const forkJoinChildTasks = {};
         const loopChildTasks = {};
         const mapChildTasks = {};
+        const onErrorChildTasks = {};
         const parallelChildTasks = {};
 
         // First pass: collect all task dispatcher data and save it in the corresponding objects
@@ -222,6 +227,7 @@ export default function useLayout({
                 forkJoinChildTasks,
                 loopChildTasks,
                 mapChildTasks,
+                onErrorChildTasks,
                 parallelChildTasks
             );
         });
@@ -264,6 +270,7 @@ export default function useLayout({
                 forkJoinChildTasks,
                 loopChildTasks,
                 mapChildTasks,
+                onErrorChildTasks,
                 parallelChildTasks,
                 taskName: name,
             });
@@ -309,6 +316,21 @@ export default function useLayout({
                     mapId: taskNode.id,
                     options: {
                         createPlaceholder: !hasSubtasks,
+                    },
+                });
+            } else if (componentName === 'on-error') {
+                const errorBranch = parameters?.[ON_ERROR_WIRE_KEY_ERROR_BRANCH];
+                const mainBranch = parameters?.[ON_ERROR_WIRE_KEY_MAIN_BRANCH];
+                const hasErrorBranchTasks = Array.isArray(errorBranch) && errorBranch.length > 0;
+                const hasMainBranchTasks = Array.isArray(mainBranch) && mainBranch.length > 0;
+
+                allNodes = createOnErrorNode({
+                    allNodes: [...allNodes, taskNode],
+                    isNested,
+                    onErrorId: taskNode.id,
+                    options: {
+                        createLeftPlaceholder: !hasMainBranchTasks,
+                        createRightPlaceholder: !hasErrorBranchTasks,
                     },
                 });
             } else if (componentName === 'branch') {
@@ -390,11 +412,14 @@ export default function useLayout({
         const isMapNode = nodeData.componentName === 'map';
         const isParallellNode = nodeData.componentName === 'parallel';
         const isForkJoinNode = nodeData.componentName === 'fork-join';
+        const isOnErrorNode = nodeData.componentName === 'on-error';
 
         const isConditionPlaceholderNode = nodeData.conditionId && node.type === 'placeholder';
         const isBranchPlaceholderNode = nodeData.branchId && node.type === 'placeholder';
+        const isOnErrorPlaceholderNode = nodeData.onErrorId && node.type === 'placeholder';
 
         const isConditionChildTask = nodeData.conditionData;
+        const isOnErrorChildTask = nodeData.onErrorData;
 
         const nextNode = allNodes[index + 1];
 
@@ -403,6 +428,15 @@ export default function useLayout({
             const conditionEdges = createConditionEdges(node, allNodes);
 
             taskEdges.push(...conditionEdges);
+
+            return;
+        }
+
+        // Create initial edges for the on-error node
+        if (isOnErrorNode) {
+            const onErrorEdges = createOnErrorEdges(node, allNodes);
+
+            taskEdges.push(...onErrorEdges);
 
             return;
         }
@@ -516,7 +550,30 @@ export default function useLayout({
                 }
             }
 
-            if (isConditionPlaceholderNode || isBranchPlaceholderNode) {
+            if (isOnErrorChildTask || node.id.includes('-onError-')) {
+                const onErrorDispatcherId = isOnErrorChildTask ? nodeData.onErrorData?.onErrorId : nodeData.onErrorId;
+
+                if (onErrorDispatcherId) {
+                    const isNextNodeInSameOnError =
+                        nextNodeData.onErrorData?.onErrorId === onErrorDispatcherId ||
+                        hasTaskInOnErrorBranches(onErrorDispatcherId, nextNode.id, tasks);
+
+                    const isOwnBottomGhost =
+                        isNextNodeTaskDispatcherBottomNode &&
+                        nextNode.id === `${onErrorDispatcherId}-onError-bottom-ghost`;
+
+                    const isInDifferentOnErrorBranches =
+                        nodeData.onErrorData &&
+                        nextNodeData.onErrorData &&
+                        nodeData.onErrorData.onErrorCase !== nextNodeData.onErrorData.onErrorCase;
+
+                    if (isInDifferentOnErrorBranches || (!isNextNodeInSameOnError && !isOwnBottomGhost)) {
+                        return;
+                    }
+                }
+            }
+
+            if (isConditionPlaceholderNode || isBranchPlaceholderNode || isOnErrorPlaceholderNode) {
                 return;
             }
 

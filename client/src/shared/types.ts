@@ -116,6 +116,12 @@ type ConditionDataType = {
     index: number;
 };
 
+type OnErrorDataType = {
+    index: number;
+    onErrorCase: 'mainBranch' | 'onErrorBranch';
+    onErrorId: string;
+};
+
 type BranchDataType = {
     branchId: string;
     caseKey: string | number;
@@ -165,6 +171,7 @@ export type TaskDispatcherDataType = BranchDataType &
     LoopDataType &
     LoopBreakDataType &
     MapDataType &
+    OnErrorDataType &
     SubflowDataType &
     TerminateDataType &
     ConditionDataType &
@@ -233,6 +240,8 @@ export type NodeDataType = {
     loopId?: string;
     mapData?: MapDataType;
     mapId?: string;
+    onErrorData?: OnErrorDataType;
+    onErrorId?: string;
     metadata?: {
         ui?: {
             dynamicPropertyTypes?: {[key: string]: string};
@@ -372,6 +381,8 @@ export type TaskDispatcherContextType = {
     loopBreakId?: string;
     loopId?: string;
     mapId?: string;
+    onErrorCase?: 'mainBranch' | 'onErrorBranch';
+    onErrorId?: string;
     parallelId?: string;
     subflowId?: string;
     taskDispatcherId: string;
@@ -394,6 +405,9 @@ export type BranchChildTasksType = {
     [branchId: string]: {cases: {[caseKey: string | number]: string[]}; default: string[]};
 };
 export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[]; caseFalse: string[]}};
+export type OnErrorChildTasksType = {
+    [onErrorId: string]: {mainBranch: string[]; onErrorBranch: string[]};
+};
 export type EachChildTasksType = {[eachId: string]: {iteratee: string}};
 export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
 export type MapChildTasksType = {[mapId: string]: {iteratee: string[]}};
