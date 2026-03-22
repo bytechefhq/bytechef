@@ -30,6 +30,6 @@ import java.util.List;
 public class CouchbaseLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(COUCHBASE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractLoadAction.of(COUCHBASE, List.of(), VECTOR_STORE, clusterElementDefinitionService);
     }
 }

@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
+import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +34,6 @@ import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
  * @author Ivica Cardic
  */
 public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
-
-    private static final String METADATA_KNOWLEDGE_BASE_ID = "knowledge_base_id";
 
     private final VectorStore vectorStore;
     private final Long knowledgeBaseId;

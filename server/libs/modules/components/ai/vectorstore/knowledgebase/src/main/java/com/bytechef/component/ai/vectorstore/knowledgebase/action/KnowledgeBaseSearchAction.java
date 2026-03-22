@@ -17,10 +17,8 @@
 package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.METADATA_TAG_IDS;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.SIMILARITY_THRESHOLD;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_IDS;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TOP_K;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -30,9 +28,11 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
+import com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
+import com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
@@ -67,7 +67,7 @@ public final class KnowledgeBaseSearchAction {
     }
 
     public static ActionDefinition of(
-        KnowledgeBaseService knowledgeBaseService, TagService tagService, VectorStore vectorStore) {
+        VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService, TagService tagService) {
 
         return action(SEARCH)
             .title("Search Data")
@@ -85,7 +85,7 @@ public final class KnowledgeBaseSearchAction {
                     .description(
                         "The search query for semantic similarity search. Leave empty for tag-only search.")
                     .required(false),
-                array(TAG_IDS)
+                array(KnowledgeBaseVectorStoreConstants.TAG_IDS)
                     .label("Tags")
                     .description(
                         "Filter results by tags. Documents with ANY of the selected tags will be returned (OR logic).")
@@ -117,7 +117,7 @@ public final class KnowledgeBaseSearchAction {
 
         Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
         String query = inputParameters.getString(QUERY);
-        List<Long> tagIds = inputParameters.getList(TAG_IDS, Long.class);
+        List<Long> tagIds = inputParameters.getList(KnowledgeBaseVectorStoreConstants.TAG_IDS, Long.class);
         int topK = inputParameters.getInteger(TOP_K, 10);
         double similarityThreshold = inputParameters.getDouble(SIMILARITY_THRESHOLD, 0.0);
 
@@ -206,7 +206,7 @@ public final class KnowledgeBaseSearchAction {
         FilterExpressionBuilder filterExpressionBuilder = new FilterExpressionBuilder();
 
         Filter.Expression[] tagExpressions = tagIds.stream()
-            .map(tagId -> filterExpressionBuilder.eq(METADATA_TAG_IDS + "_" + tagId, true)
+            .map(tagId -> filterExpressionBuilder.eq(KnowledgeBaseConstants.METADATA_TAG_IDS + "_" + tagId, true)
                 .build())
             .toArray(Filter.Expression[]::new);
 

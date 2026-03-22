@@ -16,6 +16,10 @@
 
 package com.bytechef.automation.knowledgebase.facade;
 
+import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
+import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_ID;
+import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
+
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
@@ -43,8 +47,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
 class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
-
-    private static final String METADATA_KNOWLEDGE_BASE_ID = "knowledge_base_id";
 
     private final KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService;
     private final KnowledgeBaseFileStorage knowledgeBaseFileStorage;
@@ -119,7 +121,7 @@ class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
 
         Map<String, Object> metadata = document.getMetadata();
 
-        Number chunkIdNumber = (Number) metadata.get("knowledge_base_document_chunk_id");
+        Number chunkIdNumber = (Number) metadata.get(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
 
         Long chunkId = chunkIdNumber != null ? chunkIdNumber.longValue() : null;
 
@@ -142,7 +144,7 @@ class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
         } else {
             chunk = new KnowledgeBaseDocumentChunk();
 
-            Number documentIdNumber = (Number) metadata.get("knowledge_base_document_id");
+            Number documentIdNumber = (Number) metadata.get(METADATA_KNOWLEDGE_BASE_DOCUMENT_ID);
 
             Long documentId = documentIdNumber != null ? documentIdNumber.longValue() : null;
 

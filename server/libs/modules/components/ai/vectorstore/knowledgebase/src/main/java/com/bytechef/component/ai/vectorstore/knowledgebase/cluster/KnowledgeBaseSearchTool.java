@@ -32,9 +32,10 @@ import org.springframework.ai.vectorstore.VectorStore;
 public class KnowledgeBaseSearchTool {
 
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
-        ClusterElementDefinitionService clusterElementDefinitionService, VectorStore vectorStore) {
+        VectorStore vectorStore, ClusterElementDefinitionService clusterElementDefinitionService) {
 
         return SearchToolDefinition.of(
-            "Couchbase", KNOWLEDGE_BASE, createVectorStore(vectorStore), List.of(), clusterElementDefinitionService);
+            "Knowledge Base", KNOWLEDGE_BASE, createVectorStore(vectorStore), List.of(),
+            clusterElementDefinitionService);
     }
 }

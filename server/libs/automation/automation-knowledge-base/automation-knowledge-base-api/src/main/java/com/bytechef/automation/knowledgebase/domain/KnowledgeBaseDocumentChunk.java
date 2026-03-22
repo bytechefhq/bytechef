@@ -30,6 +30,9 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * @author Ivica Cardic
+ */
 @Table("knowledge_base_document_chunk")
 public class KnowledgeBaseDocumentChunk {
 

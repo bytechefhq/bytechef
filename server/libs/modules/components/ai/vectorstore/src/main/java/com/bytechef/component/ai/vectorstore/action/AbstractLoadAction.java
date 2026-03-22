@@ -53,8 +53,8 @@ public abstract class AbstractLoadAction {
     private final VectorStore vectorStore;
 
     protected AbstractLoadAction(
-        String componentName, VectorStore vectorStore,
-        ClusterElementDefinitionService clusterElementDefinitionService) {
+        ClusterElementDefinitionService clusterElementDefinitionService, String componentName,
+        VectorStore vectorStore) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentName = componentName;
@@ -62,11 +62,11 @@ public abstract class AbstractLoadAction {
     }
 
     public static ActionDefinition of(
-        String componentName, VectorStore vectorStore, List<Property> properties,
+        String componentName, List<Property> properties, VectorStore vectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
         AbstractLoadAction loadAction = new AbstractLoadAction(
-            componentName, vectorStore, clusterElementDefinitionService) {};
+            clusterElementDefinitionService, componentName, vectorStore) {};
 
         return action(LOAD)
             .title("Load Data")

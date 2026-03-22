@@ -88,11 +88,10 @@ public class KnowledgeBaseDocumentProcessWorker {
 
             Resource resource = new KnowledgeBaseDocumentByteArrayResource(documentBytes, fileEntry);
 
-            List<Long> tagIds = knowledgeBaseDocument.getTagIds();
-
             List<Document> documents = knowledgeBaseEtlPipeline.process(
                 resource, fileEntry.getMimeType(),
                 knowledgeBase.getMinChunkSizeChars(), knowledgeBase.getMaxChunkSize(), knowledgeBase.getOverlap());
+            List<Long> tagIds = knowledgeBaseDocument.getTagIds();
 
             for (Document document : documents) {
                 KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = new KnowledgeBaseDocumentChunk();
