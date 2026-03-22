@@ -53,8 +53,7 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
     public KnowledgeBaseComponentHandler(
         ClusterElementDefinitionService clusterElementDefinitionService,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
         KnowledgeBaseService knowledgeBaseService, TagService tagService,
         @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
 
@@ -76,8 +75,8 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
             ClusterElementDefinitionService clusterElementDefinitionService,
             KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-            KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-            KnowledgeBaseService knowledgeBaseService, TagService tagService, VectorStore vectorStore) {
+            KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
+            TagService tagService, VectorStore vectorStore) {
 
             super(
                 component(KNOWLEDGE_BASE)
@@ -89,12 +88,14 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
                         KnowledgeBaseLoadAction.of(
-                            clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
-                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService, vectorStore),
-                        KnowledgeBaseSearchAction.of(knowledgeBaseService, tagService, vectorStore))
+                            vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
+                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
+                        KnowledgeBaseSearchAction.of(vectorStore, knowledgeBaseService, tagService))
                     .clusterElements(
-                        KnowledgeBaseSearchTool.of(clusterElementDefinitionService, vectorStore),
-                        KnowledgeBaseVectorStore.of(clusterElementDefinitionService, vectorStore)));
+                        KnowledgeBaseSearchTool.of(vectorStore, clusterElementDefinitionService),
+                        KnowledgeBaseVectorStore.of(
+                            vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
+                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService)));
         }
     }
 }

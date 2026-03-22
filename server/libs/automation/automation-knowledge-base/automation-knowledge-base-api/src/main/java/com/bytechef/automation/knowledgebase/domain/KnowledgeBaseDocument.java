@@ -33,6 +33,9 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * @author Ivica Cardic
+ */
 @Table("knowledge_base_document")
 public class KnowledgeBaseDocument {
 

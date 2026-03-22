@@ -28,8 +28,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Domain class representing the relationship between a workspace and a knowledge base.
- *
  * @author Ivica Cardic
  */
 @Table("workspace_knowledge_base")

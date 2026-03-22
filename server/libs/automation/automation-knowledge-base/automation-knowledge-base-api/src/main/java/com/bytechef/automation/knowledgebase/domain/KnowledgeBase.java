@@ -34,6 +34,9 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * @author Ivica Cardic
+ */
 @Table("knowledge_base")
 public class KnowledgeBase {
 

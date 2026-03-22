@@ -46,24 +46,22 @@ public final class KnowledgeBaseLoadAction {
     }
 
     public static ActionDefinition of(
-        ClusterElementDefinitionService clusterElementDefinitionService,
+        VectorStore vectorStore, ClusterElementDefinitionService clusterElementDefinitionService,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService,
-        VectorStore vectorStore) {
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
+        KnowledgeBaseService knowledgeBaseService) {
 
         return AbstractLoadAction.of(
             KNOWLEDGE_BASE,
-            createVectorStore(
-                vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                knowledgeBaseFileStorage, knowledgeBaseService),
             List.of(
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to load documents into.")
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true)),
+            createVectorStore(
+                knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+                knowledgeBaseService, vectorStore),
             clusterElementDefinitionService);
     }
 

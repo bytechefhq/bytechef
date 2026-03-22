@@ -216,7 +216,7 @@
   } ],
   "clusterElements": [ {
     "name": "search",
-    "description": "Search data from Couchbase using LLM embeddings.",
+    "description": "Search data from Knowledge Base using LLM embeddings.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -284,7 +284,7 @@
       "required": false,
       "type": "NUMBER"
     } ],
-    "title": "Couchbase Search",
+    "title": "Knowledge Base Search",
     "type": {
       "name": "TOOLS",
       "key": "tools",

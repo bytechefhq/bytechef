@@ -28,6 +28,6 @@ class KnowledgeBaseComponentHandlerTest {
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
             "definition/knowledgeBase_v1.json",
-            new KnowledgeBaseComponentHandler(null, null, null, null).getDefinition());
+            new KnowledgeBaseComponentHandler(null, null, null, null, null, null, null).getDefinition());
     }
 }

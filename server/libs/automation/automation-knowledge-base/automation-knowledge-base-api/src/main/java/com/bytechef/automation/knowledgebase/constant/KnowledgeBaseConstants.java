@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.vectorstore.knowledgebase.constant;
+package com.bytechef.automation.knowledgebase.constant;
 
 /**
  * @author Ivica Cardic
  */
-public final class KnowledgeBaseVectorStoreConstants {
+public class KnowledgeBaseConstants {
 
-    public static final String KNOWLEDGE_BASE = "knowledgeBase";
-    public static final String KNOWLEDGE_BASE_ID = "knowledgeBaseId";
-    public static final String QUERY = "query";
-    public static final String SIMILARITY_THRESHOLD = "similarityThreshold";
-    public static final String TAG_IDS = "tagIds";
-    public static final String TOP_K = "topK";
-
-    private KnowledgeBaseVectorStoreConstants() {
-    }
+    public static final String METADATA_ENVIRONMENT_ID = "environment_id";
+    public static final String METADATA_KNOWLEDGE_BASE_ID = "knowledge_base_id";
+    public static final String METADATA_KNOWLEDGE_BASE_DOCUMENT_ID = "knowledge_base_document_id";
+    public static final String METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID = "knowledge_base_document_chunk_id";
+    public static final String METADATA_TAG_IDS = "tag_ids";
 }
