@@ -31,6 +31,6 @@ public class PgVectorLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
         return AbstractLoadAction.of(
-            PGVECTOR, PgVectorConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+            PGVECTOR, List.of(), PgVectorConstants.VECTOR_STORE, clusterElementDefinitionService);
     }
 }

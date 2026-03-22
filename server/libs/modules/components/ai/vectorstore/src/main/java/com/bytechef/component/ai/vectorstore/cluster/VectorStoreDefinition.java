@@ -39,19 +39,17 @@ public final class VectorStoreDefinition {
     private final ClusterElementDefinitionService clusterElementDefinitionService;
 
     public VectorStoreDefinition(
-        VectorStore vectorStore,
-        ClusterElementDefinitionService clusterElementDefinitionService) {
+        ClusterElementDefinitionService clusterElementDefinitionService, VectorStore vectorStore) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.vectorStore = vectorStore;
     }
 
     public static ClusterElementDefinition<VectorStoreFunction> of(
-        String title, VectorStore vectorStore,
-        ClusterElementDefinitionService clusterElementDefinitionService) {
+        String title, VectorStore vectorStore, ClusterElementDefinitionService clusterElementDefinitionService) {
 
         VectorStoreDefinition vectorStoreDefinition = new VectorStoreDefinition(
-            vectorStore, clusterElementDefinitionService);
+            clusterElementDefinitionService, vectorStore);
 
         return ComponentDsl.<VectorStoreFunction>clusterElement(VECTOR_STORE)
             .title("%s VectorStore".formatted(title))

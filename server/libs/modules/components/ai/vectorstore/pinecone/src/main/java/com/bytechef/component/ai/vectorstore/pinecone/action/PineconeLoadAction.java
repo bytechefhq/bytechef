@@ -30,6 +30,6 @@ import java.util.List;
 public class PineconeLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        return AbstractLoadAction.of(PINECONE, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return AbstractLoadAction.of(PINECONE, List.of(), VECTOR_STORE, clusterElementDefinitionService);
     }
 }

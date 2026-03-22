@@ -31,7 +31,6 @@ public class PgVectorVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return VectorStoreDefinition.of(
-            "PGVector", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("PGVector", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

@@ -31,7 +31,6 @@ public class RedisVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return VectorStoreDefinition.of(
-            "Redis", VECTOR_STORE, clusterElementDefinitionService);
+        return VectorStoreDefinition.of("Redis", VECTOR_STORE, clusterElementDefinitionService);
     }
 }

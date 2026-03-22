@@ -31,6 +31,6 @@ public class TypesenseLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
         return AbstractLoadAction.of(
-            TYPESENSE, TypesenseConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+            TYPESENSE, List.of(), TypesenseConstants.VECTOR_STORE, clusterElementDefinitionService);
     }
 }

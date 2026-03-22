@@ -31,6 +31,6 @@ public class WeaviateLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
         return AbstractLoadAction.of(
-            WEAVIATE, WeaviateConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService);
+            WEAVIATE, List.of(), WeaviateConstants.VECTOR_STORE, clusterElementDefinitionService);
     }
 }
