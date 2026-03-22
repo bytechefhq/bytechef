@@ -84,7 +84,10 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        Map<String, ?> selectedCase = resolveCase(taskExecution);
+        Map<String, ?> context = taskFileStorage.readContextValue(
+            contextService.peek(Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION));
+
+        Map<String, ?> selectedCase = resolveCase(taskExecution, context);
 
         if (selectedCase.containsKey(TASKS)) {
             List<WorkflowTask> subWorkflowTasks = MapUtils
@@ -101,7 +104,7 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
 
                 eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
             } else {
-                WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
+                WorkflowTask subWorkflowTask = subWorkflowTasks.getFirst();
 
                 TaskExecution subTaskExecution = TaskExecution.builder()
                     .jobId(taskExecution.getJobId())
@@ -110,9 +113,6 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
                     .taskNumber(1)
                     .workflowTask(subWorkflowTask)
                     .build();
-
-                Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(Objects.requireNonNull(taskExecution.getId()), Classname.TASK_EXECUTION));
 
                 subTaskExecution.evaluate(context, evaluator);
 
@@ -129,7 +129,6 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
             taskExecution.setStartDate(Instant.now());
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
-            // TODO check, it seems wrong
 
             if (selectedCase.get("value") != null) {
                 taskExecution.setOutput(
@@ -140,7 +139,6 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         }
-
     }
 
     @Override
@@ -152,13 +150,15 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
         return null;
     }
 
-    private Map<String, ?> resolveCase(TaskExecution taskExecution) {
+    private Map<String, ?> resolveCase(TaskExecution taskExecution, Map<String, ?> context) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
         List<Map<String, Object>> cases = MapUtils.getRequiredList(
             taskExecution.getParameters(), CASES, new TypeReference<>() {});
 
         for (Map<String, Object> oneCase : cases) {
-            Object key = MapUtils.getRequired(oneCase, KEY);
+            Map<String, Object> keyMap = evaluator.evaluate(Map.of(KEY, MapUtils.getRequired(oneCase, KEY)), context);
+
+            Object key = keyMap.get(KEY);
 
             if (key.equals(expression)) {
                 return oneCase;

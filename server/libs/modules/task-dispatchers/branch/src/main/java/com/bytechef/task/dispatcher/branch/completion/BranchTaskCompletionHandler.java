@@ -117,7 +117,10 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
                 taskFileStorage.storeContextValue(branchTaskExecutionId, Classname.TASK_EXECUTION, newContext));
         }
 
-        List<WorkflowTask> subWorkflowTasks = resolveCase(branchTaskExecution);
+        Map<String, ?> context = taskFileStorage.readContextValue(
+            contextService.peek(branchTaskExecutionId, Classname.TASK_EXECUTION));
+
+        List<WorkflowTask> subWorkflowTasks = resolveCase(branchTaskExecution, context);
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
@@ -129,9 +132,6 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
                 .taskNumber(taskExecution.getTaskNumber() + 1)
                 .workflowTask(workflowTask)
                 .build();
-
-            Map<String, ?> context = taskFileStorage.readContextValue(
-                contextService.peek(branchTaskExecutionId, Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context, evaluator);
 
@@ -155,7 +155,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         }
     }
 
-    private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
+    private List<WorkflowTask> resolveCase(TaskExecution taskExecution, Map<String, ?> context) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
         List<Map<String, ?>> branchCases = MapUtils.getList(
             taskExecution.getParameters(), CASES, new TypeReference<>() {}, Collections.emptyList());
@@ -163,12 +163,14 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         Assert.notNull(branchCases, "you must specify 'cases' in a branch statement");
 
         for (Map<String, ?> branchCase : branchCases) {
-            Object key = MapUtils.getRequired(branchCase, KEY);
+            Map<String, Object> keyMap = evaluator.evaluate(
+                Map.of(KEY, MapUtils.getRequired(branchCase, KEY)), context);
+
+            Object key = keyMap.get(KEY);
 
             if (key.equals(expression)) {
                 return MapUtils
-                    .getList(
-                        branchCase, TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
+                    .getList(branchCase, TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
                     .stream()
                     .map(WorkflowTask::new)
                     .toList();

@@ -16,6 +16,11 @@
 
 package com.bytechef.task.dispatcher.condition.config;
 
+import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_FALSE;
+import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_TRUE;
+import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CONDITION;
+
+import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -34,6 +39,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class ConditionTaskDispatcherConfiguration {
+
+    static {
+        DeferredEvaluationParameterKeys.register(CONDITION + "/", CASE_TRUE, CASE_FALSE);
+    }
 
     @Autowired
     private Evaluator evaluator;
