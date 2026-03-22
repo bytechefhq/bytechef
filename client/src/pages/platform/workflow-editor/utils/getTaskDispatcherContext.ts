@@ -1,4 +1,4 @@
-import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {ON_ERROR_ERROR_BRANCH, ON_ERROR_MAIN_BRANCH, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {NodeDataType, TaskDispatcherContextType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
@@ -48,6 +48,13 @@ function getContextFromTaskNodeData(
         context.forkJoinId = nodeData.forkJoinData.forkJoinId as string;
         context.index = (nodeData.forkJoinData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.forkJoinData.forkJoinId as string;
+    } else if (nodeData.onErrorData) {
+        context.index = (nodeData.onErrorData.index as number) + indexIncrement;
+        context.onErrorCase = nodeData.onErrorData.onErrorCase as
+            | typeof ON_ERROR_MAIN_BRANCH
+            | typeof ON_ERROR_ERROR_BRANCH;
+        context.onErrorId = nodeData.onErrorData.onErrorId as string;
+        context.taskDispatcherId = nodeData.onErrorData.onErrorId as string;
     } else if (nodeData.terminateData) {
         context.terminateId = nodeData.terminateData.terminateId as string;
         context.taskDispatcherId = nodeData.terminateData.terminateId as string;
@@ -68,6 +75,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     const isParallelPlaceholder = placeholderNode.id.includes('parallel') && isPlaceholder;
     const isEachPlaceholder = placeholderNode.id.includes('each') && isPlaceholder;
     const isForkJoinPlaceholder = placeholderNode.id.includes('forkJoin') && isPlaceholder;
+    const isOnErrorPlaceholder = placeholderNode.id.includes('onError') && isPlaceholder;
     const isTerminatePlaceholder = placeholderNode.id.includes('terminate') && isPlaceholder;
 
     const context: TaskDispatcherContextType = {
@@ -121,6 +129,14 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
         context.branchIndex = placeholderNode.data?.branchIndex as number;
         context.forkJoinId = forkJoinId;
         context.taskDispatcherId = forkJoinId;
+    } else if (isOnErrorPlaceholder) {
+        const onErrorId = placeholderNode.data.onErrorId as string;
+
+        context.onErrorCase = placeholderNode.data?.onErrorCase as
+            | typeof ON_ERROR_MAIN_BRANCH
+            | typeof ON_ERROR_ERROR_BRANCH;
+        context.onErrorId = onErrorId;
+        context.taskDispatcherId = onErrorId;
     } else if (isTerminatePlaceholder) {
         const terminateId = placeholderNode.data?.terminateId as string;
 
@@ -197,6 +213,7 @@ export default function getTaskDispatcherContext({
                 targetNode.data.parallelData ||
                 targetNode.data.eachData ||
                 targetNode.data.forkJoinData ||
+                targetNode.data.onErrorData ||
                 targetNode.data.terminateData
             ) {
                 return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
@@ -248,6 +265,7 @@ export default function getTaskDispatcherContext({
             !sourceNode.data.mapData &&
             !sourceNode.data.branchData &&
             !sourceNode.data.forkJoinData &&
+            !sourceNode.data.onErrorData &&
             !sourceNode.data.terminateData
         ) {
             return undefined;

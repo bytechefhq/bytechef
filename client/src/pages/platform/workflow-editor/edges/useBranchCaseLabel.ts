@@ -16,6 +16,8 @@ function getTaskDispatcherPropertyName(taskDispatcherName: string): string {
     switch (taskDispatcherName) {
         case 'fork-join':
             return 'forkJoin';
+        case 'on-error':
+            return 'onError';
         case 'terminate':
             return 'terminate';
         default:

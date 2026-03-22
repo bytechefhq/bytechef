@@ -8,6 +8,10 @@ import {
     LayoutDirectionType,
     NODE_HEIGHT,
     NODE_WIDTH,
+    ON_ERROR_ERROR_BRANCH,
+    ON_ERROR_MAIN_BRANCH,
+    ON_ERROR_WIRE_KEY_ERROR_BRANCH,
+    ON_ERROR_WIRE_KEY_MAIN_BRANCH,
     PLACEHOLDER_NODE_HEIGHT,
     ROOT_CLUSTER_WIDTH,
     TASK_DISPATCHER_NAMES,
@@ -26,6 +30,7 @@ import {
     LoopChildTasksType,
     MapChildTasksType,
     NodeDataType,
+    OnErrorChildTasksType,
     ParallelChildTasksType,
 } from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
@@ -35,6 +40,7 @@ import InlineSVG from 'react-inlinesvg';
 import {calculateNodeWidth, getHandlePosition} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {getConditionBranchSide} from './createConditionEdges';
 import {getForkJoinBranchSide} from './createForkJoinEdges';
+import {getOnErrorBranchSide} from './createOnErrorEdges';
 import {getCrossAxis, getCrossAxisNodeSize} from './directionUtils';
 import {
     adjustBottomGhostForMovedChildren,
@@ -49,11 +55,16 @@ import {
     constrainBranchGhostsCrossAxis,
     constrainConditionGhostsCrossAxis,
     constrainLeftGhostPositions,
+    constrainOnErrorGhostsCrossAxis,
     containsNodePosition,
     positionConditionCasePlaceholders,
+    positionOnErrorCasePlaceholders,
     pullSimpleConditionChildrenInward,
+    pullSimpleOnErrorChildrenInward,
     separateOverlappingConditionChildren,
+    separateOverlappingOnErrorChildren,
     shiftConditionBranchContent,
+    shiftOnErrorBranchContent,
 } from './postDagreConstraints';
 import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatcherConfig';
 
@@ -587,14 +598,19 @@ export const getLayoutElements = async ({
     const conditionCaseOffset = (crossAxisSize + nodesep) / 2;
 
     constrainConditionGhostsCrossAxis(allNodes, crossAxis);
+    constrainOnErrorGhostsCrossAxis(allNodes, crossAxis);
     constrainBranchGhostsCrossAxis(allNodes, crossAxis);
     alignBranchCaseChildren(allNodes, edges, crossAxis, crossAxisSize);
     centerNodesAfterBottomGhost(allNodes, edges, {crossAxis, crossAxisSize, direction});
     alignDispatcherGhostsCrossAxis(allNodes, crossAxis);
     separateOverlappingConditionChildren(allNodes, edges, crossAxis);
+    separateOverlappingOnErrorChildren(allNodes, edges, crossAxis);
     pullSimpleConditionChildrenInward(allNodes, edges, {conditionCaseOffset, crossAxis});
+    pullSimpleOnErrorChildrenInward(allNodes, edges, {conditionCaseOffset, crossAxis});
     positionConditionCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
+    positionOnErrorCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
     shiftConditionBranchContent(allNodes, {crossAxis, nodesep});
+    shiftOnErrorBranchContent(allNodes, {crossAxis, nodesep});
     constrainLeftGhostPositions(allNodes, {conditionCaseOffset, crossAxis, direction});
 
     if (direction === 'LR') {
@@ -775,6 +791,19 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
                 });
 
                 break;
+            case 'on-error':
+                parentSubtasks = TASK_DISPATCHER_CONFIG['on-error'].getSubtasks({
+                    context: {
+                        onErrorCase:
+                            ((taskDispatcherNode?.data as NodeDataType).onErrorData?.onErrorCase as
+                                | typeof ON_ERROR_MAIN_BRANCH
+                                | typeof ON_ERROR_ERROR_BRANCH) || ON_ERROR_MAIN_BRANCH,
+                        taskDispatcherId: parentTaskDispatcher.name,
+                    },
+                    task: parentTaskDispatcher,
+                });
+
+                break;
             case 'fork-join': {
                 const branches = parentTaskDispatcher.parameters?.branches || [];
 
@@ -814,7 +843,10 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             return edgeFromNestedBottomGhostToNextSubtask;
         }
 
-        const parentTaskDispatcherBottomGhostId = `${parentTaskDispatcher.name}-${componentName}-bottom-ghost`;
+        const parentBottomGhostSegment =
+            componentName === 'fork-join' ? 'forkJoin' : componentName === 'on-error' ? 'onError' : componentName;
+
+        const parentTaskDispatcherBottomGhostId = `${parentTaskDispatcher.name}-${parentBottomGhostSegment}-bottom-ghost`;
         const parentTaskDispatcherBottomGhost = allNodes.find((node) => node.id === parentTaskDispatcherBottomGhostId);
 
         if (!parentTaskDispatcherBottomGhost) {
@@ -825,6 +857,10 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
 
         if (componentName === 'condition') {
             const branchSide = getConditionBranchSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
+
+            targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
+        } else if (componentName === 'on-error') {
+            const branchSide = getOnErrorBranchSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
 
             targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
         } else if (componentName === 'fork-join') {
@@ -859,6 +895,8 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
         const subsequentNodeData = subsequentNode.data as NodeDataType;
 
         if (subsequentNodeData.conditionData && subsequentNodeData.conditionData.conditionId === taskDispatcherId) {
+            return false;
+        } else if (subsequentNodeData.onErrorData && subsequentNodeData.onErrorData.onErrorId === taskDispatcherId) {
             return false;
         } else if (subsequentNodeData.loopData && subsequentNodeData.loopData.loopId === taskDispatcherId) {
             return false;
@@ -988,6 +1026,7 @@ export function collectTaskDispatcherData(
     forkJoinChildTasks: ForkJoinChildTasksType,
     loopChildTasks: LoopChildTasksType,
     mapChildTasks: MapChildTasksType,
+    onErrorChildTasks: OnErrorChildTasksType,
     parallelChildTasks: ParallelChildTasksType
 ): void {
     const {name, parameters, type} = task;
@@ -1017,6 +1056,14 @@ export function collectTaskDispatcherData(
             iteratee: Array.isArray(parameters.iteratee)
                 ? parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name)
                 : [],
+        };
+    } else if (componentName === 'on-error' && parameters) {
+        const errorBranch = parameters[ON_ERROR_WIRE_KEY_ERROR_BRANCH];
+        const mainBranch = parameters[ON_ERROR_WIRE_KEY_MAIN_BRANCH];
+
+        onErrorChildTasks[name] = {
+            mainBranch: Array.isArray(mainBranch) ? mainBranch.map((subtask: WorkflowTask) => subtask.name) : [],
+            onErrorBranch: Array.isArray(errorBranch) ? errorBranch.map((subtask: WorkflowTask) => subtask.name) : [],
         };
     } else if (componentName === 'branch' && parameters) {
         branchChildTasks[name] = {
@@ -1066,6 +1113,7 @@ interface GetTaskAncestryProps {
     forkJoinChildTasks: ForkJoinChildTasksType;
     loopChildTasks: LoopChildTasksType;
     mapChildTasks: MapChildTasksType;
+    onErrorChildTasks: OnErrorChildTasksType;
     parallelChildTasks: ParallelChildTasksType;
     taskName: string;
 }
@@ -1077,6 +1125,7 @@ export function getTaskAncestry({
     forkJoinChildTasks,
     loopChildTasks,
     mapChildTasks,
+    onErrorChildTasks,
     parallelChildTasks,
     taskName,
 }: GetTaskAncestryProps): {nestingData: Record<string, unknown>; isNested: boolean} {
@@ -1103,6 +1152,33 @@ export function getTaskAncestry({
             isNested = true;
 
             break;
+        }
+    }
+
+    if (!isNested) {
+        for (const [onErrorId, onErrorCases] of Object.entries(onErrorChildTasks)) {
+            const onErrorCasesList = [
+                {taskNames: onErrorCases.mainBranch, value: ON_ERROR_MAIN_BRANCH},
+                {taskNames: onErrorCases.onErrorBranch, value: ON_ERROR_ERROR_BRANCH},
+            ];
+
+            const matchingOnErrorCase = onErrorCasesList.find((onErrorCase) =>
+                onErrorCase.taskNames.includes(taskName)
+            );
+
+            if (matchingOnErrorCase) {
+                nestingData = {
+                    onErrorData: {
+                        index: matchingOnErrorCase.taskNames.indexOf(taskName),
+                        onErrorCase: matchingOnErrorCase.value,
+                        onErrorId,
+                    },
+                };
+
+                isNested = true;
+
+                break;
+            }
         }
     }
 
