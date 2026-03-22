@@ -18,6 +18,8 @@
 
 package com.bytechef.atlas.execution.domain;
 
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
@@ -33,9 +35,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -175,15 +179,57 @@ public final class TaskExecution
     /**
      * Evaluate the {@link WorkflowTask}
      *
+     * <p>
+     * Task dispatchers with conditional branches (e.g., condition) register parameter keys that contain sub-task
+     * definitions via {@link DeferredEvaluationParameterKeys}. These keys are excluded from evaluation so that sub-task
+     * expressions remain intact until the selected branch is actually dispatched.
+     *
      * @param context The context value to evaluate the task against
      * @return the evaluated {@link TaskExecution} instance.
      */
+    @SuppressWarnings("unchecked")
     public TaskExecution evaluate(Map<String, ?> context, Evaluator evaluator) {
         WorkflowTask workflowTask = getWorkflowTask();
 
-        Map<String, Object> map = evaluator.evaluate(workflowTask.toMap(), context);
+        Set<String> deferredKeys = DeferredEvaluationParameterKeys.forTaskType(workflowTask.getType());
 
-        setWorkflowTask(new WorkflowTask(map));
+        if (deferredKeys.isEmpty()) {
+            Map<String, Object> map = evaluator.evaluate(workflowTask.toMap(), context);
+
+            setWorkflowTask(new WorkflowTask(map));
+        } else {
+            Map<String, Object> taskMap = new HashMap<>(workflowTask.toMap());
+
+            Map<String, ?> originalParameters = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
+
+            if (originalParameters == null) {
+                originalParameters = Map.of();
+            }
+
+            Map<String, Object> deferredValues = new HashMap<>();
+            Map<String, Object> parametersForEvaluation = new HashMap<>(originalParameters);
+
+            for (String deferredKey : deferredKeys) {
+                Object deferredValue = parametersForEvaluation.remove(deferredKey);
+
+                if (deferredValue != null) {
+                    deferredValues.put(deferredKey, deferredValue);
+                }
+            }
+
+            taskMap.put(WorkflowConstants.PARAMETERS, parametersForEvaluation);
+
+            Map<String, Object> evaluatedMap = new HashMap<>(evaluator.evaluate(taskMap, context));
+
+            Map<String, Object> evaluatedParameters = new HashMap<>(
+                (Map<String, Object>) evaluatedMap.get(WorkflowConstants.PARAMETERS));
+
+            evaluatedParameters.putAll(deferredValues);
+
+            evaluatedMap.put(WorkflowConstants.PARAMETERS, evaluatedParameters);
+
+            setWorkflowTask(new WorkflowTask(evaluatedMap));
+        }
 
         return this;
     }
@@ -422,7 +468,7 @@ public final class TaskExecution
     }
 
     public TaskExecution putMetadata(String key, Object value) {
-        Map<String, Object> map = new java.util.HashMap<>(metadata.getMap());
+        Map<String, Object> map = new HashMap<>(metadata.getMap());
 
         map.put(key, value);
 

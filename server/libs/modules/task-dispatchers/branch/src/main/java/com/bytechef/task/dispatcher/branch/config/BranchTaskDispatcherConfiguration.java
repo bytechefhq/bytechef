@@ -16,6 +16,11 @@
 
 package com.bytechef.task.dispatcher.branch.config;
 
+import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.BRANCH;
+import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.CASES;
+import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.DEFAULT;
+
+import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -34,6 +39,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class BranchTaskDispatcherConfiguration {
+
+    static {
+        DeferredEvaluationParameterKeys.register(BRANCH + "/", CASES, DEFAULT);
+    }
 
     private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;

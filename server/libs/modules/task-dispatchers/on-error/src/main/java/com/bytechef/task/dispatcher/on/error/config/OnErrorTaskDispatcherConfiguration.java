@@ -16,6 +16,11 @@
 
 package com.bytechef.task.dispatcher.on.error.config;
 
+import static com.bytechef.task.dispatcher.on.error.constants.OnErrorTaskDispatcherConstants.MAIN_BRANCH;
+import static com.bytechef.task.dispatcher.on.error.constants.OnErrorTaskDispatcherConstants.ON_ERROR;
+import static com.bytechef.task.dispatcher.on.error.constants.OnErrorTaskDispatcherConstants.ON_ERROR_BRANCH;
+
+import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -34,6 +39,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class OnErrorTaskDispatcherConfiguration {
+
+    static {
+        DeferredEvaluationParameterKeys.register(ON_ERROR + "/", MAIN_BRANCH, ON_ERROR_BRANCH);
+    }
 
     @Autowired
     private Evaluator evaluator;
