@@ -486,6 +486,7 @@ const useWorkflowEditorCanvas = ({
         canvasHeight,
         canvasWidth: customCanvasWidth || canvasWidth,
         componentDefinitions,
+        copilotPanelOpen,
         leftSidebarOpen,
         readOnlyWorkflow: readOnlyWorkflow ? workflow : undefined,
         taskDispatcherDefinitions,
