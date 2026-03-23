@@ -15,8 +15,9 @@ import java.util.Optional;
 /**
  * Service interface for managing {@link McpIntegrationInstanceConfigurationWorkflow} entities.
  *
- * @author Ivica Cardic
  * @version ee
+ *
+ * @author Ivica Cardic
  */
 public interface McpIntegrationInstanceConfigurationWorkflowService {
 

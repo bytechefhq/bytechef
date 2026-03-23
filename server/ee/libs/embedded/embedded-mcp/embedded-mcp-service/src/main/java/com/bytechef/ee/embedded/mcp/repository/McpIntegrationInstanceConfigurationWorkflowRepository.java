@@ -17,10 +17,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository for managing {@link McpIntegrationInstanceConfigurationWorkflow} entities.
+ * @version ee
  *
  * @author Ivica Cardic
- * @version ee
  */
 @Repository
 public interface McpIntegrationInstanceConfigurationWorkflowRepository

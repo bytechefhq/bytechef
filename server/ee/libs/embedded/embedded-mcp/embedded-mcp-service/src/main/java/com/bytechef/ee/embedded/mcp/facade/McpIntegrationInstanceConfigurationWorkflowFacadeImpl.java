@@ -16,10 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of {@link McpIntegrationInstanceConfigurationWorkflowFacade}.
+ * @version ee
  *
  * @author Ivica Cardic
- * @version ee
  */
 @Service
 @Transactional
