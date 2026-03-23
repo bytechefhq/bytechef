@@ -32,8 +32,8 @@ ol[data-sonner-toaster] [data-sonner-toast] {
 /* Thread text size overrides — scales down all text in assistant-ui threads */
 
 .aui-thread-root {
-    font-size: 0.9375rem;
-    line-height: 1.375rem;
+    font-size: 0.9rem;
+    line-height: 1rem;
 }
 
 .aui-thread-root .aui-thread-welcome-message-motion-1,
@@ -77,4 +77,11 @@ ol[data-sonner-toaster] [data-sonner-toast] {
 
 .aui-thread-root .aui-composer-root {
     box-shadow: none;
+}
+
+
+.aui-thread-root {
+    code, kbd, samp, pre {
+        font-size: 0.9rem;
+    }
 }
