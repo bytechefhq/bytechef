@@ -41,8 +41,8 @@ import tools.jackson.databind.JsonNode;
 class TaskValidator {
 
     private static final Pattern TYPE_PATTERN = Pattern.compile("^[a-zA-Z0-9]+/v[0-9]+(/[a-zA-Z0-9]+)?$");
-    private static final List<String> VECTOR_STORE_OPTIONAL_CLUSTER_KEYS =
-        List.of("documentReader", "documentTransformer");
+    private static final List<String> VECTOR_STORE_OPTIONAL_CLUSTER_KEYS = List.of(
+        "documentReader", "documentTransformer");
 
     private TaskValidator() {
     }
@@ -60,8 +60,13 @@ class TaskValidator {
             processTaskDispatcher(taskJsonNode, context);
             validateDataPills(taskJsonNode, taskDefinition, context);
 
-            String taskName = taskJsonNode.has("name") ? taskJsonNode.get("name")
-                .asString() : "";
+            String taskName = "";
+
+            if (taskJsonNode.has("name")) {
+                JsonNode nameJsonNode = taskJsonNode.get("name");
+
+                taskName = nameJsonNode.asString();
+            }
 
             validateClusterElements(taskJsonNode, taskName, context);
         }
@@ -87,8 +92,10 @@ class TaskValidator {
                 continue;
             }
 
-            String elementName = clusterElementJsonNode.get("name")
-                .asString();
+            JsonNode nameJsonNode = clusterElementJsonNode.get("name");
+
+            String elementName = nameJsonNode.asString();
+
             String elementPath = PropertyUtils.buildPropertyPath(parentPath, elementName);
 
             validateClusterElementParameters(clusterElementJsonNode, elementPath, context);
@@ -101,10 +108,13 @@ class TaskValidator {
             return;
         }
 
-        String taskType = taskJsonNode.get("type")
-            .asString();
-        List<String> requiredKeys = context.getClusterTypesProviderMap()
-            .get(taskType);
+        JsonNode typeJsonNode = taskJsonNode.get("type");
+
+        String taskType = typeJsonNode.asString();
+
+        Map<String, List<String>> clusterTypesProviderMap = context.getClusterTypesProviderMap();
+
+        List<String> requiredKeys = clusterTypesProviderMap.get(taskType);
 
         if (requiredKeys == null || requiredKeys.isEmpty()) {
             return;
