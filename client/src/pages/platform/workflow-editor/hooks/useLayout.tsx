@@ -1,4 +1,5 @@
 import {
+    COPILOT_PANEL_WIDTH,
     DATA_PILL_PANEL_WIDTH,
     EDGE_STYLES,
     FINAL_PLACEHOLDER_NODE_ID,
@@ -97,6 +98,7 @@ interface UseLayoutProps {
     canvasHeight?: number;
     canvasWidth: number;
     componentDefinitions: Array<ComponentDefinitionBasic>;
+    copilotPanelOpen?: boolean;
     direction?: LayoutDirectionType;
     leftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
@@ -107,6 +109,7 @@ export default function useLayout({
     canvasHeight,
     canvasWidth,
     componentDefinitions,
+    copilotPanelOpen,
     direction: directionProp,
     leftSidebarOpen,
     readOnlyWorkflow,
@@ -183,6 +186,7 @@ export default function useLayout({
     const initialDirectionRef = useRef<LayoutDirectionType | undefined>(undefined);
     const canvasWidthRef = useRef(canvasWidth);
     const canvasHeightRef = useRef(canvasHeight);
+    const previousCopilotPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousDataPillPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
@@ -621,6 +625,7 @@ export default function useLayout({
 
     useEffect(() => {
         if (!useWorkflowDataStore.getState().isWorkflowLoaded) {
+            previousCopilotPanelOpenRef.current = copilotPanelOpen;
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
             previousLeftSidebarOpenRef.current = leftSidebarOpen;
@@ -629,6 +634,13 @@ export default function useLayout({
         }
 
         let widthDelta = 0;
+
+        if (
+            previousCopilotPanelOpenRef.current !== undefined &&
+            previousCopilotPanelOpenRef.current !== copilotPanelOpen
+        ) {
+            widthDelta += copilotPanelOpen ? COPILOT_PANEL_WIDTH : -COPILOT_PANEL_WIDTH;
+        }
 
         if (
             previousNodeDetailsPanelOpenRef.current !== undefined &&
@@ -652,6 +664,7 @@ export default function useLayout({
         }
 
         if (widthDelta === 0) {
+            previousCopilotPanelOpenRef.current = copilotPanelOpen;
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
             previousLeftSidebarOpenRef.current = leftSidebarOpen;
@@ -659,6 +672,7 @@ export default function useLayout({
             return;
         }
 
+        previousCopilotPanelOpenRef.current = copilotPanelOpen;
         previousDataPillPanelOpenRef.current = dataPillPanelOpen;
         previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
         previousLeftSidebarOpenRef.current = leftSidebarOpen;
@@ -674,6 +688,7 @@ export default function useLayout({
         // with a structural graph change (e.g. adding a node).
         incrementLayoutResetCounter();
     }, [
+        copilotPanelOpen,
         dataPillPanelOpen,
         incrementLayoutResetCounter,
         layoutDirection,
