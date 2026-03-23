@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.security.facade;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class SigningKeyFacadeImpl implements SigningKeyFacade {
 
     private final SigningKeyService signingKeyService;

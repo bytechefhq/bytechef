@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.security.service;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.ee.embedded.security.repository.SigningKeyRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,18 +35,19 @@ import org.springframework.util.Assert;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class SigningKeyServiceImpl implements SigningKeyService {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
     private static final Base64.Decoder DECODER = Base64.getDecoder();
     private static final Base64.Encoder MIME_ENCODER = Base64.getMimeEncoder();
-    private static final KeyPairGenerator keyPairGenerator;
+    private static final KeyPairGenerator KEY_PAIR_GENERATOR;
 
     static {
         try {
-            keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            KEY_PAIR_GENERATOR = KeyPairGenerator.getInstance("RSA");
 
-            keyPairGenerator.initialize(2048);
+            KEY_PAIR_GENERATOR.initialize(2048);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -64,7 +66,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
         Assert.notNull(signingKey.getName(), "'name' must not be null");
         Assert.notNull(signingKey.getType(), "'type' must not be null");
 
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        KeyPair keyPair = KEY_PAIR_GENERATOR.generateKeyPair();
 
         signingKey.setKeyId(String.valueOf(TenantKey.of()));
 
