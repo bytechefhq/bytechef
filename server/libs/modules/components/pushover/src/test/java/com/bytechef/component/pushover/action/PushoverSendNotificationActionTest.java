@@ -28,23 +28,28 @@ import static com.bytechef.component.pushover.constant.PushoverConstants.URL_TIT
 import static com.bytechef.component.pushover.constant.PushoverConstants.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Encoder;
+import com.bytechef.component.definition.Context.File;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,59 +61,80 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class PushoverSendNotificationActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Encoder, ?>> encoderFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<File, ?>> fileFunctionArgumentCaptor = forClass(ContextFunction.class);
     private final byte[] fileContent = new byte[] {
         1, 2, 3
     };
+    private final File mockedFile = mock(File.class);
+    private final Encoder mockedEncoder = mock(Encoder.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         TITLE, "testTitle", MESSAGE, "This is a test message", TOKEN, "testToken", USER, "testUserKey",
         PRIORITY, "2", RETRY, 30, EXPIRE, 1800, URL, "testUrl", URL_TITLE, "testUrlTitle",
         ATTACHMENT_BASE_64, mockedFileEntry));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = forClass(FileEntry.class);
+    private final ArgumentCaptor<byte[]> bytesArgumentCaptor = forClass(byte[].class);
 
     @Test
     void testPerform(
         ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) throws IOException {
+
+        when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<File, ?> value = fileFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedFile);
+            });
+        when(mockedFile.readAllBytes(fileEntryArgumentCaptor.capture()))
+            .thenReturn(fileContent);
+
+        when(mockedContext.encoder(encoderFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Encoder, ?> value = encoderFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedEncoder);
+            });
 
         String encodedToString = EncodingUtils.base64EncodeToString(fileContent);
 
-        when(mockedContext.encoder(any()))
+        when(mockedEncoder.base64Encode(bytesArgumentCaptor.capture()))
             .thenReturn(encodedToString);
-        when(mockedContext.file(any()))
-            .thenReturn(fileContent);
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(Map.of());
 
         Object result = PushoverSendNotificationAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
+        assertNotNull(fileFunctionArgumentCaptor.getValue());
+        assertNotNull(encoderFunctionArgumentCaptor.getValue());
+        assertEquals(mockedFileEntry, fileEntryArgumentCaptor.getValue());
+        assertEquals(fileContent, bytesArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/messages.json", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
 
         Map<String, Object> expectedBody = Map.of(
             TITLE, "testTitle", MESSAGE, "This is a test message", TOKEN, "testToken", USER, "testUserKey",
             PRIORITY, "2", RETRY, 30, EXPIRE, 1800, URL, "testUrl", URL_TITLE, "testUrlTitle",
             ATTACHMENT_BASE_64, encodedToString);
 
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }
