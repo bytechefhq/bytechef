@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer;
 
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationToken;
-import com.bytechef.ee.embedded.ai.mcp.server.service.ConnectTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
@@ -23,7 +22,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
-import java.security.PublicKey;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -33,13 +31,9 @@ import org.springframework.security.core.Authentication;
  */
 class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
 
-    private final ConnectTokenService connectTokenService;
     private final SigningKeyService signingKeyService;
 
-    EmbeddedMcpServerApiKeyAuthenticationConverter(
-        ConnectTokenService connectTokenService, SigningKeyService signingKeyService) {
-
-        this.connectTokenService = connectTokenService;
+    EmbeddedMcpServerApiKeyAuthenticationConverter(SigningKeyService signingKeyService) {
         this.signingKeyService = signingKeyService;
     }
 
@@ -66,24 +60,17 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
 
     private Jws<Claims> getJws(String secretKey, long environmentId) {
         return Jwts.parser()
-            .keyLocator(new SigningKeyLocator(connectTokenService, environmentId, signingKeyService))
+            .keyLocator(new SigningKeyLocator(environmentId, signingKeyService))
             .build()
             .parseSignedClaims(secretKey);
     }
 
-    private record SigningKeyLocator(
-        ConnectTokenService connectTokenService, long environmentId, SigningKeyService signingKeyService)
+    private record SigningKeyLocator(long environmentId, SigningKeyService signingKeyService)
         implements Locator<Key> {
 
         @Override
         public Key locate(Header header) {
             String keyId = (String) header.get("kid");
-
-            PublicKey connectPublicKey = connectTokenService.getPublicKey(keyId);
-
-            if (connectPublicKey != null) {
-                return connectPublicKey;
-            }
 
             TenantKey tenantKey = TenantKey.parse(keyId);
 

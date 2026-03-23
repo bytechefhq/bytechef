@@ -20,7 +20,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.ee.embedded.ai.mcp.server.service.ConnectTokenService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -38,6 +37,7 @@ import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfigurationWo
 import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
@@ -85,7 +85,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ConnectedUserService connectedUserService;
-    private final ConnectTokenService connectTokenService;
+    private final JwtTokenService jwtTokenService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
@@ -106,15 +106,13 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     public EmbeddedMcpToolFacade(
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, ConnectedUserService connectedUserService,
-        ConnectTokenService connectTokenService, Evaluator evaluator,
-        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        Evaluator evaluator, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        JobSyncExecutor jobSyncExecutor,
-        McpComponentService mcpComponentService,
-        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
-        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
+        IntegrationInstanceService integrationInstanceService,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
+        JobSyncExecutor jobSyncExecutor, JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, String publicUrl,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
@@ -123,7 +121,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.connectedUserService = connectedUserService;
-        this.connectTokenService = connectTokenService;
+        this.jwtTokenService = jwtTokenService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
@@ -394,8 +392,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private Map<String, Object> getConnectionRequiredResponse(
         String componentName, Environment environment, String externalUserId, long integrationId, String tenantId) {
 
-        String jwtToken = connectTokenService.generateJwtToken(
-            environment.ordinal(), externalUserId, integrationId, tenantId);
+        String jwtToken = jwtTokenService.generateJwtToken(
+            externalUserId, integrationId, environment.ordinal(), tenantId);
 
         String setupUrl = publicUrl + "/connect.html?token=" + jwtToken;
 

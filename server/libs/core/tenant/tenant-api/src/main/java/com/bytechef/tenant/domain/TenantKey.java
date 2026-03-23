@@ -33,10 +33,14 @@ public class TenantKey {
     public static TenantKey of() {
         String tenantId = TenantContext.getCurrentTenantId();
 
-        return new TenantKey(
-            EncodingUtils.base64EncodeToString(
-                tenantId + ":" + EncodingUtils.base64EncodeToString(RandomUtils.nextBytes(24))),
-            tenantId);
+        return of(tenantId);
+    }
+
+    public static TenantKey of(String tenantId) {
+        String key = EncodingUtils.base64EncodeToString(
+            tenantId + ":" + EncodingUtils.base64EncodeToString(RandomUtils.nextBytes(24)));
+
+        return new TenantKey(key, tenantId);
     }
 
     public static TenantKey parse(String tenantKeyString) {
