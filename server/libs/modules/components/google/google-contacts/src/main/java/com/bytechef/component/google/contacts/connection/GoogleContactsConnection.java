@@ -18,7 +18,7 @@ package com.bytechef.component.google.contacts.connection;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.google.commons.GoogleConnection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -35,7 +35,7 @@ public class GoogleContactsConnection {
         1,
         "https://docs.bytechef.io/reference/components/google-contacts_v1#connection-setup",
         (connection, context) -> {
-            Map<String, Boolean> map = new HashMap<>();
+            Map<String, Boolean> map = new LinkedHashMap<>();
 
             map.put("https://www.googleapis.com/auth/contacts", true);
             map.put("https://www.googleapis.com/auth/contacts.other.readonly", false);

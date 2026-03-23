@@ -19,6 +19,7 @@ package com.bytechef.component.google.contacts.action;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PAGE_SIZE;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.QUERY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.READ_MASK;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -51,10 +52,10 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class GoogleContactsSearchContactsActionTest {
 
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         QUERY, "query", READ_MASK, List.of("addresses", "names"), PAGE_SIZE, 10));
     private final Map<String, Object> responseMap = Map.of("results", List.of());
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -65,32 +66,26 @@ class GoogleContactsSearchContactsActionTest {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-            stringArgumentCaptor.capture(), integerArgumentCaptor.capture(),
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Object result = GoogleContactsSearchContactsAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = GoogleContactsSearchContactsAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(List.of(), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
-        ResponseType responseType = configuration.getResponseType();
 
-        List<String> expectedStrings = List.of(
-            "/people:searchContacts", QUERY, "query", PAGE_SIZE, READ_MASK, "addresses,names");
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/people:searchContacts", stringArgumentCaptor.getValue());
 
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
-        assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
-        assertEquals(10, integerArgumentCaptor.getValue());
+        Object[] objects = {
+            QUERY, "query", PAGE_SIZE, 10, READ_MASK, "addresses,names"
+        };
+
+        assertArrayEquals(objects, objectsArgumentCaptor.getValue());
     }
 }
