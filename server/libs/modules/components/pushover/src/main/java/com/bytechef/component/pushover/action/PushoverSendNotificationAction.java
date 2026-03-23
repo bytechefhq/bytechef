@@ -42,7 +42,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.pushover.util.PushoverUtils;
 
 /**
@@ -112,8 +111,7 @@ public class PushoverSendNotificationAction {
         String attachmentBase64 = null;
 
         if (fileEntry != null) {
-            byte[] fileContent =
-                actionContext.file(file -> file.readAllBytes(fileEntry));
+            byte[] fileContent = actionContext.file(file -> file.readAllBytes(fileEntry));
 
             attachmentBase64 = actionContext.encoder(encoder -> encoder.base64Encode(fileContent));
         }
@@ -134,6 +132,6 @@ public class PushoverSendNotificationAction {
                     ATTACHMENT_BASE_64, attachmentBase64))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
