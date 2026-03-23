@@ -24,6 +24,7 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAMES;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.ORGANIZATIONS;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PERSON_FIELDS;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBERS;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.RESOURCE_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
@@ -32,29 +33,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
-import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Context.Http.ResponseType.Type;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.google.contacts.util.GoogleContactsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 
 /**
  * @author Martin Tarasovič
@@ -63,12 +62,10 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 public class GoogleContactsUpdateContactActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
-    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(RESOURCE_NAME, "resourceName", GIVEN_NAME, "givenName", FAMILY_NAME, "familyName",
             TITLE, "title", NAME, "name", EMAIL, "email"));
-    private final Map<String, Object> responseMap = Map.of("results", List.of());
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -77,54 +74,51 @@ public class GoogleContactsUpdateContactActionTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        try (
-            MockedStatic<GoogleContactsUtils> googleContactsUtilsMockedStatic = mockStatic(GoogleContactsUtils.class)) {
-            googleContactsUtilsMockedStatic
-                .when(() -> GoogleContactsUtils.getContactToUpdate(stringArgumentCaptor.capture(),
-                    contextArgumentCaptor.capture()))
-                .thenReturn(
-                    Map.of(
-                        E_TAG, "etag", NAMES, new HashMap<>(), ORGANIZATIONS, new HashMap<>(),
-                        EMAIL_ADDRESSES, new HashMap<>(), PHONE_NUMBERS, new HashMap<>()));
+        Map<String, Object> personMap = Map.of(
+            GIVEN_NAME, "givenName", FAMILY_NAME, "familyName", TITLE, "title", NAME, "name",
+            EMAIL, "email", E_TAG, "etag");
 
-            when(mockedHttp.patch(stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.queryParameters(
-                stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                    .thenReturn(mockedExecutor);
-            when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
-            when(mockedResponse.getBody(any(TypeReference.class)))
-                .thenReturn(responseMap);
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedHttp.patch(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(personMap);
+        when(mockedResponse.getBody())
+            .thenReturn(personMap);
 
-            Object result = GoogleContactsUpdateContactAction.perform(
-                mockedParameters, null, mockedContext);
+        Object result = GoogleContactsUpdateContactAction.perform(mockedParameters, null, mockedContext);
 
-            assertEquals(responseMap, result);
+        assertEquals(personMap, result);
 
-            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-            assertNotNull(capturedFunction);
-
-            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-            Configuration configuration = configurationBuilder.build();
-            ResponseType responseType = configuration.getResponseType();
-
-            Map<String, Object> expectedBodyMap = Map.of(
-                "etag", "etag",
-                NAMES, List.of(Map.of(GIVEN_NAME, "givenName", FAMILY_NAME, "familyName")),
-                ORGANIZATIONS, List.of(Map.of(NAME, "name", TITLE, "title")),
-                EMAIL_ADDRESSES, List.of(Map.of(VALUE, "email")),
-                PHONE_NUMBERS, List.of(Map.of()));
-
-            List<String> expectedStrings = List.of(
-                "resourceName", "/resourceName:updateContact", "updatePersonFields",
-                "emailAddresses,names,phoneNumbers,organizations");
-
-            assertEquals(ResponseType.Type.JSON, responseType.getType());
-            assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
-            assertEquals(Http.Body.of(expectedBodyMap, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
-            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+        for (ContextFunction<Http, Executor> function : httpFunctionArgumentCaptor.getAllValues()) {
+            assertNotNull(function);
         }
+
+        for (ConfigurationBuilder configurationBuilder : configurationBuilderArgumentCaptor.getAllValues()) {
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(Type.JSON, configuration.getResponseType()
+                .getType());
+        }
+
+        Map<String, Object> expectedBodyMap = Map.of(
+            "etag", "etag",
+            NAMES, List.of(Map.of(GIVEN_NAME, "givenName", FAMILY_NAME, "familyName")),
+            ORGANIZATIONS, List.of(Map.of(NAME, "name", TITLE, "title")),
+            EMAIL_ADDRESSES, List.of(Map.of(VALUE, "email")),
+            PHONE_NUMBERS, List.of(Map.of()));
+
+        List<String> expectedStrings = List.of(
+            "/resourceName", PERSON_FIELDS, "emailAddresses,names,phoneNumbers,organizations",
+            "/resourceName:updateContact", "updatePersonFields",
+            "emailAddresses,names,phoneNumbers,organizations");
+
+        assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
+        assertEquals(Body.of(expectedBodyMap, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

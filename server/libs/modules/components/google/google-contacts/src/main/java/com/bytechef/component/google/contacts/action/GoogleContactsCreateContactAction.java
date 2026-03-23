@@ -41,7 +41,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 
@@ -117,6 +116,6 @@ public class GoogleContactsCreateContactAction {
                             VALUE, inputParameters.getString(PHONE_NUMBER, ""),
                             TYPE, "mobile"))))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
