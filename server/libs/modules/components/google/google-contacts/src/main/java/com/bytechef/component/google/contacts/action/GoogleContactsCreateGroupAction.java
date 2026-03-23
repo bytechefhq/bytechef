@@ -27,7 +27,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -72,11 +71,12 @@ public class GoogleContactsCreateGroupAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/contactGroups"))
             .configuration(responseType(Http.ResponseType.JSON))
-            .body(Http.Body.of(
-                "contactGroup", Map.of(
-                    NAME, inputParameters.getRequiredString(NAME)),
-                "readGroupFields", "name"))
+            .body(
+                Http.Body.of(
+                    "contactGroup", Map.of(
+                        NAME, inputParameters.getRequiredString(NAME)),
+                    "readGroupFields", "name"))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

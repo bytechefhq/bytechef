@@ -30,12 +30,12 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAMES;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.ORGANIZATIONS;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PERSON_FIELDS;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBER;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBERS;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.RESOURCE_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.VALUE;
-import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.getContactToUpdate;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -46,6 +46,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.contacts.util.GoogleContactsUtils;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,93 +99,105 @@ public class GoogleContactsUpdateContactAction {
         .help("", "https://docs.bytechef.io/reference/components/google-contacts_v1#update-contact")
         .perform(GoogleContactsUpdateContactAction::perform);
 
+    private GoogleContactsUpdateContactAction() {
+    }
+
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, Object> contactToUpdate = getContactToUpdate(
-            inputParameters.getRequiredString(RESOURCE_NAME), context);
+        String resourceName = inputParameters.getRequiredString(RESOURCE_NAME);
 
-        Map<String, Object> body = updateContact(inputParameters, contactToUpdate);
+        Map<String, Object> person = getPerson(resourceName, context);
 
-        return context.http(http -> http.patch(
-            "/%s:updateContact".formatted(inputParameters.getRequiredString(RESOURCE_NAME))))
+        return context.http(http -> http.patch("/%s:updateContact".formatted(resourceName)))
             .configuration(responseType(Http.ResponseType.JSON))
-            .queryParameters("updatePersonFields", "emailAddresses,names,phoneNumbers,organizations")
-            .body(Body.of(body))
+            .queryParameter("updatePersonFields", "emailAddresses,names,phoneNumbers,organizations")
+            .body(Body.of(updateContact(inputParameters, person)))
+            .execute()
+            .getBody();
+    }
+
+    private static Map<String, Object> getPerson(String resourceName, Context context) {
+        return context.http(http -> http.get("/%s".formatted(resourceName)))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .queryParameter(PERSON_FIELDS, "emailAddresses,names,phoneNumbers,organizations")
             .execute()
             .getBody(new TypeReference<>() {});
     }
 
-    private static Map<String, Object> updateContact(
-        Parameters parameters, Map<String, Object> contactToUpdate) {
+    public static Map<String, Object> updateContact(Parameters parameters, Map<String, Object> person) {
+        Map<String, String> names = new HashMap<>(getContactNames(person.get(NAMES)));
 
-        List<String> updateParametersList = List.of(
-            GIVEN_NAME, MIDDLE_NAME, FAMILY_NAME, TITLE, NAME, EMAIL, PHONE_NUMBER);
+        updateMap(parameters, names, GIVEN_NAME, GIVEN_NAME);
+        updateMap(parameters, names, MIDDLE_NAME, MIDDLE_NAME);
+        updateMap(parameters, names, FAMILY_NAME, FAMILY_NAME);
 
-        Map<String, String> names = (Map<String, String>) contactToUpdate.get(NAMES);
-        Map<String, String> organizations = (Map<String, String>) contactToUpdate.get(ORGANIZATIONS);
-        Map<String, String> emailAddresses = (Map<String, String>) contactToUpdate.get(EMAIL_ADDRESSES);
-        Map<String, String> phoneNumbers = (Map<String, String>) contactToUpdate.get(PHONE_NUMBERS);
+        Map<String, String> organizations = new HashMap<>(getContactOrganizations(person.get(ORGANIZATIONS)));
 
-        for (String parameter : updateParametersList) {
-            switch (parameter) {
-                case GIVEN_NAME -> {
-                    String givenName = parameters.getString(GIVEN_NAME);
+        updateMap(parameters, organizations, TITLE, TITLE);
+        updateMap(parameters, organizations, NAME, NAME);
 
-                    if (givenName != null) {
-                        names.put(GIVEN_NAME, givenName);
-                    }
-                }
-                case MIDDLE_NAME -> {
-                    String middleName = parameters.getString(MIDDLE_NAME);
+        Map<String, String> emailAddresses =
+            new HashMap<>(getContactEmailAddressesOrPhoneNumbers(person.get(EMAIL_ADDRESSES)));
 
-                    if (middleName != null) {
-                        names.put(MIDDLE_NAME, middleName);
-                    }
-                }
-                case FAMILY_NAME -> {
-                    String familyName = parameters.getString(FAMILY_NAME);
+        updateMap(parameters, emailAddresses, EMAIL, VALUE);
 
-                    if (familyName != null) {
-                        names.put(FAMILY_NAME, familyName);
-                    }
-                }
-                case TITLE -> {
-                    String title = parameters.getString(TITLE);
+        Map<String, String> phoneNumbers =
+            new HashMap<>(getContactEmailAddressesOrPhoneNumbers(person.get(PHONE_NUMBERS)));
 
-                    if (title != null) {
-                        organizations.put(TITLE, title);
-                    }
-                }
-                case NAME -> {
-                    String name = parameters.getString(NAME);
-
-                    if (name != null) {
-                        organizations.put(NAME, name);
-                    }
-                }
-                case EMAIL -> {
-                    String email = parameters.getString(EMAIL);
-
-                    if (email != null) {
-                        emailAddresses.put(VALUE, email);
-                    }
-                }
-                case PHONE_NUMBER -> {
-                    String phoneNumber = parameters.getString(PHONE_NUMBER);
-
-                    if (phoneNumber != null) {
-                        phoneNumbers.put(VALUE, phoneNumber);
-                    }
-                }
-                default -> {
-                }
-            }
-        }
+        updateMap(parameters, phoneNumbers, PHONE_NUMBER, VALUE);
 
         return Map.of(
-            E_TAG, contactToUpdate.get(E_TAG),
+            E_TAG, person.get(E_TAG),
             NAMES, List.of(names),
             ORGANIZATIONS, List.of(organizations),
             EMAIL_ADDRESSES, List.of(emailAddresses),
             PHONE_NUMBERS, List.of(phoneNumbers));
     }
+
+    private static Map<String, String> getContactNames(Object names) {
+        Map<String, String> namesMap = new HashMap<>();
+
+        if (names instanceof List<?> namesList && namesList.getFirst() instanceof Map<?, ?> namesObject) {
+            namesMap.put(GIVEN_NAME, getIfMapContains(namesObject, GIVEN_NAME));
+            namesMap.put(MIDDLE_NAME, getIfMapContains(namesObject, MIDDLE_NAME));
+            namesMap.put(FAMILY_NAME, getIfMapContains(namesObject, FAMILY_NAME));
+        }
+
+        return namesMap;
+    }
+
+    private static void updateMap(Parameters parameters, Map<String, String> map, String parameterName, String mapKey) {
+        if (parameters.getString(parameterName) != null) {
+            map.put(mapKey, parameters.getString(parameterName));
+        }
+    }
+
+    private static Map<String, String> getContactOrganizations(Object organizations) {
+        Map<String, String> organizationsMap = new HashMap<>();
+
+        if (organizations instanceof List<?> organizationsList &&
+            organizationsList.getFirst() instanceof Map<?, ?> organizationObject) {
+
+            organizationsMap.put(TITLE, getIfMapContains(organizationObject, TITLE));
+            organizationsMap.put(NAME, getIfMapContains(organizationObject, NAME));
+        }
+
+        return organizationsMap;
+    }
+
+    private static Map<String, String> getContactEmailAddressesOrPhoneNumbers(Object object) {
+        Map<String, String> map = new HashMap<>();
+
+        if (object instanceof List<?> list &&
+            list.getFirst() instanceof Map<?, ?> firstElement) {
+
+            map.put(VALUE, getIfMapContains(firstElement, VALUE));
+        }
+
+        return map;
+    }
+
+    private static String getIfMapContains(Map<?, ?> map, String key) {
+        return map.containsKey(key) ? (String) map.get(key) : "";
+    }
+
 }

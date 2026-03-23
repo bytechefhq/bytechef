@@ -32,19 +32,19 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
@@ -60,10 +60,9 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class GoogleContactsCreateContactActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(GIVEN_NAME, "givenName", FAMILY_NAME, "familyName", TITLE, "title", NAME, "name",
-            EMAIL, "email"));
+        Map.of(GIVEN_NAME, "givenName", FAMILY_NAME, "familyName", TITLE, "title", NAME, "name", EMAIL, "email"));
     private final Map<String, Object> responseMap = Map.of();
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
@@ -79,21 +78,21 @@ class GoogleContactsCreateContactActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
-        Object result = GoogleContactsCreateContactAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = GoogleContactsCreateContactAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(responseMap, result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
-        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            List.of("/people:createContact", PERSON_FIELDS, "emailAddresses,names,phoneNumbers,organizations"),
+            stringArgumentCaptor.getAllValues());
 
         Map<String, Object> expectedBodyMap = Map.of(
             NAMES, List.of(Map.of(GIVEN_NAME, "givenName", MIDDLE_NAME, "", FAMILY_NAME, "familyName")),
@@ -101,10 +100,6 @@ class GoogleContactsCreateContactActionTest {
             EMAIL_ADDRESSES, List.of(Map.of(VALUE, "email", TYPE, "work")),
             PHONE_NUMBERS, List.of(Map.of(VALUE, "", TYPE, "mobile")));
 
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
-        assertEquals(
-            List.of("/people:createContact", PERSON_FIELDS, "emailAddresses,names,phoneNumbers,organizations"),
-            stringArgumentCaptor.getAllValues());
-        assertEquals(Http.Body.of(expectedBodyMap, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
+        assertEquals(Body.of(expectedBodyMap, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

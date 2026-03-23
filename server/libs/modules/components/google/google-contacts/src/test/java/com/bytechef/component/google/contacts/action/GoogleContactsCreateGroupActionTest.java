@@ -20,19 +20,19 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
@@ -47,7 +47,7 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class GoogleContactsCreateGroupActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(NAME, "name"));
     private final Map<String, Object> responseMap = Map.of();
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -62,27 +62,23 @@ class GoogleContactsCreateGroupActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
-        Object result = GoogleContactsCreateGroupAction.perform(
-            mockedParameters, null, mockedContext);
+        Object result = GoogleContactsCreateGroupAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(responseMap, result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
-        ResponseType responseType = configuration.getResponseType();
 
-        Map<String, Object> expectedBodyMap = Map.of(
-            "contactGroup", Map.of(NAME, "name"), "readGroupFields", "name");
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/contactGroups", stringArgumentCaptor.getValue());
-        assertEquals(Http.Body.of(expectedBodyMap, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(
+                Map.of("contactGroup", Map.of(NAME, "name"), "readGroupFields", "name"),
+                BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }
