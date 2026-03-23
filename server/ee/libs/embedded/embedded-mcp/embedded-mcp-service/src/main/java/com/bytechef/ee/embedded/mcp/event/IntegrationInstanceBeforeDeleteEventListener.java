@@ -17,11 +17,9 @@ import org.springframework.data.relational.core.mapping.event.Identifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Event listener that handles before-delete events for {@link IntegrationInstance} entities. This listener is
- * responsible for cleaning up related MCP integration instance tool records before the integration instance is deleted.
+ * @version ee
  *
  * @author Ivica Cardic
- * @version ee
  */
 @Component
 @ConditionalOnEEVersion

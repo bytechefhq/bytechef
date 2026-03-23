@@ -22,10 +22,9 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Domain class representing an MCP integration.
+ * @version ee
  *
  * @author Ivica Cardic
- * @version ee
  */
 @Table
 public final class McpIntegrationInstanceConfiguration {

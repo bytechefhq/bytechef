@@ -17,12 +17,9 @@ import org.springframework.data.relational.core.mapping.event.Identifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Event listener that handles before-delete events for {@link IntegrationInstanceConfigurationWorkflow} entities. This
- * listener is responsible for cleaning up related MCP integration instance configuration workflow records before the
- * integration instance configuration workflow is deleted.
+ * @version ee
  *
  * @author Ivica Cardic
- * @version ee
  */
 @Component
 @ConditionalOnEEVersion

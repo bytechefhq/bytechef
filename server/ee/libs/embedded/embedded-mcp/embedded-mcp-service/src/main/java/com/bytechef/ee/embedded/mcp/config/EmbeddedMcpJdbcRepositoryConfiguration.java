@@ -13,8 +13,9 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
- * @author Ivica Cardic
  * @version ee
+ *
+ * @author Ivica Cardic
  */
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")
 @ConditionalOnBean(AbstractJdbcConfiguration.class)

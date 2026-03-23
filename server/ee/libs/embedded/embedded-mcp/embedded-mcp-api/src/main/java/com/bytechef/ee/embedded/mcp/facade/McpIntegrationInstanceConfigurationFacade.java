@@ -13,8 +13,9 @@ import java.util.List;
 /**
  * Facade for managing MCP Integration operations that involve multiple services.
  *
- * @author Ivica Cardic
  * @version ee
+ *
+ * @author Ivica Cardic
  */
 public interface McpIntegrationInstanceConfigurationFacade {
 
