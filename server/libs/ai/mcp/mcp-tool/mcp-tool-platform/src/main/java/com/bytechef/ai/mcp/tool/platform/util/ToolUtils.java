@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.mcp.tool.platform.util;
 
+import com.bytechef.platform.domain.BaseOption;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.ArrayList;
@@ -124,9 +125,18 @@ public final class ToolUtils {
                     .toList());
         }
 
+        List<String> options = null;
+        if (type == PropertyDecorator.Type.ARRAY || type == PropertyDecorator.Type.BOOLEAN
+            || type == PropertyDecorator.Type.DATE || type == PropertyDecorator.Type.DATE_TIME
+            || type == PropertyDecorator.Type.INTEGER || type == PropertyDecorator.Type.NUMBER
+            || type == PropertyDecorator.Type.OBJECT || type == PropertyDecorator.Type.STRING
+            || type == PropertyDecorator.Type.TIME) {
+            options = convertToOptionList(decorator);
+        }
+
         return new PropertyInfo(
             property.getName(), type.name(), property.getDescription(), property.getRequired(),
-            property.getExpressionEnabled(), property.getDisplayCondition(), nestedPropertyInfos);
+            property.getExpressionEnabled(), property.getDisplayCondition(), options, nestedPropertyInfos);
     }
 
     /**
@@ -313,6 +323,24 @@ public final class ToolUtils {
             case PropertyDecorator.Type.TASK -> "\"task" + displayCondition + required;
             default -> "\"string" + displayCondition + required;
         };
+    }
+
+    /**
+     * Converts the options of a property decorator to a list of strings in "label (value)" format.
+     *
+     * @param decorator the property decorator
+     * @return list of option strings, or null if no options are defined
+     */
+    private static List<String> convertToOptionList(PropertyDecorator decorator) {
+        List<? extends BaseOption> options = decorator.getOptions();
+
+        if (options.isEmpty()) {
+            return null;
+        }
+
+        return options.stream()
+            .map(option -> option.getLabel() + " (" + option.getValue() + ")")
+            .toList();
     }
 
     /**
@@ -563,6 +591,56 @@ public final class ToolUtils {
 
         public String getDisplayCondition() {
             return displayCondition;
+        }
+
+        public List<? extends BaseOption> getOptions() {
+            return switch (location) {
+                case COMPONENT -> switch (type) {
+                    case ARRAY ->
+                        ((com.bytechef.platform.component.domain.ArrayProperty) property).getOptions();
+                    case BOOLEAN ->
+                        ((com.bytechef.platform.component.domain.BooleanProperty) property).getOptions();
+                    case DATE ->
+                        ((com.bytechef.platform.component.domain.DateProperty) property).getOptions();
+                    case DATE_TIME ->
+                        ((com.bytechef.platform.component.domain.DateTimeProperty) property).getOptions();
+                    case INTEGER ->
+                        ((com.bytechef.platform.component.domain.IntegerProperty) property).getOptions();
+                    case NUMBER ->
+                        ((com.bytechef.platform.component.domain.NumberProperty) property).getOptions();
+                    case OBJECT ->
+                        ((com.bytechef.platform.component.domain.ObjectProperty) property).getOptions();
+                    case STRING ->
+                        ((com.bytechef.platform.component.domain.StringProperty) property).getOptions();
+                    case TIME ->
+                        ((com.bytechef.platform.component.domain.TimeProperty) property).getOptions();
+                    default -> List.of();
+                };
+                case TASK_DISPATCHER -> switch (type) {
+                    case ARRAY ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty) property).getOptions();
+                    case BOOLEAN ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty) property)
+                            .getOptions();
+                    case DATE ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.DateProperty) property).getOptions();
+                    case DATE_TIME ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.DateTimeProperty) property)
+                            .getOptions();
+                    case INTEGER ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty) property)
+                            .getOptions();
+                    case NUMBER ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty) property).getOptions();
+                    case OBJECT ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty) property).getOptions();
+                    case STRING ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty) property).getOptions();
+                    case TIME ->
+                        ((com.bytechef.platform.workflow.task.dispatcher.domain.TimeProperty) property).getOptions();
+                    default -> List.of();
+                };
+            };
         }
 
         public static List<PropertyDecorator> toPropertyDecorators(List<? extends BaseProperty> properties) {

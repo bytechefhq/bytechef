@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -402,6 +403,46 @@ class ComponentToolsTest {
         assertNotNull(result);
         assertEquals("result", result.name());
         verify(componentDefinitionService).getComponentDefinition(componentName, null);
+    }
+
+    @Test
+    void testGetOutputPropertyIncludesOptions() {
+        String componentName = "testComponent";
+        String actionName = "testAction";
+        Integer version = 1;
+
+        Option option1 = mock(Option.class);
+        when(option1.getLabel()).thenReturn("Active");
+        when(option1.getValue()).thenReturn("active");
+
+        Option option2 = mock(Option.class);
+        when(option2.getLabel()).thenReturn("Inactive");
+        when(option2.getValue()).thenReturn("inactive");
+
+        StringProperty outputProperty = mock(StringProperty.class);
+        when(outputProperty.getName()).thenReturn("status");
+        when(outputProperty.getOptions()).thenReturn(List.of(option1, option2));
+
+        OutputResponse outputResponse = new OutputResponse(outputProperty, null);
+
+        ActionDefinition action = mock(ActionDefinition.class);
+        when(action.getName()).thenReturn(actionName);
+        when(action.isOutputDefined()).thenReturn(true);
+        when(action.isOutputSchemaDefined()).thenReturn(true);
+        when(action.getOutputResponse()).thenReturn(outputResponse);
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+        when(componentDefinition.getName()).thenReturn(componentName);
+        when(componentDefinition.getVersion()).thenReturn(version);
+        when(componentDefinition.getTriggers()).thenReturn(List.of());
+        when(componentDefinition.getActions()).thenReturn(List.of(action));
+        when(componentDefinitionService.getComponentDefinition(componentName, version))
+            .thenReturn(componentDefinition);
+
+        PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
+
+        assertNotNull(result);
+        assertEquals(List.of("Active (active)", "Inactive (inactive)"), result.options());
     }
 
 }
