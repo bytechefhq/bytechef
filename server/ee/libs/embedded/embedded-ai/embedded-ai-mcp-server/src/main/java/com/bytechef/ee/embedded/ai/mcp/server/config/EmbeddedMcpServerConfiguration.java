@@ -29,7 +29,6 @@ import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer.EmbeddedMcpServerSecurityConfigurer;
-import com.bytechef.ee.embedded.ai.mcp.server.service.ConnectTokenService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -39,6 +38,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
@@ -79,6 +79,7 @@ import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHa
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.domain.TenantKey;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -139,11 +140,6 @@ public class EmbeddedMcpServerConfiguration {
     }
 
     @Bean
-    ConnectTokenService connectTokenService() {
-        return new ConnectTokenService();
-    }
-
-    @Bean
     EmbeddedMcpToolFacade embeddedMcpToolFacade(
         ApplicationProperties applicationProperties, ChildJobPrincipalFactory childJobPrincipalFactory,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
@@ -152,7 +148,7 @@ public class EmbeddedMcpServerConfiguration {
         Evaluator evaluator, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        JobService jobService, McpComponentService mcpComponentService,
+        JobService jobService, JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
@@ -182,11 +178,10 @@ public class EmbeddedMcpServerConfiguration {
 
         return new EmbeddedMcpToolFacade(
             clusterElementDefinitionFacade, clusterElementDefinitionService, connectedUserService,
-            connectTokenService(), evaluator, integrationInstanceConfigurationService,
-            integrationInstanceConfigurationWorkflowService,
-            integrationInstanceService, integrationService, jobSyncExecutor, mcpComponentService,
-            integrationInstanceWorkflowService, mcpIntegrationInstanceToolService,
-            mcpIntegrationInstanceConfigurationWorkflowService, mcpServerService, principalJobFacade,
+            evaluator, integrationInstanceConfigurationService, integrationInstanceConfigurationWorkflowService,
+            integrationInstanceService, integrationInstanceWorkflowService, integrationService, jobSyncExecutor,
+            jwtTokenService, mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+            mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade,
             applicationProperties.getPublicUrl(), taskExecutionService, taskFileStorage, workflowService);
     }
 
@@ -216,7 +211,9 @@ public class EmbeddedMcpServerConfiguration {
                     (String) mcpTransportContext.get(ENVIRONMENT));
                 McpServer mcpServer = mcpServerService.getMcpServer((String) mcpTransportContext.get(SECRET_KEY));
 
-                String tenantId = mcpServer.getSecretKey();
+                TenantKey tenantKey = TenantKey.parse(mcpServer.getSecretKey());
+
+                String tenantId = tenantKey.getTenantId();
 
                 mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
                     .stream()
@@ -248,8 +245,7 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     SecurityConfigurerContributor embeddedMcpServerSecurityConfigurerContributor(
-        ConnectTokenService connectTokenService, ConnectedUserService connectedUserService,
-        SigningKeyService signingKeyService) {
+        ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
 
         return new SecurityConfigurerContributor() {
 
@@ -258,8 +254,7 @@ public class EmbeddedMcpServerConfiguration {
             public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
                 getSecurityConfigurerAdapter() {
 
-                return (T) new EmbeddedMcpServerSecurityConfigurer(
-                    connectTokenService, connectedUserService, signingKeyService);
+                return (T) new EmbeddedMcpServerSecurityConfigurer(connectedUserService, signingKeyService);
             }
         };
     }

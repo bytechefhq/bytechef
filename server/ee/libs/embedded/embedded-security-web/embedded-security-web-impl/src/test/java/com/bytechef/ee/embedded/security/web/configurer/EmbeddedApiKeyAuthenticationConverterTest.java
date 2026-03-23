@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -41,9 +42,10 @@ class EmbeddedApiKeyAuthenticationConverterTest {
 
     @BeforeEach
     void setUp() {
+        JwtTokenService jwtTokenService = mock(JwtTokenService.class);
         signingKeyService = mock(SigningKeyService.class);
 
-        converter = new EmbeddedApiKeyAuthenticationConverter(signingKeyService);
+        converter = new EmbeddedApiKeyAuthenticationConverter(jwtTokenService, signingKeyService);
         request = mock(HttpServletRequest.class);
     }
 
