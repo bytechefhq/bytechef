@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.mcp.repository;
 
 import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceTool;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
+@ConditionalOnEEVersion
 public interface McpIntegrationInstanceToolRepository extends ListCrudRepository<McpIntegrationInstanceTool, Long> {
 
     void deleteByIntegrationInstanceId(long integrationInstanceId);

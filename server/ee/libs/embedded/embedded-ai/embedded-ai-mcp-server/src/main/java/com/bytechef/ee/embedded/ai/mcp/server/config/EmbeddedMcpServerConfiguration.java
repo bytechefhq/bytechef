@@ -104,8 +104,8 @@ import org.springframework.web.servlet.function.ServerResponse;
  *
  * @author Ivica Cardic
  */
-@ConditionalOnEEVersion
 @Configuration
+@ConditionalOnEEVersion
 public class EmbeddedMcpServerConfiguration {
 
     private static final String ENVIRONMENT = "environment";

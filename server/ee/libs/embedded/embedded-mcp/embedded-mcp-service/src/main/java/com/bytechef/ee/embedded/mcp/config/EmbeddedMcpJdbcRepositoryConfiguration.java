@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.mcp.config;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
@@ -20,5 +21,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
 @EnableJdbcRepositories(basePackages = "com.bytechef.ee.embedded.mcp.repository")
+@ConditionalOnEEVersion
 class EmbeddedMcpJdbcRepositoryConfiguration {
 }

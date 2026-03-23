@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.mcp.repository;
 
 import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Modifying;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
+@ConditionalOnEEVersion
 public interface McpIntegrationInstanceConfigurationWorkflowRepository
     extends ListCrudRepository<McpIntegrationInstanceConfigurationWorkflow, Long> {
 
