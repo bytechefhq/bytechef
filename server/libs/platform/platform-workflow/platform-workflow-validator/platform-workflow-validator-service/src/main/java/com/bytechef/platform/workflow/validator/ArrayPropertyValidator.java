@@ -338,7 +338,7 @@ class ArrayPropertyValidator {
 
                 simplified.add(new PropertyInfo(
                     prop.name(), prop.type(), prop.description(), prop.required(),
-                    prop.expressionEnabled(), simplifiedCondition, prop.nestedProperties()));
+                    prop.expressionEnabled(), simplifiedCondition, prop.options(), prop.nestedProperties()));
             } else {
                 simplified.add(prop);
             }
