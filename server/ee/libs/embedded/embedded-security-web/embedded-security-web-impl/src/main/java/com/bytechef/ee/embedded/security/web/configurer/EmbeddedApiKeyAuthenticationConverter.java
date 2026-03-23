@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.security.web.configurer;
 
+import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -22,6 +23,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.security.core.Authentication;
@@ -39,9 +41,11 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
     static final Pattern JWT_TOKEN_PATTERN =
         Pattern.compile("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_.+/=]*$");
 
+    private final JwtTokenService jwtTokenService;
     private final SigningKeyService signingKeyService;
 
-    EmbeddedApiKeyAuthenticationConverter(SigningKeyService signingKeyService) {
+    EmbeddedApiKeyAuthenticationConverter(JwtTokenService jwtTokenService, SigningKeyService signingKeyService) {
+        this.jwtTokenService = jwtTokenService;
         this.signingKeyService = signingKeyService;
     }
 
@@ -89,16 +93,24 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
 
     private Jws<Claims> getJws(String secretKey, long environmentId) {
         return Jwts.parser()
-            .keyLocator(new SigningKeyLocator(environmentId, signingKeyService))
+            .keyLocator(new SigningKeyLocator(environmentId, jwtTokenService, signingKeyService))
             .build()
             .parseSignedClaims(secretKey);
     }
 
-    private record SigningKeyLocator(long environmentId, SigningKeyService signingKeyService) implements Locator<Key> {
+    private record SigningKeyLocator(
+        long environmentId, JwtTokenService jwtTokenService, SigningKeyService signingKeyService)
+        implements Locator<Key> {
 
         @Override
         public Key locate(Header header) {
             String keyId = (String) header.get("kid");
+
+            PublicKey publicKey = jwtTokenService.getPublicKey(keyId);
+
+            if (publicKey != null) {
+                return publicKey;
+            }
 
             TenantKey tenantKey = TenantKey.parse(keyId);
 
