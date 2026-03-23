@@ -44,10 +44,12 @@ import io.modelcontextprotocol.util.Assert;
 import io.modelcontextprotocol.util.McpUriTemplateManagerFactory;
 import io.modelcontextprotocol.util.Utils;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiFunction;
@@ -58,7 +60,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A fork of the MCP SDK's {@code McpAsyncServer} (0.17.0) that adds per-session tool filtering.
+ * A fork of the MCP SDK's {@code McpAsyncServer} (1.1.0) that adds per-session tool filtering.
  *
  * <p>
  * The standard {@code McpAsyncServer} returns all registered tools to every client session. This class introduces a
@@ -99,12 +101,16 @@ public class FilterableMcpAsyncServer {
     private final ConcurrentHashMap<String, McpServerFeatures.AsyncPromptSpecification> prompts =
         new ConcurrentHashMap<>();
 
-    // FIXME: this field is deprecated and should be removed together with the
-    // broadcasting loggingNotification.
-    private LoggingLevel minLoggingLevel = LoggingLevel.DEBUG;
-
     private final ConcurrentHashMap<McpSchema.CompleteReference, McpServerFeatures.AsyncCompletionSpecification> completions =
         new ConcurrentHashMap<>();
+
+    private final ConcurrentHashMap<String, Set<String>> resourceSubscriptions = new ConcurrentHashMap<>();
+
+    // FIXME: this field is deprecated and should be removed together with the
+    // broadcasting loggingNotification.
+    // Note: exchange.setMinLoggingLevel() is package-private in the MCP SDK,
+    // so we can only set the deprecated global-level field from outside the package.
+    private LoggingLevel minLoggingLevel = LoggingLevel.DEBUG;
 
     private List<String> protocolVersions;
 
@@ -191,7 +197,8 @@ public class FilterableMcpAsyncServer {
         this.protocolVersions = mcpTransportProvider.protocolVersions();
 
         mcpTransportProvider.setSessionFactory(new DefaultMcpStreamableServerSessionFactory(requestTimeout,
-            this::asyncInitializeRequestHandler, requestHandlers, notificationHandlers));
+            this::asyncInitializeRequestHandler, requestHandlers, notificationHandlers,
+            sessionId -> this.cleanupForSession(sessionId)));
     }
 
     private Map<String, McpNotificationHandler> prepareNotificationHandlers(
@@ -236,6 +243,12 @@ public class FilterableMcpAsyncServer {
             requestHandlers.put(McpSchema.METHOD_RESOURCES_LIST, resourcesListRequestHandler());
             requestHandlers.put(McpSchema.METHOD_RESOURCES_READ, resourcesReadRequestHandler());
             requestHandlers.put(McpSchema.METHOD_RESOURCES_TEMPLATES_LIST, resourceTemplateListRequestHandler());
+
+            if (Boolean.TRUE.equals(this.serverCapabilities.resources()
+                .subscribe())) {
+                requestHandlers.put(McpSchema.METHOD_RESOURCES_SUBSCRIBE, resourcesSubscribeRequestHandler());
+                requestHandlers.put(McpSchema.METHOD_RESOURCES_UNSUBSCRIBE, resourcesUnsubscribeRequestHandler());
+            }
         }
 
         // Add prompts API handlers if provider exists
@@ -323,6 +336,17 @@ public class FilterableMcpAsyncServer {
         this.mcpTransportProvider.close();
     }
 
+    private Mono<Void> cleanupForSession(String sessionId) {
+        return Mono.fromRunnable(() -> removeSessionSubscriptions(sessionId));
+    }
+
+    private void removeSessionSubscriptions(String sessionId) {
+        this.resourceSubscriptions.forEach((uri, sessions) -> sessions.remove(sessionId));
+        this.resourceSubscriptions.entrySet()
+            .removeIf(entry -> entry.getValue()
+                .isEmpty());
+    }
+
     private McpNotificationHandler asyncRootsListChangedNotificationHandler(
         List<BiFunction<McpAsyncServerExchange, List<McpSchema.Root>, Mono<Void>>> rootsChangeConsumers) {
 
@@ -356,7 +380,7 @@ public class FilterableMcpAsyncServer {
             return Mono.error(new IllegalArgumentException("Tool must not be null"));
         }
 
-        if (toolSpecification.call() == null && toolSpecification.callHandler() == null) {
+        if (toolSpecification.callHandler() == null) {
             return Mono.error(new IllegalArgumentException("Tool call handler must not be null"));
         }
 
@@ -781,15 +805,34 @@ public class FilterableMcpAsyncServer {
     }
 
     /**
-     * Notifies clients that the resources have updated.
+     * Notifies only the sessions that have subscribed to the updated resource URI.
      *
-     * @return A Mono that completes when all clients have been notified
+     * @param resourcesUpdatedNotification the notification containing the updated resource URI
+     * @return A Mono that completes when all subscribed sessions have been notified
      */
     public Mono<Void> notifyResourcesUpdated(
         McpSchema.ResourcesUpdatedNotification resourcesUpdatedNotification) {
 
-        return this.mcpTransportProvider.notifyClients(
-            McpSchema.METHOD_NOTIFICATION_RESOURCES_UPDATED, resourcesUpdatedNotification);
+        return Mono.defer(() -> {
+            String uri = resourcesUpdatedNotification.uri();
+
+            Set<String> subscribedSessions = this.resourceSubscriptions.get(uri);
+
+            if (subscribedSessions == null || subscribedSessions.isEmpty()) {
+                logger.debug("No sessions subscribed to resource URI: {}", uri);
+
+                return Mono.empty();
+            }
+
+            return Flux.fromIterable(subscribedSessions)
+                .flatMap(sessionId -> this.mcpTransportProvider
+                    .notifyClient(sessionId, McpSchema.METHOD_NOTIFICATION_RESOURCES_UPDATED,
+                        resourcesUpdatedNotification)
+                    .doOnError(error -> logger.error(
+                        "Failed to notify session {} of resource update for {}", sessionId, uri, error))
+                    .onErrorComplete())
+                .then();
+        });
     }
 
     private McpRequestHandler<McpSchema.ListResourcesResult> resourcesListRequestHandler() {
@@ -835,6 +878,48 @@ public class FilterableMcpAsyncServer {
                         .orElseGet(() -> Mono.error(RESOURCE_NOT_FOUND.apply(resourceUri)));
                 });
         };
+    }
+
+    private McpRequestHandler<Object> resourcesSubscribeRequestHandler() {
+        return (exchange, params) -> Mono.defer(() -> {
+            McpSchema.SubscribeRequest subscribeRequest = jsonMapper.convertValue(params,
+                new TypeRef<McpSchema.SubscribeRequest>() {});
+
+            String uri = subscribeRequest.uri();
+            String sessionId = exchange.sessionId();
+
+            this.resourceSubscriptions
+                .computeIfAbsent(uri, key -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
+                .add(sessionId);
+
+            logger.debug("Session {} subscribed to resource URI: {}", sessionId, uri);
+
+            return Mono.just(Map.of());
+        });
+    }
+
+    private McpRequestHandler<Object> resourcesUnsubscribeRequestHandler() {
+        return (exchange, params) -> Mono.defer(() -> {
+            McpSchema.UnsubscribeRequest unsubscribeRequest = jsonMapper.convertValue(params,
+                new TypeRef<McpSchema.UnsubscribeRequest>() {});
+
+            String uri = unsubscribeRequest.uri();
+            String sessionId = exchange.sessionId();
+
+            Set<String> sessions = this.resourceSubscriptions.get(uri);
+
+            if (sessions != null) {
+                sessions.remove(sessionId);
+
+                if (sessions.isEmpty()) {
+                    this.resourceSubscriptions.remove(uri, sessions);
+                }
+            }
+
+            logger.debug("Session {} unsubscribed from resource URI: {}", sessionId, uri);
+
+            return Mono.just(Map.of());
+        });
     }
 
     private Optional<McpServerFeatures.AsyncResourceSpecification> findResourceSpecification(String uri) {
@@ -999,7 +1084,9 @@ public class FilterableMcpAsyncServer {
     @Deprecated
     public Mono<Void> loggingNotification(LoggingMessageNotification loggingMessageNotification) {
         if (loggingMessageNotification == null) {
-            return Mono.error(new McpError("Logging message must not be null"));
+            return Mono.error(McpError.builder(ErrorCodes.INVALID_PARAMS)
+                .message("Logging message must not be null")
+                .build());
         }
 
         if (loggingMessageNotification.level()

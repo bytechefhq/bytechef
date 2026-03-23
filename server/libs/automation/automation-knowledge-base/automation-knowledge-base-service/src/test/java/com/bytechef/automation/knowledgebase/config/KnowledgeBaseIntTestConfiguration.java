@@ -42,6 +42,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @ComponentScan(
     basePackages = {
@@ -98,8 +99,9 @@ public class KnowledgeBaseIntTestConfiguration {
     }
 
     @Bean
-    com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper() {
-        return new com.fasterxml.jackson.databind.ObjectMapper();
+    ObjectMapper jacksonObjectMapper() {
+        return JsonMapper.builder()
+            .build();
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

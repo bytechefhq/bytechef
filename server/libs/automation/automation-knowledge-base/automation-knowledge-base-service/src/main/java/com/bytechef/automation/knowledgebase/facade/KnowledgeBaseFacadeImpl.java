@@ -24,9 +24,6 @@ import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +36,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -110,7 +110,7 @@ class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
             }
 
             return combinedFilter.build();
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new IllegalArgumentException(
                 "Invalid metadata filters JSON: " + metadataFilters, exception);
         }

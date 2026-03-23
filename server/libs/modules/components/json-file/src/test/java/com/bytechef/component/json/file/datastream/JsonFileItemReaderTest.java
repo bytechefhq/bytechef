@@ -282,8 +282,10 @@ class JsonFileItemReaderTest {
 
     private List<Map<String, Object>> parseJsonArray(String content) {
         try {
-            return new com.fasterxml.jackson.databind.ObjectMapper().readValue(
-                content, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
+            return tools.jackson.databind.json.JsonMapper.builder()
+                .build()
+                .readValue(
+                    content, new tools.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
         } catch (Exception exception) {
             return List.of();
         }
@@ -291,8 +293,10 @@ class JsonFileItemReaderTest {
 
     private Map<String, Object> parseJsonObject(String content) {
         try {
-            return new com.fasterxml.jackson.databind.ObjectMapper().readValue(
-                content, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+            return tools.jackson.databind.json.JsonMapper.builder()
+                .build()
+                .readValue(
+                    content, new tools.jackson.core.type.TypeReference<Map<String, Object>>() {});
         } catch (Exception exception) {
             return Map.of();
         }

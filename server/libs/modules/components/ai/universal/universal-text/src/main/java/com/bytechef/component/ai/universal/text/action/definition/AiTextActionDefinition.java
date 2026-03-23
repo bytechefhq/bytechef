@@ -20,7 +20,6 @@ import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
 import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
 import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
 import static com.bytechef.component.ai.llm.Provider.GROQ;
-import static com.bytechef.component.ai.llm.Provider.HUGGING_FACE;
 import static com.bytechef.component.ai.llm.Provider.MISTRAL;
 import static com.bytechef.component.ai.llm.Provider.NVIDIA;
 import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
@@ -34,7 +33,6 @@ import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
 import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
-import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
@@ -49,7 +47,6 @@ import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.AzureOpenAi;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.DeepSeek;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Groq;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.HuggingFace;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Mistral;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Nvidia;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.OpenAi;
@@ -137,7 +134,6 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
             case AZURE_OPEN_AI -> getAzureOpenAiChatModel(activeProviderKeys);
             case DEEPSEEK -> getDeepSeekModel(activeProviderKeys);
             case GROQ -> getGroqChatModel(activeProviderKeys);
-            case HUGGING_FACE -> getHuggingFaceChatModel(activeProviderKeys);
             case MISTRAL -> getMistralChatModel(activeProviderKeys);
             case NVIDIA -> getNvidiaChatModel(activeProviderKeys);
             case OPEN_AI -> getOpenAiChatModel(activeProviderKeys);
@@ -289,18 +285,6 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         }
 
         return new ChatModelResult(PerplexityChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getHuggingFaceChatModel(List<String> activeProviderKeys) {
-        String token = getAiProviderToken(HUGGING_FACE.getKey(), activeProviderKeys);
-
-        if (token == null) {
-            HuggingFace huggingFace = aiProvider.getHuggingFace();
-
-            token = huggingFace.getApiKey();
-        }
-
-        return new ChatModelResult(HuggingFaceChatAction.CHAT_MODEL, token);
     }
 
     private ChatModelResult getMistralChatModel(List<String> activeProviderKeys) {

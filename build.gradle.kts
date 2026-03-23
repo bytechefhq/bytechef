@@ -20,7 +20,7 @@ dependencyManagement {
 
 versionCatalogUpdate {
     keep {
-        versions.addAll("checkstyle", "findsecbugs", "gradle-git-properties", "jackson", "jacoco", "java", "jib-gradle-plugin", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell", "testcontainers")
+        versions.addAll("checkstyle", "findsecbugs", "gradle-git-properties", "io-modelcontextprotocol-sdk", "jackson", "jacoco", "java", "jib-gradle-plugin", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell", "testcontainers")
     }
 }
 

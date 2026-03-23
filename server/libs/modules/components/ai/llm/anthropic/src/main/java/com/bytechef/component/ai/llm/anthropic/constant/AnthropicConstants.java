@@ -36,10 +36,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
-import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.ai.anthropic.api.AnthropicApi.ChatModel;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -51,8 +50,21 @@ public class AnthropicConstants {
         .description("The maximum number of tokens to generate in the chat completion.")
         .required(true);
 
-    public static final List<Option<String>> MODELS = ModelUtils.getEnumOptions(Arrays.stream(ChatModel.values())
-        .collect(Collectors.toMap(ChatModel::getValue, ChatModel::getValue)));
+    private static final Map<String, String> MODEL_MAP = new LinkedHashMap<>();
+
+    static {
+        MODEL_MAP.put("claude-opus-4-6", "claude-opus-4-6");
+        MODEL_MAP.put("claude-sonnet-4-6", "claude-sonnet-4-6");
+        MODEL_MAP.put("claude-haiku-4-5", "claude-haiku-4-5");
+        MODEL_MAP.put("claude-opus-4-5", "claude-opus-4-5");
+        MODEL_MAP.put("claude-sonnet-4-5", "claude-sonnet-4-5");
+        MODEL_MAP.put("claude-opus-4-1", "claude-opus-4-1");
+        MODEL_MAP.put("claude-opus-4-0", "claude-opus-4-0");
+        MODEL_MAP.put("claude-sonnet-4-0", "claude-sonnet-4-0");
+        MODEL_MAP.put("claude-3-haiku-20240307", "claude-3-haiku-20240307");
+    }
+
+    public static final List<Option<String>> MODELS = ModelUtils.getEnumOptions(MODEL_MAP);
 
     public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
         .label("Model")
