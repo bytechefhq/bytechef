@@ -17,6 +17,7 @@ spring-boot = "4.0.4"
 spring-cloud-aws = "4.0.0"
 spring-cloud-dependencies = "2025.1.1"
 spring-shell = "4.0.1"
+springaicommunity-agent-judge = "0.9.0"
 springaicommunity-agent-utils = "0.5.0"
 testcontainers = "1.21.3"
 
