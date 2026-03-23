@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.mcp.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.mcp.repository.McpIntegrationInstanceConfigurationRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class McpIntegrationInstanceConfigurationServiceImpl implements McpIntegrationInstanceConfigurationService {
 
     private final McpIntegrationInstanceConfigurationRepository mcpIntegrationInstanceConfigurationRepository;
