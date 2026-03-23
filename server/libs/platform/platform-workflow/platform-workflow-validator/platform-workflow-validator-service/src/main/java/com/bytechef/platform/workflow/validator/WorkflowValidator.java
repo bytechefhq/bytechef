@@ -76,7 +76,7 @@ public class WorkflowValidator {
      */
     public static void validateWorkflow(
         String workflow, TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider,
-        ClusterTypesProvider clusterTypesProvider, Map<String, List<PropertyInfo>> taskDefinitionMap,
+        @Nullable ClusterTypesProvider clusterTypesProvider, Map<String, List<PropertyInfo>> taskDefinitionMap,
         Map<String, PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesMap,
         StringBuilder errors, StringBuilder warnings) {
 
@@ -90,9 +90,9 @@ public class WorkflowValidator {
             processTriggers(
                 taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, errors, warnings,
                 workflowJsonNode, taskJsonNodes);
-            processTasks(taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
-                taskOutputMap,
-                clusterTypesMap, errors, warnings, workflowJsonNode, taskJsonNodes);
+            processTasks(
+                taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
+                taskOutputMap, clusterTypesMap, workflowJsonNode, taskJsonNodes, errors, warnings);
             validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
         } catch (Exception e) {
             errors.append("Failed to validate workflow: ");
@@ -111,8 +111,8 @@ public class WorkflowValidator {
      */
     public static void validateWorkflowTasks(
         List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
-        Map<String, PropertyInfo> taskOutput, Map<String, List<String>> clusterTypesProviderMap,
-        StringBuilder errors, StringBuilder warnings) {
+        Map<String, PropertyInfo> taskOutput, Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors,
+        StringBuilder warnings) {
 
         ValidationContext context = ValidationContext.of(
             taskJsonNodes, taskDefinitionMap, taskOutput, clusterTypesProviderMap, errors, warnings);
@@ -164,8 +164,8 @@ public class WorkflowValidator {
         JsonNode parametersJsonNode, Map<String, List<PropertyInfo>> taskDefinitionMap,
         Map<String, @Nullable PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesMap,
         List<JsonNode> taskJsonNodes, TaskDefinitionProvider taskDefinitionProvider,
-        TaskOutputProvider taskOutputProvider,
-        ClusterTypesProvider clusterTypesProvider, StringBuilder errors, StringBuilder warnings) {
+        TaskOutputProvider taskOutputProvider, ClusterTypesProvider clusterTypesProvider, StringBuilder errors,
+        StringBuilder warnings) {
 
         for (String propertyName : NESTED_TASK_PROPERTIES) {
             if (parametersJsonNode.has(propertyName)) {
@@ -177,8 +177,9 @@ public class WorkflowValidator {
 
                         if (nestedTaskJsonNode.isObject() && nestedTaskJsonNode.has("type")) {
                             String type =
-                                getType(taskDefinitionMap, taskOutputMap, taskJsonNodes,
-                                    taskDefinitionProvider, taskOutputProvider, errors, warnings, nestedTaskJsonNode);
+                                getType(
+                                    taskDefinitionMap, taskOutputMap, taskJsonNodes, taskDefinitionProvider,
+                                    taskOutputProvider, errors, warnings, nestedTaskJsonNode);
 
                             if (nestedTaskJsonNode.has("clusterElements")) {
                                 List<String> clusterElementTypes =
@@ -188,9 +189,9 @@ public class WorkflowValidator {
                                     clusterTypesMap.putIfAbsent(type, clusterElementTypes);
                                 }
 
-                                processClusterElements(nestedTaskJsonNode, taskDefinitionMap, taskOutputMap,
-                                    clusterTypesMap, taskDefinitionProvider, taskOutputProvider,
-                                    clusterTypesProvider, warnings);
+                                processClusterElements(
+                                    nestedTaskJsonNode, taskDefinitionMap, taskOutputMap, clusterTypesMap,
+                                    taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, warnings);
                             }
 
                             if (nestedTaskJsonNode.has("parameters")) {
@@ -199,8 +200,8 @@ public class WorkflowValidator {
                                 if (nestedTaskDefinition != null && !nestedTaskDefinition.isEmpty()) {
                                     extractNestedTasksFromParameters(
                                         nestedTaskJsonNode.get("parameters"), nestedTaskDefinition,
-                                        taskDefinitionMap, taskOutputMap, clusterTypesMap, taskJsonNodes,
-                                        taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, errors,
+                                        taskDefinitionMap, taskOutputMap, taskJsonNodes,
+                                        taskDefinitionProvider, taskOutputProvider, errors,
                                         warnings);
                                 } else {
                                     // Recursively discover more nested tasks
@@ -222,11 +223,9 @@ public class WorkflowValidator {
      */
     private static void extractNestedTasksFromParameters(
         JsonNode parametersJsonNode, List<PropertyInfo> taskDefinition,
-        Map<String, List<PropertyInfo>> taskDefinitionMap,
-        Map<String, @Nullable PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesMap,
+        Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, @Nullable PropertyInfo> taskOutputMap,
         List<JsonNode> taskJsonNodes, TaskDefinitionProvider taskDefinitionProvider,
-        TaskOutputProvider taskOutputProvider, ClusterTypesProvider clusterTypesProvider,
-        StringBuilder errors, StringBuilder warnings) {
+        TaskOutputProvider taskOutputProvider, StringBuilder errors, StringBuilder warnings) {
 
         for (PropertyInfo propertyInfo : taskDefinition) {
             String propertyName = propertyInfo.name();
@@ -252,10 +251,9 @@ public class WorkflowValidator {
                                 List<PropertyInfo> nestedTaskDefinition = taskDefinitionMap.get(type);
 
                                 if (nestedTaskDefinition != null) {
-                                    extractNestedTasksFromParameters(nestedTaskJsonNode.get("parameters"),
-                                        nestedTaskDefinition, taskDefinitionMap,
-                                        taskOutputMap, clusterTypesMap, taskJsonNodes,
-                                        taskDefinitionProvider, taskOutputProvider, clusterTypesProvider,
+                                    extractNestedTasksFromParameters(
+                                        nestedTaskJsonNode.get("parameters"), nestedTaskDefinition, taskDefinitionMap,
+                                        taskOutputMap, taskJsonNodes, taskDefinitionProvider, taskOutputProvider,
                                         errors, warnings);
                                 }
                             }
@@ -347,8 +345,9 @@ public class WorkflowValidator {
                     clusterTypesMap.putIfAbsent(type, clusterElementTypes);
                 }
 
-                processClusterElements(clusterElementJsonNode, taskDefinitionMap, taskOutputMap, clusterTypesMap,
-                    taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, warnings);
+                processClusterElements(
+                    clusterElementJsonNode, taskDefinitionMap, taskOutputMap, clusterTypesMap, taskDefinitionProvider,
+                    taskOutputProvider, clusterTypesProvider, warnings);
             }
         }
     }
@@ -376,9 +375,10 @@ public class WorkflowValidator {
 
     private static void processTasks(
         TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider,
-        ClusterTypesProvider clusterTypesProvider, Map<String, List<PropertyInfo>> taskDefinitionMap,
+        @Nullable ClusterTypesProvider clusterTypesProvider, Map<String, List<PropertyInfo>> taskDefinitionMap,
         Map<String, @Nullable PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesMap,
-        StringBuilder errors, StringBuilder warnings, JsonNode workflowJsonNode, List<JsonNode> taskJsonNodes) {
+        JsonNode workflowJsonNode, List<JsonNode> taskJsonNodes, StringBuilder errors, StringBuilder warnings) {
+
         JsonNode tasksJsonNode = workflowJsonNode.get("tasks");
 
         if (tasksJsonNode != null && tasksJsonNode.isArray()) {
@@ -439,8 +439,8 @@ public class WorkflowValidator {
 
                     String type = typeJsonNode.asString();
 
-                    taskDefinitionPropertyInfosMap.putIfAbsent(type,
-                        taskDefinitionProvider.getTaskProperties(type, "trigger"));
+                    taskDefinitionPropertyInfosMap.putIfAbsent(
+                        type, taskDefinitionProvider.getTaskProperties(type, "trigger"));
                     taskOutputPropertyInfoMap.putIfAbsent(
                         type, taskOutputProvider.getTaskOutputProperty(type, "trigger", warnings));
                 } else {

@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -133,30 +134,33 @@ class PropertyValidator {
     private static void generateWarningsForUndefinedNestedProperties(
         JsonNode valueJsonNode, String propertyPath, StringBuilder warnings) {
 
-        Iterator<String> fieldNamesIterator = valueJsonNode.propertyNames()
-            .iterator();
+        Collection<String> propertyNames = valueJsonNode.propertyNames();
 
-        fieldNamesIterator.forEachRemaining(curFieldName -> {
-            String fieldPath = PropertyUtils.buildPropertyPath(propertyPath, curFieldName);
-            StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(fieldPath), warnings);
+        Iterator<String> propertyNamesIterator = propertyNames.iterator();
+
+        propertyNamesIterator.forEachRemaining(curPropertyName -> {
+            String curPropertyPath = PropertyUtils.buildPropertyPath(propertyPath, curPropertyName);
+            StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(curPropertyPath), warnings);
         });
     }
 
     /**
      * Generates warnings for all properties recursively.
      */
-    private static void generateWarningsForAllProperties(JsonNode jsonNode, String path, StringBuilder warnings) {
-        Iterator<String> fieldNamesIterator = jsonNode.propertyNames()
-            .iterator();
+    private static void
+        generateWarningsForAllProperties(JsonNode jsonNode, String propertyPath, StringBuilder warnings) {
+        Collection<String> propertyNames = jsonNode.propertyNames();
 
-        fieldNamesIterator.forEachRemaining(fieldName -> {
-            String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);
-            JsonNode valueJsonNode = jsonNode.get(fieldName);
+        Iterator<String> propertyNamesIterator = propertyNames.iterator();
 
-            StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(propertyPath), warnings);
+        propertyNamesIterator.forEachRemaining(propertyName -> {
+            String curPropertyPath = PropertyUtils.buildPropertyPath(propertyPath, propertyName);
+            JsonNode valueJsonNode = jsonNode.get(propertyName);
+
+            StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(curPropertyPath), warnings);
 
             if (valueJsonNode.isObject()) {
-                generateWarningsForAllProperties(valueJsonNode, propertyPath, warnings);
+                generateWarningsForAllProperties(valueJsonNode, curPropertyPath, warnings);
             }
         });
     }
