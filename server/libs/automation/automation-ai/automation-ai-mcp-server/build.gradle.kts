@@ -1,9 +1,9 @@
 dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
-    implementation("io.modelcontextprotocol.sdk:mcp-spring-webmvc:0.17.0")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
+    implementation("org.springframework.ai:mcp-spring-webmvc")
     implementation("org.springframework.ai:spring-ai-mcp")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))

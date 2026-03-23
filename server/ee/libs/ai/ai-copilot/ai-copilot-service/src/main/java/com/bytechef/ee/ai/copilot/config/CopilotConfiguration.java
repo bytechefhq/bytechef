@@ -9,6 +9,8 @@ package com.bytechef.ee.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.anthropic.client.AnthropicClient;
+import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ReadProjectToolsImpl;
@@ -39,7 +41,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
-import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
@@ -54,7 +55,6 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -137,27 +137,30 @@ public class CopilotConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    AnthropicApi anthropicApi() {
-        return AnthropicApi.builder()
+    AnthropicClient anthropicClient() {
+        return AnthropicOkHttpClient.builder()
             .apiKey(anthropicApiKey)
-            .restClientBuilder(getRestClientBuilder())
             .build();
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    AnthropicChatModel anthropicChatModel() {
-        return new SafeAnthropicChatModel(
-            anthropicApi(),
-            AnthropicChatOptions.builder()
-                .model(anthropicChatModel)
-                .temperature(anthropicChatTemperature)
-                .maxTokens(64000)
-                .build(),
-            ToolCallingManager.builder()
-                .build(),
-            RetryUtils.DEFAULT_RETRY_TEMPLATE,
-            ObservationRegistry.NOOP);
+    ChatModel anthropicChatModel(AnthropicClient anthropicClient) {
+        AnthropicChatModel delegate = AnthropicChatModel.builder()
+            .anthropicClient(anthropicClient)
+            .options(
+                AnthropicChatOptions.builder()
+                    .model(anthropicChatModel)
+                    .temperature(anthropicChatTemperature)
+                    .maxTokens(64000)
+                    .build())
+            .toolCallingManager(
+                ToolCallingManager.builder()
+                    .build())
+            .observationRegistry(ObservationRegistry.NOOP)
+            .build();
+
+        return new SafeAnthropicChatModel(delegate);
     }
 
     @Bean

@@ -11,9 +11,6 @@ import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +20,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Filter that authenticates SCIM 2.0 requests using Bearer token authentication. The Bearer token is matched against

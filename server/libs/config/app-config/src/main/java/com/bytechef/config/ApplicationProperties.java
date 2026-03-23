@@ -1192,13 +1192,6 @@ public class ApplicationProperties {
                 return nvidia;
             }
 
-            /** HuggingFace configuration */
-            private HuggingFace huggingFace = new HuggingFace();
-
-            public HuggingFace getHuggingFace() {
-                return huggingFace;
-            }
-
             public Mistral getMistral() {
                 return mistral;
             }
@@ -1261,10 +1254,6 @@ public class ApplicationProperties {
 
             public void setNvidia(Nvidia nvidia) {
                 this.nvidia = nvidia;
-            }
-
-            public void setHuggingFace(HuggingFace huggingFace) {
-                this.huggingFace = huggingFace;
             }
 
             public void setMistral(Mistral mistral) {
@@ -1429,20 +1418,6 @@ public class ApplicationProperties {
 
             /** NVIDIA AI API configuration. */
             public static class Nvidia {
-                /** API key */
-                private String apiKey;
-
-                public String getApiKey() {
-                    return apiKey;
-                }
-
-                public void setApiKey(String apiKey) {
-                    this.apiKey = apiKey;
-                }
-            }
-
-            /** HuggingFace API configuration. */
-            public static class HuggingFace {
                 /** API key */
                 private String apiKey;
 

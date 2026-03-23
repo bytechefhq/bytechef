@@ -920,6 +920,10 @@
         "description": null,
         "label": "dall-e-3",
         "value": "dall-e-3"
+      }, {
+        "description": null,
+        "label": "gpt-image-1-mini",
+        "value": "gpt-image-1-mini"
       } ],
       "optionsDataSource": null,
       "placeholder": null,

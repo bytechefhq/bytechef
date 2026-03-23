@@ -17,9 +17,6 @@
 package com.bytechef.platform.component.util;
 
 import com.bytechef.platform.component.domain.Property;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.victools.jsonschema.generator.Module;
 import com.github.victools.jsonschema.generator.Option;
 import com.github.victools.jsonschema.generator.OptionPreset;
@@ -39,6 +36,9 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.util.json.JsonParser;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Generates JSON schema for input parameters.
@@ -64,9 +64,9 @@ public class JsonSchemaGeneratorUtils {
     }
 
     public static String generateInputSchema(List<? extends Property> properties) {
-        ObjectMapper objectMapper = JsonParser.getObjectMapper();
+        JsonMapper jsonMapper = JsonParser.getJsonMapper();
 
-        ObjectNode schemaObjectNode = objectMapper.createObjectNode();
+        ObjectNode schemaObjectNode = jsonMapper.createObjectNode();
 
         schemaObjectNode.put("type", "object");
         schemaObjectNode.put("additionalProperties", false);

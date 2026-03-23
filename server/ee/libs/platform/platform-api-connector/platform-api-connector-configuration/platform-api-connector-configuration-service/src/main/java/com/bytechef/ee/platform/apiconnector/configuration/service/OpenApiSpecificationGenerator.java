@@ -13,9 +13,6 @@ import com.bytechef.ee.platform.apiconnector.configuration.dto.ParameterDefiniti
 import com.bytechef.ee.platform.apiconnector.configuration.dto.RequestBodyDefinitionDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ResponseDefinitionDTO;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,6 +20,9 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Service for generating OpenAPI specifications from endpoint definitions.
@@ -173,7 +173,7 @@ public class OpenApiSpecificationGenerator {
                 JsonNode schemaNode = objectMapper.readTree(schemaString);
 
                 mediaType.put("schema", objectMapper.convertValue(schemaNode, Map.class));
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 Map<String, Object> fallbackSchema = new LinkedHashMap<>();
 
                 fallbackSchema.put("type", "object");
@@ -225,7 +225,7 @@ public class OpenApiSpecificationGenerator {
                         JsonNode schemaNode = objectMapper.readTree(schemaString);
 
                         mediaType.put("schema", objectMapper.convertValue(schemaNode, Map.class));
-                    } catch (JsonProcessingException e) {
+                    } catch (JacksonException e) {
                         Map<String, Object> fallbackSchema = new LinkedHashMap<>();
 
                         fallbackSchema.put("type", "object");
