@@ -7,7 +7,7 @@ import './connect.css';
 const ENVIRONMENTS = ['DEVELOPMENT', 'STAGING', 'PRODUCTION'] as const;
 
 interface JwtPayloadI {
-    env: number;
+    environmentId: number;
     exp: number;
     integrationId: number;
 }
@@ -58,7 +58,7 @@ function parseTokenData(jwtToken: string): ParseResultType {
         return {reason: 'expired', status: 'error'};
     }
 
-    const environment = ENVIRONMENTS[payload.env];
+    const environment = ENVIRONMENTS[payload.environmentId];
 
     if (!environment) {
         return {reason: 'corrupted', status: 'error'};
@@ -122,44 +122,38 @@ function ConnectPage() {
     }, []);
 
     return (
-        <div className="connect-container">
-            <div className="connect-card">
-                <div className="connect-logo">
-                    <h1>ByteChef</h1>
+        <>
+            {(pageState === 'expired' || pageState === 'error') && (
+                <div className="connect-container">
+                    <div className="connect-card">
+                        {pageState === 'expired' && (
+                            <div className="connect-expired">
+                                <div className="connect-expired-icon">&#9888;</div>
+
+                                <h2>Link Expired</h2>
+
+                                <p>This connection link has expired. Please request a new link from your MCP client.</p>
+                            </div>
+                        )}
+
+                        {pageState === 'error' && (
+                            <div className="connect-expired">
+                                <div className="connect-expired-icon">&#9888;</div>
+
+                                <h2>Invalid Link</h2>
+
+                                <p>
+                                    This connection link is invalid or corrupted. Please request a new link from your
+                                    MCP client.
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 </div>
+            )}
 
-                {pageState === 'loading' && (
-                    <div className="connect-expired">
-                        <p>Loading...</p>
-                    </div>
-                )}
-
-                {pageState === 'expired' && (
-                    <div className="connect-expired">
-                        <div className="connect-expired-icon">&#9888;</div>
-
-                        <h2>Link Expired</h2>
-
-                        <p>This connection link has expired. Please request a new link from your MCP client.</p>
-                    </div>
-                )}
-
-                {pageState === 'error' && (
-                    <div className="connect-expired">
-                        <div className="connect-expired-icon">&#9888;</div>
-
-                        <h2>Invalid Link</h2>
-
-                        <p>
-                            This connection link is invalid or corrupted. Please request a new link from your MCP
-                            client.
-                        </p>
-                    </div>
-                )}
-
-                {pageState === 'ready' && tokenData && <ConnectApp tokenData={tokenData} />}
-            </div>
-        </div>
+            {pageState === 'ready' && tokenData && <ConnectApp tokenData={tokenData} />}
+        </>
     );
 }
 
