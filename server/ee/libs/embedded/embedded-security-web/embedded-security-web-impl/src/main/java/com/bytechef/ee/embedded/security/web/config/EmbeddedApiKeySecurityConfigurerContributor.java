@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.security.web.config;
 
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.configurer.EmbeddedApiKeySecurityConfigurer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -29,20 +30,24 @@ public class EmbeddedApiKeySecurityConfigurerContributor implements SecurityConf
 
     private final ApiKeyService apiKeyService;
     private final ConnectedUserService connectedUserService;
+    private final JwtTokenService jwtTokenService;
     private final SigningKeyService signingKeyService;
 
     @SuppressFBWarnings("EI")
     public EmbeddedApiKeySecurityConfigurerContributor(
-        ApiKeyService apiKeyService, ConnectedUserService connectedUserService, SigningKeyService signingKeyService) {
+        ApiKeyService apiKeyService, ConnectedUserService connectedUserService, JwtTokenService jwtTokenService,
+        SigningKeyService signingKeyService) {
 
         this.apiKeyService = apiKeyService;
         this.connectedUserService = connectedUserService;
+        this.jwtTokenService = jwtTokenService;
         this.signingKeyService = signingKeyService;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
-        return (T) new EmbeddedApiKeySecurityConfigurer(apiKeyService, connectedUserService, signingKeyService);
+        return (T) new EmbeddedApiKeySecurityConfigurer(
+            apiKeyService, connectedUserService, jwtTokenService, signingKeyService);
     }
 }

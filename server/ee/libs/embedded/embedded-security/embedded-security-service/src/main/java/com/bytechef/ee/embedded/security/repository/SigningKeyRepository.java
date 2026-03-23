@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.security.repository;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
+@ConditionalOnEEVersion
 public interface SigningKeyRepository extends ListCrudRepository<SigningKey, Long> {
 
     Optional<SigningKey> findByKeyIdAndEnvironment(String keyId, int environment);
