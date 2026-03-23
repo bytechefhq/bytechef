@@ -24,10 +24,9 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Domain class representing an MCP integration workflow.
+ * @version ee
  *
  * @author Ivica Cardic
- * @version ee
  */
 @Table("mcp_integration_instance_configuration_workflow")
 public final class McpIntegrationInstanceConfigurationWorkflow {

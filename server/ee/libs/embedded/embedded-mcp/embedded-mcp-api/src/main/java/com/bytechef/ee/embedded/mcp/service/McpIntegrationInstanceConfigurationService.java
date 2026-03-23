@@ -14,8 +14,9 @@ import java.util.Optional;
 /**
  * Service interface for managing {@link McpIntegrationInstanceConfiguration} entities.
  *
- * @author Ivica Cardic
  * @version ee
+ *
+ * @author Ivica Cardic
  */
 public interface McpIntegrationInstanceConfigurationService {
 

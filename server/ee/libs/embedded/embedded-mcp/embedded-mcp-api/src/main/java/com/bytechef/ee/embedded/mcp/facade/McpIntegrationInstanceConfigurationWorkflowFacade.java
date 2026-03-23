@@ -10,8 +10,9 @@ package com.bytechef.ee.embedded.mcp.facade;
 /**
  * Facade for managing MCP Integration Workflow operations that involve multiple services.
  *
- * @author Ivica Cardic
  * @version ee
+ *
+ * @author Ivica Cardic
  */
 public interface McpIntegrationInstanceConfigurationWorkflowFacade {
 
