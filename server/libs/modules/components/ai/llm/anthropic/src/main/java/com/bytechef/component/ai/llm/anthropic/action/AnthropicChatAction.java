@@ -27,6 +27,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
+import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -35,7 +36,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
-import org.springframework.ai.anthropic.api.AnthropicApi;
 
 /**
  * @author Marko Kriskovic
@@ -51,12 +51,11 @@ public class AnthropicChatAction {
 
     public static final ChatModel CHAT_MODEL =
         (inputParameters, connectionParameters, responseFormatRequired) -> AnthropicChatModel.builder()
-            .anthropicApi(
-                AnthropicApi.builder()
+            .anthropicClient(
+                AnthropicOkHttpClient.builder()
                     .apiKey(connectionParameters.getString(TOKEN))
-                    .restClientBuilder(ModelUtils.getRestClientBuilder())
                     .build())
-            .defaultOptions(
+            .options(
                 AnthropicChatOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))
                     .temperature(inputParameters.getDouble(TEMPERATURE))

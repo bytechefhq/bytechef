@@ -145,21 +145,19 @@ public class MistralOcrService implements OcrService {
 
     private String performOcr(String documentUrl) {
         OCRRequest request = new OCRRequest(
-            OCRModel.MISTRAL_OCR_LATEST.getValue(),
-            new DocumentURLChunk(documentUrl));
+            OCRModel.MISTRAL_OCR_LATEST.getValue(), null, new DocumentURLChunk(documentUrl), null, null, null, null);
 
         ResponseEntity<OCRResponse> responseEntity = mistralOcrApi.ocr(request);
 
-        if (responseEntity.getBody() == null || responseEntity.getBody()
-            .pages() == null) {
+        OCRResponse body = responseEntity.getBody();
+
+        if (body == null || body.pages() == null) {
             logger.warn("OCR response was empty for document");
 
             return "";
         }
 
-        OCRResponse response = responseEntity.getBody();
-
-        String markdown = response.pages()
+        String markdown = body.pages()
             .stream()
             .map(page -> page.markdown() != null ? page.markdown() : "")
             .collect(Collectors.joining("\n\n"));
@@ -167,7 +165,7 @@ public class MistralOcrService implements OcrService {
         // Remove null bytes (0x00) which PostgreSQL text columns don't support
         markdown = markdown.replace("\0", "");
 
-        logger.debug("OCR completed, extracted {} pages", response.pagesProcessed());
+        logger.debug("OCR completed, extracted {} pages", body.pagesProcessed());
 
         return markdown;
     }

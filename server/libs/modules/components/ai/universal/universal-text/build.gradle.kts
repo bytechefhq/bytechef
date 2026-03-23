@@ -11,7 +11,6 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:azure-open-ai"))
     implementation(project(":server:libs:modules:components:ai:llm:deepseek"))
     implementation(project(":server:libs:modules:components:ai:llm:groq"))
-    implementation(project(":server:libs:modules:components:ai:llm:hugging-face"))
     implementation(project(":server:libs:modules:components:ai:llm:mistral"))
     implementation(project(":server:libs:modules:components:ai:llm:nvidia"))
     implementation(project(":server:libs:modules:components:ai:llm:open-ai"))

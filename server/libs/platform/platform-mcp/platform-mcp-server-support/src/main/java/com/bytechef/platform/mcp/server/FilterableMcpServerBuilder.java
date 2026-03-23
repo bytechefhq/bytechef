@@ -17,8 +17,7 @@
 package com.bytechef.platform.mcp.server;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.modelcontextprotocol.json.McpJsonMapper;
-import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
+import io.modelcontextprotocol.json.McpJsonDefaults;
 import io.modelcontextprotocol.server.McpAsyncServerExchange;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -163,20 +162,8 @@ public class FilterableMcpServerBuilder {
 
     public FilterableMcpAsyncServer build() {
         return new FilterableMcpAsyncServer(
-            transportProvider,
-            McpJsonMapper.getDefault(),
-            serverInfo,
-            serverCapabilities,
-            instructions,
-            tools,
-            resources,
-            resourceTemplates,
-            prompts,
-            completions,
-            rootsChangeConsumers,
-            requestTimeout,
-            uriTemplateManagerFactory,
-            JsonSchemaValidator.getDefault(),
-            toolFilter);
+            transportProvider, McpJsonDefaults.getMapper(), serverInfo, serverCapabilities, instructions, tools,
+            resources, resourceTemplates, prompts, completions, rootsChangeConsumers, requestTimeout,
+            uriTemplateManagerFactory, McpJsonDefaults.getSchemaValidator(), toolFilter);
     }
 }

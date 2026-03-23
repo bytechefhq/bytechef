@@ -26,7 +26,6 @@ import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
 import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
 import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
 import static com.bytechef.component.ai.llm.Provider.GROQ;
-import static com.bytechef.component.ai.llm.Provider.HUGGING_FACE;
 import static com.bytechef.component.ai.llm.Provider.MISTRAL;
 import static com.bytechef.component.ai.llm.Provider.NVIDIA;
 import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
@@ -195,15 +194,6 @@ public class AiTextUtils {
                 Ai.Provider.DeepSeek deepSeek = aiProvider.getDeepSeek();
 
                 yield deepSeek.getApiKey() != null;
-            }
-            case HUGGING_FACE -> {
-                if (checkAiProvider(HUGGING_FACE.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                Ai.Provider.HuggingFace huggingFace = aiProvider.getHuggingFace();
-
-                yield huggingFace.getApiKey() != null;
             }
             case GROQ -> {
                 if (checkAiProvider(GROQ.getKey(), activeProviderKeys)) {

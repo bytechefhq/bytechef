@@ -15,9 +15,6 @@ import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgDistan
 import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgDistanceType.NEGATIVE_INNER_PRODUCT;
 
 import com.bytechef.tenant.TenantContext;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.pgvector.PGvector;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.PreparedStatement;
@@ -54,6 +51,9 @@ import org.springframework.jdbc.core.SqlTypeValue;
 import org.springframework.jdbc.core.StatementCreatorUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Multi-tenant PgVectorStore implementation that dynamically resolves the schema from TenantContext.
@@ -310,7 +310,7 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
     private String toJson(Map<String, Object> map) {
         try {
             return this.objectMapper.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -404,7 +404,7 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
 
             try {
                 return (Map<String, Object>) this.objectMapper.readValue(source, Map.class);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 throw new RuntimeException(e);
             }
         }

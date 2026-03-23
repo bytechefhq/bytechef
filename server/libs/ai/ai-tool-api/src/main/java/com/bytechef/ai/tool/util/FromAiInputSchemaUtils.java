@@ -17,11 +17,11 @@
 package com.bytechef.ai.tool.util;
 
 import com.bytechef.ai.tool.FromAiResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import org.springframework.ai.util.json.JsonParser;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Generates JSON schema for AI tool parameters defined via {@code fromAi} expressions.
@@ -33,9 +33,9 @@ public class FromAiInputSchemaUtils {
     private static final String SCHEMA_DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema";
 
     public static String generateInputSchema(List<FromAiResult> fromAiResults) {
-        ObjectMapper objectMapper = JsonParser.getObjectMapper();
+        JsonMapper jsonMapper = JsonParser.getJsonMapper();
 
-        ObjectNode schemaObjectNode = objectMapper.createObjectNode();
+        ObjectNode schemaObjectNode = jsonMapper.createObjectNode();
 
         schemaObjectNode.put("$schema", SCHEMA_DRAFT_2020_12);
         schemaObjectNode.put("type", "object");
@@ -44,7 +44,7 @@ public class FromAiInputSchemaUtils {
         ArrayNode requiredArray = schemaObjectNode.putArray("required");
 
         for (FromAiResult fromAiResult : fromAiResults) {
-            ObjectNode parameterObjectNode = objectMapper.createObjectNode();
+            ObjectNode parameterObjectNode = jsonMapper.createObjectNode();
 
             parameterObjectNode.put("type", getJsonSchemaType(fromAiResult.type()));
 

@@ -8,21 +8,17 @@
 package com.bytechef.ee.ai.copilot.model;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.micrometer.observation.ObservationRegistry;
 import java.util.Collections;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.anthropic.AnthropicChatModel;
-import org.springframework.ai.anthropic.AnthropicChatOptions;
-import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.core.retry.RetryTemplate;
 import reactor.core.publisher.Flux;
 
 /**
@@ -33,26 +29,30 @@ import reactor.core.publisher.Flux;
  *
  * @author Marko Kriskovic
  */
-@SuppressFBWarnings("EI")
-public class SafeAnthropicChatModel extends AnthropicChatModel {
+public class SafeAnthropicChatModel implements ChatModel, StreamingChatModel {
 
     private static final Logger logger = LoggerFactory.getLogger(SafeAnthropicChatModel.class);
 
-    public SafeAnthropicChatModel(AnthropicApi anthropicApi, AnthropicChatOptions defaultOptions,
-        ToolCallingManager toolCallingManager, RetryTemplate retryTemplate,
-        ObservationRegistry observationRegistry) {
-        super(anthropicApi, defaultOptions, toolCallingManager, retryTemplate, observationRegistry);
+    private final AnthropicChatModel delegate;
 
-        Class<? extends ChatModel> chatModelClass = this.getClass();
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public SafeAnthropicChatModel(AnthropicChatModel delegate) {
+        this.delegate = delegate;
 
         if (logger.isTraceEnabled()) {
-            logger.trace("SafeStreamingChatModel initialized with delegate: {}", chatModelClass.getName());
+            logger.trace("SafeAnthropicChatModel initialized with delegate: {}", delegate.getClass()
+                .getName());
         }
     }
 
     @Override
+    public ChatResponse call(Prompt prompt) {
+        return delegate.call(prompt);
+    }
+
+    @Override
     public @NonNull Flux<ChatResponse> stream(Prompt prompt) {
-        return super.stream(prompt)
+        return delegate.stream(prompt)
             .map(this::ensureNonNullResult);
     }
 
@@ -67,9 +67,9 @@ public class SafeAnthropicChatModel extends AnthropicChatModel {
             if (result != null && result.getOutput() != null) {
                 return response;
             }
-        } catch (Exception e) {
+        } catch (Exception exception) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Exception checking getResult(): {}", e.getMessage());
+                logger.debug("Exception checking getResult(): {}", exception.getMessage());
             }
         }
 
