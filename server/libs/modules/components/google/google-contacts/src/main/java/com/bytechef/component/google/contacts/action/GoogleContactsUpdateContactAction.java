@@ -199,5 +199,4 @@ public class GoogleContactsUpdateContactAction {
     private static String getIfMapContains(Map<?, ?> map, String key) {
         return map.containsKey(key) ? (String) map.get(key) : "";
     }
-
 }
