@@ -268,7 +268,7 @@ describe('PropertyDynamicProperties', () => {
             const queryCall = hoisted.mockClusterElementQuery.mock.calls[0];
             const queryOptions = queryCall[0];
 
-            expect(queryOptions.request.clusterElementType).toBe('PROCESSOR');
+            expect(queryOptions.request.clusterElementType).toBe('processor');
             expect(queryOptions.request.clusterElementWorkflowNodeName).toBe('fieldMapper_1');
             expect(queryOptions.request.workflowNodeName).toBe('dataStream_1');
         });
