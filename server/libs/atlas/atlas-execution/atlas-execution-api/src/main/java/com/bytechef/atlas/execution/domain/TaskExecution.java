@@ -210,10 +210,8 @@ public final class TaskExecution
             Map<String, Object> parametersForEvaluation = new HashMap<>(originalParameters);
 
             for (String deferredKey : deferredKeys) {
-                Object deferredValue = parametersForEvaluation.remove(deferredKey);
-
-                if (deferredValue != null) {
-                    deferredValues.put(deferredKey, deferredValue);
+                if (parametersForEvaluation.containsKey(deferredKey)) {
+                    deferredValues.put(deferredKey, parametersForEvaluation.remove(deferredKey));
                 }
             }
 

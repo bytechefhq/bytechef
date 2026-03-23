@@ -280,7 +280,7 @@ public class BranchTaskDispatcherTest {
 
         taskExecution.evaluate(context, EVALUATOR);
 
-        // Verify that caseTrue/caseFalse sub-task expressions are NOT resolved
+        // Verify that 'cases' sub-task expressions are NOT resolved
         @SuppressWarnings("unchecked")
         List<Map<String, ?>> cases = (List<Map<String, ?>>) taskExecution.getParameters()
             .get("cases");
