@@ -60,7 +60,7 @@ const PropertyCodeEditorDialogRightPanelInput = ({input}: PropertyCodeEditorDial
                         {parseError && <div className="mt-2 text-sm text-destructive">{parseError}</div>}
                     </div>
                 ) : (
-                    <div>
+                    <div className="px-6">
                         <span className="text-sm text-muted-foreground">No defined entries</span>
                     </div>
                 )}
