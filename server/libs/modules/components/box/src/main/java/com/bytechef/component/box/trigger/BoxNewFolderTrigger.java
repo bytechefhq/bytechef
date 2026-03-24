@@ -47,6 +47,7 @@ public class BoxNewFolderTrigger {
         .title("New Folder")
         .description("Triggers when folder is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
+        .help("", "https://docs.bytechef.io/reference/components/box_v1#new-folder")
         .properties(
             string(FOLDER_ID)
                 .label("Folder ID")

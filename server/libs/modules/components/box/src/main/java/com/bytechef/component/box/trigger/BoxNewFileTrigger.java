@@ -47,6 +47,7 @@ public class BoxNewFileTrigger {
         .title("New File")
         .description("Triggers when file is uploaded to folder.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
+        .help("", "https://docs.bytechef.io/reference/components/box_v1#new-file")
         .properties(
             string(FOLDER_ID)
                 .label("Folder ID")

@@ -47,6 +47,7 @@ public class BoxUploadFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload File")
         .description("Uploads a small file to Box.")
+        .help("", "https://docs.bytechef.io/reference/components/box_v1#upload-file")
         .properties(
             string(ID)
                 .label("Parent Folder ID")

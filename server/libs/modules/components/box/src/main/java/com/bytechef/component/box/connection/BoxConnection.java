@@ -33,6 +33,7 @@ import java.util.Map;
 public class BoxConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .help("", "https://docs.bytechef.io/reference/components/box_v1#connection-setup")
         .baseUri((connectionParameters, context) -> "https://api.box.com/2.0")
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
@@ -65,7 +66,8 @@ public class BoxConnection {
                     return map;
                 })
                 .tokenUrl((connectionParameters, context) -> "https://api.box.com/oauth2/token")
-                .refreshUrl((connectionParameters, context) -> "https://api.box.com/oauth2/token"));
+                .refreshUrl((connectionParameters, context) -> "https://api.box.com/oauth2/token"))
+        .version(1);
 
     private BoxConnection() {
     }

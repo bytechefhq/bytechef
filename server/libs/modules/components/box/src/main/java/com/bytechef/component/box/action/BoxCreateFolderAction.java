@@ -40,6 +40,7 @@ public class BoxCreateFolderAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFolder")
         .title("Create Folder")
         .description("Creates a new empty folder within the specified parent folder.")
+        .help("", "https://docs.bytechef.io/reference/components/box_v1#create-folder")
         .properties(
             string(NAME)
                 .label("Folder Name")
