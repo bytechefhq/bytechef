@@ -85,7 +85,7 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
-                const toastId = `${new URL(response.url).pathname}-${response.status}`;
+                const toastId = `fetch-error-${response.status}`;
 
                 if (response.url.includes('/graphql')) {
                     const clonedResponse = response.clone();
