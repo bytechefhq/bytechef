@@ -203,7 +203,7 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something went wrong',
-                id: '/internal/api/test-500',
+                id: 'fetch-error-500',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
@@ -297,7 +297,7 @@ describe('useFetchInterceptor', () => {
             });
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 502', {
-                id: '/internal/api/test-502',
+                id: 'fetch-error-502',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
@@ -322,7 +322,7 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Field not found\nPermission denied',
-                id: '/graphql-200',
+                id: 'fetch-error-200',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
@@ -381,7 +381,7 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Unknown error\nValid error',
-                id: '/graphql-200',
+                id: 'fetch-error-200',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
@@ -403,7 +403,7 @@ describe('useFetchInterceptor', () => {
             });
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 500', {
-                id: '/graphql-500',
+                id: 'fetch-error-500',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
@@ -440,7 +440,7 @@ describe('useFetchInterceptor', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something broke',
-                id: '/graphql-200',
+                id: 'fetch-error-200',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
