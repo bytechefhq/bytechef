@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new empty folder within the specified parent folder.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/box_v1#create-folder"
+    },
     "metadata": null,
     "name": "createFolder",
     "outputDefinition": {
@@ -409,7 +412,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Download a selected file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/box_v1#download-file"
+    },
     "metadata": null,
     "name": "downloadFile",
     "outputDefinition": {
@@ -683,7 +689,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Uploads a small file to Box.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/box_v1#upload-file"
+    },
     "metadata": null,
     "name": "uploadFile",
     "outputDefinition": {
@@ -1313,14 +1322,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/box_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developer.box.com/reference/v2025.0"
+  },
   "description": "Box is a cloud content management and file sharing service that enables businesses to securely store, manage, and collaborate on documents.",
   "icon": "path:assets/box.svg",
   "metadata": null,
@@ -1334,7 +1349,10 @@
     "deprecated": null,
     "description": "Triggers when file is uploaded to folder.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/box_v1#new-file"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newFile",
@@ -1723,7 +1741,10 @@
     "deprecated": null,
     "description": "Triggers when folder is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/box_v1#new-folder"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newFolder",

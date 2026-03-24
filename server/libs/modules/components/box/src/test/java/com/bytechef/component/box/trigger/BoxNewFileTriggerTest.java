@@ -16,46 +16,45 @@
 
 package com.bytechef.component.box.trigger;
 
+import static com.bytechef.component.box.constant.BoxConstants.FOLDER;
 import static com.bytechef.component.box.constant.BoxConstants.FOLDER_ID;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.box.util.BoxUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
-import java.time.Instant;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class BoxNewFileTriggerTest extends AbstractBoxTriggerTest {
 
     @Test
     void testWebhookEnable() {
+        mockedParameters = MockParametersFactory.create(Map.of(FOLDER_ID, "folderId"));
         String webhookUrl = "testWebhookUrl";
 
-        when(mockedParameters.getRequiredString(FOLDER_ID))
-            .thenReturn("folderId");
-
         boxUtilsMockedStatic.when(
-            () -> BoxUtils.subscribeWebhook(webhookUrl, mockedTriggerContext, "folder", "FILE.UPLOADED", "folderId"))
+            () -> BoxUtils.subscribeWebhook(
+                stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(),
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn("123");
 
         WebhookEnableOutput webhookEnableOutput = BoxNewFileTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
-        Map<String, Object> expectedParameters = Map.of(ID, "123");
-
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+        assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
+        assertEquals(List.of(webhookUrl, FOLDER, "FILE.UPLOADED", "folderId"), stringArgumentCaptor.getAllValues());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 
     @Test
@@ -67,7 +66,7 @@ class BoxNewFileTriggerTest extends AbstractBoxTriggerTest {
 
         Object result = BoxNewFileTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedParameters, mockedTriggerContext);
 
         assertEquals(mockedObject, result);
     }
