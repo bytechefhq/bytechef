@@ -5,7 +5,12 @@ import {AlertCircleIcon, AlertTriangleIcon, BugIcon, InfoIcon, MessageSquareIcon
 import {Suspense, lazy, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const ReactJson = lazy(() => import('react-json-view'));
+const ReactJson = lazy(async () => {
+    const module = await import('react-json-view');
+    const component = (module.default as unknown as Record<string, unknown>)?.default || module.default;
+
+    return {default: component} as typeof module;
+});
 
 interface WorkflowExecutionLogsContentProps {
     isEditorEnvironment?: boolean;

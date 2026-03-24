@@ -3,7 +3,12 @@ import {Suspense, lazy, useMemo} from 'react';
 
 import {getFilteredOutput, hasValue} from './WorkflowExecutionsUtils';
 
-const ReactJson = lazy(() => import('react-json-view'));
+const ReactJson = lazy(async () => {
+    const module = await import('react-json-view');
+    const component = (module.default as unknown as Record<string, unknown>)?.default || module.default;
+
+    return {default: component} as typeof module;
+});
 
 interface WorkflowExecutionContentProps {
     error?: ExecutionError;
