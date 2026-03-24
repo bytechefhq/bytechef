@@ -46,21 +46,30 @@ public class BoxUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context.http(
-            http -> http.get("/folders/%s/items".formatted(inputParameters.getRequiredString(ID))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        int offset = 0;
+        int totalCount;
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get("entries") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), FILE)) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+        do {
+            Map<String, Object> body = context.http(
+                http -> http.get("/folders/%s/items".formatted(inputParameters.getRequiredString(ID))))
+                .queryParameters("offset", offset, "limit", 100)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("entries") instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), FILE)) {
+                        options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                    }
                 }
             }
-        }
+
+            offset += (Integer) body.get("limit");
+            totalCount = (Integer) body.get("total_count");
+        } while (totalCount > offset);
 
         return options;
     }
