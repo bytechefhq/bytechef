@@ -20,6 +20,7 @@ import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -57,6 +58,7 @@ class BoxUtilsTest {
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
     @Test
     void testGetFileIdOptions(
@@ -68,24 +70,53 @@ class BoxUtilsTest {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("entries", List.of(Map.of(NAME, "file name", ID, "fileId", TYPE, "file"))));
+            .thenReturn(
+                Map.of(
+                    "entries", List.of(Map.of(NAME, "file1", ID, "ab", TYPE, "file")),
+                    "total_count", 2,
+                    "limit", 1),
+                Map.of(
+                    "entries", List.of(Map.of(NAME, "file2", ID, "xy", TYPE, "file")),
+                    "total_count", 2,
+                    "limit", 1));
 
         assertEquals(
-            List.of(option("file name", "fileId")),
+            List.of(option("file1", "ab"), option("file2", "xy")),
             BoxUtils.getFileIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
-        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        for (ContextFunction<Http, Executor> httpFunction : httpFunctionArgumentCaptor.getAllValues()) {
+            assertNotNull(httpFunction);
+        }
 
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Configuration configuration = configurationBuilder.build();
+        for (ConfigurationBuilder configurationBuilder : configurationBuilderArgumentCaptor.getAllValues()) {
+            Configuration configuration = configurationBuilder.build();
 
-        assertEquals(ResponseType.JSON, configuration.getResponseType());
-        assertEquals("/folders/xy/items", stringArgumentCaptor.getValue());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
+        }
+
+        assertEquals(List.of("/folders/xy/items", "/folders/xy/items"), stringArgumentCaptor.getAllValues());
+
+        List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
+
+        assertEquals(2, objectsArgumentCaptorAllValues.size());
+
+        Object[] objectsOne = {
+            "offset", 0, "limit", 100
+        };
+
+        Object[] objectsTwo = {
+            "offset", 1, "limit", 100
+        };
+
+        assertArrayEquals(objectsOne, objectsArgumentCaptorAllValues.getFirst());
+        assertArrayEquals(objectsTwo, objectsArgumentCaptorAllValues.getLast());
     }
 
     @Test
-    void testSubscribeWebhok(
+    void testSubscribeWebhook(
         TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {

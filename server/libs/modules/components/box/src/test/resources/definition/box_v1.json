@@ -379,9 +379,9 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "SELECT",
+      "controlType": "TEXT",
       "defaultValue": "0",
-      "description": "ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.",
+      "description": "ID of the folder where the new folder will be created. The root folder is always represented by the ID 0.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -393,10 +393,7 @@
       "minLength": null,
       "name": "id",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
+      "optionsDataSource": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -632,9 +629,9 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "SELECT",
+      "controlType": "TEXT",
       "defaultValue": "0",
-      "description": "ID of the folder from which you want to download the file.",
+      "description": "ID of the folder from which you want to download the file. The root folder is always represented by the ID 0.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -646,10 +643,7 @@
       "minLength": null,
       "name": "id",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
+      "optionsDataSource": null,
       "placeholder": null,
       "regex": null,
       "required": false,
@@ -1123,9 +1117,9 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "SELECT",
+      "controlType": "TEXT",
       "defaultValue": "0",
-      "description": "ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.",
+      "description": "ID of the folder where the file should be uploaded. The root folder is always represented by the ID 0.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1137,10 +1131,7 @@
       "minLength": null,
       "name": "id",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
+      "optionsDataSource": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -1702,9 +1693,9 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "SELECT",
+      "controlType": "TEXT",
       "defaultValue": null,
-      "description": "ID of the folder in which file uploads will trigger this webhook.",
+      "description": "ID of the folder to monitor for new files. The root folder is always represented by the ID 0.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1716,10 +1707,7 @@
       "minLength": null,
       "name": "folderId",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
+      "optionsDataSource": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -2094,9 +2082,9 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the folder in which new folder will trigger this webhook.",
+      "controlType": "TEXT",
+      "defaultValue": "0",
+      "description": "ID of the folder to monitor for new folders. The root folder is always represented by the ID 0.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2108,10 +2096,7 @@
       "minLength": null,
       "name": "folderId",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
+      "optionsDataSource": null,
       "placeholder": null,
       "regex": null,
       "required": true,
