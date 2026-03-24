@@ -1,8 +1,8 @@
-import {Locator, type Page} from '@playwright/test';
+import {Locator, type Page, expect} from '@playwright/test';
 
 import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
 
-interface WorkflowDefinitionI {
+export interface WorkflowDefinitionI {
     tasks?: Array<{
         name?: string;
         parameters?: {
@@ -65,6 +65,20 @@ export async function getWorkflowDefinition(page: Page, workflowId: string): Pro
     return JSON.parse(workflow.definition);
 }
 
+interface ReplaceMentionsInputValueProps {
+    input: Locator;
+    page: Page;
+    value: string;
+}
+
+export async function replaceMentionsInputValue({input, page, value}: ReplaceMentionsInputValueProps): Promise<void> {
+    await input.click();
+
+    await page.keyboard.press('Control+a');
+
+    await input.fill(value);
+}
+
 export async function reopenConfigurationPanel(page: Page): Promise<Locator> {
     const varNode = page.getByLabel('var_1 node');
 
@@ -76,6 +90,46 @@ export async function reopenConfigurationPanel(page: Page): Promise<Locator> {
     });
 
     return reloadedConfigurationPanel;
+}
+
+interface AddArrayItemViaPopoverProps {
+    page: Page;
+    arrayProperty: Locator;
+    itemType?: string;
+}
+
+export async function addArrayItemViaPopover({
+    arrayProperty,
+    itemType = 'STRING',
+    page,
+}: AddArrayItemViaPopoverProps): Promise<void> {
+    const arrayPopoverTrigger = arrayProperty.getByRole('button', {name: /Add array item/i});
+    const arrayPropertyPopover = page.getByLabel('Array property popover');
+    const addArraySubpropertyButton = arrayPropertyPopover.getByRole('button', {name: /Add/i});
+
+    if (itemType != null) {
+        await expect(async () => {
+            if (!(await arrayPropertyPopover.isVisible()) && (await arrayPopoverTrigger.isVisible())) {
+                await arrayPopoverTrigger.click();
+            }
+
+            await expect(arrayPropertyPopover).toBeVisible({timeout: 100});
+
+            const typeCombobox = arrayPropertyPopover.getByRole('combobox');
+
+            await typeCombobox.click();
+
+            await page.getByRole('option', {name: itemType}).click();
+
+            await addArraySubpropertyButton.click();
+        }).toPass();
+    } else {
+        await clickAndExpectToBeVisible({
+            autoClick: true,
+            target: addArraySubpropertyButton,
+            trigger: arrayPopoverTrigger,
+        });
+    }
 }
 
 export async function openPropertiesTab(componentConfigurationPanel: Locator): Promise<void> {

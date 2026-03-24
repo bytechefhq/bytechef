@@ -1,17 +1,13 @@
-import {Page} from '@playwright/test';
+import {type Locator, type Page, expect} from '@playwright/test';
 
-import {formatPropertyValue, getPropertyValue} from '../utils/workflowUtils';
+import {
+    type WorkflowDefinitionI,
+    addArrayItemViaPopover,
+    formatPropertyValue,
+    getPropertyValue,
+} from '../utils/workflowUtils';
 
-interface WorkflowDefinitionI {
-    tasks?: Array<{
-        name?: string;
-        parameters?: {
-            value?: Record<string, unknown>;
-        };
-    }>;
-}
-
-interface ExpectedPropertyValues {
+interface ExpectedPropertyValuesI {
     Array: string;
     Boolean: string;
     Date: string;
@@ -23,23 +19,30 @@ interface ExpectedPropertyValues {
 }
 
 export class WorkflowPage {
-    constructor(private readonly page: Page) {}
+    private static readonly arrayPropertyItemLabelRegex = /Array property item at index \d+/;
 
-    async goToWorkflowEditor(projectId: string, workflowId: string): Promise<void> {
-        await this.page.goto(`/automation/projects/${projectId}/project-workflows/${workflowId}`);
+    private readonly page: Page;
 
-        await this.page.waitForLoadState('domcontentloaded');
+    static readonly LONG_DEBOUNCE_MS = 700;
+    static readonly SHORT_DEBOUNCE_MS = 300;
 
-        await this.page.waitForTimeout(2000);
+    readonly arrayProperty: Locator;
+    readonly arrayPropertyItems: Locator;
+    readonly valueProperty: Locator;
+    readonly firstTaskComponentConfigurationPanel: Locator;
+    readonly firstNode: Locator;
+
+    static assertVar1ArrayParameterIsDefined(arrayValue: unknown): void {
+        expect(Array.isArray(arrayValue)).toBe(true);
     }
 
     static getExpectedPropertyValues(
         workflowDefinition: WorkflowDefinitionI,
         taskName: string
-    ): ExpectedPropertyValues {
+    ): ExpectedPropertyValuesI {
         const propertyNames = ['Array', 'Boolean', 'Date', 'DateTime', 'Integer', 'Number', 'String', 'Time'] as const;
 
-        const expectedValues = {} as ExpectedPropertyValues;
+        const expectedValues = {} as ExpectedPropertyValuesI;
 
         for (const propertyName of propertyNames) {
             const propertyValue = getPropertyValue({
@@ -52,5 +55,52 @@ export class WorkflowPage {
         }
 
         return expectedValues;
+    }
+
+    static getFirstTaskArrayParameter(workflowDefinition: WorkflowDefinitionI): unknown {
+        return workflowDefinition.tasks?.[0]?.parameters?.value?.Array;
+    }
+
+    constructor(page: Page) {
+        this.page = page;
+        this.firstNode = page.getByLabel('var_1 node');
+        this.firstTaskComponentConfigurationPanel = page.getByLabel('var_1 component configuration panel');
+        this.valueProperty = this.firstTaskComponentConfigurationPanel.getByLabel('value property');
+        this.arrayProperty = this.firstTaskComponentConfigurationPanel.getByLabel('Array property', {exact: true});
+        this.arrayPropertyItems = this.arrayProperty.getByLabel(WorkflowPage.arrayPropertyItemLabelRegex);
+    }
+
+    arrayPropertyItemAt(index: number): Locator {
+        return this.arrayProperty.getByLabel(`Array property item at index ${index}`);
+    }
+
+    arrayPropertyItemTextboxAt(index: number): Locator {
+        return this.arrayPropertyItemAt(index).getByRole('textbox');
+    }
+
+    async addArrayItemsToReachRowCount({
+        itemType = 'STRING',
+        targetRowCount,
+    }: {
+        itemType?: string;
+        targetRowCount: number;
+    }): Promise<void> {
+        while ((await this.arrayPropertyItems.count()) < targetRowCount) {
+            await addArrayItemViaPopover({
+                arrayProperty: this.arrayProperty,
+                itemType,
+                page: this.page,
+            });
+
+            await this.page.waitForTimeout(WorkflowPage.SHORT_DEBOUNCE_MS);
+        }
+    }
+
+    async goToWorkflowEditor(projectId: string, workflowId: string): Promise<void> {
+        await this.page.goto(`/automation/projects/${projectId}/project-workflows/${workflowId}`);
+
+        await this.page.waitForLoadState('domcontentloaded');
+
+        await this.page.waitForTimeout(2000);
     }
 }
