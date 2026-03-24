@@ -1,10 +1,10 @@
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
-import {loader} from '@monaco-editor/react';
+import Editor, {loader} from '@monaco-editor/react';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import YamlWorker from 'monaco-yaml/yaml.worker?worker';
-import {Suspense, lazy, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import type {EditorOptionsType, StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 import type {editor} from 'monaco-editor';
@@ -45,8 +45,6 @@ async function ensureMonacoConfigured(): Promise<void> {
     monacoConfigured = true;
 }
 
-const Editor = lazy(() => import('@monaco-editor/react'));
-
 interface MonacoEditorProps {
     className?: string;
     defaultLanguage: string;
@@ -70,11 +68,7 @@ const MonacoEditorWrapper = (props: MonacoEditorProps) => {
         return <MonacoEditorLoader />;
     }
 
-    return (
-        <Suspense fallback={<MonacoEditorLoader />}>
-            <Editor {...props} loading={<MonacoEditorLoader />} />
-        </Suspense>
-    );
+    return <Editor {...props} loading={<MonacoEditorLoader />} />;
 };
 
 export default MonacoEditorWrapper;
