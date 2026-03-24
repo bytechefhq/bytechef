@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.on.error;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -37,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +62,26 @@ public class OnErrorTaskDispatcherIntTest {
     @BeforeEach
     void beforeEach() {
         testVarTaskHandler = new TestVarTaskHandler<>(Map::put);
+    }
+
+    @Test
+    public void testTaskExecutionWithTwoRetryAttempts() {
+        int expectedHttpClientTaskExecutions = 3;
+
+        TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution taskDispatcherJobExecution =
+            taskDispatcherJobTestExecutor.execute(
+                EncodingUtils.base64EncodeToString("on-error_v1-two-retry-attempts".getBytes(StandardCharsets.UTF_8)),
+                Collections.emptyMap(),
+                this::getTaskCompletionHandlerFactories,
+                this::getTaskDispatcherResolverFactories,
+                this::getTaskHandlerMap);
+
+        List<TaskExecution> httpClientTaskExecutions =
+            filterTaskExecutions(taskDispatcherJobExecution, "httpClient/v1/get");
+
+        Assertions.assertEquals(expectedHttpClientTaskExecutions, httpClientTaskExecutions.size());
+        Assertions.assertEquals("error branch", testVarTaskHandler.get("errorBranchVar"));
+        Assertions.assertEquals("end", testVarTaskHandler.get("endVar"));
     }
 
     @Test
@@ -152,6 +174,15 @@ public class OnErrorTaskDispatcherIntTest {
             testVarTaskHandler.get("beforeExceptionErrorBranchVar"));
         Assertions.assertNull(testVarTaskHandler.get("afterExceptionErrorBranchVar"));
         Assertions.assertNull(testVarTaskHandler.get("endVar"));
+    }
+
+    private List<TaskExecution> filterTaskExecutions(
+        TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution taskDispatcherJobExecution, String type) {
+
+        return taskDispatcherJobExecution.jobTaskExecutions()
+            .stream()
+            .filter(taskExecution -> Objects.equals(taskExecution.getType(), type))
+            .toList();
     }
 
     @SuppressWarnings("PMD")
