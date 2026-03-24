@@ -4,7 +4,6 @@ import * as path from 'node:path';
 import {resolve} from 'node:path';
 import {defineConfig, loadEnv} from 'vite';
 import svgr from 'vite-plugin-svgr';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { lingui } from '@lingui/vite-plugin';
 
 // https://vitejs.dev/config/
@@ -32,15 +31,6 @@ export default ({mode}) => {
                 },
             },
         },
-        esbuild: {
-            // https://github.com/vitejs/vite/issues/8644#issuecomment-1159308803
-            logOverride: {'this-is-undefined-in-esm': 'silent'},
-        },
-        optimizeDeps: {
-            esbuildOptions: {
-                target: 'es2020',
-            },
-        },
         plugins: [
             react({
                 babel: {
@@ -48,11 +38,11 @@ export default ({mode}) => {
                 },
             }),
             lingui(),
-            tsconfigPaths(),
             svgr(),
             isHttps() && basicSsl(),
         ],
         resolve: {
+            tsconfigPaths: true,
             alias: {
                 '@': path.resolve(__dirname, './src'),
                 '@bytechef/embedded-react': path.resolve(__dirname, '../sdks/frontend/embedded/library/react/src/main.ts'),
