@@ -124,7 +124,7 @@ const Switch = forwardRef<ComponentRef<typeof ShadcnSwitch>, SwitchPropsType>(
 
         const wrapperClasses = twMerge(
             wrapperStyles[variant],
-            isBoxVariant && checked ? 'bg-surface-brand-secondary border-stroke-brand-secondary' : ''
+            isBoxVariant && checked ? 'border-stroke-brand-secondary bg-surface-brand-secondary' : ''
         );
 
         if (isBoxVariant) {
