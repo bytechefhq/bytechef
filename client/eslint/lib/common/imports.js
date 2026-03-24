@@ -1,5 +1,5 @@
 function getLeadingComments(node, context) {
-    const code = context.getSourceCode();
+    const code = context.sourceCode;
 
     const comments = code.getCommentsBefore(node);
 
@@ -38,7 +38,7 @@ function getLeadingComments(node, context) {
         //
         //      something(); // I'm a trailing comment.
 
-        const tokenBefore = context.getSourceCode().getTokenBefore(comment, {
+        const tokenBefore = context.sourceCode.getTokenBefore(comment, {
             includeComments: true,
         });
 
@@ -114,10 +114,7 @@ function getSource(node) {
 }
 
 function getTrailingComments(node, context) {
-    return context
-        .getSourceCode()
-        .getCommentsAfter(node)
-        .filter((comment) => comment.loc.start.line === node.loc.end.line);
+    return context.sourceCode.getCommentsAfter(node).filter((comment) => comment.loc.start.line === node.loc.end.line);
 }
 
 /**
