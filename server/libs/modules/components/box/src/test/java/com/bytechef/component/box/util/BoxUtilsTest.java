@@ -85,30 +85,6 @@ class BoxUtilsTest {
     }
 
     @Test
-    void testGetRootFolderOptions(
-        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
-
-        when(mockedHttp.get(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("entries", List.of(Map.of(NAME, "folderName", ID, "folderId", TYPE, "folder"))));
-
-        assertEquals(
-            List.of(option("folderName", "folderId"), option("ROOT", "0")),
-            BoxUtils.getRootFolderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
-
-        assertNotNull(httpFunctionArgumentCaptor.getValue());
-
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Configuration configuration = configurationBuilder.build();
-
-        assertEquals(ResponseType.JSON, configuration.getResponseType());
-        assertEquals("/folders/0/items", stringArgumentCaptor.getValue());
-    }
-
-    @Test
     void testSubscribeWebhok(
         TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
