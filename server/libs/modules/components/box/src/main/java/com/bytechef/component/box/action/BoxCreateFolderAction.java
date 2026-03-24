@@ -30,7 +30,6 @@ import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -62,9 +61,7 @@ public class BoxCreateFolderAction {
     private BoxCreateFolderAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
             .http(http -> http.post("/folders"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -73,6 +70,6 @@ public class BoxCreateFolderAction {
                     NAME, inputParameters.getRequiredString(NAME),
                     PARENT, Map.of(ID, inputParameters.getRequiredString(ID))))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

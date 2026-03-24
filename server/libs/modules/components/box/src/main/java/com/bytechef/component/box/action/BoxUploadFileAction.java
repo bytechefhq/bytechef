@@ -37,7 +37,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -72,9 +71,7 @@ public class BoxUploadFileAction {
     private BoxUploadFileAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
         return context
@@ -91,6 +88,6 @@ public class BoxUploadFileAction {
                         FILE, fileEntry),
                     BodyContentType.FORM_DATA))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
