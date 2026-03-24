@@ -39,6 +39,7 @@ public class BoxDownloadFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
         .title("Download File")
         .description("Download a selected file.")
+        .help("", "https://docs.bytechef.io/reference/components/box_v1#download-file")
         .properties(
             string(ID)
                 .label("Parent Folder ID")

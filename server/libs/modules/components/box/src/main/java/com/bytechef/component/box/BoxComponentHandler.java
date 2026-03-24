@@ -41,6 +41,7 @@ public class BoxComponentHandler implements ComponentHandler {
             "Box is a cloud content management and file sharing service that enables businesses to securely " +
                 "store, manage, and collaborate on documents.")
         .customAction(true)
+        .customActionHelp("", "https://developer.box.com/reference/v2025.0")
         .icon("path:assets/box.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(BoxConnection.CONNECTION_DEFINITION)
@@ -50,7 +51,8 @@ public class BoxComponentHandler implements ComponentHandler {
             BoxUploadFileAction.ACTION_DEFINITION)
         .triggers(
             BoxNewFileTrigger.TRIGGER_DEFINITION,
-            BoxNewFolderTrigger.TRIGGER_DEFINITION);
+            BoxNewFolderTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
