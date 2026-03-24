@@ -1,4 +1,6 @@
-import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
+import {lazy} from 'react';
+
+const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 interface EndpointYamlEditorProps {
     onChange: (value: string) => void;
