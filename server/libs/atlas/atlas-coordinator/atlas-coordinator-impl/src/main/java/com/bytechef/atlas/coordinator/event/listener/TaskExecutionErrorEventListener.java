@@ -92,10 +92,8 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
             // if the task is retryable, then retry it
             if (taskExecution.getRetryAttempts() < taskExecution.getMaxRetries()) {
-
                 Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(
-                        Validate.notNull(taskExecution.getJobId(), "id"), Context.Classname.JOB));
+                    contextService.peek(Validate.notNull(taskExecution.getJobId(), "id"), Context.Classname.JOB));
 
                 TaskExecution retryTaskExecution = TaskExecution.builder()
                     .jobId(taskExecution.getJobId())
@@ -112,9 +110,7 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
                 contextService.push(
                     Validate.notNull(retryTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                     taskFileStorage.storeContextValue(
-                        Validate.notNull(
-                            retryTaskExecution.getId(), "id"),
-                        Context.Classname.TASK_EXECUTION, context));
+                        Validate.notNull(retryTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
 
                 taskDispatcher.dispatch(retryTaskExecution);
             }
@@ -125,8 +121,9 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
                     // if it's an on-error dispatcher and its error is not set, navigate back to the on-error
                     // dispatcher to start executing the error branch
-                    if (taskExecution.getType()
-                        .startsWith("on-error/") && taskExecution.getError() == null) {
+                    String type = taskExecution.getType();
+
+                    if (type.startsWith("on-error/") && taskExecution.getError() == null) {
                         taskExecution.setError(error);
                         taskExecution.setStatus(TaskExecution.Status.CREATED);
 
