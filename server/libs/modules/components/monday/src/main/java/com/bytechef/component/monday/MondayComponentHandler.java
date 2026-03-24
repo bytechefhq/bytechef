@@ -27,6 +27,8 @@ import com.bytechef.component.monday.action.MondayCreateColumnAction;
 import com.bytechef.component.monday.action.MondayCreateGroupAction;
 import com.bytechef.component.monday.action.MondayCreateItemAction;
 import com.bytechef.component.monday.action.MondayDeleteItemAction;
+import com.bytechef.component.monday.action.MondayGetBoardValuesAction;
+import com.bytechef.component.monday.action.MondayUpdateItemStatusAction;
 import com.bytechef.component.monday.connection.MondayConnection;
 import com.bytechef.component.monday.trigger.MondayNewItemInBoardTrigger;
 import com.google.auto.service.AutoService;
@@ -51,13 +53,17 @@ public class MondayComponentHandler implements ComponentHandler {
             MondayCreateColumnAction.ACTION_DEFINITION,
             MondayCreateGroupAction.ACTION_DEFINITION,
             MondayCreateItemAction.ACTION_DEFINITION,
-            MondayDeleteItemAction.ACTION_DEFINITION)
+            MondayDeleteItemAction.ACTION_DEFINITION,
+            MondayGetBoardValuesAction.ACTION_DEFINITION,
+            MondayUpdateItemStatusAction.ACTION_DEFINITION)
         .clusterElements(
             tool(MondayCreateBoardAction.ACTION_DEFINITION),
             tool(MondayCreateColumnAction.ACTION_DEFINITION),
             tool(MondayCreateGroupAction.ACTION_DEFINITION),
             tool(MondayCreateItemAction.ACTION_DEFINITION),
-            tool(MondayDeleteItemAction.ACTION_DEFINITION))
+            tool(MondayDeleteItemAction.ACTION_DEFINITION),
+            tool(MondayGetBoardValuesAction.ACTION_DEFINITION),
+            tool(MondayUpdateItemStatusAction.ACTION_DEFINITION))
         .triggers(MondayNewItemInBoardTrigger.TRIGGER_DEFINITION)
         .version(1);
 
