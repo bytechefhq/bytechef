@@ -29,7 +29,7 @@ public class RedisContainerConfiguration {
 
     @Bean
     public GenericContainer<?> redisContainer(DynamicPropertyRegistry registry) {
-        GenericContainer<?> container = new GenericContainer<>("redis:7.2-alpine")
+        GenericContainer<?> container = new GenericContainer<>("redis:8-alpine")
             .withExposedPorts(6379);
 
         registry.add("spring.data.redis.host=", container::getHost);

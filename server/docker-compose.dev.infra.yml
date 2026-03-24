@@ -38,7 +38,7 @@ services:
       - rabbitmq-lib:/var/lib/rabbitmq/
       - rabbitmq-log:/var/log/rabbitmq
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     platform: linux/amd64
     restart: always
     ports:
