@@ -88,6 +88,7 @@ public class OnErrorTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
             TaskExecution subTaskExecution = TaskExecution.builder()
                 .jobId(taskExecution.getJobId())
+                .maxRetries(subWorkflowTask.getMaxRetries())
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(1)

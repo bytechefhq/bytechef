@@ -124,6 +124,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
             TaskExecution subTaskExecution = TaskExecution.builder()
                 .jobId(branchTaskExecution.getJobId())
+                .maxRetries(workflowTask.getMaxRetries())
                 .parentId(branchTaskExecution.getId())
                 .priority(branchTaskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)

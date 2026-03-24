@@ -141,6 +141,7 @@ public class ForkJoinTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
 
                 TaskExecution branchTaskExecution = TaskExecution.builder()
                     .jobId(taskExecutionJobId)
+                    .maxRetries(branchWorkflowTask.getMaxRetries())
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(1)

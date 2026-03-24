@@ -107,6 +107,7 @@ public class EachTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
                 Object item = items.get(i);
                 TaskExecution iterateeTaskExecution = TaskExecution.builder()
                     .jobId(taskExecution.getJobId())
+                    .maxRetries(iteratee.getMaxRetries())
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(i + 1)

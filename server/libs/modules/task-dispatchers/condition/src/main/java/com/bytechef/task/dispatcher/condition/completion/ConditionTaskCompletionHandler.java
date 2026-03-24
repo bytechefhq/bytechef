@@ -121,6 +121,7 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
 
             TaskExecution subTaskExecution = TaskExecution.builder()
                 .jobId(conditionTaskExecution.getJobId())
+                .maxRetries(subWorkflowTask.getMaxRetries())
                 .parentId(conditionTaskExecution.getId())
                 .priority(conditionTaskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)

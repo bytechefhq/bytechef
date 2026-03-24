@@ -104,6 +104,7 @@ public class ParallelTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
             for (WorkflowTask workflowTask : workflowTasks) {
                 TaskExecution parallelTaskExecution = TaskExecution.builder()
                     .jobId(taskExecution.getJobId())
+                    .maxRetries(workflowTask.getMaxRetries())
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .workflowTask(workflowTask)

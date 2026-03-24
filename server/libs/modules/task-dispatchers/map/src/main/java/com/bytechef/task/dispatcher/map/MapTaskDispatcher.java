@@ -112,6 +112,7 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
 
                 TaskExecution iterateeTaskExecution = TaskExecution.builder()
                     .jobId(taskExecutionJobId)
+                    .maxRetries(iterateeWorkflowTask.getMaxRetries())
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(1)
