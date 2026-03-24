@@ -68,7 +68,7 @@ export class ProjectsPage {
 
         await this.page.waitForLoadState('domcontentloaded');
 
-        const projectItem = this.page.getByLabel(projectId);
+        const projectItem = this.page.getByLabel(projectId, {exact: true});
 
         await expect(projectItem).toBeVisible({timeout: 20000});
 
