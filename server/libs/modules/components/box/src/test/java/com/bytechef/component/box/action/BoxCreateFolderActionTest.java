@@ -20,40 +20,65 @@ import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.PARENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-class BoxCreateFolderActionTest extends AbstractBoxActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class BoxCreateFolderActionTest {
+
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(NAME, "new folder", ID, "123id"));
+    private final Object mockedObject = mock(Object.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedParameters.getRequiredString(NAME))
-            .thenReturn("new folder");
-        when(mockedParameters.getRequiredString(ID))
-            .thenReturn("123id");
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
         Object result = BoxCreateFolderAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(mockedObject, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Map.of(NAME, "new folder", PARENT, Map.of(ID, "123id")), body.getContent());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/folders", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(Map.of(NAME, "new folder", PARENT, Map.of(ID, "123id")), BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
-
 }

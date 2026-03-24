@@ -16,30 +16,76 @@
 
 package com.bytechef.component.box.action;
 
+import static com.bytechef.component.box.constant.BoxConstants.FILE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-class BoxDownloadFileActionTest extends AbstractBoxActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class BoxDownloadFileActionTest {
 
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ID, "xy"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
 
     @Test
-    void testPerform() {
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getFirstHeader("location"))
+            .thenReturn("link");
         when(mockedResponse.getBody())
             .thenReturn(mockedFileEntry);
 
         Object result = BoxDownloadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedFileEntry, result);
-    }
 
+        for (ContextFunction<Http, Executor> httpFunction : httpFunctionArgumentCaptor.getAllValues()) {
+            assertNotNull(httpFunction);
+        }
+
+        List<ConfigurationBuilder> configurationBuilders = configurationBuilderArgumentCaptor.getAllValues();
+
+        assertEquals(2, configurationBuilders.size());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilders.getFirst();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        ConfigurationBuilder secondConfigurationBuilder = configurationBuilders.getLast();
+        Configuration secondConfiguration = secondConfigurationBuilder.build();
+
+        assertEquals(ResponseType.BINARY, secondConfiguration.getResponseType());
+
+        assertEquals(List.of("/files/xy/content", "link"), stringArgumentCaptor.getAllValues());
+    }
 }
