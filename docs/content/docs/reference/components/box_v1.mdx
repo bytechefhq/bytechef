@@ -69,7 +69,7 @@ Name: createFolder
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Folder Name | STRING | The name for the new folder. | true |
-| id | Parent Folder ID | STRING | ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder. | true |
+| id | Parent Folder ID | STRING | ID of the folder where the new folder will be created. The root folder is always represented by the ID 0. | true |
 
 #### Example JSON Structure
 ```json
@@ -117,6 +117,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/box_v1#how-to-find-folder-id).
 
 
 
@@ -129,7 +132,7 @@ Name: downloadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Parent Folder ID | STRING | ID of the folder from which you want to download the file. | false |
+| id | Parent Folder ID | STRING | ID of the folder from which you want to download the file. The root folder is always represented by the ID 0. | false |
 | fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | ID of the file to download. | true |
 
 #### Example JSON Structure
@@ -174,6 +177,13 @@ Type: FILE_ENTRY
 }
 ```
 
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/box_v1#how-to-find-file-id).
+
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/box_v1#how-to-find-folder-id).
 
 
 
@@ -186,7 +196,7 @@ Name: uploadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Parent Folder ID | STRING | ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder. | true |
+| id | Parent Folder ID | STRING | ID of the folder where the file should be uploaded. The root folder is always represented by the ID 0. | true |
 | file | File Entry | FILE_ENTRY |  | true |
 
 #### Example JSON Structure
@@ -239,6 +249,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/box_v1#how-to-find-folder-id).
 
 
 
@@ -257,7 +270,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Folder ID | STRING | ID of the folder in which file uploads will trigger this webhook. | true |
+| folderId | Folder ID | STRING | ID of the folder to monitor for new files. The root folder is always represented by the ID 0. | true |
 
 
 #### Output
@@ -304,7 +317,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| folderId | Folder ID | STRING | ID of the folder in which new folder will trigger this webhook. | true |
+| folderId | Folder ID | STRING | ID of the folder to monitor for new folders. The root folder is always represented by the ID 0. | true |
 
 
 #### Output
@@ -348,3 +361,22 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find File ID
+
+The ID for any file can be determined by visiting a file in the web application and copying the ID from the URL. For example, for the URL https://*.app.box.com/files/123 the file_id is 123 .
+
+The File ID can also be found in the output of the following actions and triggers:
+* **Upload File**
+* **New File** trigger
+
+### How to find Folder ID
+
+To find a Box folder ID, open the folder in your web browser and copy the numeric string at the end of the URL (e.g., in app.box.com/folder/12345, the ID is 12345).
+
+The Folder ID can also be found in the output of the following actions and triggers:
+* **Create Folder**
+* **New Folder** trigger
