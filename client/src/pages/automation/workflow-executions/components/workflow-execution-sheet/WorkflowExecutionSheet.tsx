@@ -123,7 +123,7 @@ const WorkflowExecutionSheet = () => {
                 </div>
 
                 <CopilotPanel
-                    className="h-full rounded-r-md border-l"
+                    className="h-full rounded-r-md border-l border-l-border/50"
                     onClose={handleCopilotClose}
                     open={copilotPanelOpen}
                 />

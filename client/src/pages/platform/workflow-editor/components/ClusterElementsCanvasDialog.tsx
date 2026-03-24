@@ -142,7 +142,7 @@ const ClusterElementsCanvasDialog = ({
                         />
 
                         <CopilotPanel
-                            className="absolute inset-y-0 right-0 rounded-r-md border-l"
+                            className="absolute inset-y-0 right-0 rounded-r-md border-l border-l-border/50"
                             onClose={handleCopilotClose}
                             open={copilotPanelOpen}
                         />
