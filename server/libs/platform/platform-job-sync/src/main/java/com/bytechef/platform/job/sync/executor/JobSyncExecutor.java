@@ -203,7 +203,8 @@ public class JobSyncExecutor {
                         createEventPublisher(memoryMessageBroker), taskDispatcherPreSendProcessors))));
 
         TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
-            coordinatorEventPublisher, jobService, taskDispatcherChain, taskExecutionService);
+            coordinatorEventPublisher, contextService, jobService, taskDispatcherChain, taskExecutionService,
+            taskFileStorage);
 
         receive(
             memoryMessageBroker, TaskCoordinatorMessageRoute.ERROR_EVENTS,
