@@ -207,12 +207,18 @@ export const useProperty = ({
     const [inputValue, setInputValue] = useState(() => getInitialInputValue(control, property));
     const [isFormulaMode, setIsFormulaModeInternal] = useState(property.controlType === 'FORMULA_MODE');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
-    const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
+    const [mentionInputValue, setMentionInputValue] = useState(() => {
+        const initialMentionValue = parameterValue !== undefined ? parameterValue : property.defaultValue || '';
+
+        return typeof initialMentionValue === 'string' ? initialMentionValue : '';
+    });
     const [mentionInput, setMentionInput] = useState(
         !control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)
     );
     const [multiSelectValue, setMultiSelectValue] = useState<string[]>(property.defaultValue || []);
-    const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
+    const [propertyParameterValue, setPropertyParameterValue] = useState(() =>
+        parameterValue !== undefined ? parameterValue : property.defaultValue || ''
+    );
     const [selectValue, setSelectValue] = useState(
         property.defaultValue !== undefined ? property.defaultValue : 'null'
     );
@@ -233,6 +239,11 @@ export const useProperty = ({
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
     const mentionInputValueRef = useRef<string | number | undefined>(undefined);
+    const parameterValueRef = useRef(parameterValue);
+
+    parameterValueRef.current = parameterValue;
+
+    const previousPropertyPathForParameterSyncRef = useRef<string | undefined>(undefined);
     const resetOnModeChangeRef = useRef(false);
 
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
@@ -1165,25 +1176,31 @@ export const useProperty = ({
         const isExpressionValue = typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=');
 
         if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
-            if (!path || !encodedPath) {
-                setPropertyParameterValue(parameters[name]);
+            if (parameterValue === undefined) {
+                if (!path || !encodedPath) {
+                    setPropertyParameterValue(parameters[name]);
 
-                return;
-            }
-
-            const valueFromDefinition = resolvePath(encodedParameters, encodedPath);
-
-            if (valueFromDefinition !== undefined && valueFromDefinition !== null) {
-                setPropertyParameterValue(valueFromDefinition);
-
-                if (typeof valueFromDefinition === 'string' && valueFromDefinition.startsWith('=')) {
-                    setMentionInput(true);
-                    setMentionInputValue(valueFromDefinition.substring(1));
-
-                    setIsFormulaMode(true);
+                    return;
                 }
-            } else {
-                setPropertyParameterValue(encodedParameters[name]);
+
+                const valueFromDefinition = resolvePath(encodedParameters, encodedPath);
+
+                if (valueFromDefinition !== undefined && valueFromDefinition !== null) {
+                    setPropertyParameterValue(valueFromDefinition);
+
+                    if (typeof valueFromDefinition === 'string' && valueFromDefinition.startsWith('=')) {
+                        setMentionInput(true);
+                        setMentionInputValue(valueFromDefinition.substring(1));
+
+                        setIsFormulaMode(true);
+                    } else if (mentionInput && typeof valueFromDefinition === 'string') {
+                        setMentionInputValue(valueFromDefinition);
+
+                        mentionInputValueRef.current = valueFromDefinition ? valueFromDefinition : undefined;
+                    }
+                } else {
+                    setPropertyParameterValue(encodedParameters[name]);
+                }
             }
         } else if (isExpressionValue) {
             setMentionInput(true);
@@ -1218,6 +1235,79 @@ export const useProperty = ({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (control || !path || !currentComponent?.parameters) {
+            return;
+        }
+
+        const previousPath = previousPropertyPathForParameterSyncRef.current;
+
+        previousPropertyPathForParameterSyncRef.current = path;
+
+        if (previousPath === undefined) {
+            return;
+        }
+
+        if (previousPath === path) {
+            return;
+        }
+
+        if (!Object.keys(currentComponent.parameters).length) {
+            return;
+        }
+
+        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedPath = encodePath(path);
+
+        if (!encodedPath) {
+            return;
+        }
+
+        const valueFromDefinition = resolvePath(encodedParameters, encodedPath);
+
+        const effectiveValue = parameterValue !== undefined ? parameterValue : valueFromDefinition;
+
+        if (effectiveValue !== undefined && effectiveValue !== null) {
+            if (type === 'BOOLEAN' && typeof effectiveValue === 'boolean') {
+                setPropertyParameterValue(effectiveValue.toString());
+
+                return;
+            }
+
+            setPropertyParameterValue(effectiveValue as never);
+
+            if (typeof effectiveValue === 'string' && effectiveValue.startsWith('=')) {
+                setMentionInput(true);
+                setMentionInputValue(effectiveValue.substring(1));
+
+                setIsFormulaMode(true);
+
+                return;
+            }
+
+            if (mentionInput && typeof effectiveValue === 'string') {
+                setMentionInputValue(effectiveValue);
+
+                mentionInputValueRef.current = effectiveValue ? effectiveValue : undefined;
+            }
+
+            return;
+        }
+
+        const fallbackParameterValue = parameterValue !== undefined ? parameterValue : defaultValue;
+
+        setPropertyParameterValue(fallbackParameterValue as never);
+    }, [
+        control,
+        currentComponent?.parameters,
+        defaultValue,
+        mentionInput,
+        parameterValue,
+        path,
+        setIsFormulaMode,
+        type,
+    ]);
 
     // set error state for mention input
     useEffect(() => {
@@ -1453,9 +1543,13 @@ export const useProperty = ({
 
         const encodedPath = encodePath(path);
 
-        setPropertyParameterValue(resolvePath(encodedParameters, encodedPath));
+        const valueFromWorkflowDefinition = resolvePath(encodedParameters, encodedPath);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const nextParameterValue =
+            parameterValueRef.current !== undefined ? parameterValueRef.current : valueFromWorkflowDefinition;
+
+        setPropertyParameterValue(nextParameterValue);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- sync when workflow JSON changes; read latest parameterValue via ref
     }, [workflow.definition]);
 
     // reset all values when currentNode.operationName changes

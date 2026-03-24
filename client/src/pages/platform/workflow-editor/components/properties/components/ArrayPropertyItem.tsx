@@ -1,4 +1,5 @@
 import DeletePropertyButton from '@/pages/platform/workflow-editor/components/properties/components/DeletePropertyButton';
+import {useArrayPropertyItem} from '@/pages/platform/workflow-editor/components/properties/hooks/useArrayProperty';
 import {ArrayPropertyType, ComponentType} from '@/shared/types';
 import {Dispatch, SetStateAction} from 'react';
 
@@ -25,32 +26,14 @@ const ArrayPropertyItem = ({
     path,
     setArrayItems,
 }: ArrayPropertyItemProps) => {
-    const handleOnDeleteClick = () => {
-        onDeleteClick(path);
-
-        const basePath = path.replace(/\[\d+\]$/, '');
-
-        setArrayItems((previousItems) => {
-            const remainingItems = previousItems.filter(
-                (_previousItem, previousItemIndex) => previousItemIndex !== index
-            );
-
-            const reindexedItems = remainingItems.map((remainingItem, newIndex) => {
-                if (Array.isArray(remainingItem)) {
-                    return remainingItem;
-                }
-
-                return {
-                    ...remainingItem,
-                    defaultValue: undefined,
-                    name: newIndex.toString(),
-                    path: `${basePath}[${newIndex}]`,
-                };
-            });
-
-            return reindexedItems;
-        });
-    };
+    const {arrayCellParameterValue, handleOnDeleteClick} = useArrayPropertyItem({
+        arrayItem,
+        currentComponent,
+        index,
+        onDeleteClick,
+        path,
+        setArrayItems,
+    });
 
     return (
         <div
@@ -71,8 +54,8 @@ const ArrayPropertyItem = ({
                         />
                     ) : undefined
                 }
-                key={`${arrayName}_${arrayItem.name}_${arrayItem.key}_property`}
-                parameterValue={arrayItem.defaultValue}
+                key={`${arrayItem.key}_${path}`}
+                parameterValue={arrayCellParameterValue}
                 parentArrayItems={parentArrayItems}
                 path={path}
                 property={arrayItem as ArrayPropertyType}
