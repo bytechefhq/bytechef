@@ -27,6 +27,8 @@ public class MondayConstants {
     public static final String BOARDS = "boards";
     public static final String BOARD_NAME = "board_name";
     public static final String BOARD_KIND = "board_kind";
+    public static final String COLUMN_ID = "column_id";
+    public static final String COLUMNS = "columns";
     public static final String COLUMN_TYPE = "column_type";
     public static final String DATA = "data";
     public static final String DESCRIPTION = "description";
@@ -40,6 +42,7 @@ public class MondayConstants {
     public static final String LABELS = "labels";
     public static final String NAME = "name";
     public static final String START_DATE = "startDate";
+    public static final String STATUS = "status";
     public static final String TEXT = "text";
     public static final String TITLE = "title";
     public static final String TO = "to";
