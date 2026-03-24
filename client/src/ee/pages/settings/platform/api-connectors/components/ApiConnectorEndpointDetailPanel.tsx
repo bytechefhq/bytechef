@@ -1,10 +1,12 @@
 import Badge from '@/components/Badge/Badge';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
+import {lazy} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {getHttpMethodBadgeColor} from '../utils/httpMethod-utils';
 import useApiConnectorEndpointDetailPanel from './hooks/useApiConnectorEndpointDetailPanel';
+
+const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 const ApiConnectorEndpointDetailPanel = () => {
     const {

@@ -11,8 +11,11 @@ import {
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import {PlusIcon, Trash2Icon} from 'lucide-react';
+
+const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
+
+import {lazy} from 'react';
 
 import {ResponseDefinitionI} from '../../types/api-connector-wizard.types';
 import {getStatusCodeColor} from '../../utils/endpointEditor-utils';
