@@ -145,12 +145,15 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     private void handleNewIterationFirstChildTaskExecution(
         TaskExecution parentTaskExecution, List<WorkflowTask> iterateeWorkflowTasks, List<?> items, Integer index) {
 
+        WorkflowTask iterateeWorkflowTask = iterateeWorkflowTasks.getFirst();
+
         TaskExecution firstChildTaskExecution = TaskExecution.builder()
             .jobId(parentTaskExecution.getJobId())
+            .maxRetries(iterateeWorkflowTask.getMaxRetries())
             .parentId(parentTaskExecution.getId())
             .priority(parentTaskExecution.getPriority())
             .taskNumber(0)
-            .workflowTask(iterateeWorkflowTasks.getFirst())
+            .workflowTask(iterateeWorkflowTask)
             .build();
 
         FileEntry contextValueFileEntry = contextService.peek(
@@ -189,6 +192,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         TaskExecution nextChildTaskExecution = TaskExecution.builder()
             .jobId(parentTaskExecution.getJobId())
+            .maxRetries(nextIterateeWorkflowTask.getMaxRetries())
             .parentId(parentTaskExecution.getId())
             .priority(parentTaskExecution.getPriority())
             .taskNumber(nextTaskIndex)
