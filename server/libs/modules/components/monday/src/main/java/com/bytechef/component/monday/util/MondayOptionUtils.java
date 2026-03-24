@@ -19,10 +19,14 @@ package com.bytechef.component.monday.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARDS;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
+import static com.bytechef.component.monday.constant.MondayConstants.COLUMNS;
+import static com.bytechef.component.monday.constant.MondayConstants.COLUMN_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
+import static com.bytechef.component.monday.constant.MondayConstants.LABELS;
 import static com.bytechef.component.monday.constant.MondayConstants.NAME;
 import static com.bytechef.component.monday.constant.MondayConstants.TITLE;
+import static com.bytechef.component.monday.constant.MondayConstants.TYPE;
 import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_ID;
 
 import com.bytechef.component.definition.Context;
@@ -47,17 +51,38 @@ public class MondayOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        String query = "query{boards(workspace_ids: [%s], order_by: created_at){id name}}"
-            .formatted(inputParameters.getRequiredString(WORKSPACE_ID));
-
-        Map<String, Object> body = MondayUtils.executeGraphQLQuery(query, context);
+        List<Map<String, ?>> boards = getBoardsByWorkspace(inputParameters.getRequiredString(WORKSPACE_ID), context);
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get(DATA) instanceof Map<?, ?> map && map.get(BOARDS) instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> boardMap) {
-                    options.add(option((String) boardMap.get(NAME), (String) boardMap.get(ID)));
+        for (Map<String, ?> board : boards) {
+            options.add(option((String) board.get(NAME), (String) board.get(ID)));
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getBoardIdWithStatusOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Map<String, ?>> boards = getBoardsByWorkspace(inputParameters.getRequiredString(WORKSPACE_ID), context);
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, ?> board : boards) {
+            if (board.get(COLUMNS) instanceof List<?> columns) {
+                boolean hasStatus = columns.stream()
+                    .anyMatch(c -> {
+                        if (c instanceof Map<?, ?> columnMap) {
+                            return columnMap.get(TYPE)
+                                .equals("status");
+                        }
+                        return false;
+                    });
+
+                if (hasStatus) {
+                    options.add(option((String) board.get(NAME), (String) board.get(ID)));
                 }
             }
         }
@@ -69,22 +94,59 @@ public class MondayOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        String query = "query{boards(ids: [%s]){items_page{items{id name}}}}"
-            .formatted(inputParameters.getRequiredString(BOARD_ID));
-
-        Map<String, Object> body = MondayUtils.executeGraphQLQuery(query, context);
+        List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get(DATA) instanceof Map<?, ?> map && map.get(BOARDS) instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> boardMap &&
-                    boardMap.get("items_page") instanceof Map<?, ?> itemsPage &&
-                    itemsPage.get("items") instanceof List<?> items) {
-                    for (Object item : items) {
-                        if (item instanceof Map<?, ?> itemMap) {
-                            options.add(option((String) itemMap.get(NAME), (String) itemMap.get(ID)));
-                        }
+        for (Map<String, ?> board : boards) {
+            if (board.get("items_page") instanceof Map<?, ?> itemsPage &&
+                itemsPage.get("items") instanceof List<?> items) {
+                for (Object item : items) {
+                    if (item instanceof Map<?, ?> itemMap) {
+                        options.add(option((String) itemMap.get(NAME), (String) itemMap.get(ID)));
+                    }
+                }
+            }
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getColumnIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, ?> board : boards) {
+            if (board.get(COLUMNS) instanceof List<?> columns) {
+                for (Object column : columns) {
+                    if (column instanceof Map<?, ?> columnMap) {
+                        options.add(option((String) columnMap.get("title"), (String) columnMap.get(ID)));
+                    }
+                }
+            }
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getColumnStatusIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, ?> board : boards) {
+            if (board.get(COLUMNS) instanceof List<?> columns) {
+                for (Object column : columns) {
+                    if (column instanceof Map<?, ?> columnMap && columnMap.get(TYPE)
+                        .equals("status")) {
+                        options.add(option((String) columnMap.get("title"), (String) columnMap.get(ID)));
                     }
                 }
             }
@@ -103,19 +165,45 @@ public class MondayOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        String query =
-            "query{boards(ids: [%s]){groups{id title}}}".formatted(inputParameters.getRequiredString(BOARD_ID));
-
-        Map<String, Object> body = MondayUtils.executeGraphQLQuery(query, context);
+        List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get(DATA) instanceof Map<?, ?> map && map.get(BOARDS) instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> boardMap && boardMap.get("groups") instanceof List<?> groupList) {
-                    for (Object group : groupList) {
-                        if (group instanceof Map<?, ?> groupMap)
-                            options.add(option((String) groupMap.get(TITLE), (String) groupMap.get(ID)));
+        for (Map<String, ?> board : boards) {
+            if (board.get("groups") instanceof List<?> groupList) {
+                for (Object group : groupList) {
+                    if (group instanceof Map<?, ?> groupMap)
+                        options.add(option((String) groupMap.get(TITLE), (String) groupMap.get(ID)));
+                }
+            }
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getStatusOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, ?> board : boards) {
+            if (board.get(COLUMNS) instanceof List<?> columns) {
+                for (Object column : columns) {
+                    if (column instanceof Map<?, ?> columnMap &&
+                        columnMap.get(ID)
+                            .equals(inputParameters.getRequiredString(COLUMN_ID))
+                        &&
+                        columnMap.get("settings") instanceof Map<?, ?> settings &&
+                        settings.get(LABELS) instanceof List<?> labels) {
+
+                        for (Object label : labels) {
+                            if (label instanceof Map<?, ?> labelMap) {
+                                options.add(option((String) labelMap.get("label"), (String) labelMap.get("label")));
+                            }
+                        }
                     }
                 }
             }
@@ -143,5 +231,31 @@ public class MondayOptionUtils {
         }
 
         return options;
+    }
+
+    private static List<Map<String, ?>> getBoardsByWorkspace(String workspaceId, Context context) {
+        String query =
+            "query{boards(workspace_ids: [%s], order_by: created_at){id name columns {id title type settings}}}"
+                .formatted(workspaceId);
+
+        return extractBoards(MondayUtils.executeGraphQLQuery(query, context));
+    }
+
+    private static List<Map<String, ?>> getBoardsById(String boardId, Context context) {
+        String query =
+            "query{boards(ids: [%s]){id name columns {id title type settings} items_page{items{id name}} groups{id title}}}"
+                .formatted(boardId);
+
+        return extractBoards(MondayUtils.executeGraphQLQuery(query, context));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Map<String, ?>> extractBoards(Map<String, Object> body) {
+        if (body.get(DATA) instanceof Map<?, ?> map &&
+            map.get(BOARDS) instanceof List<?> list) {
+
+            return (List<Map<String, ?>>) list;
+        }
+        return List.of();
     }
 }
