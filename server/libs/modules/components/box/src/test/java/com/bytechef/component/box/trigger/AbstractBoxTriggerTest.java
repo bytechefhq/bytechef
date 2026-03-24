@@ -16,6 +16,7 @@
 
 package com.bytechef.component.box.trigger;
 
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -28,14 +29,14 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public abstract class AbstractBoxTriggerTest {
+abstract class AbstractBoxTriggerTest {
 
-    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
@@ -45,6 +46,8 @@ public abstract class AbstractBoxTriggerTest {
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected MockedStatic<BoxUtils> boxUtilsMockedStatic;
     protected String workflowExecutionId = "testWorkflowExecutionId";
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = forClass(TriggerContext.class);
 
     @BeforeEach
     void beforeEach() {
@@ -52,7 +55,7 @@ public abstract class AbstractBoxTriggerTest {
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         boxUtilsMockedStatic.close();
     }
 }
