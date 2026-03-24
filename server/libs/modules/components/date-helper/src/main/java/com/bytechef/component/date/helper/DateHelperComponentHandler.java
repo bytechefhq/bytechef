@@ -24,6 +24,7 @@ import com.bytechef.component.date.helper.action.DateHelperAddTimeAction;
 import com.bytechef.component.date.helper.action.DateHelperCompareDatesAction;
 import com.bytechef.component.date.helper.action.DateHelperCompareTimesAction;
 import com.bytechef.component.date.helper.action.DateHelperConvertAction;
+import com.bytechef.component.date.helper.action.DateHelperConvertToDateAction;
 import com.bytechef.component.date.helper.action.DateHelperDateDifferenceAction;
 import com.bytechef.component.date.helper.action.DateHelperDateIsInLastAction;
 import com.bytechef.component.date.helper.action.DateHelperExtractDateUnitsAction;
@@ -60,6 +61,7 @@ public class DateHelperComponentHandler implements ComponentHandler {
             DateHelperCompareDatesAction.ACTION_DEFINITION,
             DateHelperCompareTimesAction.ACTION_DEFINITION,
             DateHelperConvertAction.ACTION_DEFINITION,
+            DateHelperConvertToDateAction.ACTION_DEFINITION,
             DateHelperDateDifferenceAction.ACTION_DEFINITION,
             DateHelperDateIsInLastAction.ACTION_DEFINITION,
             DateHelperExtractDateUnitsAction.ACTION_DEFINITION,
@@ -79,6 +81,7 @@ public class DateHelperComponentHandler implements ComponentHandler {
             tool(DateHelperCompareDatesAction.ACTION_DEFINITION),
             tool(DateHelperCompareTimesAction.ACTION_DEFINITION),
             tool(DateHelperConvertAction.ACTION_DEFINITION),
+            tool(DateHelperConvertToDateAction.ACTION_DEFINITION),
             tool(DateHelperDateDifferenceAction.ACTION_DEFINITION),
             tool(DateHelperDateIsInLastAction.ACTION_DEFINITION),
             tool(DateHelperExtractDateUnitsAction.ACTION_DEFINITION),

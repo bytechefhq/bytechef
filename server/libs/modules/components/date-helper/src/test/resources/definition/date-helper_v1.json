@@ -88,7 +88,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
-      "displayCondition": null,
+      "displayCondition": "dateFormatType == 'standard'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -767,6 +767,258 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
+    "description": "Converts a date string into a Date or DateTime value.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/date-helper_v1#convert-to-date"
+    },
+    "metadata": null,
+    "name": "convertToDate",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "DATE_TIME",
+          "defaultValue": null,
+          "description": "Parsed date value.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "DATE_TIME"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "DATE_TIME",
+        "defaultValue": null,
+        "description": "Parsed date value.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "required": null,
+        "type": "DATE_TIME"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The string to convert to a date.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date String",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateString",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The type of date format to use.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date Format Type",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateFormatType",
+      "options": [ {
+        "description": null,
+        "label": "Standard",
+        "value": "standard"
+      }, {
+        "description": null,
+        "label": "Custom",
+        "value": "custom"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
+      "displayCondition": "dateFormatType == 'standard'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateFormat",
+      "options": [ {
+        "description": "Sun Sep 17 2023 11:23:58",
+        "label": "EEE MMM dd yyyy HH:mm:ss",
+        "value": "EEE MMM dd yyyy HH:mm:ss"
+      }, {
+        "description": "Sun Sep 17 11:23:58 2023",
+        "label": "EEE MMM dd HH:mm:ss yyyy",
+        "value": "EEE MMM dd HH:mm:ss yyyy"
+      }, {
+        "description": "September 17 2023 11:23:58",
+        "label": "MMMM dd yyyy HH:mm:ss",
+        "value": "MMMM dd yyyy HH:mm:ss"
+      }, {
+        "description": "September 17 2023",
+        "label": "MMMM dd yyyy",
+        "value": "MMMM dd yyyy"
+      }, {
+        "description": "Sep 17 2023",
+        "label": "MMM dd yyyy",
+        "value": "MMM dd yyyy"
+      }, {
+        "description": "2023-09-17T11:23:58",
+        "label": "yyyy-MM-ddTHH:mm:ss",
+        "value": "yyyy-MM-dd'T'HH:mm:ss"
+      }, {
+        "description": "2023-09-17 11:23:58",
+        "label": "yyyy-MM-dd HH:mm:ss",
+        "value": "yyyy-MM-dd HH:mm:ss"
+      }, {
+        "description": "2023-09-17",
+        "label": "yyyy-MM-dd",
+        "value": "yyyy-MM-dd"
+      }, {
+        "description": "09-17-2023",
+        "label": "MM-dd-yyyy",
+        "value": "MM-dd-yyyy"
+      }, {
+        "description": "09/17/2023",
+        "label": "MM/dd/yyyy",
+        "value": "MM/dd/yyyy"
+      }, {
+        "description": "09/17/23",
+        "label": "MM/dd/yy",
+        "value": "MM/dd/yy"
+      }, {
+        "description": "17-09-2023",
+        "label": "dd-MM-yyyy",
+        "value": "dd-MM-yyyy"
+      }, {
+        "description": "17/09/2023",
+        "label": "dd/MM/yyyy",
+        "value": "dd/MM/yyyy"
+      }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
+        "description": "17/09/23",
+        "label": "dd/MM/yy",
+        "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
+      }, {
+        "description": "1694949838",
+        "label": "Time in unix format",
+        "value": "UnixTimestamp"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The format pattern of the input string (e.g. yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss). If not provided, ISO format is assumed.",
+      "displayCondition": "dateFormatType == 'custom'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateFormat",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "dateTime",
+      "description": "The type of date value to produce.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Output Type",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "type",
+      "options": [ {
+        "description": "Returns a date without time (LocalDate).",
+        "label": "Date",
+        "value": "date"
+      }, {
+        "description": "Returns a date with time (LocalDateTime).",
+        "label": "Date Time",
+        "value": "dateTime"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "title": "Convert to Date",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": null,
     "description": "Get the difference between two dates.",
     "help": {
       "body": "",
@@ -1285,7 +1537,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
-      "displayCondition": null,
+      "displayCondition": "dateFormatType == 'standard'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1469,7 +1721,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
-      "displayCondition": null,
+      "displayCondition": "dateFormatType == 'standard'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3030,7 +3282,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
-      "displayCondition": null,
+      "displayCondition": "dateFormatType == 'standard'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3313,7 +3565,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
-      "displayCondition": null,
+      "displayCondition": "dateFormatType == 'standard'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3984,6 +4236,255 @@
     },
     "workflowNodeDescription": null
   }, {
+    "name": "convertToDate",
+    "description": "Converts a date string into a Date or DateTime value.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "DATE_TIME",
+          "defaultValue": null,
+          "description": "Parsed date value.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "DATE_TIME"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "DATE_TIME",
+        "defaultValue": null,
+        "description": "Parsed date value.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "required": null,
+        "type": "DATE_TIME"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The string to convert to a date.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date String",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateString",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The type of date format to use.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date Format Type",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateFormatType",
+      "options": [ {
+        "description": null,
+        "label": "Standard",
+        "value": "standard"
+      }, {
+        "description": null,
+        "label": "Custom",
+        "value": "custom"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
+      "displayCondition": "dateFormatType == 'standard'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateFormat",
+      "options": [ {
+        "description": "Sun Sep 17 2023 11:23:58",
+        "label": "EEE MMM dd yyyy HH:mm:ss",
+        "value": "EEE MMM dd yyyy HH:mm:ss"
+      }, {
+        "description": "Sun Sep 17 11:23:58 2023",
+        "label": "EEE MMM dd HH:mm:ss yyyy",
+        "value": "EEE MMM dd HH:mm:ss yyyy"
+      }, {
+        "description": "September 17 2023 11:23:58",
+        "label": "MMMM dd yyyy HH:mm:ss",
+        "value": "MMMM dd yyyy HH:mm:ss"
+      }, {
+        "description": "September 17 2023",
+        "label": "MMMM dd yyyy",
+        "value": "MMMM dd yyyy"
+      }, {
+        "description": "Sep 17 2023",
+        "label": "MMM dd yyyy",
+        "value": "MMM dd yyyy"
+      }, {
+        "description": "2023-09-17T11:23:58",
+        "label": "yyyy-MM-ddTHH:mm:ss",
+        "value": "yyyy-MM-dd'T'HH:mm:ss"
+      }, {
+        "description": "2023-09-17 11:23:58",
+        "label": "yyyy-MM-dd HH:mm:ss",
+        "value": "yyyy-MM-dd HH:mm:ss"
+      }, {
+        "description": "2023-09-17",
+        "label": "yyyy-MM-dd",
+        "value": "yyyy-MM-dd"
+      }, {
+        "description": "09-17-2023",
+        "label": "MM-dd-yyyy",
+        "value": "MM-dd-yyyy"
+      }, {
+        "description": "09/17/2023",
+        "label": "MM/dd/yyyy",
+        "value": "MM/dd/yyyy"
+      }, {
+        "description": "09/17/23",
+        "label": "MM/dd/yy",
+        "value": "MM/dd/yy"
+      }, {
+        "description": "17-09-2023",
+        "label": "dd-MM-yyyy",
+        "value": "dd-MM-yyyy"
+      }, {
+        "description": "17/09/2023",
+        "label": "dd/MM/yyyy",
+        "value": "dd/MM/yyyy"
+      }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
+        "description": "17/09/23",
+        "label": "dd/MM/yy",
+        "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
+      }, {
+        "description": "1694949838",
+        "label": "Time in unix format",
+        "value": "UnixTimestamp"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The format pattern of the input string (e.g. yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss). If not provided, ISO format is assumed.",
+      "displayCondition": "dateFormatType == 'custom'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateFormat",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "dateTime",
+      "description": "The type of date value to produce.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Output Type",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "type",
+      "options": [ {
+        "description": "Returns a date without time (LocalDate).",
+        "label": "Date",
+        "value": "date"
+      }, {
+        "description": "Returns a date with time (LocalDateTime).",
+        "label": "Date Time",
+        "value": "dateTime"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Convert to Date",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "name": "dateDifference",
     "description": "Get the difference between two dates.",
     "element": { },
@@ -4489,7 +4990,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
-      "displayCondition": null,
+      "displayCondition": "dateFormatType == 'standard'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -4670,7 +5171,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
-      "displayCondition": null,
+      "displayCondition": "dateFormatType == 'standard'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -6204,7 +6705,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
-      "displayCondition": null,
+      "displayCondition": "dateFormatType == 'standard'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,

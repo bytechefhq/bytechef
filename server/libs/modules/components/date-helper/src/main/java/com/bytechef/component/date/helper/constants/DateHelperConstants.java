@@ -37,6 +37,7 @@ public class DateHelperConstants {
     public static final String DATE_A = "dateA";
     public static final String DATE_B = "dateB";
     public static final String DATE_FORMAT = "dateFormat";
+    public static final String DATE_STRING = "dateString";
     public static final String DATE_TIMESTAMP = "dateTimestamp";
     public static final String DAY = "day";
     public static final String DAY_OF_WEEK = "dayOfWeek";
