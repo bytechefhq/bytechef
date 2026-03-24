@@ -30,7 +30,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
-import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -51,8 +50,9 @@ public class BoxNewFolderTrigger {
         .properties(
             string(FOLDER_ID)
                 .label("Folder ID")
-                .description("ID of the folder in which new folder will trigger this webhook.")
-                .options((OptionsFunction<String>) BoxUtils::getRootFolderOptions)
+                .description(
+                    "ID of the folder to monitor for new folders. The root folder is always represented by the ID 0.")
+                .defaultValue("0")
                 .required(true))
         .output(outputSchema(FOLDER_OUTPUT_PROPERTY))
         .webhookEnable(BoxNewFolderTrigger::webhookEnable)

@@ -24,9 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.box.util.BoxUtils;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
@@ -51,9 +49,8 @@ public class BoxCreateFolderAction {
             string(ID)
                 .label("Parent Folder ID")
                 .description(
-                    "ID of the folder where the new folder will be created; if no folder is selected, the folder " +
-                        "will be created in the root folder.")
-                .options((OptionsFunction<String>) BoxUtils::getRootFolderOptions)
+                    "ID of the folder where the new folder will be created. The root folder is always represented " +
+                        "by the ID 0.")
                 .defaultValue("0")
                 .required(true))
         .output(outputSchema(FOLDER_OUTPUT_PROPERTY))
