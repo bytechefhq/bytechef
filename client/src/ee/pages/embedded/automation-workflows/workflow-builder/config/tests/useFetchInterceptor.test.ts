@@ -167,7 +167,7 @@ describe('useFetchInterceptor (embedded)', () => {
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Error', {
                 description: 'Something went wrong',
-                id: '/internal/api/test-500',
+                id: 'fetch-error-500',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
@@ -261,7 +261,7 @@ describe('useFetchInterceptor (embedded)', () => {
             });
 
             expect(hoisted.toastError).toHaveBeenCalledWith('Request failed with status 502', {
-                id: '/internal/api/test-502',
+                id: 'fetch-error-502',
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
