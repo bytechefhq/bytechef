@@ -23,9 +23,9 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.text.helper.action.TextHelperBase64EncodeDecodeAction;
-import com.bytechef.component.text.helper.action.TextHelperChangeTypeAction;
 import com.bytechef.component.text.helper.action.TextHelperConcatenateAction;
 import com.bytechef.component.text.helper.action.TextHelperContainsAction;
+import com.bytechef.component.text.helper.action.TextHelperConvertToNumberAction;
 import com.bytechef.component.text.helper.action.TextHelperEscapeCharactersAction;
 import com.bytechef.component.text.helper.action.TextHelperExtractAllRegExAction;
 import com.bytechef.component.text.helper.action.TextHelperExtractContentFromHtmlAction;
@@ -83,7 +83,7 @@ public class TextHelperComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .actions(
             TextHelperBase64EncodeDecodeAction.ACTION_DEFINITION,
-            TextHelperChangeTypeAction.ACTION_DEFINITION,
+            TextHelperConvertToNumberAction.ACTION_DEFINITION,
             TextHelperConcatenateAction.ACTION_DEFINITION,
             TextHelperContainsAction.ACTION_DEFINITION,
             TextHelperEscapeCharactersAction.ACTION_DEFINITION,
@@ -130,7 +130,7 @@ public class TextHelperComponentHandler implements ComponentHandler {
             TextHelperUrlEncodeDecodeKeyValuePairAction.ACTION_DEFINITION)
         .clusterElements(
             tool(TextHelperBase64EncodeDecodeAction.ACTION_DEFINITION),
-            tool(TextHelperChangeTypeAction.ACTION_DEFINITION),
+            tool(TextHelperConvertToNumberAction.ACTION_DEFINITION),
             tool(TextHelperConcatenateAction.ACTION_DEFINITION),
             tool(TextHelperContainsAction.ACTION_DEFINITION),
             tool(TextHelperEscapeCharactersAction.ACTION_DEFINITION),

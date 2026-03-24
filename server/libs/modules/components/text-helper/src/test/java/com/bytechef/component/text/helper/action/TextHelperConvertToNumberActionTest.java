@@ -29,13 +29,13 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Nikolina Spehar
  */
-class TextHelperChangeTypeActionTest {
+class TextHelperConvertToNumberActionTest {
 
     @Test
     void testPerformValidNumber() {
         Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "42"));
 
-        double result = TextHelperChangeTypeAction.perform(mockedParameters, null, null);
+        double result = TextHelperConvertToNumberAction.perform(mockedParameters, null, null);
 
         assertEquals(42.0, result);
     }
@@ -45,6 +45,6 @@ class TextHelperChangeTypeActionTest {
         Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "not a number"));
 
         assertThrows(ProviderException.class,
-            () -> TextHelperChangeTypeAction.perform(mockedParameters, null, null));
+            () -> TextHelperConvertToNumberAction.perform(mockedParameters, null, null));
     }
 }
