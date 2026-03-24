@@ -1,3 +1,4 @@
+import babelPlugin from '@rolldown/plugin-babel';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react';
 import * as path from 'node:path';
@@ -22,20 +23,30 @@ export default ({mode}) => {
                     main: resolve(__dirname, 'index.html'),
                 },
                 output: {
-                    manualChunks: {
-                        'vendor-analytics': ['posthog-js'],
-                        'vendor-query': ['@tanstack/react-query'],
-                        'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-                        'vendor-ui': ['@radix-ui/react-icons', 'lucide-react'],
+                    manualChunks(id) {
+                        if (id.includes('posthog-js')) {
+                            return 'vendor-analytics';
+                        }
+
+                        if (id.includes('@tanstack/react-query')) {
+                            return 'vendor-query';
+                        }
+
+                        if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/react-router-dom/')) {
+                            return 'vendor-react';
+                        }
+
+                        if (id.includes('@radix-ui/react-icons') || id.includes('lucide-react')) {
+                            return 'vendor-ui';
+                        }
                     },
                 },
             },
         },
         plugins: [
-            react({
-                babel: {
-                    plugins: ['@lingui/babel-plugin-lingui-macro'],
-                },
+            react(),
+            babelPlugin({
+                plugins: ['@lingui/babel-plugin-lingui-macro'],
             }),
             lingui(),
             svgr(),
