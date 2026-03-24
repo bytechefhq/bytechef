@@ -23,13 +23,17 @@ import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,19 +50,24 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
     private static final Logger logger = LoggerFactory.getLogger(TaskExecutionErrorEventListener.class);
 
     private final ApplicationEventPublisher eventPublisher;
+    private final ContextService contextService;
     private final JobService jobService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI2")
     public TaskExecutionErrorEventListener(
-        ApplicationEventPublisher eventPublisher, JobService jobService,
-        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
 
+        this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -84,9 +93,14 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
             // if the task is retryable, then retry it
             if (taskExecution.getRetryAttempts() < taskExecution.getMaxRetries()) {
 
+                Map<String, ?> context = taskFileStorage.readContextValue(
+                    contextService.peek(
+                        Validate.notNull(taskExecution.getJobId(), "id"), Context.Classname.JOB));
+
                 TaskExecution retryTaskExecution = TaskExecution.builder()
                     .jobId(taskExecution.getJobId())
                     .maxRetries(taskExecution.getMaxRetries())
+                    .parentId(taskExecution.getParentId())
                     .priority(taskExecution.getPriority())
                     .retryAttempts(taskExecution.getRetryAttempts() + 1)
                     .status(TaskExecution.Status.CREATED)
@@ -94,6 +108,13 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
                     .build();
 
                 retryTaskExecution = taskExecutionService.create(retryTaskExecution);
+
+                contextService.push(
+                    Validate.notNull(retryTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                    taskFileStorage.storeContextValue(
+                        Validate.notNull(
+                            retryTaskExecution.getId(), "id"),
+                        Context.Classname.TASK_EXECUTION, context));
 
                 taskDispatcher.dispatch(retryTaskExecution);
             }
