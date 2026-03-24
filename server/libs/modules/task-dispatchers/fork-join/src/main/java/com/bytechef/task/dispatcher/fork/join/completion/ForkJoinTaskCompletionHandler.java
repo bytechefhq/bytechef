@@ -139,6 +139,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             TaskExecution branchTaskExecution = TaskExecution.builder()
                 .jobId(taskExecutionJobId)
+                .maxRetries(branchWorkflowTask.getMaxRetries())
                 .parentId(taskExecution.getParentId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)

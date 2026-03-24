@@ -106,6 +106,7 @@ public class OnErrorTaskCompletionHandler implements TaskCompletionHandler {
 
             TaskExecution subTaskExecution = TaskExecution.builder()
                 .jobId(onErrorTaskExecution.getJobId())
+                .maxRetries(subWorkflowTask.getMaxRetries())
                 .parentId(onErrorTaskExecution.getId())
                 .priority(onErrorTaskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)

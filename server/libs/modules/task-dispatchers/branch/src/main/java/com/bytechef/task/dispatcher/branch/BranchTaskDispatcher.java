@@ -108,6 +108,7 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
 
                 TaskExecution subTaskExecution = TaskExecution.builder()
                     .jobId(taskExecution.getJobId())
+                    .maxRetries(subWorkflowTask.getMaxRetries())
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(1)

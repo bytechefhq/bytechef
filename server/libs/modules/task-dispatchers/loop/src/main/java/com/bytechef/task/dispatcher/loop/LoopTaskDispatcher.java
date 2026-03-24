@@ -96,12 +96,15 @@ public class LoopTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
         taskExecution = taskExecutionService.update(taskExecution);
 
         if (loopForever || !items.isEmpty()) {
+            WorkflowTask iterateeWorkflowTask = iterateeWorkflowTasks.getFirst();
+
             TaskExecution subTaskExecution = TaskExecution.builder()
+                .maxRetries(iterateeWorkflowTask.getMaxRetries())
                 .jobId(taskExecution.getJobId())
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(0)
-                .workflowTask(iterateeWorkflowTasks.getFirst())
+                .workflowTask(iterateeWorkflowTask)
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
