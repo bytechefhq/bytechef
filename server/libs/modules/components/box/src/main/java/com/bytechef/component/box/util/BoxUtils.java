@@ -78,12 +78,11 @@ public class BoxUtils {
         String webhookUrl, TriggerContext context, String type, String triggerEvent, String targetId) {
 
         Map<String, ?> body = context.http(http -> http.post("/webhooks"))
-            .body(Http.Body.of(
-                "address", webhookUrl,
-                "triggers", List.of(triggerEvent),
-                "target", Map.of(
-                    ID, targetId,
-                    TYPE, type)))
+            .body(
+                Http.Body.of(
+                    "address", webhookUrl,
+                    "triggers", List.of(triggerEvent),
+                    "target", Map.of(ID, targetId, TYPE, type)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -93,7 +92,6 @@ public class BoxUtils {
 
     public static void unsubscribeWebhook(Parameters outputParameters, Context context) {
         context.http(http -> http.delete("/webhooks/" + outputParameters.getString(ID)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
 
@@ -107,6 +105,7 @@ public class BoxUtils {
                 }
             }
         }
+
         return options;
     }
 
