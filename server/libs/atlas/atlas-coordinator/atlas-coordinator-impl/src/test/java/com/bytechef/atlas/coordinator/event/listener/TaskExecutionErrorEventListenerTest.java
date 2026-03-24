@@ -30,8 +30,10 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.error.ExecutionError;
 import java.util.List;
@@ -46,11 +48,13 @@ import tools.jackson.databind.json.JsonMapper;
  */
 public class TaskExecutionErrorEventListenerTest {
 
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+    private final ContextService contextService = mock(ContextService.class);
     private final JobService jobService = mock(JobService.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+    private final TaskFileStorage taskFileStorage = mock(TaskFileStorage.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
-    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
     static {
         ObjectMapper objectMapper = JsonMapper.builder()
@@ -65,7 +69,7 @@ public class TaskExecutionErrorEventListenerTest {
             .thenReturn(new Job(4567L));
 
         TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
-            eventPublisher, jobService, taskDispatcher, taskExecutionService);
+            eventPublisher, contextService, jobService, taskDispatcher, taskExecutionService, taskFileStorage);
 
         TaskExecution erroredTaskExecution = new TaskExecution();
 
@@ -87,12 +91,13 @@ public class TaskExecutionErrorEventListenerTest {
             .thenReturn(new Job());
 
         TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
-            eventPublisher, jobService, taskDispatcher, taskExecutionService);
+            eventPublisher, contextService, jobService, taskDispatcher, taskExecutionService, taskFileStorage);
 
         TaskExecution erroredTaskExecution = new TaskExecution();
 
         erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
         erroredTaskExecution.setId(1234L);
+        erroredTaskExecution.setJobId(4321L);
         erroredTaskExecution.setMaxRetries(1);
         erroredTaskExecution.setWorkflowTask(
             new WorkflowTask(
@@ -100,8 +105,8 @@ public class TaskExecutionErrorEventListenerTest {
                     "name", "workflowTaskName",
                     "type", "workflowTaskType")));
 
-        when(taskExecutionService.update(any()))
-            .thenReturn(erroredTaskExecution);
+        when(taskExecutionService.update(any(TaskExecution.class))).thenReturn(erroredTaskExecution);
+        when(taskExecutionService.create(any(TaskExecution.class))).thenReturn(erroredTaskExecution);
 
         taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(erroredTaskExecution));
 
