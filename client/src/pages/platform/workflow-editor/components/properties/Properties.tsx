@@ -10,9 +10,8 @@ import {twMerge} from 'tailwind-merge';
 
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 
-interface PropertiesProps {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    control?: Control<any, any>;
+interface PropertiesProps<T extends FieldValues = FieldValues> {
+    control?: Control<T>;
     controlPath?: string;
     displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
     customClassName?: string;
@@ -24,7 +23,7 @@ interface PropertiesProps {
     toolsMode?: boolean;
 }
 
-const Properties = ({
+const Properties = <T extends FieldValues = FieldValues>({
     control,
     controlPath,
     customClassName,
@@ -35,7 +34,7 @@ const Properties = ({
     path,
     properties,
     toolsMode,
-}: PropertiesProps) => {
+}: PropertiesProps<T>) => {
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const advancedProperties = properties.filter((property) => {
@@ -74,7 +73,7 @@ const Properties = ({
             >
                 {simpleProperties.map((property, index) => (
                     <Property
-                        control={control}
+                        control={control as Control<FieldValues>}
                         controlPath={controlPath}
                         displayConditionsQuery={displayConditionsQuery}
                         formState={formState}
@@ -102,7 +101,7 @@ const Properties = ({
                         <ul className="space-y-4 pt-4" key={`${currentNode?.operationName}_advancedProperties`}>
                             {advancedProperties.map((property, index) => (
                                 <Property
-                                    control={control}
+                                    control={control as Control<FieldValues>}
                                     controlPath={controlPath}
                                     displayConditionsQuery={displayConditionsQuery}
                                     formState={formState}
