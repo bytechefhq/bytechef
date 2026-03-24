@@ -35,7 +35,7 @@ services:
 #      # HTTP management UI
 #      - '15672:15672'
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     platform: linux/amd64
     restart: always
     ports:
