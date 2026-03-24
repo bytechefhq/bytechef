@@ -30,10 +30,10 @@ import com.bytechef.component.exception.ProviderException;
 /**
  * @author Nikolina Špehar
  */
-public class TextHelperChangeTypeAction {
+public class TextHelperConvertToNumberAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("changeType")
-        .title("Change Type")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("convertToNumber")
+        .title("Convert to Number")
         .description("Change the type of the input text to number.")
         .properties(
             string(TEXT)
@@ -42,9 +42,9 @@ public class TextHelperChangeTypeAction {
                 .required(true))
         .output(outputSchema(number().description("Number input text")))
         .help("", "https://docs.bytechef.io/reference/components/text-helper_v1#change-type")
-        .perform(TextHelperChangeTypeAction::perform);
+        .perform(TextHelperConvertToNumberAction::perform);
 
-    private TextHelperChangeTypeAction() {
+    private TextHelperConvertToNumberAction() {
     }
 
     public static double perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

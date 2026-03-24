@@ -132,7 +132,7 @@
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/text-helper_v1#change-type"
     },
     "metadata": null,
-    "name": "changeType",
+    "name": "convertToNumber",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -212,7 +212,7 @@
       "type": "STRING"
     } ],
     "resumePerform": null,
-    "title": "Change Type",
+    "title": "Convert to Number",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -7632,7 +7632,7 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "changeType",
+    "name": "convertToNumber",
     "description": "Change the type of the input text to number.",
     "element": { },
     "help": null,
@@ -7713,7 +7713,7 @@
       "required": true,
       "type": "STRING"
     } ],
-    "title": "Change Type",
+    "title": "Convert to Number",
     "type": {
       "name": "TOOLS",
       "key": "tools",
