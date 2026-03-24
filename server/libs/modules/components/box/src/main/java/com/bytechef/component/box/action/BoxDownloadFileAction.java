@@ -58,19 +58,16 @@ public class BoxDownloadFileAction {
     private BoxDownloadFileAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         Http.Response response = context
             .http(http -> http.get("/files/" + inputParameters.getRequiredString(FILE_ID) + "/content"))
             .configuration(Http.responseType(ResponseType.JSON))
             .execute();
 
-        Http.Response fileResponse = context
+        return context
             .http(http -> http.get(response.getFirstHeader("location")))
             .configuration(Http.responseType(Http.ResponseType.BINARY))
-            .execute();
-
-        return fileResponse.getBody();
+            .execute()
+            .getBody();
     }
 }
