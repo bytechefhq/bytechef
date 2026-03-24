@@ -193,7 +193,7 @@ const Property = ({
             {mentionInput && currentComponent && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
                 <PropertyMentionsInput
                     controlType={controlType || 'TEXT'}
-                    defaultValue={defaultValue}
+                    defaultValue={parameterValue !== undefined ? parameterValue : defaultValue}
                     deletePropertyButton={deletePropertyButton}
                     description={description}
                     error={hasError}
