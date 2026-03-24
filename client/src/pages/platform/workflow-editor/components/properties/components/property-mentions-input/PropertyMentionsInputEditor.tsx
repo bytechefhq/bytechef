@@ -181,7 +181,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             'span',
                             mergeAttributes(options.HTMLAttributes, {
                                 class: twMerge(
-                                    'relative inline-flex items-center gap-0.5 not-prose bg-muted hover:bg-foreground/15 px-2 rounded-full',
+                                    'not-prose relative inline-flex items-center gap-0.5 rounded-full bg-muted px-2 hover:bg-foreground/15',
                                     controlType !== 'RICH_TEXT' &&
                                         controlType !== 'TEXT_AREA' &&
                                         controlType !== 'FORMULA_MODE' &&
@@ -521,7 +521,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     ...(labelId ? {'aria-labelledby': labelId} : {}),
                     'aria-multiline': 'true',
                     class: twMerge(
-                        'text-sm outline-none max-w-full border-none ring-0 break-words whitespace-pre-wrap w-full min-w-0 break-all',
+                        'w-full min-w-0 max-w-full whitespace-pre-wrap break-words break-all border-none text-sm outline-none ring-0',
                         controlType === 'RICH_TEXT' && 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl',
                         className
                     ),

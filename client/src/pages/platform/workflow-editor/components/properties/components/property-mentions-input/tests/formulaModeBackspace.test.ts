@@ -142,11 +142,10 @@ describe('formulaModeBackspace', () => {
          * the value prop. Formula mode entry is handled elsewhere.
          */
         it('old sync effect re-enables formula mode when value still starts with =', () => {
-            let isFormulaMode = true;
             const value = '='; // Stale value, saveNullValue hasn't completed
 
-            // Backspace handler sets isFormulaMode to false
-            isFormulaMode = false;
+            // Backspace handler sets isFormulaMode to false (simulates state after handler)
+            const isFormulaMode = false;
 
             // Old sync effect checks value — BUG: re-enables formula mode
             const oldEffectReEnables = typeof value === 'string' && value.startsWith('=') && isFormulaMode === false;
@@ -155,11 +154,10 @@ describe('formulaModeBackspace', () => {
         });
 
         it('new sync effect only syncs current state without checking value', () => {
-            let isFormulaMode = true;
             const value = '='; // Stale value
 
-            // Backspace handler sets isFormulaMode to false
-            isFormulaMode = false;
+            // Backspace handler sets isFormulaMode to false (simulates state after handler)
+            const isFormulaMode = false;
 
             // New sync effect only syncs isFormulaMode to storage
             const storageIsFormulaMode = isFormulaMode;

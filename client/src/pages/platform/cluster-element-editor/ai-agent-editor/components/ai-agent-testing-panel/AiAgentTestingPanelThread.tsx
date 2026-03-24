@@ -1,5 +1,3 @@
-/* eslint-disable tailwindcss/no-custom-classname */
-
 import {ComposerAddAttachment, ComposerAttachments, UserMessageAttachments} from '@/components/assistant-ui/attachment';
 import {MarkdownText} from '@/components/assistant-ui/markdown-text';
 import {TooltipIconButton} from '@/components/assistant-ui/tooltip-icon-button';

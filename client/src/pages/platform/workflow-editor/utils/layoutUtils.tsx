@@ -737,7 +737,7 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
 
         componentName = parentTaskDispatcher.type.split('/')[0];
 
-        let parentSubtasks: WorkflowTask[] = [];
+        let parentSubtasks: WorkflowTask[];
 
         switch (componentName) {
             case 'branch': {
