@@ -292,7 +292,7 @@ const useOAuth2 = ({
             try {
                 popupAppearsClosed = !popupRef.current || popupRef.current.closed;
             } catch {
-                popupAppearsClosed = false;
+                // Cross-origin access may throw; keep popupAppearsClosed as false
             }
 
             if (popupAppearsClosed) {
