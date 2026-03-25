@@ -29,7 +29,6 @@ import org.springaicommunity.agent.tools.task.TaskTool;
 import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentType;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
@@ -64,6 +63,6 @@ public class AgentUtilsTaskTool {
                 .build())
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(taskToolCallback));
+        return ToolCallbackProvider.from(taskToolCallback);
     }
 }
