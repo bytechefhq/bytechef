@@ -87,6 +87,17 @@ export type AdminUserPage = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type AgentSkill = {
+  __typename?: 'AgentSkill';
+  /** Epoch milliseconds */
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Epoch milliseconds */
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+};
+
 export type ApiCollectionSearchResult = SearchResult & {
   __typename?: 'ApiCollectionSearchResult';
   description?: Maybe<Scalars['String']['output']>;
@@ -1187,6 +1198,8 @@ export type Mutation = {
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
   cancelGenerationJob: Scalars['Boolean']['output'];
+  createAgentSkill: AgentSkill;
+  createAgentSkillFromInstructions: AgentSkill;
   createApiConnector: ApiConnector;
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
@@ -1204,6 +1217,7 @@ export type Mutation = {
   createMcpTool?: Maybe<McpTool>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
+  deleteAgentSkill?: Maybe<Scalars['Boolean']['output']>;
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
@@ -1253,6 +1267,7 @@ export type Mutation = {
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
+  updateAgentSkill: AgentSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
@@ -1286,6 +1301,21 @@ export type MutationAddDataTableColumnArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationCreateAgentSkillArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  fileBytes: Scalars['String']['input'];
+  filename: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+};
+
+
+export type MutationCreateAgentSkillFromInstructionsArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  instructions: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 
@@ -1377,6 +1407,11 @@ export type MutationCreateWorkspaceApiKeyArgs = {
 
 export type MutationCreateWorkspaceMcpServerArgs = {
   input: CreateWorkspaceMcpServerInput;
+};
+
+
+export type MutationDeleteAgentSkillArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1655,6 +1690,13 @@ export type MutationTestWorkflowNodeScriptArgs = {
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateAgentSkillArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
 };
 
 
@@ -2028,6 +2070,12 @@ export type Query = {
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
+  agentSkill?: Maybe<AgentSkill>;
+  /** Returns the skill archive as a Base64-encoded zip file */
+  agentSkillDownload: Scalars['String']['output'];
+  agentSkillFileContent: Scalars['String']['output'];
+  agentSkillFilePaths: Array<Scalars['String']['output']>;
+  agentSkills: Array<AgentSkill>;
   apiConnector?: Maybe<ApiConnector>;
   apiConnectors: Array<ApiConnector>;
   apiKey?: Maybe<ApiKey>;
@@ -2158,6 +2206,27 @@ export type QueryActionDefinitionsArgs = {
 
 export type QueryAdminApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
+};
+
+
+export type QueryAgentSkillArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAgentSkillDownloadArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAgentSkillFileContentArgs = {
+  id: Scalars['ID']['input'];
+  path: Scalars['String']['input'];
+};
+
+
+export type QueryAgentSkillFilePathsArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2982,6 +3051,75 @@ export type WorkflowTrigger = {
   parameters?: Maybe<Scalars['Map']['output']>;
   type: Scalars['String']['output'];
 };
+
+export type AgentSkillQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type AgentSkillQuery = { __typename?: 'Query', agentSkill?: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } | null };
+
+export type AgentSkillDownloadQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type AgentSkillDownloadQuery = { __typename?: 'Query', agentSkillDownload: string };
+
+export type AgentSkillFileContentQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  path: Scalars['String']['input'];
+}>;
+
+
+export type AgentSkillFileContentQuery = { __typename?: 'Query', agentSkillFileContent: string };
+
+export type AgentSkillFilePathsQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type AgentSkillFilePathsQuery = { __typename?: 'Query', agentSkillFilePaths: Array<string> };
+
+export type AgentSkillsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AgentSkillsQuery = { __typename?: 'Query', agentSkills: Array<{ __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null }> };
+
+export type CreateAgentSkillMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  filename: Scalars['String']['input'];
+  fileBytes: Scalars['String']['input'];
+}>;
+
+
+export type CreateAgentSkillMutation = { __typename?: 'Mutation', createAgentSkill: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type CreateAgentSkillFromInstructionsMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  instructions: Scalars['String']['input'];
+}>;
+
+
+export type CreateAgentSkillFromInstructionsMutation = { __typename?: 'Mutation', createAgentSkillFromInstructions: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type DeleteAgentSkillMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAgentSkillMutation = { __typename?: 'Mutation', deleteAgentSkill?: boolean | null };
+
+export type UpdateAgentSkillMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateAgentSkillMutation = { __typename?: 'Mutation', updateAgentSkill: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
 export type ApprovalTaskQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -4276,6 +4414,231 @@ export type UsersQueryVariables = Exact<{
 export type UsersQuery = { __typename?: 'Query', users?: { __typename?: 'AdminUserPage', number: number, size: number, totalElements: number, totalPages: number, content: Array<{ __typename?: 'AdminUser', id?: string | null, login?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null, activated?: boolean | null, authorities?: Array<string | null> | null } | null> } | null };
 
 
+
+export const AgentSkillDocument = `
+    query agentSkill($id: ID!) {
+  agentSkill(id: $id) {
+    id
+    name
+    description
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useAgentSkillQuery = <
+      TData = AgentSkillQuery,
+      TError = unknown
+    >(
+      variables: AgentSkillQueryVariables,
+      options?: Omit<UseQueryOptions<AgentSkillQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentSkillQuery, TError, TData>(
+      {
+    queryKey: ['agentSkill', variables],
+    queryFn: fetcher<AgentSkillQuery, AgentSkillQueryVariables>(AgentSkillDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentSkillDownloadDocument = `
+    query agentSkillDownload($id: ID!) {
+  agentSkillDownload(id: $id)
+}
+    `;
+
+export const useAgentSkillDownloadQuery = <
+      TData = AgentSkillDownloadQuery,
+      TError = unknown
+    >(
+      variables: AgentSkillDownloadQueryVariables,
+      options?: Omit<UseQueryOptions<AgentSkillDownloadQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillDownloadQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentSkillDownloadQuery, TError, TData>(
+      {
+    queryKey: ['agentSkillDownload', variables],
+    queryFn: fetcher<AgentSkillDownloadQuery, AgentSkillDownloadQueryVariables>(AgentSkillDownloadDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentSkillFileContentDocument = `
+    query agentSkillFileContent($id: ID!, $path: String!) {
+  agentSkillFileContent(id: $id, path: $path)
+}
+    `;
+
+export const useAgentSkillFileContentQuery = <
+      TData = AgentSkillFileContentQuery,
+      TError = unknown
+    >(
+      variables: AgentSkillFileContentQueryVariables,
+      options?: Omit<UseQueryOptions<AgentSkillFileContentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillFileContentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentSkillFileContentQuery, TError, TData>(
+      {
+    queryKey: ['agentSkillFileContent', variables],
+    queryFn: fetcher<AgentSkillFileContentQuery, AgentSkillFileContentQueryVariables>(AgentSkillFileContentDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentSkillFilePathsDocument = `
+    query agentSkillFilePaths($id: ID!) {
+  agentSkillFilePaths(id: $id)
+}
+    `;
+
+export const useAgentSkillFilePathsQuery = <
+      TData = AgentSkillFilePathsQuery,
+      TError = unknown
+    >(
+      variables: AgentSkillFilePathsQueryVariables,
+      options?: Omit<UseQueryOptions<AgentSkillFilePathsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillFilePathsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentSkillFilePathsQuery, TError, TData>(
+      {
+    queryKey: ['agentSkillFilePaths', variables],
+    queryFn: fetcher<AgentSkillFilePathsQuery, AgentSkillFilePathsQueryVariables>(AgentSkillFilePathsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentSkillsDocument = `
+    query agentSkills {
+  agentSkills {
+    id
+    name
+    description
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useAgentSkillsQuery = <
+      TData = AgentSkillsQuery,
+      TError = unknown
+    >(
+      variables?: AgentSkillsQueryVariables,
+      options?: Omit<UseQueryOptions<AgentSkillsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentSkillsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['agentSkills'] : ['agentSkills', variables],
+    queryFn: fetcher<AgentSkillsQuery, AgentSkillsQueryVariables>(AgentSkillsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAgentSkillDocument = `
+    mutation createAgentSkill($name: String!, $description: String, $filename: String!, $fileBytes: String!) {
+  createAgentSkill(
+    name: $name
+    description: $description
+    filename: $filename
+    fileBytes: $fileBytes
+  ) {
+    id
+    name
+    description
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useCreateAgentSkillMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAgentSkillMutation, TError, CreateAgentSkillMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAgentSkillMutation, TError, CreateAgentSkillMutationVariables, TContext>(
+      {
+    mutationKey: ['createAgentSkill'],
+    mutationFn: (variables?: CreateAgentSkillMutationVariables) => fetcher<CreateAgentSkillMutation, CreateAgentSkillMutationVariables>(CreateAgentSkillDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAgentSkillFromInstructionsDocument = `
+    mutation createAgentSkillFromInstructions($name: String!, $description: String, $instructions: String!) {
+  createAgentSkillFromInstructions(
+    name: $name
+    description: $description
+    instructions: $instructions
+  ) {
+    id
+    name
+    description
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useCreateAgentSkillFromInstructionsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAgentSkillFromInstructionsMutation, TError, CreateAgentSkillFromInstructionsMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAgentSkillFromInstructionsMutation, TError, CreateAgentSkillFromInstructionsMutationVariables, TContext>(
+      {
+    mutationKey: ['createAgentSkillFromInstructions'],
+    mutationFn: (variables?: CreateAgentSkillFromInstructionsMutationVariables) => fetcher<CreateAgentSkillFromInstructionsMutation, CreateAgentSkillFromInstructionsMutationVariables>(CreateAgentSkillFromInstructionsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAgentSkillDocument = `
+    mutation deleteAgentSkill($id: ID!) {
+  deleteAgentSkill(id: $id)
+}
+    `;
+
+export const useDeleteAgentSkillMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAgentSkillMutation, TError, DeleteAgentSkillMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAgentSkillMutation, TError, DeleteAgentSkillMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAgentSkill'],
+    mutationFn: (variables?: DeleteAgentSkillMutationVariables) => fetcher<DeleteAgentSkillMutation, DeleteAgentSkillMutationVariables>(DeleteAgentSkillDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAgentSkillDocument = `
+    mutation updateAgentSkill($id: ID!, $name: String!, $description: String) {
+  updateAgentSkill(id: $id, name: $name, description: $description) {
+    id
+    name
+    description
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useUpdateAgentSkillMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAgentSkillMutation, TError, UpdateAgentSkillMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAgentSkillMutation, TError, UpdateAgentSkillMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAgentSkill'],
+    mutationFn: (variables?: UpdateAgentSkillMutationVariables) => fetcher<UpdateAgentSkillMutation, UpdateAgentSkillMutationVariables>(UpdateAgentSkillDocument, variables)(),
+    ...options
+  }
+    )};
 
 export const ApprovalTaskDocument = `
     query approvalTask($id: ID!) {
