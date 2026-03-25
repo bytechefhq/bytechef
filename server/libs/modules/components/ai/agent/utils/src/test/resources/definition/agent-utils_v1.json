@@ -122,7 +122,7 @@
         "advancedOption": null,
         "controlType": "SELECT",
         "defaultValue": null,
-        "description": "Choose a skill.",
+        "description": null,
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
@@ -151,7 +151,7 @@
       "name": "skills",
       "options": null,
       "optionsDataSource": null,
-      "placeholder": null,
+      "placeholder": "Choose a skill...",
       "required": null,
       "type": "ARRAY"
     } ],
