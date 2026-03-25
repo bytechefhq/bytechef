@@ -218,9 +218,23 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                         return state;
                     }
 
+                    if (definition.triggers) {
+                        for (const trigger of definition.triggers) {
+                            if (trigger.name === workflowNodeName) {
+                                trigger.parameters = parameters;
+
+                                break;
+                            }
+                        }
+                    }
+
                     if (definition.tasks) {
                         updateTaskParametersInTasks(definition.tasks, workflowNodeName, parameters);
                     }
+
+                    const updatedTriggers = workflow.triggers?.map((trigger) =>
+                        trigger.name === workflowNodeName ? {...trigger, parameters} : trigger
+                    );
 
                     const updatedTasks = workflow.tasks?.map((task) =>
                         task.name === workflowNodeName ? {...task, parameters} : task
@@ -232,6 +246,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                             ...workflow,
                             definition: JSON.stringify(definition, null, SPACE),
                             tasks: updatedTasks,
+                            triggers: updatedTriggers,
                             version: version ?? workflow.version,
                         },
                     };
