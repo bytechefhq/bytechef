@@ -332,7 +332,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             return actionDefinitionFacade.executePerform(
                 workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null,
                 null, null, null, inputParameters, connectionIds, extensions, environmentId, null, true,
-                null, null);
+                null, null, null);
         } else {
             ComponentConnection componentConnection = getClusterElementComponentConnection(
                 workflowId, workflowNodeName, clusterElementWorkflowNodeName, environmentId);
@@ -350,7 +350,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return actionDefinitionFacade.executePerform(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
-            null, inputParameters, connectionIds, extensions, environmentId, null, true, null, null);
+            null, inputParameters, connectionIds, extensions, environmentId, null, true, Map.of(), null, null);
     }
 
     private WorkflowNodeTestOutput executeAndSaveTestOutput(

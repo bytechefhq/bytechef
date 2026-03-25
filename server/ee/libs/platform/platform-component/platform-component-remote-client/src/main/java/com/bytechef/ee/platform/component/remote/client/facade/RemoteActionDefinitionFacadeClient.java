@@ -81,7 +81,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, Long taskExecutionId, String workflowId, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds, Map<String, ?> extensions, Long environmentId, PlatformType type,
-        boolean editorEnvironment, Map<String, ?> continueParameters, Instant suspendExpiresAt) {
+        boolean editorEnvironment, Map<String, ?> continueParameters, Map<String, ?> resumeData,
+        Instant suspendExpiresAt) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(

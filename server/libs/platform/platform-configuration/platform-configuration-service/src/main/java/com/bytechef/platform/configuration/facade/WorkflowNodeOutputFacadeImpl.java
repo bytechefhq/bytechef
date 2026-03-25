@@ -58,6 +58,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,6 +110,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
+    @Nullable
     public ClusterElementOutputDTO getClusterElementOutput(
         String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
         long environmentId) {
@@ -131,6 +133,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
+    @Nullable
     public WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName, long environmentId) {
         WorkflowNodeOutputDTO workflowNodeOutputDTO = null;
         Workflow workflow = workflowService.getWorkflow(workflowId);

@@ -46,6 +46,7 @@ import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.annotation.WithTokenRefresh;
 import com.bytechef.platform.component.annotation.WithTokenRefresh.ComponentNameParam;
 import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionParam;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
@@ -171,62 +172,60 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         Long jobPrincipalWorkflowId, Long jobId, @Nullable Long taskExecutionId, String workflowId,
         Map<String, ?> inputParameters, @ConnectionParam Map<String, ComponentConnection> componentConnections,
         Map<String, ?> extensions, Long environmentId, boolean editorEnvironment, PlatformType type,
-        @Nullable Map<String, ?> continueParameters, @Nullable Instant suspendExpiresAt) {
+        @Nullable Map<String, ?> continueParameters, @Nullable Map<String, ?> resumeData,
+        @Nullable Instant suspendExpiresAt) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName);
 
-        if (continueParameters != null) {
-            Optional<ResumePerformFunction> resumePerformOptional = actionDefinition.getResumePerform();
+        Optional<ResumePerformFunction> resumePerformOptional = actionDefinition.getResumePerform();
 
-            if (resumePerformOptional.isPresent()) {
+        if (continueParameters == null || resumePerformOptional.isEmpty()) {
+            BasePerformFunction basePerformFunction = actionDefinition.getPerform()
+                .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
+
+            Object result;
+            ActionContext actionContext;
+
+            if (basePerformFunction instanceof PerformFunction performFunction) {
                 ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
 
-                ActionContext actionContext = contextFactory.createActionContext(
+                actionContext = contextFactory.createActionContext(
                     componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
                     taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
 
-                return executeResumePerform(
-                    actionDefinition, resumePerformOptional.get(), inputParameters, continueParameters,
-                    suspendExpiresAt, firstComponentConnection, actionContext);
+                result = executeSingleConnectionPerform(
+                    performFunction, inputParameters, firstComponentConnection, actionContext);
+            } else {
+                actionContext = contextFactory.createActionContext(
+                    componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                    taskExecutionId, workflowId, null, environmentId, type, editorEnvironment);
+
+                if (basePerformFunction instanceof MultipleConnectionsPerformFunction performFunction) {
+                    result = executeMultipleConnectionsPerform(
+                        performFunction, inputParameters, componentConnections, extensions, actionContext);
+                } else if (basePerformFunction instanceof MultipleConnectionsStreamPerformFunction performFunction) {
+                    result = executeMultipleConnectionsStreamPerform(
+                        performFunction, inputParameters, componentConnections, extensions, actionContext);
+                } else {
+                    result = executeMultipleConnectionsSseStreamResponsePerform(
+                        (MultipleConnectionsSseStreamResponsePerformFunction) basePerformFunction, inputParameters,
+                        componentConnections, extensions, actionContext);
+                }
             }
-        }
 
-        BasePerformFunction basePerformFunction = actionDefinition
-            .getPerform()
-            .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
-
-        Object result;
-        ActionContext actionContext;
-
-        if (basePerformFunction instanceof PerformFunction performFunction) {
+            return checkSuspend(actionDefinition, actionContext, result);
+        } else {
             ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
 
-            actionContext = contextFactory.createActionContext(
+            ActionContext actionContext = contextFactory.createActionContext(
                 componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
                 taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
 
-            result = executeSingleConnectionPerform(
-                performFunction, inputParameters, firstComponentConnection, actionContext);
-        } else {
-            actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                taskExecutionId, workflowId, null, environmentId, type, editorEnvironment);
-
-            if (basePerformFunction instanceof MultipleConnectionsPerformFunction performFunction) {
-                result = executeMultipleConnectionsPerform(
-                    performFunction, inputParameters, componentConnections, extensions, actionContext);
-            } else if (basePerformFunction instanceof MultipleConnectionsStreamPerformFunction performFunction) {
-                result = executeMultipleConnectionsStreamPerform(
-                    performFunction, inputParameters, componentConnections, extensions, actionContext);
-            } else {
-                result = executeMultipleConnectionsSseStreamResponsePerform(
-                    (MultipleConnectionsSseStreamResponsePerformFunction) basePerformFunction, inputParameters,
-                    componentConnections, extensions, actionContext);
-            }
+            return executeResumePerform(
+                actionDefinition, resumePerformOptional.get(), inputParameters, continueParameters, resumeData,
+                suspendExpiresAt, firstComponentConnection, actionContext);
         }
-
-        return checkSuspend(actionDefinition, actionContext, result);
     }
 
     @Override
@@ -460,7 +459,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     private Object executeResumePerform(
         com.bytechef.component.definition.ActionDefinition actionDefinition,
         ResumePerformFunction resumePerformFunction, Map<String, ?> inputParameters,
-        Map<String, ?> continueParameters, @Nullable Instant suspendExpiresAt,
+        Map<String, ?> continueParameters, @Nullable Map<String, ?> resumeData,
+        @Nullable Instant suspendExpiresAt,
         @Nullable ComponentConnection componentConnection, ActionContext context) {
 
         try {
@@ -495,7 +495,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 ParametersFactory.create(mergedInputParameters),
                 componentConnection == null
                     ? null : ParametersFactory.create(componentConnection.getConnectionParameters()),
-                ParametersFactory.create(continueParameters), context);
+                ParametersFactory.create(continueParameters),
+                ParametersFactory.create(resumeData == null ? Map.of() : resumeData),
+                context);
         } catch (Exception exception) {
             if (exception instanceof ProviderException) {
                 throw (ProviderException) exception;
@@ -515,16 +517,28 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             if (suspend != null) {
                 Optional<BeforeSuspendConsumer> beforeSuspendOptional = actionDefinition.getBeforeSuspend();
 
+                String resumeUrl = actionContextAware.generateResumeUrl();
+                String jobResumeId = actionContextAware.getJobResumeId();
+
                 if (beforeSuspendOptional.isPresent()) {
                     try {
                         beforeSuspendOptional.get()
                             .apply(
-                                null, suspend.expiresAt(), ParametersFactory.create(suspend.continueParameters()),
+                                resumeUrl, suspend.expiresAt(),
+                                ParametersFactory.create(suspend.continueParameters()),
                                 actionContext);
                     } catch (Exception exception) {
                         throw new ExecutionException(
                             exception, Map.of(), ActionDefinitionErrorType.EXECUTE_PERFORM);
                     }
+                }
+
+                if (jobResumeId != null) {
+                    Map<String, Object> continueParameters = new HashMap<>(suspend.continueParameters());
+
+                    continueParameters.put(MetadataConstants.JOB_RESUME_ID, jobResumeId);
+
+                    return new ActionContext.Suspend(continueParameters, suspend.expiresAt());
                 }
 
                 return suspend;

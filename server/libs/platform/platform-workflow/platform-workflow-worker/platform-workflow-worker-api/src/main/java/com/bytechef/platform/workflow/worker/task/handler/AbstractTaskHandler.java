@@ -56,6 +56,7 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
             taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 
         Map<String, ?> continueParameters = extractContinueParameters(taskExecution);
+        Map<String, ?> resumeData = extractResumeData(taskExecution);
         Instant suspendExpiresAt = extractSuspendExpiresAt(taskExecution);
 
         try {
@@ -72,7 +73,7 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.ENVIRONMENT_ID),
                 MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, PlatformType.class),
                 MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false),
-                continueParameters, suspendExpiresAt);
+                continueParameters, resumeData, suspendExpiresAt);
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }
@@ -80,17 +81,29 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
 
     @SuppressWarnings("unchecked")
     private static @Nullable Map<String, ?> extractContinueParameters(TaskExecution taskExecution) {
-        Map<String, ?> suspendData = MapUtils.getMap(
-            taskExecution.getMetadata(), MetadataConstants.SUSPEND, Map.of());
+        Map<String, ?> suspendMap = MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.SUSPEND, Map.of());
 
-        if (suspendData.isEmpty()) {
+        if (suspendMap.isEmpty()) {
             return null;
         }
 
-        Object continueParametersValue = suspendData.get("continueParameters");
+        Object continueParameters = suspendMap.get("continueParameters");
 
-        if (continueParametersValue instanceof Map) {
-            return (Map<String, ?>) continueParametersValue;
+        if (continueParameters instanceof Map) {
+            return (Map<String, ?>) continueParameters;
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static @Nullable Map<String, ?> extractResumeData(TaskExecution taskExecution) {
+        Map<String, ?> metadata = taskExecution.getMetadata();
+
+        Object resumeData = metadata.get(MetadataConstants.RESUME_DATA);
+
+        if (resumeData instanceof Map) {
+            return (Map<String, ?>) resumeData;
         }
 
         return null;

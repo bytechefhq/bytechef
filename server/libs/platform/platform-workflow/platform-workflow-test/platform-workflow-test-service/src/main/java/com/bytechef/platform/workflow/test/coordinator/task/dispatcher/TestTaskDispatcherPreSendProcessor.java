@@ -20,8 +20,14 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
+import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -35,17 +41,23 @@ import org.apache.commons.lang3.Validate;
 public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSendProcessor {
 
     private final JobService jobService;
+    private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public TestTaskDispatcherPreSendProcessor(
-        JobService jobService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        JobService jobService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.jobService = jobService;
+        this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
@@ -55,8 +67,19 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
-        taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, 0);
+        taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, Environment.DEVELOPMENT.ordinal());
         taskExecution.putMetadata(MetadataConstants.EDITOR_ENVIRONMENT, true);
+
+        WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
+            job.getWorkflowId(), taskExecution.getName(), Environment.DEVELOPMENT.ordinal());
+
+        if (workflowNodeOutputDTO != null && workflowNodeOutputDTO.getSampleOutput() instanceof Map map &&
+            MapUtils.getBoolean(map, ResumeResponse.RESUMED, false)) {
+
+            taskExecution.putMetadata(MetadataConstants.RESUME_DATA, map.get(ResumeResponse.DATA));
+            taskExecution.putMetadata(MetadataConstants.SUSPEND, new ActionContext.Suspend(Map.of(), null));
+        }
+
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         return taskExecution;

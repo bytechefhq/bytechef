@@ -81,7 +81,7 @@ public class RemoteActionDefinitionFacadeController {
                 performRequest.jobPrincipalId, performRequest.jobPrincipalWorkflowId, performRequest.jobId,
                 performRequest.taskExecutionId, performRequest.workflowId, performRequest.inputParameters,
                 performRequest.connectionIds, performRequest.extensions, performRequest.environmentId,
-                performRequest.type, false, null, null));
+                performRequest.type, false, null, null, null));
     }
 
     @RequestMapping(

@@ -26,6 +26,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -514,16 +515,32 @@ public interface ActionDefinition {
          * @param connectionParameters the parameters related to the connection or external resource required for
          *                             execution
          * @param continueParameters   the parameters associated with the continuation process or resume state
+         * @param data                 the data submitted by the external service when resuming the workflow via the
+         *                             webhook URL
          * @param context              the action context providing access to auxiliary data, event functions, or state
          *                             management facilities
          * @return the result of the action execution, which can be any object as per the operation's requirements
          * @throws Exception if an error occurs during execution or processing of the action
          */
-        Object apply(
+        ResumeResponse apply(
             Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters,
-            ActionContext context)
+            Parameters data, ActionContext context)
 
             throws Exception;
+
+        class ResumeResponse extends HashMap<String, Object> {
+
+            public static final String DATA = "data";
+            public static final String RESUMED = "resumed";
+
+            private ResumeResponse(Map<String, Object> data) {
+                super(Map.of(DATA, data, RESUMED, true));
+            }
+
+            public static ResumeResponse of(Map<String, Object> data) {
+                return new ResumeResponse(data);
+            }
+        }
     }
 
     /**

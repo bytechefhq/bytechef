@@ -17,15 +17,16 @@
 package com.bytechef.component.wait.action;
 
 import static com.bytechef.component.wait.constant.WaitConstants.AMOUNT;
-import static com.bytechef.component.wait.constant.WaitConstants.CSRF_TOKEN;
 import static com.bytechef.component.wait.constant.WaitConstants.UNIT;
 import static org.mockito.ArgumentMatchers.eq;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -44,8 +45,6 @@ public class WaitOnWebHookCallActionTest {
         Parameters connectionParameters = Mockito.mock(Parameters.class);
         ActionContext context = Mockito.mock(ActionContext.class);
 
-        Mockito.when(inputParameters.getRequiredString(eq(CSRF_TOKEN)))
-            .thenReturn("test-token-123");
         Mockito.when(inputParameters.getRequiredInteger(eq(AMOUNT)))
             .thenReturn(30);
         Mockito.when(inputParameters.getRequiredString(eq(UNIT)))
@@ -68,8 +67,6 @@ public class WaitOnWebHookCallActionTest {
         Assertions.assertNotNull(suspend);
         Assertions.assertNotNull(suspend.expiresAt());
         Assertions.assertNotNull(suspend.continueParameters());
-        Assertions.assertEquals("test-token-123", suspend.continueParameters()
-            .get("csrfToken"));
     }
 
     @Test
@@ -78,5 +75,37 @@ public class WaitOnWebHookCallActionTest {
 
         Assertions.assertTrue(actionDefinition.getBeforeSuspend()
             .isPresent());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testResumePerformReturnsResumeData() throws Exception {
+        Parameters inputParameters = Mockito.mock(Parameters.class);
+        Parameters connectionParameters = Mockito.mock(Parameters.class);
+        Parameters continueParameters = Mockito.mock(Parameters.class);
+        Parameters data = Mockito.mock(Parameters.class);
+        ActionContext context = Mockito.mock(ActionContext.class);
+
+        Map<String, Object> dataMap = Map.of("key", "value");
+
+        Mockito.doReturn(dataMap)
+            .when(data)
+            .toMap();
+
+        ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.of();
+
+        ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
+            .orElseThrow();
+
+        Object result = resumePerformFunction.apply(
+            inputParameters, connectionParameters, continueParameters, data, context);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertInstanceOf(Map.class, result);
+
+        Map<String, Object> resultMap = (Map<String, Object>) result;
+
+        Assertions.assertEquals(true, resultMap.get("resumed"));
+        Assertions.assertEquals(dataMap, resultMap.get(ResumePerformFunction.ResumeResponse.DATA));
     }
 }

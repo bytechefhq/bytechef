@@ -17,18 +17,24 @@
 package com.bytechef.component.wait.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.wait.constant.WaitConstants.DATE_TIME;
+import static com.bytechef.component.wait.constant.WaitConstants.TIMEZONE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.wait.util.WaitUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 /**
@@ -43,42 +49,59 @@ public class WaitAtSpecifiedTimeAction {
             .title("At Specified Time")
             .description("Pauses the workflow execution until a specified date and time.")
             .properties(
-                dateTime(DATE_TIME)
-                    .label("Date and Time")
-                    .description("The date and time to wait until before resuming workflow execution.")
-                    .required(true))
-            .output(
-                outputSchema(
-                    object()
-                        .properties(
-                            dateTime("scheduledAt")
-                                .description("The date and time at which the workflow was scheduled to resume."))))
+                object(ResumeResponse.DATA)
+                    .properties(
+                        dateTime(DATE_TIME)
+                            .label("Date and Time")
+                            .description("The date and time to wait until before resuming workflow execution.")
+                            .required(true),
+                        string(TIMEZONE)
+                            .label("Timezone")
+                            .description("The timezone in which the specified date and time should be interpreted.")
+                            .options(WaitUtils.getTimeZoneOptions())
+                            .required(true)),
+                bool(ResumeResponse.RESUMED)
+                    .description("Whether the workflow was resumed by a webhook call."))
+            .output(waitAtSpecifiedTimeAction::output)
             .perform(waitAtSpecifiedTimeAction::perform)
             .resumePerform(waitAtSpecifiedTimeAction::resumePerform);
+    }
+
+    protected OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        long expiresAtMillis = inputParameters.getLong("expiresAt", System.currentTimeMillis());
+        String timezone = inputParameters.getString("timezone", "UTC");
+
+        LocalDateTime scheduledAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAtMillis), ZoneId.of(timezone));
+
+        return OutputResponse.of(ResumeResponse.of(Map.of("scheduledAt", scheduledAt)));
     }
 
     protected Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         LocalDateTime localDateTime = inputParameters.getRequiredLocalDateTime(DATE_TIME);
+        String timezone = inputParameters.getRequiredString(TIMEZONE);
 
-        Instant expiresAt = localDateTime.atZone(ZoneId.systemDefault())
-            .toInstant();
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of(timezone));
 
-        context.suspend(new Suspend(Map.of("expiresAt", expiresAt.toEpochMilli()), expiresAt));
+        Instant expiresAt = zonedDateTime.toInstant();
+
+        context.suspend(new Suspend(Map.of("expiresAt", expiresAt.toEpochMilli(), "timezone", timezone), expiresAt));
 
         return null;
     }
 
-    protected Object resumePerform(
-        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters,
+    protected ResumeResponse resumePerform(
+        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
         ActionContext context) {
 
-        long expiresAtMillis = continueParameters.getLong("expiresAt");
+        long expiresAtMillis = continueParameters.getLong("expiresAt", System.currentTimeMillis());
+        String timezone = continueParameters.getString("timezone", "UTC");
 
-        LocalDateTime scheduledAt =
-            LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAtMillis), ZoneId.systemDefault());
+        LocalDateTime scheduledAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAtMillis), ZoneId.of(timezone));
 
-        return Map.of("scheduledAt", scheduledAt);
+        return ResumeResponse.of(Map.of("scheduledAt", scheduledAt));
     }
 }

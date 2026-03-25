@@ -23,6 +23,8 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.time.Instant;
+import java.util.Map;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,15 +41,25 @@ public class SuspendTaskExecutionPostOutputProcessor implements TaskExecutionPos
     @Override
     public Object process(TaskExecution taskExecution, Object output) {
         if (output instanceof Suspend suspend) {
-            JobResumeId jobResumeId = JobResumeId.of(taskExecution.getJobId(), true);
+            long jobId = Objects.requireNonNull(taskExecution.getJobId());
+
+            Map<String, ?> continueParametersMap = suspend.continueParameters();
+
+            String jobResumeIdString = (String) continueParametersMap.get(MetadataConstants.JOB_RESUME_ID);
+
+            if (jobResumeIdString == null) {
+                JobResumeId jobResumeId = JobResumeId.of(jobId, true);
+
+                jobResumeIdString = jobResumeId.toString();
+            }
 
             Instant expiresAt = suspend.expiresAt();
 
             if (expiresAt != null && triggerScheduler != null) {
-                triggerScheduler.scheduleOneTimeTask(expiresAt, suspend.continueParameters(), taskExecution.getJobId());
+                triggerScheduler.scheduleOneTimeTask(expiresAt, continueParametersMap, jobId);
             }
 
-            taskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, jobResumeId.toString());
+            taskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
             taskExecution.putMetadata(MetadataConstants.SUSPEND, suspend);
         }
 

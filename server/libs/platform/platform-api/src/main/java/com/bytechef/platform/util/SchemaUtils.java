@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,68 +102,18 @@ public class SchemaUtils {
         return outputProperty;
     }
 
-    public static OutputResponse toOutput(
-        BaseOutputDefinition.OutputResponse outputResponse, OutputFactoryFunction outputFactoryFunction,
-        SchemaPropertyFactory propertyFactoryFunction) {
-
-        Object sampleOutput = outputResponse.getSampleOutput();
-
-        if (sampleOutput == null && outputResponse.getOutputSchema() != null) {
-            sampleOutput = getSampleOutput(outputResponse.getOutputSchema());
-        } else if (sampleOutput instanceof String string && !string.isBlank()) {
-            String trimmedString = string.trim();
-
-            if (trimmedString.startsWith("{")) {
-                try {
-                    sampleOutput = JsonUtils.readMap(string);
-                } catch (Exception exception) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
-                            "Failed to parse sample output as JSON map: {}", exception.getMessage(), exception);
-                    }
-                }
-            } else if (trimmedString.startsWith("[")) {
-                try {
-                    sampleOutput = JsonUtils.readList(string);
-                } catch (Exception exception) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
-                            "Failed to parse sample output as JSON list: {}", exception.getMessage(), exception);
-                    }
-                }
-            }
-        }
-
-        BaseValueProperty<?> outputSchema = outputResponse.getOutputSchema();
-
-        if (outputSchema == null && sampleOutput != null) {
-            outputSchema = (BaseValueProperty<?>) getOutputSchema(sampleOutput, propertyFactoryFunction);
-        }
-
-        return outputFactoryFunction.apply(outputSchema, sampleOutput, outputResponse.getPlaceholder());
-    }
-
-    public static OutputResponse toOutput(
-        Object value, OutputFactoryFunction outputFactoryFunction, SchemaPropertyFactory propertyFactoryFunction) {
-
-        return toOutput(
-            BaseOutputDefinition.OutputResponse.of(
-                (BaseValueProperty<?>) getOutputSchema(value, propertyFactoryFunction), value),
-            outputFactoryFunction, propertyFactoryFunction);
-    }
-
-    private static Object getSampleOutput(BaseProperty definitionProperty) {
+    public static Object getSampleOutput(BaseProperty definitionProperty) {
         if (definitionProperty instanceof BaseValueProperty<?> valueProperty) {
-            if (valueProperty.getExampleValue()
-                .isPresent()) {
-                return valueProperty.getExampleValue()
-                    .get();
+            Optional<?> exampleValueOptional = valueProperty.getExampleValue();
+
+            if (exampleValueOptional.isPresent()) {
+                return exampleValueOptional.get();
             }
 
-            if (valueProperty.getDefaultValue()
-                .isPresent()) {
-                return valueProperty.getDefaultValue()
-                    .get();
+            Optional<?> defaultValueOptional = valueProperty.getDefaultValue();
+
+            if (defaultValueOptional.isPresent()) {
+                return defaultValueOptional.get();
             }
         }
 
@@ -212,6 +163,56 @@ public class SchemaUtils {
             default -> throw new IllegalArgumentException(
                 "Definition %s is not allowed".formatted(definitionProperty.getName()));
         };
+    }
+
+    public static OutputResponse toOutput(
+        BaseOutputDefinition.OutputResponse outputResponse, OutputFactoryFunction outputFactoryFunction,
+        SchemaPropertyFactory propertyFactoryFunction) {
+
+        Object sampleOutput = outputResponse.getSampleOutput();
+
+        if (sampleOutput == null && outputResponse.getOutputSchema() != null) {
+            sampleOutput = getSampleOutput(outputResponse.getOutputSchema());
+        } else if (sampleOutput instanceof String string && !string.isBlank()) {
+            String trimmedString = string.trim();
+
+            if (trimmedString.startsWith("{")) {
+                try {
+                    sampleOutput = JsonUtils.readMap(string);
+                } catch (Exception exception) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                            "Failed to parse sample output as JSON map: {}", exception.getMessage(), exception);
+                    }
+                }
+            } else if (trimmedString.startsWith("[")) {
+                try {
+                    sampleOutput = JsonUtils.readList(string);
+                } catch (Exception exception) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                            "Failed to parse sample output as JSON list: {}", exception.getMessage(), exception);
+                    }
+                }
+            }
+        }
+
+        BaseValueProperty<?> outputSchema = outputResponse.getOutputSchema();
+
+        if (outputSchema == null && sampleOutput != null) {
+            outputSchema = (BaseValueProperty<?>) getOutputSchema(sampleOutput, propertyFactoryFunction);
+        }
+
+        return outputFactoryFunction.apply(outputSchema, sampleOutput, outputResponse.getPlaceholder());
+    }
+
+    public static OutputResponse toOutput(
+        Object value, OutputFactoryFunction outputFactoryFunction, SchemaPropertyFactory propertyFactoryFunction) {
+
+        return toOutput(
+            BaseOutputDefinition.OutputResponse.of(
+                (BaseValueProperty<?>) getOutputSchema(value, propertyFactoryFunction), value),
+            outputFactoryFunction, propertyFactoryFunction);
     }
 
     public static @Nullable BaseValueProperty<?> getJsonSchemaProperty(

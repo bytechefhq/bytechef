@@ -17,6 +17,8 @@
 package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -31,6 +33,8 @@ public interface JobFacade {
     void resumeApproval(long jobId, String uuid, boolean approved);
 
     void resumeJob(long id);
+
+    void resumeJob(long id, @Nullable Map<String, ?> data);
 
     void stopJob(long id);
 }
