@@ -410,11 +410,11 @@ export default function useWorkflowNodeDetailsPanel({
         currentActionDefinition?.outputDefined ||
         currentTriggerDefinition?.outputDefined ||
         currentClusterElementDefinition?.outputDefined ||
-        (currentOperationDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined;
+        (currentOperationDefinition as TaskDispatcherDefinition)?.outputDefined;
     const outputFunctionDefined =
         currentActionDefinition?.outputFunctionDefined ||
         currentTriggerDefinition?.outputFunctionDefined ||
-        currentClusterElementDefinition?.outputSchemaDefined;
+        currentClusterElementDefinition?.outputFunctionDefined;
 
     const showOutputTab = useMemo(() => {
         if (currentNode?.clusterElementType && currentNode.clusterElementType !== CLUSTER_ELEMENT_TYPE_TOOLS) {
@@ -431,7 +431,7 @@ export default function useWorkflowNodeDetailsPanel({
         if (currentOperationDefinition && 'variablePropertiesDefined' in currentOperationDefinition) {
             const taskDispatcher = currentOperationDefinition as TaskDispatcherDefinition;
 
-            if (!taskDispatcher.variablePropertiesDefined) {
+            if (!taskDispatcher.outputDefined) {
                 return false;
             }
         }
