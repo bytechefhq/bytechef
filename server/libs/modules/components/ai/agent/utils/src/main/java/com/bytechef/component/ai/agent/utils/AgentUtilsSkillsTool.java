@@ -198,6 +198,7 @@ public class AgentUtilsSkillsTool {
         return options;
     }
 
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private Path extractSkillToTempDirectory(byte[] zipBytes, long skillId) {
         try {
             Path tempDirectory = Files.createTempDirectory("bytechef-skill-" + skillId + "-");
@@ -239,7 +240,12 @@ public class AgentUtilsSkillsTool {
                             "Zip entry path traversal detected: " + zipEntry.getName());
                     }
 
-                    Files.createDirectories(targetPath.getParent());
+                    Path parentPath = targetPath.getParent();
+
+                    if (parentPath != null) {
+                        Files.createDirectories(parentPath);
+                    }
+
                     Files.write(targetPath, content);
                 }
             }
