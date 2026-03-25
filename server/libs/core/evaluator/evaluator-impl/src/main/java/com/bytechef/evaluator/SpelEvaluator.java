@@ -200,7 +200,11 @@ public class SpelEvaluator implements Evaluator {
     }
 
     @Nullable
-    private Object evaluate(Object value, Map<String, ?> context, boolean lenient) {
+    private Object evaluate(@Nullable Object value, Map<String, ?> context, boolean lenient) {
+        if (value == null) {
+            return null;
+        }
+
         switch (value) {
             case String string -> {
                 Expression expression;
