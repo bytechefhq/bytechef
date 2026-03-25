@@ -467,13 +467,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 }
             }
         } else {
-            // Currently, variable output samples are stored as the output response in db
-            if (taskDispatcherOutput == null || !taskDispatcherOutput) {
-                variableOutputResponse = outputResponse;
-
-                outputResponse = null;
-            }
-
+            // Task dispatchers no longer show variable property outputs (loop, each), only real outputs (like map)
             testoutputResponse = true;
         }
 
