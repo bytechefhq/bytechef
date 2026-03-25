@@ -36,6 +36,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,11 +46,8 @@ import java.util.zip.ZipInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.tools.SkillsTool;
-import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 
 /**
  * Provides a TOOLS cluster element that loads selected AgentSkill zip archives, extracts .md files, and passes them to
@@ -99,7 +98,7 @@ public class AgentUtilsSkillsTool {
         Parameters inputParameters, Parameters connectionParameters,
         com.bytechef.component.definition.Context context) throws Exception {
 
-        List<Resource> skillResources = new ArrayList<>();
+        List<Path> skillDirectories = new ArrayList<>();
         List<String> skippedSkillReasons = new ArrayList<>();
 
         List<?> skillItems = inputParameters.getList(SKILLS, Object.class, List.of());
@@ -109,6 +108,15 @@ public class AgentUtilsSkillsTool {
         }
 
         for (Object skillItem : skillItems) {
+            if (skillItem == null) {
+                String reason = "Unexpected null skill item in configuration";
+
+                logger.warn("{}, skipping", reason);
+                skippedSkillReasons.add(reason);
+
+                continue;
+            }
+
             if (!(skillItem instanceof Map<?, ?> skillMap)) {
                 String reason = "Unexpected skill item type: " + skillItem.getClass()
                     .getName();
@@ -146,9 +154,9 @@ public class AgentUtilsSkillsTool {
             try {
                 byte[] zipBytes = agentSkillFacade.getAgentSkillDownload(skillId);
 
-                List<Resource> extractedResources = extractSkillResources(zipBytes);
+                Path skillDirectory = extractSkillToTempDirectory(zipBytes, skillId);
 
-                skillResources.addAll(extractedResources);
+                skillDirectories.add(skillDirectory);
             } catch (RuntimeException runtimeException) {
                 String reason = "Failed to load skill ID " + skillId + ": " + runtimeException.getMessage();
 
@@ -165,13 +173,13 @@ public class AgentUtilsSkillsTool {
 
         SkillsTool.Builder builder = SkillsTool.builder();
 
-        if (!skillResources.isEmpty()) {
-            builder.addSkillsResources(skillResources);
+        for (Path skillDirectory : skillDirectories) {
+            builder.addSkillsDirectory(skillDirectory.toString());
         }
 
         ToolCallback skillsToolCallback = builder.build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(skillsToolCallback));
+        return ToolCallbackProvider.from(skillsToolCallback);
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
@@ -190,22 +198,30 @@ public class AgentUtilsSkillsTool {
         return options;
     }
 
-    private List<Resource> extractSkillResources(byte[] zipBytes) {
-        List<Resource> resources = new ArrayList<>();
+    private Path extractSkillToTempDirectory(byte[] zipBytes, long skillId) {
+        try {
+            Path tempDirectory = Files.createTempDirectory("bytechef-skill-" + skillId + "-");
 
-        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
-            ZipEntry zipEntry;
-            int entryCount = 0;
+            try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+                ZipEntry zipEntry;
+                int entryCount = 0;
 
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                if (++entryCount > MAX_ZIP_ENTRIES) {
-                    throw new IllegalArgumentException(
-                        "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
-                }
+                while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                    if (++entryCount > MAX_ZIP_ENTRIES) {
+                        throw new IllegalArgumentException(
+                            "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
+                    }
 
-                if (!zipEntry.isDirectory() && zipEntry.getName()
-                    .toLowerCase()
-                    .endsWith(".md")) {
+                    if (zipEntry.isDirectory()) {
+                        continue;
+                    }
+
+                    if (!zipEntry.getName()
+                        .toLowerCase()
+                        .endsWith(".md")) {
+
+                        continue;
+                    }
 
                     byte[] content = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
 
@@ -215,13 +231,22 @@ public class AgentUtilsSkillsTool {
                                 (MAX_ZIP_ENTRY_SIZE / 1024 / 1024) + " MB");
                     }
 
-                    resources.add(new ByteArrayResource(content, zipEntry.getName()));
+                    Path targetPath = tempDirectory.resolve(zipEntry.getName())
+                        .normalize();
+
+                    if (!targetPath.startsWith(tempDirectory)) {
+                        throw new IllegalArgumentException(
+                            "Zip entry path traversal detected: " + zipEntry.getName());
+                    }
+
+                    Files.createDirectories(targetPath.getParent());
+                    Files.write(targetPath, content);
                 }
             }
+
+            return tempDirectory;
         } catch (IOException ioException) {
             throw new UncheckedIOException("Failed to extract skill resources from zip archive", ioException);
         }
-
-        return resources;
     }
 }

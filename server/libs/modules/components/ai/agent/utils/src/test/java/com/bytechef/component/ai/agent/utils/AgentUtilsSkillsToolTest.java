@@ -76,19 +76,15 @@ class AgentUtilsSkillsToolTest {
 
     @Test
     void testApplyWithValidSkillFetchesZipBytes() throws Exception {
-        byte[] zipBytes = createZipWithMdFile("SKILL.md", "# Test Skill\nDo something useful.");
+        byte[] zipBytes = createZipWithMdFile("skill1/SKILL.md", createSkillMd("Test Skill", "Do something useful."));
 
         when(inputParameters.getList("skills", Object.class, List.of()))
             .thenReturn(List.of(Map.of("skillId", "42")));
         when(agentSkillFacade.getAgentSkillDownload(42L)).thenReturn(zipBytes);
 
-        try {
-            invokeApply();
-        } catch (Exception exception) {
-            // SkillsTool.builder() may fail loading ByteArrayResource as URL — that's a third-party limitation;
-            // we verify the facade was called correctly
-        }
+        ToolCallbackProvider toolCallbackProvider = invokeApply();
 
+        assertNotNull(toolCallbackProvider);
         verify(agentSkillFacade).getAgentSkillDownload(42L);
     }
 
@@ -158,20 +154,17 @@ class AgentUtilsSkillsToolTest {
 
     @Test
     void testApplyWithMultipleValidSkillsFetchesAll() throws Exception {
-        byte[] zipBytes1 = createZipWithMdFile("SKILL.md", "# Skill 1");
-        byte[] zipBytes2 = createZipWithMdFile("SKILL.md", "# Skill 2");
+        byte[] zipBytes1 = createZipWithMdFile("skill1/SKILL.md", createSkillMd("Skill 1", "First skill."));
+        byte[] zipBytes2 = createZipWithMdFile("skill2/SKILL.md", createSkillMd("Skill 2", "Second skill."));
 
         when(inputParameters.getList("skills", Object.class, List.of()))
             .thenReturn(List.of(Map.of("skillId", "1"), Map.of("skillId", "2")));
         when(agentSkillFacade.getAgentSkillDownload(1L)).thenReturn(zipBytes1);
         when(agentSkillFacade.getAgentSkillDownload(2L)).thenReturn(zipBytes2);
 
-        try {
-            invokeApply();
-        } catch (Exception exception) {
-            // SkillsTool.builder() may fail — we verify both skills were fetched
-        }
+        ToolCallbackProvider toolCallbackProvider = invokeApply();
 
+        assertNotNull(toolCallbackProvider);
         verify(agentSkillFacade).getAgentSkillDownload(1L);
         verify(agentSkillFacade).getAgentSkillDownload(2L);
     }
@@ -203,6 +196,10 @@ class AgentUtilsSkillsToolTest {
 
             throw new RuntimeException(cause);
         }
+    }
+
+    private String createSkillMd(String name, String description) {
+        return "---\nname: " + name + "\ndescription: " + description + "\n---\n\n" + description;
     }
 
     private byte[] createZipWithMdFile(String entryName, String content) {
