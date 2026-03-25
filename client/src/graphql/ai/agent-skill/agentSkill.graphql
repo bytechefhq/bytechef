@@ -1,0 +1,9 @@
+query agentSkill($id: ID!) {
+    agentSkill(id: $id) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}

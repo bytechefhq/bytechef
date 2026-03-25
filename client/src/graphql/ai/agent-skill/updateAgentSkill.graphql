@@ -1,0 +1,9 @@
+mutation updateAgentSkill($id: ID!, $name: String!, $description: String) {
+    updateAgentSkill(id: $id, name: $name, description: $description) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}
