@@ -9,19 +9,11 @@ import useAiAgentTestingPanel from './hooks/useAiAgentTestingPanel';
 
 interface AiAgentTestingPanelProps {
     contentClassName?: string;
-    copilotEnabled?: boolean;
     headerClassName?: string;
     onClose?: () => void;
-    onCopilotClick?: () => void;
 }
 
-export default function AiAgentTestingPanel({
-    contentClassName,
-    copilotEnabled,
-    headerClassName,
-    onClose,
-    onCopilotClick,
-}: AiAgentTestingPanelProps) {
+export default function AiAgentTestingPanel({contentClassName, headerClassName, onClose}: AiAgentTestingPanelProps) {
     const {conversationId, handleReset, handleTestAgent, isTestingAgent} = useAiAgentTestingPanel();
 
     if (!isTestingAgent) {
@@ -73,21 +65,6 @@ export default function AiAgentTestingPanel({
 
                         <TooltipContent>Reset conversation</TooltipContent>
                     </Tooltip>
-
-                    {copilotEnabled && onCopilotClick && (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    icon={<SparklesIcon />}
-                                    onClick={onCopilotClick}
-                                    size="iconSm"
-                                    variant="ghost"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent>Open Copilot panel</TooltipContent>
-                        </Tooltip>
-                    )}
 
                     {onClose && <Button icon={<XIcon />} onClick={onClose} size="iconSm" variant="ghost" />}
                 </div>

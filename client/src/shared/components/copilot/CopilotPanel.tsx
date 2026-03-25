@@ -16,11 +16,12 @@ const ANIMATION_DURATION_MS = 300;
 
 interface CopilotPanelProps {
     className?: string;
+    headerClassName?: string;
     onClose?: () => void;
     open: boolean;
 }
 
-const CopilotPanelContent = ({className, onClose}: Omit<CopilotPanelProps, 'open'>) => {
+const CopilotPanelContent = ({className, headerClassName, onClose}: Omit<CopilotPanelProps, 'open'>) => {
     const {context, generateConversationId, resetMessages, setContext} = useCopilotStore(
         useShallow((state) => ({
             context: state.context,
@@ -63,7 +64,7 @@ const CopilotPanelContent = ({className, onClose}: Omit<CopilotPanelProps, 'open
 
     return (
         <div className={twMerge('relative h-full min-h-[50vh] w-[450px] bg-surface-main', className)}>
-            <div className="flex items-center justify-between px-3 py-3">
+            <div className={twMerge('flex items-center justify-between px-4 py-3', headerClassName)}>
                 <div className="flex items-center space-x-1">
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
                 </div>
@@ -116,7 +117,7 @@ const CopilotPanelContent = ({className, onClose}: Omit<CopilotPanelProps, 'open
     );
 };
 
-const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
+const CopilotPanel = ({className, headerClassName, onClose, open}: CopilotPanelProps) => {
     const [shouldRender, setShouldRender] = useState(open);
     const [isVisible, setIsVisible] = useState(open);
 
@@ -173,7 +174,13 @@ const CopilotPanel = ({className, onClose, open}: CopilotPanelProps) => {
                     !isSlideAnimation && (isVisible ? 'w-[450px]' : 'w-0')
                 )}
             >
-                {shouldRender && <CopilotPanelContent className={contentClassName} onClose={onClose} />}
+                {shouldRender && (
+                    <CopilotPanelContent
+                        className={contentClassName}
+                        headerClassName={headerClassName}
+                        onClose={onClose}
+                    />
+                )}
             </div>
         </CopilotPanelBoundary>
     );

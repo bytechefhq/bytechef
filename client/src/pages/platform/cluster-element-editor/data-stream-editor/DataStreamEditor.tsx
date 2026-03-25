@@ -14,11 +14,19 @@ const STEP_LABELS = ['Source', 'Destination', 'Mapping', 'Test'];
 
 interface DataStreamEditorProps {
     className?: string;
+    copilotEnabled?: boolean;
     onClose?: () => void;
+    onCopilotClick?: () => void;
     onToggleEditor?: (showDataStream: boolean) => void;
 }
 
-export default function DataStreamEditor({className, onClose, onToggleEditor}: DataStreamEditorProps) {
+export default function DataStreamEditor({
+    className,
+    copilotEnabled,
+    onClose,
+    onCopilotClick,
+    onToggleEditor,
+}: DataStreamEditorProps) {
     const {configuredSteps, currentStep, handleGoToStep, handleNext, handlePrevious} = useDataStreamEditor();
 
     useDataStreamDataPills();
@@ -40,7 +48,12 @@ export default function DataStreamEditor({className, onClose, onToggleEditor}: D
 
     return (
         <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
-            <DataStreamHeader onClose={onClose} onToggleEditor={onToggleEditor} />
+            <DataStreamHeader
+                copilotEnabled={copilotEnabled}
+                onClose={onClose}
+                onCopilotClick={onCopilotClick}
+                onToggleEditor={onToggleEditor}
+            />
 
             <DataStreamStepNav
                 configuredSteps={configuredSteps}

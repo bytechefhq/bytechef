@@ -2,6 +2,9 @@ import Button from '@/components/Button/Button';
 import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import AiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/AiAgentEditor';
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
+import AiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/AiAgentSkills';
+import useAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkills';
+import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
 import ClusterElementsWorkflowEditor from '@/pages/platform/cluster-element-editor/components/ClusterElementsWorkflowEditor';
 import ClusterElementsWorkflowEditorHeader from '@/pages/platform/cluster-element-editor/components/ClusterElementsWorkflowEditorHeader';
 import DataStreamEditor from '@/pages/platform/cluster-element-editor/data-stream-editor/DataStreamEditor';
@@ -40,6 +43,7 @@ const ClusterElementsCanvasDialog = ({
     const [shouldRenderDataPillPanel, setShouldRenderDataPillPanel] = useState(false);
     const [isDataPillPanelVisible, setIsDataPillPanelVisible] = useState(false);
 
+    const {setSkillsPanelOpen, skillsHeaderInfo, skillsPanelOpen} = useAiAgentSkillsStore();
     const {copilotPanelOpen, showAiAgentEditor, showDataStreamEditor, testingPanelOpen} =
         useClusterElementsCanvasDialogStore(
             useShallow((state) => ({
@@ -53,7 +57,9 @@ const ClusterElementsCanvasDialog = ({
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
     );
+    const ff_4070 = useFeatureFlagsStore()('ff-4070');
 
+    const {handleClose: handleSkillsClose} = useAgentSkills({enabled: skillsPanelOpen});
     const {
         copilotEnabled,
         handleClose,
@@ -70,8 +76,6 @@ const ClusterElementsCanvasDialog = ({
     } = useClusterElementsCanvasDialog({
         onOpenChange,
     });
-
-    const ff_4070 = useFeatureFlagsStore()('ff-4070');
 
     useEffect(() => {
         let outerRafId: number | undefined;
@@ -122,8 +126,21 @@ const ClusterElementsCanvasDialog = ({
                 {isDataStreamClusterRoot && showDataStreamEditor ? (
                     <div className="flex size-full min-h-0 overflow-hidden">
                         <DataStreamEditor
+                            className={twMerge(
+                                'transition-[margin] duration-300 ease-in-out',
+                                copilotPanelOpen && 'mr-[450px]'
+                            )}
+                            copilotEnabled={ff_4070 && copilotEnabled}
                             onClose={handleClose}
+                            onCopilotClick={handleCopilotClick}
                             onToggleEditor={isDataStreamSimpleModeAvailable ? handleToggleEditor : undefined}
+                        />
+
+                        <CopilotPanel
+                            className="absolute inset-y-0 right-0 rounded-r-md border-l border-l-border/50"
+                            headerClassName="py-4"
+                            onClose={handleCopilotClose}
+                            open={copilotPanelOpen}
                         />
                     </div>
                 ) : showAiAgentEditor ? (
@@ -143,6 +160,7 @@ const ClusterElementsCanvasDialog = ({
 
                         <CopilotPanel
                             className="absolute inset-y-0 right-0 rounded-r-md border-l border-l-border/50"
+                            headerClassName="py-4"
                             onClose={handleCopilotClose}
                             open={copilotPanelOpen}
                         />
@@ -151,31 +169,29 @@ const ClusterElementsCanvasDialog = ({
                     <>
                         <div
                             className={twMerge(
-                                'flex min-h-0 flex-1 flex-col rounded-lg bg-surface-popover-canvas transition-[margin] duration-300 ease-in-out',
+                                'relative min-h-0 flex-1 rounded-lg bg-surface-popover-canvas transition-[margin] duration-300 ease-in-out',
                                 workflowNodeDetailsPanelOpen && 'mr-[465px]',
                                 workflowNodeDetailsPanelOpen && copilotPanelOpen && 'mr-[915px]'
                             )}
                         >
-                            {(isAiAgentClusterRoot || isDataStreamClusterRoot) && (
-                                <ClusterElementsWorkflowEditorHeader
-                                    copilotEnabled={ff_4070 && copilotEnabled}
-                                    onCopilotClick={handleCopilotClick}
-                                    onTestClick={handleTestClick}
-                                    onToggleEditor={handleToggleEditor}
-                                    showTestButton={isAiAgentClusterRoot}
-                                    showToggleEditor={
-                                        isAiAgentClusterRoot ||
-                                        (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
-                                    }
-                                    toggleEditorLabel={
-                                        isAiAgentClusterRoot
-                                            ? 'Switch to AI Agent editor'
-                                            : 'Switch to DataStream editor'
-                                    }
-                                />
-                            )}
+                            <div className="absolute inset-0">
+                                <ClusterElementsWorkflowEditor />
+                            </div>
 
-                            <ClusterElementsWorkflowEditor />
+                            <ClusterElementsWorkflowEditorHeader
+                                copilotEnabled={ff_4070 && copilotEnabled}
+                                onCopilotClick={handleCopilotClick}
+                                onSkillsClick={isAiAgentClusterRoot ? () => setSkillsPanelOpen(true) : undefined}
+                                onTestClick={handleTestClick}
+                                onToggleEditor={handleToggleEditor}
+                                showTestButton={isAiAgentClusterRoot}
+                                showToggleEditor={
+                                    isAiAgentClusterRoot || (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
+                                }
+                                toggleEditorLabel={
+                                    isAiAgentClusterRoot ? 'Switch to AI Agent editor' : 'Switch to DataStream editor'
+                                }
+                            />
                         </div>
 
                         <WorkflowNodeDetailsPanel
@@ -227,16 +243,41 @@ const ClusterElementsCanvasDialog = ({
                             >
                                 <AiAgentTestingPanel
                                     contentClassName="rounded-none"
-                                    copilotEnabled={ff_4070 && copilotEnabled}
                                     headerClassName="px-4 pt-4"
                                     onClose={handleCloseTestingPanel}
-                                    onCopilotClick={handleCopilotClick}
                                 />
+                            </div>
+                        )}
+
+                        {skillsPanelOpen && (
+                            <div className="absolute inset-0 z-20 flex flex-col overflow-y-auto rounded-lg bg-white">
+                                <div className="flex items-center justify-between p-4">
+                                    <div>
+                                        <div className="text-lg font-semibold">{skillsHeaderInfo.title}</div>
+
+                                        {skillsHeaderInfo.subtitle && (
+                                            <p className="text-sm text-gray-500">{skillsHeaderInfo.subtitle}</p>
+                                        )}
+                                    </div>
+
+                                    <Button
+                                        icon={<XIcon />}
+                                        onClick={handleSkillsClose}
+                                        size="icon"
+                                        title="Close skills"
+                                        variant="ghost"
+                                    />
+                                </div>
+
+                                <div className="flex min-h-0 flex-1 flex-col px-4">
+                                    <AiAgentSkills />
+                                </div>
                             </div>
                         )}
 
                         <CopilotPanel
                             className="absolute inset-y-0 right-0 rounded-r-md border-l"
+                            headerClassName="py-6"
                             onClose={handleCopilotClose}
                             open={copilotPanelOpen}
                         />
