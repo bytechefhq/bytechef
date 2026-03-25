@@ -1,8 +1,7 @@
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
 import {useCreateAgentSkillFromInstructionsMutation, useCreateAgentSkillMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import type React from 'react';
-import {useCallback, useRef, useState} from 'react';
+import {type ChangeEvent, type DragEvent, useCallback, useRef, useState} from 'react';
 import {toast} from 'sonner';
 
 const ACCEPTED_EXTENSIONS = ['.zip', '.skill', '.md'];
@@ -65,7 +64,7 @@ export default function useAgentSkillUploadForm() {
     }, []);
 
     const handleDrop = useCallback(
-        (event: React.DragEvent<HTMLDivElement>) => {
+        (event: DragEvent<HTMLDivElement>) => {
             event.preventDefault();
             setDragActive(false);
 
@@ -78,7 +77,7 @@ export default function useAgentSkillUploadForm() {
         [handleFilesSelect]
     );
 
-    const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    const handleDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         setDragActive(true);
     }, []);
@@ -88,7 +87,7 @@ export default function useAgentSkillUploadForm() {
     }, []);
 
     const handleFileInputChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
+        (event: ChangeEvent<HTMLInputElement>) => {
             const files = event.target.files;
 
             if (files && files.length > 0) {
