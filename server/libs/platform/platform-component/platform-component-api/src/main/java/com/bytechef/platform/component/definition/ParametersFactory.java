@@ -30,6 +30,10 @@ public class ParametersFactory {
     }
 
     public static Parameters create(Map<String, ?> map) {
+        if (map == null) {
+            map = Map.of();
+        }
+
         try {
             return new ParametersImpl(map);
         } catch (Exception exception) {
