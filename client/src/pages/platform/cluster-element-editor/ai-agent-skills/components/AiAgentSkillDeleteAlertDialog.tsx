@@ -11,7 +11,12 @@ import {
 
 const AiAgentSkillDeleteAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => {
     return (
-        <AlertDialog open={true}>
+        <AlertDialog
+            open={true}
+            onOpenChange={(open) => {
+                if (!open) onClose();
+            }}
+        >
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

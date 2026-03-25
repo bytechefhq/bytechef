@@ -1,6 +1,7 @@
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
 import {useCreateAgentSkillFromInstructionsMutation, useCreateAgentSkillMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
+import type React from 'react';
 import {useCallback, useRef, useState} from 'react';
 import {toast} from 'sonner';
 
@@ -129,15 +130,18 @@ export default function useAgentSkillUploadForm() {
                         name: fileNameWithoutExtension,
                     });
                 } else {
-                    const arrayBuffer = await file.arrayBuffer();
-                    const bytes = new Uint8Array(arrayBuffer);
-                    let binaryString = '';
+                    const base64Content = await new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
 
-                    for (const byte of bytes) {
-                        binaryString += String.fromCharCode(byte);
-                    }
+                        reader.onload = () => {
+                            const dataUrl = reader.result as string;
+                            const base64 = dataUrl.split(',')[1];
 
-                    const base64Content = btoa(binaryString);
+                            resolve(base64);
+                        };
+                        reader.onerror = () => reject(reader.error);
+                        reader.readAsDataURL(file);
+                    });
 
                     await createSkillMutation.mutateAsync({
                         fileBytes: base64Content,

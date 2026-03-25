@@ -21,7 +21,14 @@ const AiAgentSkillRenameDialog = ({currentName, onClose, onRename}: AiAgentSkill
     const [name, setName] = useState(currentName);
 
     return (
-        <AlertDialog open={true}>
+        <AlertDialog
+            open={true}
+            onOpenChange={(open) => {
+                if (!open) {
+                    onClose();
+                }
+            }}
+        >
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Rename Skill</AlertDialogTitle>
