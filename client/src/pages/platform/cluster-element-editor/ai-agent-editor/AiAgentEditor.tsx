@@ -1,13 +1,15 @@
 import AiAgentHeader from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/AiAgentHeader';
 import {AiAgentConfigurationPanel} from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/AiAgentConfigurationPanel';
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
+import useAiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/hooks/useAiAgentEditor';
+import AiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/AiAgentSkills';
+import useAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkills';
+import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
 import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
-import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
-import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
-import {Suspense, lazy, useCallback} from 'react';
+import {Suspense, lazy} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const DataPillPanel = lazy(() => import('@/pages/platform/workflow-editor/components/datapills/DataPillPanel'));
@@ -31,23 +33,34 @@ export default function AiAgentEditor({
     previousComponentDefinitions,
     workflowNodeOutputs,
 }: AiAgentEditorProps) {
-    const aiAgentNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore((state) => state.aiAgentNodeDetailsPanelOpen);
-    const currentNodeClusterElementType = useWorkflowNodeDetailsPanelStore(
-        (state) => state.currentNode?.clusterElementType
-    );
+    const {setSkillsPanelOpen, skillsHeaderInfo, skillsPanelOpen} = useAiAgentSkillsStore();
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
-    const {updateWorkflowMutation} = useWorkflowEditor();
+    const ff_4545 = useFeatureFlagsStore()('ff-4545');
+    const ff_4554 = useFeatureFlagsStore()('ff-4554');
+    const {handleNodeDetailsPanelClose, showNodeDetailsPanel, updateWorkflowMutation} = useAiAgentEditor({
+        previousComponentDefinitions,
+        workflowNodeOutputs,
+    });
+    const {handleClose: handleSkillsClose} = useAgentSkills({enabled: skillsPanelOpen});
 
-    const handleNodeDetailsPanelClose = useCallback(() => {
-        useWorkflowNodeDetailsPanelStore.getState().setAiAgentNodeDetailsPanelOpen(false);
-    }, []);
+    if (skillsPanelOpen) {
+        return (
+            <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
+                <AiAgentHeader
+                    copilotEnabled={ff_4554 && copilotEnabled}
+                    onClose={handleSkillsClose}
+                    onCopilotClick={onCopilotClick}
+                    subtitle={skillsHeaderInfo.subtitle}
+                    title={skillsHeaderInfo.title}
+                />
 
-    const showNodeDetailsPanel =
-        aiAgentNodeDetailsPanelOpen &&
-        (currentNodeClusterElementType === 'tools' || currentNodeClusterElementType === 'model') &&
-        previousComponentDefinitions &&
-        workflowNodeOutputs;
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pl-2 pr-4">
+                    <AiAgentSkills />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
@@ -55,6 +68,7 @@ export default function AiAgentEditor({
                 copilotEnabled={copilotEnabled}
                 onClose={onClose}
                 onCopilotClick={onCopilotClick}
+                onSkillsClick={ff_4545 ? () => setSkillsPanelOpen(true) : undefined}
                 onToggleEditor={onToggleEditor}
             />
 
@@ -68,7 +82,7 @@ export default function AiAgentEditor({
                         <AiAgentTestingPanel />
                     </div>
 
-                    {showNodeDetailsPanel && (
+                    {showNodeDetailsPanel && previousComponentDefinitions && workflowNodeOutputs && (
                         <>
                             {dataPillPanelOpen && (
                                 <div className="absolute inset-y-0 -left-[405px] z-10 w-[400px] overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background shadow-lg">

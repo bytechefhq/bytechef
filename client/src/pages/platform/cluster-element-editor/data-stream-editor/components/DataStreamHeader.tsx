@@ -1,13 +1,20 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {LayoutGridIcon, XIcon} from 'lucide-react';
+import {LayoutGridIcon, SparklesIcon, XIcon} from 'lucide-react';
 
 interface DataStreamHeaderProps {
+    copilotEnabled?: boolean;
     onClose?: () => void;
+    onCopilotClick?: () => void;
     onToggleEditor?: (showDataStream: boolean) => void;
 }
 
-export default function DataStreamHeader({onClose, onToggleEditor}: DataStreamHeaderProps) {
+export default function DataStreamHeader({
+    copilotEnabled,
+    onClose,
+    onCopilotClick,
+    onToggleEditor,
+}: DataStreamHeaderProps) {
     return (
         <div className="flex items-center justify-between p-4">
             <div className="text-lg font-semibold">Data Stream Editor</div>
@@ -30,6 +37,22 @@ export default function DataStreamHeader({onClose, onToggleEditor}: DataStreamHe
                             <TooltipContent>Switch to advanced Data Stream editor - workflow canvas</TooltipContent>
                         </Tooltip>
                     </div>
+                )}
+
+                {copilotEnabled && onCopilotClick && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                className="[&_svg]:size-5"
+                                icon={<SparklesIcon />}
+                                onClick={onCopilotClick}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Open Copilot panel</TooltipContent>
+                    </Tooltip>
                 )}
 
                 {onClose && (
