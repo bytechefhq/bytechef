@@ -80,8 +80,11 @@ const OutputTabSampleDataDialog = ({onClose, onUpload, open, placeholder}: Outpu
     }, [placeholder]);
 
     return (
-        <Dialog onOpenChange={handleOpenChange} open={open}>
-            <DialogContent className="max-w-output-tab-sample-data-dialog-width">
+        <Dialog modal={false} onOpenChange={handleOpenChange} open={open}>
+            <DialogContent
+                className="max-w-output-tab-sample-data-dialog-width"
+                onInteractOutside={(event) => event.preventDefault()}
+            >
                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                     <div className="flex flex-col space-y-1">
                         <DialogTitle>Upload Sample Output Data</DialogTitle>
