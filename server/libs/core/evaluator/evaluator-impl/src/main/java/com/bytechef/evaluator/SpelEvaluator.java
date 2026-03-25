@@ -200,88 +200,94 @@ public class SpelEvaluator implements Evaluator {
 
     @Nullable
     private Object evaluate(Object value, Map<String, ?> context, boolean lenient) {
-        if (value instanceof String string) {
-            Expression expression;
-            boolean formulaExpression = false;
+        switch (value) {
+            case String string -> {
+                Expression expression;
+                boolean formulaExpression = false;
 
-            String trimmedString = string.trim();
+                String trimmedString = string.trim();
 
-            if (trimmedString.equals(FORMULA_PREFIX)) {
-                return string;
-            }
+                if (trimmedString.equals(FORMULA_PREFIX)) {
+                    return string;
+                }
 
-            if (trimmedString.startsWith(FORMULA_PREFIX)) {
-                formulaExpression = true;
+                if (trimmedString.startsWith(FORMULA_PREFIX)) {
+                    formulaExpression = true;
 
-                try {
-                    string = string.replaceAll("\\$\\{([^}]*)}", "$1");
+                    try {
+                        string = string.replaceAll("\\$\\{([^}]*)}", "$1");
 
-                    if (!validateFormulaExpression(string)) {
+                        if (!validateFormulaExpression(string)) {
+                            if (lenient) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("Invalid formula expression: {}", string);
+                                }
+
+                                return value;
+                            }
+
+                            throw new IllegalArgumentException("Invalid formula expression: " + string);
+                        }
+
+                        expression = expressionParser.parseExpression(string.substring(1));
+                    } catch (ParseException parseException) {
                         if (lenient) {
                             if (logger.isDebugEnabled()) {
-                                logger.debug("Invalid formula expression: {}", string);
+                                logger.debug("Unparseable formula expression: {}", string, parseException);
                             }
 
                             return value;
                         }
 
-                        throw new IllegalArgumentException("Invalid formula expression: " + string);
+                        throw new IllegalArgumentException("Unparseable formula expression: " + string, parseException);
+                    }
+                } else {
+                    if (!validateTextExpression(string)) {
+                        if (lenient) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Invalid expression: {}", string);
+                            }
+
+                            return value;
+                        }
+
+                        throw new IllegalArgumentException("Invalid expression: " + string);
                     }
 
-                    expression = expressionParser.parseExpression(string.substring(1));
-                } catch (ParseException parseException) {
-                    if (lenient) {
+                    expression = expressionParser.parseExpression(
+                        string, new TemplateParserContext(ACCESSOR_PREFIX, ACCESSOR_SUFFIX));
+                }
+
+                if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
+                    return evaluate((CompositeStringExpression) expression, context, lenient);
+                } else if (expression instanceof LiteralExpression) {
+                    return expression.getValue();
+                } else {
+                    try {
+                        return expression.getValue(createEvaluationContext(context, formulaExpression));
+                    } catch (SpelEvaluationException spelEvaluationException) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("Unparseable formula expression: {}", string, parseException);
+                            logger.debug(spelEvaluationException.getMessage());
                         }
 
                         return value;
                     }
-
-                    throw new IllegalArgumentException("Unparseable formula expression: " + string, parseException);
-                }
-            } else {
-                if (!validateTextExpression(string)) {
-                    if (lenient) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Invalid expression: {}", string);
-                        }
-
-                        return value;
-                    }
-
-                    throw new IllegalArgumentException("Invalid expression: " + string);
-                }
-
-                expression = expressionParser.parseExpression(
-                    string, new TemplateParserContext(ACCESSOR_PREFIX, ACCESSOR_SUFFIX));
-            }
-
-            if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
-                return evaluate((CompositeStringExpression) expression, context, lenient);
-            } else if (expression instanceof LiteralExpression) {
-                return expression.getValue();
-            } else {
-                try {
-                    return expression.getValue(createEvaluationContext(context, formulaExpression));
-                } catch (SpelEvaluationException spelEvaluationException) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(spelEvaluationException.getMessage());
-                    }
-
-                    return value;
                 }
             }
-        } else if (value instanceof List<?> list) {
-            List<@Nullable Object> evaluatedlist = new ArrayList<>();
+            case List<?> list -> {
+                List<@Nullable Object> evaluatedlist = new ArrayList<>();
 
-            for (Object item : list) {
-                evaluatedlist.add(evaluate(item, context, lenient));
+                for (Object item : list) {
+                    evaluatedlist.add(evaluate(item, context, lenient));
+                }
+
+                return evaluatedlist;
             }
-
-            return evaluatedlist;
-        } else if (value instanceof Map<?, ?> map) {
-            return evaluateInternal(map, context, lenient);
+            case Map<?, ?> map -> {
+                return evaluateInternal(map, context, lenient);
+            }
+            default -> {
+            }
         }
 
         return value;
