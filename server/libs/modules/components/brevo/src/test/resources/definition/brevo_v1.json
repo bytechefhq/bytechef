@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/brevo_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -172,8 +175,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Updates existing contact.",
-    "help": null,
+    "description": "Updates an existing contact.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/brevo_v1#update-contact"
+    },
     "metadata": null,
     "name": "updateContact",
     "outputDefinition": null,
@@ -255,8 +261,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Sends and email from your Brevo account.",
-    "help": null,
+    "description": "Sends an email from your Brevo account.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/brevo_v1#send-transactional-email"
+    },
     "metadata": null,
     "name": "sendTransactionalEmail",
     "outputDefinition": {
@@ -778,7 +787,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "updateContact",
-    "description": "Updates existing contact.",
+    "description": "Updates an existing contact.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -861,7 +870,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "sendTransactionalEmail",
-    "description": "Sends and email from your Brevo account.",
+    "description": "Sends an email from your Brevo account.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -1290,14 +1299,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/brevo_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.brevo.com/docs/quickstart-reference"
+  },
   "description": "Brevo is an email marketing platform that offers a cloud-based marketing communication software suite with transactional email, marketing automation, customer-relationship management and more.",
   "icon": "path:assets/brevo.svg",
   "metadata": null,
@@ -1311,7 +1326,10 @@
     "deprecated": null,
     "description": "Triggers when transactional email is opened.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/brevo_v1#transactional-email-opened"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "transactionalEmailOpened",
