@@ -27,16 +27,16 @@ type SwitchPropsType = LabeledSwitchProps | PlainSwitchProps;
 
 const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}> = {
     default: {
-        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4',
+        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4 [&>span]:shadow-none',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     // eslint-disable-next-line sort-keys
     box: {
-        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4',
+        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4 [&>span]:shadow-none',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     small: {
-        thumbOverrides: '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3',
+        thumbOverrides: '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3 [&>span]:shadow-none',
         track: 'h-[14px] w-[26px] px-[1px] rounded-[7px] border-0',
     },
 };
@@ -45,7 +45,7 @@ const wrapperStyles: Record<VariantType, string> = {
     default: 'flex w-[228px] items-start gap-2',
     // eslint-disable-next-line sort-keys
     box: 'flex w-fit items-start gap-2 rounded-lg border border-stroke-neutral-secondary p-3',
-    small: 'flex w-[98px] items-center gap-1',
+    small: 'flex w-fit max-w-[200px] items-center gap-1',
 };
 
 interface TextBlockProps {
@@ -95,10 +95,9 @@ const Switch = forwardRef<ComponentRef<typeof ShadcnSwitch>, SwitchPropsType>(
         const switchClasses = twMerge(
             config.track,
             config.thumbOverrides,
-            'data-[state=checked]:bg-surface-brand-primary data-[state=unchecked]:bg-surface-neutral-secondary',
+            'data-[state=checked]:bg-surface-brand-primary data-[state=unchecked]:bg-surface-neutral-tertiary',
             'focus-visible:ring-2 focus-visible:ring-stroke-brand-focus focus-visible:ring-offset-0',
             '[&>span]:bg-surface-neutral-primary',
-            '[&>span]:shadow-[0_0_8px_rgba(0,0,0,0.15)]',
             className
         );
 
