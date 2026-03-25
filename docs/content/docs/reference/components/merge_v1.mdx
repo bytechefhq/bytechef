@@ -1,0 +1,128 @@
+---
+title: "Merge"
+description: "Combine multiple inputs into one output."
+---
+
+
+Categories: Helpers
+
+
+Type: merge/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Append
+Name: append
+
+`Takes multiple input items and combines them into a single array by appending all entries, keeping all keys.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputs | Inputs | ARRAY <details> <summary> Items </summary> [] </details> | A collection of objects, arrays, or nested structures to be merged. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Append",
+  "name" : "append",
+  "parameters" : {
+    "inputs" : [ ]
+  },
+  "type" : "merge/v1/append"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Combine
+Name: combine
+
+`Combine data from two inputs.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| combine_by | Combine By | STRING <details> <summary> Options </summary> <span title="Merge items that have the same values for the specified key.">matchingFields</span>, <span title="Combine items based on their order in each input list.">position</span>, <span title="Merge every item from one input with every item from the others.">allPossibleCombinations</span> </details> | Determines how input items are combined. | true |
+| field_to_match | Field to Match | STRING | The field to match for combining items. | true |
+| input_1 | Input 1 | ARRAY <details> <summary> Items </summary> [] </details> | The first input to combine. | true |
+| input_2 | Input 2 | ARRAY <details> <summary> Items </summary> [] </details> | The second input to combine. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Combine",
+  "name" : "combine",
+  "parameters" : {
+    "combine_by" : "",
+    "field_to_match" : "",
+    "input_1" : [ ],
+    "input_2" : [ ]
+  },
+  "type" : "merge/v1/combine"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### SQL Query
+Name: sqlQuery
+
+`Write SQL Query to merge the data with DuckDB.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputs | Inputs | ARRAY <details> <summary> Items </summary> [&#123;STRING\(tableName), &#123;&#125;\(value)&#125;] </details> | A collection of objects, arrays, or nested structures to be merged. | true |
+| sql_query | SQL Query | STRING | The SQL query to execute. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "SQL Query",
+  "name" : "sqlQuery",
+  "parameters" : {
+    "inputs" : [ {
+      "tableName" : "",
+      "value" : { }
+    } ],
+    "sql_query" : ""
+  },
+  "type" : "merge/v1/sqlQuery"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+
+
