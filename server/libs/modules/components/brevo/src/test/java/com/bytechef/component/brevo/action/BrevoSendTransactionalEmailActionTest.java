@@ -25,13 +25,23 @@ import static com.bytechef.component.brevo.constant.BrevoConstants.SENDER_EMAIL;
 import static com.bytechef.component.brevo.constant.BrevoConstants.SUBJECT;
 import static com.bytechef.component.brevo.constant.BrevoConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
@@ -49,11 +59,32 @@ class BrevoSendTransactionalEmailActionTest extends AbstractBrevoActionTest {
             CONTENT, "this is a test."));
 
     @Test
-    void testPerform() {
-        Object result = BrevoSendTransactionalEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+    void testPerform(
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+
+        Object result = BrevoSendTransactionalEmailAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(responseMap, result);
-        Http.Body body = bodyArgumentCaptor.getValue();
+
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/smtp/email/", stringArgumentCaptor.getValue());
+
+        Body body = bodyArgumentCaptor.getValue();
 
         Map<String, Object> expectedBody = Map.of(
             "sender", Map.of(EMAIL, "sender@test.com"),
