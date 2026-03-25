@@ -186,7 +186,7 @@ describe('Switch - States', () => {
         render(<Switch checked={false} />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('data-[state=unchecked]:bg-surface-neutral-secondary');
+        expect(switchElement).toHaveClass('data-[state=unchecked]:bg-surface-neutral-tertiary');
     });
 
     it('should apply thumb background color via arbitrary variant', () => {
@@ -196,11 +196,11 @@ describe('Switch - States', () => {
         expect(switchElement.className).toMatch(/\[&>span\]:bg-surface-neutral-primary/);
     });
 
-    it('should apply thumb shadow via arbitrary variant', () => {
+    it('should override shadcn thumb shadow with shadow-none', () => {
         render(<Switch checked={false} />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement.className).toMatch(/\[&>span\]:shadow-\[0_0_8px_rgba\(0,0,0,0\.15\)\]/);
+        expect(switchElement.className).toMatch(/\[&>span\]:shadow-none/);
     });
 
     it('should handle disabled state', () => {
