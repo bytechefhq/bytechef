@@ -74,6 +74,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -173,9 +174,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             listenerEnableConsumer.accept(
-                ParametersFactory.create(inputParameters),
-                ParametersFactory
-                    .create(componentConnection == null ? Map.of() : componentConnection.parameters()),
+                ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection),
                 workflowExecutionId,
                 output -> eventPublisher.publishEvent(
                     new TriggerListenerEvent(
@@ -412,9 +411,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .map(outputFunction -> {
                 try {
                     BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
-                        ParametersFactory.create(inputParameters),
-                        ParametersFactory.create(
-                            componentConnection == null ? Map.of() : componentConnection.getConnectionParameters()),
+                        ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection),
                         context);
 
                     if (outputResponse == null) {
@@ -442,9 +439,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         PollOutput pollOutput;
 
-        Parameters connectionParameters =
-            ParametersFactory.create(
-                componentConnection == null ? Map.of() : componentConnection.getConnectionParameters());
+        Parameters connectionParameters = ParametersFactory.create(componentConnection);
 
         try {
             pollOutput = pollFunction.apply(
@@ -496,7 +491,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
             WebhookValidateResponse response = executeWebhookValidate(
-                triggerDefinition, ParametersFactory.create(inputParameters), webhookRequest, context);
+                triggerDefinition, ParametersFactory.create(inputParameters), Objects.requireNonNull(webhookRequest),
+                context);
 
             if (response.status() != HttpStatus.OK.getValue()) {
                 throw new IllegalStateException("Invalid trigger signature.");
@@ -537,9 +533,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             webhookDisableConsumer.accept(
-                ParametersFactory.create(inputParameters),
-                ParametersFactory
-                    .create(componentConnection == null ? Map.of() : componentConnection.parameters()),
+                ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection),
                 ParametersFactory.create(outputParameters), workflowExecutionId, context);
         } catch (Exception e) {
             if (e instanceof ProviderException pe) {
@@ -565,9 +559,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             return webhookEnableFunction.apply(
-                ParametersFactory.create(inputParameters),
-                ParametersFactory.create(
-                    componentConnection == null ? Map.of() : componentConnection.parameters()),
+                ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection),
                 webhookUrl, workflowExecutionId, context);
         } catch (Exception e) {
             if (e instanceof ProviderException pe) {
@@ -624,11 +616,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             webhookOutput = webhookRequestFunction.apply(
-                ParametersFactory.create(inputParameters),
-                ParametersFactory
-                    .create(componentConnection == null ? Map.of() : componentConnection.parameters()),
-                new HttpHeadersImpl(webhookRequest.headers()),
-                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
+                ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection),
+                new HttpHeadersImpl(webhookRequest.headers()), new HttpParametersImpl(webhookRequest.parameters()),
+                webhookRequest.body(), webhookRequest.method(),
                 ParametersFactory.create(webhookEnabledOutputParameters), triggerContext);
         } catch (Exception e) {
             if (e instanceof ProviderException pe) {
@@ -768,9 +758,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @Nullable ComponentConnection componentConnection) {
 
         return new WrapResult(
-            ParametersFactory.create(inputParameters),
-            ParametersFactory.create(
-                componentConnection == null ? Map.of() : componentConnection.parameters()),
+            ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection),
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
