@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.wait.constant;
+package com.bytechef.atlas.coordinator.constant;
 
 /**
  * @author Ivica Cardic
  */
-public class WaitConstants {
+public class MetadataConstants {
 
-    public static final String AMOUNT = "amount";
-    public static final String DATE_TIME = "dateTime";
-    public static final String SERVICE_URL = "serviceUrl";
-    public static final String TIMEZONE = "timezone";
-    public static final String UNIT = "unit";
-    public static final String WAIT = "wait";
+    public static final String RESUME_DATA = "__resumeData";
 }

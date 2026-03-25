@@ -20,6 +20,7 @@ import com.bytechef.platform.configuration.dto.ClusterElementOutputDTO;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -32,10 +33,12 @@ public interface WorkflowNodeOutputFacade {
     List<String> WORKFLOW_CACHE_NAMES = List.of(
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE);
 
+    @Nullable
     ClusterElementOutputDTO getClusterElementOutput(
         String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
         long environmentId);
 
+    @Nullable
     WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName, long environmentId);
 
     List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(

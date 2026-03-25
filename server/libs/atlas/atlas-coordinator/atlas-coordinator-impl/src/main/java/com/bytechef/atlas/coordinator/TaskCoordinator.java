@@ -20,6 +20,7 @@ package com.bytechef.atlas.coordinator;
 
 import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.Task;
+import com.bytechef.atlas.coordinator.constant.MetadataConstants;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
@@ -41,7 +42,9 @@ import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -122,6 +125,18 @@ public class TaskCoordinator {
         }
 
         Job job = jobService.resumeToStatusStarted(resumeJobEvent.getJobId());
+
+        Map<String, ?> data = resumeJobEvent.getData();
+
+        if (data != null) {
+            Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
+
+            jobMetadata.put(MetadataConstants.RESUME_DATA, data);
+
+            job.setMetadata(jobMetadata);
+
+            jobService.update(job);
+        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={} resumed", resumeJobEvent.getJobId());
@@ -231,8 +246,7 @@ public class TaskCoordinator {
             TaskExecution taskExecution = taskExecutionOptional.get();
 
             taskExecution.setError(
-                new ExecutionError(
-                    exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+                new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
 
             eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
         } else {

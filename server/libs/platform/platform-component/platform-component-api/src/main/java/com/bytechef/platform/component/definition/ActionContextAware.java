@@ -58,6 +58,23 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
     Suspend getSuspend();
 
     /**
+     * Retrieves the job resume ID string that was generated during suspend processing.
+     *
+     * @return the job resume ID string, or null if not set
+     */
+    @Nullable
+    String getJobResumeId();
+
+    /**
+     * Generates a resume URL for the current job. Creates a new job resume ID and returns the full URL that external
+     * services can call to resume the suspended workflow.
+     *
+     * @return the resume URL, or null if publicUrl or jobId is not available
+     */
+    @Nullable
+    String generateResumeUrl();
+
+    /**
      * Retrieves the unique identifier associated with the job principal.
      *
      * @return the job principal ID as a {@link Long}, or {@code null} if no job principal ID is set.

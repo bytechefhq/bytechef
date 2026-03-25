@@ -126,7 +126,7 @@ public class AiAgentTestFacadeTest {
         // And the action returns a result
         when(actionDefinitionFacade.executePerform(
             anyString(), anyInt(), anyString(), isNull(), isNull(), isNull(), isNull(), eq(WORKFLOW_ID), any(),
-            any(), any(), eq(ENVIRONMENT_ID), isNull(), eq(true), isNull(), isNull()))
+            any(), any(), eq(ENVIRONMENT_ID), isNull(), eq(true), isNull(), isNull(), isNull()))
                 .thenReturn("AI response");
 
         // When
@@ -138,7 +138,7 @@ public class AiAgentTestFacadeTest {
 
         verify(actionDefinitionFacade).executePerform(
             eq("aiComponent"), eq(1), eq("chat"), isNull(), isNull(), isNull(), isNull(), eq(WORKFLOW_ID), any(),
-            any(), any(), eq(ENVIRONMENT_ID), isNull(), eq(true), isNull(), isNull());
+            any(), any(), eq(ENVIRONMENT_ID), isNull(), eq(true), isNull(), isNull(), isNull());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class AiAgentTestFacadeTest {
             WORKFLOW_ID, WORKFLOW_NODE_NAME, ENVIRONMENT_ID)).thenReturn(List.of());
         when(actionDefinitionFacade.executePerform(
             anyString(), anyInt(), anyString(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(),
-            any(boolean.class), any(), any())).thenReturn("result");
+            any(boolean.class), any(), any(), any())).thenReturn("result");
 
         // When
         aiAgentTestFacade.executeAiAgentAction(
@@ -237,7 +237,7 @@ public class AiAgentTestFacadeTest {
 
         when(actionDefinitionFacade.executePerform(
             anyString(), anyInt(), anyString(), any(), any(), any(), any(), any(), any(), any(),
-            extensionsCaptor.capture(), any(), any(), any(boolean.class), any(), any())).thenReturn("result");
+            extensionsCaptor.capture(), any(), any(), any(boolean.class), any(), any(), any())).thenReturn("result");
 
         // When
         aiAgentTestFacade.executeAiAgentAction(
@@ -285,7 +285,7 @@ public class AiAgentTestFacadeTest {
 
         when(actionDefinitionFacade.executePerform(
             anyString(), anyInt(), anyString(), any(), any(), any(), any(), any(), any(), connectionIdsCaptor.capture(),
-            any(), any(), any(), any(boolean.class), any(), any())).thenReturn("result");
+            any(), any(), any(), any(boolean.class), any(), any(), any())).thenReturn("result");
 
         // When
         aiAgentTestFacade.executeAiAgentAction(

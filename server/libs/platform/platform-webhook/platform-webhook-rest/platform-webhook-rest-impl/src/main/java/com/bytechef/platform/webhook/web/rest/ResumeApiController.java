@@ -21,11 +21,13 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,14 +40,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin
 @ConditionalOnCoordinator
-public class ResumeWebhookController {
+public class ResumeApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResumeWebhookController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResumeApiController.class);
 
     private final JobFacade jobFacade;
 
     @SuppressFBWarnings("EI")
-    public ResumeWebhookController(JobFacade jobFacade) {
+    public ResumeApiController(JobFacade jobFacade) {
         this.jobFacade = jobFacade;
     }
 
@@ -64,8 +66,10 @@ public class ResumeWebhookController {
         justification = "id is sanitized with replaceAll before logging; CSRF disabled for external resume callbacks")
     @RequestMapping(method = {
         RequestMethod.GET, RequestMethod.POST
-    }, value = "/job/resume/{id}")
-    public ResponseEntity<Void> resume(@PathVariable String id) {
+    }, value = "/api/job/resume/{id}")
+    public ResponseEntity<Void> resume(
+        @PathVariable String id, @RequestBody(required = false) Map<String, Object> data) {
+
         JobResumeId jobResumeId;
 
         try {
@@ -78,11 +82,10 @@ public class ResumeWebhookController {
         }
 
         return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
-            jobFacade.resumeJob(jobResumeId.getJobId());
+            jobFacade.resumeJob(jobResumeId.getJobId(), data);
 
             return ResponseEntity.noContent()
                 .build();
         });
     }
-
 }

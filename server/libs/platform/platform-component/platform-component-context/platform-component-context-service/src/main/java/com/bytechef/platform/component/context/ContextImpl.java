@@ -26,6 +26,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -833,6 +834,11 @@ class ContextImpl implements Context {
         @Override
         public ValueProperty<?> getOutputSchema(Object value) {
             return (ValueProperty<?>) SchemaUtils.getOutputSchema(value, PropertyFactory.PROPERTY_FACTORY);
+        }
+
+        @Override
+        public @Nullable Object getSampleOutput(BaseProperty definitionProperty) {
+            return SchemaUtils.getSampleOutput(definitionProperty);
         }
     }
 

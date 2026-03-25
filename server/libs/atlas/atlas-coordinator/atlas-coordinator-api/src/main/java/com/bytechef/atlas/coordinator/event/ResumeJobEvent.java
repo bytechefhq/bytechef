@@ -17,6 +17,9 @@
 package com.bytechef.atlas.coordinator.event;
 
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
+import java.util.Collections;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -24,24 +27,35 @@ import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 public class ResumeJobEvent extends AbstractEvent {
 
     private long jobId;
+    private @Nullable Map<String, ?> data;
 
     private ResumeJobEvent() {
     }
 
     public ResumeJobEvent(long jobId) {
+        this(jobId, null);
+    }
+
+    public ResumeJobEvent(long jobId, @Nullable Map<String, ?> data) {
         super(TaskCoordinatorMessageRoute.JOB_RESUME_EVENTS);
 
         this.jobId = jobId;
+        this.data = data == null ? null : Collections.unmodifiableMap(data);
     }
 
     public long getJobId() {
         return jobId;
     }
 
+    public @Nullable Map<String, ?> getData() {
+        return data == null ? null : Collections.unmodifiableMap(data);
+    }
+
     @Override
     public String toString() {
         return "ResumeJobEvent{" +
             "jobId=" + jobId +
+            ", data=" + data +
             ", createdDate=" + createDate +
             ", route=" + route +
             "} ";
