@@ -55,7 +55,8 @@ public class BrevoSendTransactionalEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendTransactionalEmail")
         .title("Send Transactional Email")
-        .description("Sends and email from your Brevo account.")
+        .description("Sends an email from your Brevo account.")
+        .help("", "https://docs.bytechef.io/reference/components/brevo_v1#send-transactional-email")
         .properties(
             string(SENDER_EMAIL)
                 .label("Sender Email")

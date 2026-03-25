@@ -40,6 +40,8 @@ public class BrevoComponentHandler implements ComponentHandler {
         .description(
             "Brevo is an email marketing platform that offers a cloud-based marketing communication software suite " +
                 "with transactional email, marketing automation, customer-relationship management and more.")
+        .customAction(true)
+        .customActionHelp("", "https://developers.brevo.com/docs/quickstart-reference")
         .icon("path:assets/brevo.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(BrevoConnection.CONNECTION_DEFINITION)
@@ -52,7 +54,8 @@ public class BrevoComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(BrevoCreateContactAction.ACTION_DEFINITION),
             tool(BrevoUpdateContactAction.ACTION_DEFINITION),
-            tool(BrevoSendTransactionalEmailAction.ACTION_DEFINITION));
+            tool(BrevoSendTransactionalEmailAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

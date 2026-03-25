@@ -36,7 +36,8 @@ public class BrevoUpdateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
         .title("Update Contact")
-        .description("Updates existing contact.")
+        .description("Updates an existing contact.")
+        .help("", "https://docs.bytechef.io/reference/components/brevo_v1#update-contact")
         .properties(
             string(EMAIL)
                 .label("Email")
