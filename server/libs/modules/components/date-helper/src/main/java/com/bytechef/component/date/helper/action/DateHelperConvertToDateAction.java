@@ -17,8 +17,8 @@
 package com.bytechef.component.date.helper.action;
 
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_PROPERTY;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_STRING;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIX_TIMESTAMP;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -56,8 +56,39 @@ public class DateHelperConvertToDateAction {
                     option("Standard", "standard"),
                     option("Custom", "custom"))
                 .required(true),
-            DATE_FORMAT_PROPERTY
-                .displayCondition("dateFormatType == 'standard'"),
+            string(DATE_FORMAT)
+                .label("Date Format")
+                .description("Here's what each part of the format (eg. YYYY) means: " +
+                    "yyyy : Year (4 digits) " +
+                    "yy : Year (2 digits) " +
+                    "MMMM : Month (full name) " +
+                    "MMM : Month (short name) " +
+                    "MM : Month (2 digits) " +
+                    "EEE : Day (short name) " +
+                    "dd : Day (2 digits) " +
+                    "HH : Hour (2 digits) " +
+                    "mm : Minute (2 digits) " +
+                    "ss : Second (2 digits).")
+                .options(
+                    option("EEE MMM dd yyyy HH:mm:ss", "EEE MMM dd yyyy HH:mm:ss", "Sun Sep 17 2023 11:23:58"),
+                    option("EEE MMM dd HH:mm:ss yyyy", "EEE MMM dd HH:mm:ss yyyy", "Sun Sep 17 11:23:58 2023"),
+                    option("MMMM dd yyyy HH:mm:ss", "MMMM dd yyyy HH:mm:ss", "September 17 2023 11:23:58"),
+                    option("MMMM dd yyyy", "MMMM dd yyyy", "September 17 2023"),
+                    option("MMM dd yyyy", "MMM dd yyyy", "Sep 17 2023"),
+                    option("yyyy-MM-ddTHH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "2023-09-17T11:23:58"),
+                    option("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss", "2023-09-17 11:23:58"),
+                    option("yyyy-MM-dd", "yyyy-MM-dd", "2023-09-17"),
+                    option("MM-dd-yyyy", "MM-dd-yyyy", "09-17-2023"),
+                    option("MM/dd/yyyy", "MM/dd/yyyy", "09/17/2023"),
+                    option("MM/dd/yy", "MM/dd/yy", "09/17/23"),
+                    option("dd-MM-yyyy", "dd-MM-yyyy", "17-09-2023"),
+                    option("dd/MM/yyyy", "dd/MM/yyyy", "17/09/2023"),
+                    option("dd.MM.yyyy", "dd.MM.yyyy", "17.09.2023"),
+                    option("dd/MM/yy", "dd/MM/yy", "17/09/23"),
+                    option("dd.MM.yy", "dd.MM.yy", "17.09.23"),
+                    option("Time in unix format", UNIX_TIMESTAMP, "1694949838"))
+                .displayCondition("dateFormatType == 'standard'")
+                .required(true),
             string(DATE_FORMAT)
                 .label("Date Format")
                 .description(
