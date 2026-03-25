@@ -1,0 +1,9 @@
+query agentSkills {
+    agentSkills {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}
