@@ -80,10 +80,10 @@ public class AgentUtilsSkillsTool {
                     array(SKILLS)
                         .label("Skills")
                         .description("Select skills to make available to the agent.")
+                        .placeholder("Choose a skill...")
                         .items(
                             string(SKILL_ID)
                                 .label("Skill")
-                                .description("Choose a skill.")
                                 .options(
                                     (ClusterElementDefinition.OptionsFunction<String>) this::getSkillOptions)
                                 .required(true)))
