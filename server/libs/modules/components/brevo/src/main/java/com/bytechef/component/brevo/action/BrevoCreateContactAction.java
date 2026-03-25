@@ -43,6 +43,7 @@ public class BrevoCreateContactAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
         .description("Creates new contact.")
+        .help("", "https://docs.bytechef.io/reference/components/brevo_v1#create-contact")
         .properties(
             string(EMAIL)
                 .label("Email")
@@ -84,9 +85,9 @@ public class BrevoCreateContactAction {
     private static Map<String, String> createAttributesMap(Parameters inputParameters) {
         Map<String, String> attributesMap = new HashMap<>();
 
-        String firstNAme = inputParameters.getString(FIRST_NAME);
-        if (firstNAme != null) {
-            attributesMap.put(FIRST_NAME, firstNAme);
+        String firstName = inputParameters.getString(FIRST_NAME);
+        if (firstName != null) {
+            attributesMap.put(FIRST_NAME, firstName);
         }
 
         String lastName = inputParameters.getString(LAST_NAME);
