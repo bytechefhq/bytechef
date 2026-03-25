@@ -570,7 +570,9 @@ public class SpelEvaluatorTest {
         "user[abc]",
         "user['unclosed]",
         "user[1a]",
-        "user['x']y"
+        "user['x']y",
+        "1abc",
+        "user.1name"
     })
     void testShouldRejectInvalidAccessors(String accessor) {
         assertThrowsExactly(

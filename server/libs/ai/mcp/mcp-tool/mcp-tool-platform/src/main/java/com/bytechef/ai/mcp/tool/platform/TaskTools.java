@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class TaskTools {
         @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
-            return switch (StringUtils.trim(type.toLowerCase())) {
+            return switch (StringUtils.trim(type.toLowerCase(Locale.ROOT))) {
                 case "action" -> {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for action type");
@@ -125,7 +126,7 @@ public class TaskTools {
         @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
-            return switch (StringUtils.trim(type.toLowerCase())) {
+            return switch (StringUtils.trim(type.toLowerCase(Locale.ROOT))) {
                 case "action", "trigger" -> {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for " + type + " type");
@@ -153,7 +154,7 @@ public class TaskTools {
         @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
-            return switch (StringUtils.trim(type.toLowerCase())) {
+            return switch (StringUtils.trim(type.toLowerCase(Locale.ROOT))) {
                 case "action", "trigger" -> {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for " + type + " type");
@@ -179,7 +180,7 @@ public class TaskTools {
         @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
-            return switch (StringUtils.trim(type.toLowerCase())) {
+            return switch (StringUtils.trim(type.toLowerCase(Locale.ROOT))) {
                 case "action" -> {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for action type");
@@ -234,7 +235,7 @@ public class TaskTools {
 
         try {
             List<TaskMinimalInfo> allTasks = new ArrayList<>();
-            String normalizedType = type != null ? StringUtils.trim(type.toLowerCase()) : null;
+            String normalizedType = type != null ? StringUtils.trim(type.toLowerCase(Locale.ROOT)) : null;
 
             boolean includeActions = normalizedType == null || "action".equals(normalizedType);
             boolean includeTriggers = normalizedType == null || "trigger".equals(normalizedType);
@@ -312,7 +313,7 @@ public class TaskTools {
 
         try {
             List<TaskMinimalInfo> matchingTasks = new ArrayList<>();
-            String normalizedType = type != null ? StringUtils.trim(type.toLowerCase()) : null;
+            String normalizedType = type != null ? StringUtils.trim(type.toLowerCase(Locale.ROOT)) : null;
 
             boolean includeActions = normalizedType == null || "action".equals(normalizedType);
             boolean includeTriggers = normalizedType == null || "trigger".equals(normalizedType);
