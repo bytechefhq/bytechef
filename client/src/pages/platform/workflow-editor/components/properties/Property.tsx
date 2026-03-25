@@ -875,6 +875,7 @@ const Property = ({
                         currentNode?.connections?.length === 0
                     }
                     formState={formState}
+                    hideFromAi={hideFromAi}
                     lookupDependsOnPaths={propertiesDataSource?.propertiesLookupDependsOn}
                     lookupDependsOnValues={lookupDependsOnValues}
                     name={name}
