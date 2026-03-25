@@ -1,0 +1,219 @@
+{
+  "actions": null,
+  "clusterElements": [ {
+    "name": "fileSystemTools",
+    "description": "Read, write, and edit files with precise control.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "File System Tools",
+    "type": {
+      "name": "CLAUDE_CODE_TOOLS",
+      "key": "claudeCodeTools",
+      "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "shellTools",
+    "description": "Execute shell commands with timeout control, background process management, and regex output filtering.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Shell Tools",
+    "type": {
+      "name": "CLAUDE_CODE_TOOLS",
+      "key": "claudeCodeTools",
+      "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "grepTool",
+    "description": "Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Grep Tool",
+    "type": {
+      "name": "CLAUDE_CODE_TOOLS",
+      "key": "claudeCodeTools",
+      "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "globTool",
+    "description": "Fast file pattern matching tool for finding files by name patterns with glob syntax.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Glob Tool",
+    "type": {
+      "name": "CLAUDE_CODE_TOOLS",
+      "key": "claudeCodeTools",
+      "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "smartWebFetchTool",
+    "description": "AI-powered web content summarization with caching.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Smart Web Fetch Tool",
+    "type": {
+      "name": "CLAUDE_CODE_TOOLS",
+      "key": "claudeCodeTools",
+      "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "braveWebSearchTool",
+    "description": "Web search with domain filtering using the Brave Search API.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Brave Web Search Tool",
+    "type": {
+      "name": "CLAUDE_CODE_TOOLS",
+      "key": "claudeCodeTools",
+      "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "skillsTool",
+    "description": "Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Select skills to make available to the agent.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Choose a skill.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Skill",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "skillId",
+        "options": null,
+        "optionsDataSource": {
+          "options": { },
+          "optionsLookupDependsOn": null
+        },
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      } ],
+      "label": "Skills",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "skills",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "ARRAY"
+    } ],
+    "title": "Skills Tool",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "todoWriteTool",
+    "description": "Structured task management with state tracking.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Todo Write Tool",
+    "type": {
+      "name": "CLAUDE_CODE_TOOLS",
+      "key": "claudeCodeTools",
+      "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "taskTool",
+    "description": "Delegate complex tasks to specialized sub-agents for parallel execution.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Task Tool",
+    "type": {
+      "name": "CLAUDE_CODE_TOOLS",
+      "key": "claudeCodeTools",
+      "label": "Claude Code Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "AI Agent Utils brings Claude Code-inspired tools and agent skills.",
+  "icon": "path:assets/agent-utils.svg",
+  "metadata": null,
+  "name": "aiAgentUtils",
+  "resources": null,
+  "tags": null,
+  "title": "AI Agent Utils",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
+}

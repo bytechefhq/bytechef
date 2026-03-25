@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
+package com.bytechef.component.ai.agent.utils.cluster;
 
 import static com.bytechef.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
 import static com.bytechef.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
@@ -82,14 +81,12 @@ public class AgentUtilsSkillsTool {
                         .label("Skills")
                         .description("Select skills to make available to the agent.")
                         .items(
-                            object()
-                                .properties(
-                                    string(SKILL_ID)
-                                        .label("Skill")
-                                        .description("Choose a skill.")
-                                        .options(
-                                            (ClusterElementDefinition.OptionsFunction<String>) this::getSkillOptions)
-                                        .required(true))))
+                            string(SKILL_ID)
+                                .label("Skill")
+                                .description("Choose a skill.")
+                                .options(
+                                    (ClusterElementDefinition.OptionsFunction<String>) this::getSkillOptions)
+                                .required(true)))
                 .object(() -> this::apply);
     }
 

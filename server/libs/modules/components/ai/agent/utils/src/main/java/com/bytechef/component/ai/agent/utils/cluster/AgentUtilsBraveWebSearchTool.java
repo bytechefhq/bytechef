@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
+package com.bytechef.component.ai.agent.utils.cluster;
 
 import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction.CLAUDE_CODE_TOOLS;
 
@@ -23,35 +23,43 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.ShellTools;
+import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides shell tools (Bash, BashOutput, KillShell) for the AI agent.
+ * Provides web search with domain filtering using the Brave Search API.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsShellTools {
+public class AgentUtilsBraveWebSearchTool {
+
+    public static final String BRAVE_API_KEY = "braveApiKey";
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("shellTools")
-            .title("Shell Tools")
-            .description("Execute shell commands with timeout control, background process management, "
-                + "and regex output filtering.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("braveWebSearchTool")
+            .title("Brave Web Search Tool")
+            .description("Web search with domain filtering using the Brave Search API.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsShellTools::apply);
+            .object(() -> AgentUtilsBraveWebSearchTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        ShellTools shellTools = ShellTools.builder()
+        String apiKey = connectionParameters.getString(BRAVE_API_KEY);
+
+        if (apiKey == null || apiKey.isBlank()) {
+            return ToolCallbackProvider.from(List.of());
+        }
+
+        BraveWebSearchTool braveWebSearchTool = BraveWebSearchTool.builder(apiKey)
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(shellTools));
+        return ToolCallbackProvider.from(ToolCallbacks.from(braveWebSearchTool));
     }
 }
