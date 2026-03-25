@@ -120,6 +120,7 @@
         "tailwind-merge": "^3.5.0",
         "tailwindcss-animate": "^1.0.7",
         "tippy.js": "^6.3.7",
+        "tiptap-markdown": "^0.9.0",
         "use-debounce": "^10.1.0",
         "vite-plugin-svgr": "^4.5.0",
         "whatwg-fetch": "^3.6.20",
