@@ -36,7 +36,7 @@ const ClusterElementsWorkflowEditor = () => {
     );
 
     return (
-        <div className="flex-1">
+        <div className="size-full">
             <ReactFlowProvider>
                 <ReactFlow
                     defaultViewport={{x: 0, y: 0, zoom: DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM}}

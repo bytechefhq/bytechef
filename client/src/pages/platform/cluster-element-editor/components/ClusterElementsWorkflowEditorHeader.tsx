@@ -1,10 +1,11 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {PlayIcon, SparklesIcon, TextInitialIcon} from 'lucide-react';
+import {PlayIcon, SparklesIcon, TextInitialIcon, ZapIcon} from 'lucide-react';
 
 interface ClusterElementsWorkflowEditorHeaderProps {
     copilotEnabled: boolean;
     onCopilotClick: () => void;
+    onSkillsClick?: () => void;
     onTestClick: () => void;
     onToggleEditor: (showAiAgent: boolean) => void;
     showTestButton: boolean;
@@ -15,6 +16,7 @@ interface ClusterElementsWorkflowEditorHeaderProps {
 const ClusterElementsWorkflowEditorHeader = ({
     copilotEnabled,
     onCopilotClick,
+    onSkillsClick,
     onTestClick,
     onToggleEditor,
     showTestButton,
@@ -22,8 +24,8 @@ const ClusterElementsWorkflowEditorHeader = ({
     toggleEditorLabel = 'Switch to simple editor',
 }: ClusterElementsWorkflowEditorHeaderProps) => {
     return (
-        <div className="flex items-center justify-end p-4">
-            <div className="flex items-center gap-1">
+        <div className="relative z-10 flex items-center justify-end p-4">
+            <div className="flex items-center gap-1 rounded-lg bg-white/70 p-1 backdrop-blur-sm">
                 {showToggleEditor && (
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -36,6 +38,22 @@ const ClusterElementsWorkflowEditorHeader = ({
                         </TooltipTrigger>
 
                         <TooltipContent>{toggleEditorLabel}</TooltipContent>
+                    </Tooltip>
+                )}
+
+                {onSkillsClick && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                className="[&_svg]:size-5"
+                                icon={<ZapIcon />}
+                                onClick={onSkillsClick}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Agent Skills</TooltipContent>
                     </Tooltip>
                 )}
 
