@@ -18,6 +18,7 @@
 
 package com.bytechef.evaluator;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * @author Arik Cohen
@@ -498,6 +501,17 @@ public class SpelEvaluatorTest {
     }
 
     @Test
+    public void test48() {
+        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(
+                Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"),
+                Map.of("str1", 6, "str2", "abc")));
+
+        assertEquals("Invalid arguments for equalsIgnoreCase.", illegalArgumentException.getMessage());
+    }
+
+    @Test
     public void testIncompleteFormulaThrowsInStrictMode() {
         assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
             Map.of("type", "type", "value", "=222+"), Collections.emptyMap()));
@@ -527,14 +541,41 @@ public class SpelEvaluatorTest {
         assertEquals("=10*3-", MapUtils.get(map, "value"));
     }
 
-    @Test
-    public void test48() {
-        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
-            IllegalArgumentException.class,
-            () -> EVALUATOR.evaluate(
-                Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"),
-                Map.of("str1", 6, "str2", "abc")));
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "abc",
+        "_abc",
+        "user.name",
+        "user.address.street",
+        "items[0]",
+        "items[10].name",
+        "user['first name']",
+        "user['ключ']",
+        "foo.[0]",
+        "foo.['bar-baz']"
+    })
+    void testShouldAcceptValidAccessors(String accessor) {
+        assertDoesNotThrow(
+            () -> EVALUATOR.evaluate(Map.of("key", "${" + accessor + "}"), Collections.emptyMap()),
+            accessor);
+    }
 
-        assertEquals("Invalid arguments for equalsIgnoreCase.", illegalArgumentException.getMessage());
+    @ParameterizedTest
+    @ValueSource(strings = {
+        " ",
+        "T(java.lang.System)",
+        "user..name",
+        ".user",
+        "user.",
+        "user[abc]",
+        "user['unclosed]",
+        "user[1a]",
+        "user['x']y"
+    })
+    void testShouldRejectInvalidAccessors(String accessor) {
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("key", "${" + accessor + "}"), Collections.emptyMap()),
+            accessor);
     }
 }

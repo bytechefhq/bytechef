@@ -79,11 +79,10 @@ public class SpelEvaluator implements Evaluator {
     private static final String ACCESSOR_PREFIX = "${";
     private static final String ACCESSOR_SUFFIX = "}";
     private static final String FORMULA_PREFIX = "=";
-    private static final Pattern ACCESSOR_EXPRESSION_PATTERN = Pattern.compile("\\$\\{(.*?)}");
     private static final Pattern FORMULA_EXPRESSION_PATTERN =
         Pattern.compile("^(?!.*T\\()(?!.*\\.\\w+\\()(?!.*new\\s+\\w+(?:<[^>]*>)?\\s*\\[).*$");
-    private static final Pattern VALID_ACCESSOR_PATTERN = Pattern.compile(
-        "^(?!T\\()([a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*(\\.(([a-zA-Z_][a-zA-Z0-9_]*)|\\[(\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]))*(\\.([a-zA-Z_][a-zA-Z0-9_]*)(\\[(\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*)*$)");
+    private static final Pattern INVALID_ACCESSOR_PATTERN = Pattern.compile(
+        "\\$\\{(?!(?!T\\()[a-zA-Z0-9_]+(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*(?:\\.(?:[a-zA-Z0-9_]+(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*|\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]))*})");
 
     private final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -311,19 +310,9 @@ public class SpelEvaluator implements Evaluator {
     }
 
     private static boolean validateTextExpression(String expression) {
-        Matcher accessorMatcher = ACCESSOR_EXPRESSION_PATTERN.matcher(expression);
+        Matcher matcher = INVALID_ACCESSOR_PATTERN.matcher(expression);
 
-        while (accessorMatcher.find()) {
-            String accessorContent = accessorMatcher.group(1);
-
-            Matcher validAccessorMatcher = VALID_ACCESSOR_PATTERN.matcher(accessorContent);
-
-            if (!validAccessorMatcher.matches()) {
-                return false;
-            }
-        }
-
-        return true;
+        return !matcher.find();
     }
 
     private static boolean validateFormulaExpression(String expression) {
