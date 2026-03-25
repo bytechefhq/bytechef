@@ -13,7 +13,7 @@ import {
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
 import {getCookie} from '@/shared/util/cookie-utils';
-import {Suspense, lazy, useState} from 'react';
+import {Suspense, lazy, useRef, useState} from 'react';
 
 import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
@@ -33,6 +33,8 @@ const fetchGenerateSchema = async (data: string): Promise<Response> => {
 const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newSchema: SchemaRecordType) => void}) => {
     const [curSchema, setCurSchema] = useState<SchemaRecordType | undefined>();
     const [open, setOpen] = useState<boolean>(true);
+
+    const editorRef = useRef<StandaloneCodeEditorType | null>(null);
 
     const handleEditorOnChange = (value: string | undefined) => {
         const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
@@ -72,6 +74,8 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
     };
 
     const handleEditorOnMount = (editor: StandaloneCodeEditorType) => {
+        editorRef.current = editor;
+
         const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
 
         if (!placeholder) {
@@ -80,7 +84,7 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
 
         placeholder.style.display = curSchema ? 'none' : 'block';
 
-        editor.focus();
+        setTimeout(() => editor.focus(), 0);
     };
 
     const handleOpenChange = (open: boolean) => {
@@ -97,7 +101,16 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
                 <Button label="Generate" variant="outline" />
             </DialogTrigger>
 
-            <DialogContent className="max-w-output-tab-sample-data-dialog-width">
+            <DialogContent
+                className="max-w-output-tab-sample-data-dialog-width"
+                onFocusOutside={(event) => event.preventDefault()}
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault();
+
+                    setTimeout(() => editorRef.current?.focus(), 0);
+                }}
+                onPointerDownOutside={(event) => event.preventDefault()}
+            >
                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                     <div className="flex flex-col space-y-1">
                         <DialogTitle>Sample JSON</DialogTitle>
