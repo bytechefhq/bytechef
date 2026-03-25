@@ -16,38 +16,34 @@
 
 package com.bytechef.component.brevo.action;
 
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 abstract class AbstractBrevoActionTest {
 
-    protected Context mockedContext = mock(Context.class);
-    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected Http.Response mockedResponse = mock(Http.Response.class);
     protected Map<String, Object> responseMap = Map.of("key", "value");
-    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    protected ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
+    void beforeEach(Response mockedResponse, Executor mockedExecutor) {
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
     }

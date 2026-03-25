@@ -22,11 +22,13 @@ import static com.bytechef.component.brevo.constant.BrevoConstants.LAST_NAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.Body;
+import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.brevo.util.BrevoUtils;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -66,6 +68,7 @@ public class BrevoUpdateContactAction {
                     FIRST_NAME, inputParameters.getString(FIRST_NAME),
                     LAST_NAME, inputParameters.getString(LAST_NAME)
                 }))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute();
 
         return null;
