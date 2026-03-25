@@ -220,11 +220,23 @@ export const useProperty = ({
         parameterValue !== undefined ? parameterValue : property.defaultValue || ''
     );
     const [selectValue, setSelectValue] = useState(() => {
-        if (parameterValue !== undefined && parameterValue !== null) {
-            return typeof parameterValue === 'boolean' ? parameterValue.toString() : parameterValue;
+        if (parameterValue !== undefined) {
+            if (parameterValue === null) {
+                return 'null';
+            }
+
+            return String(parameterValue);
         }
 
-        return property.defaultValue !== undefined ? property.defaultValue : 'null';
+        if (property.defaultValue !== undefined) {
+            if (property.defaultValue === null) {
+                return 'null';
+            }
+
+            return String(property.defaultValue);
+        }
+
+        return 'null';
     });
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
