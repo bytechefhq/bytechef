@@ -150,8 +150,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             componentName, componentVersion, clusterElementName, componentConnection, true);
 
         Parameters inputParams = ParametersFactory.create(inputParameters);
-        Parameters connectionParams = ParametersFactory.create(
-            componentConnection == null ? Map.of() : componentConnection.parameters());
+        Parameters connectionParams = ParametersFactory.create(componentConnection);
 
         try {
             BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
@@ -350,8 +349,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         @Nullable ComponentConnection componentConnection) {
 
         return new ConvertResult(
-            ParametersFactory.create(inputParameters),
-            ParametersFactory.create(componentConnection == null ? Map.of() : componentConnection.parameters()),
+            ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection),
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
@@ -441,8 +439,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             componentName, componentVersion, clusterElementName);
 
         Parameters inputParameters = ParametersFactory.create(inputParameterMap);
-        Parameters connectionParameters = ParametersFactory.create(
-            componentConnection == null ? Map.of() : componentConnection.getParameters());
+        Parameters connectionParameters = ParametersFactory.create(componentConnection);
 
         try {
             if (clusterElement instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
