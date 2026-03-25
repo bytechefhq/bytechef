@@ -32,6 +32,8 @@ public class BrevoConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.brevo.com/v3")
+        .help("", "https://docs.bytechef.io/reference/components/brevo_v1#connection-setup")
+        .version(1)
         .authorizations(
             authorization(AuthorizationType.API_KEY)
                 .title("API Key")

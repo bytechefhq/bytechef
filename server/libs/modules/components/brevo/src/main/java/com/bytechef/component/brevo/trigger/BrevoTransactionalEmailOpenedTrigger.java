@@ -41,6 +41,7 @@ public class BrevoTransactionalEmailOpenedTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("transactionalEmailOpened")
         .title("Transactional Email Opened")
         .description("Triggers when transactional email is opened.")
+        .help("", "https://docs.bytechef.io/reference/components/brevo_v1#transactional-email-opened")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output()
         .webhookEnable(BrevoTransactionalEmailOpenedTrigger::webhookEnable)
