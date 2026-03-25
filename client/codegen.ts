@@ -44,6 +44,7 @@ const config: CodegenConfig = {
         '../server/ee/libs/embedded/embedded-configuration/embedded-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/embedded/embedded-connected-user/embedded-connected-user-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/embedded/embedded-mcp/embedded-mcp-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/libs/ai/ai-agent/ai-agent-skill/ai-agent-skill-graphql/src/main/resources/graphql/**/*.graphqls',
     ],
 };
 
