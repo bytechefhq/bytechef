@@ -219,9 +219,13 @@ export const useProperty = ({
     const [propertyParameterValue, setPropertyParameterValue] = useState(() =>
         parameterValue !== undefined ? parameterValue : property.defaultValue || ''
     );
-    const [selectValue, setSelectValue] = useState(
-        property.defaultValue !== undefined ? property.defaultValue : 'null'
-    );
+    const [selectValue, setSelectValue] = useState(() => {
+        if (parameterValue !== undefined && parameterValue !== null) {
+            return typeof parameterValue === 'boolean' ? parameterValue.toString() : parameterValue;
+        }
+
+        return property.defaultValue !== undefined ? property.defaultValue : 'null';
+    });
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
     );
@@ -1546,7 +1550,7 @@ export const useProperty = ({
         const valueFromWorkflowDefinition = resolvePath(encodedParameters, encodedPath);
 
         const nextParameterValue =
-            parameterValueRef.current !== undefined ? parameterValueRef.current : valueFromWorkflowDefinition;
+            valueFromWorkflowDefinition !== undefined ? valueFromWorkflowDefinition : parameterValueRef.current;
 
         setPropertyParameterValue(nextParameterValue);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- sync when workflow JSON changes; read latest parameterValue via ref
