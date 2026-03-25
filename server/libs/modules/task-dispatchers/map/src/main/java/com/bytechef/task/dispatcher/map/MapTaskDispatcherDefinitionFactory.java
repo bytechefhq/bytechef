@@ -33,14 +33,15 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;
 
@@ -49,6 +50,8 @@ import tools.jackson.core.type.TypeReference;
  */
 @Component
 public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
+
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(MapTaskDispatcherDefinitionFactory.class);
 
     private final TaskDispatcherDefinition taskDispatcherDefinition;
 
@@ -79,7 +82,7 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
         long environmentId = MapUtils.getLong(inputParameters, ENVIRONMENT_ID, 0L);
 
         List<Map<String, ?>> iterateeTasks = MapUtils.getList(
-            inputParameters, ITERATEE, new TypeReference<Map<String, ?>>() {}, List.of());
+            inputParameters, ITERATEE, new TypeReference<>() {}, List.of());
 
         if (iterateeTasks.isEmpty()) {
             return null;
@@ -101,8 +104,7 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
             return null;
         }
 
-        ModifiableValueProperty<?, ?> lastTaskSchema =
-            (ModifiableValueProperty<?, ?>) lastTaskOutput.getOutputSchema();
+        ModifiableValueProperty<?, ?> lastTaskSchema = (ModifiableValueProperty<?, ?>) lastTaskOutput.getOutputSchema();
 
         Object lastTaskSampleOutput = lastTaskOutput.getSampleOutput();
 
@@ -114,20 +116,34 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
     }
 
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
-        ObjectProperty variableProperties;
+        OutputResponse outputResponse;
+        List<?> list = List.of();
 
-        List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
-
-        if (list.isEmpty()) {
-            variableProperties = object();
-        } else {
-            ModifiableValueProperty<?, ?> outputSchema = (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                ITEM, list.getFirst(), PropertyFactory.PROPERTY_FACTORY);
-
-            variableProperties = object()
-                .properties(outputSchema, integer(INDEX));
+        if (MapUtils.containsKey(inputParameters, ITEMS)) {
+            // TODO Remove once UI suppress executing outputs if previous nodes don't have defined output
+            try {
+                list = MapUtils.getList(inputParameters, ITEMS, List.of());
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(e.getMessage());
+                }
+            }
         }
 
-        return OutputResponse.of(variableProperties);
+        boolean allNull = list.isEmpty() || list.stream()
+            .allMatch(Objects::isNull);
+
+        if (allNull) {
+            outputResponse = OutputResponse.of(
+                object().properties(object(ITEM), integer(INDEX)), Map.of(ITEM, Map.of(), INDEX, 0));
+        } else {
+            ModifiableValueProperty<?, ?> itemProperty = (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
+                ITEM, list.getFirst(), PropertyFactory.PROPERTY_FACTORY);
+
+            outputResponse = OutputResponse.of(
+                object().properties(itemProperty, integer(INDEX)), Map.of(ITEM, list.getFirst(), INDEX, 0));
+        }
+
+        return outputResponse;
     }
 }
