@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -142,6 +143,11 @@ public class JobFacadeImpl implements JobFacade {
     @Override
     public void resumeJob(long id) {
         eventPublisher.publishEvent(new ResumeJobEvent(id));
+    }
+
+    @Override
+    public void resumeJob(long id, @Nullable Map<String, ?> data) {
+        eventPublisher.publishEvent(new ResumeJobEvent(id, data));
     }
 
     @Override

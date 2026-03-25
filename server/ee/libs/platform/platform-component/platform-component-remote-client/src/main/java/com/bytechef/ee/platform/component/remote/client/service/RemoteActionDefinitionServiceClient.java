@@ -74,7 +74,8 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, @Nullable Long taskExecutionId, String workflowId, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
-        boolean editorEnvironment, PlatformType type, Map<String, ?> continueParameters, Instant suspendExpiresAt) {
+        boolean editorEnvironment, PlatformType type, Map<String, ?> continueParameters,
+        Map<String, ?> resumeData, Instant suspendExpiresAt) {
 
         throw new UnsupportedOperationException();
     }

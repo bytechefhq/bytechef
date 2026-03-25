@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.time.Instant;
@@ -96,18 +97,21 @@ public class WaitAfterTimeIntervalActionTest {
         ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
             .orElseThrow();
 
-        Object result = resumePerformFunction.apply(
-            inputParameters, connectionParameters, continueParameters, context);
+        Parameters data = Mockito.mock(Parameters.class);
+
+        ResumeResponse result = resumePerformFunction.apply(
+            inputParameters, connectionParameters, continueParameters, data, context);
 
         Assertions.assertNotNull(result);
-        Assertions.assertTrue(result instanceof Map);
+        Assertions.assertTrue(result.containsKey(ResumeResponse.DATA));
+        Assertions.assertTrue(result.containsKey(ResumeResponse.RESUMED));
+        Assertions.assertEquals(true, result.get(ResumeResponse.RESUMED));
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> resultMap = (Map<String, Object>) result;
+        Map<String, Object> dataMap = (Map<String, Object>) result.get(ResumeResponse.DATA);
 
-        Assertions.assertTrue(resultMap.containsKey("scheduledAt"));
-        Assertions.assertTrue(resultMap.get("scheduledAt") instanceof Instant);
-        Assertions.assertEquals(5, resultMap.get("amount"));
-        Assertions.assertEquals("MINUTES", resultMap.get("unit"));
+        Assertions.assertTrue(dataMap.containsKey("scheduledAt"));
+        Assertions.assertEquals(5, dataMap.get("amount"));
+        Assertions.assertEquals("MINUTES", dataMap.get("unit"));
     }
 }

@@ -140,7 +140,9 @@ public class WorkflowTestConfiguration {
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(
                     evaluator),
-                List.of(new TestTaskDispatcherPreSendProcessor(jobService, workflowTestConfigurationService)),
+                List.of(
+                    new TestTaskDispatcherPreSendProcessor(
+                        jobService, workflowNodeOutputFacade, workflowTestConfigurationService)),
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, coordinatorEventPublisher, jobService,
                     subflowResolver, taskExecutionService, taskFileStorage, workflowService),

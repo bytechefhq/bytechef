@@ -44,6 +44,6 @@ public class ActionFacadeImpl implements ActionFacade {
         return actionDefinitionFacade.executePerform(
             componentName, componentVersion, actionName, null, null, null, null, null, inputParameters,
             connectionId == null ? Map.of() : Map.of(componentName, connectionId), Map.of(), null, null, false,
-            null, null);
+            null, null, null);
     }
 }

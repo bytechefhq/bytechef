@@ -17,6 +17,7 @@
 package com.bytechef.component.wait.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -28,8 +29,10 @@ import static com.bytechef.component.wait.constant.WaitConstants.UNIT;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -40,6 +43,10 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public class WaitAfterTimeIntervalAction {
+
+    private static final String EXPIRES_AT = "expiresAt";
+    private static final String MINUTES = "MINUTES";
+    private static final String SCHEDULED_AT = "scheduledAt";
 
     public static ModifiableActionDefinition of() {
         WaitAfterTimeIntervalAction waitAfterTimeIntervalAction = new WaitAfterTimeIntervalAction();
@@ -57,24 +64,41 @@ public class WaitAfterTimeIntervalAction {
                     .label("Unit")
                     .description("The unit of time.")
                     .required(true)
-                    .defaultValue("MINUTES")
+                    .defaultValue(MINUTES)
                     .options(
                         option("Seconds", "SECONDS"),
-                        option("Minutes", "MINUTES"),
+                        option("Minutes", MINUTES),
                         option("Hours", "HOURS"),
                         option("Days", "DAYS")))
             .output(
                 outputSchema(
                     object()
                         .properties(
-                            integer(AMOUNT)
-                                .description("The amount of time that was waited."),
-                            dateTime("scheduledAt")
-                                .description("The date and time at which the workflow was scheduled to resume."),
-                            string(UNIT)
-                                .description("The unit of time that was waited."))))
+                            object(ResumeResponse.DATA)
+                                .properties(
+                                    dateTime(SCHEDULED_AT)
+                                        .description(
+                                            "The date and time at which the workflow was scheduled to resume."),
+                                    integer(AMOUNT)
+                                        .description("The amount of time that was waited."),
+                                    string(UNIT)
+                                        .description("The unit of time that was waited.")),
+                            bool(ResumeResponse.RESUMED)
+                                .description("Whether the workflow was resumed by a webhook call."))))
+            .output(waitAfterTimeIntervalAction::output)
             .perform(waitAfterTimeIntervalAction::perform)
             .resumePerform(waitAfterTimeIntervalAction::resumePerform);
+    }
+
+    protected OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return OutputResponse.of(
+            ResumeResponse.of(
+                Map.of(
+                    SCHEDULED_AT, LocalDateTime.now(),
+                    AMOUNT, inputParameters.getInteger(AMOUNT, 1),
+                    UNIT, inputParameters.getString(UNIT, MINUTES))));
     }
 
     protected Object perform(
@@ -83,28 +107,27 @@ public class WaitAfterTimeIntervalAction {
         int amount = inputParameters.getRequiredInteger(AMOUNT);
         String unit = inputParameters.getRequiredString(UNIT);
 
-        ChronoUnit chronoUnit = ChronoUnit.valueOf(unit);
+        Instant now = Instant.now();
 
-        Instant expiresAt = Instant.now()
-            .plus(amount, chronoUnit);
+        Instant expiresAt = now.plus(amount, ChronoUnit.valueOf(unit));
 
-        context.suspend(
-            new Suspend(Map.of("expiresAt", expiresAt.toEpochMilli(), "amount", amount, "unit", unit), expiresAt));
+        context.suspend(new Suspend(Map.of(EXPIRES_AT, expiresAt.toEpochMilli()), expiresAt));
 
         return null;
     }
 
-    protected Object resumePerform(
-        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters,
+    protected ResumeResponse resumePerform(
+        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
         ActionContext context) {
 
-        long expiresAtMillis = continueParameters.getLong("expiresAt");
+        long expiresAtMillis = continueParameters.getLong(EXPIRES_AT, System.currentTimeMillis());
 
         LocalDateTime scheduledAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiresAtMillis), ZoneOffset.UTC);
 
-        int amount = continueParameters.getInteger("amount");
-        String unit = continueParameters.getString("unit");
-
-        return Map.of("scheduledAt", scheduledAt, "amount", amount, "unit", unit);
+        return ResumeResponse.of(
+            Map.of(
+                SCHEDULED_AT, scheduledAt,
+                AMOUNT, inputParameters.getRequiredInteger(AMOUNT),
+                UNIT, inputParameters.getRequiredString(UNIT)));
     }
 }

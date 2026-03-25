@@ -124,7 +124,7 @@ public interface ActionDefinitionService extends OperationDefinitionService {
         Long jobId, @Nullable Long taskExecutionId, String workflowId, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
         boolean editorEnvironment, PlatformType type, @Nullable Map<String, ?> continueParameters,
-        @Nullable Instant suspendExpiresAt);
+        @Nullable Map<String, ?> resumeData, @Nullable Instant suspendExpiresAt);
 
     /**
      * Executes the perform logic for a specific component and its version in the context of polyglot execution. This

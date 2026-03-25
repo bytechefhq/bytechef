@@ -91,7 +91,6 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     private TaskExecution preProcess(TaskExecution taskExecution) {
         for (TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
             if (taskDispatcherPreSendProcessor.canProcess(taskExecution)) {
-
                 taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
 
                 if (taskExecution.getStatus() == TaskExecution.Status.CANCELLED) {

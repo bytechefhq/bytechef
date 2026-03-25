@@ -50,5 +50,5 @@ public interface ActionDefinitionFacade {
         @Nullable String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
         Map<String, ?> extensions, @Nullable Long environmentId, @Nullable PlatformType type,
         boolean editorEnvironment, @Nullable Map<String, ?> continueParameters,
-        @Nullable Instant suspendExpiresAt);
+        @Nullable Map<String, ?> resumeData, @Nullable Instant suspendExpiresAt);
 }

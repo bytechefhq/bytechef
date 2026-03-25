@@ -114,6 +114,6 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
         return actionDefinitionFacade.executePerform(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null,
             null, workflowId, evaluatedParameters, connectionIds, evaluatedExtensions, environmentId, null,
-            true, null, null);
+            true, null, null, null);
     }
 }

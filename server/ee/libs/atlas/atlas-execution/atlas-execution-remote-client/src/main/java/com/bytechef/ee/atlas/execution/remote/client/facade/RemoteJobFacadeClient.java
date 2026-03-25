@@ -11,6 +11,8 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,6 +52,11 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void resumeJob(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void resumeJob(long id, @Nullable Map<String, ?> data) {
         throw new UnsupportedOperationException();
     }
 

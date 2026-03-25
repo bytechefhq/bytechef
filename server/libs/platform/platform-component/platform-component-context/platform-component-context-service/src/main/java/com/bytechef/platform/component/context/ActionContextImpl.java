@@ -28,6 +28,7 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.ApprovalId;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
@@ -56,6 +57,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable Long jobPrincipalWorkflowId;
     private final @Nullable Long jobId;
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
+    private @Nullable String jobResumeId;
     private @Nullable Suspend suspend;
     private final @Nullable PlatformType type;
     private final @Nullable String publicUrl;
@@ -261,6 +263,26 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Override
     public String getActionName() {
         return actionName;
+    }
+
+    @Override
+    @Nullable
+    public String generateResumeUrl() {
+        if (publicUrl == null || jobId == null) {
+            return null;
+        }
+
+        JobResumeId jobResumeId = JobResumeId.of(jobId, true);
+
+        this.jobResumeId = jobResumeId.toString();
+
+        return publicUrl + "/api/job/resume/" + this.jobResumeId;
+    }
+
+    @Override
+    @Nullable
+    public String getJobResumeId() {
+        return jobResumeId;
     }
 
     @Override

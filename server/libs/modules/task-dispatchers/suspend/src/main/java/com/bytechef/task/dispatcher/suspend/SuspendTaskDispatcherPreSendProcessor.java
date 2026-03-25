@@ -73,6 +73,12 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
 
         Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
 
+        Object resumeData = jobMetadata.remove(MetadataConstants.RESUME_DATA);
+
+        if (resumeData != null) {
+            taskExecution.putMetadata(MetadataConstants.RESUME_DATA, resumeData);
+        }
+
         jobMetadata.remove(MetadataConstants.JOB_RESUME_ID);
 
         job.setMetadata(jobMetadata);
