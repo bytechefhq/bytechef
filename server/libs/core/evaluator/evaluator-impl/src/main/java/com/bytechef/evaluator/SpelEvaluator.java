@@ -150,12 +150,12 @@ public class SpelEvaluator implements Evaluator {
         methodExecutorMap = Collections.unmodifiableMap(map);
     }
 
-    public Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context) {
+    public Map<String, @Nullable Object> evaluate(Map<String, ?> map, Map<String, ?> context) {
         return evaluateInternal(map, context, false);
     }
 
     @Override
-    public Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
+    public Map<String, @Nullable Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
         return evaluateInternal(map, context, lenient);
     }
 
@@ -273,7 +273,7 @@ public class SpelEvaluator implements Evaluator {
                 }
             }
         } else if (value instanceof List<?> list) {
-            List<Object> evaluatedlist = new ArrayList<>();
+            List<@Nullable Object> evaluatedlist = new ArrayList<>();
 
             for (Object item : list) {
                 evaluatedlist.add(evaluate(item, context, lenient));
@@ -287,8 +287,8 @@ public class SpelEvaluator implements Evaluator {
         return value;
     }
 
-    private Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, ?> context, boolean lenient) {
-        Map<String, Object> newMap = new LinkedHashMap<>();
+    private Map<String, @Nullable Object> evaluateInternal(Map<?, ?> map, Map<String, ?> context, boolean lenient) {
+        Map<String, @Nullable Object> newMap = new LinkedHashMap<>();
 
         for (Entry<?, ?> entry : map.entrySet()) {
             newMap.put((String) entry.getKey(), evaluate(entry.getValue(), context, lenient));
