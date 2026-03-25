@@ -18,18 +18,24 @@ package com.bytechef.component.brevo.trigger;
 
 import static com.bytechef.component.brevo.constant.BrevoConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -42,28 +48,34 @@ import org.mockito.ArgumentCaptor;
  */
 class BrevoTransactionalEmailOpenedTriggerTest {
 
-    private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
-    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
-    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "id"));
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Object mockedObject = mock(Object.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Executor mockedExecutor = mock(Executor.class);
+    private final Response mockedResponse = mock(Response.class);
+    private final Http mockedHttp = mock(Http.class);
+    private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
 
     @Test
     void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
-        String workflowExecutionId = "testWorkflowExecutionId";
 
-        when(mockedTriggerContext.http(any()))
+        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -71,15 +83,53 @@ class BrevoTransactionalEmailOpenedTriggerTest {
             .thenReturn(Map.of(ID, "123"));
 
         WebhookEnableOutput webhookEnableOutput = BrevoTransactionalEmailOpenedTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            null, null, webhookUrl, null, mockedTriggerContext);
 
-        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
+        WebhookEnableOutput expectedWebhookEnableOutput =
+            new WebhookEnableOutput(Map.of(ID, "123"), null);
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/webhooks", stringArgumentCaptor.getValue());
+
+        Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("url", webhookUrl, "events", List.of("opened")), body.getContent());
+    }
+
+    @Test
+    void testWebhookDisable() {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, 123));
+
+        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+
+        BrevoTransactionalEmailOpenedTrigger.webhookDisable(
+            null, null, mockedParameters, null, mockedTriggerContext);
+
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+        assertEquals("/webhooks/123", stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -88,8 +138,8 @@ class BrevoTransactionalEmailOpenedTriggerTest {
             .thenReturn(mockedObject);
 
         Object result = BrevoTransactionalEmailOpenedTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            null, null, null, null, mockedWebhookBody,
+            null, null, null);
 
         assertEquals(mockedObject, result);
     }
