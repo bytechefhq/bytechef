@@ -78,12 +78,12 @@ export default function useAgentSkillDetail() {
     const {closeSkillDetail, selectedSkillId} = useAiAgentSkillsStore();
 
     const {data: skillData, isError: isSkillError} = useAgentSkillQuery(
-        {id: selectedSkillId!},
+        {id: selectedSkillId ?? ''},
         {enabled: !!selectedSkillId}
     );
 
     const {data: filePathsData, isError: isFilePathsError} = useAgentSkillFilePathsQuery(
-        {id: selectedSkillId!},
+        {id: selectedSkillId ?? ''},
         {enabled: !!selectedSkillId}
     );
 
@@ -92,7 +92,7 @@ export default function useAgentSkillDetail() {
         isError: isFileContentError,
         isLoading: isFileContentLoading,
     } = useAgentSkillFileContentQuery(
-        {id: selectedSkillId!, path: selectedFilePath!},
+        {id: selectedSkillId ?? '', path: selectedFilePath ?? ''},
         {enabled: !!selectedSkillId && !!selectedFilePath}
     );
 

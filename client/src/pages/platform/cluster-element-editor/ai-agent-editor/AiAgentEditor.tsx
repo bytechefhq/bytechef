@@ -9,6 +9,7 @@ import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Suspense, lazy} from 'react';
 import {twMerge} from 'tailwind-merge';
 

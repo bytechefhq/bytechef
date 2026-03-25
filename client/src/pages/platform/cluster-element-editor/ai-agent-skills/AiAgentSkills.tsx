@@ -8,7 +8,7 @@ import useAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-ski
 import {AlertTriangleIcon, Loader2Icon} from 'lucide-react';
 
 const AiAgentSkills = () => {
-    const {currentView, isError, isLoading, skills} = useAgentSkills();
+    const {isError, isLoading, skills, skillsView: currentView} = useAgentSkills();
 
     if (isLoading) {
         return (
