@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
+package com.bytechef.component.ai.agent.utils.cluster;
 
 import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction.CLAUDE_CODE_TOOLS;
 
@@ -23,43 +23,35 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
-import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.SmartWebFetchTool;
-import org.springframework.ai.chat.client.ChatClient;
+import org.springaicommunity.agent.tools.GlobTool;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides AI-powered web content fetching and summarization with caching.
+ * Provides fast file pattern matching for finding files by name patterns with glob syntax.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsSmartWebFetchTool {
+public class AgentUtilsGlobTool {
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("smartWebFetchTool")
-            .title("Smart Web Fetch Tool")
-            .description("AI-powered web content summarization with caching.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("globTool")
+            .title("Glob Tool")
+            .description("Fast file pattern matching tool for finding files by name patterns with glob syntax.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsSmartWebFetchTool::apply);
+            .object(() -> AgentUtilsGlobTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        if (chatModel == null) {
-            return ToolCallbackProvider.from(List.of());
-        }
-
-        ChatClient chatClient = ChatClient.builder(chatModel)
+        GlobTool globTool = GlobTool.builder()
+            .workingDirectory(workingDirectory)
             .build();
 
-        SmartWebFetchTool smartWebFetchTool = SmartWebFetchTool.builder(chatClient)
-            .build();
-
-        return ToolCallbackProvider.from(ToolCallbacks.from(smartWebFetchTool));
+        return ToolCallbackProvider.from(ToolCallbacks.from(globTool));
     }
 }

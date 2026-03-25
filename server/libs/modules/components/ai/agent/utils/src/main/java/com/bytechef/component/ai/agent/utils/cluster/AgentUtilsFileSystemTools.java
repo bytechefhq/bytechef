@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
+package com.bytechef.component.ai.agent.utils.cluster;
 
 import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction.CLAUDE_CODE_TOOLS;
 

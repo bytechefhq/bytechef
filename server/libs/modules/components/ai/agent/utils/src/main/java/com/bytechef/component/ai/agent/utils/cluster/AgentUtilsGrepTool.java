@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
+package com.bytechef.component.ai.agent.utils.cluster;
 
 import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction.CLAUDE_CODE_TOOLS;
 
@@ -24,33 +24,35 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.TodoWriteTool;
+import org.springaicommunity.agent.tools.GrepTool;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides structured task management with state tracking for the AI agent.
+ * Provides a pure Java grep implementation for code search with regex, glob filtering, and multiple output modes.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsTodoWriteTool {
+public class AgentUtilsGrepTool {
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("todoWriteTool")
-            .title("Todo Write Tool")
-            .description("Structured task management with state tracking.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("grepTool")
+            .title("Grep Tool")
+            .description("Pure Java grep implementation for code search with regex, glob filtering, "
+                + "and multiple output modes.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsTodoWriteTool::apply);
+            .object(() -> AgentUtilsGrepTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        TodoWriteTool todoWriteTool = TodoWriteTool.builder()
+        GrepTool grepTool = GrepTool.builder()
+            .workingDirectory(workingDirectory)
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(todoWriteTool));
+        return ToolCallbackProvider.from(ToolCallbacks.from(grepTool));
     }
 }

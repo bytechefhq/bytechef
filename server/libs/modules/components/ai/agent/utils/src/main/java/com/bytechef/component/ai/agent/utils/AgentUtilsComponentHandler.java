@@ -20,6 +20,15 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.ai.agent.skill.facade.AgentSkillFacade;
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsBraveWebSearchTool;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsFileSystemTools;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsGlobTool;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsGrepTool;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsShellTools;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsSkillsTool;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsSmartWebFetchTool;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsTaskTool;
+import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsTodoWriteTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import org.springframework.stereotype.Component;
@@ -28,11 +37,11 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component("aiAgentUtils_v1_ComponentHandler")
-public class AgentUtilsToolComponentHandler implements ComponentHandler {
+public class AgentUtilsComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
 
-    public AgentUtilsToolComponentHandler(AgentSkillFacade agentSkillFacade) {
+    public AgentUtilsComponentHandler(AgentSkillFacade agentSkillFacade) {
         AgentUtilsSkillsTool agentUtilsSkillsTool = new AgentUtilsSkillsTool(agentSkillFacade);
 
         this.componentDefinition = component("aiAgentUtils")
