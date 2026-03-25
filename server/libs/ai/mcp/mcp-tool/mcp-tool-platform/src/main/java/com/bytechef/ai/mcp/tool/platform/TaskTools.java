@@ -74,8 +74,7 @@ public class TaskTools {
         @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
-            return switch (type.toLowerCase()
-                .trim()) {
+            return switch (StringUtils.trim(type.toLowerCase())) {
                 case "action" -> {
                     if (componentName == null || StringUtils.isBlank(componentName)) {
                         throw new IllegalArgumentException("componentName is required for action type");
