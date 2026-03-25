@@ -620,6 +620,7 @@ const ConnectionDialog = ({
                                             <Properties
                                                 control={control}
                                                 formState={formState}
+                                                hideFromAi={true}
                                                 properties={authorizations[0]?.properties}
                                             />
                                         </WorkflowMockProvider>
