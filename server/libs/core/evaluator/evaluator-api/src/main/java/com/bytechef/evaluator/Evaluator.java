@@ -17,6 +17,7 @@
 package com.bytechef.evaluator;
 
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Strategy interface for evaluating a map.
@@ -32,7 +33,7 @@ public interface Evaluator {
      * @param context The context to evaluate the task against
      * @return the evaluate {@link java.util.Map}.
      */
-    Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context);
+    Map<String, @Nullable Object> evaluate(Map<String, ?> map, Map<String, ?> context);
 
     /**
      * Evaluate the {@link java.util.Map} against the provided {@link java.util.Map}.}
@@ -43,7 +44,7 @@ public interface Evaluator {
      *                {@code false} (workflow execution), invalid formula expressions throw an exception.
      * @return the evaluate {@link java.util.Map}.
      */
-    default Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
+    default Map<String, @Nullable Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
         return evaluate(map, context);
     }
 }
