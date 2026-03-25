@@ -24,6 +24,7 @@ interface PropertyDynamicPropertiesProps {
     currentOperationName?: string;
     enabled: boolean;
     formState?: FormState<FieldValues>;
+    hideFromAi?: boolean;
     lookupDependsOnPaths?: Array<unknown>;
     lookupDependsOnValues?: Array<unknown>;
     name?: string;
@@ -39,6 +40,7 @@ const PropertyDynamicProperties = ({
     currentOperationName,
     enabled,
     formState,
+    hideFromAi,
     lookupDependsOnPaths,
     lookupDependsOnValues,
     name,
@@ -285,6 +287,7 @@ const PropertyDynamicProperties = ({
                         controlPath={childControlPath}
                         dynamicPropertySource={name}
                         formState={formState}
+                        hideFromAi={hideFromAi}
                         key={`${property.name}_${index}_${lastProcessedKey}_property`}
                         objectName={control ? undefined : name}
                         operationName={currentOperationName}
