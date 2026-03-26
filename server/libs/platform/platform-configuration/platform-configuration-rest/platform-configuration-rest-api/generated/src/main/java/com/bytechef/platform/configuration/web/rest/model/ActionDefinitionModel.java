@@ -49,6 +49,8 @@ public class ActionDefinitionModel {
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
+  private @Nullable Boolean resumePerformFunctionDefined;
+
   private @Nullable Boolean sseStreamResponse;
 
   private @Nullable String title;
@@ -258,6 +260,26 @@ public class ActionDefinitionModel {
     this.properties = properties;
   }
 
+  public ActionDefinitionModel resumePerformFunctionDefined(@Nullable Boolean resumePerformFunctionDefined) {
+    this.resumePerformFunctionDefined = resumePerformFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does action define resume perform function.
+   * @return resumePerformFunctionDefined
+   */
+
+  @Schema(name = "resumePerformFunctionDefined", description = "Does action define resume perform function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("resumePerformFunctionDefined")
+  public @Nullable Boolean getResumePerformFunctionDefined() {
+    return resumePerformFunctionDefined;
+  }
+
+  public void setResumePerformFunctionDefined(@Nullable Boolean resumePerformFunctionDefined) {
+    this.resumePerformFunctionDefined = resumePerformFunctionDefined;
+  }
+
   public ActionDefinitionModel sseStreamResponse(@Nullable Boolean sseStreamResponse) {
     this.sseStreamResponse = sseStreamResponse;
     return this;
@@ -336,6 +358,7 @@ public class ActionDefinitionModel {
         Objects.equals(this.outputFunctionDefined, actionDefinition.outputFunctionDefined) &&
         Objects.equals(this.outputSchemaDefined, actionDefinition.outputSchemaDefined) &&
         Objects.equals(this.properties, actionDefinition.properties) &&
+        Objects.equals(this.resumePerformFunctionDefined, actionDefinition.resumePerformFunctionDefined) &&
         Objects.equals(this.sseStreamResponse, actionDefinition.sseStreamResponse) &&
         Objects.equals(this.title, actionDefinition.title) &&
         Objects.equals(this.workflowNodeDescriptionDefined, actionDefinition.workflowNodeDescriptionDefined);
@@ -343,7 +366,7 @@ public class ActionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, properties, sseStreamResponse, title, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, properties, resumePerformFunctionDefined, sseStreamResponse, title, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -359,6 +382,7 @@ public class ActionDefinitionModel {
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+    sb.append("    resumePerformFunctionDefined: ").append(toIndentedString(resumePerformFunctionDefined)).append("\n");
     sb.append("    sseStreamResponse: ").append(toIndentedString(sseStreamResponse)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    workflowNodeDescriptionDefined: ").append(toIndentedString(workflowNodeDescriptionDefined)).append("\n");
