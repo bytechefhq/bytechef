@@ -111,7 +111,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
             ...matchingItem,
             controlType,
             custom: true,
-            expressionEnabled: true,
+            expressionEnabled: matchingItem?.expressionEnabled ?? true,
             key: crypto.randomUUID(),
             label: `${matchingItem?.label ?? 'Item'} ${arrayItems.length.toString()}`,
             name: `${matchingItem?.label ?? name}__${arrayItems.length.toString()}`,
