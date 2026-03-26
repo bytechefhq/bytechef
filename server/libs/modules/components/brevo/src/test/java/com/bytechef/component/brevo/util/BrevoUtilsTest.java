@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -33,7 +32,6 @@ import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
@@ -52,7 +50,6 @@ class BrevoUtilsTest {
     private final List<Option<String>> expectedOptions = List.of(
         option("contact1@test.com", "contact1@test.com"),
         option("contact2@test.com", "contact2@test.com"));
-    private final Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach
@@ -76,27 +73,21 @@ class BrevoUtilsTest {
         List<Option<String>> result = BrevoUtils.getContactsOptions(
             null, null, null, null, mockedContext);
 
-        assertEquals(result, expectedOptions);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/contacts", stringArgumentCaptor.getValue());
     }
 
     @Test
     void testGetSendersOptions(
         Context mockedContext, Response mockedResponse,
-        ArgumentCaptor<Context.ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(
@@ -107,19 +98,13 @@ class BrevoUtilsTest {
         List<Option<String>> result = BrevoUtils.getSendersOptions(
             null, null, null, null, mockedContext);
 
-        assertEquals(result, expectedOptions);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/senders", stringArgumentCaptor.getValue());
     }
 }

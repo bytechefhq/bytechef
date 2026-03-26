@@ -26,28 +26,38 @@ import static com.bytechef.component.brevo.constant.BrevoConstants.SUBJECT;
 import static com.bytechef.component.brevo.constant.BrevoConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.brevo.action.BrevoSendTransactionalEmailAction.ContentType;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
-class BrevoSendTransactionalEmailActionTest extends AbstractBrevoActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class BrevoSendTransactionalEmailActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             SENDER_EMAIL, "sender@test.com",
@@ -55,36 +65,33 @@ class BrevoSendTransactionalEmailActionTest extends AbstractBrevoActionTest {
             CC, List.of("recepient1@test.com", "recepient2@test.com"),
             BCC, List.of("recepient1@test.com", "recepient2@test.com"),
             SUBJECT, "test",
-            CONTENT_TYPE, BrevoSendTransactionalEmailAction.ContentType.TEXT.name(),
+            CONTENT_TYPE, ContentType.TEXT.name(),
             CONTENT, "this is a test."));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
-        Context mockedContext, Executor mockedExecutor, Http mockedHttp,
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of());
 
         Object result = BrevoSendTransactionalEmailAction.perform(mockedParameters, null, mockedContext);
 
-        assertEquals(responseMap, result);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertEquals(Map.of(), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/smtp/email/", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
 
         Map<String, Object> expectedBody = Map.of(
             "sender", Map.of(EMAIL, "sender@test.com"),
@@ -94,6 +101,6 @@ class BrevoSendTransactionalEmailActionTest extends AbstractBrevoActionTest {
             SUBJECT, "test",
             "textContent", "this is a test.");
 
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }
