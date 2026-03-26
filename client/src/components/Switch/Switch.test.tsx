@@ -348,6 +348,15 @@ describe('Switch - Event Handlers', () => {
 
         expect(handleChange).not.toHaveBeenCalled();
     });
+
+    it('should toggle switch when label text is clicked', () => {
+        const handleChange = vi.fn();
+        render(<Switch checked={false} label="Enable notifications" onCheckedChange={handleChange} />);
+
+        screen.getByText('Enable notifications').click();
+
+        expect(handleChange).toHaveBeenCalledWith(true);
+    });
 });
 
 describe('Switch - Combined Props', () => {

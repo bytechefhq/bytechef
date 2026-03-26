@@ -36,16 +36,17 @@ const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     small: {
-        thumbOverrides: '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3',
+        thumbOverrides:
+            '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3 [&>span]:data-[state=unchecked]:translate-x-0',
         track: 'h-[14px] w-[26px] px-[1px] rounded-[7px] border-0',
     },
 };
 
 const wrapperStyles: Record<VariantType, string> = {
-    default: 'flex w-[228px] items-start gap-2',
+    default: 'flex w-fit items-start gap-2 cursor-pointer',
     // eslint-disable-next-line sort-keys
-    box: 'flex w-fit items-start gap-2 rounded-lg border border-stroke-neutral-secondary p-3',
-    small: 'flex w-fit max-w-[200px] items-center gap-1',
+    box: 'flex w-fit items-start gap-2 rounded-lg border border-stroke-neutral-secondary p-3 cursor-pointer',
+    small: 'flex w-fit max-w-[200px] items-center gap-1 cursor-pointer',
 };
 
 interface TextBlockProps {
@@ -129,7 +130,7 @@ const Switch = forwardRef<ComponentRef<typeof ShadcnSwitch>, SwitchPropsType>(
 
         if (isBoxVariant) {
             return (
-                <div className={wrapperClasses} data-testid="switch-wrapper">
+                <label className={wrapperClasses} data-testid="switch-wrapper">
                     {alignment === 'start' ? (
                         <>
                             {switchElement}
@@ -141,20 +142,20 @@ const Switch = forwardRef<ComponentRef<typeof ShadcnSwitch>, SwitchPropsType>(
                             {switchElement}
                         </>
                     )}
-                </div>
+                </label>
             );
         }
 
         const contentClasses = twMerge('flex items-start gap-2', alignment === 'start' && 'flex-row-reverse');
 
         return (
-            <div className={wrapperClasses} data-testid="switch-wrapper">
+            <label className={wrapperClasses} data-testid="switch-wrapper">
                 <div className={contentClasses}>
                     <TextBlock description={description} label={label} variant={variant} />
 
                     {switchElement}
                 </div>
-            </div>
+            </label>
         );
     }
 );
