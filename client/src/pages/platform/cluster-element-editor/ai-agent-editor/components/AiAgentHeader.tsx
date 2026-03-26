@@ -1,12 +1,13 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {LayoutGridIcon, SparklesIcon, XIcon, ZapIcon} from 'lucide-react';
+import {FlaskConicalIcon, LayoutGridIcon, SparklesIcon, XIcon, ZapIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 interface AiAgentHeaderProps {
     copilotEnabled?: boolean;
     onClose?: () => void;
     onCopilotClick?: () => void;
+    onEvalsClick?: () => void;
     onSkillsClick?: () => void;
     onToggleEditor?: (showAiAgent: boolean) => void;
     skillsPanelOpen?: boolean;
@@ -18,6 +19,7 @@ export default function AiAgentHeader({
     copilotEnabled,
     onClose,
     onCopilotClick,
+    onEvalsClick,
     onSkillsClick,
     onToggleEditor,
     skillsPanelOpen,
@@ -65,6 +67,22 @@ export default function AiAgentHeader({
                         </TooltipTrigger>
 
                         <TooltipContent>Agent Skills</TooltipContent>
+                    </Tooltip>
+                )}
+
+                {onEvalsClick && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                className="[&_svg]:size-5"
+                                icon={<FlaskConicalIcon />}
+                                onClick={onEvalsClick}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Agent Evals</TooltipContent>
                     </Tooltip>
                 )}
 

@@ -2,6 +2,9 @@ import AiAgentHeader from '@/pages/platform/cluster-element-editor/ai-agent-edit
 import {AiAgentConfigurationPanel} from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/AiAgentConfigurationPanel';
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
 import useAiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/hooks/useAiAgentEditor';
+import AiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals';
+import useAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvals';
+import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import AiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/AiAgentSkills';
 import useAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkills';
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
@@ -34,19 +37,39 @@ export default function AiAgentEditor({
     previousComponentDefinitions,
     workflowNodeOutputs,
 }: AiAgentEditorProps) {
+    const {evalsPanelOpen, setEvalsPanelOpen} = useAiAgentEvalsStore();
     const {setSkillsPanelOpen, skillsHeaderInfo, skillsPanelOpen} = useAiAgentSkillsStore();
 
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
     const ff_4545 = useFeatureFlagsStore()('ff-4545');
+    const ff_4553 = useFeatureFlagsStore()('ff-4553');
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
+    const ff_4572 = useFeatureFlagsStore()('ff-4572');
 
     const {handleNodeDetailsPanelClose, showNodeDetailsPanel, updateWorkflowMutation} = useAiAgentEditor({
         previousComponentDefinitions,
         workflowNodeOutputs,
     });
-
+    const {handleClose: handleEvalsClose} = useAgentEvals();
     const {handleClose: handleSkillsClose} = useAgentSkills({enabled: skillsPanelOpen});
+
+    if (evalsPanelOpen) {
+        return (
+            <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
+                <AiAgentHeader
+                    copilotEnabled={ff_4572 && copilotEnabled}
+                    onClose={handleEvalsClose}
+                    onCopilotClick={onCopilotClick}
+                    title="Evals"
+                />
+
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                    <AiAgentEvals />
+                </div>
+            </div>
+        );
+    }
 
     if (skillsPanelOpen) {
         return (
@@ -72,16 +95,17 @@ export default function AiAgentEditor({
                 copilotEnabled={copilotEnabled}
                 onClose={onClose}
                 onCopilotClick={onCopilotClick}
+                onEvalsClick={ff_4553 ? () => setEvalsPanelOpen(true) : undefined}
                 onSkillsClick={ff_4545 ? () => setSkillsPanelOpen(true) : undefined}
                 onToggleEditor={onToggleEditor}
             />
 
-            <div className="grid min-h-0 flex-1 grid-cols-2 gap-6 overflow-hidden px-4">
-                <div className="overflow-y-auto">
+            <div className="grid min-h-0 flex-1 grid-cols-2 gap-6 overflow-hidden px-4 pt-4">
+                <div className="min-h-0 overflow-y-auto">
                     <AiAgentConfigurationPanel />
                 </div>
 
-                <div className="relative mb-4">
+                <div className="relative mb-4 min-h-0">
                     <div className="size-full overflow-hidden">
                         <AiAgentTestingPanel />
                     </div>

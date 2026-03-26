@@ -2,6 +2,9 @@ import Button from '@/components/Button/Button';
 import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import AiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/AiAgentEditor';
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
+import AiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals';
+import useAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvals';
+import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import AiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/AiAgentSkills';
 import useAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkills';
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
@@ -43,7 +46,8 @@ const ClusterElementsCanvasDialog = ({
     const [shouldRenderDataPillPanel, setShouldRenderDataPillPanel] = useState(false);
     const [isDataPillPanelVisible, setIsDataPillPanelVisible] = useState(false);
 
-    const {setSkillsPanelOpen, skillsHeaderInfo, skillsPanelOpen} = useAiAgentSkillsStore();
+    const {evalsPanelOpen, setEvalsPanelOpen} = useAiAgentEvalsStore();
+    const {setSkillsPanelOpen, skillsHeaderInfo, skillsPanelOpen, skillsView} = useAiAgentSkillsStore();
     const {copilotPanelOpen, showAiAgentEditor, showDataStreamEditor, testingPanelOpen} =
         useClusterElementsCanvasDialogStore(
             useShallow((state) => ({
@@ -59,6 +63,7 @@ const ClusterElementsCanvasDialog = ({
     );
     const ff_4070 = useFeatureFlagsStore()('ff-4070');
 
+    const {handleClose: handleEvalsClose} = useAgentEvals();
     const {handleClose: handleSkillsClose} = useAgentSkills({enabled: skillsPanelOpen});
     const {
         copilotEnabled,
@@ -182,6 +187,7 @@ const ClusterElementsCanvasDialog = ({
                             <ClusterElementsWorkflowEditorHeader
                                 copilotEnabled={ff_4070 && copilotEnabled}
                                 onCopilotClick={handleCopilotClick}
+                                onEvalsClick={isAiAgentClusterRoot ? () => setEvalsPanelOpen(true) : undefined}
                                 onSkillsClick={isAiAgentClusterRoot ? () => setSkillsPanelOpen(true) : undefined}
                                 onTestClick={handleTestClick}
                                 onToggleEditor={handleToggleEditor}
@@ -237,9 +243,10 @@ const ClusterElementsCanvasDialog = ({
                         {testingPanelOpen && (
                             <div
                                 className={twMerge(
-                                    'absolute inset-y-0 right-0 z-0 w-[800px] overflow-hidden border-l border-r bg-background transition-[right] duration-300 ease-in-out',
+                                    'absolute inset-y-0 right-0 z-10 w-[800px] overflow-hidden border-l border-r bg-background transition-[right] duration-300 ease-in-out',
                                     workflowNodeDetailsPanelOpen && !copilotPanelOpen && 'right-[465px]',
-                                    copilotPanelOpen && 'right-[450px] z-10'
+                                    copilotPanelOpen && !workflowNodeDetailsPanelOpen && 'right-[450px]',
+                                    copilotPanelOpen && workflowNodeDetailsPanelOpen && 'right-[915px]'
                                 )}
                             >
                                 <AiAgentTestingPanel
@@ -250,9 +257,34 @@ const ClusterElementsCanvasDialog = ({
                             </div>
                         )}
 
+                        {evalsPanelOpen && (
+                            <div className="absolute inset-0 z-20 flex flex-col overflow-y-auto rounded-lg bg-white">
+                                <div className="flex items-center justify-between border-b border-b-border/50 p-4">
+                                    <div className="text-lg font-semibold">Evals</div>
+
+                                    <Button
+                                        icon={<XIcon />}
+                                        onClick={handleEvalsClose}
+                                        size="icon"
+                                        title="Close evals"
+                                        variant="ghost"
+                                    />
+                                </div>
+
+                                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                                    <AiAgentEvals />
+                                </div>
+                            </div>
+                        )}
+
                         {skillsPanelOpen && (
                             <div className="absolute inset-0 z-20 flex flex-col overflow-y-auto rounded-lg bg-white">
-                                <div className="flex items-center justify-between p-4">
+                                <div
+                                    className={twMerge(
+                                        'flex items-center justify-between p-4',
+                                        skillsView !== 'empty' && 'border-b border-b-border/50'
+                                    )}
+                                >
                                     <div>
                                         <div className="text-lg font-semibold">{skillsHeaderInfo.title}</div>
 
