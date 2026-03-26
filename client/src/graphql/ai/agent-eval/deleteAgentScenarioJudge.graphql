@@ -1,0 +1,3 @@
+mutation deleteAgentScenarioJudge($id: ID!) {
+    deleteAgentScenarioJudge(id: $id)
+}

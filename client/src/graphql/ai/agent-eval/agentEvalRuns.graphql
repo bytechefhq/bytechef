@@ -1,0 +1,13 @@
+query agentEvalRuns($agentEvalTestId: ID!, $limit: Int, $offset: Int) {
+    agentEvalRuns(agentEvalTestId: $agentEvalTestId, limit: $limit, offset: $offset) {
+        id
+        name
+        status
+        averageScore
+        totalScenarios
+        completedScenarios
+        startedDate
+        completedDate
+        createdDate
+    }
+}

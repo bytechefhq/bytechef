@@ -1,0 +1,28 @@
+query agentEvalTest($id: ID!) {
+    agentEvalTest(id: $id) {
+        id
+        name
+        description
+        scenarios {
+            id
+            name
+            type
+            userMessage
+            expectedOutput
+            personaPrompt
+            maxTurns
+            judges {
+                id
+                name
+                type
+                configuration
+                createdDate
+                lastModifiedDate
+            }
+            createdDate
+            lastModifiedDate
+        }
+        createdDate
+        lastModifiedDate
+    }
+}

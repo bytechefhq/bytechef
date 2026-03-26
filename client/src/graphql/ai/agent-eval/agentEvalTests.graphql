@@ -1,0 +1,9 @@
+query agentEvalTests($workflowId: String!, $workflowNodeName: String!) {
+    agentEvalTests(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}
