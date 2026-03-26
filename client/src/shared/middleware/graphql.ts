@@ -87,13 +87,127 @@ export type AdminUserPage = {
   totalPages: Scalars['Int']['output'];
 };
 
-export type AgentSkill = {
-  __typename?: 'AgentSkill';
-  /** Epoch milliseconds */
+export type AgentEvalResult = {
+  __typename?: 'AgentEvalResult';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  scenario: AgentEvalScenario;
+  score?: Maybe<Scalars['Float']['output']>;
+  status: AgentEvalResultStatus;
+  transcriptFile?: Maybe<Scalars['String']['output']>;
+  verdicts: Array<AgentJudgeVerdict>;
+};
+
+export enum AgentEvalResultStatus {
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Running = 'RUNNING'
+}
+
+export type AgentEvalRun = {
+  __typename?: 'AgentEvalRun';
+  averageScore?: Maybe<Scalars['Float']['output']>;
+  completedDate?: Maybe<Scalars['Long']['output']>;
+  completedScenarios: Scalars['Int']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  results: Array<AgentEvalResult>;
+  startedDate?: Maybe<Scalars['Long']['output']>;
+  status: AgentEvalRunStatus;
+  totalScenarios: Scalars['Int']['output'];
+};
+
+export enum AgentEvalRunStatus {
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Running = 'RUNNING'
+}
+
+export type AgentEvalScenario = {
+  __typename?: 'AgentEvalScenario';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  expectedOutput?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  judges: Array<AgentScenarioJudge>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  maxTurns?: Maybe<Scalars['Int']['output']>;
+  name: Scalars['String']['output'];
+  personaPrompt?: Maybe<Scalars['String']['output']>;
+  type: AgentScenarioType;
+  userMessage?: Maybe<Scalars['String']['output']>;
+};
+
+export type AgentEvalTest = {
+  __typename?: 'AgentEvalTest';
   createdDate?: Maybe<Scalars['Long']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
-  /** Epoch milliseconds */
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  scenarios: Array<AgentEvalScenario>;
+};
+
+export type AgentJudge = {
+  __typename?: 'AgentJudge';
+  configuration: Scalars['Map']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  type: AgentJudgeType;
+};
+
+export enum AgentJudgeScope {
+  Agent = 'AGENT',
+  Scenario = 'SCENARIO'
+}
+
+export enum AgentJudgeType {
+  ContainsText = 'CONTAINS_TEXT',
+  JsonSchema = 'JSON_SCHEMA',
+  LlmRule = 'LLM_RULE',
+  RegexMatch = 'REGEX_MATCH',
+  ResponseLength = 'RESPONSE_LENGTH',
+  Similarity = 'SIMILARITY'
+}
+
+export type AgentJudgeVerdict = {
+  __typename?: 'AgentJudgeVerdict';
+  explanation: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  judgeName: Scalars['String']['output'];
+  judgeScope: AgentJudgeScope;
+  judgeType: AgentJudgeType;
+  passed: Scalars['Boolean']['output'];
+  score: Scalars['Float']['output'];
+};
+
+export type AgentScenarioJudge = {
+  __typename?: 'AgentScenarioJudge';
+  configuration: Scalars['Map']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  type: AgentJudgeType;
+};
+
+export enum AgentScenarioType {
+  MultiTurn = 'MULTI_TURN',
+  SingleTurn = 'SINGLE_TURN'
+}
+
+export type AgentSkill = {
+  __typename?: 'AgentSkill';
+  /** Epoch milliseconds (UTC) */
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Epoch milliseconds (UTC) */
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
 };
@@ -1197,7 +1311,12 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
+  cancelAgentEvalRun: AgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
+  createAgentEvalScenario: AgentEvalScenario;
+  createAgentEvalTest: AgentEvalTest;
+  createAgentJudge: AgentJudge;
+  createAgentScenarioJudge: AgentScenarioJudge;
   createAgentSkill: AgentSkill;
   createAgentSkillFromInstructions: AgentSkill;
   createApiConnector: ApiConnector;
@@ -1217,7 +1336,11 @@ export type Mutation = {
   createMcpTool?: Maybe<McpTool>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
-  deleteAgentSkill?: Maybe<Scalars['Boolean']['output']>;
+  deleteAgentEvalScenario: Scalars['Boolean']['output'];
+  deleteAgentEvalTest: Scalars['Boolean']['output'];
+  deleteAgentJudge: Scalars['Boolean']['output'];
+  deleteAgentScenarioJudge: Scalars['Boolean']['output'];
+  deleteAgentSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
@@ -1262,11 +1385,16 @@ export type Mutation = {
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  startAgentEvalRun: AgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
+  updateAgentEvalScenario: AgentEvalScenario;
+  updateAgentEvalTest: AgentEvalTest;
+  updateAgentJudge: AgentJudge;
+  updateAgentScenarioJudge: AgentScenarioJudge;
   updateAgentSkill: AgentSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
@@ -1299,8 +1427,49 @@ export type MutationAddDataTableColumnArgs = {
 };
 
 
+export type MutationCancelAgentEvalRunArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationCreateAgentEvalScenarioArgs = {
+  agentEvalTestId: Scalars['ID']['input'];
+  expectedOutput?: InputMaybe<Scalars['String']['input']>;
+  maxTurns?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  personaPrompt?: InputMaybe<Scalars['String']['input']>;
+  type: AgentScenarioType;
+  userMessage?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCreateAgentEvalTestArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationCreateAgentJudgeArgs = {
+  configuration: Scalars['Map']['input'];
+  name: Scalars['String']['input'];
+  type: AgentJudgeType;
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationCreateAgentScenarioJudgeArgs = {
+  agentEvalScenarioId: Scalars['ID']['input'];
+  configuration: Scalars['Map']['input'];
+  name: Scalars['String']['input'];
+  type: AgentJudgeType;
 };
 
 
@@ -1407,6 +1576,26 @@ export type MutationCreateWorkspaceApiKeyArgs = {
 
 export type MutationCreateWorkspaceMcpServerArgs = {
   input: CreateWorkspaceMcpServerInput;
+};
+
+
+export type MutationDeleteAgentEvalScenarioArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAgentEvalTestArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAgentJudgeArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAgentScenarioJudgeArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1660,6 +1849,13 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
 };
 
 
+export type MutationStartAgentEvalRunArgs = {
+  agentEvalTestId: Scalars['ID']['input'];
+  environmentId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
+
+
 export type MutationStartDiscoverEndpointsArgs = {
   input: DiscoverEndpointsInput;
 };
@@ -1690,6 +1886,37 @@ export type MutationTestWorkflowNodeScriptArgs = {
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateAgentEvalScenarioArgs = {
+  expectedOutput?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  maxTurns?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  personaPrompt?: InputMaybe<Scalars['String']['input']>;
+  userMessage?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpdateAgentEvalTestArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpdateAgentJudgeArgs = {
+  configuration?: InputMaybe<Scalars['Map']['input']>;
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpdateAgentScenarioJudgeArgs = {
+  configuration?: InputMaybe<Scalars['Map']['input']>;
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -2070,9 +2297,14 @@ export type Query = {
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
-  agentSkill?: Maybe<AgentSkill>;
-  /** Returns the skill archive as a Base64-encoded zip file */
-  agentSkillDownload: Scalars['String']['output'];
+  agentEvalResult?: Maybe<AgentEvalResult>;
+  agentEvalResultTranscript?: Maybe<Scalars['String']['output']>;
+  agentEvalRun?: Maybe<AgentEvalRun>;
+  agentEvalRuns: Array<AgentEvalRun>;
+  agentEvalTest?: Maybe<AgentEvalTest>;
+  agentEvalTests: Array<AgentEvalTest>;
+  agentJudges: Array<AgentJudge>;
+  agentSkill: AgentSkill;
   agentSkillFileContent: Scalars['String']['output'];
   agentSkillFilePaths: Array<Scalars['String']['output']>;
   agentSkills: Array<AgentSkill>;
@@ -2209,12 +2441,46 @@ export type QueryAdminApiKeysArgs = {
 };
 
 
-export type QueryAgentSkillArgs = {
+export type QueryAgentEvalResultArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryAgentSkillDownloadArgs = {
+export type QueryAgentEvalResultTranscriptArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAgentEvalRunArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAgentEvalRunsArgs = {
+  agentEvalTestId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAgentEvalTestArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAgentEvalTestsArgs = {
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type QueryAgentJudgesArgs = {
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type QueryAgentSkillArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -3052,19 +3318,192 @@ export type WorkflowTrigger = {
   type: Scalars['String']['output'];
 };
 
+export type AgentEvalResultQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type AgentEvalResultQuery = { __typename?: 'Query', agentEvalResult?: { __typename?: 'AgentEvalResult', id: string, status: AgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, createdDate?: any | null, scenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AgentJudgeVerdict', id: string, judgeName: string, judgeType: AgentJudgeType, judgeScope: AgentJudgeScope, passed: boolean, score: number, explanation: string }> } | null };
+
+export type AgentEvalResultTranscriptQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type AgentEvalResultTranscriptQuery = { __typename?: 'Query', agentEvalResultTranscript?: string | null };
+
+export type AgentEvalRunQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type AgentEvalRunQuery = { __typename?: 'Query', agentEvalRun?: { __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null, results: Array<{ __typename?: 'AgentEvalResult', id: string, status: AgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, createdDate?: any | null, scenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AgentJudgeVerdict', id: string, judgeName: string, judgeType: AgentJudgeType, judgeScope: AgentJudgeScope, passed: boolean, score: number, explanation: string }> }> } | null };
+
+export type AgentEvalRunsQueryVariables = Exact<{
+  agentEvalTestId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type AgentEvalRunsQuery = { __typename?: 'Query', agentEvalRuns: Array<{ __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null }> };
+
+export type AgentEvalTestQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type AgentEvalTestQuery = { __typename?: 'Query', agentEvalTest?: { __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }> } | null };
+
+export type AgentEvalTestsQueryVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+}>;
+
+
+export type AgentEvalTestsQuery = { __typename?: 'Query', agentEvalTests: Array<{ __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null }> };
+
+export type AgentJudgesQueryVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+}>;
+
+
+export type AgentJudgesQuery = { __typename?: 'Query', agentJudges: Array<{ __typename?: 'AgentJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> };
+
+export type CancelAgentEvalRunMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CancelAgentEvalRunMutation = { __typename?: 'Mutation', cancelAgentEvalRun: { __typename?: 'AgentEvalRun', id: string, status: AgentEvalRunStatus } };
+
+export type CreateAgentEvalScenarioMutationVariables = Exact<{
+  agentEvalTestId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  type: AgentScenarioType;
+  userMessage?: InputMaybe<Scalars['String']['input']>;
+  expectedOutput?: InputMaybe<Scalars['String']['input']>;
+  personaPrompt?: InputMaybe<Scalars['String']['input']>;
+  maxTurns?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type CreateAgentEvalScenarioMutation = { __typename?: 'Mutation', createAgentEvalScenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
+
+export type CreateAgentEvalTestMutationVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CreateAgentEvalTestMutation = { __typename?: 'Mutation', createAgentEvalTest: { __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type CreateAgentJudgeMutationVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  workflowNodeName: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  type: AgentJudgeType;
+  configuration: Scalars['Map']['input'];
+}>;
+
+
+export type CreateAgentJudgeMutation = { __typename?: 'Mutation', createAgentJudge: { __typename?: 'AgentJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type CreateAgentScenarioJudgeMutationVariables = Exact<{
+  agentEvalScenarioId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  type: AgentJudgeType;
+  configuration: Scalars['Map']['input'];
+}>;
+
+
+export type CreateAgentScenarioJudgeMutation = { __typename?: 'Mutation', createAgentScenarioJudge: { __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type DeleteAgentEvalScenarioMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAgentEvalScenarioMutation = { __typename?: 'Mutation', deleteAgentEvalScenario: boolean };
+
+export type DeleteAgentEvalTestMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAgentEvalTestMutation = { __typename?: 'Mutation', deleteAgentEvalTest: boolean };
+
+export type DeleteAgentJudgeMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAgentJudgeMutation = { __typename?: 'Mutation', deleteAgentJudge: boolean };
+
+export type DeleteAgentScenarioJudgeMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAgentScenarioJudgeMutation = { __typename?: 'Mutation', deleteAgentScenarioJudge: boolean };
+
+export type StartAgentEvalRunMutationVariables = Exact<{
+  agentEvalTestId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  environmentId: Scalars['ID']['input'];
+}>;
+
+
+export type StartAgentEvalRunMutation = { __typename?: 'Mutation', startAgentEvalRun: { __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, totalScenarios: number, completedScenarios: number, createdDate?: any | null } };
+
+export type UpdateAgentEvalScenarioMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  userMessage?: InputMaybe<Scalars['String']['input']>;
+  expectedOutput?: InputMaybe<Scalars['String']['input']>;
+  personaPrompt?: InputMaybe<Scalars['String']['input']>;
+  maxTurns?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type UpdateAgentEvalScenarioMutation = { __typename?: 'Mutation', updateAgentEvalScenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
+
+export type UpdateAgentEvalTestMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateAgentEvalTestMutation = { __typename?: 'Mutation', updateAgentEvalTest: { __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type UpdateAgentJudgeMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  configuration?: InputMaybe<Scalars['Map']['input']>;
+}>;
+
+
+export type UpdateAgentJudgeMutation = { __typename?: 'Mutation', updateAgentJudge: { __typename?: 'AgentJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type UpdateAgentScenarioJudgeMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  configuration?: InputMaybe<Scalars['Map']['input']>;
+}>;
+
+
+export type UpdateAgentScenarioJudgeMutation = { __typename?: 'Mutation', updateAgentScenarioJudge: { __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+
 export type AgentSkillQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AgentSkillQuery = { __typename?: 'Query', agentSkill?: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } | null };
-
-export type AgentSkillDownloadQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type AgentSkillDownloadQuery = { __typename?: 'Query', agentSkillDownload: string };
+export type AgentSkillQuery = { __typename?: 'Query', agentSkill: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
 export type AgentSkillFileContentQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3110,7 +3549,7 @@ export type DeleteAgentSkillMutationVariables = Exact<{
 }>;
 
 
-export type DeleteAgentSkillMutation = { __typename?: 'Mutation', deleteAgentSkill?: boolean | null };
+export type DeleteAgentSkillMutation = { __typename?: 'Mutation', deleteAgentSkill: boolean };
 
 export type UpdateAgentSkillMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -4415,6 +4854,676 @@ export type UsersQuery = { __typename?: 'Query', users?: { __typename?: 'AdminUs
 
 
 
+export const AgentEvalResultDocument = `
+    query agentEvalResult($id: ID!) {
+  agentEvalResult(id: $id) {
+    id
+    scenario {
+      id
+      name
+      type
+      userMessage
+      expectedOutput
+      personaPrompt
+      maxTurns
+      judges {
+        id
+        name
+        type
+        configuration
+        createdDate
+        lastModifiedDate
+      }
+      createdDate
+      lastModifiedDate
+    }
+    status
+    score
+    errorMessage
+    transcriptFile
+    verdicts {
+      id
+      judgeName
+      judgeType
+      judgeScope
+      passed
+      score
+      explanation
+    }
+    createdDate
+  }
+}
+    `;
+
+export const useAgentEvalResultQuery = <
+      TData = AgentEvalResultQuery,
+      TError = unknown
+    >(
+      variables: AgentEvalResultQueryVariables,
+      options?: Omit<UseQueryOptions<AgentEvalResultQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalResultQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentEvalResultQuery, TError, TData>(
+      {
+    queryKey: ['agentEvalResult', variables],
+    queryFn: fetcher<AgentEvalResultQuery, AgentEvalResultQueryVariables>(AgentEvalResultDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentEvalResultTranscriptDocument = `
+    query agentEvalResultTranscript($id: ID!) {
+  agentEvalResultTranscript(id: $id)
+}
+    `;
+
+export const useAgentEvalResultTranscriptQuery = <
+      TData = AgentEvalResultTranscriptQuery,
+      TError = unknown
+    >(
+      variables: AgentEvalResultTranscriptQueryVariables,
+      options?: Omit<UseQueryOptions<AgentEvalResultTranscriptQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalResultTranscriptQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentEvalResultTranscriptQuery, TError, TData>(
+      {
+    queryKey: ['agentEvalResultTranscript', variables],
+    queryFn: fetcher<AgentEvalResultTranscriptQuery, AgentEvalResultTranscriptQueryVariables>(AgentEvalResultTranscriptDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentEvalRunDocument = `
+    query agentEvalRun($id: ID!) {
+  agentEvalRun(id: $id) {
+    id
+    name
+    status
+    averageScore
+    totalScenarios
+    completedScenarios
+    startedDate
+    completedDate
+    results {
+      id
+      scenario {
+        id
+        name
+        type
+        userMessage
+        expectedOutput
+        personaPrompt
+        maxTurns
+        judges {
+          id
+          name
+          type
+          configuration
+          createdDate
+          lastModifiedDate
+        }
+        createdDate
+        lastModifiedDate
+      }
+      status
+      score
+      errorMessage
+      transcriptFile
+      verdicts {
+        id
+        judgeName
+        judgeType
+        judgeScope
+        passed
+        score
+        explanation
+      }
+      createdDate
+    }
+    createdDate
+  }
+}
+    `;
+
+export const useAgentEvalRunQuery = <
+      TData = AgentEvalRunQuery,
+      TError = unknown
+    >(
+      variables: AgentEvalRunQueryVariables,
+      options?: Omit<UseQueryOptions<AgentEvalRunQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalRunQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentEvalRunQuery, TError, TData>(
+      {
+    queryKey: ['agentEvalRun', variables],
+    queryFn: fetcher<AgentEvalRunQuery, AgentEvalRunQueryVariables>(AgentEvalRunDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentEvalRunsDocument = `
+    query agentEvalRuns($agentEvalTestId: ID!, $limit: Int, $offset: Int) {
+  agentEvalRuns(agentEvalTestId: $agentEvalTestId, limit: $limit, offset: $offset) {
+    id
+    name
+    status
+    averageScore
+    totalScenarios
+    completedScenarios
+    startedDate
+    completedDate
+    createdDate
+  }
+}
+    `;
+
+export const useAgentEvalRunsQuery = <
+      TData = AgentEvalRunsQuery,
+      TError = unknown
+    >(
+      variables: AgentEvalRunsQueryVariables,
+      options?: Omit<UseQueryOptions<AgentEvalRunsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalRunsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentEvalRunsQuery, TError, TData>(
+      {
+    queryKey: ['agentEvalRuns', variables],
+    queryFn: fetcher<AgentEvalRunsQuery, AgentEvalRunsQueryVariables>(AgentEvalRunsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentEvalTestDocument = `
+    query agentEvalTest($id: ID!) {
+  agentEvalTest(id: $id) {
+    id
+    name
+    description
+    scenarios {
+      id
+      name
+      type
+      userMessage
+      expectedOutput
+      personaPrompt
+      maxTurns
+      judges {
+        id
+        name
+        type
+        configuration
+        createdDate
+        lastModifiedDate
+      }
+      createdDate
+      lastModifiedDate
+    }
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useAgentEvalTestQuery = <
+      TData = AgentEvalTestQuery,
+      TError = unknown
+    >(
+      variables: AgentEvalTestQueryVariables,
+      options?: Omit<UseQueryOptions<AgentEvalTestQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalTestQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentEvalTestQuery, TError, TData>(
+      {
+    queryKey: ['agentEvalTest', variables],
+    queryFn: fetcher<AgentEvalTestQuery, AgentEvalTestQueryVariables>(AgentEvalTestDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentEvalTestsDocument = `
+    query agentEvalTests($workflowId: String!, $workflowNodeName: String!) {
+  agentEvalTests(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
+    id
+    name
+    description
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useAgentEvalTestsQuery = <
+      TData = AgentEvalTestsQuery,
+      TError = unknown
+    >(
+      variables: AgentEvalTestsQueryVariables,
+      options?: Omit<UseQueryOptions<AgentEvalTestsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalTestsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentEvalTestsQuery, TError, TData>(
+      {
+    queryKey: ['agentEvalTests', variables],
+    queryFn: fetcher<AgentEvalTestsQuery, AgentEvalTestsQueryVariables>(AgentEvalTestsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AgentJudgesDocument = `
+    query agentJudges($workflowId: String!, $workflowNodeName: String!) {
+  agentJudges(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
+    id
+    name
+    type
+    configuration
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useAgentJudgesQuery = <
+      TData = AgentJudgesQuery,
+      TError = unknown
+    >(
+      variables: AgentJudgesQueryVariables,
+      options?: Omit<UseQueryOptions<AgentJudgesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentJudgesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentJudgesQuery, TError, TData>(
+      {
+    queryKey: ['agentJudges', variables],
+    queryFn: fetcher<AgentJudgesQuery, AgentJudgesQueryVariables>(AgentJudgesDocument, variables),
+    ...options
+  }
+    )};
+
+export const CancelAgentEvalRunDocument = `
+    mutation cancelAgentEvalRun($id: ID!) {
+  cancelAgentEvalRun(id: $id) {
+    id
+    status
+  }
+}
+    `;
+
+export const useCancelAgentEvalRunMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CancelAgentEvalRunMutation, TError, CancelAgentEvalRunMutationVariables, TContext>) => {
+    
+    return useMutation<CancelAgentEvalRunMutation, TError, CancelAgentEvalRunMutationVariables, TContext>(
+      {
+    mutationKey: ['cancelAgentEvalRun'],
+    mutationFn: (variables?: CancelAgentEvalRunMutationVariables) => fetcher<CancelAgentEvalRunMutation, CancelAgentEvalRunMutationVariables>(CancelAgentEvalRunDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAgentEvalScenarioDocument = `
+    mutation createAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: AgentScenarioType!, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int) {
+  createAgentEvalScenario(
+    agentEvalTestId: $agentEvalTestId
+    name: $name
+    type: $type
+    userMessage: $userMessage
+    expectedOutput: $expectedOutput
+    personaPrompt: $personaPrompt
+    maxTurns: $maxTurns
+  ) {
+    id
+    name
+    type
+    userMessage
+    expectedOutput
+    personaPrompt
+    maxTurns
+    judges {
+      id
+      name
+      type
+      configuration
+      createdDate
+      lastModifiedDate
+    }
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useCreateAgentEvalScenarioMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAgentEvalScenarioMutation, TError, CreateAgentEvalScenarioMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAgentEvalScenarioMutation, TError, CreateAgentEvalScenarioMutationVariables, TContext>(
+      {
+    mutationKey: ['createAgentEvalScenario'],
+    mutationFn: (variables?: CreateAgentEvalScenarioMutationVariables) => fetcher<CreateAgentEvalScenarioMutation, CreateAgentEvalScenarioMutationVariables>(CreateAgentEvalScenarioDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAgentEvalTestDocument = `
+    mutation createAgentEvalTest($workflowId: String!, $workflowNodeName: String!, $name: String!, $description: String) {
+  createAgentEvalTest(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    name: $name
+    description: $description
+  ) {
+    id
+    name
+    description
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useCreateAgentEvalTestMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAgentEvalTestMutation, TError, CreateAgentEvalTestMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAgentEvalTestMutation, TError, CreateAgentEvalTestMutationVariables, TContext>(
+      {
+    mutationKey: ['createAgentEvalTest'],
+    mutationFn: (variables?: CreateAgentEvalTestMutationVariables) => fetcher<CreateAgentEvalTestMutation, CreateAgentEvalTestMutationVariables>(CreateAgentEvalTestDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAgentJudgeDocument = `
+    mutation createAgentJudge($workflowId: String!, $workflowNodeName: String!, $name: String!, $type: AgentJudgeType!, $configuration: Map!) {
+  createAgentJudge(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    name: $name
+    type: $type
+    configuration: $configuration
+  ) {
+    id
+    name
+    type
+    configuration
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useCreateAgentJudgeMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAgentJudgeMutation, TError, CreateAgentJudgeMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAgentJudgeMutation, TError, CreateAgentJudgeMutationVariables, TContext>(
+      {
+    mutationKey: ['createAgentJudge'],
+    mutationFn: (variables?: CreateAgentJudgeMutationVariables) => fetcher<CreateAgentJudgeMutation, CreateAgentJudgeMutationVariables>(CreateAgentJudgeDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAgentScenarioJudgeDocument = `
+    mutation createAgentScenarioJudge($agentEvalScenarioId: ID!, $name: String!, $type: AgentJudgeType!, $configuration: Map!) {
+  createAgentScenarioJudge(
+    agentEvalScenarioId: $agentEvalScenarioId
+    name: $name
+    type: $type
+    configuration: $configuration
+  ) {
+    id
+    name
+    type
+    configuration
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useCreateAgentScenarioJudgeMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAgentScenarioJudgeMutation, TError, CreateAgentScenarioJudgeMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAgentScenarioJudgeMutation, TError, CreateAgentScenarioJudgeMutationVariables, TContext>(
+      {
+    mutationKey: ['createAgentScenarioJudge'],
+    mutationFn: (variables?: CreateAgentScenarioJudgeMutationVariables) => fetcher<CreateAgentScenarioJudgeMutation, CreateAgentScenarioJudgeMutationVariables>(CreateAgentScenarioJudgeDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAgentEvalScenarioDocument = `
+    mutation deleteAgentEvalScenario($id: ID!) {
+  deleteAgentEvalScenario(id: $id)
+}
+    `;
+
+export const useDeleteAgentEvalScenarioMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAgentEvalScenarioMutation, TError, DeleteAgentEvalScenarioMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAgentEvalScenarioMutation, TError, DeleteAgentEvalScenarioMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAgentEvalScenario'],
+    mutationFn: (variables?: DeleteAgentEvalScenarioMutationVariables) => fetcher<DeleteAgentEvalScenarioMutation, DeleteAgentEvalScenarioMutationVariables>(DeleteAgentEvalScenarioDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAgentEvalTestDocument = `
+    mutation deleteAgentEvalTest($id: ID!) {
+  deleteAgentEvalTest(id: $id)
+}
+    `;
+
+export const useDeleteAgentEvalTestMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAgentEvalTestMutation, TError, DeleteAgentEvalTestMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAgentEvalTestMutation, TError, DeleteAgentEvalTestMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAgentEvalTest'],
+    mutationFn: (variables?: DeleteAgentEvalTestMutationVariables) => fetcher<DeleteAgentEvalTestMutation, DeleteAgentEvalTestMutationVariables>(DeleteAgentEvalTestDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAgentJudgeDocument = `
+    mutation deleteAgentJudge($id: ID!) {
+  deleteAgentJudge(id: $id)
+}
+    `;
+
+export const useDeleteAgentJudgeMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAgentJudgeMutation, TError, DeleteAgentJudgeMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAgentJudgeMutation, TError, DeleteAgentJudgeMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAgentJudge'],
+    mutationFn: (variables?: DeleteAgentJudgeMutationVariables) => fetcher<DeleteAgentJudgeMutation, DeleteAgentJudgeMutationVariables>(DeleteAgentJudgeDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAgentScenarioJudgeDocument = `
+    mutation deleteAgentScenarioJudge($id: ID!) {
+  deleteAgentScenarioJudge(id: $id)
+}
+    `;
+
+export const useDeleteAgentScenarioJudgeMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAgentScenarioJudgeMutation, TError, DeleteAgentScenarioJudgeMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAgentScenarioJudgeMutation, TError, DeleteAgentScenarioJudgeMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAgentScenarioJudge'],
+    mutationFn: (variables?: DeleteAgentScenarioJudgeMutationVariables) => fetcher<DeleteAgentScenarioJudgeMutation, DeleteAgentScenarioJudgeMutationVariables>(DeleteAgentScenarioJudgeDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const StartAgentEvalRunDocument = `
+    mutation startAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!) {
+  startAgentEvalRun(
+    agentEvalTestId: $agentEvalTestId
+    name: $name
+    environmentId: $environmentId
+  ) {
+    id
+    name
+    status
+    totalScenarios
+    completedScenarios
+    createdDate
+  }
+}
+    `;
+
+export const useStartAgentEvalRunMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<StartAgentEvalRunMutation, TError, StartAgentEvalRunMutationVariables, TContext>) => {
+    
+    return useMutation<StartAgentEvalRunMutation, TError, StartAgentEvalRunMutationVariables, TContext>(
+      {
+    mutationKey: ['startAgentEvalRun'],
+    mutationFn: (variables?: StartAgentEvalRunMutationVariables) => fetcher<StartAgentEvalRunMutation, StartAgentEvalRunMutationVariables>(StartAgentEvalRunDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAgentEvalScenarioDocument = `
+    mutation updateAgentEvalScenario($id: ID!, $name: String, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int) {
+  updateAgentEvalScenario(
+    id: $id
+    name: $name
+    userMessage: $userMessage
+    expectedOutput: $expectedOutput
+    personaPrompt: $personaPrompt
+    maxTurns: $maxTurns
+  ) {
+    id
+    name
+    type
+    userMessage
+    expectedOutput
+    personaPrompt
+    maxTurns
+    judges {
+      id
+      name
+      type
+      configuration
+      createdDate
+      lastModifiedDate
+    }
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useUpdateAgentEvalScenarioMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAgentEvalScenarioMutation, TError, UpdateAgentEvalScenarioMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAgentEvalScenarioMutation, TError, UpdateAgentEvalScenarioMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAgentEvalScenario'],
+    mutationFn: (variables?: UpdateAgentEvalScenarioMutationVariables) => fetcher<UpdateAgentEvalScenarioMutation, UpdateAgentEvalScenarioMutationVariables>(UpdateAgentEvalScenarioDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAgentEvalTestDocument = `
+    mutation updateAgentEvalTest($id: ID!, $name: String, $description: String) {
+  updateAgentEvalTest(id: $id, name: $name, description: $description) {
+    id
+    name
+    description
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useUpdateAgentEvalTestMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAgentEvalTestMutation, TError, UpdateAgentEvalTestMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAgentEvalTestMutation, TError, UpdateAgentEvalTestMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAgentEvalTest'],
+    mutationFn: (variables?: UpdateAgentEvalTestMutationVariables) => fetcher<UpdateAgentEvalTestMutation, UpdateAgentEvalTestMutationVariables>(UpdateAgentEvalTestDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAgentJudgeDocument = `
+    mutation updateAgentJudge($id: ID!, $name: String, $configuration: Map) {
+  updateAgentJudge(id: $id, name: $name, configuration: $configuration) {
+    id
+    name
+    type
+    configuration
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useUpdateAgentJudgeMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAgentJudgeMutation, TError, UpdateAgentJudgeMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAgentJudgeMutation, TError, UpdateAgentJudgeMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAgentJudge'],
+    mutationFn: (variables?: UpdateAgentJudgeMutationVariables) => fetcher<UpdateAgentJudgeMutation, UpdateAgentJudgeMutationVariables>(UpdateAgentJudgeDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAgentScenarioJudgeDocument = `
+    mutation updateAgentScenarioJudge($id: ID!, $name: String, $configuration: Map) {
+  updateAgentScenarioJudge(id: $id, name: $name, configuration: $configuration) {
+    id
+    name
+    type
+    configuration
+    createdDate
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useUpdateAgentScenarioJudgeMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAgentScenarioJudgeMutation, TError, UpdateAgentScenarioJudgeMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAgentScenarioJudgeMutation, TError, UpdateAgentScenarioJudgeMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAgentScenarioJudge'],
+    mutationFn: (variables?: UpdateAgentScenarioJudgeMutationVariables) => fetcher<UpdateAgentScenarioJudgeMutation, UpdateAgentScenarioJudgeMutationVariables>(UpdateAgentScenarioJudgeDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const AgentSkillDocument = `
     query agentSkill($id: ID!) {
   agentSkill(id: $id) {
@@ -4439,28 +5548,6 @@ export const useAgentSkillQuery = <
       {
     queryKey: ['agentSkill', variables],
     queryFn: fetcher<AgentSkillQuery, AgentSkillQueryVariables>(AgentSkillDocument, variables),
-    ...options
-  }
-    )};
-
-export const AgentSkillDownloadDocument = `
-    query agentSkillDownload($id: ID!) {
-  agentSkillDownload(id: $id)
-}
-    `;
-
-export const useAgentSkillDownloadQuery = <
-      TData = AgentSkillDownloadQuery,
-      TError = unknown
-    >(
-      variables: AgentSkillDownloadQueryVariables,
-      options?: Omit<UseQueryOptions<AgentSkillDownloadQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillDownloadQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<AgentSkillDownloadQuery, TError, TData>(
-      {
-    queryKey: ['agentSkillDownload', variables],
-    queryFn: fetcher<AgentSkillDownloadQuery, AgentSkillDownloadQueryVariables>(AgentSkillDownloadDocument, variables),
     ...options
   }
     )};
