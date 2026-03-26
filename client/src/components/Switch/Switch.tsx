@@ -27,16 +27,16 @@ type SwitchPropsType = LabeledSwitchProps | PlainSwitchProps;
 
 const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}> = {
     default: {
-        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4 [&>span]:shadow-none',
+        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     // eslint-disable-next-line sort-keys
     box: {
-        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4 [&>span]:shadow-none',
+        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     small: {
-        thumbOverrides: '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3 [&>span]:shadow-none',
+        thumbOverrides: '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3',
         track: 'h-[14px] w-[26px] px-[1px] rounded-[7px] border-0',
     },
 };
@@ -95,6 +95,7 @@ const Switch = forwardRef<ComponentRef<typeof ShadcnSwitch>, SwitchPropsType>(
         const switchClasses = twMerge(
             config.track,
             config.thumbOverrides,
+            'shadow-none [&_.shadow-lg]:shadow-none',
             'data-[state=checked]:bg-surface-brand-primary data-[state=unchecked]:bg-surface-neutral-tertiary',
             'focus-visible:ring-2 focus-visible:ring-stroke-brand-focus focus-visible:ring-offset-0',
             '[&>span]:bg-surface-neutral-primary',

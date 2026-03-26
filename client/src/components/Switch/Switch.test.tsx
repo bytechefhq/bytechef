@@ -200,7 +200,8 @@ describe('Switch - States', () => {
         render(<Switch checked={false} />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement.className).toMatch(/\[&>span\]:shadow-none/);
+        expect(switchElement).toHaveClass('shadow-none');
+        expect(switchElement.className).toMatch(/\[&_\.shadow-lg\]:shadow-none/);
     });
 
     it('should handle disabled state', () => {
