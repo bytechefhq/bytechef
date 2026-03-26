@@ -21,6 +21,8 @@ import static com.bytechef.component.asana.constant.AsanaConstants.RESOURCE;
 import static com.bytechef.component.asana.constant.AsanaConstants.TARGET;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -35,6 +37,7 @@ import com.bytechef.component.definition.Context.Http.Configuration.Configuratio
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -44,10 +47,12 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -59,9 +64,9 @@ import org.mockito.ArgumentCaptor;
 class AsanaNewTaskTriggerTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(RESOURCE, "resource"));
     private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(
-        RESOURCE, "resource"));
     private final Parameters mockedParameters = mock(Parameters.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -79,8 +84,7 @@ class AsanaNewTaskTriggerTest {
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(
-                "data", Map.of(GID, "123")));
+            .thenReturn(Map.of("data", Map.of(GID, "123")));
 
         WebhookEnableOutput result = AsanaNewTaskTrigger.webhookEnable(
             mockedInputParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
@@ -113,8 +117,6 @@ class AsanaNewTaskTriggerTest {
 
         when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
 
         AsanaNewTaskTrigger.webhookDisable(
             mockedInputParameters, mockedParameters, mockedOutputParameters, "testWorkflowExecutionId",
@@ -125,37 +127,102 @@ class AsanaNewTaskTriggerTest {
     }
 
     @Test
-    void testWebhookRequest() {
+    void testWebhookRequest(
+        TriggerContext mockedTriggerContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
-            .thenReturn(Map.of("events", List.of(mockedObject)));
+            .thenReturn(
+                Map.of(
+                    "events",
+                    List.of(Map.of("parent", Map.of("resource_type", "project"), "resource", Map.of("gid", "123")))));
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
         Object result = AsanaNewTaskTrigger.webhookRequest(
             mockedInputParameters, mockedParameters, mock(HttpHeaders.class), mock(HttpParameters.class),
-            mockedWebhookBody, mock(WebhookMethod.class), mock(Parameters.class), mock(TriggerContext.class));
+            mockedWebhookBody, mock(WebhookMethod.class), mock(Parameters.class), mockedTriggerContext);
 
-        assertEquals(Map.of("events", List.of(mockedObject)), result);
+        assertEquals(mockedObject, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/tasks/123", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testWebhookValidateOnEnable() {
-        HttpHeaders headersWithSecret = mock(HttpHeaders.class);
-        when(headersWithSecret.firstValue("X-Hook-Secret")).thenReturn(java.util.Optional.of("secret"));
+    void testWebhookRequestHeartbeat(TriggerContext mockedTriggerContext) {
+        when(mockedTriggerContext.isEditorEnvironment())
+            .thenReturn(false);
+
+        when(mockedWebhookBody.getContent(any(TypeReference.class)))
+            .thenReturn(Map.of("events", List.of()));
+
+        Object result = AsanaNewTaskTrigger.webhookRequest(
+            mockedInputParameters, mockedParameters, mock(HttpHeaders.class), mock(HttpParameters.class),
+            mockedWebhookBody, mock(WebhookMethod.class), mock(Parameters.class), mockedTriggerContext);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testWebhookRequestHeartbeatEditorEnvironment(TriggerContext mockedTriggerContext) {
+        when(mockedTriggerContext.isEditorEnvironment())
+            .thenReturn(true);
+
+        when(mockedWebhookBody.getContent(any(TypeReference.class)))
+            .thenReturn(Map.of("events", List.of()));
+
+        assertThrows(
+            ProviderException.class,
+            () -> AsanaNewTaskTrigger.webhookRequest(
+                mockedInputParameters, mockedParameters, mock(HttpHeaders.class), mock(HttpParameters.class),
+                mockedWebhookBody, mock(WebhookMethod.class), mock(Parameters.class), mockedTriggerContext));
+    }
+
+    @Test
+    void testWebhookValidateOnEnableWithXHookSecret() {
+        when(mockedHttpHeaders.firstValue(stringArgumentCaptor.capture()))
+            .thenReturn(Optional.of("secret"));
 
         WebhookValidateResponse response = AsanaNewTaskTrigger.webhookValidateOnEnable(
-            mockedInputParameters, headersWithSecret, mock(HttpParameters.class),
+            mockedInputParameters, mockedHttpHeaders, mock(HttpParameters.class),
             mock(WebhookBody.class), mock(WebhookMethod.class), mock(TriggerContext.class));
 
-        assertEquals(200, response.status());
-        assertEquals(List.of("secret"), response.headers()
-            .get("X-Hook-Secret"));
+        WebhookValidateResponse expectedResponse = new WebhookValidateResponse(
+            null, Map.of("X-Hook-Secret", List.of("secret")), HttpStatus.OK.getValue());
+
+        assertEquals(expectedResponse, response);
+        assertEquals("X-Hook-Secret", stringArgumentCaptor.getValue());
 
         HttpHeaders headersWithoutSecret = mock(HttpHeaders.class);
-        when(headersWithoutSecret.firstValue("X-Hook-Secret")).thenReturn(java.util.Optional.empty());
+        when(headersWithoutSecret.firstValue("X-Hook-Secret")).thenReturn(Optional.empty());
 
         WebhookValidateResponse responseWithoutSecret = AsanaNewTaskTrigger.webhookValidateOnEnable(
             mockedInputParameters, headersWithoutSecret, mock(HttpParameters.class),
             mock(WebhookBody.class), mock(WebhookMethod.class), mock(TriggerContext.class));
 
         assertEquals(400, responseWithoutSecret.status());
+    }
+
+    @Test
+    void testWebhookValidateOnEnableWithoutXHookSecret() {
+        when(mockedHttpHeaders.firstValue(stringArgumentCaptor.capture()))
+            .thenReturn(Optional.empty());
+
+        WebhookValidateResponse response = AsanaNewTaskTrigger.webhookValidateOnEnable(
+            mockedInputParameters, mockedHttpHeaders, mock(HttpParameters.class),
+            mock(WebhookBody.class), mock(WebhookMethod.class), mock(TriggerContext.class));
+
+        WebhookValidateResponse expectedResponse = WebhookValidateResponse.badRequest();
+
+        assertEquals(expectedResponse, response);
+        assertEquals("X-Hook-Secret", stringArgumentCaptor.getValue());
     }
 }
