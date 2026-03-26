@@ -36,8 +36,7 @@ const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     small: {
-        thumbOverrides:
-            '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3 [&>span]:data-[state=unchecked]:translate-x-0',
+        thumbOverrides: '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3',
         track: 'h-[14px] w-[26px] px-[1px] rounded-[7px] border-0',
     },
 };
