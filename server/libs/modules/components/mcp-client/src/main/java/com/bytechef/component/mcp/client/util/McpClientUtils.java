@@ -54,6 +54,7 @@ import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
 import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.net.URI;
 import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,10 +160,15 @@ public class McpClientUtils {
         Consumer<HttpRequest.Builder> requestCustomizer = getRequestCustomizer(
             connectionParameters, connectionDefinitionService, context);
 
+        URI serverUri = URI.create(serverUrl);
+
+        String baseUrl = serverUri.getScheme() + "://" + serverUri.getAuthority();
+        String endpoint = serverUri.getRawPath();
+
         McpClientTransport transport = switch (transportType) {
             case HTTP_STREAMABLE -> {
-                HttpClientStreamableHttpTransport.Builder builder =
-                    HttpClientStreamableHttpTransport.builder(serverUrl);
+                HttpClientStreamableHttpTransport.Builder builder = HttpClientStreamableHttpTransport.builder(baseUrl)
+                    .endpoint(endpoint);
 
                 if (requestCustomizer != null) {
                     builder.customizeRequest(requestCustomizer);
@@ -171,7 +177,8 @@ public class McpClientUtils {
                 yield builder.build();
             }
             case HTTP_SSE -> {
-                HttpClientSseClientTransport.Builder builder = HttpClientSseClientTransport.builder(serverUrl);
+                HttpClientSseClientTransport.Builder builder = HttpClientSseClientTransport.builder(baseUrl)
+                    .sseEndpoint(endpoint);
 
                 if (requestCustomizer != null) {
                     builder.customizeRequest(requestCustomizer);
