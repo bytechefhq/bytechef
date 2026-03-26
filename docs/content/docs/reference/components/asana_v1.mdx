@@ -56,6 +56,9 @@ Version: 1
     - tasks:write
     - teams:read
     - users:read
+    - webhooks:read
+    - webhooks:write
+    - webhooks:delete
     - workspaces:read
 13. Done 🚀.
 
@@ -185,9 +188,9 @@ Type: OBJECT
 }
 ```
 
-#### Find Workspace ID
+#### Find Workspace GID
 
-To find your workspace ID, click [here](/reference/components/asana_v1#how-to-find-your-workspace-id).
+To find workspace GID, click [here](/reference/components/asana_v1#how-to-find-workspace-gid).
 
 
 
@@ -230,7 +233,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(gid), STRING\(name), STRING\(notes), &#123;STRING\(gid), STRING\(name)&#125;\(team), &#123;STRING\(gid), STRING\(name)&#125;\(workspace)&#125; </details> |  |
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(gid), STRING\(resource_type), BOOLEAN\(archived), STRING\(color), STRING\(icon), DATE_TIME\(created_at), &#123;STRING\(gid), STRING\(resource_type), STRING\(title), STRING\(resource_subtype)&#125;\(current_status_update), STRING\(default_view), STRING\(due_on), STRING\(html_notes), STRING\(name), STRING\(notes), &#123;STRING\(gid), STRING\(name)&#125;\(team), &#123;STRING\(gid), STRING\(name)&#125;\(workspace)&#125; </details> |  |
 
 
 
@@ -240,6 +243,20 @@ Type: OBJECT
 {
   "data" : {
     "gid" : "",
+    "resource_type" : "",
+    "archived" : false,
+    "color" : "",
+    "icon" : "",
+    "created_at" : "2021-01-01T00:00:00",
+    "current_status_update" : {
+      "gid" : "",
+      "resource_type" : "",
+      "title" : "",
+      "resource_subtype" : ""
+    },
+    "default_view" : "",
+    "due_on" : "",
+    "html_notes" : "",
     "name" : "",
     "notes" : "",
     "team" : {
@@ -254,13 +271,13 @@ Type: OBJECT
 }
 ```
 
-#### Find Workspace ID
+#### Find Workspace GID
 
-To find your workspace ID, click [here](/reference/components/asana_v1#how-to-find-your-workspace-id).
+To find workspace GID, click [here](/reference/components/asana_v1#how-to-find-workspace-gid).
 
 #### Find Team ID
 
-To find your team ID, click [here](/reference/components/asana_v1#how-to-find-your-team-id).
+To find team GID, click [here](/reference/components/asana_v1#how-to-find-team-gid).
 
 
 
@@ -275,8 +292,8 @@ Name: createSubtask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| taskGid | Task gID | STRING <details> <summary> Depends On </summary> data.workspace, data.project </details> | The task gID of the task that will be the parent of the subtask. | true |
-| data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), STRING\(assignee)&#125; </details> |  | false |
+| taskGid | Parent Task GID | STRING <details> <summary> Depends On </summary> data.workspace </details> | The task GID of the task that will be the parent of the subtask. | true |
+| data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace), [STRING]\(projects), STRING\(name), STRING\(notes), DATE\(due_on), STRING\(assignee)&#125; </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -287,7 +304,7 @@ Name: createSubtask
     "taskGid" : "",
     "data" : {
       "workspace" : "",
-      "project" : "",
+      "projects" : [ "" ],
       "name" : "",
       "notes" : "",
       "due_on" : "2021-01-01",
@@ -342,34 +359,34 @@ Type: OBJECT
 }
 ```
 
-#### Find Workspace ID
+#### Find Parent Task GID
 
-To find your workspace ID, click [here](/reference/components/asana_v1#how-to-find-your-workspace-id).
+To find parent task GID, click [here](/reference/components/asana_v1#how-to-find-task-gid).
 
-#### Find Project ID
+#### Find Workspace GID
 
-To find your project ID, click [here](/reference/components/asana_v1#how-to-find-your-project-id).
+To find workspace GID, click [here](/reference/components/asana_v1#how-to-find-workspace-gid).
 
-#### Find Parent Task IDs
+#### Find Project GID
 
-To find parent task IDs, click [here](/reference/components/asana_v1#how-to-find-your-task-id).
+To find project GID, click [here](/reference/components/asana_v1#how-to-find-project-gid).
 
-#### Find Assignee User ID
+#### Find Assignee User GID
 
-To find the user ID of the assignee, click [here](/reference/components/asana_v1#how-to-find-user-id).
+To find the user ID of the assignee, click [here](/reference/components/asana_v1#how-to-find-user-gid).
 
 
 
 ### Create Task
 Name: createTask
 
-`Creates a new task`
+`Creates a new task in a workspace.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)&#125; </details> |  | false |
+| data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(workspace), [STRING]\(projects), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)&#125; </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -379,7 +396,7 @@ Name: createTask
   "parameters" : {
     "data" : {
       "workspace" : "",
-      "project" : "",
+      "projects" : [ "" ],
       "name" : "",
       "notes" : "",
       "due_on" : "2021-01-01",
@@ -431,21 +448,79 @@ Type: OBJECT
 }
 ```
 
-#### Find Workspace ID
+#### Find Workspace GID
 
-To find your workspace ID, click [here](/reference/components/asana_v1#how-to-find-your-workspace-id).
+To find workspace GID, click [here](/reference/components/asana_v1#how-to-find-workspace-gid).
 
 #### Find Project ID
 
-To find your project ID, click [here](/reference/components/asana_v1#how-to-find-your-project-id).
+To find project ID, click [here](/reference/components/asana_v1#how-to-find-project-id).
 
 #### Find Assignee User ID
 
 To find the user ID of the assignee, click [here](/reference/components/asana_v1#how-to-find-user-id).
 
-#### Find Tag IDs
+#### Find Tag ID
 
-To find tag IDs, click [here](/reference/components/asana_v1#how-to-find-tags-id).
+To find tag ID, click [here](/reference/components/asana_v1#how-to-find-tag-id).
+
+
+
+
+## Triggers
+
+
+### New Task
+Name: newTask
+
+`Triggers when new task is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace | Workspace | STRING | The workspace where the project is located. | true |
+| resource | Project | STRING <details> <summary> Depends On </summary> workspace </details> | The project to monitor for newly created tasks. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| gid | STRING | Globally unique identifier of the task. |
+| name | STRING | Name of the task. |
+| resource_type | STRING | Type of the resource (task). |
+| created_at | STRING | Timestamp when the task was created. |
+| modified_at | STRING | Timestamp when the task was last modified. |
+| completed | STRING | Indicates whether the task is completed. |
+| notes | STRING | Description or notes of the task. |
+| assignee | OBJECT <details> <summary> Properties </summary> &#123;STRING\(gid), STRING\(name)&#125; </details> | User assigned to the task. |
+| project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(gid), STRING\(name)&#125; </details> | Project the task belongs to. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Task",
+  "name" : "newTask",
+  "parameters" : {
+    "workspace" : "",
+    "resource" : ""
+  },
+  "type" : "asana/v1/newTask"
+}
+```
 
 
 
@@ -461,50 +536,38 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 # Additional Instructions
 
-### How to find your Workspace ID
+### How to find Workspace GID
 
 You have several methods to find your Asana workspace ID:
 
 * **Method 1: Through the Asana URL**
 
 1. Log in to **Asana**.
-
 2. Open the workspace you want to use.
-
 3. Look at the URL in your browser. It will look similar to:
-
    ```
    https://app.asana.com/0/123456789012345/home
    ```
-
 4. The number after `/0/` (`123456789012345` in this example) is your **workspace ID**.
-
 
 * **Method 2: Through the Asana API**
 
 1. Open your browser or API client.
-
 2. Enter the following request:
-
    ```
    https://app.asana.com/api/1.0/workspaces
    ```
-
 3. Look for the workspace you want in the JSON response.
-
 4. The value under `gid` is your **workspace ID**.
 
-
-### How to find your Team ID
+### How to find Team GID
 
 You have several methods to find your Asana team ID:
 
 * **Method 1: Through the Asana URL**
 
 1. Open **Asana**.
-
 2. Navigate to the team you want to use.
-
 3. Look at the URL in your browser. It will look similar to:
 
    ```
@@ -513,108 +576,78 @@ You have several methods to find your Asana team ID:
 
 4. The number in the URL (`987654321098765` in this example) is your **team ID**.
 
-
 * **Method 2: Through the Asana API**
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
-
    ```
    https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/teams
    ```
-
 3. Find the team you want in the JSON response.
-
 4. The value under `gid` is the **team ID**.
 
-
-### How to find your Project ID
+### How to find Project GID
 
 You have several methods to find your Asana project ID:
 
 * **Method 1: Through the Project URL**
 
 1. Open the project in **Asana**.
-
 2. Look at the URL in your browser. It will look similar to:
-
    ```
    https://app.asana.com/0/123456789012345/678901234567890
    ```
-
 3. The **second number** (`678901234567890` in this example) is the **project ID**.
 
 * **Method 2: Through the Asana API**
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
-
    ```
    https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/projects
    ```
-
 3. Find the project in the JSON response.
-
 4. The value under `gid` is the **project ID**.
 
-
-### How to find your Task ID
+### How to find Task GID
 
 You have several methods to find your Asana task ID:
 
 * **Method 1: Through the Task URL**
 
 1. Open the task in **Asana**.
-
 2. Look at the URL in your browser. It will look similar to:
-
    ```
    https://app.asana.com/0/123456789012345/987654321012345
    ```
-
 3. The **second number** (`987654321012345` in this example) is the **task ID**.
 
 * **Method 2: Through the Asana API**
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `PROJECT_GID` with your project ID):
-
    ```
    https://app.asana.com/api/1.0/projects/PROJECT_GID/tasks
    ```
-
 3. Find the task in the JSON response.
-
 4. The value under `gid` is the **task ID**.
 
-
-### How to find User ID
+### How to find User GID
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
-
    ```
    https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/users
    ```
-
 3. Find the user in the JSON response.
-
 4. The value under `gid` is the **user ID**.
 
-### How to find Tags ID
+### How to find Tags GID
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
-
    ```
    https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/tags
    ```
-
 3. Find the tag you want in the JSON response.
-
 4. The value under `gid` is the **tag ID**.
