@@ -1818,6 +1818,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+        resumePerformFunctionDefined:
+          description: "Does action define resume perform function."
+          type: "boolean"
         sseStreamResponse:
           description: "Does action support SSE streaming."
           type: "boolean"
@@ -1863,6 +1866,9 @@ components:
           type: "boolean"
         outputSchemaDefined:
           description: "Does action defines output schema."
+          type: "boolean"
+        resumePerformFunctionDefined:
+          description: "Does action define resume perform function."
           type: "boolean"
         sseStreamResponse:
           description: "Does action support SSE streaming."

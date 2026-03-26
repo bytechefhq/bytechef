@@ -47,6 +47,7 @@ public class ActionDefinition {
     private OutputResponse outputResponse;
     private boolean outputSchemaDefined;
     private List<? extends Property> properties;
+    private boolean resumePerformFunctionDefined;
     boolean singleConnection;
     private boolean sseStreamResponse;
     private String title;
@@ -82,6 +83,8 @@ public class ActionDefinition {
             actionDefinition.getProperties()
                 .orElse(List.of()),
             Property::toProperty);
+        this.resumePerformFunctionDefined = actionDefinition.getResumePerform()
+            .isPresent();
         this.singleConnection = actionDefinition.getPerform()
             .map(perform -> perform instanceof PerformFunction)
             .orElse(false);
@@ -107,7 +110,9 @@ public class ActionDefinition {
             Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
             Objects.equals(outputResponse, that.outputResponse) &&
             Objects.equals(outputSchemaDefined, that.outputSchemaDefined) &&
-            Objects.equals(properties, that.properties) && sseStreamResponse == that.sseStreamResponse &&
+            Objects.equals(properties, that.properties) &&
+            resumePerformFunctionDefined == that.resumePerformFunctionDefined &&
+            sseStreamResponse == that.sseStreamResponse &&
             Objects.equals(title, that.title) && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
     }
 
@@ -115,7 +120,8 @@ public class ActionDefinition {
     public int hashCode() {
         return Objects.hash(
             batch, componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined,
-            outputResponse, outputSchemaDefined, properties, sseStreamResponse, title, workflowNodeDescriptionDefined);
+            outputResponse, outputSchemaDefined, properties, resumePerformFunctionDefined, sseStreamResponse, title,
+            workflowNodeDescriptionDefined);
     }
 
     public String getComponentName() {
@@ -167,6 +173,10 @@ public class ActionDefinition {
         return outputSchemaDefined;
     }
 
+    public boolean isResumePerformFunctionDefined() {
+        return resumePerformFunctionDefined;
+    }
+
     public boolean isSingleConnection() {
         return singleConnection;
     }
@@ -188,6 +198,7 @@ public class ActionDefinition {
             ", title='" + title + '\'' +
             ", description='" + description + '\'' +
             ", properties=" + properties +
+            ", resumePerformFunctionDefined=" + resumePerformFunctionDefined +
             ", batch=" + batch +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +
