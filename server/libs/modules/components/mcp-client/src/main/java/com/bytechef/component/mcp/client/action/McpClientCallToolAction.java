@@ -21,8 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.TOOL_ARGUMENTS;
 import static com.bytechef.component.mcp.client.constant.McpClientConstants.TOOL_NAME;
-import static com.bytechef.component.mcp.client.constant.McpClientConstants.TRANSPORT_TYPE;
-import static com.bytechef.component.mcp.client.constant.McpClientConstants.URL;
 import static com.bytechef.component.mcp.client.util.McpClientUtils.createMcpSyncClient;
 
 import com.bytechef.component.definition.ActionContext;
@@ -56,7 +54,6 @@ public final class McpClientCallToolAction {
                             inputParameters, connectionParameters,
                             lookupDependsOnPaths, searchText, context) -> McpClientUtils.getToolOptions(
                                 connectionParameters, connectionDefinitionService, context))
-                    .optionsLookupDependsOn(URL, TRANSPORT_TYPE)
                     .required(true),
                 dynamicProperties(TOOL_ARGUMENTS)
                     .propertiesLookupDependsOn(TOOL_NAME)

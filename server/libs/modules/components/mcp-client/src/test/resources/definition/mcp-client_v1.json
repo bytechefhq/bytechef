@@ -30,7 +30,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "url", "transportType" ]
+        "optionsLookupDependsOn": null
       },
       "placeholder": null,
       "regex": null,
