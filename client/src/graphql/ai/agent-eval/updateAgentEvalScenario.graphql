@@ -1,0 +1,21 @@
+mutation updateAgentEvalScenario($id: ID!, $name: String, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int) {
+    updateAgentEvalScenario(id: $id, name: $name, userMessage: $userMessage, expectedOutput: $expectedOutput, personaPrompt: $personaPrompt, maxTurns: $maxTurns) {
+        id
+        name
+        type
+        userMessage
+        expectedOutput
+        personaPrompt
+        maxTurns
+        judges {
+            id
+            name
+            type
+            configuration
+            createdDate
+            lastModifiedDate
+        }
+        createdDate
+        lastModifiedDate
+    }
+}

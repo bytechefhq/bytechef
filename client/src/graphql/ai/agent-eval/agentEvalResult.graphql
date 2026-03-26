@@ -1,0 +1,38 @@
+query agentEvalResult($id: ID!) {
+    agentEvalResult(id: $id) {
+        id
+        scenario {
+            id
+            name
+            type
+            userMessage
+            expectedOutput
+            personaPrompt
+            maxTurns
+            judges {
+                id
+                name
+                type
+                configuration
+                createdDate
+                lastModifiedDate
+            }
+            createdDate
+            lastModifiedDate
+        }
+        status
+        score
+        errorMessage
+        transcriptFile
+        verdicts {
+            id
+            judgeName
+            judgeType
+            judgeScope
+            passed
+            score
+            explanation
+        }
+        createdDate
+    }
+}

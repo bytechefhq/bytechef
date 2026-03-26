@@ -1,0 +1,9 @@
+mutation createAgentEvalTest($workflowId: String!, $workflowNodeName: String!, $name: String!, $description: String) {
+    createAgentEvalTest(workflowId: $workflowId, workflowNodeName: $workflowNodeName, name: $name, description: $description) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}
