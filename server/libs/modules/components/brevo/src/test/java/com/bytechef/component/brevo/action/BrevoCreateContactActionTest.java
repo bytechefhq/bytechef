@@ -21,60 +21,67 @@ import static com.bytechef.component.brevo.constant.BrevoConstants.FIRST_NAME;
 import static com.bytechef.component.brevo.constant.BrevoConstants.LAST_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
-class BrevoCreateContactActionTest extends AbstractBrevoActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class BrevoCreateContactActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(EMAIL, "test@test.com", FIRST_NAME, "test", LAST_NAME, "test"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
-        Context mockedContext, Executor mockedExecutor, Http mockedHttp,
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of());
 
         Object result = BrevoCreateContactAction.perform(mockedParameters, null, mockedContext);
 
-        assertEquals(responseMap, result);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertEquals(Map.of(), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/contacts/", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expected = Map.of(
-            EMAIL, "test@test.com",
-            "attributes", Map.of(FIRST_NAME, "test", LAST_NAME, "test"));
-        assertEquals(expected, body.getContent());
+        assertEquals(
+            Body.of(
+                Map.of(EMAIL, "test@test.com", "attributes", Map.of(FIRST_NAME, "test", LAST_NAME, "test")),
+                BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }
