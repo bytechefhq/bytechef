@@ -89,6 +89,12 @@ export interface ActionDefinition {
      */
     properties?: Array<Property>;
     /**
+     * Does action define resume perform function.
+     * @type {boolean}
+     * @memberof ActionDefinition
+     */
+    resumePerformFunctionDefined?: boolean;
+    /**
      * Does action support SSE streaming.
      * @type {boolean}
      * @memberof ActionDefinition
@@ -139,6 +145,7 @@ export function ActionDefinitionFromJSONTyped(json: any, ignoreDiscriminator: bo
         'outputFunctionDefined': json['outputFunctionDefined'],
         'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
+        'resumePerformFunctionDefined': json['resumePerformFunctionDefined'] == null ? undefined : json['resumePerformFunctionDefined'],
         'sseStreamResponse': json['sseStreamResponse'] == null ? undefined : json['sseStreamResponse'],
         'title': json['title'] == null ? undefined : json['title'],
         'workflowNodeDescriptionDefined': json['workflowNodeDescriptionDefined'] == null ? undefined : json['workflowNodeDescriptionDefined'],
@@ -165,6 +172,7 @@ export function ActionDefinitionToJSONTyped(value?: ActionDefinition | null, ign
         'outputFunctionDefined': value['outputFunctionDefined'],
         'outputSchemaDefined': value['outputSchemaDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
+        'resumePerformFunctionDefined': value['resumePerformFunctionDefined'],
         'sseStreamResponse': value['sseStreamResponse'],
         'title': value['title'],
         'workflowNodeDescriptionDefined': value['workflowNodeDescriptionDefined'],
