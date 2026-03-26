@@ -1,47 +1,35 @@
-### How to find your Workspace ID
+### How to find Workspace GID
 
 You have several methods to find your Asana workspace ID:
 
 * **Method 1: Through the Asana URL**
 
 1. Log in to **Asana**.
-
 2. Open the workspace you want to use.
-
 3. Look at the URL in your browser. It will look similar to:
-
    ```
    https://app.asana.com/0/123456789012345/home
    ```
-
 4. The number after `/0/` (`123456789012345` in this example) is your **workspace ID**.
-
 
 * **Method 2: Through the Asana API**
 
 1. Open your browser or API client.
-
 2. Enter the following request:
-
    ```
    https://app.asana.com/api/1.0/workspaces
    ```
-
 3. Look for the workspace you want in the JSON response.
-
 4. The value under `gid` is your **workspace ID**.
 
-
-### How to find your Team ID
+### How to find Team GID
 
 You have several methods to find your Asana team ID:
 
 * **Method 1: Through the Asana URL**
 
 1. Open **Asana**.
-
 2. Navigate to the team you want to use.
-
 3. Look at the URL in your browser. It will look similar to:
 
    ```
@@ -50,108 +38,78 @@ You have several methods to find your Asana team ID:
 
 4. The number in the URL (`987654321098765` in this example) is your **team ID**.
 
-
 * **Method 2: Through the Asana API**
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
-
    ```
    https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/teams
    ```
-
 3. Find the team you want in the JSON response.
-
 4. The value under `gid` is the **team ID**.
 
-
-### How to find your Project ID
+### How to find Project GID
 
 You have several methods to find your Asana project ID:
 
 * **Method 1: Through the Project URL**
 
 1. Open the project in **Asana**.
-
 2. Look at the URL in your browser. It will look similar to:
-
    ```
    https://app.asana.com/0/123456789012345/678901234567890
    ```
-
 3. The **second number** (`678901234567890` in this example) is the **project ID**.
 
 * **Method 2: Through the Asana API**
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
-
    ```
    https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/projects
    ```
-
 3. Find the project in the JSON response.
-
 4. The value under `gid` is the **project ID**.
 
-
-### How to find your Task ID
+### How to find Task GID
 
 You have several methods to find your Asana task ID:
 
 * **Method 1: Through the Task URL**
 
 1. Open the task in **Asana**.
-
 2. Look at the URL in your browser. It will look similar to:
-
    ```
    https://app.asana.com/0/123456789012345/987654321012345
    ```
-
 3. The **second number** (`987654321012345` in this example) is the **task ID**.
 
 * **Method 2: Through the Asana API**
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `PROJECT_GID` with your project ID):
-
    ```
    https://app.asana.com/api/1.0/projects/PROJECT_GID/tasks
    ```
-
 3. Find the task in the JSON response.
-
 4. The value under `gid` is the **task ID**.
 
-
-### How to find User ID
+### How to find User GID
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
-
    ```
    https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/users
    ```
-
 3. Find the user in the JSON response.
-
 4. The value under `gid` is the **user ID**.
 
-### How to find Tags ID
+### How to find Tags GID
 
 1. Open your browser or API client.
-
 2. Run the following request (replace `WORKSPACE_GID` with your workspace ID):
-
    ```
    https://app.asana.com/api/1.0/workspaces/WORKSPACE_GID/tags
    ```
-
 3. Find the tag you want in the JSON response.
-
 4. The value under `gid` is the **tag ID**.
