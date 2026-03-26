@@ -13,6 +13,7 @@ type ActionDefinition {
     outputFunctionDefined: Boolean!
     outputSchemaDefined: Boolean
     properties: [Property!]!
+    resumePerformFunctionDefined: Boolean
     title: String
     workflowNodeDescriptionDefined: Boolean
 }
