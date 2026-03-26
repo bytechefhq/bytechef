@@ -37,8 +37,8 @@ import java.util.Map;
 public class BambooHrUtils {
 
     public static List<Option<String>> getEmployeeIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("/employees/directory"))
@@ -63,8 +63,8 @@ public class BambooHrUtils {
     }
 
     public static List<Option<String>> getEmployeeFilesIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("/employees/%s/files/view".formatted(inputParameters.getRequiredString(ID))))
@@ -87,8 +87,8 @@ public class BambooHrUtils {
     }
 
     public static List<Option<String>> getFieldOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/meta/fields"))

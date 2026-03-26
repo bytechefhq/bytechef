@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import com.bytechef.component.bamboohr.util.BambooHrUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -49,6 +50,7 @@ public class BambooHrUpdatedEmployeeTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("updatedEmployee")
         .title("Updated Employee")
         .description("Triggers when specific employee fields are updated.")
+        .help("", "https://docs.bytechef.io/reference/components/bamboohr_v1#updated-employee")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             array(MONITOR_FIELDS)
@@ -84,7 +86,7 @@ public class BambooHrUpdatedEmployeeTrigger {
 
         Map<String, ?> body = context.http(http -> http.post("/webhooks"))
             .body(
-                Http.Body.of(
+                Body.of(
                     "name", "bambooHRWebhook",
                     MONITOR_FIELDS, inputParameters.getRequiredList(MONITOR_FIELDS, String.class),
                     POST_FIELDS, options,

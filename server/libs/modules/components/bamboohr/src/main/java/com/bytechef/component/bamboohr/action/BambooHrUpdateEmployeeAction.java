@@ -31,7 +31,7 @@ import com.bytechef.component.bamboohr.util.BambooHrUtils;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -42,6 +42,7 @@ public class BambooHrUpdateEmployeeAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateEmployee")
         .title("Update Employee")
         .description("Update an employee, based on employee ID.")
+        .help("", "https://docs.bytechef.io/reference/components/bamboohr_v1#update-employee")
         .properties(
             string(ID)
                 .label("Employee ID")
@@ -84,7 +85,7 @@ public class BambooHrUpdateEmployeeAction {
         context
             .http(http -> http.post("/employees/" + inputParameters.getRequiredString(ID)))
             .body(
-                Http.Body.of(
+                Body.of(
                     FIRST_NAME, inputParameters.getString(FIRST_NAME),
                     LAST_NAME, inputParameters.getString(LAST_NAME),
                     JOB_TITLE, inputParameters.getString(JOB_TITLE),
