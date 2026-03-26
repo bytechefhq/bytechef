@@ -42,6 +42,8 @@ public class ActionDefinitionBasicModel {
 
   private @Nullable Boolean outputSchemaDefined;
 
+  private @Nullable Boolean resumePerformFunctionDefined;
+
   private @Nullable Boolean sseStreamResponse;
 
   private @Nullable String title;
@@ -221,6 +223,26 @@ public class ActionDefinitionBasicModel {
     this.outputSchemaDefined = outputSchemaDefined;
   }
 
+  public ActionDefinitionBasicModel resumePerformFunctionDefined(@Nullable Boolean resumePerformFunctionDefined) {
+    this.resumePerformFunctionDefined = resumePerformFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does action define resume perform function.
+   * @return resumePerformFunctionDefined
+   */
+
+  @Schema(name = "resumePerformFunctionDefined", description = "Does action define resume perform function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("resumePerformFunctionDefined")
+  public @Nullable Boolean getResumePerformFunctionDefined() {
+    return resumePerformFunctionDefined;
+  }
+
+  public void setResumePerformFunctionDefined(@Nullable Boolean resumePerformFunctionDefined) {
+    this.resumePerformFunctionDefined = resumePerformFunctionDefined;
+  }
+
   public ActionDefinitionBasicModel sseStreamResponse(@Nullable Boolean sseStreamResponse) {
     this.sseStreamResponse = sseStreamResponse;
     return this;
@@ -278,13 +300,14 @@ public class ActionDefinitionBasicModel {
         Objects.equals(this.outputDefined, actionDefinitionBasic.outputDefined) &&
         Objects.equals(this.outputFunctionDefined, actionDefinitionBasic.outputFunctionDefined) &&
         Objects.equals(this.outputSchemaDefined, actionDefinitionBasic.outputSchemaDefined) &&
+        Objects.equals(this.resumePerformFunctionDefined, actionDefinitionBasic.resumePerformFunctionDefined) &&
         Objects.equals(this.sseStreamResponse, actionDefinitionBasic.sseStreamResponse) &&
         Objects.equals(this.title, actionDefinitionBasic.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, sseStreamResponse, title);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, resumePerformFunctionDefined, sseStreamResponse, title);
   }
 
   @Override
@@ -299,6 +322,7 @@ public class ActionDefinitionBasicModel {
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
+    sb.append("    resumePerformFunctionDefined: ").append(toIndentedString(resumePerformFunctionDefined)).append("\n");
     sb.append("    sseStreamResponse: ").append(toIndentedString(sseStreamResponse)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
