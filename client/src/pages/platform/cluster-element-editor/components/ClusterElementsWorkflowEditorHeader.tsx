@@ -1,10 +1,11 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {PlayIcon, SparklesIcon, TextInitialIcon, ZapIcon} from 'lucide-react';
+import {FlaskConicalIcon, PlayIcon, SparklesIcon, TextInitialIcon, ZapIcon} from 'lucide-react';
 
 interface ClusterElementsWorkflowEditorHeaderProps {
     copilotEnabled: boolean;
     onCopilotClick: () => void;
+    onEvalsClick?: () => void;
     onSkillsClick?: () => void;
     onTestClick: () => void;
     onToggleEditor: (showAiAgent: boolean) => void;
@@ -16,6 +17,7 @@ interface ClusterElementsWorkflowEditorHeaderProps {
 const ClusterElementsWorkflowEditorHeader = ({
     copilotEnabled,
     onCopilotClick,
+    onEvalsClick,
     onSkillsClick,
     onTestClick,
     onToggleEditor,
@@ -54,6 +56,22 @@ const ClusterElementsWorkflowEditorHeader = ({
                         </TooltipTrigger>
 
                         <TooltipContent>Agent Skills</TooltipContent>
+                    </Tooltip>
+                )}
+
+                {onEvalsClick && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                className="[&_svg]:size-5"
+                                icon={<FlaskConicalIcon />}
+                                onClick={onEvalsClick}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Agent Evals</TooltipContent>
                     </Tooltip>
                 )}
 
