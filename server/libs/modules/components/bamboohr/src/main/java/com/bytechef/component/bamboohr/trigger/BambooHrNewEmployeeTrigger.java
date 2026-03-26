@@ -43,6 +43,7 @@ public class BambooHrNewEmployeeTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newEmployee")
         .title("New Employee")
         .description("Triggers when a new employee is created.")
+        .help("", "https://docs.bytechef.io/reference/components/bamboohr_v1#new-employee")
         .type(TriggerType.POLLING)
         .output(outputSchema(string()))
         .poll(BambooHrNewEmployeeTrigger::poll);

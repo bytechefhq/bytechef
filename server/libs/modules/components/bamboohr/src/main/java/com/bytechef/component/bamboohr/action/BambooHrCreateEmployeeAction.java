@@ -34,6 +34,7 @@ import com.bytechef.component.bamboohr.util.BambooHrUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ public class BambooHrCreateEmployeeAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEmployee")
         .title("Create Employee")
         .description("Add a new employee.")
+        .help("", "https://docs.bytechef.io/reference/components/bamboohr_v1#create-employee")
         .properties(
             string(FIRST_NAME)
                 .label("First Name")
@@ -94,14 +96,15 @@ public class BambooHrCreateEmployeeAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Http.Response response = context
             .http(http -> http.post("/employees/"))
-            .body(Http.Body.of(
-                FIRST_NAME, inputParameters.getRequiredString(FIRST_NAME),
-                LAST_NAME, inputParameters.getRequiredString(LAST_NAME),
-                EMPLOYEE_NUMBER, inputParameters.getString(EMPLOYEE_NUMBER),
-                JOB_TITLE, inputParameters.getString(JOB_TITLE),
-                LOCATION, inputParameters.getString(LOCATION),
-                EMPLOYMENT_STATUS, inputParameters.getString(EMPLOYMENT_STATUS),
-                HIRE_DATE, inputParameters.getString(HIRE_DATE)))
+            .body(
+                Body.of(
+                    FIRST_NAME, inputParameters.getRequiredString(FIRST_NAME),
+                    LAST_NAME, inputParameters.getRequiredString(LAST_NAME),
+                    EMPLOYEE_NUMBER, inputParameters.getString(EMPLOYEE_NUMBER),
+                    JOB_TITLE, inputParameters.getString(JOB_TITLE),
+                    LOCATION, inputParameters.getString(LOCATION),
+                    EMPLOYMENT_STATUS, inputParameters.getString(EMPLOYMENT_STATUS),
+                    HIRE_DATE, inputParameters.getString(HIRE_DATE)))
             .execute();
 
         List<String> location = response.getHeader("location");

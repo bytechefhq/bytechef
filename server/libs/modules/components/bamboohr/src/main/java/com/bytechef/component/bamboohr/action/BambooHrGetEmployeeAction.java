@@ -40,6 +40,7 @@ public class BambooHrGetEmployeeAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getEmployee")
         .title("Get Employee")
         .description("Get employee data, based on employee ID.")
+        .help("", "https://docs.bytechef.io/reference/components/bamboohr_v1#get-employee")
         .properties(
             string(ID)
                 .label("Employee ID")
