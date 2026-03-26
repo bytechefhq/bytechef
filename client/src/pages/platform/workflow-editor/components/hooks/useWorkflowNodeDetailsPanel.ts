@@ -410,7 +410,8 @@ export default function useWorkflowNodeDetailsPanel({
         currentActionDefinition?.outputDefined ||
         currentTriggerDefinition?.outputDefined ||
         currentClusterElementDefinition?.outputDefined ||
-        (currentOperationDefinition as TaskDispatcherDefinition)?.outputDefined;
+        (currentOperationDefinition as TaskDispatcherDefinition)?.outputDefined ||
+        (currentOperationDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined;
     const outputFunctionDefined =
         currentActionDefinition?.outputFunctionDefined ||
         currentTriggerDefinition?.outputFunctionDefined ||
@@ -431,7 +432,7 @@ export default function useWorkflowNodeDetailsPanel({
         if (currentOperationDefinition && 'variablePropertiesDefined' in currentOperationDefinition) {
             const taskDispatcher = currentOperationDefinition as TaskDispatcherDefinition;
 
-            if (!taskDispatcher.outputDefined) {
+            if (!taskDispatcher.outputDefined && !taskDispatcher.variablePropertiesDefined) {
                 return false;
             }
         }

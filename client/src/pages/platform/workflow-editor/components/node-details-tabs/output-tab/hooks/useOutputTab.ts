@@ -85,8 +85,9 @@ export default function useOutputTab({
         : regularNodeOutputIsFetching;
     const workflowNodeOutputRefetch = isClusterElement ? clusterElementOutputRefetch : regularNodeOutputRefetch;
 
-    const {outputSchema, placeholder, sampleOutput} =
-        workflowNodeOutput?.outputResponse || workflowNodeOutput?.variableOutputResponse || {};
+    const {outputSchema, placeholder, sampleOutput} = workflowNodeOutput?.outputResponse || {};
+    const {outputSchema: variableOutputSchema, sampleOutput: variableSampleOutput} =
+        workflowNodeOutput?.variableOutputResponse || {};
 
     const {refetch: workflowNodeTestOutputExistsRefetch} = useCheckWorkflowNodeTestOutputExistsQuery(
         {
@@ -296,6 +297,8 @@ export default function useOutputTab({
         showUploadDialog,
         testing,
         uploadSampleOutputRequestMutationPending: uploadSampleOutputRequestMutation.isPending,
+        variableOutputSchema,
+        variableSampleOutput,
         webhookTestCancelEnabled,
         webhookTestUrl,
         workflowNodeOutputIsFetching,
