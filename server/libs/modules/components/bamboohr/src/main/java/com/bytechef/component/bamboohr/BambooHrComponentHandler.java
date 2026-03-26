@@ -43,6 +43,8 @@ public class BambooHrComponentHandler implements ComponentHandler {
             "BambooHR is a human resources software that helps HR teams manage employee data, hiring, onboarding, " +
                 "time tracking, payroll, performance management, and more in one platform.")
         .icon("path:assets/bamboohr.svg")
+        .customAction(true)
+        .customActionHelp("", "https://documentation.bamboohr.com/reference")
         .categories(ComponentCategory.HRIS)
         .connection(BambooHrConnection.CONNECTION_DEFINITION)
         .actions(
@@ -57,7 +59,8 @@ public class BambooHrComponentHandler implements ComponentHandler {
             tool(BambooHrCreateEmployeeAction.ACTION_DEFINITION),
             tool(BambooHrUpdateEmployeeAction.ACTION_DEFINITION),
             tool(BambooHrGetEmployeeAction.ACTION_DEFINITION),
-            tool(BambooHrUpdateEmployeeFileAction.ACTION_DEFINITION));
+            tool(BambooHrUpdateEmployeeFileAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

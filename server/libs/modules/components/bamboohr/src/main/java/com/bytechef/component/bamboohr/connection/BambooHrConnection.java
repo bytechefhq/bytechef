@@ -43,7 +43,9 @@ public class BambooHrConnection {
                         .label("API Key")
                         .required(true)))
         .baseUri((connectionParameters, context) -> "https://api.bamboohr.com/api/gateway.php/"
-            + connectionParameters.getRequiredString(COMPANY_DOMAIN) + "/v1");
+            + connectionParameters.getRequiredString(COMPANY_DOMAIN) + "/v1")
+        .help("", "https://docs.bytechef.io/reference/components/bamboohr_v1#connection-setup")
+        .version(1);
 
     private BambooHrConnection() {
     }

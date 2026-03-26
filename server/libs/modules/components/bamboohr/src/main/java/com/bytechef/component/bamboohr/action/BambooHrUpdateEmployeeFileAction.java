@@ -29,7 +29,7 @@ import com.bytechef.component.bamboohr.util.BambooHrUtils;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -40,6 +40,7 @@ public class BambooHrUpdateEmployeeFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateEmployeeFile")
         .title("Update Employee File")
         .description("Update an employee file.")
+        .help("", "https://docs.bytechef.io/reference/components/bamboohr_v1#update-employee-file")
         .properties(
             string(ID)
                 .label("Employee ID")
@@ -53,7 +54,7 @@ public class BambooHrUpdateEmployeeFileAction {
                 .optionsLookupDependsOn(ID)
                 .required(true),
             string(NAME)
-                .label("Updated Name Of The File")
+                .label("Updated File Name")
                 .description("Use if you want to rename the file.")
                 .required(false),
             string(CATEGORY_ID)
@@ -75,7 +76,7 @@ public class BambooHrUpdateEmployeeFileAction {
                 "/employees/" + inputParameters.getRequiredString(ID) + "/files/" +
                     inputParameters.getRequiredString(FILE_ID)))
             .body(
-                Http.Body.of(
+                Body.of(
                     NAME, inputParameters.getString(NAME),
                     CATEGORY_ID, inputParameters.getString(CATEGORY_ID),
                     SHARE_WITH_EMPLOYEE, inputParameters.getString(SHARE_WITH_EMPLOYEE)))
