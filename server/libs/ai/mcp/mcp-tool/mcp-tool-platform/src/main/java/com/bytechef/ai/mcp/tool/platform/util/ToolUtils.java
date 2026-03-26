@@ -314,7 +314,7 @@ public final class ToolUtils {
             case PropertyDecorator.Type.DATE_TIME -> "\"datetime" + displayCondition + required;
             case PropertyDecorator.Type.DYNAMIC_PROPERTIES -> "{}" + displayCondition + required;
             case PropertyDecorator.Type.INTEGER -> "\"integer" + displayCondition + required;
-            case PropertyDecorator.Type.NUMBER -> "\"float" + displayCondition + required;
+            case PropertyDecorator.Type.NUMBER -> "\"number" + displayCondition + required;
             case PropertyDecorator.Type.OBJECT ->
                 generateObjectValue(property.getObjectProperties(), displayCondition, required);
             case PropertyDecorator.Type.FILE_ENTRY ->
