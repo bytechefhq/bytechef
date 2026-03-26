@@ -60,7 +60,7 @@ const ProjectDeploymentDialog = ({
     triggerNode,
 }: ProjectDeploymentDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
-    const [groupConnections, setGroupConnections] = useState(false);
+    const [connectionsGrouped, setConnectionsGrouped] = useState(false);
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const initializedProjectKeyRef = useRef<string>('');
@@ -196,7 +196,7 @@ const ProjectDeploymentDialog = ({
                 <ProjectDeploymentDialogWorkflowsStep
                     control={control}
                     formState={formState}
-                    groupConnections={groupConnections}
+                    groupConnections={connectionsGrouped}
                     setValue={setValue}
                     workflows={workflows}
                 />
@@ -221,7 +221,7 @@ const ProjectDeploymentDialog = ({
 
             resetWorkflowsEnabledStore();
 
-            setGroupConnections(false);
+            setConnectionsGrouped(false);
         }, 300);
     };
 
@@ -399,9 +399,11 @@ const ProjectDeploymentDialog = ({
                             <>
                                 {activeStepIndex === 1 && hasVisibleConnections && (
                                     <div className="mr-auto flex items-center gap-2">
-                                        <Switch checked={groupConnections} onCheckedChange={setGroupConnections} />
-
-                                        <span className="text-sm font-semibold">Group Connections</span>
+                                        <Switch
+                                            checked={connectionsGrouped}
+                                            label="Group Connections"
+                                            onCheckedChange={setConnectionsGrouped}
+                                        />
 
                                         <Tooltip>
                                             <TooltipTrigger asChild>
