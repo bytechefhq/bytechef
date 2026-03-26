@@ -180,6 +180,7 @@ const ClusterElementsCanvasDialog = ({
 
                             <ClusterElementsWorkflowEditorHeader
                                 copilotEnabled={ff_4070 && copilotEnabled}
+                                onClose={handleClose}
                                 onCopilotClick={handleCopilotClick}
                                 onSkillsClick={isAiAgentClusterRoot ? () => setSkillsPanelOpen(true) : undefined}
                                 onTestClick={handleTestClick}
