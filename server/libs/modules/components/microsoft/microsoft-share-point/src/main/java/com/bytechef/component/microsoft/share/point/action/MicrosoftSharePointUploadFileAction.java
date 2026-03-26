@@ -26,16 +26,18 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FILE;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER_PROPERTY;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
 import static com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils.getFolderId;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
@@ -48,8 +50,12 @@ public class MicrosoftSharePointUploadFileAction {
         .description("Upload file to Microsoft SharePoint folder.")
         .properties(
             SITE_ID_PROPERTY,
-            PARENT_FOLDER_PROPERTY
-                .description("If no folder is selected, file will be uploaded to root folder"),
+            string(PARENT_FOLDER)
+                .label("Parent Folder ID")
+                .description("If no folder is selected, file will be uploaded to root folder.")
+                .optionsLookupDependsOn(SITE_ID)
+                .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
+                .required(false),
             fileEntry(FILE)
                 .label("File Entry")
                 .description("File to upload.")
