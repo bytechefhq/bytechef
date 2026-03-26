@@ -16,6 +16,7 @@
 
 package com.bytechef.component.asana.util;
 
+import static com.bytechef.component.asana.constant.AsanaConstants.WORKSPACE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -91,12 +92,12 @@ class AsanaUtilsTest {
     }
 
     @Test
-    void testGetProjectOptions(
+    void testGetProjectsOptions(
         Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         List<Option<String>> result =
-            AsanaUtils.getProjectOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            AsanaUtils.getProjectsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(expectedOptions, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
@@ -119,8 +120,8 @@ class AsanaUtilsTest {
         Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        List<Option<String>> result =
-            AsanaUtils.getTagsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        List<Option<String>> result = AsanaUtils.getTagsOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(expectedOptions, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
@@ -132,7 +133,7 @@ class AsanaUtilsTest {
         assertEquals("/tags", stringArgumentCaptor.getValue());
 
         Object[] expectedQueryParameters = {
-            "limit", 100, "offset", null,
+            "limit", 100, "offset", null, WORKSPACE, "data.workspace"
         };
 
         assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
@@ -201,7 +202,7 @@ class AsanaUtilsTest {
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
-        assertEquals("/projects/data.project/tasks", stringArgumentCaptor.getValue());
+        assertEquals("/workspaces/data.workspace/tasks/search", stringArgumentCaptor.getValue());
 
         Object[] expectedQueryParameters = {
             "limit", 100, "offset", null, "opt_fields", "gid,name"
