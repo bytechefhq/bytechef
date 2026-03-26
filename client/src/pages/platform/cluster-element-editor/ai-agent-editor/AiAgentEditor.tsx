@@ -35,14 +35,17 @@ export default function AiAgentEditor({
     workflowNodeOutputs,
 }: AiAgentEditorProps) {
     const {setSkillsPanelOpen, skillsHeaderInfo, skillsPanelOpen} = useAiAgentSkillsStore();
+
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
     const ff_4545 = useFeatureFlagsStore()('ff-4545');
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
+
     const {handleNodeDetailsPanelClose, showNodeDetailsPanel, updateWorkflowMutation} = useAiAgentEditor({
         previousComponentDefinitions,
         workflowNodeOutputs,
     });
+
     const {handleClose: handleSkillsClose} = useAgentSkills({enabled: skillsPanelOpen});
 
     if (skillsPanelOpen) {

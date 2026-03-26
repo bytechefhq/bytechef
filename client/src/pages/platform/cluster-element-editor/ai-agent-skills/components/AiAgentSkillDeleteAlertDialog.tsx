@@ -9,33 +9,33 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const AiAgentSkillDeleteAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => {
-    return (
-        <AlertDialog
-            onOpenChange={(open) => {
-                if (!open) onClose();
-            }}
-            open={true}
-        >
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+const AiAgentSkillDeleteAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
+    <AlertDialog
+        onOpenChange={(open) => {
+            if (!open) {
+                onClose();
+            }
+        }}
+        open
+    >
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the skill.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
+                <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the skill.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
 
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-red-600" onClick={onDelete}>
-                        Delete
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
-};
+                <AlertDialogAction className="bg-red-600" onClick={onDelete}>
+                    Delete
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+);
 
 export default AiAgentSkillDeleteAlertDialog;
