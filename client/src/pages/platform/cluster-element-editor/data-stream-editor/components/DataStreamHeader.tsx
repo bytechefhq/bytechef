@@ -9,56 +9,51 @@ interface DataStreamHeaderProps {
     onToggleEditor?: (showDataStream: boolean) => void;
 }
 
-export default function DataStreamHeader({
-    copilotEnabled,
-    onClose,
-    onCopilotClick,
-    onToggleEditor,
-}: DataStreamHeaderProps) {
-    return (
-        <div className="flex items-center justify-between p-4">
-            <div className="text-lg font-semibold">Data Stream Editor</div>
+const DataStreamHeader = ({copilotEnabled, onClose, onCopilotClick, onToggleEditor}: DataStreamHeaderProps) => (
+    <div className="flex items-center justify-between p-4">
+        <div className="text-lg font-semibold">Data Stream Editor</div>
 
-            <div className="flex items-center gap-1">
-                {onToggleEditor && (
-                    <div className="flex items-center gap-1 rounded-md p-0.5">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    className="bg-surface-neutral-primary"
-                                    icon={<LayoutGridIcon />}
-                                    label="Advanced"
-                                    onClick={() => onToggleEditor(false)}
-                                    size="default"
-                                    variant="ghost"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent>Switch to advanced Data Stream editor - workflow canvas</TooltipContent>
-                        </Tooltip>
-                    </div>
-                )}
-
-                {copilotEnabled && onCopilotClick && (
+        <div className="flex items-center gap-1">
+            {onToggleEditor && (
+                <div className="flex items-center gap-1 rounded-md p-0.5">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                className="[&_svg]:size-5"
-                                icon={<SparklesIcon />}
-                                onClick={onCopilotClick}
-                                size="icon"
+                                className="bg-surface-neutral-primary"
+                                icon={<LayoutGridIcon />}
+                                label="Advanced"
+                                onClick={() => onToggleEditor(false)}
+                                size="default"
                                 variant="ghost"
                             />
                         </TooltipTrigger>
 
-                        <TooltipContent>Open Copilot panel</TooltipContent>
+                        <TooltipContent>Switch to advanced Data Stream editor - workflow canvas</TooltipContent>
                     </Tooltip>
-                )}
+                </div>
+            )}
 
-                {onClose && (
-                    <Button icon={<XIcon />} onClick={onClose} size="icon" title="Close the canvas" variant="ghost" />
-                )}
-            </div>
+            {copilotEnabled && onCopilotClick && (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            className="[&_svg]:size-5"
+                            icon={<SparklesIcon />}
+                            onClick={onCopilotClick}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent>Open Copilot panel</TooltipContent>
+                </Tooltip>
+            )}
+
+            {onClose && (
+                <Button icon={<XIcon />} onClick={onClose} size="icon" title="Close the canvas" variant="ghost" />
+            )}
         </div>
-    );
-}
+    </div>
+);
+
+export default DataStreamHeader;

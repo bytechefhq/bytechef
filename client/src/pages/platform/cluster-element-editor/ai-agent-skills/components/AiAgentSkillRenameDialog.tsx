@@ -27,7 +27,7 @@ const AiAgentSkillRenameDialog = ({currentName, onClose, onRename}: AiAgentSkill
                     onClose();
                 }
             }}
-            open={true}
+            open
         >
             <AlertDialogContent>
                 <AlertDialogHeader>

@@ -12,15 +12,13 @@ import {Markdown} from 'tiptap-markdown';
 
 const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
-function FileTreeNode({
-    node,
-    onSelect,
-    selectedPath,
-}: {
+interface FileTreeNodeProps {
     node: FileTreeNodeI;
     onSelect: (path: string) => void;
     selectedPath: string | null;
-}) {
+}
+
+const FileTreeNode = ({node, onSelect, selectedPath}: FileTreeNodeProps) => {
     const isSelected = node.type === 'file' && node.path === selectedPath;
 
     if (node.type === 'directory') {
@@ -42,12 +40,16 @@ function FileTreeNode({
     }
 
     return (
-        <button
+        <Button
             className={twMerge(
-                'flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-sm hover:bg-gray-100',
-                isSelected && 'bg-blue-50 text-blue-700'
+                'h-auto w-full justify-start gap-1.5 rounded px-2 py-1 text-left text-sm font-normal',
+                isSelected &&
+                    'bg-blue-50 text-blue-700 hover:bg-blue-50 hover:text-blue-700 active:bg-blue-50 active:text-blue-700'
             )}
             onClick={() => onSelect(node.path)}
+            size="xs"
+            type="button"
+            variant="ghost"
         >
             {node.name.toLowerCase().endsWith('.md') ? (
                 <FileTextIcon className="size-4" />
@@ -56,9 +58,9 @@ function FileTreeNode({
             )}
 
             <span>{node.name}</span>
-        </button>
+        </Button>
     );
-}
+};
 
 function parseFrontmatter(content: string): {body: string; frontmatter: Record<string, string> | null} {
     const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -84,23 +86,21 @@ function parseFrontmatter(content: string): {body: string; frontmatter: Record<s
     return {body: frontmatterMatch[2].trim(), frontmatter};
 }
 
-function FrontmatterTable({frontmatter}: {frontmatter: Record<string, string>}) {
-    return (
-        <table className="mb-6 w-full border-collapse text-sm">
-            <tbody>
-                {Object.entries(frontmatter).map(([key, value]) => (
-                    <tr className="border-b border-b-border/50" key={key}>
-                        <td className="py-2 pr-4 font-medium text-gray-600">{key}</td>
+const FrontmatterTable = ({frontmatter}: {frontmatter: Record<string, string>}) => (
+    <table className="mb-6 w-full border-collapse text-sm">
+        <tbody>
+            {Object.entries(frontmatter).map(([key, value]) => (
+                <tr className="border-b border-b-border/50" key={key}>
+                    <td className="py-2 pr-4 font-medium text-gray-600">{key}</td>
 
-                        <td className="py-2 text-gray-900">{value}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    );
-}
+                    <td className="py-2 text-gray-900">{value}</td>
+                </tr>
+            ))}
+        </tbody>
+    </table>
+);
 
-function MarkdownViewer({content}: {content: string}) {
+const MarkdownViewer = ({content}: {content: string}) => {
     const {body, frontmatter} = parseFrontmatter(content);
 
     const editor = useEditor({
@@ -124,7 +124,7 @@ function MarkdownViewer({content}: {content: string}) {
             </div>
         </div>
     );
-}
+};
 
 const AiAgentSkillDetail = () => {
     const {

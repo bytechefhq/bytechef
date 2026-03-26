@@ -66,13 +66,14 @@ const AiAgentSkillUploadForm = () => {
                                     {(file.size / 1024).toFixed(1)} KB
                                 </span>
 
-                                <button
-                                    className="shrink-0 text-gray-400 hover:text-gray-600"
+                                <Button
+                                    className="shrink-0 text-gray-400 hover:text-gray-600 [&_svg]:size-4"
+                                    icon={<XIcon />}
                                     onClick={() => handleRemoveFile(index)}
+                                    size="iconXs"
                                     type="button"
-                                >
-                                    <XIcon className="size-4" />
-                                </button>
+                                    variant="ghost"
+                                />
                             </div>
                         ))}
                     </div>
