@@ -375,9 +375,11 @@ const WorkflowTestConfigurationDialog = ({
                             <div className="mr-auto flex items-center gap-2">
                                 {componentConnections.length > 1 && (
                                     <>
-                                        <Switch checked={connectionsGrouped} onCheckedChange={setConnectionsGrouped} />
-
-                                        <span className="text-sm font-semibold">Group Connections</span>
+                                        <Switch
+                                            checked={connectionsGrouped}
+                                            label="Group Connections"
+                                            onCheckedChange={setConnectionsGrouped}
+                                        />
 
                                         <Tooltip>
                                             <TooltipTrigger asChild>
