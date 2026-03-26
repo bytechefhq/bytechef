@@ -75,7 +75,7 @@ export const Thread: FC = () => {
                         ['--thread-max-width' as string]: '60rem',
                     }}
                 >
-                    <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll px-4">
+                    <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex min-h-0 flex-1 flex-col overflow-x-auto overflow-y-scroll px-4">
                         <ThreadPrimitive.If empty>
                             <ThreadWelcome />
                         </ThreadPrimitive.If>
@@ -364,7 +364,7 @@ const Composer: FC = () => {
     }, [workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
 
     return (
-        <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl pb-4 md:pb-6">
+        <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl pb-4 md:pb-4">
             <ThreadScrollToBottom />
 
             <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col rounded-3xl border border-border bg-muted px-1 pt-2 shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)] dark:border-muted-foreground/15">
