@@ -1,0 +1,10 @@
+mutation startAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!) {
+    startAgentEvalRun(agentEvalTestId: $agentEvalTestId, name: $name, environmentId: $environmentId) {
+        id
+        name
+        status
+        totalScenarios
+        completedScenarios
+        createdDate
+    }
+}

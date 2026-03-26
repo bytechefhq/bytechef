@@ -1,0 +1,9 @@
+mutation updateAgentEvalTest($id: ID!, $name: String, $description: String) {
+    updateAgentEvalTest(id: $id, name: $name, description: $description) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}
