@@ -64,7 +64,7 @@ const OutputSchemaDisplay = ({
 }: OutputSchemaDisplayProps) => {
     const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
     const hasItems = Boolean(outputSchema && 'items' in outputSchema && outputSchema.items);
-    console.log(outputDefined);
+
     return (
         <div className="h-full">
             {outputDefined && outputSchema && (
