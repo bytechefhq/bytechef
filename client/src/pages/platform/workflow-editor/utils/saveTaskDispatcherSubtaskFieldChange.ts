@@ -10,8 +10,8 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 type FieldUpdateType = {
-    field: 'operation' | 'label' | 'description';
-    value: string;
+    field: 'description' | 'label' | 'maxRetries' | 'operation';
+    value: number | string;
 };
 
 interface SaveTaskDispatcherSubtaskFieldChangeProps {
@@ -215,13 +215,19 @@ export default function saveTaskDispatcherSubtaskFieldChange({
             case 'label':
                 updatedTask = {
                     ...parentTaskDispatcherTask,
-                    label: fieldUpdate.value,
+                    label: fieldUpdate.value as string,
                 };
                 break;
             case 'description':
                 updatedTask = {
                     ...parentTaskDispatcherTask,
-                    description: fieldUpdate.value,
+                    description: fieldUpdate.value as string,
+                };
+                break;
+            case 'maxRetries':
+                updatedTask = {
+                    ...parentTaskDispatcherTask,
+                    maxRetries: fieldUpdate.value as number,
                 };
                 break;
             default:
@@ -251,12 +257,17 @@ export default function saveTaskDispatcherSubtaskFieldChange({
                     case 'label':
                         return {
                             ...subtask,
-                            label: fieldUpdate.value,
+                            label: fieldUpdate.value as string,
                         };
                     case 'description':
                         return {
                             ...subtask,
-                            description: fieldUpdate.value,
+                            description: fieldUpdate.value as string,
+                        };
+                    case 'maxRetries':
+                        return {
+                            ...subtask,
+                            maxRetries: fieldUpdate.value as number,
                         };
                     default:
                         return subtask;
@@ -288,14 +299,16 @@ export default function saveTaskDispatcherSubtaskFieldChange({
                     ...commonUpdates,
                     displayConditions: {},
                     metadata: {},
-                    operationName: fieldUpdate.value,
+                    operationName: fieldUpdate.value as string,
                     parameters: getParametersWithDefaultValues({
                         properties: currentOperationProperties as Array<PropertyAllType>,
                     }),
                     type: `${componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
                 };
+            } else if (fieldUpdate.field === 'maxRetries') {
+                commonUpdates.maxRetries = fieldUpdate.value as number;
             } else {
-                commonUpdates[fieldUpdate.field] = fieldUpdate.value;
+                commonUpdates[fieldUpdate.field as 'label' | 'description'] = fieldUpdate.value as string;
             }
 
             setCurrentComponent({
