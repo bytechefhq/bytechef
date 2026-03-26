@@ -68,6 +68,7 @@ export type ComponentType = {
         [key: string]: boolean;
     };
     label?: string;
+    maxRetries?: number;
     metadata?: {
         ui?: {
             condition?: string;
@@ -240,6 +241,7 @@ export type NodeDataType = {
     loopId?: string;
     mapData?: MapDataType;
     mapId?: string;
+    maxRetries?: number;
     onErrorData?: OnErrorDataType;
     onErrorId?: string;
     metadata?: {
@@ -309,6 +311,7 @@ export type WorkflowTaskType = {
     };
     finalize?: Array<WorkflowTaskType>;
     label?: string;
+    maxRetries?: number;
     name: string;
     node?: string;
     parameters?: {[key: string]: object | []};
