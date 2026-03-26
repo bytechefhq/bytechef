@@ -170,7 +170,8 @@ const ClusterElementsCanvasDialog = ({
                         <div
                             className={twMerge(
                                 'relative min-h-0 flex-1 rounded-lg bg-surface-popover-canvas transition-[margin] duration-300 ease-in-out',
-                                workflowNodeDetailsPanelOpen && 'mr-[465px]',
+                                copilotPanelOpen && !workflowNodeDetailsPanelOpen && 'mr-[450px]',
+                                workflowNodeDetailsPanelOpen && !copilotPanelOpen && 'mr-[465px]',
                                 workflowNodeDetailsPanelOpen && copilotPanelOpen && 'mr-[915px]'
                             )}
                         >
