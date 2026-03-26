@@ -24,6 +24,7 @@ interface OutputTabProps {
     outputDefined?: boolean;
     outputFunctionDefined?: boolean;
     parentWorkflowNodeName?: string;
+    resumePerformFunctionDefined?: boolean;
     variablePropertiesDefined?: boolean;
     workflowId: string;
 }
@@ -36,6 +37,7 @@ const OutputTab = ({
     outputDefined,
     outputFunctionDefined,
     parentWorkflowNodeName,
+    resumePerformFunctionDefined = false,
     variablePropertiesDefined = false,
     workflowId,
 }: OutputTabProps) => {
@@ -58,6 +60,8 @@ const OutputTab = ({
         showUploadDialog,
         testing,
         uploadSampleOutputRequestMutationPending,
+        variableOutputSchema,
+        variableSampleOutput,
         webhookTestCancelEnabled,
         webhookTestUrl,
         workflowNodeOutputIsFetching,
@@ -73,13 +77,13 @@ const OutputTab = ({
         return <></>;
     }
 
-    if (!testing && outputFunctionDefined && !outputSchema) {
+    if (!testing && outputFunctionDefined && !outputSchema && !variableOutputSchema) {
         return <div className="p-4 text-sm text-muted-foreground">No output schema to show.</div>;
     }
 
     return (
         <div className="h-full p-4">
-            {!testing && outputSchema && (
+            {!testing && (outputSchema || variableOutputSchema) && (
                 <div className="h-full">
                     <OutputSchemaDisplay
                         clusterElementType={clusterElementType}
@@ -92,18 +96,22 @@ const OutputTab = ({
                         handlePredefinedOutputSchemaClick={handlePredefinedOutputSchemaClick}
                         handleTestOperationClick={handleTestOperationClick}
                         isClusterElement={!!clusterElementType}
+                        outputDefined={outputDefined}
                         outputSchema={outputSchema}
+                        resumePerformFunctionDefined={resumePerformFunctionDefined}
                         sampleOutput={sampleOutput}
                         saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
                         saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
                         setShowUploadDialog={setShowUploadDialog}
                         showClusterElementTestButton={hasClusterElementProperties}
+                        variableOutputSchema={variableOutputSchema}
                         variablePropertiesDefined={variablePropertiesDefined}
+                        variableSampleOutput={variableSampleOutput}
                     />
                 </div>
             )}
 
-            {!testing && !outputSchema && (
+            {!testing && !outputSchema && !variablePropertiesDefined && (
                 <div className="absolute inset-0 flex items-center justify-center px-4">
                     <OutputSchemaCreationControls
                         clusterElementType={clusterElementType}
@@ -120,7 +128,6 @@ const OutputTab = ({
                         showUploadSampleOutputButton={outputDefined}
                         trigger={currentNode.trigger}
                         uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutationPending}
-                        variablePropertiesDefined={variablePropertiesDefined}
                     />
                 </div>
             )}

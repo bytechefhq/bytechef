@@ -9,7 +9,11 @@ import DescriptionTab from '@/pages/platform/workflow-editor/components/node-det
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
-import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
+import {
+    ActionDefinition,
+    ComponentDefinitionBasic,
+    WorkflowNodeOutput,
+} from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {ExternalLinkIcon, InfoIcon, XIcon} from 'lucide-react';
@@ -265,6 +269,10 @@ const WorkflowNodeDetailsPanel = ({
                                             outputDefined={outputDefined}
                                             outputFunctionDefined={outputFunctionDefined}
                                             parentWorkflowNodeName={rootClusterElementNodeData?.workflowNodeName}
+                                            resumePerformFunctionDefined={
+                                                (currentActionDefinition as ActionDefinition)
+                                                    ?.resumePerformFunctionDefined
+                                            }
                                             variablePropertiesDefined={
                                                 currentTaskDispatcherDefinition?.variablePropertiesDefined
                                             }

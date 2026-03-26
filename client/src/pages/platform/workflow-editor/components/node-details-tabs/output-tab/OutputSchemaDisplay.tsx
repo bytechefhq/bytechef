@@ -26,13 +26,17 @@ interface OutputSchemaDisplayProps {
     handleTestOperationClick: () => void;
     clusterElementType?: string;
     isClusterElement?: boolean;
-    outputSchema: PropertyAllType;
+    outputDefined?: boolean;
+    outputSchema?: PropertyAllType;
+    resumePerformFunctionDefined?: boolean;
     sampleOutput?: object;
     saveClusterElementTestOutputMutationPending?: boolean;
     saveWorkflowNodeTestOutputMutation: {isPending: boolean};
     setShowUploadDialog: (show: boolean) => void;
     showClusterElementTestButton?: boolean;
+    variableOutputSchema?: PropertyAllType;
     variablePropertiesDefined?: boolean;
+    variableSampleOutput?: object;
 }
 
 const OutputSchemaDisplay = ({
@@ -46,117 +50,159 @@ const OutputSchemaDisplay = ({
     handlePredefinedOutputSchemaClick,
     handleTestOperationClick,
     isClusterElement,
+    outputDefined,
     outputSchema,
+    resumePerformFunctionDefined,
     sampleOutput,
     saveClusterElementTestOutputMutationPending,
     saveWorkflowNodeTestOutputMutation,
     setShowUploadDialog,
     showClusterElementTestButton,
+    variableOutputSchema,
     variablePropertiesDefined,
+    variableSampleOutput,
 }: OutputSchemaDisplayProps) => {
     const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
     const hasItems = Boolean(outputSchema && 'items' in outputSchema && outputSchema.items);
-
+    console.log(outputDefined);
     return (
         <div className="h-full">
-            <div className="mb-2 flex items-center justify-between">
-                <h3 className="text-sm text-gray-500">Output Schema</h3>
+            {outputDefined && outputSchema && (
+                <>
+                    <div className="mb-2 flex items-center justify-between">
+                        <h3 className="text-sm text-gray-500">Output Schema</h3>
 
-                <ButtonGroup>
-                    {!variablePropertiesDefined &&
-                        (showClusterElementTestButton &&
-                        currentOperationProperties &&
-                        handleClusterElementTestSubmit ? (
-                            <ClusterElementTestButton
-                                clusterElementType={clusterElementType}
-                                connectionMissing={connectionMissing}
-                                currentNode={currentNode}
-                                onSubmit={handleClusterElementTestSubmit}
-                                properties={currentOperationProperties}
-                                saving={!!saveClusterElementTestOutputMutationPending}
-                            />
-                        ) : (
-                            <Button
-                                disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
-                                label={`Test ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}
-                                onClick={handleTestOperationClick}
-                                variant="outline"
-                            />
-                        ))}
+                        <ButtonGroup>
+                            {!resumePerformFunctionDefined &&
+                                !variablePropertiesDefined &&
+                                (showClusterElementTestButton &&
+                                currentOperationProperties &&
+                                handleClusterElementTestSubmit ? (
+                                    <ClusterElementTestButton
+                                        clusterElementType={clusterElementType}
+                                        connectionMissing={connectionMissing}
+                                        currentNode={currentNode}
+                                        onSubmit={handleClusterElementTestSubmit}
+                                        properties={currentOperationProperties}
+                                        saving={!!saveClusterElementTestOutputMutationPending}
+                                    />
+                                ) : (
+                                    <Button
+                                        disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
+                                        label={`Test ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}
+                                        onClick={handleTestOperationClick}
+                                        variant="outline"
+                                    />
+                                ))}
 
-                    {variablePropertiesDefined && !isClusterElement && (
-                        <Button
-                            disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                            label="Upload Sample Output"
-                            onClick={() => setShowUploadDialog(true)}
-                            variant="outline"
+                            {(resumePerformFunctionDefined || (outputSchema && variablePropertiesDefined)) &&
+                                !isClusterElement && (
+                                    <Button
+                                        disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                        label="Upload Sample Output"
+                                        onClick={() => setShowUploadDialog(true)}
+                                        variant="outline"
+                                    />
+                                )}
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        aria-label="More Options"
+                                        disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                        icon={<MoreHorizontalIcon />}
+                                        size="icon"
+                                        variant="outline"
+                                    />
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuContent align="end" className="w-52">
+                                    <DropdownMenuGroup>
+                                        {!resumePerformFunctionDefined &&
+                                            !variablePropertiesDefined &&
+                                            !isClusterElement && (
+                                                <DropdownMenuItem
+                                                    className="cursor-pointer"
+                                                    onClick={() => setShowUploadDialog(true)}
+                                                >
+                                                    Upload Sample Output
+                                                </DropdownMenuItem>
+                                            )}
+
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={handlePredefinedOutputSchemaClick}
+                                        >
+                                            Reset
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </ButtonGroup>
+                    </div>
+
+                    <PropertyField
+                        copiedValue={copiedValue}
+                        copyToClipboard={copyToClipboard}
+                        label={currentNode.name}
+                        property={outputSchema}
+                        sampleOutput={sampleOutput}
+                        valueToCopy={`$\{${currentNode.name}}`}
+                        workflowNodeName={currentNode.name}
+                    />
+
+                    {hasProperties && sampleOutput && (
+                        <SchemaProperties
+                            copiedValue={copiedValue}
+                            copyToClipboard={copyToClipboard}
+                            properties={(outputSchema as PropertyAllType).properties!}
+                            sampleOutput={sampleOutput}
+                            workflowNodeName={currentNode.name}
                         />
                     )}
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="More Options"
-                                disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                icon={<MoreHorizontalIcon />}
-                                size="icon"
-                                variant="outline"
+                    {hasItems && sampleOutput && (
+                        <div className="ml-3 flex flex-col overflow-y-auto border-l border-l-border/50 pl-1">
+                            <SchemaProperties
+                                copiedValue={copiedValue}
+                                copyToClipboard={copyToClipboard}
+                                properties={(outputSchema as PropertyAllType).items!}
+                                sampleOutput={sampleOutput}
+                                workflowNodeName={currentNode.name}
                             />
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end" className="w-52">
-                            <DropdownMenuGroup>
-                                {!variablePropertiesDefined && !isClusterElement && (
-                                    <DropdownMenuItem
-                                        className="cursor-pointer"
-                                        onClick={() => setShowUploadDialog(true)}
-                                    >
-                                        Upload Sample Output
-                                    </DropdownMenuItem>
-                                )}
-
-                                <DropdownMenuItem
-                                    className="cursor-pointer"
-                                    onClick={handlePredefinedOutputSchemaClick}
-                                >
-                                    Reset
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </ButtonGroup>
-            </div>
-
-            <PropertyField
-                copiedValue={copiedValue}
-                copyToClipboard={copyToClipboard}
-                label={currentNode.name}
-                property={outputSchema}
-                sampleOutput={sampleOutput}
-                valueToCopy={`$\{${currentNode.name}}`}
-                workflowNodeName={currentNode.name}
-            />
-
-            {hasProperties && sampleOutput && (
-                <SchemaProperties
-                    copiedValue={copiedValue}
-                    copyToClipboard={copyToClipboard}
-                    properties={(outputSchema as PropertyAllType).properties!}
-                    sampleOutput={sampleOutput}
-                    workflowNodeName={currentNode.name}
-                />
+                        </div>
+                    )}
+                </>
             )}
 
-            {hasItems && sampleOutput && (
-                <div className="ml-3 flex flex-col overflow-y-auto border-l border-l-border/50 pl-1">
-                    <SchemaProperties
-                        copiedValue={copiedValue}
-                        copyToClipboard={copyToClipboard}
-                        properties={(outputSchema as PropertyAllType).items!}
-                        sampleOutput={sampleOutput}
-                        workflowNodeName={currentNode.name}
-                    />
-                </div>
+            {variablePropertiesDefined && (
+                <>
+                    <div className="my-3 flex items-center justify-between">
+                        <h3 className="text-sm text-gray-500">Item Schema</h3>
+                    </div>
+
+                    {variableOutputSchema && (
+                        <PropertyField
+                            copiedValue={copiedValue}
+                            copyToClipboard={copyToClipboard}
+                            label={currentNode.name}
+                            property={variableOutputSchema}
+                            sampleOutput={variableSampleOutput}
+                            valueToCopy={`$\{${currentNode.name}}`}
+                            workflowNodeName={currentNode.name}
+                        />
+                    )}
+
+                    {variableOutputSchema && variableSampleOutput && (
+                        <SchemaProperties
+                            copiedValue={copiedValue}
+                            copyToClipboard={copyToClipboard}
+                            properties={(variableOutputSchema as PropertyAllType).properties!}
+                            sampleOutput={variableSampleOutput}
+                            workflowNodeName={currentNode.name}
+                        />
+                    )}
+                </>
             )}
         </div>
     );
