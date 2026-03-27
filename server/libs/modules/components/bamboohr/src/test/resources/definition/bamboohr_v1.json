@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add a new employee.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bamboohr_v1#create-employee"
+    },
     "metadata": null,
     "name": "createEmployee",
     "outputDefinition": {
@@ -308,7 +311,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an employee, based on employee ID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bamboohr_v1#update-employee"
+    },
     "metadata": null,
     "name": "updateEmployee",
     "outputDefinition": null,
@@ -480,7 +486,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get employee data, based on employee ID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bamboohr_v1#get-employee"
+    },
     "metadata": null,
     "name": "getEmployee",
     "outputDefinition": {
@@ -571,7 +580,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an employee file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bamboohr_v1#update-employee-file"
+    },
     "metadata": null,
     "name": "updateEmployeeFile",
     "outputDefinition": null,
@@ -634,7 +646,7 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Updated Name Of The File",
+      "label": "Updated File Name",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
@@ -1325,7 +1337,7 @@
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Updated Name Of The File",
+      "label": "Updated File Name",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
@@ -1464,14 +1476,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bamboohr_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://documentation.bamboohr.com/reference"
+  },
   "description": "BambooHR is a human resources software that helps HR teams manage employee data, hiring, onboarding, time tracking, payroll, performance management, and more in one platform.",
   "icon": "path:assets/bamboohr.svg",
   "metadata": null,
@@ -1485,7 +1503,10 @@
     "deprecated": null,
     "description": "Triggers when specific employee fields are updated.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bamboohr_v1#updated-employee"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "updatedEmployee",
@@ -1604,7 +1625,10 @@
     "deprecated": null,
     "description": "Triggers when a new employee is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bamboohr_v1#new-employee"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newEmployee",
