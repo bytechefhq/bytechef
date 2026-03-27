@@ -46,6 +46,7 @@ public class RocketchatNewMessageTrigger {
         .title("New Message")
         .description(
             "Trigger off whenever a new message is posted to any public channel, private group or direct messages.")
+        .help("", "https://docs.bytechef.io/reference/components/rocketchat_v1#new-message")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output()
         .webhookDisable(RocketchatNewMessageTrigger::webhookDisable)

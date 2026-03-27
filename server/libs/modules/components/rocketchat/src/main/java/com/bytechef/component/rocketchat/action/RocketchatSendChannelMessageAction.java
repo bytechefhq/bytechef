@@ -38,6 +38,7 @@ public class RocketchatSendChannelMessageAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendChannelMessage")
         .title("Send Channel Message")
         .description("Send messages to channel on your workspace.")
+        .help("", "https://docs.bytechef.io/reference/components/rocketchat_v1#send-channel-message")
         .properties(
             string(ROOM_ID)
                 .label("Channel Name")
