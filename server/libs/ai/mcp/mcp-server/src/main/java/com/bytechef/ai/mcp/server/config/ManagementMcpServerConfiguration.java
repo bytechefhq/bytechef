@@ -33,6 +33,8 @@ import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
@@ -42,9 +44,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.web.servlet.function.EntityResponse;
 import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
 
 /**
@@ -87,7 +93,96 @@ public class ManagementMcpServerConfiguration {
 
     @Bean
     RouterFunction<ServerResponse> mcpRouterFunction() {
-        return webMvcStreamableHttpServerTransportProvider().getRouterFunction();
+        Map<String, String> sessionIdCache = new ConcurrentHashMap<>();
+
+        return webMvcStreamableHttpServerTransportProvider()
+            .getRouterFunction()
+            .filter((request, next) -> {
+                List<MediaType> accept = request.headers()
+                    .accept();
+                ServerRequest workingRequest;
+
+                if ("GET".equals(request.method()
+                    .name())) {
+                    // GET SSE requests need only text/event-stream — do not inject application/json
+                    workingRequest = request;
+                } else if (accept.contains(MediaType.TEXT_EVENT_STREAM)
+                    && accept.contains(MediaType.APPLICATION_JSON)) {
+                    workingRequest = request;
+                } else {
+                    // POST requests require both Accept types in Spring AI M3
+                    workingRequest = ServerRequest.from(request)
+                        .headers(headers -> headers.set(
+                            HttpHeaders.ACCEPT,
+                            MediaType.APPLICATION_JSON_VALUE + ", " + MediaType.TEXT_EVENT_STREAM_VALUE))
+                        .build();
+                }
+
+                // Inject cached session ID for clients (e.g. supergateway) that do not forward Mcp-Session-Id
+                String secretKey = request.pathVariable("secretKey");
+
+                if (request.headers()
+                    .header("Mcp-Session-Id")
+                    .isEmpty()) {
+                    String cachedSessionId = sessionIdCache.get(secretKey);
+
+                    if (cachedSessionId != null) {
+                        final String sessionId = cachedSessionId;
+
+                        workingRequest = ServerRequest.from(workingRequest)
+                            .headers(headers -> headers.set("Mcp-Session-Id", sessionId))
+                            .build();
+                    }
+                }
+
+                ServerResponse response = next.handle(workingRequest);
+
+                // Cache the session ID returned by the initialize response
+                String sessionId = response.headers()
+                    .getFirst("Mcp-Session-Id");
+
+                if (sessionId != null) {
+                    sessionIdCache.put(secretKey, sessionId);
+
+                    // Downgrade protocol version in the initialize response.
+                    // supergateway (3.x) uses @modelcontextprotocol/sdk npm which only supports up to
+                    // 2025-06-18; it forwards Claude Desktop's 2025-11-25 but then rejects the server
+                    // response if it echoes 2025-11-25 back.
+                    response = downgradeMcpProtocolVersion(response, sessionId);
+                } else if (response.statusCode()
+                    .value() == 404) {
+                    sessionIdCache.remove(secretKey);
+                }
+
+                return response;
+            });
+    }
+
+    private static ServerResponse downgradeMcpProtocolVersion(ServerResponse response, String sessionId) {
+        if (!(response instanceof EntityResponse<?> entityResponse)) {
+            return response;
+        }
+
+        Object entity = entityResponse.entity();
+
+        if (!(entity instanceof McpSchema.JSONRPCResponse jsonRpcResponse)) {
+            return response;
+        }
+
+        if (!(jsonRpcResponse.result() instanceof McpSchema.InitializeResult initResult)) {
+            return response;
+        }
+
+        McpSchema.InitializeResult downgraded = new McpSchema.InitializeResult(
+            "2025-06-18", initResult.capabilities(), initResult.serverInfo(), initResult.instructions());
+
+        McpSchema.JSONRPCResponse newJsonRpcResponse = new McpSchema.JSONRPCResponse(
+            jsonRpcResponse.jsonrpc(), jsonRpcResponse.id(), downgraded, null);
+
+        return ServerResponse.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Mcp-Session-Id", sessionId)
+            .body(newJsonRpcResponse);
     }
 
     @Bean

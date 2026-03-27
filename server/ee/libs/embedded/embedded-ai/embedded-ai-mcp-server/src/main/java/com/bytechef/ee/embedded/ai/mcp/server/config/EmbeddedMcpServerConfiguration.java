@@ -87,6 +87,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
@@ -95,9 +96,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
 
 /**
@@ -136,7 +140,57 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     RouterFunction<ServerResponse> embeddedMcpRouterFunction() {
-        return embeddedWebMvcStreamableHttpServerTransportProvider().getRouterFunction();
+        Map<String, String> sessionIdCache = new ConcurrentHashMap<>();
+
+        return embeddedWebMvcStreamableHttpServerTransportProvider()
+            .getRouterFunction()
+            .filter((request, next) -> {
+                List<MediaType> accept = request.headers()
+                    .accept();
+                ServerRequest workingRequest;
+
+                if (accept.contains(MediaType.TEXT_EVENT_STREAM) && accept.contains(MediaType.APPLICATION_JSON)) {
+                    workingRequest = request;
+                } else {
+                    workingRequest = ServerRequest.from(request)
+                        .headers(headers -> headers.set(
+                            HttpHeaders.ACCEPT,
+                            MediaType.APPLICATION_JSON_VALUE + ", " + MediaType.TEXT_EVENT_STREAM_VALUE))
+                        .build();
+                }
+
+                // Inject cached session ID for clients (e.g. supergateway) that do not forward Mcp-Session-Id
+                String secretKey = request.pathVariable(SECRET_KEY);
+
+                if (request.headers()
+                    .header("Mcp-Session-Id")
+                    .isEmpty()) {
+                    String cachedSessionId = sessionIdCache.get(secretKey);
+
+                    if (cachedSessionId != null) {
+                        final String sessionId = cachedSessionId;
+
+                        workingRequest = ServerRequest.from(workingRequest)
+                            .headers(headers -> headers.set("Mcp-Session-Id", sessionId))
+                            .build();
+                    }
+                }
+
+                ServerResponse response = next.handle(workingRequest);
+
+                // Cache the session ID returned by the initialize response
+                String sessionId = response.headers()
+                    .getFirst("Mcp-Session-Id");
+
+                if (sessionId != null) {
+                    sessionIdCache.put(secretKey, sessionId);
+                } else if (response.statusCode()
+                    .value() == 404) {
+                    sessionIdCache.remove(secretKey);
+                }
+
+                return response;
+            });
     }
 
     @Bean
