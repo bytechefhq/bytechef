@@ -52,7 +52,9 @@ public class RocketchatConnection {
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
                     Map.of(
                         X_AUTH_TOKEN, List.of(connectionParameters.getRequiredString(X_AUTH_TOKEN)),
-                        X_USER_ID, List.of(connectionParameters.getRequiredString(X_USER_ID))))));
+                        X_USER_ID, List.of(connectionParameters.getRequiredString(X_USER_ID))))))
+        .help("", "https://docs.bytechef.io/reference/components/rocketchat_v1#connection-setup")
+        .version(1);
 
     private RocketchatConnection() {
     }
