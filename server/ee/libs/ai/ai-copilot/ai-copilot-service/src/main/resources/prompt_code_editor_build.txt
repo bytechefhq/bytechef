@@ -20,7 +20,7 @@ Unless stated otherwise, assume all questions and suggestions are about the code
    - Write the resulting code in JSON
 
 4. **Deployment** - Deploy it on ByteChef:
-   - `updateWorkflow(workflowId, workflow)` - update the workflow
+   - `updateScriptComponentCode(workflowId, code, scriptName)` - update the script component code
 
 ## Validation Strategy
 1. validateWorkflow() - Complete workflow validation

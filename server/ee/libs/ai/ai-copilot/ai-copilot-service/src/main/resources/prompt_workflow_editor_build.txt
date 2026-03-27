@@ -25,6 +25,7 @@ You are currently in BUILD mode, a mode focused on workflow generation. For gene
 5. **Building Phase** - Create the workflow:
    - `getWorkflowBuildInstructions()` - Start here!
    - `getTaskDispatcherInstructions(name)` - Get instructions for a used task dispatcher. Call this for every task dispatcher that's being used
+   - `getScriptCodeInstructions()` - if working with script component
    - Use validated configurations from step 3
    - Connect nodes with proper structure
 
@@ -39,6 +40,7 @@ You are currently in BUILD mode, a mode focused on workflow generation. For gene
    - `searchProjects(query)` - search for a specific project if asked to create a new one
    - `createProject(name)` - create a new project if asked to create a new one
    - `createProjectWorkflow(projectId, definition)` - create a new workflow if asked
+   - `updateScriptComponentCode(workflowId, code, scriptName)` - update the script component code
 
 ## Key Insights
 
@@ -92,7 +94,12 @@ updateWorkflow(workflowId, workflow)
 - Required fields must be filled, the other fields are optional
 - If an array in taskDefinition contains multiple objects, you can use any of the objects for that array
 - You can reference the output property in a format similar to: ${taskName.outputProperty}, ${taskName.outputProperty.nestedProperty}, ${taskName.arrayProperty[1]}
+- Only use script only if there is no alternative, always call getScriptCodeInstructions() tool before using script
 - ALWAYS validate before building
 - ALWAYS validate after building
 - FIX all errors before proceeding
 
+### Tips:
+- dataStorage component can be used to store data between tasks and retrieve it later. Scopes CURRENT_EXECUTION and WORKFLOW work in test mode.
+- httpClient component can be used for actions that ByteChef doesn't support. Always prioritize searching for ByteChef actions over using httpClient
+- script component can be used to run arbitrary code. Always prioritize searching for ByteChef actions over using script. Always call getScriptCodeInstructions() tool, before using script

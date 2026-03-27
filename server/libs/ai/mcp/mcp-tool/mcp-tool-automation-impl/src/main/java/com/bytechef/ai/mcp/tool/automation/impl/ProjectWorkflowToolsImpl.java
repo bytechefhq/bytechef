@@ -82,7 +82,11 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     @Tool(description = "Instructions for writing custom code in Script component")
     public String getScriptCodeInstructions() {
         return """
-            The main function is perform(input, context).
+            The main function is perform(input, context) and needs to start in this exact format:
+            - javascript - function perform(input, context)
+            - python - def perform(input, context):
+            - ruby - def perform(input, context)
+
             - input - object that holds all the input parameters defined in the 'input' object property of the Script component
                     - the input parameters are of same type as in the Script component
                     - `input.testInputMapName`
@@ -90,6 +94,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                       - `context.component.componentName.actionName({'parameterName': parameterValue});`
                       - ONLY use context property when you need to use Bytechef Actions
 
+            function always needs to return something.
             If the language supports ';' at the end of the line, add ';' at the end of the line.
             """;
     }
