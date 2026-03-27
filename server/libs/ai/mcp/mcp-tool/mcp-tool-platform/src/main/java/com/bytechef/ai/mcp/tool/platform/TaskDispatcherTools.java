@@ -62,6 +62,9 @@ public class TaskDispatcherTools {
         }
         """;
 
+    private static final List<String> workingTaskDispatchersList = List.of(
+        "branch", "condition", "loop", "map", "on-error");
+
     @SuppressFBWarnings("EI")
     public TaskDispatcherTools(TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
@@ -79,6 +82,8 @@ public class TaskDispatcherTools {
             }
 
             return taskDispatcherDefinitions.stream()
+                .filter(
+                    taskDispatcherDefinition -> workingTaskDispatchersList.contains(taskDispatcherDefinition.getName()))
                 .map(taskDispatcherDefinition -> new TaskDispatcherMinimalInfo(
                     taskDispatcherDefinition.getName(), taskDispatcherDefinition.getDescription(),
                     taskDispatcherDefinition.getVersion()))
@@ -214,6 +219,8 @@ public class TaskDispatcherTools {
                 .trim();
 
             List<TaskDispatcherMinimalInfo> matchingTaskDispatchers = taskDispatcherDefinitions.stream()
+                .filter(
+                    taskDispatcherDefinition -> workingTaskDispatchersList.contains(taskDispatcherDefinition.getName()))
                 .filter(taskDispatcherDefinition -> ToolUtils.matchesQuery(
                     taskDispatcherDefinition.getName(), taskDispatcherDefinition.getDescription(), null, null,
                     lowerQuery))
@@ -275,6 +282,14 @@ public class TaskDispatcherTools {
 
     public String getTaskDispatcherInstructions(String taskDispatcher) {
         return switch (taskDispatcher) {
+            case "branch" ->
+                """
+                    'expression' is the raw expression that will be evaluated.
+                    Example:
+                    "expression": "${taskName.numberProperty} >= 7 && !contains({'EMPTY','REGEX'}, ${taskName.stringProperty}) || ${taskName.booleanProperty} != false"
+
+                    The result of the evaluation will get compared to cases[i].key. If no match is found, the default case will be used.
+                    """;
             case "condition" ->
                 """
                     If 'rawExpression' is true, then fill out 'expression' with Spring Expression Language (SpEL), if false fill out 'conditions'.
@@ -321,7 +336,7 @@ public class TaskDispatcherTools {
                     - 'caseTrue' - tasks when the conditions evaluate to true
                     - 'caseFalse' - tasks when the conditions evaluate to false
                     """;
-            case "loop" ->
+            case "loop", "map" ->
                 """
                     'items' is an array that contains the items to loop over.
                     'iteratee' is an array that contains the tasks to execute for each item.
