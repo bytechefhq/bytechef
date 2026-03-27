@@ -38,6 +38,7 @@ public class RocketchatSendDirectMessageAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendDirectMessage")
         .title("Send Direct Message")
         .description("Send messages to users on your workspace.")
+        .help("", "https://docs.bytechef.io/reference/components/rocketchat_v1#send-direct-message")
         .properties(
             string(ROOM_ID)
                 .label("Username")

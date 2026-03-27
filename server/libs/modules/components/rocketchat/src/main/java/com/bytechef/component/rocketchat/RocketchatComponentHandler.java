@@ -40,6 +40,8 @@ public class RocketchatComponentHandler implements ComponentHandler {
         .description(
             "Rocket.Chat is a communication platform that enables team collaboration through messaging, " +
                 "audio/video calls, and integrations, all customizable and self-hostable.")
+        .customAction(true)
+        .customActionHelp("", "https://developer.rocket.chat/apidocs")
         .icon("path:assets/rocketchat.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(RocketchatConnection.CONNECTION_DEFINITION)
@@ -51,7 +53,8 @@ public class RocketchatComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(RocketchatSendDirectMessageAction.ACTION_DEFINITION),
             tool(RocketchatSendChannelMessageAction.ACTION_DEFINITION),
-            tool(RocketchatCreateChannelAction.ACTION_DEFINITION));
+            tool(RocketchatCreateChannelAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -32,6 +32,7 @@ import static com.bytechef.component.rocketchat.constant.RocketchatConstants.REA
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.rocketchat.util.RocketchatUtils;
 
@@ -43,6 +44,7 @@ public class RocketchatCreateChannelAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createChannel")
         .title("Create Channel")
         .description("Create a public channel.")
+        .help("", "https://docs.bytechef.io/reference/components/rocketchat_v1#create-channel")
         .properties(
             string(NAME)
                 .label("Channel Name")
@@ -56,7 +58,7 @@ public class RocketchatCreateChannelAction {
                 .required(false),
             bool(READ_ONLY)
                 .label("Read Only")
-                .description("Set if the channel is read only or not.")
+                .description("Whether the channel is read only.")
                 .defaultValue(false)
                 .required(false),
             bool(EXCLUDE_SELF)
@@ -75,7 +77,7 @@ public class RocketchatCreateChannelAction {
         return context
             .http(http -> http.post("/channels.create"))
             .body(
-                Http.Body.of(
+                Body.of(
                     NAME, inputParameters.getRequiredString(NAME),
                     MEMBERS, inputParameters.getList(MEMBERS),
                     READ_ONLY, inputParameters.getBoolean(READ_ONLY),
