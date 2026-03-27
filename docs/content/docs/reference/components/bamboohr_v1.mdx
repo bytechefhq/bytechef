@@ -155,6 +155,9 @@ This action does not produce any output.
 
 
 
+#### Find Employee ID
+
+To find the Employee ID, click [here](/reference/components/bamboohr_v1#how-to-find-employee-id).
 
 
 
@@ -189,6 +192,13 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Employee ID
+
+To find the Employee ID, click [here](/reference/components/bamboohr_v1#how-to-find-employee-id).
+
+#### Find Fields
+
+To find the Fields, click [here](/reference/components/bamboohr_v1#how-to-find-fields).
 
 
 
@@ -229,6 +239,13 @@ This action does not produce any output.
 
 
 
+#### Find Employee ID
+
+To find the Employee ID, click [here](/reference/components/bamboohr_v1#how-to-find-employee-id).
+
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/bamboohr_v1#how-to-find-file-id).
 
 
 
@@ -267,6 +284,9 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "bambooHr/v1/updatedEmployee"
 }
 ```
+#### Find Fields
+
+To find the Fields, click [here](/reference/components/bamboohr_v1#how-to-find-fields).
 
 
 
@@ -300,4 +320,20 @@ Type: STRING
 
 
 
+
+<hr />
+
+# Additional Instructions
+
+### How to find Employee ID
+
+Use the `GET /employees/directory` endpoint to retrieve a list of all employees and their IDs.
+
+### How to find Fields
+
+Use the `GET /meta/fields` endpoint to retrieve a list of all fields or visit https://documentation.bamboohr.com/docs/list-of-field-names where you can find field names.
+
+### How to find File ID
+
+Use the `GET /employees/EMPLOYEE_ID/files/view` endpoint to retrieve a list of all files from specific employee and their IDs.
 
