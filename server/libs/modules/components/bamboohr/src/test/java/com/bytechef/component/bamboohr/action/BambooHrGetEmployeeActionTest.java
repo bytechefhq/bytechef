@@ -19,52 +19,73 @@ package com.bytechef.component.bamboohr.action;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.FIELDS;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class BambooHrGetEmployeeActionTest {
 
-    private final Context mockedContext = mock(Context.class);
     private final Object mockedObject = mock(Object.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(ID, 1, FIELDS, List.of("firstName", "lastName", "employeeNumber")));
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = BambooHrGetEmployeeAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = BambooHrGetEmployeeAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
 
-        assertEquals(List.of(FIELDS, "firstName,lastName,employeeNumber", "accept", "application/json"),
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.JSON, responseType.getType());
+
+        assertEquals(List.of("/employees/1", FIELDS, "firstName,lastName,employeeNumber", "accept", "application/json"),
             stringArgumentCaptor.getAllValues());
     }
 }
