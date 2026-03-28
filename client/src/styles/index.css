@@ -36,6 +36,10 @@ ol[data-sonner-toaster] [data-sonner-toast] {
     line-height: 1rem;
 }
 
+.aui-thread-root .aui-md-h3 {
+    font-size: 1.05rem !important;
+}
+
 .aui-thread-root .aui-thread-welcome-message-motion-1,
 .aui-thread-root .aui-thread-welcome-message-motion-2 {
     font-size: 1.25rem;
