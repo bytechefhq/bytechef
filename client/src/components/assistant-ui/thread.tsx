@@ -19,7 +19,7 @@ import {
   ThreadPrimitive,
 } from "@assistant-ui/react";
 
-import type { FC } from "react";
+import { type FC, useCallback } from "react";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 
@@ -171,6 +171,36 @@ const ThreadSuggestions: FC = () => {
 };
 
 const Composer: FC = () => {
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (event.key === "Enter" && event.altKey && !event.shiftKey) {
+        event.preventDefault();
+
+        const textarea = event.currentTarget;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const currentValue = textarea.value;
+
+        const newValue =
+          currentValue.substring(0, start) + "\n" + currentValue.substring(end);
+
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLTextAreaElement.prototype,
+          "value",
+        )?.set;
+
+        nativeInputValueSetter?.call(textarea, newValue);
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
+
+        requestAnimationFrame(() => {
+          textarea.selectionStart = start + 1;
+          textarea.selectionEnd = start + 1;
+        });
+      }
+    },
+    [],
+  );
+
   return (
     <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl pb-4 md:pb-6">
       <ThreadScrollToBottom />
@@ -181,6 +211,7 @@ const Composer: FC = () => {
           className="aui-composer-input mb-1 max-h-32 min-h-16 w-full resize-none bg-transparent px-3.5 pt-1.5 pb-3 text-base outline-none placeholder:text-muted-foreground ring-0 border-0"
           rows={1}
           autoFocus
+          onKeyDown={handleKeyDown}
           aria-label="Message input"
         />
         <ComposerAction />
