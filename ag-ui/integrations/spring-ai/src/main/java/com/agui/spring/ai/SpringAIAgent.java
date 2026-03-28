@@ -18,8 +18,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.util.StringUtils;
-
 import java.util.*;
 import java.util.function.Function;
 
@@ -206,14 +204,14 @@ public class SpringAIAgent extends LocalAgent {
         }
         var content = evt.getResult().getOutput().getText();
 
-        if (StringUtils.hasText(content)) {
+        if (content != null && !content.isEmpty()) {
             this.emitEvent(
                 textMessageContentEvent(messageId, content),
                 subscriber
             );
 
             assistantMessage.setContent(
-                assistantMessage.getContent() + " " + content
+                assistantMessage.getContent() + content
             );
         }
     }
