@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utility class containing common helper methods for MCP tools.
@@ -126,11 +127,12 @@ public final class ToolUtils {
         }
 
         List<String> options = null;
-        if (type == PropertyDecorator.Type.ARRAY || type == PropertyDecorator.Type.BOOLEAN
-            || type == PropertyDecorator.Type.DATE || type == PropertyDecorator.Type.DATE_TIME
-            || type == PropertyDecorator.Type.INTEGER || type == PropertyDecorator.Type.NUMBER
-            || type == PropertyDecorator.Type.OBJECT || type == PropertyDecorator.Type.STRING
-            || type == PropertyDecorator.Type.TIME) {
+        if (type == PropertyDecorator.Type.ARRAY || type == PropertyDecorator.Type.BOOLEAN ||
+            type == PropertyDecorator.Type.DATE || type == PropertyDecorator.Type.DATE_TIME ||
+            type == PropertyDecorator.Type.INTEGER || type == PropertyDecorator.Type.NUMBER ||
+            type == PropertyDecorator.Type.OBJECT || type == PropertyDecorator.Type.STRING ||
+            type == PropertyDecorator.Type.TIME) {
+
             options = convertToOptionList(decorator);
         }
 
@@ -331,6 +333,7 @@ public final class ToolUtils {
      * @param decorator the property decorator
      * @return list of option strings, or null if no options are defined
      */
+    @Nullable
     private static List<String> convertToOptionList(PropertyDecorator decorator) {
         List<? extends BaseOption> options = decorator.getOptions();
 

@@ -18,8 +18,10 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.workflow.validator.DisplayConditionEvaluator.DisplayConditionResult;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import tools.jackson.databind.JsonNode;
@@ -38,7 +40,7 @@ class ArrayPropertyValidator {
     /**
      * Validates array property using PropertyInfo.
      */
-    static void validateFromPropertyInfo(
+    static void validate(
         JsonNode valueJsonNode, PropertyInfo propertyInfo, String propertyPath, StringBuilder errors,
         StringBuilder warnings) {
 
@@ -47,24 +49,27 @@ class ArrayPropertyValidator {
         }
 
         if (!valueJsonNode.isArray()) {
-            String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
-            StringUtils.appendWithNewline(
-                ValidationErrorUtils.typeError(propertyPath, "array", actualType), errors);
+            String actualType = JsonNodeUtils.getJsonNodeType(valueJsonNode);
+
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "array", actualType), errors);
+
             return;
         }
 
-        List<PropertyInfo> nestedProperties = propertyInfo.nestedProperties();
-        if (nestedProperties == null || nestedProperties.isEmpty()) {
+        List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
+
+        if (nestedPropertyInfos == null || nestedPropertyInfos.isEmpty()) {
             return;
         }
 
-        if (isTaskTypeArray(nestedProperties)) {
+        if (isTaskTypeArray(nestedPropertyInfos)) {
             TaskValidator.validateTaskArray(valueJsonNode, propertyPath, errors);
+
             return;
         }
 
-        if (isWrappedDefinition(nestedProperties)) {
-            validateWrappedArray(valueJsonNode, nestedProperties, propertyPath, errors, warnings);
+        if (isWrappedDefinition(nestedPropertyInfos)) {
+            validateWrappedArray(valueJsonNode, nestedPropertyInfos, propertyPath, errors, warnings);
 
             return;
         }
@@ -73,110 +78,199 @@ class ArrayPropertyValidator {
             JsonNode firstElement = valueJsonNode.get(0);
 
             if (firstElement.isObject()) {
-                validateObjectArray(valueJsonNode, nestedProperties, propertyPath, errors, warnings);
+                validateObjectArray(valueJsonNode, nestedPropertyInfos, propertyPath, errors, warnings);
             } else {
-                validateUnionTypeArray(valueJsonNode, nestedProperties, propertyPath, errors);
+                validateUnionTypeArray(valueJsonNode, nestedPropertyInfos, propertyPath, errors);
             }
         }
     }
 
-    /**
-     * Validates union type array elements (array of simple types).
-     */
-    private static void validateUnionTypeArray(
-        JsonNode arrayJsonNode, List<PropertyInfo> allowedTypes, String propertyPath, StringBuilder errors) {
+    private static void addUnionTypeError(
+        JsonNode valueJsonNode, List<PropertyInfo> allowedTypePropertyInfos, String propertyPath,
+        StringBuilder errors) {
 
-        for (int i = 0; i < arrayJsonNode.size(); i++) {
-            JsonNode valueJsonNode = arrayJsonNode.get(i);
+        String elementValue = formatValue(valueJsonNode);
+        String propertyName = PropertyUtils.extractPropertyNameFromPath(propertyPath);
+        String actualType = JsonNodeUtils.getJsonNodeType(valueJsonNode);
 
-            boolean matchesAnyType = allowedTypes.stream()
-                .anyMatch(typeInfo -> TypeValidator.isTypeValid(valueJsonNode, typeInfo.type()));
+        StringBuilder expectedTypes = new StringBuilder();
 
-            if (!matchesAnyType) {
-                addUnionTypeError(valueJsonNode, allowedTypes, propertyPath, errors);
+        for (int i = 0; i < allowedTypePropertyInfos.size(); i++) {
+            if (i > 0) {
+                expectedTypes.append(" or ");
             }
+
+            PropertyInfo propertyInfo = allowedTypePropertyInfos.get(i);
+
+            expectedTypes.append(org.apache.commons.lang3.StringUtils.lowerCase(propertyInfo.type()));
+        }
+
+        StringUtils.appendWithNewline(
+            ValidationErrorUtils.arrayElementError(elementValue, propertyName, expectedTypes.toString(), actualType),
+            errors);
+    }
+
+    private static void addUnionTypeObjectError(
+        String elementPath, List<PropertyInfo> unionTypePropertyInfos, StringBuilder errors) {
+
+        StringBuilder typeNames = new StringBuilder();
+
+        for (int i = 0; i < unionTypePropertyInfos.size(); i++) {
+            if (i > 0) {
+                typeNames.append(", ");
+            }
+
+            PropertyInfo propertyInfo = unionTypePropertyInfos.get(i);
+
+            typeNames.append(propertyInfo.name());
+        }
+
+        StringUtils.appendWithNewline(
+            "Property '" + elementPath + "' does not match any of the expected union types: " + typeNames,
+            errors);
+    }
+
+    private static void checkDisplayConditionForExtraProperty(
+        PropertyInfo propertyInfo, int index, String propertyPath, String fieldName, JsonNode rootParametersJsonNode,
+        StringBuilder warnings) {
+
+        DisplayConditionResult displayConditionResult = DisplayConditionEvaluator.evaluateForArrayElement(
+            propertyInfo.displayCondition(), index, rootParametersJsonNode);
+
+        if (!displayConditionResult.shouldShow()) {
+            StringUtils.appendWithNewline(
+                "Property '" + propertyPath + "[" + index + "]." + fieldName + "' is not defined in task definition",
+                warnings);
         }
     }
 
-    /**
-     * Validates object array elements.
-     */
-    private static void validateObjectArray(
-        JsonNode arrayJsonNode, List<PropertyInfo> elementProperties,
-        String propertyPath, StringBuilder errors, StringBuilder warnings) {
+    private static JsonNode createRootParametersJsonNode(JsonNode arrayValue, String propertyPath) {
+        ObjectNode rootNode = com.bytechef.commons.util.JsonUtils.createObjectNode();
 
-        if (isUnionTypeObjectArray(elementProperties)) {
-            validateUnionTypeObjectArray(arrayJsonNode, elementProperties, propertyPath, errors, warnings);
+        rootNode.set(propertyPath, arrayValue);
 
-            return;
-        }
-
-        JsonNode rootParametersJsonNode = createRootParametersJsonNode(arrayJsonNode, propertyPath);
-
-        for (int i = 0; i < arrayJsonNode.size(); i++) {
-            validateObjectArrayElement(
-                arrayJsonNode.get(i), elementProperties, propertyPath, i, rootParametersJsonNode, errors, warnings);
-        }
+        return rootNode;
     }
 
-    /**
-     * Validates union type object array where each object must match one of several schemas.
-     */
-    private static void validateUnionTypeObjectArray(
-        JsonNode arrayJsonNode, List<PropertyInfo> unionTypes,
-        String propertyPath, StringBuilder errors, StringBuilder warnings) {
+    private static String formatValue(JsonNode jsonNode) {
+        return jsonNode.isString() ? "'" + jsonNode.asString() + "'" : jsonNode.toString();
+    }
 
-        for (int i = 0; i < arrayJsonNode.size(); i++) {
-            JsonNode elementJsonNode = arrayJsonNode.get(i);
-            String elementPath = propertyPath + "[" + i + "]";
+    private static boolean isTaskTypeArray(List<PropertyInfo> nestedPropertyInfos) {
+        PropertyInfo nestedPropertyInfo = nestedPropertyInfos.getFirst();
 
-            if (!elementJsonNode.isObject()) {
-                String actualType = JsonUtils.getJsonNodeType(elementJsonNode);
+        return nestedPropertyInfos.size() == 1 && "TASK".equalsIgnoreCase(nestedPropertyInfo.type());
+    }
 
-                StringUtils.appendWithNewline(
-                    ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+    private static boolean isUnionTypeObjectArray(List<PropertyInfo> elementPropertyInfos) {
+        return elementPropertyInfos.stream()
+            .allMatch(propertyInfo -> "OBJECT".equalsIgnoreCase(propertyInfo.type()) &&
+                propertyInfo.nestedProperties() != null &&
+                !CollectionUtils.isEmpty(propertyInfo.nestedProperties()));
+    }
 
+    private static boolean isWrappedDefinition(List<PropertyInfo> nestedProperties) {
+        PropertyInfo propertyInfo = nestedProperties.getFirst();
+
+        List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
+
+        return nestedProperties.size() == 1 && propertyInfos != null && !propertyInfos.isEmpty();
+    }
+
+    private static boolean matchesAnyUnionType(
+        JsonNode elementJsonNode, List<PropertyInfo> unionTypePropertyInfos, String elementPath,
+        StringBuilder warnings) {
+
+        for (PropertyInfo unionTypePropertyInfo : unionTypePropertyInfos) {
+            List<PropertyInfo> schemaPropertyInfos = unionTypePropertyInfo.nestedProperties();
+
+            if (schemaPropertyInfos == null || schemaPropertyInfos.isEmpty()) {
                 continue;
             }
 
-            if (!matchesAnyUnionType(elementJsonNode, unionTypes, elementPath, warnings)) {
-                addUnionTypeObjectError(elementPath, unionTypes, errors);
+            StringBuilder currentErrors = new StringBuilder();
+            StringBuilder currentWarnings = new StringBuilder();
+
+            List<PropertyInfo> simplifiedPropertyInfos = simplifyDisplayConditionsForUnionType(
+                schemaPropertyInfos, elementPath.substring(0, elementPath.lastIndexOf('[')));
+
+            PropertyValidator.validateProperties(
+                elementJsonNode, simplifiedPropertyInfos, elementPath, elementJsonNode.toString(), currentErrors,
+                currentWarnings);
+
+            if (currentErrors.isEmpty()) {
+                if (!currentWarnings.isEmpty()) {
+                    warnings.append(currentWarnings);
+                }
+
+                return true;
             }
         }
+
+        return false;
     }
 
-    private static void validateObjectArrayElement(
-        JsonNode elementJsonNode, List<PropertyInfo> elementProperties, String propertyPath, int index,
-        JsonNode rootParametersJsonNode, StringBuilder errors, StringBuilder warnings) {
+    private static List<PropertyInfo> simplifyDisplayConditionsForUnionType(
+        List<PropertyInfo> propertyInfos, String arrayPath) {
 
-        String elementPath = propertyPath + "[" + index + "]";
+        List<PropertyInfo> simplifiedPropertyInfos = new ArrayList<>();
+        String baseArrayName = arrayPath.replaceAll("\\[\\d+]", "");
 
-        if (!elementJsonNode.isObject()) {
-            String actualType = JsonUtils.getJsonNodeType(elementJsonNode);
+        for (PropertyInfo propertyInfo : propertyInfos) {
+            String displayCondition = propertyInfo.displayCondition();
 
-            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+            if (displayCondition != null && !displayCondition.isEmpty()) {
+                String simplifiedDisplayCondition = simplifyDisplayConditionForUnionType(
+                    displayCondition, baseArrayName);
 
-            return;
+                simplifiedPropertyInfos.add(new PropertyInfo(
+                    propertyInfo.name(), propertyInfo.type(), propertyInfo.description(), propertyInfo.required(),
+                    propertyInfo.expressionEnabled(), simplifiedDisplayCondition, propertyInfo.options(),
+                    propertyInfo.nestedProperties()));
+            } else {
+                simplifiedPropertyInfos.add(propertyInfo);
+            }
         }
 
-        validateExtraPropertiesInArrayElement(
-            elementJsonNode, elementProperties, propertyPath, index, rootParametersJsonNode, warnings);
+        return simplifiedPropertyInfos;
+    }
 
-        for (PropertyInfo propertyInfo : elementProperties) {
-            validatePropertyInArrayElement(
-                elementJsonNode, propertyInfo, elementPath, index, rootParametersJsonNode, errors);
+    private static String simplifyDisplayConditionForUnionType(String condition, String baseArrayName) {
+        String escapedArrayName = baseArrayName.replaceAll("\\[", "\\\\[")
+            .replaceAll("]", "\\\\]");
+
+        String simplifiedCondition = condition.replaceAll(escapedArrayName + "\\[index]\\[index]\\.", "");
+
+        simplifiedCondition = simplifiedCondition.replaceAll(escapedArrayName + "\\[index]\\.", "");
+
+        return simplifiedCondition;
+    }
+
+    private static void validateArrayOfArrays(
+        JsonNode valueJsonNode, PropertyInfo wrapperInfo, String propertyPath, StringBuilder errors,
+        StringBuilder warnings) {
+
+        for (int i = 0; i < valueJsonNode.size(); i++) {
+            JsonNode elementJsonNode = valueJsonNode.get(i);
+            String elementPath = propertyPath + "[" + i + "]";
+
+            PropertyInfo elementInfo = new PropertyInfo(
+                null, "ARRAY", null, false, false, null, wrapperInfo.nestedProperties());
+
+            validate(elementJsonNode, elementInfo, elementPath, errors, warnings);
         }
     }
 
     private static void validateExtraPropertiesInArrayElement(
-        JsonNode elementJsonNode, List<PropertyInfo> elementProperties,
-        String propertyPath, int index, JsonNode rootParametersJsonNode, StringBuilder warnings) {
+        JsonNode elementJsonNode, List<PropertyInfo> elementPropertyInfos, String propertyPath, int index,
+        JsonNode rootParametersJsonNode, StringBuilder warnings) {
 
-        Iterator<String> fieldNamesIterator = elementJsonNode.propertyNames()
-            .iterator();
+        Collection<String> propertyNames = elementJsonNode.propertyNames();
+
+        Iterator<String> fieldNamesIterator = propertyNames.iterator();
 
         fieldNamesIterator.forEachRemaining(fieldName -> {
-            PropertyInfo matchingProperty = elementProperties.stream()
+            PropertyInfo matchingProperty = elementPropertyInfos.stream()
                 .filter(prop -> fieldName.equals(prop.name()))
                 .findFirst()
                 .orElse(null);
@@ -194,215 +288,130 @@ class ArrayPropertyValidator {
         });
     }
 
-    private static void checkDisplayConditionForExtraProperty(
-        PropertyInfo propertyInfo, int index, String propertyPath, String fieldName,
-        JsonNode rootParametersJsonNode, StringBuilder warnings) {
+    /**
+     * Validates object array elements.
+     */
+    private static void validateObjectArray(
+        JsonNode arrayJsonNode, List<PropertyInfo> elementPropertyInfos, String propertyPath, StringBuilder errors,
+        StringBuilder warnings) {
 
-        DisplayConditionEvaluator.DisplayConditionResult result =
-            DisplayConditionEvaluator.evaluateForArrayElement(
-                propertyInfo.displayCondition(), index, rootParametersJsonNode);
+        if (isUnionTypeObjectArray(elementPropertyInfos)) {
+            validateUnionTypeObjectArray(arrayJsonNode, elementPropertyInfos, propertyPath, errors, warnings);
 
-        if (!result.shouldShow()) {
-            StringUtils.appendWithNewline(
-                "Property '" + propertyPath + "[" + index + "]." + fieldName + "' is not defined in task definition",
-                warnings);
+            return;
+        }
+
+        JsonNode rootParametersJsonNode = createRootParametersJsonNode(arrayJsonNode, propertyPath);
+
+        for (int i = 0; i < arrayJsonNode.size(); i++) {
+            validateObjectArrayElement(
+                arrayJsonNode.get(i), elementPropertyInfos, propertyPath, i, rootParametersJsonNode, errors, warnings);
+        }
+    }
+
+    private static void validateObjectArrayElement(
+        JsonNode elementJsonNode, List<PropertyInfo> elementPropertyInfos, String propertyPath, int index,
+        JsonNode rootParametersJsonNode, StringBuilder errors, StringBuilder warnings) {
+
+        String elementPath = propertyPath + "[" + index + "]";
+
+        if (!elementJsonNode.isObject()) {
+            String actualType = JsonNodeUtils.getJsonNodeType(elementJsonNode);
+
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+
+            return;
+        }
+
+        validateExtraPropertiesInArrayElement(
+            elementJsonNode, elementPropertyInfos, propertyPath, index, rootParametersJsonNode, warnings);
+
+        for (PropertyInfo propertyInfo : elementPropertyInfos) {
+            validatePropertyInArrayElement(
+                elementJsonNode, propertyInfo, elementPath, index, rootParametersJsonNode, errors);
         }
     }
 
     private static void validatePropertyInArrayElement(
-        JsonNode elementJsonNode, PropertyInfo propertyInfo, String elementPath,
-        int index, JsonNode rootParametersJsonNode, StringBuilder errors) {
+        JsonNode elementJsonNode, PropertyInfo propertyInfo, String elementPath, int index,
+        JsonNode rootParametersJsonNode, StringBuilder errors) {
 
         String fieldName = propertyInfo.name();
         String fieldPath = elementPath + "." + fieldName;
         boolean isRequired = propertyInfo.required();
 
-        DisplayConditionEvaluator.DisplayConditionResult result =
-            DisplayConditionEvaluator.evaluateForArrayElement(
-                propertyInfo.displayCondition(), index, rootParametersJsonNode);
+        DisplayConditionResult displayConditionResult = DisplayConditionEvaluator.evaluateForArrayElement(
+            propertyInfo.displayCondition(), index, rootParametersJsonNode);
 
-        if (result.shouldShow()) {
+        if (displayConditionResult.shouldShow()) {
             if (isRequired && !elementJsonNode.has(fieldName)) {
                 StringUtils.appendWithNewline("Missing required property: " + fieldPath, errors);
             } else if (elementJsonNode.has(fieldName)) {
                 JsonNode valueJsonNode = elementJsonNode.get(fieldName);
 
-                if (!valueJsonNode.isTextual() || !TypeValidator.isDataPillExpression(valueJsonNode.asText())) {
+                if (!valueJsonNode.isString() || !TypeValidator.isDataPillExpression(valueJsonNode.asString())) {
                     TypeValidator.validateType(valueJsonNode, propertyInfo.type(), fieldPath, errors);
                 }
             }
         }
     }
 
-    private static boolean matchesAnyUnionType(
-        JsonNode elementJsonNode, List<PropertyInfo> unionTypes, String elementPath, StringBuilder warnings) {
+    /**
+     * Validates union type array elements (array of simple types).
+     */
+    private static void validateUnionTypeArray(
+        JsonNode arrayJsonNode, List<PropertyInfo> allowedTypePropertyInfos, String propertyPath,
+        StringBuilder errors) {
 
-        for (PropertyInfo unionType : unionTypes) {
-            List<PropertyInfo> schemaProperties = unionType.nestedProperties();
+        for (int i = 0; i < arrayJsonNode.size(); i++) {
+            JsonNode valueJsonNode = arrayJsonNode.get(i);
 
-            if (schemaProperties == null || schemaProperties.isEmpty()) {
+            boolean matchesAnyType = allowedTypePropertyInfos.stream()
+                .anyMatch(typeInfo -> TypeValidator.isTypeValid(valueJsonNode, typeInfo.type()));
+
+            if (!matchesAnyType) {
+                addUnionTypeError(valueJsonNode, allowedTypePropertyInfos, propertyPath, errors);
+            }
+        }
+    }
+
+    /**
+     * Validates union type object array where each object must match one of several schemas.
+     */
+    private static void validateUnionTypeObjectArray(
+        JsonNode arrayJsonNode, List<PropertyInfo> unionTypePropertyInfos, String propertyPath, StringBuilder errors,
+        StringBuilder warnings) {
+
+        for (int i = 0; i < arrayJsonNode.size(); i++) {
+            JsonNode elementJsonNode = arrayJsonNode.get(i);
+            String elementPath = propertyPath + "[" + i + "]";
+
+            if (!elementJsonNode.isObject()) {
+                String actualType = JsonNodeUtils.getJsonNodeType(elementJsonNode);
+
+                StringUtils.appendWithNewline(
+                    ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+
                 continue;
             }
 
-            StringBuilder currentErrors = new StringBuilder();
-            StringBuilder currentWarnings = new StringBuilder();
-
-            List<PropertyInfo> simplifiedProperties = simplifyDisplayConditionsForUnionType(
-                schemaProperties, elementPath.substring(0, elementPath.lastIndexOf('[')));
-
-            PropertyValidator.validatePropertiesFromPropertyInfo(
-                elementJsonNode, simplifiedProperties, elementPath,
-                elementJsonNode.toString(), currentErrors, currentWarnings);
-
-            if (currentErrors.isEmpty()) {
-                if (!currentWarnings.isEmpty()) {
-                    warnings.append(currentWarnings);
-                }
-
-                return true;
+            if (!matchesAnyUnionType(elementJsonNode, unionTypePropertyInfos, elementPath, warnings)) {
+                addUnionTypeObjectError(elementPath, unionTypePropertyInfos, errors);
             }
         }
-
-        return false;
     }
 
     private static void validateWrappedArray(
-        JsonNode valueJsonNode, List<PropertyInfo> nestedProperties,
-        String propertyPath, StringBuilder errors, StringBuilder warnings) {
+        JsonNode valueJsonNode, List<PropertyInfo> nestedPropertyInfos, String propertyPath, StringBuilder errors,
+        StringBuilder warnings) {
 
-        PropertyInfo wrapperInfo = nestedProperties.getFirst();
-        String wrapperType = wrapperInfo.type();
+        PropertyInfo wrapperPropertyInfo = nestedPropertyInfos.getFirst();
+        String wrapperType = wrapperPropertyInfo.type();
 
         if ("ARRAY".equalsIgnoreCase(wrapperType)) {
-            validateArrayOfArrays(valueJsonNode, wrapperInfo, propertyPath, errors, warnings);
+            validateArrayOfArrays(valueJsonNode, wrapperPropertyInfo, propertyPath, errors, warnings);
         } else {
-            validateObjectArray(valueJsonNode, wrapperInfo.nestedProperties(), propertyPath, errors, warnings);
+            validateObjectArray(valueJsonNode, wrapperPropertyInfo.nestedProperties(), propertyPath, errors, warnings);
         }
-    }
-
-    private static void validateArrayOfArrays(
-        JsonNode valueJsonNode, PropertyInfo wrapperInfo,
-        String propertyPath, StringBuilder errors, StringBuilder warnings) {
-
-        for (int i = 0; i < valueJsonNode.size(); i++) {
-            JsonNode elementJsonNode = valueJsonNode.get(i);
-            String elementPath = propertyPath + "[" + i + "]";
-
-            PropertyInfo elementInfo = new PropertyInfo(
-                null, "ARRAY", null, false, false, null, wrapperInfo.nestedProperties());
-
-            validateFromPropertyInfo(elementJsonNode, elementInfo, elementPath, errors, warnings);
-        }
-    }
-
-    private static boolean isTaskTypeArray(List<PropertyInfo> nestedProperties) {
-        return nestedProperties.size() == 1 && "TASK".equalsIgnoreCase(nestedProperties.getFirst()
-            .type());
-    }
-
-    private static boolean isWrappedDefinition(List<PropertyInfo> nestedProperties) {
-        return nestedProperties.size() == 1 &&
-            nestedProperties.getFirst()
-                .nestedProperties() != null
-            &&
-            !nestedProperties.getFirst()
-                .nestedProperties()
-                .isEmpty();
-    }
-
-    private static boolean isUnionTypeObjectArray(List<PropertyInfo> elementProperties) {
-        return elementProperties.stream()
-            .allMatch(prop -> "OBJECT".equalsIgnoreCase(prop.type()) && prop.nestedProperties() != null &&
-                !CollectionUtils.isEmpty(prop.nestedProperties()));
-    }
-
-    private static JsonNode createRootParametersJsonNode(JsonNode arrayValue, String propertyPath) {
-        ObjectNode rootNode = com.bytechef.commons.util.JsonUtils.createObjectNode();
-
-        rootNode.set(propertyPath, arrayValue);
-
-        return rootNode;
-    }
-
-    private static List<PropertyInfo> simplifyDisplayConditionsForUnionType(
-        List<PropertyInfo> properties, String arrayPath) {
-
-        List<PropertyInfo> simplified = new ArrayList<>();
-        String baseArrayName = arrayPath.replaceAll("\\[\\d+]", "");
-
-        for (PropertyInfo prop : properties) {
-            String displayCondition = prop.displayCondition();
-
-            if (displayCondition != null && !displayCondition.isEmpty()) {
-                String simplifiedCondition = simplifyConditionForUnionType(displayCondition, baseArrayName);
-
-                simplified.add(new PropertyInfo(
-                    prop.name(), prop.type(), prop.description(), prop.required(),
-                    prop.expressionEnabled(), simplifiedCondition, prop.options(), prop.nestedProperties()));
-            } else {
-                simplified.add(prop);
-            }
-        }
-
-        return simplified;
-    }
-
-    private static String simplifyConditionForUnionType(String condition, String baseArrayName) {
-        String escapedArrayName = baseArrayName.replaceAll("\\[", "\\\\[")
-            .replaceAll("]", "\\\\]");
-
-        String simplified = condition.replaceAll(escapedArrayName + "\\[index]\\[index]\\.", "");
-
-        simplified = simplified.replaceAll(escapedArrayName + "\\[index]\\.", "");
-
-        return simplified;
-    }
-
-    private static void addUnionTypeError(
-        JsonNode valueJsonNode, List<PropertyInfo> allowedTypes, String propertyPath, StringBuilder errors) {
-
-        String elementValue = formatValue(valueJsonNode);
-        String propertyName = PropertyUtils.extractPropertyNameFromPath(propertyPath);
-        String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
-
-        StringBuilder expectedTypes = new StringBuilder();
-
-        for (int j = 0; j < allowedTypes.size(); j++) {
-            if (j > 0) {
-                expectedTypes.append(" or ");
-            }
-
-            PropertyInfo propertyInfo = allowedTypes.get(j);
-
-            expectedTypes.append(org.apache.commons.lang3.StringUtils.lowerCase(propertyInfo.type()));
-        }
-
-        StringUtils.appendWithNewline(
-            ValidationErrorUtils.arrayElementError(elementValue, propertyName, expectedTypes.toString(), actualType),
-            errors);
-    }
-
-    private static void addUnionTypeObjectError(
-        String elementPath, List<PropertyInfo> unionTypes, StringBuilder errors) {
-
-        StringBuilder typeNames = new StringBuilder();
-
-        for (int j = 0; j < unionTypes.size(); j++) {
-            if (j > 0) {
-                typeNames.append(", ");
-            }
-
-            PropertyInfo propertyInfo = unionTypes.get(j);
-
-            typeNames.append(propertyInfo.name());
-        }
-
-        StringUtils.appendWithNewline(
-            "Property '" + elementPath + "' does not match any of the expected union types: " + typeNames,
-            errors);
-    }
-
-    private static String formatValue(JsonNode jsonNode) {
-        return jsonNode.isTextual() ? "'" + jsonNode.asText() + "'" : jsonNode.toString();
     }
 }
