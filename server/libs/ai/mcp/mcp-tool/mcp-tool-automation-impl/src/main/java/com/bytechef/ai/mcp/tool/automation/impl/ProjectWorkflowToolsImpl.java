@@ -116,8 +116,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                 projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
                 projectWorkflowDTO.getDescription(), projectWorkflowDTO.getDefinition(),
                 projectWorkflowDTO.getVersion(),
-                projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
-                projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
+                projectWorkflowDTO.getCreatedDate(),
+                projectWorkflowDTO.getLastModifiedDate());
         } catch (Exception e) {
             logger.error("Failed to get workflow {}", workflowId, e);
 
@@ -326,8 +326,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                 projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
                 projectWorkflowDTO.getDescription(), definition,
                 projectWorkflowDTO.getVersion(),
-                projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
-                projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
+                projectWorkflowDTO.getCreatedDate(),
+                projectWorkflowDTO.getLastModifiedDate());
         } catch (Exception e) {
             logger.error("Failed to update workflow {}", workflowId, e);
 
