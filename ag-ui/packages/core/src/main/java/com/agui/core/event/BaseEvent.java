@@ -2,7 +2,7 @@ package com.agui.core.event;
 
 import com.agui.core.type.EventType;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
 
