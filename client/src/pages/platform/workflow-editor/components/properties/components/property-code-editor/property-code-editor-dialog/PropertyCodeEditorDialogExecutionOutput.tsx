@@ -50,7 +50,12 @@ const PropertyCodeEditorDialogExecutionOutput = () => {
             if (typeof unwrappedOutput === 'object' && unwrappedOutput !== null) {
                 return (
                     <Suspense fallback={<LoadingDots />}>
-                        <ReactJson enableClipboard={false} sortKeys={true} src={unwrappedOutput as object} />
+                        <ReactJson
+                            enableClipboard={false}
+                            sortKeys={true}
+                            src={unwrappedOutput as object}
+                            style={{fontSize: '12px'}}
+                        />
                     </Suspense>
                 );
             }
