@@ -62,8 +62,7 @@ public class TaskDispatcherTools {
         }
         """;
 
-    private static final List<String> workingTaskDispatchersList = List.of(
-        "branch", "condition", "loop", "map", "on-error");
+    private static final List<String> taskDispatcherNames = List.of("branch", "condition", "loop", "map", "on-error");
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherTools(TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
@@ -83,7 +82,7 @@ public class TaskDispatcherTools {
 
             return taskDispatcherDefinitions.stream()
                 .filter(
-                    taskDispatcherDefinition -> workingTaskDispatchersList.contains(taskDispatcherDefinition.getName()))
+                    taskDispatcherDefinition -> taskDispatcherNames.contains(taskDispatcherDefinition.getName()))
                 .map(taskDispatcherDefinition -> new TaskDispatcherMinimalInfo(
                     taskDispatcherDefinition.getName(), taskDispatcherDefinition.getDescription(),
                     taskDispatcherDefinition.getVersion()))
@@ -220,7 +219,7 @@ public class TaskDispatcherTools {
 
             List<TaskDispatcherMinimalInfo> matchingTaskDispatchers = taskDispatcherDefinitions.stream()
                 .filter(
-                    taskDispatcherDefinition -> workingTaskDispatchersList.contains(taskDispatcherDefinition.getName()))
+                    taskDispatcherDefinition -> taskDispatcherNames.contains(taskDispatcherDefinition.getName()))
                 .filter(taskDispatcherDefinition -> ToolUtils.matchesQuery(
                     taskDispatcherDefinition.getName(), taskDispatcherDefinition.getDescription(), null, null,
                     lowerQuery))

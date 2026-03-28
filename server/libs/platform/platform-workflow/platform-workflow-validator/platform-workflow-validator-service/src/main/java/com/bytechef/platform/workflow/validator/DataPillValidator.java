@@ -55,7 +55,7 @@ class DataPillValidator {
 
         JsonNode nameJsonNode = taskJsonNode.get("name");
 
-        String name = nameJsonNode.asText();
+        String name = nameJsonNode.asString();
 
         TaskValidationContext taskContext = new TaskValidationContext();
 
@@ -105,8 +105,8 @@ class DataPillValidator {
                     jsonNode.get(i), currentPath + "[" + i + "]", currentTaskName, taskOutput, taskNames,
                     taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition);
             }
-        } else if (jsonNode.isTextual() && !context.stopProcessing) {
-            String textValue = jsonNode.asText();
+        } else if (jsonNode.isString() && !context.stopProcessing) {
+            String textValue = jsonNode.asString();
 
             processDataPillsInText(
                 textValue, currentPath, currentTaskName, taskOutput, taskNames, taskNameToTypeMap, errors, warnings,
@@ -309,7 +309,7 @@ class DataPillValidator {
             for (int i = 0; i < itemsJsonNode.size(); i++) {
                 JsonNode itemJsonNode = itemsJsonNode.get(i);
 
-                String actualType = JsonUtils.getJsonNodeType(itemJsonNode);
+                String actualType = JsonNodeUtils.getJsonNodeType(itemJsonNode);
 
                 if (!isTypeCompatible(expectedType, actualType)) {
                     // Allow any type to be converted to string in interpolation
@@ -330,9 +330,9 @@ class DataPillValidator {
                     }
                 }
             }
-        } else if (itemsJsonNode.isTextual()) {
+        } else if (itemsJsonNode.isString()) {
             // Handle data pill references like "${task1.items}"
-            String items = itemsJsonNode.asText();
+            String items = itemsJsonNode.asString();
 
             if (items.startsWith("${") && items.endsWith("}")) {
                 validateLoopItemTypesFromDataPill(
@@ -367,7 +367,7 @@ class DataPillValidator {
         // Get the source task's type and find its output definition
         JsonNode typeJsonNode = sourceTaskJsonNode.get("type");
 
-        PropertyInfo sourceTaskOutput = taskOutput.get(typeJsonNode.asText());
+        PropertyInfo sourceTaskOutput = taskOutput.get(typeJsonNode.asString());
 
         if (sourceTaskOutput == null) {
             return;
@@ -383,70 +383,67 @@ class DataPillValidator {
                 // Get the array element definition (first nested property)
                 PropertyInfo arrayElementPropertyInfo = propertyInfos.getFirst();
 
-                if (arrayElementPropertyInfo != null) {
+                // Extract the property name from the data pill expression
+                // For example, from "loop1.item.propBool" we want "propBool"
+                if (dataPillExpression.contains(".item.")) {
+                    String[] itemParts = dataPillExpression.split("\\.item\\.");
 
-                    // Extract the property name from the data pill expression
-                    // For example, from "loop1.item.propBool" we want "propBool"
-                    if (dataPillExpression.contains(".item.")) {
-                        String[] itemParts = dataPillExpression.split("\\.item\\.");
+                    if (itemParts.length > 1) {
+                        String propertyName = itemParts[1];
 
-                        if (itemParts.length > 1) {
-                            String propertyName = itemParts[1];
+                        if (arrayElementPropertyInfo.nestedProperties() != null) {
+                            // Find the specific property within the array element
+                            PropertyInfo targetProperty = PropertyUtils.findPropertyByName(
+                                arrayElementPropertyInfo, propertyName);
 
-                            if (arrayElementPropertyInfo.nestedProperties() != null) {
-                                // Find the specific property within the array element
-                                PropertyInfo targetProperty = PropertyUtils.findPropertyByName(
-                                    arrayElementPropertyInfo, propertyName);
+                            if (targetProperty != null) {
+                                String actualType = mapTypeToString(targetProperty.type());
 
-                                if (targetProperty != null) {
-                                    String actualType = mapTypeToString(targetProperty.type());
+                                if (!isTypeCompatible(expectedType, actualType)) {
+                                    // Generate errors for each array element (simulating 3 elements based on test
+                                    // expectations)
+                                    for (int i = 0; i < 3; i++) {
+                                        String errorMessage = String.format(
+                                            "Property 'loop1.item[%d].%s' in output of 'loop/v1' is of type %s, " +
+                                                "not %s",
+                                            i, propertyName, actualType, expectedType.toLowerCase());
 
-                                    if (!isTypeCompatible(expectedType, actualType)) {
-                                        // Generate errors for each array element (simulating 3 elements based on test
-                                        // expectations)
-                                        for (int i = 0; i < 3; i++) {
-                                            String errorMessage = String.format(
-                                                "Property 'loop1.item[%d].%s' in output of 'loop/v1' is of type %s, " +
-                                                    "not %s",
-                                                i, propertyName, actualType, expectedType.toLowerCase());
-
-                                            StringUtils.appendWithNewline(errorMessage, errors);
-                                        }
+                                        StringUtils.appendWithNewline(errorMessage, errors);
                                     }
                                 }
                             }
                         }
-                    } else if (dataPillExpression.endsWith(".item")) {
-                        // Handle direct item references like "loop1.item"
-                        // When referencing the item directly, we need to determine what type it represents
-                        // For arrays of objects, we use the first property of the object as the default type
-                        List<PropertyInfo> nestedPropertyInfos = arrayElementPropertyInfo.nestedProperties();
+                    }
+                } else if (dataPillExpression.endsWith(".item")) {
+                    // Handle direct item references like "loop1.item"
+                    // When referencing the item directly, we need to determine what type it represents
+                    // For arrays of objects, we use the first property of the object as the default type
+                    List<PropertyInfo> nestedPropertyInfos = arrayElementPropertyInfo.nestedProperties();
 
-                        if (nestedPropertyInfos != null && !nestedPropertyInfos.isEmpty()) {
-                            // Get the first property of the array element as the default type
+                    if (nestedPropertyInfos != null && !nestedPropertyInfos.isEmpty()) {
+                        // Get the first property of the array element as the default type
 
-                            PropertyInfo firstPropertyInfo = nestedPropertyInfos.getFirst();
+                        PropertyInfo firstPropertyInfo = nestedPropertyInfos.getFirst();
 
-                            String actualType = mapTypeToString(firstPropertyInfo.type());
+                        String actualType = mapTypeToString(firstPropertyInfo.type());
 
-                            if (!isTypeCompatible(expectedType, actualType)) {
-                                String errorMessage = String.format(
-                                    "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
-                                    actualType, expectedType.toLowerCase());
+                        if (!isTypeCompatible(expectedType, actualType)) {
+                            String errorMessage = String.format(
+                                "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
+                                actualType, expectedType.toLowerCase());
 
-                                StringUtils.appendWithNewline(errorMessage, errors);
-                            }
-                        } else {
-                            // For arrays of primitive types, use the array element type directly
-                            String actualType = mapTypeToString(arrayElementPropertyInfo.type());
+                            StringUtils.appendWithNewline(errorMessage, errors);
+                        }
+                    } else {
+                        // For arrays of primitive types, use the array element type directly
+                        String actualType = mapTypeToString(arrayElementPropertyInfo.type());
 
-                            if (!isTypeCompatible(expectedType, actualType)) {
-                                String errorMessage = String.format(
-                                    "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
-                                    actualType, expectedType.toLowerCase());
+                        if (!isTypeCompatible(expectedType, actualType)) {
+                            String errorMessage = String.format(
+                                "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
+                                actualType, expectedType.toLowerCase());
 
-                                StringUtils.appendWithNewline(errorMessage, errors);
-                            }
+                            StringUtils.appendWithNewline(errorMessage, errors);
                         }
                     }
                 }

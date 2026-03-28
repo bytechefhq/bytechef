@@ -168,12 +168,11 @@ class TaskValidator {
             parameters = parametersJsonNode.toString();
         }
 
-        JsonNode parametersNode = JsonUtils.parseJsonWithErrorHandling(parameters, context.getErrors());
+        JsonNode parametersNode = JsonNodeUtils.parseJsonWithErrorHandling(parameters, context.getErrors());
 
         if (parametersNode != null && parametersNode.isObject()) {
-            PropertyValidator.validatePropertiesFromPropertyInfo(
-                parametersNode, elementDefinition, elementPath, parameters,
-                context.getErrors(), new StringBuilder());
+            PropertyValidator.validateProperties(
+                parametersNode, elementDefinition, elementPath, parameters, context.getErrors(), new StringBuilder());
         }
 
         DataPillValidator.validateTaskDataPills(clusterElementJsonNode, context, elementDefinition, true);
@@ -186,13 +185,13 @@ class TaskValidator {
      * @param errors   StringBuilder to collect validation errors
      */
     public static void validateTaskStructure(String taskJson, StringBuilder errors) {
-        JsonNode taskJsonNode = JsonUtils.parseJsonWithErrorHandling(taskJson, errors);
+        JsonNode taskJsonNode = JsonNodeUtils.parseJsonWithErrorHandling(taskJson, errors);
 
         if (taskJsonNode == null) {
             return;
         }
 
-        if (!JsonUtils.appendErrorNodeIsObject(taskJsonNode, "Task", errors)) {
+        if (!JsonNodeUtils.appendErrorNodeIsObject(taskJsonNode, "Task", errors)) {
             return;
         }
 
@@ -211,7 +210,7 @@ class TaskValidator {
             String path = propertyPath + "[" + i + "]";
 
             if (!taskJsonNode.isObject()) {
-                String actualType = JsonUtils.getJsonNodeType(taskJsonNode);
+                String actualType = JsonNodeUtils.getJsonNodeType(taskJsonNode);
 
                 StringUtils.appendWithNewline(ValidationErrorUtils.typeError(path, "object", actualType), errors);
             } else {
@@ -221,7 +220,7 @@ class TaskValidator {
                     JsonNode parametersJsonNode = taskJsonNode.get("parameters");
 
                     if (!parametersJsonNode.isObject()) {
-                        String actualType = JsonUtils.getJsonNodeType(parametersJsonNode);
+                        String actualType = JsonNodeUtils.getJsonNodeType(parametersJsonNode);
 
                         StringUtils.appendWithNewline(
                             ValidationErrorUtils.typeError(path + ".parameters", "object", actualType), errors);
@@ -242,13 +241,13 @@ class TaskValidator {
     public static void validateTaskParameters(
         String taskParameters, List<PropertyInfo> taskDefinition, StringBuilder errors, StringBuilder warnings) {
 
-        JsonNode taskParametersJsonNode = JsonUtils.parseJsonWithErrorHandling(taskParameters, errors);
+        JsonNode taskParametersJsonNode = JsonNodeUtils.parseJsonWithErrorHandling(taskParameters, errors);
 
-        if (!JsonUtils.appendErrorNodeIsObject(taskParametersJsonNode, "Current task parameters", errors)) {
+        if (!JsonNodeUtils.appendErrorNodeIsObject(taskParametersJsonNode, "Current task parameters", errors)) {
             return;
         }
 
-        PropertyValidator.validatePropertiesFromPropertyInfo(
+        PropertyValidator.validateProperties(
             taskParametersJsonNode, taskDefinition, "", taskParameters, errors, warnings);
     }
 

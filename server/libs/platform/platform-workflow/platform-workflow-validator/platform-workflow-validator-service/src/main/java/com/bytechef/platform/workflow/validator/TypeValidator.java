@@ -36,14 +36,14 @@ class TypeValidator {
     static void validateType(
         JsonNode valueJsonNode, String expectedType, String propertyPath, StringBuilder errors) {
 
-        if (valueJsonNode.isTextual() && isDataPillExpression(valueJsonNode.asText())) {
+        if (valueJsonNode.isString() && isDataPillExpression(valueJsonNode.asString())) {
             return;
         }
 
-        if (valueJsonNode.isTextual() && isDateTimeType(expectedType)) {
-            validateDateTimeType(valueJsonNode.asText(), expectedType, propertyPath, errors);
+        if (valueJsonNode.isString() && isDateTimeType(expectedType)) {
+            validateDateTimeType(valueJsonNode.asString(), expectedType, propertyPath, errors);
         } else if (!isTypeValid(valueJsonNode, expectedType)) {
-            String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
+            String actualType = JsonNodeUtils.getJsonNodeType(valueJsonNode);
             String normalizedExpectedType = expectedType.toLowerCase();
             StringUtils.appendWithNewline(
                 ValidationErrorUtils.typeError(propertyPath, normalizedExpectedType, actualType), errors);
@@ -59,7 +59,7 @@ class TypeValidator {
         }
 
         return switch (expectedType.toLowerCase()) {
-            case "string" -> jsonNode.isTextual();
+            case "string" -> jsonNode.isString();
             case "float" -> jsonNode.isFloatingPointNumber();
             case "integer" -> jsonNode.isIntegralNumber();
             case "number" -> jsonNode.isNumber();
@@ -67,9 +67,9 @@ class TypeValidator {
             case "array" -> jsonNode.isArray();
             case "object" -> jsonNode.isObject();
             case "null" -> jsonNode.isNull();
-            case "date" -> jsonNode.isTextual() && DateTimeValidator.isValidDate(jsonNode.asText());
-            case "time" -> jsonNode.isTextual() && DateTimeValidator.isValidTime(jsonNode.asText());
-            case "date_time" -> jsonNode.isTextual() && DateTimeValidator.isValidDateTime(jsonNode.asText());
+            case "date" -> jsonNode.isString() && DateTimeValidator.isValidDate(jsonNode.asString());
+            case "time" -> jsonNode.isString() && DateTimeValidator.isValidTime(jsonNode.asString());
+            case "date_time" -> jsonNode.isString() && DateTimeValidator.isValidDateTime(jsonNode.asString());
             default -> true;
         };
     }

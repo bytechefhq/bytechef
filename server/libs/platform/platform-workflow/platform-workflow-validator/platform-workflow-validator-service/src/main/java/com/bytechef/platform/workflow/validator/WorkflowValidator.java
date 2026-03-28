@@ -472,13 +472,13 @@ public class WorkflowValidator {
      * @param errors   StringBuilder to collect validation errors
      */
     static void validateWorkflowStructure(String workflow, StringBuilder errors) {
-        JsonNode workflowJsonNode = JsonUtils.parseJsonWithErrorHandling(workflow, errors);
+        JsonNode workflowJsonNode = JsonNodeUtils.parseJsonWithErrorHandling(workflow, errors);
 
         if (workflowJsonNode == null) {
             return;
         }
 
-        if (!JsonUtils.appendErrorNodeIsObject(workflowJsonNode, "Workflow", errors)) {
+        if (!JsonNodeUtils.appendErrorNodeIsObject(workflowJsonNode, "Workflow", errors)) {
             return;
         }
 
