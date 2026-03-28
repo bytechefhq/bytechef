@@ -82,20 +82,83 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     @Tool(description = "Instructions for writing custom code in Script component")
     public String getScriptCodeInstructions() {
         return """
-            The main function is perform(input, context) and needs to start in this exact format:
-            - javascript - function perform(input, context)
-            - python - def perform(input, context):
-            - ruby - def perform(input, context)
+            ## Script Component Runtime Environment
 
-            - input - object that holds all the input parameters defined in the 'input' object property of the Script component
-                    - the input parameters are of same type as in the Script component
-                    - `input.testInputMapName`
-            - context - used for calling Actions from other providers. Parameters of the action are defined as a map.
-                      - `context.component.componentName.actionName({'parameterName': parameterValue});`
-                      - ONLY use context property when you need to use Bytechef Actions
+            Scripts run inside a GraalVM Polyglot engine with a **synchronous, sandboxed** execution model.
+            There is NO event loop, NO browser APIs, and NO Node.js APIs available.
 
-            function always needs to return something.
-            If the language supports ';' at the end of the line, add ';' at the end of the line.
+            ## Entry Point
+
+            The main function is `perform(input, context)` and must use this exact signature:
+            - JavaScript: `function perform(input, context) { ... }`
+            - Python: `def perform(input, context):`
+            - Ruby: `def perform(input, context) ... end`
+
+            The function MUST always return a value. It MUST be synchronous (not async).
+
+            ## Parameters
+
+            - `input` - holds all input parameters defined in the Script component's 'input' property.
+              Parameters keep their original types. Access via `input.parameterName`.
+            - `context` - provides access to ByteChef component actions. Use it to call any installed
+              ByteChef component action:
+              `context.component.componentName.actionName({'parameterName': parameterValue})`
+              If the action requires a specific connection, pass the connection name as a second argument:
+              `context.component.componentName.actionName({'parameterName': parameterValue}, 'connectionName')`
+              ONLY use `context.component` when you need to invoke ByteChef component actions.
+
+            ## Available Language Features
+
+            Only standard language features from the respective language specifications are available:
+            - JavaScript: Full ECMAScript (ES2024+) — variables, functions, classes, destructuring,
+              template literals, Array/Object/String/Math/JSON/Date built-ins, regular expressions,
+              Map, Set, Symbol, Proxy, Reflect, WeakMap, WeakSet, iterators, generators, Intl.
+            - Python: Standard Python language features, built-in functions, data structures.
+            - Ruby: Standard Ruby language features, built-in classes and methods.
+
+            ## NOT Available (all languages)
+
+            The following APIs and features are NOT available in the GraalVM runtime:
+            - `fetch`, `XMLHttpRequest`, `Request`, `Response` — no HTTP client APIs
+            - `async`, `await`, `Promise` — no asynchronous execution support
+            - `setTimeout`, `setInterval`, `setImmediate` — no timers (no event loop)
+            - `require`, `import` (ES modules) — no module system
+            - File system APIs (`fs`, `File.open`, `open()`) — no file I/O
+            - Network/socket APIs — no direct network access
+            - Browser APIs (`window`, `document`, `localStorage`) — not a browser
+            - Node.js APIs (`process`, `Buffer`, `child_process`) — not Node.js
+
+            ## How to Perform Common Operations via ByteChef Components
+
+            Since direct APIs are not available, use `context.component` to call ByteChef actions instead:
+
+            ### HTTP Requests
+            Use the `httpClient` component instead of fetch/XMLHttpRequest:
+            - JavaScript:
+              `var response = context.component.httpClient.get({uri: 'https://api.example.com/data'});`
+            - Python:
+              `response = context.component.httpClient.get({"uri": "https://api.example.com/data"})`
+            - Ruby:
+              `response = context.component.httpClient.get({"uri" => "https://api.example.com/data"})`
+
+            Available HTTP methods: `get`, `post`, `put`, `patch`, `delete`, `head`.
+            Common parameters: `uri` (required), `headers` (object with array values),
+            `queryParameters` (object with array values), `bodyContent` (for POST/PUT/PATCH),
+            `responseType` (default: JSON).
+
+            ### Logging
+            Use the `logger` component:
+            `context.component.logger.info({text: 'Log message here'});`
+
+            ### Other Operations
+            Use `searchActions(query)` to discover available ByteChef component actions for any
+            operation the user needs (e.g., sending emails, accessing databases, file operations).
+
+            ## Code Style
+
+            - If the language supports `;` at the end of the line, always add `;`.
+            - Use `var` instead of `const`/`let` in JavaScript for maximum GraalVM compatibility.
+            - Keep code synchronous — all `context.component` calls block and return results directly.
             """;
     }
 
