@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.component.service;
 
+import static com.bytechef.platform.component.exception.ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES;
+import static com.bytechef.platform.component.exception.ActionDefinitionErrorType.EXECUTE_PERFORM;
+
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -344,8 +347,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ConfigurationException(
-                e, inputParameters, ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
+            throw new ConfigurationException(e, inputParameters, EXECUTE_DYNAMIC_PROPERTIES);
         }
     }
 
@@ -372,7 +374,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 ParametersFactory.create(inputParameters), componentConnections, ParametersFactory.create(extensions),
                 context);
         } catch (Exception e) {
-            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ExecutionException(toUserFriendlyMessage(e), e, inputParameters, EXECUTE_PERFORM);
         }
     }
 
@@ -385,7 +387,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 ParametersFactory.create(inputParameters), componentConnections, ParametersFactory.create(extensions),
                 context);
         } catch (Exception e) {
-            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ExecutionException(toUserFriendlyMessage(e), e, inputParameters, EXECUTE_PERFORM);
         }
     }
 
@@ -398,7 +400,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 ParametersFactory.create(inputParameters), componentConnections, ParametersFactory.create(extensions),
                 context);
         } catch (Exception e) {
-            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ExecutionException(toUserFriendlyMessage(e), e, inputParameters, EXECUTE_PERFORM);
         }
     }
 
@@ -495,7 +497,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) exception;
             }
 
-            throw new ExecutionException(exception, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ExecutionException(
+                toUserFriendlyMessage(exception), exception, inputParameters,
+                EXECUTE_PERFORM);
         }
     }
 
@@ -521,7 +525,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                             actionContext);
                     } catch (Exception exception) {
                         throw new ExecutionException(
-                            exception, Map.of(), ActionDefinitionErrorType.EXECUTE_PERFORM);
+                            toUserFriendlyMessage(exception), exception, Map.of(),
+                            EXECUTE_PERFORM);
                     }
                 }
 
@@ -553,7 +558,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ExecutionException(
+                toUserFriendlyMessage(e), e, inputParameters, EXECUTE_PERFORM);
         }
     }
 
@@ -633,6 +639,44 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         return SchemaUtils.toOutput(
             outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+    }
+
+    private static String toUserFriendlyMessage(Exception exception) {
+        Throwable rootCause = exception;
+
+        while (rootCause.getCause() != null) {
+            rootCause = rootCause.getCause();
+        }
+
+        String originalMessage = rootCause.getMessage();
+
+        if (originalMessage == null) {
+            return exception.getMessage();
+        }
+
+        String rootCauseClassName = rootCause.getClass()
+            .getSimpleName();
+
+        if (rootCauseClassName.equals("MismatchedInputException") &&
+            originalMessage.contains("ArrayList") && originalMessage.contains("String value")) {
+
+            return """
+                Type mismatch: a parameter value was passed as a plain string, but the platform expects an array \
+                (e.g., use ["value"] instead of "value"). This commonly happens with 'headers' or 'queryParameters' \
+                in httpClient calls. Original error: %s""".formatted(originalMessage);
+        }
+
+        if (rootCauseClassName.equals("MismatchedInputException")) {
+            return """
+                Type mismatch in input parameters: the script returned or passed a value of an unexpected type. \
+                Original error: %s""".formatted(originalMessage);
+        }
+
+        if (originalMessage.startsWith("Unexpected character")) {
+            return "JSON parsing error: the input is not valid JSON. " + originalMessage;
+        }
+
+        return exception.getMessage();
     }
 
     private record ConvertResult(
