@@ -47,7 +47,11 @@ const PropertyCodeEditorDialog = ({
                     <DialogDescription />
                 </DialogHeader>
 
-                <DialogContent className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0">
+                <DialogContent
+                    className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0"
+                    onFocusOutside={(event) => event.preventDefault()}
+                    onPointerDownOutside={(event) => event.preventDefault()}
+                >
                     <div className="flex min-w-0 flex-1 flex-col gap-2">
                         <PropertyCodeEditorDialogToolbar
                             language={language}
