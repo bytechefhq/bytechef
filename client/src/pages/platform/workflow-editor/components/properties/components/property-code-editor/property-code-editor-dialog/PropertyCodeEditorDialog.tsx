@@ -6,6 +6,7 @@ import PropertyCodeEditorDialogExecutionOutput from '@/pages/platform/workflow-e
 import PropertyCodeEditorDialogRightPanel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanel';
 import PropertyCodeEditorDialogToolbar from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogToolbar';
 import {usePropertyCodeEditorDialog} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
+import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 
@@ -34,6 +35,8 @@ const PropertyCodeEditorDialog = ({
         handleUnsavedChangesAlertDialogClose,
         unsavedChangesAlertDialogOpen,
     } = usePropertyCodeEditorDialog({onClose, value, workflow, workflowNodeName});
+
+    const rightPanelOpen = usePropertyCodeEditorDialogStore((state) => state.rightPanelOpen);
 
     return (
         <>
@@ -66,10 +69,12 @@ const PropertyCodeEditorDialog = ({
                                 </ResizablePanel>
                             </ResizablePanelGroup>
 
-                            <PropertyCodeEditorDialogRightPanel
-                                workflow={workflow}
-                                workflowNodeName={workflowNodeName}
-                            />
+                            {rightPanelOpen && (
+                                <PropertyCodeEditorDialogRightPanel
+                                    workflow={workflow}
+                                    workflowNodeName={workflowNodeName}
+                                />
+                            )}
                         </div>
                     </div>
 

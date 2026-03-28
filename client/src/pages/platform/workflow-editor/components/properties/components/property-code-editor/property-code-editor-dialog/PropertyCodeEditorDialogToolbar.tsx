@@ -3,8 +3,18 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {DialogClose} from '@/components/ui/dialog';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {usePropertyCodeEditorDialogToolbar} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
+import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {PlayIcon, SaveIcon, SparklesIcon, SquareIcon, XIcon} from 'lucide-react';
+import {
+    PanelRightCloseIcon,
+    PanelRightOpenIcon,
+    PlayIcon,
+    SaveIcon,
+    SparklesIcon,
+    SquareIcon,
+    XIcon,
+} from 'lucide-react';
+import {useShallow} from 'zustand/react/shallow';
 
 interface PropertyCodeEditorDialogToolbarProps {
     language: string;
@@ -34,6 +44,13 @@ const PropertyCodeEditorDialogToolbar = ({
         workflowId,
         workflowNodeName,
     });
+
+    const {rightPanelOpen, setRightPanelOpen} = usePropertyCodeEditorDialogStore(
+        useShallow((state) => ({
+            rightPanelOpen: state.rightPanelOpen,
+            setRightPanelOpen: state.setRightPanelOpen,
+        }))
+    );
 
     const ff_2504 = useFeatureFlagsStore()('ff-2504');
 
@@ -78,6 +95,19 @@ const PropertyCodeEditorDialogToolbar = ({
                 {scriptIsRunning && (
                     <Button icon={<SquareIcon />} onClick={handleStopClick} size="icon" variant="destructive" />
                 )}
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            icon={rightPanelOpen ? <PanelRightCloseIcon /> : <PanelRightOpenIcon />}
+                            onClick={() => setRightPanelOpen(!rightPanelOpen)}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent>{rightPanelOpen ? 'Hide side panel' : 'Show side panel'}</TooltipContent>
+                </Tooltip>
 
                 {ff_2504 && copilotEnabled && (
                     <Tooltip>
