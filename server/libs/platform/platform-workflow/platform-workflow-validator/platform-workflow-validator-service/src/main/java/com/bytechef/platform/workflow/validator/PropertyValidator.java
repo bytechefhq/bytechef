@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.workflow.validator.DisplayConditionEvaluator.DisplayConditionResult;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.Collection;
 import java.util.HashSet;
@@ -40,7 +41,7 @@ class PropertyValidator {
     /**
      * Recursively validates properties in current parameters against their definition using the PropertyInfo list.
      */
-    public static void validatePropertiesFromPropertyInfo(
+    public static void validateProperties(
         JsonNode taskParametersJsonNode, List<PropertyInfo> propertyInfos, String path,
         String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
 
@@ -50,18 +51,18 @@ class PropertyValidator {
             return;
         }
 
-        Set<String> validatedProperties = new HashSet<>();
+        Set<String> validatedPropertyNames = new HashSet<>();
 
         for (PropertyInfo propertyInfo : propertyInfos) {
             ValidationResult result = validatePropertyWithDisplayCondition(
                 taskParametersJsonNode, propertyInfo, path, originalCurrentParameters, errors, warnings);
 
             if (result.wasProcessed()) {
-                validatedProperties.add(propertyInfo.name());
+                validatedPropertyNames.add(propertyInfo.name());
             }
         }
 
-        checkForUndefinedProperties(taskParametersJsonNode, validatedProperties, path, warnings);
+        checkForUndefinedProperties(taskParametersJsonNode, validatedPropertyNames, path, warnings);
     }
 
     private static ValidationResult validatePropertyWithDisplayCondition(
@@ -72,20 +73,20 @@ class PropertyValidator {
 
         String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);
 
-        DisplayConditionEvaluator.DisplayConditionResult conditionResult =
-            DisplayConditionEvaluator.evaluate(
-                propertyInfo.displayCondition(),
-                com.bytechef.commons.util.JsonUtils.readTree(originalCurrentParameters));
+        DisplayConditionResult displayConditionResult = DisplayConditionEvaluator.evaluate(
+            propertyInfo.displayCondition(),
+            com.bytechef.commons.util.JsonUtils.readTree(originalCurrentParameters));
 
-        if (conditionResult.isMalformed()) {
+        if (displayConditionResult.isMalformed()) {
             handleMalformedDisplayCondition(
-                taskParametersJsonNode, fieldName, propertyPath, conditionResult.getMalformedMessage(), warnings);
+                taskParametersJsonNode, fieldName, propertyPath, displayConditionResult.getMalformedMessage(),
+                warnings);
 
             return ValidationResult.processed();
         }
 
-        if (conditionResult.shouldShow()) {
-            validatePropertyFromPropertyInfo(
+        if (displayConditionResult.shouldShow()) {
+            validateProperty(
                 taskParametersJsonNode, propertyInfo, propertyPath, originalCurrentParameters, errors, warnings);
 
             return ValidationResult.processed();
@@ -131,24 +132,9 @@ class PropertyValidator {
         });
     }
 
-    private static void generateWarningsForUndefinedNestedProperties(
-        JsonNode valueJsonNode, String propertyPath, StringBuilder warnings) {
+    private static void generateWarningsForAllProperties(
+        JsonNode jsonNode, String propertyPath, StringBuilder warnings) {
 
-        Collection<String> propertyNames = valueJsonNode.propertyNames();
-
-        Iterator<String> propertyNamesIterator = propertyNames.iterator();
-
-        propertyNamesIterator.forEachRemaining(curPropertyName -> {
-            String curPropertyPath = PropertyUtils.buildPropertyPath(propertyPath, curPropertyName);
-            StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(curPropertyPath), warnings);
-        });
-    }
-
-    /**
-     * Generates warnings for all properties recursively.
-     */
-    private static void
-        generateWarningsForAllProperties(JsonNode jsonNode, String propertyPath, StringBuilder warnings) {
         Collection<String> propertyNames = jsonNode.propertyNames();
 
         Iterator<String> propertyNamesIterator = propertyNames.iterator();
@@ -165,25 +151,23 @@ class PropertyValidator {
         });
     }
 
-    /**
-     * Recursively reports all nested required properties as missing.
-     */
     private static void reportMissingNestedRequiredProperties(
         PropertyInfo propertyInfo, String propertyPath, StringBuilder errors) {
 
-        List<PropertyInfo> nestedProperties = propertyInfo.nestedProperties();
+        List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
 
-        if (nestedProperties == null || nestedProperties.isEmpty()) {
+        if (nestedPropertyInfos == null || nestedPropertyInfos.isEmpty()) {
             return;
         }
 
-        for (PropertyInfo nestedProp : nestedProperties) {
-            if (shouldReportMissingProperty(nestedProp)) {
-                String nestedPath = PropertyUtils.buildPropertyPath(propertyPath, nestedProp.name());
+        for (PropertyInfo nestedPropertyInfo : nestedPropertyInfos) {
+            if (shouldReportMissingProperty(nestedPropertyInfo)) {
+                String nestedPath = PropertyUtils.buildPropertyPath(propertyPath, nestedPropertyInfo.name());
+
                 StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(nestedPath), errors);
 
-                if ("OBJECT".equalsIgnoreCase(nestedProp.type())) {
-                    reportMissingNestedRequiredProperties(nestedProp, nestedPath, errors);
+                if ("OBJECT".equalsIgnoreCase(nestedPropertyInfo.type())) {
+                    reportMissingNestedRequiredProperties(nestedPropertyInfo, nestedPath, errors);
                 }
             }
         }
@@ -195,12 +179,9 @@ class PropertyValidator {
                 org.apache.commons.lang3.StringUtils.isEmpty(propertyInfo.displayCondition()));
     }
 
-    /**
-     * Validates a single property using PropertyInfo.
-     */
-    private static void validatePropertyFromPropertyInfo(
-        JsonNode taskParametersJsonNode, PropertyInfo propertyInfo,
-        String propertyPath, String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
+    private static void validateProperty(
+        JsonNode taskParametersJsonNode, PropertyInfo propertyInfo, String propertyPath,
+        String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
 
         String fieldName = propertyInfo.name();
         String type = propertyInfo.type();
@@ -221,7 +202,7 @@ class PropertyValidator {
 
         JsonNode valueJsonNode = taskParametersJsonNode.get(fieldName);
 
-        if (valueJsonNode.isTextual() && TypeValidator.isDataPillExpression(valueJsonNode.asText())) {
+        if (valueJsonNode.isString() && TypeValidator.isDataPillExpression(valueJsonNode.asString())) {
             return;
         }
 
@@ -235,47 +216,15 @@ class PropertyValidator {
         String type = propertyInfo.type();
 
         if ("OBJECT".equalsIgnoreCase(type)) {
-            validateObjectPropertyFromPropertyInfo(
+            ObjectPropertyValidator.validate(
                 valueJsonNode, propertyInfo, propertyPath, originalCurrentParameters, errors, warnings);
         } else if ("ARRAY".equalsIgnoreCase(type)) {
-            ArrayPropertyValidator.validateFromPropertyInfo(
-                valueJsonNode, propertyInfo, propertyPath, errors, warnings);
+            ArrayPropertyValidator.validate(valueJsonNode, propertyInfo, propertyPath, errors, warnings);
         } else {
             TypeValidator.validateType(valueJsonNode, type, propertyPath, errors);
         }
     }
 
-    /**
-     * Validates an object property using PropertyInfo.
-     */
-    private static void validateObjectPropertyFromPropertyInfo(
-        JsonNode valueJsonNode, PropertyInfo propertyInfo,
-        String propertyPath, String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
-
-        if (valueJsonNode.isNull()) {
-            return;
-        }
-
-        if (!valueJsonNode.isObject()) {
-            String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
-
-            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "object", actualType), errors);
-
-            return;
-        }
-
-        List<PropertyInfo> nestedProperties = propertyInfo.nestedProperties();
-        if (nestedProperties != null && !nestedProperties.isEmpty()) {
-            validatePropertiesFromPropertyInfo(
-                valueJsonNode, nestedProperties, propertyPath, originalCurrentParameters, errors, warnings);
-        } else {
-            generateWarningsForUndefinedNestedProperties(valueJsonNode, propertyPath, warnings);
-        }
-    }
-
-    /**
-     * Result of property validation with display condition.
-     */
     private static class ValidationResult {
         private final boolean processed;
 

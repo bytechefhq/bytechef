@@ -25,9 +25,9 @@ import tools.jackson.databind.JsonNode;
  *
  * @author Marko Kriskovic
  */
-class JsonUtils {
+class JsonNodeUtils {
 
-    private JsonUtils() {
+    private JsonNodeUtils() {
     }
 
     /**
@@ -37,7 +37,7 @@ class JsonUtils {
     public static String getJsonNodeType(@Nullable JsonNode jsonNode) {
         if (jsonNode == null) {
             return "null";
-        } else if (jsonNode.isTextual()) {
+        } else if (jsonNode.isString()) {
             return "string";
         } else if (jsonNode.isNumber()) {
             if (jsonNode.isInt()) {
