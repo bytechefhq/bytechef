@@ -151,6 +151,14 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             logger.debug("Found workflow task: name={}, type={}", workflowTask.getName(), workflowTask.getType());
         }
 
+        Map<String, ?> parameters = workflowTask.getParameters();
+
+        Object input = parameters.get("input");
+
+        if (!(input instanceof Map<?, ?> inputMap)) {
+            return Map.of();
+        }
+
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
 
@@ -161,27 +169,15 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             logger.debug("Context for evaluation - inputs: {}, outputs: {}", inputs, outputs);
         }
 
-        Map<String, ?> evaluatedParameters = workflowTask.evaluateParameters(
-            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+        Map<String, Object> evaluatedInput = evaluator.evaluate(
+            (Map<String, Object>) inputMap,
+            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Evaluated parameters: {}", evaluatedParameters);
+            logger.debug("Evaluated input: {}", evaluatedInput);
         }
 
-        Object input = evaluatedParameters.get("input");
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(
-                "Input parameter: value={}, type={}",
-                input, input == null ? "null" : input.getClass()
-                    .getName());
-        }
-
-        if (input instanceof Map<?, ?> inputMap) {
-            return (Map<String, Object>) inputMap;
-        }
-
-        return Map.of();
+        return evaluatedInput;
     }
 
     @Override
