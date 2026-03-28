@@ -89,7 +89,10 @@ export function CopilotRuntimeProvider({
         addMessage({content: '', role: 'assistant'});
 
         const subscriber: AgentSubscriber = {
-            onTextMessageContentEvent: ({textMessageBuffer}) => {
+            onTextMessageContentEvent: ({event, textMessageBuffer}) => {
+                appendToLastAssistantMessage(textMessageBuffer + event.delta);
+            },
+            onTextMessageEndEvent: ({textMessageBuffer}) => {
                 appendToLastAssistantMessage(textMessageBuffer);
             },
         };
