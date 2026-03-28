@@ -87,4 +87,9 @@ ol[data-sonner-toaster] [data-sonner-toast] {
     code, kbd, samp, pre {
         font-size: 0.8rem;
     }
+
+    p, ol, ul, li {
+        margin-top: 0.25rem !important;
+        margin-bottom: 0.25rem !important;
+    }
 }
