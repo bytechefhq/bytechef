@@ -20,6 +20,12 @@ plugins {
 
 rootProject.name = "bytechef"
 
+include("ag-ui:packages:core")
+include("ag-ui:utils:json")
+include("ag-ui:packages:server")
+include("ag-ui:servers:spring")
+include("ag-ui:integrations:spring-ai")
+
 include("cli:cli-app")
 include("cli:commands:component")
 include("cli:commands:component:init:openapi")
