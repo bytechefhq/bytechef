@@ -7,8 +7,8 @@ dependencies {
     api(project(":ag-ui:packages:server"))
 
     implementation(project(":ag-ui:utils:json"))
-    implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("tools.jackson.core:jackson-databind")
 }

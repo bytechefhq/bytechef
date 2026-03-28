@@ -10,7 +10,7 @@ dependencies {
 
     implementation(platform("org.springframework.ai:spring-ai-bom:${libs.findVersion("spring-ai").get()}"))
     implementation(project(":ag-ui:utils:json"))
-    implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.springframework.ai:spring-ai-model")
     implementation("org.springframework.ai:spring-ai-client-chat")
+    implementation("tools.jackson.core:jackson-databind")
 }
