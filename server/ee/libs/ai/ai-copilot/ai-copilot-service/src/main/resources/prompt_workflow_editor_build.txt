@@ -88,6 +88,7 @@ updateWorkflow(workflowId, workflow)
 // When he does, repeat the process from step 2.
 
 ## Important Rules:
+- NEVER use fromAi(...) expressions in standalone workflow task parameters. fromAi(...) is exclusively for AI Agent tool configurations — it allows the AI Agent to dynamically fill parameters for its tools at runtime. In regular workflow tasks, use concrete values, expressions referencing other task outputs (e.g., ${taskName.property}), or user-provided inputs instead.
 - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
 - Display condition is located in metadata if the property is an object. If the condition is false: the object is not part of the JSON definition. Otherwise it is a part of it.
 - Every task must have a unique name in format: componentName_{number}
