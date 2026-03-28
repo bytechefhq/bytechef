@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    implementation("javax.validation:validation-api:2.0.1.Final")
+    implementation("jakarta.validation:jakarta.validation-api")
 }
