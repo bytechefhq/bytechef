@@ -16,6 +16,8 @@
 
 package com.bytechef.ai.mcp.tool.automation.impl;
 
+import static com.bytechef.ai.mcp.tool.platform.exception.ProjectWorkflowToolErrorType.GET_WORKFLOW;
+
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowInfo;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
@@ -115,14 +117,12 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                 projectWorkflowDTO.getId(), projectWorkflowDTO.getProjectWorkflowId(),
                 projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
                 projectWorkflowDTO.getDescription(), projectWorkflowDTO.getDefinition(),
-                projectWorkflowDTO.getVersion(),
-                projectWorkflowDTO.getCreatedDate(),
+                projectWorkflowDTO.getVersion(), projectWorkflowDTO.getCreatedDate(),
                 projectWorkflowDTO.getLastModifiedDate());
         } catch (Exception e) {
             logger.error("Failed to get workflow {}", workflowId, e);
 
-            throw new ExecutionException("Failed to get workflow: " + e.getMessage(), e,
-                ProjectWorkflowToolErrorType.GET_WORKFLOW);
+            throw new ExecutionException("Failed to get workflow: " + e.getMessage(), e, GET_WORKFLOW);
         }
     }
 
@@ -324,10 +324,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             return new WorkflowInfo(
                 projectWorkflowDTO.getId(), projectWorkflowDTO.getProjectWorkflowId(),
                 projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
-                projectWorkflowDTO.getDescription(), definition,
-                projectWorkflowDTO.getVersion(),
-                projectWorkflowDTO.getCreatedDate(),
-                projectWorkflowDTO.getLastModifiedDate());
+                projectWorkflowDTO.getDescription(), definition, projectWorkflowDTO.getVersion(),
+                projectWorkflowDTO.getCreatedDate(), projectWorkflowDTO.getLastModifiedDate());
         } catch (Exception e) {
             logger.error("Failed to update workflow {}", workflowId, e);
 
