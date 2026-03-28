@@ -22,15 +22,19 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Marko Kriskovic
@@ -42,9 +46,14 @@ class ProjectWorkflowToolsImplTest {
     private ProjectWorkflowToolsImpl projectWorkflowTools;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
-        projectWorkflowTools = new ProjectWorkflowToolsImpl(null, taskTools);
+
+        Resource emptyResource = mock(Resource.class);
+
+        when(emptyResource.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
+
+        projectWorkflowTools = new ProjectWorkflowToolsImpl(null, taskTools, emptyResource, emptyResource);
     }
 
     @Test
