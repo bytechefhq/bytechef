@@ -5,5 +5,5 @@ plugins {
 dependencies {
     api(project(":ag-ui:packages:core"))
 
-    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("tools.jackson.core:jackson-databind")
 }

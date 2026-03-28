@@ -1,7 +1,7 @@
 package com.agui.spring.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.agui.core.event.BaseEvent;
 import com.agui.core.event.ToolCallArgsEvent;
 import com.agui.core.event.ToolCallEndEvent;
@@ -109,7 +109,7 @@ public class ToolMapper {
                     public String inputSchema() {
                         try {
                             return objectMapper.writeValueAsString(tool.parameters());
-                        } catch (JsonProcessingException e) {
+                        } catch (JacksonException e) {
                             return "";
                         }
                     }

@@ -35,7 +35,6 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagSer
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
-import com.bytechef.ee.ai.copilot.config.AgUiJacksonConfiguration;
 import com.bytechef.ee.ai.copilot.config.CopilotConfiguration;
 import com.bytechef.ee.ai.copilot.config.CopilotPgVectorConfiguration;
 import com.bytechef.ee.ai.copilot.service.CopilotVectorStoreService;
@@ -85,7 +84,6 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeanNamesForType(CopilotConfiguration.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(CopilotVectorStoreService.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(CopilotPgVectorConfiguration.class)).isEmpty();
-        assertThat(applicationContext.getBeanNamesForType(AgUiJacksonConfiguration.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(CopilotApiController.class)).isEmpty();
     }
 
