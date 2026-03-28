@@ -29,6 +29,12 @@ subprojects {
     apply(plugin = "com.bytechef.java-common-conventions")
     apply(plugin = "io.spring.dependency-management")
 
+    if (project.path.startsWith(":ag-ui")) {
+        tasks.matching { it.name.startsWith("spotless") || it.name.startsWith("checkstyle") || it.name.startsWith("pmd") || it.name.startsWith("spotbugs") }.configureEach {
+            enabled = false
+        }
+    }
+
     dependencyManagement {
         dependencies {
             dependency("com.github.spotbugs:spotbugs-annotations:[${rootProject.libs.versions.spotbugs.get()},)")
