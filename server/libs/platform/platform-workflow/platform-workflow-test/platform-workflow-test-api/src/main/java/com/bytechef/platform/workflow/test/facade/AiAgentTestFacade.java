@@ -51,10 +51,10 @@ public interface AiAgentTestFacade {
      * @param conversationId   the conversation identifier for the AI agent
      * @param message          the user prompt message
      * @param attachments      the list of attachments
-     * @param toolSimulations  map of tool name to simulated response prompt
+     * @param toolSimulations  map of tool name to simulation config (keys: responsePrompt, simulationModel)
      * @return the result of the action execution
      */
     Object executeAiAgentAction(
         String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
-        List<Object> attachments, Map<String, String> toolSimulations);
+        List<Object> attachments, Map<String, Map<String, String>> toolSimulations);
 }
