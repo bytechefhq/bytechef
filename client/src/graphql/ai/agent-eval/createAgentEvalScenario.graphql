@@ -1,5 +1,5 @@
-mutation createAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: AgentScenarioType!, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int) {
-    createAgentEvalScenario(agentEvalTestId: $agentEvalTestId, name: $name, type: $type, userMessage: $userMessage, expectedOutput: $expectedOutput, personaPrompt: $personaPrompt, maxTurns: $maxTurns) {
+mutation createAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: AgentScenarioType!, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
+    createAgentEvalScenario(agentEvalTestId: $agentEvalTestId, name: $name, type: $type, userMessage: $userMessage, expectedOutput: $expectedOutput, personaPrompt: $personaPrompt, maxTurns: $maxTurns, numberOfRuns: $numberOfRuns) {
         id
         name
         type
@@ -7,6 +7,7 @@ mutation createAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: A
         expectedOutput
         personaPrompt
         maxTurns
+        numberOfRuns
         judges {
             id
             name

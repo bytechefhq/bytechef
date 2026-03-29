@@ -3,6 +3,32 @@ query agentEvalTests($workflowId: String!, $workflowNodeName: String!) {
         id
         name
         description
+        scenarios {
+            id
+            name
+            type
+            userMessage
+            expectedOutput
+            personaPrompt
+            maxTurns
+            numberOfRuns
+            toolSimulations {
+                id
+                toolName
+                responsePrompt
+                simulationModel
+            }
+            judges {
+                id
+                name
+                type
+                configuration
+                createdDate
+                lastModifiedDate
+            }
+            createdDate
+            lastModifiedDate
+        }
         createdDate
         lastModifiedDate
     }
