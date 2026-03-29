@@ -36,7 +36,7 @@ interface AgentEvalRunDetailProps {
 
 const AgentEvalRunDetail = ({onBack, run, summary}: AgentEvalRunDetailProps) => {
     return (
-        <div className="flex flex-1 flex-col gap-4">
+        <div className="flex flex-1 flex-col gap-4 px-4">
             <div className="flex items-center gap-2">
                 <button className="text-gray-400 hover:text-gray-600" onClick={onBack}>
                     <ArrowLeftIcon className="size-4" />
