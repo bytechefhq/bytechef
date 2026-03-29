@@ -6,6 +6,9 @@ query agentEvalRun($id: ID!) {
         averageScore
         totalScenarios
         completedScenarios
+        agentVersion
+        totalInputTokens
+        totalOutputTokens
         startedDate
         completedDate
         results {
@@ -33,6 +36,9 @@ query agentEvalRun($id: ID!) {
             score
             errorMessage
             transcriptFile
+            inputTokens
+            outputTokens
+            runIndex
             verdicts {
                 id
                 judgeName

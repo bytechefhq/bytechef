@@ -1,10 +1,11 @@
-mutation startAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!) {
-    startAgentEvalRun(agentEvalTestId: $agentEvalTestId, name: $name, environmentId: $environmentId) {
+mutation startAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!, $scenarioIds: [ID!], $agentJudgeIds: [ID!]) {
+    startAgentEvalRun(agentEvalTestId: $agentEvalTestId, name: $name, environmentId: $environmentId, scenarioIds: $scenarioIds, agentJudgeIds: $agentJudgeIds) {
         id
         name
         status
         totalScenarios
         completedScenarios
+        agentVersion
         createdDate
     }
 }

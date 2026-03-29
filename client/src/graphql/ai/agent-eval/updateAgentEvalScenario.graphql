@@ -1,5 +1,5 @@
-mutation updateAgentEvalScenario($id: ID!, $name: String, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int) {
-    updateAgentEvalScenario(id: $id, name: $name, userMessage: $userMessage, expectedOutput: $expectedOutput, personaPrompt: $personaPrompt, maxTurns: $maxTurns) {
+mutation updateAgentEvalScenario($id: ID!, $name: String, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
+    updateAgentEvalScenario(id: $id, name: $name, userMessage: $userMessage, expectedOutput: $expectedOutput, personaPrompt: $personaPrompt, maxTurns: $maxTurns, numberOfRuns: $numberOfRuns) {
         id
         name
         type
@@ -7,6 +7,7 @@ mutation updateAgentEvalScenario($id: ID!, $name: String, $userMessage: String, 
         expectedOutput
         personaPrompt
         maxTurns
+        numberOfRuns
         judges {
             id
             name
