@@ -49,6 +49,7 @@ import {
     alignDispatcherGhostsCrossAxis,
     alignTrailingPlaceholder,
     applySavedPositions,
+    centerDispatcherChildrenOnMainAxis,
     centerDispatcherPlaceholdersOnMainAxis,
     centerLRSmallNodes,
     centerNodesAfterBottomGhost,
@@ -606,6 +607,10 @@ export const getLayoutElements = async ({
     alignTrailingPlaceholder(allNodes, edges, crossAxis, direction, allDispatcherDeltas);
 
     centerDispatcherPlaceholdersOnMainAxis(allNodes, edges, mainAxis);
+
+    if (direction === 'TB') {
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, mainAxis);
+    }
 
     const sourceEdgeMap = new Map<string, Edge[]>();
 

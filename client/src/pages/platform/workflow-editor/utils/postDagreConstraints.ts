@@ -2653,3 +2653,182 @@ export function alignTrailingPlaceholder(
         }
     }
 }
+
+/**
+ * Returns the main-axis rendered size for any node type.
+ */
+function getNodeMainAxisSize(node: Node, mainAxis: 'x' | 'y'): number {
+    if (node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode') {
+        return 2;
+    }
+
+    if (node.type === 'placeholder') {
+        return mainAxis === 'y' ? PLACEHOLDER_NODE_HEIGHT : CLUSTER_ELEMENT_NODE_WIDTH;
+    }
+
+    return mainAxis === 'y' ? NODE_HEIGHT : NODE_WIDTH;
+}
+
+/**
+ * Walks a chain from a starting node toward a bottom ghost, collecting the
+ * main node IDs along the chain. Task dispatchers are included but their
+ * internals are skipped (jumped over via the dispatcher's bottom ghost edge).
+ */
+function collectChainMainNodeIds(
+    startNodeId: string,
+    bottomGhostId: string,
+    allNodes: Node[],
+    edges: Edge[]
+): string[] {
+    const nodeIds: string[] = [];
+    let currentNodeId = startNodeId;
+
+    while (currentNodeId) {
+        if (currentNodeId === bottomGhostId) {
+            break;
+        }
+
+        const currentNode = allNodes.find((node) => node.id === currentNodeId);
+
+        if (!currentNode || currentNode.type === 'taskDispatcherBottomGhostNode') {
+            break;
+        }
+
+        nodeIds.push(currentNodeId);
+
+        const currentData = currentNode.data as NodeDataType;
+
+        if (currentData.taskDispatcher && currentData.taskDispatcherId) {
+            const componentName = currentData.componentName as string;
+            const nestedBottomGhostId = bottomGhostIdForDispatcherTask(componentName, currentData.taskDispatcherId);
+            const nestedBottomGhostEdge = edges.find((edge) => edge.source === nestedBottomGhostId);
+
+            currentNodeId = nestedBottomGhostEdge?.target || '';
+        } else {
+            const nextEdge = edges.find((edge) => edge.source === currentNodeId);
+
+            currentNodeId = nextEdge?.target || '';
+        }
+    }
+
+    return nodeIds;
+}
+
+/**
+ * Centers child node chains on the main axis within their task dispatcher's
+ * ghost node span.
+ *
+ * Dagre assigns nodes to ranks top-down, so a shallow branch arm (e.g. a
+ * single node in a condition's FALSE branch) ends up near the top of the
+ * available space with a long empty gap below. This function repositions each
+ * branch arm's chain so it is visually centered between the top and bottom
+ * ghost nodes.
+ *
+ * Each outgoing edge from a top ghost is treated as an independent branch arm,
+ * so condition TRUE/FALSE, branch cases, and single-chain dispatchers (loop,
+ * each, map) are all handled uniformly.
+ */
+export function centerDispatcherChildrenOnMainAxis(allNodes: Node[], edges: Edge[], mainAxis: 'x' | 'y'): void {
+    const GHOST_SIZE = 2;
+
+    allNodes.forEach((topGhost) => {
+        if (topGhost.type !== 'taskDispatcherTopGhostNode') {
+            return;
+        }
+
+        const bottomGhostId = topGhost.id.replace('-top-ghost', '-bottom-ghost');
+        const bottomGhost = allNodes.find((node) => node.id === bottomGhostId);
+
+        if (!bottomGhost) {
+            return;
+        }
+
+        const availableTop = topGhost.position[mainAxis] + GHOST_SIZE;
+        const availableBottom = bottomGhost.position[mainAxis];
+
+        if (availableBottom <= availableTop) {
+            return;
+        }
+
+        const outgoingEdges = edges.filter((edge) => edge.source === topGhost.id);
+
+        for (const outgoingEdge of outgoingEdges) {
+            const firstChild = allNodes.find((node) => node.id === outgoingEdge.target);
+
+            if (
+                !firstChild ||
+                firstChild.type === 'placeholder' ||
+                firstChild.type === 'taskDispatcherLeftGhostNode'
+            ) {
+                continue;
+            }
+
+            const chainMainNodeIds = collectChainMainNodeIds(firstChild.id, bottomGhostId, allNodes, edges);
+
+            if (chainMainNodeIds.length === 0) {
+                continue;
+            }
+
+            const hasSavedPosition = chainMainNodeIds.some((nodeId) => {
+                const node = allNodes.find((existingNode) => existingNode.id === nodeId);
+
+                return node && containsNodePosition((node.data as NodeDataType).metadata);
+            });
+
+            if (hasSavedPosition) {
+                continue;
+            }
+
+            const allChainNodeIds = new Set(chainMainNodeIds);
+
+            for (const nodeId of chainMainNodeIds) {
+                const node = allNodes.find((existingNode) => existingNode.id === nodeId);
+                const nodeData = node?.data as NodeDataType;
+
+                if (nodeData?.taskDispatcher && nodeData.taskDispatcherId) {
+                    collectNestedDispatcherNodes(nodeData.taskDispatcherId, allNodes, allChainNodeIds);
+                }
+            }
+
+            let chainMin = Infinity;
+            let chainMax = -Infinity;
+
+            for (const nodeId of allChainNodeIds) {
+                const node = allNodes.find((existingNode) => existingNode.id === nodeId);
+
+                if (!node) {
+                    continue;
+                }
+
+                const position = node.position[mainAxis];
+                const size = getNodeMainAxisSize(node, mainAxis);
+
+                chainMin = Math.min(chainMin, position);
+                chainMax = Math.max(chainMax, position + size);
+            }
+
+            if (!isFinite(chainMin)) {
+                continue;
+            }
+
+            const chainCenter = (chainMin + chainMax) / 2;
+            const availableCenter = (availableTop + availableBottom) / 2;
+            const shift = availableCenter - chainCenter;
+
+            if (Math.abs(shift) < 1) {
+                continue;
+            }
+
+            for (const nodeId of allChainNodeIds) {
+                const node = allNodes.find((existingNode) => existingNode.id === nodeId);
+
+                if (node) {
+                    node.position = {
+                        ...node.position,
+                        [mainAxis]: node.position[mainAxis] + shift,
+                    };
+                }
+            }
+        }
+    });
+}
