@@ -23,7 +23,7 @@ const WorkflowChatContainer = () => {
             header={<Header centerTitle position="main" right={<EnvironmentSelect />} title="Workflow Chat" />}
             leftSidebarBody={<WorkflowChatSidebar />}
             leftSidebarHeader={<Header position="sidebar" title="Workflow Chat" />}
-            leftSidebarWidth="72"
+            leftSidebarWidth="64"
         >
             {workflowExecutionId ? (
                 <Outlet />
