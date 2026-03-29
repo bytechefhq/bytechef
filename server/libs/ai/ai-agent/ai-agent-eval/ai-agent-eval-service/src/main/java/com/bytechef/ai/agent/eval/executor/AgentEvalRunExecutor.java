@@ -29,6 +29,7 @@ import com.bytechef.ai.agent.eval.domain.AgentEvalScenario;
 import com.bytechef.ai.agent.eval.domain.AgentJudge;
 import com.bytechef.ai.agent.eval.domain.AgentJudgeVerdict;
 import com.bytechef.ai.agent.eval.domain.AgentScenarioJudge;
+import com.bytechef.ai.agent.eval.domain.AgentScenarioToolSimulation;
 import com.bytechef.ai.agent.eval.file.storage.AgentEvalFileStorage;
 import com.bytechef.ai.agent.eval.judge.AgentJudgeFactory;
 import com.bytechef.ai.agent.eval.service.AgentEvalResultService;
@@ -37,6 +38,7 @@ import com.bytechef.ai.agent.eval.service.AgentEvalScenarioService;
 import com.bytechef.ai.agent.eval.service.AgentJudgeService;
 import com.bytechef.ai.agent.eval.service.AgentJudgeVerdictService;
 import com.bytechef.ai.agent.eval.service.AgentScenarioJudgeService;
+import com.bytechef.ai.agent.eval.service.AgentScenarioToolSimulationService;
 import com.bytechef.ai.agent.eval.simulator.UserSimulator;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -95,6 +97,7 @@ public class AgentEvalRunExecutor {
     private final AgentJudgeService agentJudgeService;
     private final AgentJudgeVerdictService agentJudgeVerdictService;
     private final AgentScenarioJudgeService agentScenarioJudgeService;
+    private final AgentScenarioToolSimulationService agentScenarioToolSimulationService;
     private final AiAgentTestFacade aiAgentTestFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ConnectionService connectionService;
@@ -106,6 +109,7 @@ public class AgentEvalRunExecutor {
         AgentEvalRunService agentEvalRunService, AgentEvalScenarioService agentEvalScenarioService,
         AgentJudgeFactory agentJudgeFactory, AgentJudgeService agentJudgeService,
         AgentJudgeVerdictService agentJudgeVerdictService, AgentScenarioJudgeService agentScenarioJudgeService,
+        AgentScenarioToolSimulationService agentScenarioToolSimulationService,
         AiAgentTestFacade aiAgentTestFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ConnectionService connectionService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -118,6 +122,7 @@ public class AgentEvalRunExecutor {
         this.agentJudgeService = agentJudgeService;
         this.agentJudgeVerdictService = agentJudgeVerdictService;
         this.agentScenarioJudgeService = agentScenarioJudgeService;
+        this.agentScenarioToolSimulationService = agentScenarioToolSimulationService;
         this.aiAgentTestFacade = aiAgentTestFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.connectionService = connectionService;
@@ -529,9 +534,11 @@ public class AgentEvalRunExecutor {
         String conversationId = UUID.randomUUID()
             .toString();
 
+        Map<String, String> toolSimulations = loadToolSimulations(scenario.getId());
+
         Object result = aiAgentTestFacade.executeAiAgentAction(
             evalRun.getWorkflowId(), evalRun.getWorkflowNodeName(), evalRun.getEnvironmentId(),
-            conversationId, scenario.getUserMessage(), List.of());
+            conversationId, scenario.getUserMessage(), List.of(), toolSimulations);
 
         String agentResponse = extractAgentResponse(result);
 
@@ -556,6 +563,8 @@ public class AgentEvalRunExecutor {
 
         UserSimulator userSimulator = new UserSimulator(chatClient, scenario.getPersonaPrompt());
 
+        Map<String, String> toolSimulations = loadToolSimulations(scenario.getId());
+
         String conversationId = UUID.randomUUID()
             .toString();
 
@@ -573,7 +582,7 @@ public class AgentEvalRunExecutor {
         for (int turnIndex = 0; turnIndex < scenario.getMaxTurns(); turnIndex++) {
             Object result = aiAgentTestFacade.executeAiAgentAction(
                 evalRun.getWorkflowId(), evalRun.getWorkflowNodeName(), evalRun.getEnvironmentId(),
-                conversationId, userMessage, List.of());
+                conversationId, userMessage, List.of(), toolSimulations);
 
             String agentResponse = extractAgentResponse(result);
 
@@ -654,6 +663,23 @@ public class AgentEvalRunExecutor {
         AgentEvalRun evalRun = agentEvalRunService.getAgentEvalRun(evalRunId);
 
         return evalRun.getStatus() == AgentEvalRunStatus.FAILED;
+    }
+
+    private Map<String, String> loadToolSimulations(long scenarioId) {
+        List<AgentScenarioToolSimulation> simulations =
+            agentScenarioToolSimulationService.getAgentScenarioToolSimulations(scenarioId);
+
+        if (simulations.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, String> toolSimulationMap = new HashMap<>();
+
+        for (AgentScenarioToolSimulation simulation : simulations) {
+            toolSimulationMap.put(simulation.getToolName(), simulation.getResponsePrompt());
+        }
+
+        return toolSimulationMap;
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
