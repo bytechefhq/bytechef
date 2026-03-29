@@ -18,6 +18,7 @@ package com.bytechef.ai.agent.eval.judge;
 
 import com.bytechef.ai.agent.eval.constant.AgentJudgeType;
 import java.util.Map;
+import java.util.Objects;
 import org.springaicommunity.judge.Judge;
 import org.springaicommunity.judge.JudgeType;
 import org.springaicommunity.judge.Judges;
@@ -63,12 +64,16 @@ public class AgentJudgeFactory {
                 ((Number) configuration.get("threshold")).doubleValue(),
                 (String) configuration.get("algorithm"));
             case STRING_EQUALS -> new StringEqualsJudge(
-                (String) configuration.get("expectedValue"),
+                Objects.requireNonNull(
+                    (String) configuration.get("expectedValue"),
+                    "STRING_EQUALS judge requires 'expectedValue' in configuration"),
                 configuration.containsKey("caseSensitive")
                     ? (Boolean) configuration.get("caseSensitive")
                     : true);
             case TOOL_USAGE -> new ToolUsageJudge(
-                (String) configuration.get("toolName"),
+                Objects.requireNonNull(
+                    (String) configuration.get("toolName"),
+                    "TOOL_USAGE judge requires 'toolName' in configuration"),
                 (String) configuration.getOrDefault("position", "ANYWHERE"),
                 (String) configuration.getOrDefault("comparison", "AT_LEAST"),
                 configuration.containsKey("count")
