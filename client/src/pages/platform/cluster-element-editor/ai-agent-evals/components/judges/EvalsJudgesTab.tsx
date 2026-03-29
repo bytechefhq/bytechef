@@ -33,27 +33,28 @@ const EvalsJudgesTab = ({workflowId, workflowNodeName}: EvalsJudgesTabProps) => 
 
     return (
         <div className="flex flex-1 flex-col gap-3 px-4">
-            {judges.length > 0 &&
-                judges.map((judge) => (
-                    <AgentJudgeCard
-                        judge={judge}
-                        key={judge.id}
-                        onDelete={handleDeleteJudge}
-                        onEdit={(selectedJudge) => setEditingJudge(selectedJudge)}
-                    />
-                ))}
+            {judges.length > 0 ? (
+                <>
+                    <div className="flex items-center justify-end">
+                        <button
+                            className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+                            onClick={() => setShowCreateDialog(true)}
+                        >
+                            <PlusIcon className="size-3.5" />
+                            New Judge
+                        </button>
+                    </div>
 
-            {judges.length > 0 && (
-                <button
-                    className="flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-gray-300 py-2.5 text-sm text-gray-500 hover:border-gray-400 hover:text-gray-600"
-                    onClick={() => setShowCreateDialog(true)}
-                >
-                    <PlusIcon className="size-4" />
-                    New Judge
-                </button>
-            )}
-
-            {judges.length === 0 && (
+                    {judges.map((judge) => (
+                        <AgentJudgeCard
+                            judge={judge}
+                            key={judge.id}
+                            onDelete={handleDeleteJudge}
+                            onEdit={(selectedJudge) => setEditingJudge(selectedJudge)}
+                        />
+                    ))}
+                </>
+            ) : (
                 <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
                     <div className="flex size-12 items-center justify-center rounded-full bg-violet-100">
                         <GavelIcon className="size-6 text-violet-600" />
