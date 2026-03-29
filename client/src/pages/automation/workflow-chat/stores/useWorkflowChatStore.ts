@@ -11,7 +11,9 @@ import {devtools} from 'zustand/middleware';
 
 interface WorkflowChatStateI {
     conversationId: string;
+    currentChatName: string | null;
     messages: ThreadMessageLike[];
+    setCurrentChatName: (name: string | null) => void;
     setMessage: (message: ThreadMessageLike) => void;
     appendToLastAssistantMessage: (delta: string) => void;
     setLastAssistantMessageContent: (content: string) => void;
@@ -27,12 +29,14 @@ const generateId = () =>
 
 const initialState = {
     conversationId: generateId(),
+    currentChatName: null as string | null,
     messages: [] as ThreadMessageLike[],
 };
 
 export const useWorkflowChatStore = create<WorkflowChatStateI>()(
     devtools((set) => ({
         ...initialState,
+        setCurrentChatName: (name) => set({currentChatName: name}),
         setMessage: (message) =>
             set((state) => ({
                 messages: [...state.messages, message],
