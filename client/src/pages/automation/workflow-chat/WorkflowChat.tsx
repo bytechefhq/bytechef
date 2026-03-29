@@ -1,9 +1,10 @@
 import {Thread} from '@/components/assistant-ui/thread';
 import {WorkflowChatRuntimeProvider} from '@/pages/automation/workflow-chat/runtime-providers/WorkflowChatRuntimeProvider';
+import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
 import {toEnvironmentName} from '@/shared/constants';
 import {useWorkflowChatProjectDeploymentWorkflowQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 import {useParams} from 'react-router-dom';
 
 const WorkflowChat = () => {
@@ -22,6 +23,8 @@ const WorkflowChat = () => {
         }
     );
 
+    const setCurrentChatName = useWorkflowChatStore((state) => state.setCurrentChatName);
+
     const chatName = useMemo(() => {
         if (data?.projectDeploymentWorkflow) {
             const workflow = data.projectDeploymentWorkflow.projectWorkflow?.workflow;
@@ -32,6 +35,10 @@ const WorkflowChat = () => {
         return null;
     }, [data]);
 
+    useEffect(() => {
+        setCurrentChatName(chatName);
+    }, [chatName, setCurrentChatName]);
+
     return (
         <div className="flex flex-1">
             <WorkflowChatRuntimeProvider
@@ -39,15 +46,7 @@ const WorkflowChat = () => {
                 sseStreamResponse={data?.projectDeploymentWorkflow?.projectWorkflow?.sseStreamResponse}
                 workflowExecutionId={workflowExecutionId!}
             >
-                <div className="relative flex size-full flex-col pt-14">
-                    <div className="absolute top-0 flex items-center space-x-4 p-4">
-                        {chatName && (
-                            <div className="space-x-1">
-                                <span className="font-semibold">{chatName}</span>
-                            </div>
-                        )}
-                    </div>
-
+                <div className="relative flex size-full flex-col">
                     <Thread />
                 </div>
             </WorkflowChatRuntimeProvider>
