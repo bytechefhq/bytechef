@@ -6,15 +6,26 @@ const config: CodegenConfig = {
         'src/shared/middleware/graphql.ts': {
             config: {
                 fetcher: {
-                    endpoint: 'endpointUrl',
-                    fetchParams: 'fetchParams',
+                    func: './graphqlFetcher#fetcher',
                 },
                 reactQueryVersion: 5,
             },
             plugins: [
                 {
                     add: {
-                        content: "import { endpointUrl, fetchParams } from './config';",
+                        content: [
+                            'export class TypedDocumentString<TResult, TVariables> extends String {',
+                            '  __apiType?: { result: TResult; variables: TVariables };',
+                            '',
+                            '  constructor(private value: string) {',
+                            '    super(value);',
+                            '  }',
+                            '',
+                            '  override toString(): string {',
+                            '    return this.value;',
+                            '  }',
+                            '}',
+                        ].join('\n'),
                     },
                 },
                 'typescript',
