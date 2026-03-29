@@ -43,9 +43,7 @@ const AiAgentEvals = () => {
                     <EvalsJudgesTab workflowId={workflowId} workflowNodeName={workflowNodeName} />
                 )}
 
-                {evalsTab === 'runs' && workflowId && workflowNodeName && (
-                    <EvalsRunsTab workflowId={workflowId} workflowNodeName={workflowNodeName} />
-                )}
+                {evalsTab === 'runs' && <EvalsRunsTab />}
             </div>
         </div>
     );

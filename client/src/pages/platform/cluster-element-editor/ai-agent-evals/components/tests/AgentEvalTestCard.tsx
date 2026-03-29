@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import AgentEvalScenarioRow from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/AgentEvalScenarioRow';
 import CreateScenarioDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/CreateScenarioDialog';
-import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
+import RunTestDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/RunTestDialog';
 import {
     type AgentEvalTestQuery,
     AgentEvalTestsQuery,
@@ -56,6 +56,8 @@ interface AgentEvalTestCardProps {
         }
     ) => void;
     test: AgentEvalTestListItemType;
+    workflowId: string;
+    workflowNodeName: string;
 }
 
 const AgentEvalTestCard = ({
@@ -64,12 +66,14 @@ const AgentEvalTestCard = ({
     onDeleteTest,
     onUpdateScenario,
     test,
+    workflowId,
+    workflowNodeName,
 }: AgentEvalTestCardProps) => {
-    const {setEvalsTab, setSelectedTestId} = useAiAgentEvalsStore();
     const [editingScenario, setEditingScenario] = useState<AgentEvalScenarioType | null>(null);
     const [expanded, setExpanded] = useState(false);
     const [showCreateScenarioDialog, setShowCreateScenarioDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showRunDialog, setShowRunDialog] = useState(false);
 
     const {data: testDetailData} = useAgentEvalTestQuery({id: test.id}, {enabled: expanded});
 
@@ -112,8 +116,7 @@ const AgentEvalTestCard = ({
                             icon={<PlayIcon className="size-3.5" />}
                             onClick={(event) => {
                                 event.stopPropagation();
-                                setSelectedTestId(test.id);
-                                setEvalsTab('runs');
+                                setShowRunDialog(true);
                             }}
                             size="icon"
                             variant="ghost"
@@ -213,6 +216,15 @@ const AgentEvalTestCard = ({
                     onClose={() => setEditingScenario(null)}
                     onCreate={onCreateScenario}
                     onUpdate={onUpdateScenario}
+                />
+            )}
+
+            {showRunDialog && (
+                <RunTestDialog
+                    onClose={() => setShowRunDialog(false)}
+                    test={test}
+                    workflowId={workflowId}
+                    workflowNodeName={workflowNodeName}
                 />
             )}
         </>
