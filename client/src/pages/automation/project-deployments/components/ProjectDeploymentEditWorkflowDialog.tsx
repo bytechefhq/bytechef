@@ -143,9 +143,9 @@ const ProjectDeploymentEditWorkflowDialog = ({
 
                     <div className="max-h-dialog-height overflow-y-auto px-6">
                         <ProjectDeploymentDialogWorkflowsStepItem
+                            connectionsGrouped={connectionsGrouped}
                             control={control}
                             formState={formState}
-                            groupConnections={connectionsGrouped}
                             key={workflow.id!}
                             setValue={setValue}
                             switchHidden={true}

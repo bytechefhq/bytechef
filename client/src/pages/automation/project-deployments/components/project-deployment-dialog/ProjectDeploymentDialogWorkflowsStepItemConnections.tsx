@@ -5,7 +5,7 @@ import {Control, UseFormSetValue} from 'react-hook-form';
 interface ProjectDeploymentDialogWorkflowsStepItemConnectionsProps {
     componentConnections: ComponentConnection[];
     control: Control<ProjectDeployment>;
-    groupConnections?: boolean;
+    connectionsGrouped?: boolean;
     setValue: UseFormSetValue<ProjectDeployment>;
     workflowIndex: number;
     workflowNodeLabelMap: Map<string, string>;
@@ -18,8 +18,8 @@ type ComponentConnectionWithIndexType = {
 
 const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
     componentConnections,
+    connectionsGrouped,
     control,
-    groupConnections,
     setValue,
     workflowIndex,
     workflowNodeLabelMap,
@@ -30,7 +30,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
         return <p className="text-sm">No defined connections.</p>;
     }
 
-    if (!groupConnections) {
+    if (!connectionsGrouped) {
         return (
             <ul className="space-y-4">
                 {componentConnections.map((componentConnection, componentConnectionIndex) => (
