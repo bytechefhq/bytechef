@@ -11,6 +11,7 @@ query agentEvalTest($id: ID!) {
             expectedOutput
             personaPrompt
             maxTurns
+            numberOfRuns
             judges {
                 id
                 name

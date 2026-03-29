@@ -19,6 +19,8 @@ const JUDGE_TYPE_LABELS: Record<AgentJudgeType, string> = {
     [AgentJudgeType.RegexMatch]: 'Regex Match',
     [AgentJudgeType.ResponseLength]: 'Response Length',
     [AgentJudgeType.Similarity]: 'Similarity',
+    [AgentJudgeType.StringEquals]: 'String Equals',
+    [AgentJudgeType.ToolUsage]: 'Tool Usage',
 };
 
 const JUDGE_TYPE_COLORS: Record<AgentJudgeType, string> = {
@@ -28,6 +30,8 @@ const JUDGE_TYPE_COLORS: Record<AgentJudgeType, string> = {
     [AgentJudgeType.RegexMatch]: 'border-purple-200 bg-purple-50 text-purple-700',
     [AgentJudgeType.ResponseLength]: 'border-green-200 bg-green-50 text-green-700',
     [AgentJudgeType.Similarity]: 'border-teal-200 bg-teal-50 text-teal-700',
+    [AgentJudgeType.StringEquals]: 'border-cyan-200 bg-cyan-50 text-cyan-700',
+    [AgentJudgeType.ToolUsage]: 'border-orange-200 bg-orange-50 text-orange-700',
 };
 
 function getConfigurationSummary(type: AgentJudgeType, configuration: Record<string, unknown>): string {
@@ -79,6 +83,23 @@ function getConfigurationSummary(type: AgentJudgeType, configuration: Record<str
             const algorithm = String(configuration.algorithm ?? 'COSINE');
 
             return `${algorithm === 'COSINE' ? 'Cosine' : 'Edit Distance'} similarity >= ${threshold}`;
+        }
+
+        case AgentJudgeType.StringEquals: {
+            const expectedValue = String(configuration.expectedValue ?? '');
+
+            return `Must equal: '${expectedValue}'`;
+        }
+
+        case AgentJudgeType.ToolUsage: {
+            const toolName = String(configuration.toolName ?? '');
+            const position = String(configuration.position ?? 'ANYWHERE').toLowerCase();
+            const comparison = String(configuration.comparison ?? 'AT_LEAST')
+                .toLowerCase()
+                .replace('_', ' ');
+            const count = configuration.count ?? 1;
+
+            return `Tool: ${toolName} (${position}, ${comparison} ${count})`;
         }
 
         default:
