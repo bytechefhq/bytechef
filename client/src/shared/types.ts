@@ -244,6 +244,7 @@ export type NodeDataType = {
     onErrorId?: string;
     metadata?: {
         ui?: {
+            chainAlignedPosition?: {x: number; y: number};
             dynamicPropertyTypes?: {[key: string]: string};
             nodePosition?: {x: number; y: number};
             placeholderPositions?: Record<string, {x: number; y: number}>;
