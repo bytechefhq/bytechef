@@ -1,6 +1,7 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/automation/configuration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/automation/configuration/web/rest/ApproveFormApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/CategoryApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/ComponentDefinitionApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/ConnectionApi.java
@@ -12,6 +13,7 @@ src/main/java/com/bytechef/automation/configuration/web/rest/ProjectTagApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WebhookTriggerTestApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkspaceApi.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/ApproveFormModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/AuthorizationTypeModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ComponentCategoryModel.java
