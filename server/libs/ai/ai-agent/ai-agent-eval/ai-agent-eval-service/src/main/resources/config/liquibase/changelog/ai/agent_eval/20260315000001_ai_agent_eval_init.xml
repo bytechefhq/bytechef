@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260315000001" author="Ivica Cardic">
+        <createTable tableName="agent_judge">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workflow_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_node_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="configuration" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="agent_judge" indexName="ix_agent_judge_workflow">
+            <column name="workflow_id"/>
+            <column name="workflow_node_name"/>
+        </createIndex>
+
+        <createTable tableName="agent_eval_test">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workflow_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_node_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="agent_eval_test" indexName="ix_agent_eval_test_workflow">
+            <column name="workflow_id"/>
+            <column name="workflow_node_name"/>
+        </createIndex>
+
+        <createTable tableName="agent_eval_scenario">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_eval_test_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_message" type="TEXT"/>
+            <column name="expected_output" type="TEXT"/>
+            <column name="persona_prompt" type="TEXT"/>
+            <column name="max_turns" type="INT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="agent_eval_scenario" baseColumnNames="agent_eval_test_id"
+                                 referencedTableName="agent_eval_test" referencedColumnNames="id"
+                                 constraintName="fk_agent_eval_scenario_test" onDelete="CASCADE"/>
+
+        <createIndex tableName="agent_eval_scenario" indexName="ix_agent_eval_scenario_test">
+            <column name="agent_eval_test_id"/>
+        </createIndex>
+
+        <createTable tableName="agent_scenario_judge">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_eval_scenario_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="configuration" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="agent_scenario_judge" baseColumnNames="agent_eval_scenario_id"
+                                 referencedTableName="agent_eval_scenario" referencedColumnNames="id"
+                                 constraintName="fk_agent_scenario_judge_scenario" onDelete="CASCADE"/>
+
+        <createIndex tableName="agent_scenario_judge" indexName="ix_agent_scenario_judge_scenario">
+            <column name="agent_eval_scenario_id"/>
+        </createIndex>
+
+        <createTable tableName="agent_eval_run">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_eval_test_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_node_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="average_score" type="DOUBLE PRECISION"/>
+            <column name="total_scenarios" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed_scenarios" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="started_date" type="TIMESTAMP"/>
+            <column name="completed_date" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="agent_eval_run" baseColumnNames="agent_eval_test_id"
+                                 referencedTableName="agent_eval_test" referencedColumnNames="id"
+                                 constraintName="fk_agent_eval_run_test" onDelete="CASCADE"/>
+
+        <createIndex tableName="agent_eval_run" indexName="ix_agent_eval_run_test">
+            <column name="agent_eval_test_id"/>
+        </createIndex>
+
+        <createIndex tableName="agent_eval_run" indexName="ix_agent_eval_run_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createTable tableName="agent_eval_result">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_eval_run_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="agent_eval_scenario_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="DOUBLE PRECISION"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="transcript_file" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="agent_eval_result" baseColumnNames="agent_eval_run_id"
+                                 referencedTableName="agent_eval_run" referencedColumnNames="id"
+                                 constraintName="fk_agent_eval_result_run" onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="agent_eval_result" baseColumnNames="agent_eval_scenario_id"
+                                 referencedTableName="agent_eval_scenario" referencedColumnNames="id"
+                                 constraintName="fk_agent_eval_result_scenario" onDelete="CASCADE"/>
+
+        <createIndex tableName="agent_eval_result" indexName="ix_agent_eval_result_run">
+            <column name="agent_eval_run_id"/>
+        </createIndex>
+
+        <createTable tableName="agent_judge_verdict">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_eval_result_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="judge_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="judge_type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="judge_scope" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="passed" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="explanation" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="agent_judge_verdict" baseColumnNames="agent_eval_result_id"
+                                 referencedTableName="agent_eval_result" referencedColumnNames="id"
+                                 constraintName="fk_agent_judge_verdict_result" onDelete="CASCADE"/>
+
+        <createIndex tableName="agent_judge_verdict" indexName="ix_agent_judge_verdict_result">
+            <column name="agent_eval_result_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
