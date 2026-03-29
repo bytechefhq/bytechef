@@ -4,7 +4,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {InfoIcon} from 'lucide-react';
+import {InfoIcon, Loader2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 interface ToolSimulationEditDataI {
@@ -17,29 +17,39 @@ interface ToolSimulationEditDataI {
 interface CreateToolSimulationDialogProps {
     editData?: ToolSimulationEditDataI;
     onClose: () => void;
-    onCreate: (toolName: string, responsePrompt: string, simulationModel?: string) => void;
-    onUpdate?: (id: string, toolName?: string, responsePrompt?: string, simulationModel?: string) => void;
+    onCreate: (toolName: string, responsePrompt: string, simulationModel?: string) => Promise<void>;
+    onUpdate?: (id: string, toolName?: string, responsePrompt?: string, simulationModel?: string) => Promise<void>;
 }
 
 const CreateToolSimulationDialog = ({editData, onClose, onCreate, onUpdate}: CreateToolSimulationDialogProps) => {
     const [responsePrompt, setResponsePrompt] = useState(editData?.responsePrompt ?? '');
     const [simulationModel, setSimulationModel] = useState(editData?.simulationModel ?? '');
+    const [submitting, setSubmitting] = useState(false);
     const [toolName, setToolName] = useState(editData?.toolName ?? '');
 
     const isEditing = !!editData;
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!toolName.trim() || !responsePrompt.trim()) {
             return;
         }
 
-        if (isEditing && editData && onUpdate) {
-            onUpdate(editData.id, toolName.trim(), responsePrompt.trim(), simulationModel.trim() || undefined);
-        } else {
-            onCreate(toolName.trim(), responsePrompt.trim(), simulationModel.trim() || undefined);
-        }
+        setSubmitting(true);
 
-        onClose();
+        try {
+            if (isEditing && editData && onUpdate) {
+                await onUpdate(
+                    editData.id, toolName.trim(), responsePrompt.trim(), simulationModel.trim() || undefined);
+            } else {
+                await onCreate(toolName.trim(), responsePrompt.trim(), simulationModel.trim() || undefined);
+            }
+
+            onClose();
+        } catch {
+            // Error is handled by the mutation's onError callback
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -126,11 +136,12 @@ const CreateToolSimulationDialog = ({editData, onClose, onCreate, onUpdate}: Cre
                 </fieldset>
 
                 <DialogFooter>
-                    <Button label="Cancel" onClick={onClose} variant="outline" />
+                    <Button disabled={submitting} label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
-                        disabled={!toolName.trim() || !responsePrompt.trim()}
-                        label={isEditing ? 'Save' : 'Add'}
+                        disabled={!toolName.trim() || !responsePrompt.trim() || submitting}
+                        icon={submitting ? <Loader2Icon className="animate-spin" /> : undefined}
+                        label={submitting ? 'Saving...' : isEditing ? 'Save' : 'Add'}
                         onClick={handleSubmit}
                     />
                 </DialogFooter>
