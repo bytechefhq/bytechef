@@ -65,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.judge.Judge;
@@ -535,7 +536,7 @@ public class AgentEvalRunExecutor {
 
         String conversationId = uuid.toString();
 
-        Map<String, String> toolSimulations = loadToolSimulations(scenario.getId());
+        Map<String, Map<String, String>> toolSimulations = loadToolSimulations(scenario.getId());
 
         Object result = aiAgentTestFacade.executeAiAgentAction(
             evalRun.getWorkflowId(), evalRun.getWorkflowNodeName(), evalRun.getEnvironmentId(),
@@ -564,7 +565,7 @@ public class AgentEvalRunExecutor {
 
         UserSimulator userSimulator = new UserSimulator(chatClient, scenario.getPersonaPrompt());
 
-        Map<String, String> toolSimulations = loadToolSimulations(scenario.getId());
+        Map<String, Map<String, String>> toolSimulations = loadToolSimulations(scenario.getId());
 
         UUID uuid = UUID.randomUUID();
 
@@ -667,21 +668,25 @@ public class AgentEvalRunExecutor {
         return evalRun.getStatus() == AgentEvalRunStatus.FAILED;
     }
 
-    private Map<String, String> loadToolSimulations(long scenarioId) {
+    private Map<String, Map<String, String>> loadToolSimulations(long scenarioId) {
         List<AgentScenarioToolSimulation> simulations =
             agentScenarioToolSimulationService.getAgentScenarioToolSimulations(scenarioId);
 
-        if (simulations.isEmpty()) {
-            return Map.of();
-        }
+        return simulations.stream()
+            .collect(
+                Collectors.toMap(
+                    AgentScenarioToolSimulation::getToolName,
+                    simulation -> {
+                        Map<String, String> config = new HashMap<>();
 
-        Map<String, String> toolSimulationMap = new HashMap<>();
+                        config.put("responsePrompt", simulation.getResponsePrompt());
 
-        for (AgentScenarioToolSimulation simulation : simulations) {
-            toolSimulationMap.put(simulation.getToolName(), simulation.getResponsePrompt());
-        }
+                        if (simulation.getSimulationModel() != null) {
+                            config.put("simulationModel", simulation.getSimulationModel());
+                        }
 
-        return toolSimulationMap;
+                        return config;
+                    }));
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
