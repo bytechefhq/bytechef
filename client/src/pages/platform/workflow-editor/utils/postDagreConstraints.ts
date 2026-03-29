@@ -13,6 +13,15 @@ export const containsNodePosition = (metadata: any): metadata is {ui: {nodePosit
     metadata?.ui?.nodePosition !== undefined;
 
 /**
+ * Returns true when a node has been positioned — either by the user (nodePosition)
+ * or by the chain-alignment algorithm (chainAlignedPosition). Downstream layout
+ * functions use this to avoid moving already-positioned nodes.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isNodePositioned = (metadata: any): boolean =>
+    metadata?.ui?.nodePosition !== undefined || metadata?.ui?.chainAlignedPosition !== undefined;
+
+/**
  * Returns the parent dispatcher ID for a node that is a child of a dispatcher.
  * Ghost/placeholder nodes use `taskDispatcherId` directly, while workflow child
  * nodes use dispatcher-specific data properties (conditionData, loopData, etc.).
@@ -418,14 +427,15 @@ export function separateOverlappingConditionChildren(allNodes: Node[], edges: Ed
             return;
         }
 
-        // Only process conditions nested inside another condition
-        const parentConditionId = conditionData.conditionData?.conditionId;
+        // Process conditions nested inside another condition or a branch
+        const parentDispatcherId =
+            conditionData.conditionData?.conditionId || conditionData.branchData?.branchId;
 
-        if (!parentConditionId) {
+        if (!parentDispatcherId) {
             return;
         }
 
-        const parentCondition = allNodes.find((node) => node.id === parentConditionId);
+        const parentCondition = allNodes.find((node) => node.id === parentDispatcherId);
 
         if (!parentCondition) {
             return;
@@ -2297,7 +2307,7 @@ export function alignChainNodesCrossAxis(
             const predecessorNode = allNodes[predecessorIndex];
 
             const predecessorData = predecessorNode.data as NodeDataType;
-            const predecessorHasPosition = containsNodePosition(predecessorData.metadata);
+            const predecessorHasPosition = isNodePositioned(predecessorData.metadata);
 
             // Skip task dispatchers unless predecessor has a saved/adjusted position,
             // because dagre positions dispatchers to accommodate their branch structure.
@@ -2354,7 +2364,8 @@ export function alignChainNodesCrossAxis(
             }
 
             if (adjustedMainAxis) {
-                // Set nodePosition metadata for pin button display and cascading
+                // Mark as chain-aligned so downstream layout functions skip this node,
+                // but do NOT set nodePosition — that field is reserved for user-saved positions.
                 allNodes[nodeIndex] = {
                     ...node,
                     data: {
@@ -2363,7 +2374,7 @@ export function alignChainNodesCrossAxis(
                             ...nodeData.metadata,
                             ui: {
                                 ...nodeData.metadata?.ui,
-                                nodePosition: newPosition,
+                                chainAlignedPosition: newPosition,
                             },
                         },
                     },
@@ -2465,7 +2476,7 @@ export function alignChainNodesCrossAxis(
                         ...nodeData.metadata,
                         ui: {
                             ...nodeData.metadata?.ui,
-                            nodePosition: newPosition,
+                            chainAlignedPosition: newPosition,
                         },
                     },
                 },
@@ -2530,7 +2541,7 @@ export function alignChainNodesCrossAxis(
                                 ...nodeData.metadata,
                                 ui: {
                                     ...nodeData.metadata?.ui,
-                                    nodePosition: newPosition,
+                                    chainAlignedPosition: newPosition,
                                 },
                             },
                         },
@@ -2622,8 +2633,8 @@ export function alignTrailingPlaceholder(
 
         const sourceData = sourceNode.data as NodeDataType;
 
-        // Case 1: source is a workflow node with saved/adjusted position
-        if (containsNodePosition(sourceData.metadata)) {
+        // Case 1: source is a workflow node with saved or chain-aligned position
+        if (isNodePositioned(sourceData.metadata)) {
             const gap = computeMainAxisGapToPlaceholder(sourceNode, direction);
 
             // In LR mode, centerLRSmallNodes applied different cross-axis centering
@@ -2769,13 +2780,13 @@ export function centerDispatcherChildrenOnMainAxis(allNodes: Node[], edges: Edge
                 continue;
             }
 
-            const hasSavedPosition = chainMainNodeIds.some((nodeId) => {
+            const hasAdjustedPosition = chainMainNodeIds.some((nodeId) => {
                 const node = allNodes.find((existingNode) => existingNode.id === nodeId);
 
-                return node && containsNodePosition((node.data as NodeDataType).metadata);
+                return node && isNodePositioned((node.data as NodeDataType).metadata);
             });
 
-            if (hasSavedPosition) {
+            if (hasAdjustedPosition) {
                 continue;
             }
 

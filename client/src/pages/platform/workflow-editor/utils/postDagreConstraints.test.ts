@@ -1700,7 +1700,8 @@ describe('alignChainNodesCrossAxis', () => {
 
         // Both axes adjusted: x = 800 + 170, y = 200
         expect(allNodes[1].position).toEqual({x: 970, y: 200});
-        expect((allNodes[1].data as NodeDataType).metadata?.ui?.nodePosition).toEqual({x: 970, y: 200});
+        expect((allNodes[1].data as NodeDataType).metadata?.ui?.chainAlignedPosition).toEqual({x: 970, y: 200});
+        expect((allNodes[1].data as NodeDataType).metadata?.ui?.nodePosition).toBeUndefined();
     });
 
     it('should NOT align when no saved positions exist in chain', () => {
@@ -2441,10 +2442,10 @@ describe('alignChainNodesCrossAxis', () => {
         expect(allNodes[1].position).toEqual({x: 500, y: 600});
     });
 
-    it('should set nodePosition metadata on node after chain-aligned dispatcher via bottom-ghost', () => {
+    it('should set chainAlignedPosition metadata on node after chain-aligned dispatcher via bottom-ghost', () => {
         // Scenario: saved condition_1 → chain-aligned condition_2 → accelo_5 via bottom-ghost.
         // accelo_5 should get both axes adjusted (not just cross-axis) so that
-        // alignTrailingPlaceholder can detect it via containsNodePosition.
+        // alignTrailingPlaceholder can detect it via isNodePositioned.
         const savedCondition: Node = {
             data: {
                 componentName: 'condition',
@@ -2502,11 +2503,14 @@ describe('alignChainNodesCrossAxis', () => {
 
         // accelo_5 should be cross-axis aligned to condition_2's new x
         expect(allNodes[4].position.x).toBe(allNodes[2].position.x);
-        // accelo_5 should have nodePosition metadata set (so alignTrailingPlaceholder can detect it)
-        const accelo5Data = allNodes[4].data as {metadata?: {ui?: {nodePosition?: {x: number; y: number}}}};
+        // accelo_5 should have chainAlignedPosition metadata set (so alignTrailingPlaceholder can detect it via isNodePositioned)
+        const accelo5Data = allNodes[4].data as {
+            metadata?: {ui?: {chainAlignedPosition?: {x: number; y: number}; nodePosition?: {x: number; y: number}}};
+        };
 
-        expect(accelo5Data.metadata?.ui?.nodePosition).toBeDefined();
-        expect(accelo5Data.metadata!.ui!.nodePosition!.x).toBe(allNodes[4].position.x);
+        expect(accelo5Data.metadata?.ui?.chainAlignedPosition).toBeDefined();
+        expect(accelo5Data.metadata!.ui!.chainAlignedPosition!.x).toBe(allNodes[4].position.x);
+        expect(accelo5Data.metadata?.ui?.nodePosition).toBeUndefined();
     });
 
     it('should delta-shift nested task dispatcher using forkJoinData, not taskDispatcherId', () => {
@@ -2762,7 +2766,8 @@ describe('alignChainNodesCrossAxis', () => {
         // TB gap = NODE_HEIGHT/2 + RANKSEP + NODE_HEIGHT/2 = 100/2 + 50 + 100/2 = 150
         expect(allNodes[0].position.x).toBe(500);
         expect(allNodes[0].position.y).toBe(600 - 150);
-        expect((allNodes[0].data as NodeDataType).metadata?.ui?.nodePosition).toEqual({x: 500, y: 600 - 150});
+        expect((allNodes[0].data as NodeDataType).metadata?.ui?.chainAlignedPosition).toEqual({x: 500, y: 600 - 150});
+        expect((allNodes[0].data as NodeDataType).metadata?.ui?.nodePosition).toBeUndefined();
     });
 
     it('should backward-propagate position when successor has saved position in LR mode', () => {
