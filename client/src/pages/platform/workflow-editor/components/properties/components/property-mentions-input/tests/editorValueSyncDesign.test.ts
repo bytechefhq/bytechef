@@ -32,7 +32,7 @@ type EditorSyncResultType = {
 
 /**
  * Strips the `=` prefix from formula mode values so the editor only displays
- * the expression body (the EqualIcon leading icon already represents `=`).
+ * the expression body (the SquareFunctionIcon leading icon already represents `=`).
  */
 const stripFormulaPrefix = (rawValue: string | number | undefined): string | number | undefined => {
     return typeof rawValue === 'string' && rawValue.startsWith('=') ? rawValue.substring(1) : rawValue;
