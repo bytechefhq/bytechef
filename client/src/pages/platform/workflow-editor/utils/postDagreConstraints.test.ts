@@ -1327,6 +1327,36 @@ describe('applySavedPositions', () => {
         expect(allNodes[0].position).toEqual({x: 999, y: 888});
     });
 
+    it('should fall back to dagre position for undefined axis in saved position (TB mode)', () => {
+        const node: Node = {
+            data: {componentName: 'httpClient', metadata: {ui: {nodePosition: {x: 500, y: undefined}}}},
+            id: 'httpClient_1',
+            position: {x: 100, y: 200},
+            type: 'workflow',
+        };
+        const allNodes = [node];
+
+        applySavedPositions(allNodes);
+
+        // x uses saved value, y falls back to dagre position
+        expect(allNodes[0].position).toEqual({x: 500, y: 200});
+    });
+
+    it('should fall back to dagre position for undefined axis in saved position (LR mode)', () => {
+        const node: Node = {
+            data: {componentName: 'httpClient', metadata: {ui: {nodePosition: {x: undefined, y: 600}}}},
+            id: 'httpClient_1',
+            position: {x: 100, y: 200},
+            type: 'workflow',
+        };
+        const allNodes = [node];
+
+        applySavedPositions(allNodes);
+
+        // y uses saved value, x falls back to dagre position
+        expect(allNodes[0].position).toEqual({x: 100, y: 600});
+    });
+
     it('should offset ghost nodes when their dispatcher has a saved position', () => {
         const dispatcher: Node = {
             data: {

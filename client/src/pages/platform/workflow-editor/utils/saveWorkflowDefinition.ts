@@ -8,6 +8,7 @@ import {
     WorkflowDefinitionType,
 } from '@/shared/types';
 
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {flattenDefinitionTasks} from './flattenDefinitionTasks';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
@@ -224,19 +225,32 @@ export default async function saveWorkflowDefinition({
 
                 updatedWorkflowDefinitionTasks.splice(nodeIndex, 0, newTask);
 
-                // Clear saved positions for tasks after the insertion point,
-                // since their positions are now stale due to the shift.
-                for (let taskIndex = nodeIndex + 1; taskIndex < updatedWorkflowDefinitionTasks.length; taskIndex++) {
+                // Clear main-axis of saved positions for tasks after the insertion
+                // point so dagre can shift them, but preserve cross-axis customization.
+                const direction = useLayoutDirectionStore.getState().layoutDirection;
+                const mainAxis = direction === 'TB' ? 'y' : 'x';
+                const crossAxis = direction === 'TB' ? 'x' : 'y';
+
+                for (
+                    let taskIndex = nodeIndex + 1;
+                    taskIndex < updatedWorkflowDefinitionTasks.length;
+                    taskIndex++
+                ) {
                     const task = updatedWorkflowDefinitionTasks[taskIndex];
 
                     if (task.metadata?.ui?.nodePosition) {
+                        const savedCrossValue = task.metadata.ui.nodePosition[crossAxis];
+
                         updatedWorkflowDefinitionTasks[taskIndex] = {
                             ...task,
                             metadata: {
                                 ...task.metadata,
                                 ui: {
                                     ...task.metadata.ui,
-                                    nodePosition: undefined,
+                                    nodePosition: {
+                                        [crossAxis]: savedCrossValue,
+                                        [mainAxis]: undefined,
+                                    } as {x: number; y: number},
                                 },
                             },
                         };
