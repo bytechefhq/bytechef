@@ -50,6 +50,7 @@ export type ActionDefinition = {
   outputFunctionDefined: Scalars['Boolean']['output'];
   outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
   properties: Array<Property>;
+  resumePerformFunctionDefined?: Maybe<Scalars['Boolean']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   workflowNodeDescriptionDefined?: Maybe<Scalars['Boolean']['output']>;
 };
@@ -92,6 +93,9 @@ export type AgentEvalResult = {
   createdDate?: Maybe<Scalars['Long']['output']>;
   errorMessage?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  inputTokens?: Maybe<Scalars['Int']['output']>;
+  outputTokens?: Maybe<Scalars['Int']['output']>;
+  runIndex?: Maybe<Scalars['Int']['output']>;
   scenario: AgentEvalScenario;
   score?: Maybe<Scalars['Float']['output']>;
   status: AgentEvalResultStatus;
@@ -108,6 +112,7 @@ export enum AgentEvalResultStatus {
 
 export type AgentEvalRun = {
   __typename?: 'AgentEvalRun';
+  agentVersion?: Maybe<Scalars['String']['output']>;
   averageScore?: Maybe<Scalars['Float']['output']>;
   completedDate?: Maybe<Scalars['Long']['output']>;
   completedScenarios: Scalars['Int']['output'];
@@ -117,6 +122,8 @@ export type AgentEvalRun = {
   results: Array<AgentEvalResult>;
   startedDate?: Maybe<Scalars['Long']['output']>;
   status: AgentEvalRunStatus;
+  totalInputTokens?: Maybe<Scalars['Int']['output']>;
+  totalOutputTokens?: Maybe<Scalars['Int']['output']>;
   totalScenarios: Scalars['Int']['output'];
 };
 
@@ -136,7 +143,9 @@ export type AgentEvalScenario = {
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   maxTurns?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
+  numberOfRuns?: Maybe<Scalars['Int']['output']>;
   personaPrompt?: Maybe<Scalars['String']['output']>;
+  toolSimulations: Array<AgentScenarioToolSimulation>;
   type: AgentScenarioType;
   userMessage?: Maybe<Scalars['String']['output']>;
 };
@@ -172,7 +181,9 @@ export enum AgentJudgeType {
   LlmRule = 'LLM_RULE',
   RegexMatch = 'REGEX_MATCH',
   ResponseLength = 'RESPONSE_LENGTH',
-  Similarity = 'SIMILARITY'
+  Similarity = 'SIMILARITY',
+  StringEquals = 'STRING_EQUALS',
+  ToolUsage = 'TOOL_USAGE'
 }
 
 export type AgentJudgeVerdict = {
@@ -194,6 +205,16 @@ export type AgentScenarioJudge = {
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
   type: AgentJudgeType;
+};
+
+export type AgentScenarioToolSimulation = {
+  __typename?: 'AgentScenarioToolSimulation';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  responsePrompt: Scalars['String']['output'];
+  simulationModel?: Maybe<Scalars['String']['output']>;
+  toolName: Scalars['String']['output'];
 };
 
 export enum AgentScenarioType {
@@ -1317,6 +1338,7 @@ export type Mutation = {
   createAgentEvalTest: AgentEvalTest;
   createAgentJudge: AgentJudge;
   createAgentScenarioJudge: AgentScenarioJudge;
+  createAgentScenarioToolSimulation: AgentScenarioToolSimulation;
   createAgentSkill: AgentSkill;
   createAgentSkillFromInstructions: AgentSkill;
   createApiConnector: ApiConnector;
@@ -1340,6 +1362,7 @@ export type Mutation = {
   deleteAgentEvalTest: Scalars['Boolean']['output'];
   deleteAgentJudge: Scalars['Boolean']['output'];
   deleteAgentScenarioJudge: Scalars['Boolean']['output'];
+  deleteAgentScenarioToolSimulation: Scalars['Boolean']['output'];
   deleteAgentSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
@@ -1395,6 +1418,7 @@ export type Mutation = {
   updateAgentEvalTest: AgentEvalTest;
   updateAgentJudge: AgentJudge;
   updateAgentScenarioJudge: AgentScenarioJudge;
+  updateAgentScenarioToolSimulation: AgentScenarioToolSimulation;
   updateAgentSkill: AgentSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
@@ -1442,6 +1466,7 @@ export type MutationCreateAgentEvalScenarioArgs = {
   expectedOutput?: InputMaybe<Scalars['String']['input']>;
   maxTurns?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
+  numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
   personaPrompt?: InputMaybe<Scalars['String']['input']>;
   type: AgentScenarioType;
   userMessage?: InputMaybe<Scalars['String']['input']>;
@@ -1470,6 +1495,14 @@ export type MutationCreateAgentScenarioJudgeArgs = {
   configuration: Scalars['Map']['input'];
   name: Scalars['String']['input'];
   type: AgentJudgeType;
+};
+
+
+export type MutationCreateAgentScenarioToolSimulationArgs = {
+  agentEvalScenarioId: Scalars['ID']['input'];
+  responsePrompt: Scalars['String']['input'];
+  simulationModel?: InputMaybe<Scalars['String']['input']>;
+  toolName: Scalars['String']['input'];
 };
 
 
@@ -1595,6 +1628,11 @@ export type MutationDeleteAgentJudgeArgs = {
 
 
 export type MutationDeleteAgentScenarioJudgeArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAgentScenarioToolSimulationArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -1851,8 +1889,10 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
 
 export type MutationStartAgentEvalRunArgs = {
   agentEvalTestId: Scalars['ID']['input'];
+  agentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']>>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+  scenarioIds?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
 
@@ -1894,6 +1934,7 @@ export type MutationUpdateAgentEvalScenarioArgs = {
   id: Scalars['ID']['input'];
   maxTurns?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
   personaPrompt?: InputMaybe<Scalars['String']['input']>;
   userMessage?: InputMaybe<Scalars['String']['input']>;
 };
@@ -1917,6 +1958,14 @@ export type MutationUpdateAgentScenarioJudgeArgs = {
   configuration?: InputMaybe<Scalars['Map']['input']>;
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpdateAgentScenarioToolSimulationArgs = {
+  id: Scalars['ID']['input'];
+  responsePrompt?: InputMaybe<Scalars['String']['input']>;
+  simulationModel?: InputMaybe<Scalars['String']['input']>;
+  toolName?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -3337,7 +3386,7 @@ export type AgentEvalRunQueryVariables = Exact<{
 }>;
 
 
-export type AgentEvalRunQuery = { __typename?: 'Query', agentEvalRun?: { __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null, results: Array<{ __typename?: 'AgentEvalResult', id: string, status: AgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, createdDate?: any | null, scenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AgentJudgeVerdict', id: string, judgeName: string, judgeType: AgentJudgeType, judgeScope: AgentJudgeScope, passed: boolean, score: number, explanation: string }> }> } | null };
+export type AgentEvalRunQuery = { __typename?: 'Query', agentEvalRun?: { __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, agentVersion?: string | null, totalInputTokens?: number | null, totalOutputTokens?: number | null, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null, results: Array<{ __typename?: 'AgentEvalResult', id: string, status: AgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, inputTokens?: number | null, outputTokens?: number | null, runIndex?: number | null, createdDate?: any | null, scenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AgentJudgeVerdict', id: string, judgeName: string, judgeType: AgentJudgeType, judgeScope: AgentJudgeScope, passed: boolean, score: number, explanation: string }> }> } | null };
 
 export type AgentEvalRunsQueryVariables = Exact<{
   agentEvalTestId: Scalars['ID']['input'];
@@ -3361,7 +3410,7 @@ export type AgentEvalTestsQueryVariables = Exact<{
 }>;
 
 
-export type AgentEvalTestsQuery = { __typename?: 'Query', agentEvalTests: Array<{ __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null }> };
+export type AgentEvalTestsQuery = { __typename?: 'Query', agentEvalTests: Array<{ __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, toolSimulations: Array<{ __typename?: 'AgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null }>, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }> }> };
 
 export type AgentJudgesQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -3386,10 +3435,11 @@ export type CreateAgentEvalScenarioMutationVariables = Exact<{
   expectedOutput?: InputMaybe<Scalars['String']['input']>;
   personaPrompt?: InputMaybe<Scalars['String']['input']>;
   maxTurns?: InputMaybe<Scalars['Int']['input']>;
+  numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type CreateAgentEvalScenarioMutation = { __typename?: 'Mutation', createAgentEvalScenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
+export type CreateAgentEvalScenarioMutation = { __typename?: 'Mutation', createAgentEvalScenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
 
 export type CreateAgentEvalTestMutationVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -3422,6 +3472,16 @@ export type CreateAgentScenarioJudgeMutationVariables = Exact<{
 
 export type CreateAgentScenarioJudgeMutation = { __typename?: 'Mutation', createAgentScenarioJudge: { __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
 
+export type CreateAgentScenarioToolSimulationMutationVariables = Exact<{
+  agentEvalScenarioId: Scalars['ID']['input'];
+  toolName: Scalars['String']['input'];
+  responsePrompt: Scalars['String']['input'];
+  simulationModel?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CreateAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', createAgentScenarioToolSimulation: { __typename?: 'AgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
+
 export type DeleteAgentEvalScenarioMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -3450,14 +3510,23 @@ export type DeleteAgentScenarioJudgeMutationVariables = Exact<{
 
 export type DeleteAgentScenarioJudgeMutation = { __typename?: 'Mutation', deleteAgentScenarioJudge: boolean };
 
+export type DeleteAgentScenarioToolSimulationMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', deleteAgentScenarioToolSimulation: boolean };
+
 export type StartAgentEvalRunMutationVariables = Exact<{
   agentEvalTestId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   environmentId: Scalars['ID']['input'];
+  scenarioIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
+  agentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
 }>;
 
 
-export type StartAgentEvalRunMutation = { __typename?: 'Mutation', startAgentEvalRun: { __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, totalScenarios: number, completedScenarios: number, createdDate?: any | null } };
+export type StartAgentEvalRunMutation = { __typename?: 'Mutation', startAgentEvalRun: { __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, totalScenarios: number, completedScenarios: number, agentVersion?: string | null, createdDate?: any | null } };
 
 export type UpdateAgentEvalScenarioMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3466,10 +3535,11 @@ export type UpdateAgentEvalScenarioMutationVariables = Exact<{
   expectedOutput?: InputMaybe<Scalars['String']['input']>;
   personaPrompt?: InputMaybe<Scalars['String']['input']>;
   maxTurns?: InputMaybe<Scalars['Int']['input']>;
+  numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type UpdateAgentEvalScenarioMutation = { __typename?: 'Mutation', updateAgentEvalScenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
+export type UpdateAgentEvalScenarioMutation = { __typename?: 'Mutation', updateAgentEvalScenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
 
 export type UpdateAgentEvalTestMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3497,6 +3567,16 @@ export type UpdateAgentScenarioJudgeMutationVariables = Exact<{
 
 
 export type UpdateAgentScenarioJudgeMutation = { __typename?: 'Mutation', updateAgentScenarioJudge: { __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type UpdateAgentScenarioToolSimulationMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  toolName?: InputMaybe<Scalars['String']['input']>;
+  responsePrompt?: InputMaybe<Scalars['String']['input']>;
+  simulationModel?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', updateAgentScenarioToolSimulation: { __typename?: 'AgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
 
 export type AgentSkillQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -4854,7 +4934,7 @@ export type UsersQuery = { __typename?: 'Query', users?: { __typename?: 'AdminUs
 
 
 
-export const AgentEvalResultDocument = `
+export const AgentEvalResultDocument = new TypedDocumentString(`
     query agentEvalResult($id: ID!) {
   agentEvalResult(id: $id) {
     id
@@ -4893,7 +4973,7 @@ export const AgentEvalResultDocument = `
     createdDate
   }
 }
-    `;
+    `);
 
 export const useAgentEvalResultQuery = <
       TData = AgentEvalResultQuery,
@@ -4911,11 +4991,11 @@ export const useAgentEvalResultQuery = <
   }
     )};
 
-export const AgentEvalResultTranscriptDocument = `
+export const AgentEvalResultTranscriptDocument = new TypedDocumentString(`
     query agentEvalResultTranscript($id: ID!) {
   agentEvalResultTranscript(id: $id)
 }
-    `;
+    `);
 
 export const useAgentEvalResultTranscriptQuery = <
       TData = AgentEvalResultTranscriptQuery,
@@ -4933,7 +5013,7 @@ export const useAgentEvalResultTranscriptQuery = <
   }
     )};
 
-export const AgentEvalRunDocument = `
+export const AgentEvalRunDocument = new TypedDocumentString(`
     query agentEvalRun($id: ID!) {
   agentEvalRun(id: $id) {
     id
@@ -4942,6 +5022,9 @@ export const AgentEvalRunDocument = `
     averageScore
     totalScenarios
     completedScenarios
+    agentVersion
+    totalInputTokens
+    totalOutputTokens
     startedDate
     completedDate
     results {
@@ -4969,6 +5052,9 @@ export const AgentEvalRunDocument = `
       score
       errorMessage
       transcriptFile
+      inputTokens
+      outputTokens
+      runIndex
       verdicts {
         id
         judgeName
@@ -4983,7 +5069,7 @@ export const AgentEvalRunDocument = `
     createdDate
   }
 }
-    `;
+    `);
 
 export const useAgentEvalRunQuery = <
       TData = AgentEvalRunQuery,
@@ -5001,7 +5087,7 @@ export const useAgentEvalRunQuery = <
   }
     )};
 
-export const AgentEvalRunsDocument = `
+export const AgentEvalRunsDocument = new TypedDocumentString(`
     query agentEvalRuns($agentEvalTestId: ID!, $limit: Int, $offset: Int) {
   agentEvalRuns(agentEvalTestId: $agentEvalTestId, limit: $limit, offset: $offset) {
     id
@@ -5015,7 +5101,7 @@ export const AgentEvalRunsDocument = `
     createdDate
   }
 }
-    `;
+    `);
 
 export const useAgentEvalRunsQuery = <
       TData = AgentEvalRunsQuery,
@@ -5033,7 +5119,7 @@ export const useAgentEvalRunsQuery = <
   }
     )};
 
-export const AgentEvalTestDocument = `
+export const AgentEvalTestDocument = new TypedDocumentString(`
     query agentEvalTest($id: ID!) {
   agentEvalTest(id: $id) {
     id
@@ -5062,7 +5148,7 @@ export const AgentEvalTestDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useAgentEvalTestQuery = <
       TData = AgentEvalTestQuery,
@@ -5080,17 +5166,43 @@ export const useAgentEvalTestQuery = <
   }
     )};
 
-export const AgentEvalTestsDocument = `
+export const AgentEvalTestsDocument = new TypedDocumentString(`
     query agentEvalTests($workflowId: String!, $workflowNodeName: String!) {
   agentEvalTests(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
     id
     name
     description
+    scenarios {
+      id
+      name
+      type
+      userMessage
+      expectedOutput
+      personaPrompt
+      maxTurns
+      numberOfRuns
+      toolSimulations {
+        id
+        toolName
+        responsePrompt
+        simulationModel
+      }
+      judges {
+        id
+        name
+        type
+        configuration
+        createdDate
+        lastModifiedDate
+      }
+      createdDate
+      lastModifiedDate
+    }
     createdDate
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useAgentEvalTestsQuery = <
       TData = AgentEvalTestsQuery,
@@ -5108,7 +5220,7 @@ export const useAgentEvalTestsQuery = <
   }
     )};
 
-export const AgentJudgesDocument = `
+export const AgentJudgesDocument = new TypedDocumentString(`
     query agentJudges($workflowId: String!, $workflowNodeName: String!) {
   agentJudges(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
     id
@@ -5119,7 +5231,7 @@ export const AgentJudgesDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useAgentJudgesQuery = <
       TData = AgentJudgesQuery,
@@ -5137,14 +5249,14 @@ export const useAgentJudgesQuery = <
   }
     )};
 
-export const CancelAgentEvalRunDocument = `
+export const CancelAgentEvalRunDocument = new TypedDocumentString(`
     mutation cancelAgentEvalRun($id: ID!) {
   cancelAgentEvalRun(id: $id) {
     id
     status
   }
 }
-    `;
+    `);
 
 export const useCancelAgentEvalRunMutation = <
       TError = unknown,
@@ -5159,8 +5271,8 @@ export const useCancelAgentEvalRunMutation = <
   }
     )};
 
-export const CreateAgentEvalScenarioDocument = `
-    mutation createAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: AgentScenarioType!, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int) {
+export const CreateAgentEvalScenarioDocument = new TypedDocumentString(`
+    mutation createAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: AgentScenarioType!, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
   createAgentEvalScenario(
     agentEvalTestId: $agentEvalTestId
     name: $name
@@ -5169,6 +5281,7 @@ export const CreateAgentEvalScenarioDocument = `
     expectedOutput: $expectedOutput
     personaPrompt: $personaPrompt
     maxTurns: $maxTurns
+    numberOfRuns: $numberOfRuns
   ) {
     id
     name
@@ -5177,6 +5290,7 @@ export const CreateAgentEvalScenarioDocument = `
     expectedOutput
     personaPrompt
     maxTurns
+    numberOfRuns
     judges {
       id
       name
@@ -5189,7 +5303,7 @@ export const CreateAgentEvalScenarioDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useCreateAgentEvalScenarioMutation = <
       TError = unknown,
@@ -5204,7 +5318,7 @@ export const useCreateAgentEvalScenarioMutation = <
   }
     )};
 
-export const CreateAgentEvalTestDocument = `
+export const CreateAgentEvalTestDocument = new TypedDocumentString(`
     mutation createAgentEvalTest($workflowId: String!, $workflowNodeName: String!, $name: String!, $description: String) {
   createAgentEvalTest(
     workflowId: $workflowId
@@ -5219,7 +5333,7 @@ export const CreateAgentEvalTestDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useCreateAgentEvalTestMutation = <
       TError = unknown,
@@ -5234,7 +5348,7 @@ export const useCreateAgentEvalTestMutation = <
   }
     )};
 
-export const CreateAgentJudgeDocument = `
+export const CreateAgentJudgeDocument = new TypedDocumentString(`
     mutation createAgentJudge($workflowId: String!, $workflowNodeName: String!, $name: String!, $type: AgentJudgeType!, $configuration: Map!) {
   createAgentJudge(
     workflowId: $workflowId
@@ -5251,7 +5365,7 @@ export const CreateAgentJudgeDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useCreateAgentJudgeMutation = <
       TError = unknown,
@@ -5266,7 +5380,7 @@ export const useCreateAgentJudgeMutation = <
   }
     )};
 
-export const CreateAgentScenarioJudgeDocument = `
+export const CreateAgentScenarioJudgeDocument = new TypedDocumentString(`
     mutation createAgentScenarioJudge($agentEvalScenarioId: ID!, $name: String!, $type: AgentJudgeType!, $configuration: Map!) {
   createAgentScenarioJudge(
     agentEvalScenarioId: $agentEvalScenarioId
@@ -5282,7 +5396,7 @@ export const CreateAgentScenarioJudgeDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useCreateAgentScenarioJudgeMutation = <
       TError = unknown,
@@ -5297,11 +5411,40 @@ export const useCreateAgentScenarioJudgeMutation = <
   }
     )};
 
-export const DeleteAgentEvalScenarioDocument = `
+export const CreateAgentScenarioToolSimulationDocument = new TypedDocumentString(`
+    mutation createAgentScenarioToolSimulation($agentEvalScenarioId: ID!, $toolName: String!, $responsePrompt: String!, $simulationModel: String) {
+  createAgentScenarioToolSimulation(
+    agentEvalScenarioId: $agentEvalScenarioId
+    toolName: $toolName
+    responsePrompt: $responsePrompt
+    simulationModel: $simulationModel
+  ) {
+    id
+    toolName
+    responsePrompt
+    simulationModel
+  }
+}
+    `);
+
+export const useCreateAgentScenarioToolSimulationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAgentScenarioToolSimulationMutation, TError, CreateAgentScenarioToolSimulationMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAgentScenarioToolSimulationMutation, TError, CreateAgentScenarioToolSimulationMutationVariables, TContext>(
+      {
+    mutationKey: ['createAgentScenarioToolSimulation'],
+    mutationFn: (variables?: CreateAgentScenarioToolSimulationMutationVariables) => fetcher<CreateAgentScenarioToolSimulationMutation, CreateAgentScenarioToolSimulationMutationVariables>(CreateAgentScenarioToolSimulationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAgentEvalScenarioDocument = new TypedDocumentString(`
     mutation deleteAgentEvalScenario($id: ID!) {
   deleteAgentEvalScenario(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteAgentEvalScenarioMutation = <
       TError = unknown,
@@ -5316,11 +5459,11 @@ export const useDeleteAgentEvalScenarioMutation = <
   }
     )};
 
-export const DeleteAgentEvalTestDocument = `
+export const DeleteAgentEvalTestDocument = new TypedDocumentString(`
     mutation deleteAgentEvalTest($id: ID!) {
   deleteAgentEvalTest(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteAgentEvalTestMutation = <
       TError = unknown,
@@ -5335,11 +5478,11 @@ export const useDeleteAgentEvalTestMutation = <
   }
     )};
 
-export const DeleteAgentJudgeDocument = `
+export const DeleteAgentJudgeDocument = new TypedDocumentString(`
     mutation deleteAgentJudge($id: ID!) {
   deleteAgentJudge(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteAgentJudgeMutation = <
       TError = unknown,
@@ -5354,11 +5497,11 @@ export const useDeleteAgentJudgeMutation = <
   }
     )};
 
-export const DeleteAgentScenarioJudgeDocument = `
+export const DeleteAgentScenarioJudgeDocument = new TypedDocumentString(`
     mutation deleteAgentScenarioJudge($id: ID!) {
   deleteAgentScenarioJudge(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteAgentScenarioJudgeMutation = <
       TError = unknown,
@@ -5373,22 +5516,44 @@ export const useDeleteAgentScenarioJudgeMutation = <
   }
     )};
 
-export const StartAgentEvalRunDocument = `
-    mutation startAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!) {
+export const DeleteAgentScenarioToolSimulationDocument = new TypedDocumentString(`
+    mutation deleteAgentScenarioToolSimulation($id: ID!) {
+  deleteAgentScenarioToolSimulation(id: $id)
+}
+    `);
+
+export const useDeleteAgentScenarioToolSimulationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAgentScenarioToolSimulationMutation, TError, DeleteAgentScenarioToolSimulationMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAgentScenarioToolSimulationMutation, TError, DeleteAgentScenarioToolSimulationMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAgentScenarioToolSimulation'],
+    mutationFn: (variables?: DeleteAgentScenarioToolSimulationMutationVariables) => fetcher<DeleteAgentScenarioToolSimulationMutation, DeleteAgentScenarioToolSimulationMutationVariables>(DeleteAgentScenarioToolSimulationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const StartAgentEvalRunDocument = new TypedDocumentString(`
+    mutation startAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!, $scenarioIds: [ID!], $agentJudgeIds: [ID!]) {
   startAgentEvalRun(
     agentEvalTestId: $agentEvalTestId
     name: $name
     environmentId: $environmentId
+    scenarioIds: $scenarioIds
+    agentJudgeIds: $agentJudgeIds
   ) {
     id
     name
     status
     totalScenarios
     completedScenarios
+    agentVersion
     createdDate
   }
 }
-    `;
+    `);
 
 export const useStartAgentEvalRunMutation = <
       TError = unknown,
@@ -5403,8 +5568,8 @@ export const useStartAgentEvalRunMutation = <
   }
     )};
 
-export const UpdateAgentEvalScenarioDocument = `
-    mutation updateAgentEvalScenario($id: ID!, $name: String, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int) {
+export const UpdateAgentEvalScenarioDocument = new TypedDocumentString(`
+    mutation updateAgentEvalScenario($id: ID!, $name: String, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
   updateAgentEvalScenario(
     id: $id
     name: $name
@@ -5412,6 +5577,7 @@ export const UpdateAgentEvalScenarioDocument = `
     expectedOutput: $expectedOutput
     personaPrompt: $personaPrompt
     maxTurns: $maxTurns
+    numberOfRuns: $numberOfRuns
   ) {
     id
     name
@@ -5420,6 +5586,7 @@ export const UpdateAgentEvalScenarioDocument = `
     expectedOutput
     personaPrompt
     maxTurns
+    numberOfRuns
     judges {
       id
       name
@@ -5432,7 +5599,7 @@ export const UpdateAgentEvalScenarioDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useUpdateAgentEvalScenarioMutation = <
       TError = unknown,
@@ -5447,7 +5614,7 @@ export const useUpdateAgentEvalScenarioMutation = <
   }
     )};
 
-export const UpdateAgentEvalTestDocument = `
+export const UpdateAgentEvalTestDocument = new TypedDocumentString(`
     mutation updateAgentEvalTest($id: ID!, $name: String, $description: String) {
   updateAgentEvalTest(id: $id, name: $name, description: $description) {
     id
@@ -5457,7 +5624,7 @@ export const UpdateAgentEvalTestDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useUpdateAgentEvalTestMutation = <
       TError = unknown,
@@ -5472,7 +5639,7 @@ export const useUpdateAgentEvalTestMutation = <
   }
     )};
 
-export const UpdateAgentJudgeDocument = `
+export const UpdateAgentJudgeDocument = new TypedDocumentString(`
     mutation updateAgentJudge($id: ID!, $name: String, $configuration: Map) {
   updateAgentJudge(id: $id, name: $name, configuration: $configuration) {
     id
@@ -5483,7 +5650,7 @@ export const UpdateAgentJudgeDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useUpdateAgentJudgeMutation = <
       TError = unknown,
@@ -5498,7 +5665,7 @@ export const useUpdateAgentJudgeMutation = <
   }
     )};
 
-export const UpdateAgentScenarioJudgeDocument = `
+export const UpdateAgentScenarioJudgeDocument = new TypedDocumentString(`
     mutation updateAgentScenarioJudge($id: ID!, $name: String, $configuration: Map) {
   updateAgentScenarioJudge(id: $id, name: $name, configuration: $configuration) {
     id
@@ -5509,7 +5676,7 @@ export const UpdateAgentScenarioJudgeDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useUpdateAgentScenarioJudgeMutation = <
       TError = unknown,
@@ -5524,7 +5691,36 @@ export const useUpdateAgentScenarioJudgeMutation = <
   }
     )};
 
-export const AgentSkillDocument = `
+export const UpdateAgentScenarioToolSimulationDocument = new TypedDocumentString(`
+    mutation updateAgentScenarioToolSimulation($id: ID!, $toolName: String, $responsePrompt: String, $simulationModel: String) {
+  updateAgentScenarioToolSimulation(
+    id: $id
+    toolName: $toolName
+    responsePrompt: $responsePrompt
+    simulationModel: $simulationModel
+  ) {
+    id
+    toolName
+    responsePrompt
+    simulationModel
+  }
+}
+    `);
+
+export const useUpdateAgentScenarioToolSimulationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAgentScenarioToolSimulationMutation, TError, UpdateAgentScenarioToolSimulationMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAgentScenarioToolSimulationMutation, TError, UpdateAgentScenarioToolSimulationMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAgentScenarioToolSimulation'],
+    mutationFn: (variables?: UpdateAgentScenarioToolSimulationMutationVariables) => fetcher<UpdateAgentScenarioToolSimulationMutation, UpdateAgentScenarioToolSimulationMutationVariables>(UpdateAgentScenarioToolSimulationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AgentSkillDocument = new TypedDocumentString(`
     query agentSkill($id: ID!) {
   agentSkill(id: $id) {
     id
@@ -5534,7 +5730,7 @@ export const AgentSkillDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useAgentSkillQuery = <
       TData = AgentSkillQuery,
@@ -5552,11 +5748,11 @@ export const useAgentSkillQuery = <
   }
     )};
 
-export const AgentSkillFileContentDocument = `
+export const AgentSkillFileContentDocument = new TypedDocumentString(`
     query agentSkillFileContent($id: ID!, $path: String!) {
   agentSkillFileContent(id: $id, path: $path)
 }
-    `;
+    `);
 
 export const useAgentSkillFileContentQuery = <
       TData = AgentSkillFileContentQuery,
@@ -5574,11 +5770,11 @@ export const useAgentSkillFileContentQuery = <
   }
     )};
 
-export const AgentSkillFilePathsDocument = `
+export const AgentSkillFilePathsDocument = new TypedDocumentString(`
     query agentSkillFilePaths($id: ID!) {
   agentSkillFilePaths(id: $id)
 }
-    `;
+    `);
 
 export const useAgentSkillFilePathsQuery = <
       TData = AgentSkillFilePathsQuery,
@@ -5596,7 +5792,7 @@ export const useAgentSkillFilePathsQuery = <
   }
     )};
 
-export const AgentSkillsDocument = `
+export const AgentSkillsDocument = new TypedDocumentString(`
     query agentSkills {
   agentSkills {
     id
@@ -5606,7 +5802,7 @@ export const AgentSkillsDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useAgentSkillsQuery = <
       TData = AgentSkillsQuery,
@@ -5624,7 +5820,7 @@ export const useAgentSkillsQuery = <
   }
     )};
 
-export const CreateAgentSkillDocument = `
+export const CreateAgentSkillDocument = new TypedDocumentString(`
     mutation createAgentSkill($name: String!, $description: String, $filename: String!, $fileBytes: String!) {
   createAgentSkill(
     name: $name
@@ -5639,7 +5835,7 @@ export const CreateAgentSkillDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useCreateAgentSkillMutation = <
       TError = unknown,
@@ -5654,7 +5850,7 @@ export const useCreateAgentSkillMutation = <
   }
     )};
 
-export const CreateAgentSkillFromInstructionsDocument = `
+export const CreateAgentSkillFromInstructionsDocument = new TypedDocumentString(`
     mutation createAgentSkillFromInstructions($name: String!, $description: String, $instructions: String!) {
   createAgentSkillFromInstructions(
     name: $name
@@ -5668,7 +5864,7 @@ export const CreateAgentSkillFromInstructionsDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useCreateAgentSkillFromInstructionsMutation = <
       TError = unknown,
@@ -5683,11 +5879,11 @@ export const useCreateAgentSkillFromInstructionsMutation = <
   }
     )};
 
-export const DeleteAgentSkillDocument = `
+export const DeleteAgentSkillDocument = new TypedDocumentString(`
     mutation deleteAgentSkill($id: ID!) {
   deleteAgentSkill(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteAgentSkillMutation = <
       TError = unknown,
@@ -5702,7 +5898,7 @@ export const useDeleteAgentSkillMutation = <
   }
     )};
 
-export const UpdateAgentSkillDocument = `
+export const UpdateAgentSkillDocument = new TypedDocumentString(`
     mutation updateAgentSkill($id: ID!, $name: String!, $description: String) {
   updateAgentSkill(id: $id, name: $name, description: $description) {
     id
@@ -5712,7 +5908,7 @@ export const UpdateAgentSkillDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useUpdateAgentSkillMutation = <
       TError = unknown,
@@ -5727,7 +5923,7 @@ export const useUpdateAgentSkillMutation = <
   }
     )};
 
-export const ApprovalTaskDocument = `
+export const ApprovalTaskDocument = new TypedDocumentString(`
     query approvalTask($id: ID!) {
   approvalTask(id: $id) {
     createdBy
@@ -5740,7 +5936,7 @@ export const ApprovalTaskDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useApprovalTaskQuery = <
       TData = ApprovalTaskQuery,
@@ -5758,7 +5954,7 @@ export const useApprovalTaskQuery = <
   }
     )};
 
-export const ApprovalTasksDocument = `
+export const ApprovalTasksDocument = new TypedDocumentString(`
     query approvalTasks {
   approvalTasks {
     createdBy
@@ -5771,7 +5967,7 @@ export const ApprovalTasksDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useApprovalTasksQuery = <
       TData = ApprovalTasksQuery,
@@ -5789,7 +5985,7 @@ export const useApprovalTasksQuery = <
   }
     )};
 
-export const CreateApprovalTaskDocument = `
+export const CreateApprovalTaskDocument = new TypedDocumentString(`
     mutation createApprovalTask($approvalTask: ApprovalTaskInput!) {
   createApprovalTask(approvalTask: $approvalTask) {
     description
@@ -5797,7 +5993,7 @@ export const CreateApprovalTaskDocument = `
     name
   }
 }
-    `;
+    `);
 
 export const useCreateApprovalTaskMutation = <
       TError = unknown,
@@ -5812,11 +6008,11 @@ export const useCreateApprovalTaskMutation = <
   }
     )};
 
-export const DeleteApprovalTaskDocument = `
+export const DeleteApprovalTaskDocument = new TypedDocumentString(`
     mutation deleteApprovalTask($id: ID!) {
   deleteApprovalTask(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteApprovalTaskMutation = <
       TError = unknown,
@@ -5831,7 +6027,7 @@ export const useDeleteApprovalTaskMutation = <
   }
     )};
 
-export const UpdateApprovalTaskDocument = `
+export const UpdateApprovalTaskDocument = new TypedDocumentString(`
     mutation updateApprovalTask($approvalTask: ApprovalTaskInput!) {
   updateApprovalTask(approvalTask: $approvalTask) {
     description
@@ -5840,7 +6036,7 @@ export const UpdateApprovalTaskDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useUpdateApprovalTaskMutation = <
       TError = unknown,
@@ -5855,7 +6051,7 @@ export const useUpdateApprovalTaskMutation = <
   }
     )};
 
-export const CreateMcpProjectDocument = `
+export const CreateMcpProjectDocument = new TypedDocumentString(`
     mutation createMcpProject($input: CreateMcpProjectInput!) {
   createMcpProject(input: $input) {
     id
@@ -5864,7 +6060,7 @@ export const CreateMcpProjectDocument = `
     projectVersion
   }
 }
-    `;
+    `);
 
 export const useCreateMcpProjectMutation = <
       TError = unknown,
@@ -5879,7 +6075,7 @@ export const useCreateMcpProjectMutation = <
   }
     )};
 
-export const CreateWorkspaceApiKeyDocument = `
+export const CreateWorkspaceApiKeyDocument = new TypedDocumentString(`
     mutation createWorkspaceApiKey($workspaceId: ID!, $name: String!, $environmentId: ID!) {
   createWorkspaceApiKey(
     workspaceId: $workspaceId
@@ -5887,7 +6083,7 @@ export const CreateWorkspaceApiKeyDocument = `
     environmentId: $environmentId
   )
 }
-    `;
+    `);
 
 export const useCreateWorkspaceApiKeyMutation = <
       TError = unknown,
@@ -5902,7 +6098,7 @@ export const useCreateWorkspaceApiKeyMutation = <
   }
     )};
 
-export const CreateMcpServerDocument = `
+export const CreateMcpServerDocument = new TypedDocumentString(`
     mutation createMcpServer($input: CreateWorkspaceMcpServerInput!) {
   createWorkspaceMcpServer(input: $input) {
     id
@@ -5912,7 +6108,7 @@ export const CreateMcpServerDocument = `
     enabled
   }
 }
-    `;
+    `);
 
 export const useCreateMcpServerMutation = <
       TError = unknown,
@@ -5927,11 +6123,11 @@ export const useCreateMcpServerMutation = <
   }
     )};
 
-export const DeleteMcpProjectDocument = `
+export const DeleteMcpProjectDocument = new TypedDocumentString(`
     mutation deleteMcpProject($id: ID!) {
   deleteMcpProject(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteMcpProjectMutation = <
       TError = unknown,
@@ -5946,11 +6142,11 @@ export const useDeleteMcpProjectMutation = <
   }
     )};
 
-export const DeleteMcpProjectWorkflowDocument = `
+export const DeleteMcpProjectWorkflowDocument = new TypedDocumentString(`
     mutation deleteMcpProjectWorkflow($id: ID!) {
   deleteMcpProjectWorkflow(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteMcpProjectWorkflowMutation = <
       TError = unknown,
@@ -5965,11 +6161,11 @@ export const useDeleteMcpProjectWorkflowMutation = <
   }
     )};
 
-export const DeleteSharedProjectDocument = `
+export const DeleteSharedProjectDocument = new TypedDocumentString(`
     mutation deleteSharedProject($id: ID!) {
   deleteSharedProject(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteSharedProjectMutation = <
       TError = unknown,
@@ -5984,11 +6180,11 @@ export const useDeleteSharedProjectMutation = <
   }
     )};
 
-export const DeleteSharedWorkflowDocument = `
+export const DeleteSharedWorkflowDocument = new TypedDocumentString(`
     mutation deleteSharedWorkflow($workflowId: String!) {
   deleteSharedWorkflow(workflowId: $workflowId)
 }
-    `;
+    `);
 
 export const useDeleteSharedWorkflowMutation = <
       TError = unknown,
@@ -6003,11 +6199,11 @@ export const useDeleteSharedWorkflowMutation = <
   }
     )};
 
-export const DeleteWorkspaceApiKeyDocument = `
+export const DeleteWorkspaceApiKeyDocument = new TypedDocumentString(`
     mutation deleteWorkspaceApiKey($apiKeyId: ID!) {
   deleteWorkspaceApiKey(apiKeyId: $apiKeyId)
 }
-    `;
+    `);
 
 export const useDeleteWorkspaceApiKeyMutation = <
       TError = unknown,
@@ -6022,11 +6218,11 @@ export const useDeleteWorkspaceApiKeyMutation = <
   }
     )};
 
-export const DeleteWorkspaceMcpServerDocument = `
+export const DeleteWorkspaceMcpServerDocument = new TypedDocumentString(`
     mutation deleteWorkspaceMcpServer($id: ID!) {
   deleteWorkspaceMcpServer(mcpServerId: $id)
 }
-    `;
+    `);
 
 export const useDeleteWorkspaceMcpServerMutation = <
       TError = unknown,
@@ -6041,11 +6237,11 @@ export const useDeleteWorkspaceMcpServerMutation = <
   }
     )};
 
-export const DisconnectConnectionDocument = `
+export const DisconnectConnectionDocument = new TypedDocumentString(`
     mutation DisconnectConnection($connectionId: ID!) {
   disconnectConnection(connectionId: $connectionId)
 }
-    `;
+    `);
 
 export const useDisconnectConnectionMutation = <
       TError = unknown,
@@ -6060,11 +6256,11 @@ export const useDisconnectConnectionMutation = <
   }
     )};
 
-export const ExportSharedProjectDocument = `
+export const ExportSharedProjectDocument = new TypedDocumentString(`
     mutation exportSharedProject($id: ID!, $description: String) {
   exportSharedProject(id: $id, description: $description)
 }
-    `;
+    `);
 
 export const useExportSharedProjectMutation = <
       TError = unknown,
@@ -6079,11 +6275,11 @@ export const useExportSharedProjectMutation = <
   }
     )};
 
-export const ExportSharedWorkflowDocument = `
+export const ExportSharedWorkflowDocument = new TypedDocumentString(`
     mutation exportSharedWorkflow($workflowId: String!, $description: String) {
   exportSharedWorkflow(workflowId: $workflowId, description: $description)
 }
-    `;
+    `);
 
 export const useExportSharedWorkflowMutation = <
       TError = unknown,
@@ -6098,7 +6294,7 @@ export const useExportSharedWorkflowMutation = <
   }
     )};
 
-export const ImportProjectTemplateDocument = `
+export const ImportProjectTemplateDocument = new TypedDocumentString(`
     mutation importProjectTemplate($id: String!, $workspaceId: ID!, $sharedProject: Boolean!) {
   importProjectTemplate(
     id: $id
@@ -6106,7 +6302,7 @@ export const ImportProjectTemplateDocument = `
     sharedProject: $sharedProject
   )
 }
-    `;
+    `);
 
 export const useImportProjectTemplateMutation = <
       TError = unknown,
@@ -6121,7 +6317,7 @@ export const useImportProjectTemplateMutation = <
   }
     )};
 
-export const ImportWorkflowTemplateDocument = `
+export const ImportWorkflowTemplateDocument = new TypedDocumentString(`
     mutation importWorkflowTemplate($workflowUuid: String!, $projectId: ID!, $sharedWorkflow: Boolean!) {
   importWorkflowTemplate(
     id: $workflowUuid
@@ -6129,7 +6325,7 @@ export const ImportWorkflowTemplateDocument = `
     sharedWorkflow: $sharedWorkflow
   )
 }
-    `;
+    `);
 
 export const useImportWorkflowTemplateMutation = <
       TError = unknown,
@@ -6144,7 +6340,7 @@ export const useImportWorkflowTemplateMutation = <
   }
     )};
 
-export const McpProjectWorkflowPropertiesDocument = `
+export const McpProjectWorkflowPropertiesDocument = new TypedDocumentString(`
     query mcpProjectWorkflowProperties($mcpProjectWorkflowId: ID!) {
   mcpProjectWorkflowProperties(mcpProjectWorkflowId: $mcpProjectWorkflowId) {
     advancedOption
@@ -6193,7 +6389,7 @@ export const McpProjectWorkflowPropertiesDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useMcpProjectWorkflowPropertiesQuery = <
       TData = McpProjectWorkflowPropertiesQuery,
@@ -6211,7 +6407,7 @@ export const useMcpProjectWorkflowPropertiesQuery = <
   }
     )};
 
-export const McpProjectsDocument = `
+export const McpProjectsDocument = new TypedDocumentString(`
     query mcpProjects {
   mcpProjects {
     id
@@ -6222,7 +6418,7 @@ export const McpProjectsDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useMcpProjectsQuery = <
       TData = McpProjectsQuery,
@@ -6240,7 +6436,7 @@ export const useMcpProjectsQuery = <
   }
     )};
 
-export const McpProjectsByServerIdDocument = `
+export const McpProjectsByServerIdDocument = new TypedDocumentString(`
     query mcpProjectsByServerId($mcpServerId: ID!) {
   mcpProjectsByServerId(mcpServerId: $mcpServerId) {
     id
@@ -6294,7 +6490,7 @@ export const McpProjectsByServerIdDocument = `
     projectVersion
   }
 }
-    `;
+    `);
 
 export const useMcpProjectsByServerIdQuery = <
       TData = McpProjectsByServerIdQuery,
@@ -6312,7 +6508,7 @@ export const useMcpProjectsByServerIdQuery = <
   }
     )};
 
-export const PreBuiltProjectTemplatesDocument = `
+export const PreBuiltProjectTemplatesDocument = new TypedDocumentString(`
     query preBuiltProjectTemplates($query: String, $category: String) {
   preBuiltProjectTemplates(query: $query, category: $category) {
     authorName
@@ -6343,7 +6539,7 @@ export const PreBuiltProjectTemplatesDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const usePreBuiltProjectTemplatesQuery = <
       TData = PreBuiltProjectTemplatesQuery,
@@ -6361,7 +6557,7 @@ export const usePreBuiltProjectTemplatesQuery = <
   }
     )};
 
-export const PreBuiltWorkflowTemplatesDocument = `
+export const PreBuiltWorkflowTemplatesDocument = new TypedDocumentString(`
     query preBuiltWorkflowTemplates($query: String, $category: String) {
   preBuiltWorkflowTemplates(query: $query, category: $category) {
     authorName
@@ -6385,7 +6581,7 @@ export const PreBuiltWorkflowTemplatesDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const usePreBuiltWorkflowTemplatesQuery = <
       TData = PreBuiltWorkflowTemplatesQuery,
@@ -6403,14 +6599,14 @@ export const usePreBuiltWorkflowTemplatesQuery = <
   }
     )};
 
-export const ProjectByIdDocument = `
+export const ProjectByIdDocument = new TypedDocumentString(`
     query projectById($id: ID!) {
   project(id: $id) {
     id
     name
   }
 }
-    `;
+    `);
 
 export const useProjectByIdQuery = <
       TData = ProjectByIdQuery,
@@ -6428,7 +6624,7 @@ export const useProjectByIdQuery = <
   }
     )};
 
-export const ProjectTemplateDocument = `
+export const ProjectTemplateDocument = new TypedDocumentString(`
     query projectTemplate($id: String!, $sharedProject: Boolean!) {
   projectTemplate(id: $id, sharedProject: $sharedProject) {
     components {
@@ -6456,7 +6652,7 @@ export const ProjectTemplateDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useProjectTemplateQuery = <
       TData = ProjectTemplateQuery,
@@ -6474,7 +6670,7 @@ export const useProjectTemplateQuery = <
   }
     )};
 
-export const SharedProjectDocument = `
+export const SharedProjectDocument = new TypedDocumentString(`
     query sharedProject($projectUuid: String!) {
   sharedProject(projectUuid: $projectUuid) {
     description
@@ -6483,7 +6679,7 @@ export const SharedProjectDocument = `
     publicUrl
   }
 }
-    `;
+    `);
 
 export const useSharedProjectQuery = <
       TData = SharedProjectQuery,
@@ -6501,7 +6697,7 @@ export const useSharedProjectQuery = <
   }
     )};
 
-export const SharedWorkflowDocument = `
+export const SharedWorkflowDocument = new TypedDocumentString(`
     query sharedWorkflow($workflowUuid: String!) {
   sharedWorkflow(workflowUuid: $workflowUuid) {
     description
@@ -6510,7 +6706,7 @@ export const SharedWorkflowDocument = `
     publicUrl
   }
 }
-    `;
+    `);
 
 export const useSharedWorkflowQuery = <
       TData = SharedWorkflowQuery,
@@ -6528,7 +6724,7 @@ export const useSharedWorkflowQuery = <
   }
     )};
 
-export const ToolEligibleProjectVersionWorkflowsDocument = `
+export const ToolEligibleProjectVersionWorkflowsDocument = new TypedDocumentString(`
     query toolEligibleProjectVersionWorkflows($projectId: ID!, $projectVersion: Int!) {
   toolEligibleProjectVersionWorkflows(
     projectId: $projectId
@@ -6541,7 +6737,7 @@ export const ToolEligibleProjectVersionWorkflowsDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useToolEligibleProjectVersionWorkflowsQuery = <
       TData = ToolEligibleProjectVersionWorkflowsQuery,
@@ -6559,7 +6755,7 @@ export const useToolEligibleProjectVersionWorkflowsQuery = <
   }
     )};
 
-export const UpdateMcpProjectDocument = `
+export const UpdateMcpProjectDocument = new TypedDocumentString(`
     mutation updateMcpProject($id: ID!, $input: UpdateMcpProjectInput!) {
   updateMcpProject(id: $id, input: $input) {
     id
@@ -6568,7 +6764,7 @@ export const UpdateMcpProjectDocument = `
     projectVersion
   }
 }
-    `;
+    `);
 
 export const useUpdateMcpProjectMutation = <
       TError = unknown,
@@ -6583,7 +6779,7 @@ export const useUpdateMcpProjectMutation = <
   }
     )};
 
-export const UpdateMcpProjectWorkflowDocument = `
+export const UpdateMcpProjectWorkflowDocument = new TypedDocumentString(`
     mutation updateMcpProjectWorkflow($id: ID!, $input: McpProjectWorkflowUpdateInput!) {
   updateMcpProjectWorkflow(id: $id, input: $input) {
     id
@@ -6592,7 +6788,7 @@ export const UpdateMcpProjectWorkflowDocument = `
     parameters
   }
 }
-    `;
+    `);
 
 export const useUpdateMcpProjectWorkflowMutation = <
       TError = unknown,
@@ -6607,7 +6803,7 @@ export const useUpdateMcpProjectWorkflowMutation = <
   }
     )};
 
-export const UpdateMcpServerDocument = `
+export const UpdateMcpServerDocument = new TypedDocumentString(`
     mutation updateMcpServer($id: ID!, $input: McpServerUpdateInput!) {
   updateMcpServer(id: $id, input: $input) {
     id
@@ -6615,7 +6811,7 @@ export const UpdateMcpServerDocument = `
     enabled
   }
 }
-    `;
+    `);
 
 export const useUpdateMcpServerMutation = <
       TError = unknown,
@@ -6630,13 +6826,13 @@ export const useUpdateMcpServerMutation = <
   }
     )};
 
-export const UpdateMcpServerTagsDocument = `
+export const UpdateMcpServerTagsDocument = new TypedDocumentString(`
     mutation updateMcpServerTags($id: ID!, $tags: [TagInput!]!) {
   updateMcpServerTags(id: $id, tags: $tags) {
     id
   }
 }
-    `;
+    `);
 
 export const useUpdateMcpServerTagsMutation = <
       TError = unknown,
@@ -6651,11 +6847,11 @@ export const useUpdateMcpServerTagsMutation = <
   }
     )};
 
-export const UpdateWorkspaceApiKeyDocument = `
+export const UpdateWorkspaceApiKeyDocument = new TypedDocumentString(`
     mutation updateWorkspaceApiKey($apiKeyId: ID!, $name: String!) {
   updateWorkspaceApiKey(apiKeyId: $apiKeyId, name: $name)
 }
-    `;
+    `);
 
 export const useUpdateWorkspaceApiKeyMutation = <
       TError = unknown,
@@ -6670,7 +6866,7 @@ export const useUpdateWorkspaceApiKeyMutation = <
   }
     )};
 
-export const WorkflowChatProjectDeploymentWorkflowDocument = `
+export const WorkflowChatProjectDeploymentWorkflowDocument = new TypedDocumentString(`
     query workflowChatProjectDeploymentWorkflow($id: String!) {
   projectDeploymentWorkflow(id: $id) {
     projectWorkflow {
@@ -6681,7 +6877,7 @@ export const WorkflowChatProjectDeploymentWorkflowDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useWorkflowChatProjectDeploymentWorkflowQuery = <
       TData = WorkflowChatProjectDeploymentWorkflowQuery,
@@ -6699,7 +6895,7 @@ export const useWorkflowChatProjectDeploymentWorkflowQuery = <
   }
     )};
 
-export const WorkflowChatWorkspaceProjectDeploymentsDocument = `
+export const WorkflowChatWorkspaceProjectDeploymentsDocument = new TypedDocumentString(`
     query workflowChatWorkspaceProjectDeployments($workspaceId: ID!, $environmentId: ID!, $projectId: ID, $tagId: ID) {
   workspaceProjectDeployments(
     workspaceId: $workspaceId
@@ -6731,7 +6927,7 @@ export const WorkflowChatWorkspaceProjectDeploymentsDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useWorkflowChatWorkspaceProjectDeploymentsQuery = <
       TData = WorkflowChatWorkspaceProjectDeploymentsQuery,
@@ -6749,7 +6945,7 @@ export const useWorkflowChatWorkspaceProjectDeploymentsQuery = <
   }
     )};
 
-export const WorkflowTemplateDocument = `
+export const WorkflowTemplateDocument = new TypedDocumentString(`
     query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
   workflowTemplate(id: $id, sharedWorkflow: $sharedWorkflow) {
     description
@@ -6770,7 +6966,7 @@ export const WorkflowTemplateDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useWorkflowTemplateQuery = <
       TData = WorkflowTemplateQuery,
@@ -6788,7 +6984,7 @@ export const useWorkflowTemplateQuery = <
   }
     )};
 
-export const WorkspaceApiKeysDocument = `
+export const WorkspaceApiKeysDocument = new TypedDocumentString(`
     query workspaceApiKeys($workspaceId: ID!, $environmentId: ID!) {
   workspaceApiKeys(workspaceId: $workspaceId, environmentId: $environmentId) {
     id
@@ -6801,7 +6997,7 @@ export const WorkspaceApiKeysDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useWorkspaceApiKeysQuery = <
       TData = WorkspaceApiKeysQuery,
@@ -6819,7 +7015,7 @@ export const useWorkspaceApiKeysQuery = <
   }
     )};
 
-export const WorkspaceMcpServersDocument = `
+export const WorkspaceMcpServersDocument = new TypedDocumentString(`
     query workspaceMcpServers($workspaceId: ID!) {
   workspaceMcpServers(workspaceId: $workspaceId) {
     id
@@ -6842,7 +7038,7 @@ export const WorkspaceMcpServersDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useWorkspaceMcpServersQuery = <
       TData = WorkspaceMcpServersQuery,
@@ -6860,11 +7056,11 @@ export const useWorkspaceMcpServersQuery = <
   }
     )};
 
-export const AddDataTableColumnDocument = `
+export const AddDataTableColumnDocument = new TypedDocumentString(`
     mutation addDataTableColumn($input: AddColumnInput!) {
   addDataTableColumn(input: $input)
 }
-    `;
+    `);
 
 export const useAddDataTableColumnMutation = <
       TError = unknown,
@@ -6879,11 +7075,11 @@ export const useAddDataTableColumnMutation = <
   }
     )};
 
-export const CreateDataTableDocument = `
+export const CreateDataTableDocument = new TypedDocumentString(`
     mutation createDataTable($input: CreateDataTableInput!) {
   createDataTable(input: $input)
 }
-    `;
+    `);
 
 export const useCreateDataTableMutation = <
       TError = unknown,
@@ -6898,14 +7094,14 @@ export const useCreateDataTableMutation = <
   }
     )};
 
-export const DataTableRowsDocument = `
+export const DataTableRowsDocument = new TypedDocumentString(`
     query dataTableRows($environmentId: ID!, $tableId: ID!) {
   dataTableRows(environmentId: $environmentId, tableId: $tableId) {
     id
     values
   }
 }
-    `;
+    `);
 
 export const useDataTableRowsQuery = <
       TData = DataTableRowsQuery,
@@ -6923,7 +7119,7 @@ export const useDataTableRowsQuery = <
   }
     )};
 
-export const DataTableRowsPageDocument = `
+export const DataTableRowsPageDocument = new TypedDocumentString(`
     query dataTableRowsPage($environmentId: ID!, $tableId: ID!, $limit: Int, $offset: Int) {
   dataTableRowsPage(
     environmentId: $environmentId
@@ -6939,7 +7135,7 @@ export const DataTableRowsPageDocument = `
     nextOffset
   }
 }
-    `;
+    `);
 
 export const useDataTableRowsPageQuery = <
       TData = DataTableRowsPageQuery,
@@ -6957,14 +7153,14 @@ export const useDataTableRowsPageQuery = <
   }
     )};
 
-export const DataTableTagsDocument = `
+export const DataTableTagsDocument = new TypedDocumentString(`
     query dataTableTags {
   dataTableTags {
     id
     name
   }
 }
-    `;
+    `);
 
 export const useDataTableTagsQuery = <
       TData = DataTableTagsQuery,
@@ -6982,7 +7178,7 @@ export const useDataTableTagsQuery = <
   }
     )};
 
-export const DataTableTagsByTableDocument = `
+export const DataTableTagsByTableDocument = new TypedDocumentString(`
     query dataTableTagsByTable {
   dataTableTagsByTable {
     tableId
@@ -6992,7 +7188,7 @@ export const DataTableTagsByTableDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useDataTableTagsByTableQuery = <
       TData = DataTableTagsByTableQuery,
@@ -7010,7 +7206,7 @@ export const useDataTableTagsByTableQuery = <
   }
     )};
 
-export const DataTablesDocument = `
+export const DataTablesDocument = new TypedDocumentString(`
     query dataTables($environmentId: ID!, $workspaceId: ID!) {
   dataTables(environmentId: $environmentId, workspaceId: $workspaceId) {
     id
@@ -7023,7 +7219,7 @@ export const DataTablesDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useDataTablesQuery = <
       TData = DataTablesQuery,
@@ -7041,11 +7237,11 @@ export const useDataTablesQuery = <
   }
     )};
 
-export const DeleteDataTableRowDocument = `
+export const DeleteDataTableRowDocument = new TypedDocumentString(`
     mutation deleteDataTableRow($input: DeleteRowInput!) {
   deleteDataTableRow(input: $input)
 }
-    `;
+    `);
 
 export const useDeleteDataTableRowMutation = <
       TError = unknown,
@@ -7060,11 +7256,11 @@ export const useDeleteDataTableRowMutation = <
   }
     )};
 
-export const DropDataTableDocument = `
+export const DropDataTableDocument = new TypedDocumentString(`
     mutation dropDataTable($input: RemoveTableInput!) {
   dropDataTable(input: $input)
 }
-    `;
+    `);
 
 export const useDropDataTableMutation = <
       TError = unknown,
@@ -7079,11 +7275,11 @@ export const useDropDataTableMutation = <
   }
     )};
 
-export const DuplicateDataTableDocument = `
+export const DuplicateDataTableDocument = new TypedDocumentString(`
     mutation duplicateDataTable($input: DuplicateDataTableInput!) {
   duplicateDataTable(input: $input)
 }
-    `;
+    `);
 
 export const useDuplicateDataTableMutation = <
       TError = unknown,
@@ -7098,11 +7294,11 @@ export const useDuplicateDataTableMutation = <
   }
     )};
 
-export const ExportDataTableCsvDocument = `
+export const ExportDataTableCsvDocument = new TypedDocumentString(`
     query exportDataTableCsv($environmentId: ID!, $tableId: ID!) {
   exportDataTableCsv(environmentId: $environmentId, tableId: $tableId)
 }
-    `;
+    `);
 
 export const useExportDataTableCsvQuery = <
       TData = ExportDataTableCsvQuery,
@@ -7120,11 +7316,11 @@ export const useExportDataTableCsvQuery = <
   }
     )};
 
-export const ImportDataTableCsvDocument = `
+export const ImportDataTableCsvDocument = new TypedDocumentString(`
     mutation importDataTableCsv($input: ImportCsvInput!) {
   importDataTableCsv(input: $input)
 }
-    `;
+    `);
 
 export const useImportDataTableCsvMutation = <
       TError = unknown,
@@ -7139,14 +7335,14 @@ export const useImportDataTableCsvMutation = <
   }
     )};
 
-export const InsertDataTableRowDocument = `
+export const InsertDataTableRowDocument = new TypedDocumentString(`
     mutation insertDataTableRow($input: InsertRowInput!) {
   insertDataTableRow(input: $input) {
     id
     values
   }
 }
-    `;
+    `);
 
 export const useInsertDataTableRowMutation = <
       TError = unknown,
@@ -7161,11 +7357,11 @@ export const useInsertDataTableRowMutation = <
   }
     )};
 
-export const RemoveDataTableColumnDocument = `
+export const RemoveDataTableColumnDocument = new TypedDocumentString(`
     mutation removeDataTableColumn($input: RemoveColumnInput!) {
   removeDataTableColumn(input: $input)
 }
-    `;
+    `);
 
 export const useRemoveDataTableColumnMutation = <
       TError = unknown,
@@ -7180,11 +7376,11 @@ export const useRemoveDataTableColumnMutation = <
   }
     )};
 
-export const RenameDataTableDocument = `
+export const RenameDataTableDocument = new TypedDocumentString(`
     mutation renameDataTable($input: RenameDataTableInput!) {
   renameDataTable(input: $input)
 }
-    `;
+    `);
 
 export const useRenameDataTableMutation = <
       TError = unknown,
@@ -7199,11 +7395,11 @@ export const useRenameDataTableMutation = <
   }
     )};
 
-export const RenameDataTableColumnDocument = `
+export const RenameDataTableColumnDocument = new TypedDocumentString(`
     mutation renameDataTableColumn($input: RenameColumnInput!) {
   renameDataTableColumn(input: $input)
 }
-    `;
+    `);
 
 export const useRenameDataTableColumnMutation = <
       TError = unknown,
@@ -7218,14 +7414,14 @@ export const useRenameDataTableColumnMutation = <
   }
     )};
 
-export const UpdateDataTableRowDocument = `
+export const UpdateDataTableRowDocument = new TypedDocumentString(`
     mutation updateDataTableRow($input: UpdateRowInput!) {
   updateDataTableRow(input: $input) {
     id
     values
   }
 }
-    `;
+    `);
 
 export const useUpdateDataTableRowMutation = <
       TError = unknown,
@@ -7240,11 +7436,11 @@ export const useUpdateDataTableRowMutation = <
   }
     )};
 
-export const UpdateDataTableTagsDocument = `
+export const UpdateDataTableTagsDocument = new TypedDocumentString(`
     mutation updateDataTableTags($input: UpdateDataTableTagsInput!) {
   updateDataTableTags(input: $input)
 }
-    `;
+    `);
 
 export const useUpdateDataTableTagsMutation = <
       TError = unknown,
@@ -7259,7 +7455,7 @@ export const useUpdateDataTableTagsMutation = <
   }
     )};
 
-export const CreateKnowledgeBaseDocument = `
+export const CreateKnowledgeBaseDocument = new TypedDocumentString(`
     mutation createKnowledgeBase($knowledgeBase: KnowledgeBaseInput!, $environmentId: ID!, $workspaceId: ID!) {
   createKnowledgeBase(
     knowledgeBase: $knowledgeBase
@@ -7270,7 +7466,7 @@ export const CreateKnowledgeBaseDocument = `
     name
   }
 }
-    `;
+    `);
 
 export const useCreateKnowledgeBaseMutation = <
       TError = unknown,
@@ -7285,11 +7481,11 @@ export const useCreateKnowledgeBaseMutation = <
   }
     )};
 
-export const DeleteKnowledgeBaseDocument = `
+export const DeleteKnowledgeBaseDocument = new TypedDocumentString(`
     mutation deleteKnowledgeBase($id: ID!) {
   deleteKnowledgeBase(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteKnowledgeBaseMutation = <
       TError = unknown,
@@ -7304,11 +7500,11 @@ export const useDeleteKnowledgeBaseMutation = <
   }
     )};
 
-export const DeleteKnowledgeBaseDocumentDocument = `
+export const DeleteKnowledgeBaseDocumentDocument = new TypedDocumentString(`
     mutation deleteKnowledgeBaseDocument($id: ID!) {
   deleteKnowledgeBaseDocument(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteKnowledgeBaseDocumentMutation = <
       TError = unknown,
@@ -7323,11 +7519,11 @@ export const useDeleteKnowledgeBaseDocumentMutation = <
   }
     )};
 
-export const DeleteKnowledgeBaseDocumentChunkDocument = `
+export const DeleteKnowledgeBaseDocumentChunkDocument = new TypedDocumentString(`
     mutation deleteKnowledgeBaseDocumentChunk($id: ID!) {
   deleteKnowledgeBaseDocumentChunk(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteKnowledgeBaseDocumentChunkMutation = <
       TError = unknown,
@@ -7342,7 +7538,7 @@ export const useDeleteKnowledgeBaseDocumentChunkMutation = <
   }
     )};
 
-export const KnowledgeBaseDocument = `
+export const KnowledgeBaseDocument = new TypedDocumentString(`
     query knowledgeBase($id: ID!) {
   knowledgeBase(id: $id) {
     id
@@ -7377,7 +7573,7 @@ export const KnowledgeBaseDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useKnowledgeBaseQuery = <
       TData = KnowledgeBaseQuery,
@@ -7395,7 +7591,7 @@ export const useKnowledgeBaseQuery = <
   }
     )};
 
-export const KnowledgeBaseDocumentStatusDocument = `
+export const KnowledgeBaseDocumentStatusDocument = new TypedDocumentString(`
     query knowledgeBaseDocumentStatus($id: ID!) {
   knowledgeBaseDocumentStatus(id: $id) {
     documentId
@@ -7404,7 +7600,7 @@ export const KnowledgeBaseDocumentStatusDocument = `
     message
   }
 }
-    `;
+    `);
 
 export const useKnowledgeBaseDocumentStatusQuery = <
       TData = KnowledgeBaseDocumentStatusQuery,
@@ -7422,14 +7618,14 @@ export const useKnowledgeBaseDocumentStatusQuery = <
   }
     )};
 
-export const KnowledgeBaseDocumentTagsDocument = `
+export const KnowledgeBaseDocumentTagsDocument = new TypedDocumentString(`
     query knowledgeBaseDocumentTags {
   knowledgeBaseDocumentTags {
     id
     name
   }
 }
-    `;
+    `);
 
 export const useKnowledgeBaseDocumentTagsQuery = <
       TData = KnowledgeBaseDocumentTagsQuery,
@@ -7447,7 +7643,7 @@ export const useKnowledgeBaseDocumentTagsQuery = <
   }
     )};
 
-export const KnowledgeBaseDocumentTagsByDocumentDocument = `
+export const KnowledgeBaseDocumentTagsByDocumentDocument = new TypedDocumentString(`
     query knowledgeBaseDocumentTagsByDocument {
   knowledgeBaseDocumentTagsByDocument {
     knowledgeBaseDocumentId
@@ -7457,7 +7653,7 @@ export const KnowledgeBaseDocumentTagsByDocumentDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useKnowledgeBaseDocumentTagsByDocumentQuery = <
       TData = KnowledgeBaseDocumentTagsByDocumentQuery,
@@ -7475,14 +7671,14 @@ export const useKnowledgeBaseDocumentTagsByDocumentQuery = <
   }
     )};
 
-export const KnowledgeBaseTagsDocument = `
+export const KnowledgeBaseTagsDocument = new TypedDocumentString(`
     query knowledgeBaseTags {
   knowledgeBaseTags {
     id
     name
   }
 }
-    `;
+    `);
 
 export const useKnowledgeBaseTagsQuery = <
       TData = KnowledgeBaseTagsQuery,
@@ -7500,7 +7696,7 @@ export const useKnowledgeBaseTagsQuery = <
   }
     )};
 
-export const KnowledgeBaseTagsByKnowledgeBaseDocument = `
+export const KnowledgeBaseTagsByKnowledgeBaseDocument = new TypedDocumentString(`
     query knowledgeBaseTagsByKnowledgeBase {
   knowledgeBaseTagsByKnowledgeBase {
     knowledgeBaseId
@@ -7510,7 +7706,7 @@ export const KnowledgeBaseTagsByKnowledgeBaseDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useKnowledgeBaseTagsByKnowledgeBaseQuery = <
       TData = KnowledgeBaseTagsByKnowledgeBaseQuery,
@@ -7528,7 +7724,7 @@ export const useKnowledgeBaseTagsByKnowledgeBaseQuery = <
   }
     )};
 
-export const KnowledgeBasesDocument = `
+export const KnowledgeBasesDocument = new TypedDocumentString(`
     query knowledgeBases($environmentId: ID!, $workspaceId: ID!) {
   knowledgeBases(environmentId: $environmentId, workspaceId: $workspaceId) {
     id
@@ -7541,7 +7737,7 @@ export const KnowledgeBasesDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useKnowledgeBasesQuery = <
       TData = KnowledgeBasesQuery,
@@ -7559,7 +7755,7 @@ export const useKnowledgeBasesQuery = <
   }
     )};
 
-export const SearchKnowledgeBaseDocument = `
+export const SearchKnowledgeBaseDocument = new TypedDocumentString(`
     query searchKnowledgeBase($id: ID!, $query: String!, $metadataFilters: String) {
   searchKnowledgeBase(id: $id, query: $query, metadataFilters: $metadataFilters) {
     id
@@ -7569,7 +7765,7 @@ export const SearchKnowledgeBaseDocument = `
     score
   }
 }
-    `;
+    `);
 
 export const useSearchKnowledgeBaseQuery = <
       TData = SearchKnowledgeBaseQuery,
@@ -7587,7 +7783,7 @@ export const useSearchKnowledgeBaseQuery = <
   }
     )};
 
-export const UpdateKnowledgeBaseDocument = `
+export const UpdateKnowledgeBaseDocument = new TypedDocumentString(`
     mutation updateKnowledgeBase($id: ID!, $knowledgeBase: KnowledgeBaseInput!) {
   updateKnowledgeBase(id: $id, knowledgeBase: $knowledgeBase) {
     id
@@ -7598,7 +7794,7 @@ export const UpdateKnowledgeBaseDocument = `
     overlap
   }
 }
-    `;
+    `);
 
 export const useUpdateKnowledgeBaseMutation = <
       TError = unknown,
@@ -7613,7 +7809,7 @@ export const useUpdateKnowledgeBaseMutation = <
   }
     )};
 
-export const UpdateKnowledgeBaseDocumentChunkDocument = `
+export const UpdateKnowledgeBaseDocumentChunkDocument = new TypedDocumentString(`
     mutation updateKnowledgeBaseDocumentChunk($id: ID!, $knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput!) {
   updateKnowledgeBaseDocumentChunk(
     id: $id
@@ -7625,7 +7821,7 @@ export const UpdateKnowledgeBaseDocumentChunkDocument = `
     metadata
   }
 }
-    `;
+    `);
 
 export const useUpdateKnowledgeBaseDocumentChunkMutation = <
       TError = unknown,
@@ -7640,11 +7836,11 @@ export const useUpdateKnowledgeBaseDocumentChunkMutation = <
   }
     )};
 
-export const UpdateKnowledgeBaseDocumentTagsDocument = `
+export const UpdateKnowledgeBaseDocumentTagsDocument = new TypedDocumentString(`
     mutation updateKnowledgeBaseDocumentTags($input: UpdateKnowledgeBaseDocumentTagsInput!) {
   updateKnowledgeBaseDocumentTags(input: $input)
 }
-    `;
+    `);
 
 export const useUpdateKnowledgeBaseDocumentTagsMutation = <
       TError = unknown,
@@ -7659,11 +7855,11 @@ export const useUpdateKnowledgeBaseDocumentTagsMutation = <
   }
     )};
 
-export const UpdateKnowledgeBaseTagsDocument = `
+export const UpdateKnowledgeBaseTagsDocument = new TypedDocumentString(`
     mutation updateKnowledgeBaseTags($input: UpdateKnowledgeBaseTagsInput!) {
   updateKnowledgeBaseTags(input: $input)
 }
-    `;
+    `);
 
 export const useUpdateKnowledgeBaseTagsMutation = <
       TError = unknown,
@@ -7678,7 +7874,7 @@ export const useUpdateKnowledgeBaseTagsMutation = <
   }
     )};
 
-export const AutomationSearchDocument = `
+export const AutomationSearchDocument = new TypedDocumentString(`
     query automationSearch($query: String!, $limit: Int) {
   automationSearch(query: $query, limit: $limit) {
     id
@@ -7701,7 +7897,7 @@ export const AutomationSearchDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useAutomationSearchQuery = <
       TData = AutomationSearchQuery,
@@ -7719,7 +7915,7 @@ export const useAutomationSearchQuery = <
   }
     )};
 
-export const ConnectedUserProjectsDocument = `
+export const ConnectedUserProjectsDocument = new TypedDocumentString(`
     query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
   connectedUserProjects(
     connectedUserId: $connectedUserId
@@ -7755,7 +7951,7 @@ export const ConnectedUserProjectsDocument = `
     projectVersion
   }
 }
-    `;
+    `);
 
 export const useConnectedUserProjectsQuery = <
       TData = ConnectedUserProjectsQuery,
@@ -7773,7 +7969,7 @@ export const useConnectedUserProjectsQuery = <
   }
     )};
 
-export const CreateEmbeddedMcpServerDocument = `
+export const CreateEmbeddedMcpServerDocument = new TypedDocumentString(`
     mutation createEmbeddedMcpServer($input: CreateEmbeddedMcpServerInput!) {
   createEmbeddedMcpServer(input: $input) {
     enabled
@@ -7783,7 +7979,7 @@ export const CreateEmbeddedMcpServerDocument = `
     type
   }
 }
-    `;
+    `);
 
 export const useCreateEmbeddedMcpServerMutation = <
       TError = unknown,
@@ -7798,7 +7994,7 @@ export const useCreateEmbeddedMcpServerMutation = <
   }
     )};
 
-export const CreateMcpIntegrationInstanceConfigurationDocument = `
+export const CreateMcpIntegrationInstanceConfigurationDocument = new TypedDocumentString(`
     mutation createMcpIntegrationInstanceConfiguration($input: CreateMcpIntegrationInstanceConfigurationInput!) {
   createMcpIntegrationInstanceConfiguration(input: $input) {
     id
@@ -7806,7 +8002,7 @@ export const CreateMcpIntegrationInstanceConfigurationDocument = `
     mcpServerId
   }
 }
-    `;
+    `);
 
 export const useCreateMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
@@ -7821,11 +8017,11 @@ export const useCreateMcpIntegrationInstanceConfigurationMutation = <
   }
     )};
 
-export const DeleteEmbeddedMcpServerDocument = `
+export const DeleteEmbeddedMcpServerDocument = new TypedDocumentString(`
     mutation deleteEmbeddedMcpServer($mcpServerId: ID!) {
   deleteEmbeddedMcpServer(mcpServerId: $mcpServerId)
 }
-    `;
+    `);
 
 export const useDeleteEmbeddedMcpServerMutation = <
       TError = unknown,
@@ -7840,11 +8036,11 @@ export const useDeleteEmbeddedMcpServerMutation = <
   }
     )};
 
-export const DeleteMcpIntegrationInstanceConfigurationDocument = `
+export const DeleteMcpIntegrationInstanceConfigurationDocument = new TypedDocumentString(`
     mutation deleteMcpIntegrationInstanceConfiguration($id: ID!) {
   deleteMcpIntegrationInstanceConfiguration(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
@@ -7859,11 +8055,11 @@ export const useDeleteMcpIntegrationInstanceConfigurationMutation = <
   }
     )};
 
-export const DeleteMcpIntegrationInstanceConfigurationWorkflowDocument = `
+export const DeleteMcpIntegrationInstanceConfigurationWorkflowDocument = new TypedDocumentString(`
     mutation deleteMcpIntegrationInstanceConfigurationWorkflow($id: ID!) {
   deleteMcpIntegrationInstanceConfigurationWorkflow(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation = <
       TError = unknown,
@@ -7878,7 +8074,7 @@ export const useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation = <
   }
     )};
 
-export const EmbeddedMcpServersDocument = `
+export const EmbeddedMcpServersDocument = new TypedDocumentString(`
     query embeddedMcpServers {
   embeddedMcpServers {
     id
@@ -7910,7 +8106,7 @@ export const EmbeddedMcpServersDocument = `
     url
   }
 }
-    `;
+    `);
 
 export const useEmbeddedMcpServersQuery = <
       TData = EmbeddedMcpServersQuery,
@@ -7928,14 +8124,14 @@ export const useEmbeddedMcpServersQuery = <
   }
     )};
 
-export const IntegrationByIdDocument = `
+export const IntegrationByIdDocument = new TypedDocumentString(`
     query integrationById($id: ID!) {
   integration(id: $id) {
     id
     name
   }
 }
-    `;
+    `);
 
 export const useIntegrationByIdQuery = <
       TData = IntegrationByIdQuery,
@@ -7953,7 +8149,7 @@ export const useIntegrationByIdQuery = <
   }
     )};
 
-export const IntegrationWorkflowsDocument = `
+export const IntegrationWorkflowsDocument = new TypedDocumentString(`
     query integrationWorkflows {
   integrationWorkflows {
     id
@@ -7969,7 +8165,7 @@ export const IntegrationWorkflowsDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useIntegrationWorkflowsQuery = <
       TData = IntegrationWorkflowsQuery,
@@ -7987,7 +8183,7 @@ export const useIntegrationWorkflowsQuery = <
   }
     )};
 
-export const IntegrationWorkflowsByIntegrationIdDocument = `
+export const IntegrationWorkflowsByIntegrationIdDocument = new TypedDocumentString(`
     query integrationWorkflowsByIntegrationId($integrationId: ID!) {
   integrationWorkflowsByIntegrationId(integrationId: $integrationId) {
     id
@@ -8003,7 +8199,7 @@ export const IntegrationWorkflowsByIntegrationIdDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useIntegrationWorkflowsByIntegrationIdQuery = <
       TData = IntegrationWorkflowsByIntegrationIdQuery,
@@ -8021,7 +8217,7 @@ export const useIntegrationWorkflowsByIntegrationIdQuery = <
   }
     )};
 
-export const McpComponentDefinitionsDocument = `
+export const McpComponentDefinitionsDocument = new TypedDocumentString(`
     query mcpComponentDefinitions {
   mcpComponentDefinitions {
     clusterElementsCount
@@ -8032,7 +8228,7 @@ export const McpComponentDefinitionsDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useMcpComponentDefinitionsQuery = <
       TData = McpComponentDefinitionsQuery,
@@ -8050,7 +8246,7 @@ export const useMcpComponentDefinitionsQuery = <
   }
     )};
 
-export const McpIntegrationInstanceConfigurationWorkflowPropertiesDocument = `
+export const McpIntegrationInstanceConfigurationWorkflowPropertiesDocument = new TypedDocumentString(`
     query mcpIntegrationInstanceConfigurationWorkflowProperties($mcpIntegrationInstanceConfigurationWorkflowId: ID!) {
   mcpIntegrationInstanceConfigurationWorkflowProperties(
     mcpIntegrationInstanceConfigurationWorkflowId: $mcpIntegrationInstanceConfigurationWorkflowId
@@ -8101,7 +8297,7 @@ export const McpIntegrationInstanceConfigurationWorkflowPropertiesDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useMcpIntegrationInstanceConfigurationWorkflowPropertiesQuery = <
       TData = McpIntegrationInstanceConfigurationWorkflowPropertiesQuery,
@@ -8119,7 +8315,7 @@ export const useMcpIntegrationInstanceConfigurationWorkflowPropertiesQuery = <
   }
     )};
 
-export const McpIntegrationInstanceConfigurationsDocument = `
+export const McpIntegrationInstanceConfigurationsDocument = new TypedDocumentString(`
     query mcpIntegrationInstanceConfigurations {
   mcpIntegrationInstanceConfigurations {
     id
@@ -8136,7 +8332,7 @@ export const McpIntegrationInstanceConfigurationsDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useMcpIntegrationInstanceConfigurationsQuery = <
       TData = McpIntegrationInstanceConfigurationsQuery,
@@ -8154,7 +8350,7 @@ export const useMcpIntegrationInstanceConfigurationsQuery = <
   }
     )};
 
-export const McpIntegrationInstanceConfigurationsByServerIdDocument = `
+export const McpIntegrationInstanceConfigurationsByServerIdDocument = new TypedDocumentString(`
     query mcpIntegrationInstanceConfigurationsByServerId($mcpServerId: ID) {
   mcpIntegrationInstanceConfigurationsByServerId(mcpServerId: $mcpServerId) {
     id
@@ -8192,7 +8388,7 @@ export const McpIntegrationInstanceConfigurationsByServerIdDocument = `
     mcpServerId
   }
 }
-    `;
+    `);
 
 export const useMcpIntegrationInstanceConfigurationsByServerIdQuery = <
       TData = McpIntegrationInstanceConfigurationsByServerIdQuery,
@@ -8210,7 +8406,7 @@ export const useMcpIntegrationInstanceConfigurationsByServerIdQuery = <
   }
     )};
 
-export const ToolEligibleIntegrationInstanceConfigurationWorkflowsDocument = `
+export const ToolEligibleIntegrationInstanceConfigurationWorkflowsDocument = new TypedDocumentString(`
     query toolEligibleIntegrationInstanceConfigurationWorkflows($integrationInstanceConfigurationId: ID!) {
   toolEligibleIntegrationInstanceConfigurationWorkflows(
     integrationInstanceConfigurationId: $integrationInstanceConfigurationId
@@ -8220,7 +8416,7 @@ export const ToolEligibleIntegrationInstanceConfigurationWorkflowsDocument = `
     label
   }
 }
-    `;
+    `);
 
 export const useToolEligibleIntegrationInstanceConfigurationWorkflowsQuery = <
       TData = ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery,
@@ -8238,7 +8434,7 @@ export const useToolEligibleIntegrationInstanceConfigurationWorkflowsQuery = <
   }
     )};
 
-export const ToolEligibleIntegrationVersionWorkflowsDocument = `
+export const ToolEligibleIntegrationVersionWorkflowsDocument = new TypedDocumentString(`
     query toolEligibleIntegrationVersionWorkflows($integrationId: ID!, $integrationVersion: Int!) {
   toolEligibleIntegrationVersionWorkflows(
     integrationId: $integrationId
@@ -8249,7 +8445,7 @@ export const ToolEligibleIntegrationVersionWorkflowsDocument = `
     label
   }
 }
-    `;
+    `);
 
 export const useToolEligibleIntegrationVersionWorkflowsQuery = <
       TData = ToolEligibleIntegrationVersionWorkflowsQuery,
@@ -8267,7 +8463,7 @@ export const useToolEligibleIntegrationVersionWorkflowsQuery = <
   }
     )};
 
-export const UpdateMcpIntegrationInstanceConfigurationDocument = `
+export const UpdateMcpIntegrationInstanceConfigurationDocument = new TypedDocumentString(`
     mutation updateMcpIntegrationInstanceConfiguration($id: ID!, $input: UpdateMcpIntegrationInstanceConfigurationInput!) {
   updateMcpIntegrationInstanceConfiguration(id: $id, input: $input) {
     id
@@ -8275,7 +8471,7 @@ export const UpdateMcpIntegrationInstanceConfigurationDocument = `
     mcpServerId
   }
 }
-    `;
+    `);
 
 export const useUpdateMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
@@ -8290,11 +8486,11 @@ export const useUpdateMcpIntegrationInstanceConfigurationMutation = <
   }
     )};
 
-export const UpdateMcpIntegrationInstanceConfigurationVersionDocument = `
+export const UpdateMcpIntegrationInstanceConfigurationVersionDocument = new TypedDocumentString(`
     mutation updateMcpIntegrationInstanceConfigurationVersion($id: ID!, $input: UpdateMcpIntegrationInstanceConfigurationVersionInput!) {
   updateMcpIntegrationInstanceConfigurationVersion(id: $id, input: $input)
 }
-    `;
+    `);
 
 export const useUpdateMcpIntegrationInstanceConfigurationVersionMutation = <
       TError = unknown,
@@ -8309,7 +8505,7 @@ export const useUpdateMcpIntegrationInstanceConfigurationVersionMutation = <
   }
     )};
 
-export const UpdateMcpIntegrationInstanceConfigurationWorkflowDocument = `
+export const UpdateMcpIntegrationInstanceConfigurationWorkflowDocument = new TypedDocumentString(`
     mutation updateMcpIntegrationInstanceConfigurationWorkflow($id: ID!, $input: McpIntegrationInstanceConfigurationWorkflowUpdateInput!) {
   updateMcpIntegrationInstanceConfigurationWorkflow(id: $id, input: $input) {
     id
@@ -8318,7 +8514,7 @@ export const UpdateMcpIntegrationInstanceConfigurationWorkflowDocument = `
     parameters
   }
 }
-    `;
+    `);
 
 export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
       TError = unknown,
@@ -8333,7 +8529,7 @@ export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
   }
     )};
 
-export const ApiConnectorDocument = `
+export const ApiConnectorDocument = new TypedDocumentString(`
     query apiConnector($id: ID!) {
   apiConnector(id: $id) {
     id
@@ -8359,7 +8555,7 @@ export const ApiConnectorDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useApiConnectorQuery = <
       TData = ApiConnectorQuery,
@@ -8377,7 +8573,7 @@ export const useApiConnectorQuery = <
   }
     )};
 
-export const ApiConnectorsDocument = `
+export const ApiConnectorsDocument = new TypedDocumentString(`
     query apiConnectors {
   apiConnectors {
     id
@@ -8403,7 +8599,7 @@ export const ApiConnectorsDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useApiConnectorsQuery = <
       TData = ApiConnectorsQuery,
@@ -8421,11 +8617,11 @@ export const useApiConnectorsQuery = <
   }
     )};
 
-export const CancelGenerationJobDocument = `
+export const CancelGenerationJobDocument = new TypedDocumentString(`
     mutation cancelGenerationJob($jobId: String!) {
   cancelGenerationJob(jobId: $jobId)
 }
-    `;
+    `);
 
 export const useCancelGenerationJobMutation = <
       TError = unknown,
@@ -8440,7 +8636,7 @@ export const useCancelGenerationJobMutation = <
   }
     )};
 
-export const CreateApiConnectorDocument = `
+export const CreateApiConnectorDocument = new TypedDocumentString(`
     mutation createApiConnector($input: CreateApiConnectorInput!) {
   createApiConnector(input: $input) {
     id
@@ -8466,7 +8662,7 @@ export const CreateApiConnectorDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useCreateApiConnectorMutation = <
       TError = unknown,
@@ -8481,11 +8677,11 @@ export const useCreateApiConnectorMutation = <
   }
     )};
 
-export const DeleteApiConnectorDocument = `
+export const DeleteApiConnectorDocument = new TypedDocumentString(`
     mutation deleteApiConnector($id: ID!) {
   deleteApiConnector(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteApiConnectorMutation = <
       TError = unknown,
@@ -8500,11 +8696,11 @@ export const useDeleteApiConnectorMutation = <
   }
     )};
 
-export const EnableApiConnectorDocument = `
+export const EnableApiConnectorDocument = new TypedDocumentString(`
     mutation enableApiConnector($id: ID!, $enable: Boolean!) {
   enableApiConnector(id: $id, enable: $enable)
 }
-    `;
+    `);
 
 export const useEnableApiConnectorMutation = <
       TError = unknown,
@@ -8519,13 +8715,13 @@ export const useEnableApiConnectorMutation = <
   }
     )};
 
-export const GenerateSpecificationDocument = `
+export const GenerateSpecificationDocument = new TypedDocumentString(`
     mutation generateSpecification($input: GenerateSpecificationInput!) {
   generateSpecification(input: $input) {
     specification
   }
 }
-    `;
+    `);
 
 export const useGenerateSpecificationMutation = <
       TError = unknown,
@@ -8540,7 +8736,7 @@ export const useGenerateSpecificationMutation = <
   }
     )};
 
-export const GenerationJobStatusDocument = `
+export const GenerationJobStatusDocument = new TypedDocumentString(`
     query generationJobStatus($jobId: String!) {
   generationJobStatus(jobId: $jobId) {
     jobId
@@ -8549,7 +8745,7 @@ export const GenerationJobStatusDocument = `
     errorMessage
   }
 }
-    `;
+    `);
 
 export const useGenerationJobStatusQuery = <
       TData = GenerationJobStatusQuery,
@@ -8567,7 +8763,7 @@ export const useGenerationJobStatusQuery = <
   }
     )};
 
-export const ImportOpenApiSpecificationDocument = `
+export const ImportOpenApiSpecificationDocument = new TypedDocumentString(`
     mutation importOpenApiSpecification($input: ImportOpenApiSpecificationInput!) {
   importOpenApiSpecification(input: $input) {
     id
@@ -8593,7 +8789,7 @@ export const ImportOpenApiSpecificationDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useImportOpenApiSpecificationMutation = <
       TError = unknown,
@@ -8608,7 +8804,7 @@ export const useImportOpenApiSpecificationMutation = <
   }
     )};
 
-export const StartGenerateFromDocumentationPreviewDocument = `
+export const StartGenerateFromDocumentationPreviewDocument = new TypedDocumentString(`
     mutation startGenerateFromDocumentationPreview($input: GenerateFromDocumentationInput!) {
   startGenerateFromDocumentationPreview(input: $input) {
     jobId
@@ -8617,7 +8813,7 @@ export const StartGenerateFromDocumentationPreviewDocument = `
     errorMessage
   }
 }
-    `;
+    `);
 
 export const useStartGenerateFromDocumentationPreviewMutation = <
       TError = unknown,
@@ -8632,7 +8828,7 @@ export const useStartGenerateFromDocumentationPreviewMutation = <
   }
     )};
 
-export const UpdateApiConnectorDocument = `
+export const UpdateApiConnectorDocument = new TypedDocumentString(`
     mutation updateApiConnector($id: ID!, $input: UpdateApiConnectorInput!) {
   updateApiConnector(id: $id, input: $input) {
     id
@@ -8658,7 +8854,7 @@ export const UpdateApiConnectorDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useUpdateApiConnectorMutation = <
       TError = unknown,
@@ -8673,7 +8869,7 @@ export const useUpdateApiConnectorMutation = <
   }
     )};
 
-export const EditorJobFileLogsDocument = `
+export const EditorJobFileLogsDocument = new TypedDocumentString(`
     query editorJobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
   editorJobFileLogs(jobId: $jobId, filter: $filter, page: $page, size: $size) {
     content {
@@ -8695,7 +8891,7 @@ export const EditorJobFileLogsDocument = `
     hasPrevious
   }
 }
-    `;
+    `);
 
 export const useEditorJobFileLogsQuery = <
       TData = EditorJobFileLogsQuery,
@@ -8713,11 +8909,11 @@ export const useEditorJobFileLogsQuery = <
   }
     )};
 
-export const EditorJobFileLogsExistDocument = `
+export const EditorJobFileLogsExistDocument = new TypedDocumentString(`
     query editorJobFileLogsExist($jobId: ID!) {
   editorJobFileLogsExist(jobId: $jobId)
 }
-    `;
+    `);
 
 export const useEditorJobFileLogsExistQuery = <
       TData = EditorJobFileLogsExistQuery,
@@ -8735,7 +8931,7 @@ export const useEditorJobFileLogsExistQuery = <
   }
     )};
 
-export const EditorTaskExecutionFileLogsDocument = `
+export const EditorTaskExecutionFileLogsDocument = new TypedDocumentString(`
     query editorTaskExecutionFileLogs($jobId: ID!, $taskExecutionId: ID!) {
   editorTaskExecutionFileLogs(jobId: $jobId, taskExecutionId: $taskExecutionId) {
     timestamp
@@ -8749,7 +8945,7 @@ export const EditorTaskExecutionFileLogsDocument = `
     stackTrace
   }
 }
-    `;
+    `);
 
 export const useEditorTaskExecutionFileLogsQuery = <
       TData = EditorTaskExecutionFileLogsQuery,
@@ -8767,7 +8963,7 @@ export const useEditorTaskExecutionFileLogsQuery = <
   }
     )};
 
-export const JobFileLogsDocument = `
+export const JobFileLogsDocument = new TypedDocumentString(`
     query jobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
   jobFileLogs(jobId: $jobId, filter: $filter, page: $page, size: $size) {
     content {
@@ -8789,7 +8985,7 @@ export const JobFileLogsDocument = `
     hasPrevious
   }
 }
-    `;
+    `);
 
 export const useJobFileLogsQuery = <
       TData = JobFileLogsQuery,
@@ -8807,11 +9003,11 @@ export const useJobFileLogsQuery = <
   }
     )};
 
-export const JobFileLogsExistDocument = `
+export const JobFileLogsExistDocument = new TypedDocumentString(`
     query jobFileLogsExist($jobId: ID!) {
   jobFileLogsExist(jobId: $jobId)
 }
-    `;
+    `);
 
 export const useJobFileLogsExistQuery = <
       TData = JobFileLogsExistQuery,
@@ -8829,7 +9025,7 @@ export const useJobFileLogsExistQuery = <
   }
     )};
 
-export const TaskExecutionFileLogsDocument = `
+export const TaskExecutionFileLogsDocument = new TypedDocumentString(`
     query taskExecutionFileLogs($jobId: ID!, $taskExecutionId: ID!) {
   taskExecutionFileLogs(jobId: $jobId, taskExecutionId: $taskExecutionId) {
     timestamp
@@ -8843,7 +9039,7 @@ export const TaskExecutionFileLogsDocument = `
     stackTrace
   }
 }
-    `;
+    `);
 
 export const useTaskExecutionFileLogsQuery = <
       TData = TaskExecutionFileLogsQuery,
@@ -8861,7 +9057,7 @@ export const useTaskExecutionFileLogsQuery = <
   }
     )};
 
-export const AdminApiKeysDocument = `
+export const AdminApiKeysDocument = new TypedDocumentString(`
     query adminApiKeys($environmentId: ID!) {
   adminApiKeys(environmentId: $environmentId) {
     id
@@ -8874,7 +9070,7 @@ export const AdminApiKeysDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useAdminApiKeysQuery = <
       TData = AdminApiKeysQuery,
@@ -8892,7 +9088,7 @@ export const useAdminApiKeysQuery = <
   }
     )};
 
-export const ApiKeysDocument = `
+export const ApiKeysDocument = new TypedDocumentString(`
     query apiKeys($environmentId: ID!, $type: PlatformType!) {
   apiKeys(environmentId: $environmentId, type: $type) {
     id
@@ -8905,7 +9101,7 @@ export const ApiKeysDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useApiKeysQuery = <
       TData = ApiKeysQuery,
@@ -8923,7 +9119,7 @@ export const useApiKeysQuery = <
   }
     )};
 
-export const ClusterElementComponentConnectionsDocument = `
+export const ClusterElementComponentConnectionsDocument = new TypedDocumentString(`
     query clusterElementComponentConnections($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!) {
   clusterElementComponentConnections(
     workflowId: $workflowId
@@ -8938,7 +9134,7 @@ export const ClusterElementComponentConnectionsDocument = `
     workflowNodeName
   }
 }
-    `;
+    `);
 
 export const useClusterElementComponentConnectionsQuery = <
       TData = ClusterElementComponentConnectionsQuery,
@@ -8956,7 +9152,7 @@ export const useClusterElementComponentConnectionsQuery = <
   }
     )};
 
-export const ClusterElementDefinitionDocument = `
+export const ClusterElementDefinitionDocument = new TypedDocumentString(`
     query clusterElementDefinition($componentName: String!, $componentVersion: Int!, $clusterElementName: String!) {
   clusterElementDefinition(
     componentName: $componentName
@@ -9270,7 +9466,7 @@ export const ClusterElementDefinitionDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useClusterElementDefinitionQuery = <
       TData = ClusterElementDefinitionQuery,
@@ -9288,7 +9484,7 @@ export const useClusterElementDefinitionQuery = <
   }
     )};
 
-export const ClusterElementDynamicPropertiesDocument = `
+export const ClusterElementDynamicPropertiesDocument = new TypedDocumentString(`
     query clusterElementDynamicProperties($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
   clusterElementDynamicProperties(
     componentName: $componentName
@@ -9572,7 +9768,7 @@ export const ClusterElementDynamicPropertiesDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useClusterElementDynamicPropertiesQuery = <
       TData = ClusterElementDynamicPropertiesQuery,
@@ -9590,7 +9786,7 @@ export const useClusterElementDynamicPropertiesQuery = <
   }
     )};
 
-export const ClusterElementOptionsDocument = `
+export const ClusterElementOptionsDocument = new TypedDocumentString(`
     query clusterElementOptions($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
   clusterElementOptions(
     componentName: $componentName
@@ -9606,7 +9802,7 @@ export const ClusterElementOptionsDocument = `
     value
   }
 }
-    `;
+    `);
 
 export const useClusterElementOptionsQuery = <
       TData = ClusterElementOptionsQuery,
@@ -9624,7 +9820,7 @@ export const useClusterElementOptionsQuery = <
   }
     )};
 
-export const ClusterElementScriptInputDocument = `
+export const ClusterElementScriptInputDocument = new TypedDocumentString(`
     query clusterElementScriptInput($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!) {
   clusterElementScriptInput(
     workflowId: $workflowId
@@ -9634,7 +9830,7 @@ export const ClusterElementScriptInputDocument = `
     environmentId: $environmentId
   )
 }
-    `;
+    `);
 
 export const useClusterElementScriptInputQuery = <
       TData = ClusterElementScriptInputQuery,
@@ -9652,7 +9848,7 @@ export const useClusterElementScriptInputQuery = <
   }
     )};
 
-export const ComponentDefinitionSearchDocument = `
+export const ComponentDefinitionSearchDocument = new TypedDocumentString(`
     query ComponentDefinitionSearch($query: String!) {
   componentDefinitionSearch(query: $query) {
     name
@@ -9685,7 +9881,7 @@ export const ComponentDefinitionSearchDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useComponentDefinitionSearchQuery = <
       TData = ComponentDefinitionSearchQuery,
@@ -9703,11 +9899,11 @@ export const useComponentDefinitionSearchQuery = <
   }
     )};
 
-export const CreateApiKeyDocument = `
+export const CreateApiKeyDocument = new TypedDocumentString(`
     mutation createApiKey($name: String!, $environmentId: ID!, $type: PlatformType) {
   createApiKey(name: $name, environmentId: $environmentId, type: $type)
 }
-    `;
+    `);
 
 export const useCreateApiKeyMutation = <
       TError = unknown,
@@ -9722,7 +9918,7 @@ export const useCreateApiKeyMutation = <
   }
     )};
 
-export const CreateMcpComponentDocument = `
+export const CreateMcpComponentDocument = new TypedDocumentString(`
     mutation createMcpComponent($input: McpComponentInput!) {
   createMcpComponent(input: $input) {
     id
@@ -9733,7 +9929,7 @@ export const CreateMcpComponentDocument = `
     connectionId
   }
 }
-    `;
+    `);
 
 export const useCreateMcpComponentMutation = <
       TError = unknown,
@@ -9748,7 +9944,7 @@ export const useCreateMcpComponentMutation = <
   }
     )};
 
-export const CreateMcpComponentWithToolsDocument = `
+export const CreateMcpComponentWithToolsDocument = new TypedDocumentString(`
     mutation createMcpComponentWithTools($input: McpComponentWithToolsInput!) {
   createMcpComponentWithTools(input: $input) {
     id
@@ -9764,7 +9960,7 @@ export const CreateMcpComponentWithToolsDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useCreateMcpComponentWithToolsMutation = <
       TError = unknown,
@@ -9779,7 +9975,7 @@ export const useCreateMcpComponentWithToolsMutation = <
   }
     )};
 
-export const CreateMcpToolDocument = `
+export const CreateMcpToolDocument = new TypedDocumentString(`
     mutation createMcpTool($input: McpToolInput!) {
   createMcpTool(input: $input) {
     id
@@ -9788,7 +9984,7 @@ export const CreateMcpToolDocument = `
     parameters
   }
 }
-    `;
+    `);
 
 export const useCreateMcpToolMutation = <
       TError = unknown,
@@ -9803,11 +9999,11 @@ export const useCreateMcpToolMutation = <
   }
     )};
 
-export const DeleteApiKeyDocument = `
+export const DeleteApiKeyDocument = new TypedDocumentString(`
     mutation deleteApiKey($id: ID!) {
   deleteApiKey(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteApiKeyMutation = <
       TError = unknown,
@@ -9822,11 +10018,11 @@ export const useDeleteApiKeyMutation = <
   }
     )};
 
-export const DeleteMcpComponentDocument = `
+export const DeleteMcpComponentDocument = new TypedDocumentString(`
     mutation deleteMcpComponent($id: ID!) {
   deleteMcpComponent(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteMcpComponentMutation = <
       TError = unknown,
@@ -9841,11 +10037,11 @@ export const useDeleteMcpComponentMutation = <
   }
     )};
 
-export const DeleteMcpToolDocument = `
+export const DeleteMcpToolDocument = new TypedDocumentString(`
     mutation deleteMcpTool($id: ID!) {
   deleteMcpTool(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteMcpToolMutation = <
       TError = unknown,
@@ -9860,14 +10056,14 @@ export const useDeleteMcpToolMutation = <
   }
     )};
 
-export const EnvironmentsDocument = `
+export const EnvironmentsDocument = new TypedDocumentString(`
     query environments {
   environments {
     id
     name
   }
 }
-    `;
+    `);
 
 export const useEnvironmentsQuery = <
       TData = EnvironmentsQuery,
@@ -9885,11 +10081,11 @@ export const useEnvironmentsQuery = <
   }
     )};
 
-export const ManagementMcpServerUrlDocument = `
+export const ManagementMcpServerUrlDocument = new TypedDocumentString(`
     query managementMcpServerUrl {
   managementMcpServerUrl
 }
-    `;
+    `);
 
 export const useManagementMcpServerUrlQuery = <
       TData = ManagementMcpServerUrlQuery,
@@ -9907,7 +10103,7 @@ export const useManagementMcpServerUrlQuery = <
   }
     )};
 
-export const McpComponentsByServerIdDocument = `
+export const McpComponentsByServerIdDocument = new TypedDocumentString(`
     query mcpComponentsByServerId($mcpServerId: ID!) {
   mcpComponentsByServerId(mcpServerId: $mcpServerId) {
     id
@@ -9928,7 +10124,7 @@ export const McpComponentsByServerIdDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useMcpComponentsByServerIdQuery = <
       TData = McpComponentsByServerIdQuery,
@@ -9946,14 +10142,14 @@ export const useMcpComponentsByServerIdQuery = <
   }
     )};
 
-export const McpServerTagsDocument = `
+export const McpServerTagsDocument = new TypedDocumentString(`
     query mcpServerTags($type: PlatformType!) {
   mcpServerTags(type: $type) {
     id
     name
   }
 }
-    `;
+    `);
 
 export const useMcpServerTagsQuery = <
       TData = McpServerTagsQuery,
@@ -9971,7 +10167,7 @@ export const useMcpServerTagsQuery = <
   }
     )};
 
-export const McpServersDocument = `
+export const McpServersDocument = new TypedDocumentString(`
     query mcpServers($type: PlatformType!) {
   mcpServers(type: $type, orderBy: NAME_ASC) {
     id
@@ -9994,7 +10190,7 @@ export const McpServersDocument = `
     lastModifiedDate
   }
 }
-    `;
+    `);
 
 export const useMcpServersQuery = <
       TData = McpServersQuery,
@@ -10012,7 +10208,7 @@ export const useMcpServersQuery = <
   }
     )};
 
-export const McpToolsByComponentIdDocument = `
+export const McpToolsByComponentIdDocument = new TypedDocumentString(`
     query mcpToolsByComponentId($mcpComponentId: ID!) {
   mcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
     id
@@ -10023,7 +10219,7 @@ export const McpToolsByComponentIdDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useMcpToolsByComponentIdQuery = <
       TData = McpToolsByComponentIdQuery,
@@ -10041,7 +10237,7 @@ export const useMcpToolsByComponentIdQuery = <
   }
     )};
 
-export const SaveClusterElementTestConfigurationConnectionDocument = `
+export const SaveClusterElementTestConfigurationConnectionDocument = new TypedDocumentString(`
     mutation saveClusterElementTestConfigurationConnection($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $workflowConnectionKey: String!, $connectionId: Long!, $environmentId: Long!) {
   saveClusterElementTestConfigurationConnection(
     workflowId: $workflowId
@@ -10053,7 +10249,7 @@ export const SaveClusterElementTestConfigurationConnectionDocument = `
     environmentId: $environmentId
   )
 }
-    `;
+    `);
 
 export const useSaveClusterElementTestConfigurationConnectionMutation = <
       TError = unknown,
@@ -10068,7 +10264,7 @@ export const useSaveClusterElementTestConfigurationConnectionMutation = <
   }
     )};
 
-export const SaveClusterElementTestOutputDocument = `
+export const SaveClusterElementTestOutputDocument = new TypedDocumentString(`
     mutation saveClusterElementTestOutput($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
   saveClusterElementTestOutput(
     workflowId: $workflowId
@@ -10083,7 +10279,7 @@ export const SaveClusterElementTestOutputDocument = `
     workflowNodeName
   }
 }
-    `;
+    `);
 
 export const useSaveClusterElementTestOutputMutation = <
       TError = unknown,
@@ -10098,7 +10294,7 @@ export const useSaveClusterElementTestOutputMutation = <
   }
     )};
 
-export const SaveWorkflowTestConfigurationConnectionDocument = `
+export const SaveWorkflowTestConfigurationConnectionDocument = new TypedDocumentString(`
     mutation saveWorkflowTestConfigurationConnection($workflowId: String!, $workflowNodeName: String!, $workflowConnectionKey: String!, $connectionId: Long!, $environmentId: Long!) {
   saveWorkflowTestConfigurationConnection(
     workflowId: $workflowId
@@ -10108,7 +10304,7 @@ export const SaveWorkflowTestConfigurationConnectionDocument = `
     environmentId: $environmentId
   )
 }
-    `;
+    `);
 
 export const useSaveWorkflowTestConfigurationConnectionMutation = <
       TError = unknown,
@@ -10123,7 +10319,7 @@ export const useSaveWorkflowTestConfigurationConnectionMutation = <
   }
     )};
 
-export const TestClusterElementScriptDocument = `
+export const TestClusterElementScriptDocument = new TypedDocumentString(`
     mutation testClusterElementScript($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
   testClusterElementScript(
     workflowId: $workflowId
@@ -10140,7 +10336,7 @@ export const TestClusterElementScriptDocument = `
     output
   }
 }
-    `;
+    `);
 
 export const useTestClusterElementScriptMutation = <
       TError = unknown,
@@ -10155,7 +10351,7 @@ export const useTestClusterElementScriptMutation = <
   }
     )};
 
-export const TestWorkflowNodeScriptDocument = `
+export const TestWorkflowNodeScriptDocument = new TypedDocumentString(`
     mutation testWorkflowNodeScript($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
   testWorkflowNodeScript(
     workflowId: $workflowId
@@ -10170,7 +10366,7 @@ export const TestWorkflowNodeScriptDocument = `
     output
   }
 }
-    `;
+    `);
 
 export const useTestWorkflowNodeScriptMutation = <
       TError = unknown,
@@ -10185,11 +10381,11 @@ export const useTestWorkflowNodeScriptMutation = <
   }
     )};
 
-export const UpdateApiKeyDocument = `
+export const UpdateApiKeyDocument = new TypedDocumentString(`
     mutation updateApiKey($id: ID!, $name: String!) {
   updateApiKey(id: $id, name: $name)
 }
-    `;
+    `);
 
 export const useUpdateApiKeyMutation = <
       TError = unknown,
@@ -10204,11 +10400,11 @@ export const useUpdateApiKeyMutation = <
   }
     )};
 
-export const UpdateManagementMcpServerUrlDocument = `
+export const UpdateManagementMcpServerUrlDocument = new TypedDocumentString(`
     mutation updateManagementMcpServerUrl {
   updateManagementMcpServerUrl
 }
-    `;
+    `);
 
 export const useUpdateManagementMcpServerUrlMutation = <
       TError = unknown,
@@ -10223,7 +10419,7 @@ export const useUpdateManagementMcpServerUrlMutation = <
   }
     )};
 
-export const UpdateMcpComponentWithToolsDocument = `
+export const UpdateMcpComponentWithToolsDocument = new TypedDocumentString(`
     mutation updateMcpComponentWithTools($id: ID!, $input: McpComponentWithToolsInput!) {
   updateMcpComponentWithTools(id: $id, input: $input) {
     id
@@ -10239,7 +10435,7 @@ export const UpdateMcpComponentWithToolsDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useUpdateMcpComponentWithToolsMutation = <
       TError = unknown,
@@ -10254,11 +10450,11 @@ export const useUpdateMcpComponentWithToolsMutation = <
   }
     )};
 
-export const UpdateMcpServerUrlDocument = `
+export const UpdateMcpServerUrlDocument = new TypedDocumentString(`
     mutation updateMcpServerUrl($id: ID!) {
   updateMcpServerUrl(id: $id)
 }
-    `;
+    `);
 
 export const useUpdateMcpServerUrlMutation = <
       TError = unknown,
@@ -10273,7 +10469,7 @@ export const useUpdateMcpServerUrlMutation = <
   }
     )};
 
-export const UpdateMcpToolDocument = `
+export const UpdateMcpToolDocument = new TypedDocumentString(`
     mutation updateMcpTool($id: ID!, $input: McpToolInput!) {
   updateMcpTool(id: $id, input: $input) {
     id
@@ -10283,7 +10479,7 @@ export const UpdateMcpToolDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useUpdateMcpToolMutation = <
       TError = unknown,
@@ -10298,7 +10494,7 @@ export const useUpdateMcpToolMutation = <
   }
     )};
 
-export const WorkflowNodeComponentConnectionsDocument = `
+export const WorkflowNodeComponentConnectionsDocument = new TypedDocumentString(`
     query workflowNodeComponentConnections($workflowId: String!, $workflowNodeName: String!) {
   workflowNodeComponentConnections(
     workflowId: $workflowId
@@ -10311,7 +10507,7 @@ export const WorkflowNodeComponentConnectionsDocument = `
     workflowNodeName
   }
 }
-    `;
+    `);
 
 export const useWorkflowNodeComponentConnectionsQuery = <
       TData = WorkflowNodeComponentConnectionsQuery,
@@ -10329,7 +10525,7 @@ export const useWorkflowNodeComponentConnectionsQuery = <
   }
     )};
 
-export const WorkflowNodeScriptInputDocument = `
+export const WorkflowNodeScriptInputDocument = new TypedDocumentString(`
     query workflowNodeScriptInput($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!) {
   workflowNodeScriptInput(
     workflowId: $workflowId
@@ -10337,7 +10533,7 @@ export const WorkflowNodeScriptInputDocument = `
     environmentId: $environmentId
   )
 }
-    `;
+    `);
 
 export const useWorkflowNodeScriptInputQuery = <
       TData = WorkflowNodeScriptInputQuery,
@@ -10355,7 +10551,7 @@ export const useWorkflowNodeScriptInputQuery = <
   }
     )};
 
-export const CustomComponentDocument = `
+export const CustomComponentDocument = new TypedDocumentString(`
     query customComponent($id: ID!) {
   customComponent(id: $id) {
     id
@@ -10373,7 +10569,7 @@ export const CustomComponentDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useCustomComponentQuery = <
       TData = CustomComponentQuery,
@@ -10391,7 +10587,7 @@ export const useCustomComponentQuery = <
   }
     )};
 
-export const CustomComponentDefinitionDocument = `
+export const CustomComponentDefinitionDocument = new TypedDocumentString(`
     query customComponentDefinition($id: ID!) {
   customComponentDefinition(id: $id) {
     actions {
@@ -10406,7 +10602,7 @@ export const CustomComponentDefinitionDocument = `
     }
   }
 }
-    `;
+    `);
 
 export const useCustomComponentDefinitionQuery = <
       TData = CustomComponentDefinitionQuery,
@@ -10424,7 +10620,7 @@ export const useCustomComponentDefinitionQuery = <
   }
     )};
 
-export const CustomComponentsDocument = `
+export const CustomComponentsDocument = new TypedDocumentString(`
     query customComponents {
   customComponents {
     id
@@ -10442,7 +10638,7 @@ export const CustomComponentsDocument = `
     version
   }
 }
-    `;
+    `);
 
 export const useCustomComponentsQuery = <
       TData = CustomComponentsQuery,
@@ -10460,11 +10656,11 @@ export const useCustomComponentsQuery = <
   }
     )};
 
-export const DeleteCustomComponentDocument = `
+export const DeleteCustomComponentDocument = new TypedDocumentString(`
     mutation deleteCustomComponent($id: ID!) {
   deleteCustomComponent(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteCustomComponentMutation = <
       TError = unknown,
@@ -10479,11 +10675,11 @@ export const useDeleteCustomComponentMutation = <
   }
     )};
 
-export const EnableCustomComponentDocument = `
+export const EnableCustomComponentDocument = new TypedDocumentString(`
     mutation enableCustomComponent($id: ID!, $enable: Boolean!) {
   enableCustomComponent(id: $id, enable: $enable)
 }
-    `;
+    `);
 
 export const useEnableCustomComponentMutation = <
       TError = unknown,
@@ -10498,11 +10694,11 @@ export const useEnableCustomComponentMutation = <
   }
     )};
 
-export const AuthoritiesDocument = `
+export const AuthoritiesDocument = new TypedDocumentString(`
     query authorities {
   authorities
 }
-    `;
+    `);
 
 export const useAuthoritiesQuery = <
       TData = AuthoritiesQuery,
@@ -10520,7 +10716,7 @@ export const useAuthoritiesQuery = <
   }
     )};
 
-export const CreateIdentityProviderDocument = `
+export const CreateIdentityProviderDocument = new TypedDocumentString(`
     mutation createIdentityProvider($input: IdentityProviderInput!) {
   createIdentityProvider(input: $input) {
     autoProvision
@@ -10545,7 +10741,7 @@ export const CreateIdentityProviderDocument = `
     type
   }
 }
-    `;
+    `);
 
 export const useCreateIdentityProviderMutation = <
       TError = unknown,
@@ -10560,11 +10756,11 @@ export const useCreateIdentityProviderMutation = <
   }
     )};
 
-export const DeleteIdentityProviderDocument = `
+export const DeleteIdentityProviderDocument = new TypedDocumentString(`
     mutation deleteIdentityProvider($id: ID!) {
   deleteIdentityProvider(id: $id)
 }
-    `;
+    `);
 
 export const useDeleteIdentityProviderMutation = <
       TError = unknown,
@@ -10579,11 +10775,11 @@ export const useDeleteIdentityProviderMutation = <
   }
     )};
 
-export const DeleteUserDocument = `
+export const DeleteUserDocument = new TypedDocumentString(`
     mutation deleteUser($login: String!) {
   deleteUser(login: $login)
 }
-    `;
+    `);
 
 export const useDeleteUserMutation = <
       TError = unknown,
@@ -10598,7 +10794,7 @@ export const useDeleteUserMutation = <
   }
     )};
 
-export const IdentityProviderDocument = `
+export const IdentityProviderDocument = new TypedDocumentString(`
     query identityProvider($id: ID!) {
   identityProvider(id: $id) {
     autoProvision
@@ -10623,7 +10819,7 @@ export const IdentityProviderDocument = `
     type
   }
 }
-    `;
+    `);
 
 export const useIdentityProviderQuery = <
       TData = IdentityProviderQuery,
@@ -10641,7 +10837,7 @@ export const useIdentityProviderQuery = <
   }
     )};
 
-export const IdentityProvidersDocument = `
+export const IdentityProvidersDocument = new TypedDocumentString(`
     query identityProviders {
   identityProviders {
     autoProvision
@@ -10666,7 +10862,7 @@ export const IdentityProvidersDocument = `
     type
   }
 }
-    `;
+    `);
 
 export const useIdentityProvidersQuery = <
       TData = IdentityProvidersQuery,
@@ -10684,11 +10880,11 @@ export const useIdentityProvidersQuery = <
   }
     )};
 
-export const InviteUserDocument = `
+export const InviteUserDocument = new TypedDocumentString(`
     mutation inviteUser($email: String!, $password: String!, $role: String!) {
   inviteUser(email: $email, password: $password, role: $role)
 }
-    `;
+    `);
 
 export const useInviteUserMutation = <
       TError = unknown,
@@ -10703,7 +10899,7 @@ export const useInviteUserMutation = <
   }
     )};
 
-export const UpdateIdentityProviderDocument = `
+export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
   updateIdentityProvider(id: $id, input: $input) {
     autoProvision
@@ -10728,7 +10924,7 @@ export const UpdateIdentityProviderDocument = `
     type
   }
 }
-    `;
+    `);
 
 export const useUpdateIdentityProviderMutation = <
       TError = unknown,
@@ -10743,7 +10939,7 @@ export const useUpdateIdentityProviderMutation = <
   }
     )};
 
-export const UpdateUserDocument = `
+export const UpdateUserDocument = new TypedDocumentString(`
     mutation updateUser($login: String!, $role: String!) {
   updateUser(login: $login, role: $role) {
     id
@@ -10755,7 +10951,7 @@ export const UpdateUserDocument = `
     authorities
   }
 }
-    `;
+    `);
 
 export const useUpdateUserMutation = <
       TError = unknown,
@@ -10770,7 +10966,7 @@ export const useUpdateUserMutation = <
   }
     )};
 
-export const UsersDocument = `
+export const UsersDocument = new TypedDocumentString(`
     query users($pageNumber: Int, $pageSize: Int) {
   users(pageNumber: $pageNumber, pageSize: $pageSize) {
     content {
@@ -10788,7 +10984,7 @@ export const UsersDocument = `
     totalPages
   }
 }
-    `;
+    `);
 
 export const useUsersQuery = <
       TData = UsersQuery,
