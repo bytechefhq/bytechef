@@ -33,7 +33,7 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
 
     return (
         <div className="flex flex-1 flex-col gap-3 px-4">
-            {evalTests.length > 0 && (
+            {evalTests.length > 0 ? (
                 <>
                     <div className="flex items-center justify-end">
                         <button
@@ -58,9 +58,7 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
                         />
                     ))}
                 </>
-            )}
-
-            {evalTests.length === 0 && (
+            ) : (
                 <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
                     <div className="flex size-12 items-center justify-center rounded-full bg-emerald-100">
                         <FlaskConicalIcon className="size-6 text-emerald-600" />

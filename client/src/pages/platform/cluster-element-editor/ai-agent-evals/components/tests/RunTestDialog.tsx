@@ -12,7 +12,7 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {Loader2Icon} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
@@ -60,15 +60,26 @@ const RunTestDialog = ({onClose, test, workflowId, workflowNodeName}: RunTestDia
     const {data: testDetailData} = useAgentEvalTestQuery({id: test.id});
     const {data: judgesData} = useAgentJudgesQuery({workflowId, workflowNodeName});
 
+    const scenariosInitializedRef = useRef(false);
+    const judgesInitializedRef = useRef(false);
+
     const scenarios = useMemo(() => testDetailData?.agentEvalTest?.scenarios ?? [], [testDetailData]);
     const judges = useMemo(() => judgesData?.agentJudges ?? [], [judgesData]);
 
     useEffect(() => {
-        setSelectedScenarioIds(new Set(scenarios.map((scenario) => scenario.id)));
+        if (scenarios.length > 0 && !scenariosInitializedRef.current) {
+            scenariosInitializedRef.current = true;
+
+            setSelectedScenarioIds(new Set(scenarios.map((scenario) => scenario.id)));
+        }
     }, [scenarios]);
 
     useEffect(() => {
-        setSelectedJudgeIds(new Set(judges.map((judge) => judge.id)));
+        if (judges.length > 0 && !judgesInitializedRef.current) {
+            judgesInitializedRef.current = true;
+
+            setSelectedJudgeIds(new Set(judges.map((judge) => judge.id)));
+        }
     }, [judges]);
 
     const startRunMutation = useStartAgentEvalRunMutation({
@@ -78,10 +89,13 @@ const RunTestDialog = ({onClose, test, workflowId, workflowNodeName}: RunTestDia
         onSuccess: (data) => {
             queryClient.invalidateQueries({queryKey: ['agentEvalRuns']});
 
+            setSelectedTestId(test.id);
+            setEvalsTab('runs');
+
             if (data.startAgentEvalRun?.id) {
-                setSelectedTestId(test.id);
                 setSelectedRunId(data.startAgentEvalRun.id);
-                setEvalsTab('runs');
+            } else {
+                toast.warning('Run started but the run ID was not returned. Check the Runs tab for status.');
             }
 
             onClose();

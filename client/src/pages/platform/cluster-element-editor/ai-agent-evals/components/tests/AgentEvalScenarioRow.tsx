@@ -16,6 +16,7 @@ import {
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, ChevronRightIcon, GavelIcon, PencilIcon, PlusIcon, TrashIcon, WrenchIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
+import {toast} from 'sonner';
 
 type AgentEvalScenarioFromQueryType = NonNullable<AgentEvalTestQuery['agentEvalTest']>['scenarios'][number];
 type ScenarioJudgeType = AgentEvalScenarioFromQueryType['judges'][number];
@@ -47,9 +48,18 @@ const AgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AgentEvalScenarioRow
     const deleteJudgeMutation = useDeleteAgentScenarioJudgeMutation({onSuccess: invalidateTest});
     const updateJudgeMutation = useUpdateAgentScenarioJudgeMutation({onSuccess: invalidateTest});
 
-    const createToolSimulationMutation = useCreateAgentScenarioToolSimulationMutation({onSuccess: invalidateTest});
-    const deleteToolSimulationMutation = useDeleteAgentScenarioToolSimulationMutation({onSuccess: invalidateTest});
-    const updateToolSimulationMutation = useUpdateAgentScenarioToolSimulationMutation({onSuccess: invalidateTest});
+    const createToolSimulationMutation = useCreateAgentScenarioToolSimulationMutation({
+        onError: (error: Error) => toast.error('Failed to create tool simulation: ' + error.message),
+        onSuccess: invalidateTest,
+    });
+    const deleteToolSimulationMutation = useDeleteAgentScenarioToolSimulationMutation({
+        onError: (error: Error) => toast.error('Failed to delete tool simulation: ' + error.message),
+        onSuccess: invalidateTest,
+    });
+    const updateToolSimulationMutation = useUpdateAgentScenarioToolSimulationMutation({
+        onError: (error: Error) => toast.error('Failed to update tool simulation: ' + error.message),
+        onSuccess: invalidateTest,
+    });
 
     const handleCreateJudge = useCallback(
         (name: string, type: AgentJudgeType, configuration: Record<string, unknown>) => {
@@ -78,8 +88,8 @@ const AgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AgentEvalScenarioRow
     );
 
     const handleCreateToolSimulation = useCallback(
-        (toolName: string, responsePrompt: string, simulationModel?: string) => {
-            createToolSimulationMutation.mutate({
+        async (toolName: string, responsePrompt: string, simulationModel?: string) => {
+            await createToolSimulationMutation.mutateAsync({
                 agentEvalScenarioId: scenario.id,
                 responsePrompt,
                 simulationModel,
@@ -97,8 +107,8 @@ const AgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AgentEvalScenarioRow
     );
 
     const handleUpdateToolSimulation = useCallback(
-        (id: string, toolName?: string, responsePrompt?: string, simulationModel?: string) => {
-            updateToolSimulationMutation.mutate({id, responsePrompt, simulationModel, toolName});
+        async (id: string, toolName?: string, responsePrompt?: string, simulationModel?: string) => {
+            await updateToolSimulationMutation.mutateAsync({id, responsePrompt, simulationModel, toolName});
         },
         [updateToolSimulationMutation]
     );
