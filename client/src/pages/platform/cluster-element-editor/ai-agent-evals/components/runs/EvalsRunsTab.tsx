@@ -61,8 +61,8 @@ const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-3">
-            <div className="flex items-center gap-2 px-4">
+        <div className="flex flex-1 flex-col gap-3 px-4">
+            <div className="flex items-center gap-2">
                 <Select onValueChange={(value) => setSelectedTestId(value || null)} value={validSelectedTestId ?? ''}>
                     <SelectTrigger className="w-[400px] text-xs">
                         <SelectValue placeholder="Select a test..." />
