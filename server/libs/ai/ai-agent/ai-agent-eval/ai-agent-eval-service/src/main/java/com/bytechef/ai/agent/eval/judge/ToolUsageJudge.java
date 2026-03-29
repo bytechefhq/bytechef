@@ -16,14 +16,16 @@
 
 package com.bytechef.ai.agent.eval.judge;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springaicommunity.judge.DeterministicJudge;
 import org.springaicommunity.judge.context.JudgmentContext;
 import org.springaicommunity.judge.result.Judgment;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * A deterministic judge that checks whether a specific tool was used in the agent's execution transcript, with support
@@ -43,9 +45,9 @@ class ToolUsageJudge extends DeterministicJudge {
     ToolUsageJudge(String toolName, String position, String comparison, int count) {
         super("ToolUsage", "Checks usage of tool: " + toolName);
 
-        this.toolName = toolName;
-        this.position = position;
-        this.comparison = comparison;
+        this.toolName = Objects.requireNonNull(toolName, "toolName");
+        this.position = Objects.requireNonNull(position, "position");
+        this.comparison = Objects.requireNonNull(comparison, "comparison");
         this.count = count;
     }
 
@@ -64,7 +66,7 @@ class ToolUsageJudge extends DeterministicJudge {
 
         try {
             toolCallNames = extractToolCallNames(transcript);
-        } catch (Exception exception) {
+        } catch (JacksonException exception) {
             return Judgment.fail("Failed to parse transcript JSON: " + exception.getMessage());
         }
 
@@ -77,7 +79,7 @@ class ToolUsageJudge extends DeterministicJudge {
         }
     }
 
-    private List<String> extractToolCallNames(String transcript) throws Exception {
+    private List<String> extractToolCallNames(String transcript) throws JacksonException {
         JsonNode rootNode = OBJECT_MAPPER.readTree(transcript);
         JsonNode messagesNode = rootNode.path("messages");
 
@@ -136,9 +138,10 @@ class ToolUsageJudge extends DeterministicJudge {
             .count();
 
         boolean passes = switch (comparison) {
-            case "EXACTLY" -> actualCount == count;
+            case "AT_LEAST" -> actualCount >= count;
             case "AT_MOST" -> actualCount <= count;
-            default -> actualCount >= count;
+            case "EXACTLY" -> actualCount == count;
+            default -> throw new IllegalStateException("Unknown comparison: " + comparison);
         };
 
         if (passes) {

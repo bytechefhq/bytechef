@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.agent.eval.judge;
 
+import java.util.Objects;
 import org.springaicommunity.judge.DeterministicJudge;
 import org.springaicommunity.judge.context.JudgmentContext;
 import org.springaicommunity.judge.result.Judgment;
@@ -33,7 +34,7 @@ class StringEqualsJudge extends DeterministicJudge {
     StringEqualsJudge(String expectedValue, boolean caseSensitive) {
         super("StringEquals", "Checks exact match against: " + expectedValue);
 
-        this.expectedValue = expectedValue;
+        this.expectedValue = Objects.requireNonNull(expectedValue, "expectedValue");
         this.caseSensitive = caseSensitive;
     }
 
