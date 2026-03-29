@@ -1,17 +1,39 @@
 ---
-title: "In Memory Chat Memory"
-description: "In Memory Chat Memory."
+title: "Cassandra Chat Memory"
+description: "Cassandra Chat Memory stores conversation history in Apache Cassandra for distributed, scalable persistent storage."
 ---
 
 
 Categories: Artificial Intelligence
 
 
-Type: inMemoryChatMemory/v1
+Type: cassandraChatMemory/v1
 
 <hr />
 
 
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | The Cassandra username (optional). | false |
+| password | Password | STRING | The Cassandra password. | false |
+
+
+
+
+
+
+<hr />
 
 
 ## Actions
@@ -41,7 +63,7 @@ Name: addMessages
       "content" : ""
     } ]
   },
-  "type" : "inMemoryChatMemory/v1/addMessages"
+  "type" : "cassandraChatMemory/v1/addMessages"
 }
 ```
 
@@ -73,7 +95,7 @@ Name: getMessages
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/getMessages"
+  "type" : "cassandraChatMemory/v1/getMessages"
 }
 ```
 
@@ -127,7 +149,7 @@ Name: deleteConversation
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/deleteConversation"
+  "type" : "cassandraChatMemory/v1/deleteConversation"
 }
 ```
 
@@ -169,7 +191,7 @@ Name: listConversations
 {
   "label" : "List Conversations",
   "name" : "listConversations",
-  "type" : "inMemoryChatMemory/v1/listConversations"
+  "type" : "cassandraChatMemory/v1/listConversations"
 }
 ```
 

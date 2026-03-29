@@ -127,7 +127,7 @@ Name: createImage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> <span>dall-e-2</span>, <span>dall-e-3</span> </details> | The model to use for image generation. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>dall-e-2</span>, <span>dall-e-3</span>, <span>gpt-image-1-mini</span> </details> | The model to use for image generation. | true |
 | imageMessages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(content), NUMBER\(weight)&#125;] </details> | A list of messages comprising the conversation so far. | true |
 | size | Size | STRING <details> <summary> Options </summary> <span>DALL_E_2_256x256</span>, <span>DALL_E_2_512x512</span>, <span>_1024x1024</span>, <span>DALL_E_3_1792x1024</span>, <span>DALL_E_3_1024x1792</span> </details> | The size of the generated images. | true |
 | n | Number of Responses | INTEGER | The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.. | false |

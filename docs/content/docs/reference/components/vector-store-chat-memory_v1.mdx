@@ -14,5 +14,171 @@ Type: vectorStoreChatMemory/v1
 
 
 
+## Actions
+
+
+### Add Messages
+Name: addMessages
+
+`Adds messages to the vector store chat memory for a conversation.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| conversationId | Conversation ID | STRING | The unique identifier for the conversation. | true |
+| messages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(role), STRING\(content)&#125;] </details> | The messages to add to the conversation. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Messages",
+  "name" : "addMessages",
+  "parameters" : {
+    "conversationId" : "",
+    "messages" : [ {
+      "role" : "",
+      "content" : ""
+    } ]
+  },
+  "type" : "vectorStoreChatMemory/v1/addMessages"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| messageCount | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "messageCount" : 1
+}
+```
+
+
+
+
+### Get Messages
+Name: getMessages
+
+`Retrieves messages from the vector store chat memory for a conversation.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| conversationId | Conversation ID | STRING | The unique identifier for the conversation. | true |
+| topK | Top K | INTEGER | The maximum number of messages to retrieve. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Messages",
+  "name" : "getMessages",
+  "parameters" : {
+    "conversationId" : "",
+    "topK" : 1
+  },
+  "type" : "vectorStoreChatMemory/v1/getMessages"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(role), STRING\(content)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "messages" : [ {
+    "role" : "",
+    "content" : ""
+  } ]
+}
+```
+
+
+
+
+### Delete Conversation
+Name: deleteConversation
+
+`Deletes all messages for a conversation from the vector store.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| conversationId | Conversation ID | STRING | The unique identifier for the conversation to delete. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Conversation",
+  "name" : "deleteConversation",
+  "parameters" : {
+    "conversationId" : ""
+  },
+  "type" : "vectorStoreChatMemory/v1/deleteConversation"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "deleted" : false
+}
+```
+
+
+
+
 
 

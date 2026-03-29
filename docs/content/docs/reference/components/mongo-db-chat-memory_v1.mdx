@@ -1,17 +1,39 @@
 ---
-title: "In Memory Chat Memory"
-description: "In Memory Chat Memory."
+title: "MongoDB Chat Memory"
+description: "MongoDB Chat Memory stores conversation history in MongoDB for flexible, document-based persistent storage."
 ---
 
 
 Categories: Artificial Intelligence
 
 
-Type: inMemoryChatMemory/v1
+Type: mongoDbChatMemory/v1
 
 <hr />
 
 
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | The MongoDB username. | false |
+| password | Password | STRING | The MongoDB password. | false |
+
+
+
+
+
+
+<hr />
 
 
 ## Actions
@@ -41,7 +63,7 @@ Name: addMessages
       "content" : ""
     } ]
   },
-  "type" : "inMemoryChatMemory/v1/addMessages"
+  "type" : "mongoDbChatMemory/v1/addMessages"
 }
 ```
 
@@ -73,7 +95,7 @@ Name: getMessages
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/getMessages"
+  "type" : "mongoDbChatMemory/v1/getMessages"
 }
 ```
 
@@ -127,7 +149,7 @@ Name: deleteConversation
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/deleteConversation"
+  "type" : "mongoDbChatMemory/v1/deleteConversation"
 }
 ```
 
@@ -169,7 +191,7 @@ Name: listConversations
 {
   "label" : "List Conversations",
   "name" : "listConversations",
-  "type" : "inMemoryChatMemory/v1/listConversations"
+  "type" : "mongoDbChatMemory/v1/listConversations"
 }
 ```
 

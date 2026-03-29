@@ -1,13 +1,13 @@
 ---
-title: "In Memory Chat Memory"
-description: "In Memory Chat Memory."
+title: "JDBC Chat Memory"
+description: "JDBC Chat Memory stores conversation history in a relational database."
 ---
 
 
 Categories: Artificial Intelligence
 
 
-Type: inMemoryChatMemory/v1
+Type: jdbcChatMemory/v1
 
 <hr />
 
@@ -41,15 +41,34 @@ Name: addMessages
       "content" : ""
     } ]
   },
-  "type" : "inMemoryChatMemory/v1/addMessages"
+  "type" : "jdbcChatMemory/v1/addMessages"
 }
 ```
 
 #### Output
 
-This action does not produce any output.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| messageCount | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "messageCount" : 1
+}
+```
 
 
 
@@ -73,7 +92,7 @@ Name: getMessages
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/getMessages"
+  "type" : "jdbcChatMemory/v1/getMessages"
 }
 ```
 
@@ -127,7 +146,7 @@ Name: deleteConversation
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/deleteConversation"
+  "type" : "jdbcChatMemory/v1/deleteConversation"
 }
 ```
 
@@ -169,7 +188,7 @@ Name: listConversations
 {
   "label" : "List Conversations",
   "name" : "listConversations",
-  "type" : "inMemoryChatMemory/v1/listConversations"
+  "type" : "jdbcChatMemory/v1/listConversations"
 }
 ```
 

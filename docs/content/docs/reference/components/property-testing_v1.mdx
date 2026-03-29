@@ -1,0 +1,143 @@
+---
+title: "Property Testing"
+description: "Component fo testing."
+---
+
+
+Categories: Helpers
+
+
+Type: propertyTesting/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Testing
+Name: testingAction
+
+`Description`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| arrayDefaultValues | Array With Default Values | ARRAY <details> <summary> Items </summary> [] </details> | Default value is [element1, element2, element3] | false |
+| arrayMaxItems | Array Max Items | ARRAY <details> <summary> Items </summary> [STRING] </details> | Max items set to 3 | false |
+| arrayMinItems | Array Min Items | ARRAY <details> <summary> Items </summary> [STRING] </details> | Min items set to 3 | false |
+| arrayNoDefaultValues | Array With No Default Values | ARRAY <details> <summary> Items </summary> [] </details> |  | null |
+| arrayNoPredefinedProperties | Array No Predefined Properties | ARRAY <details> <summary> Items </summary> [] </details> |  | null |
+| arrayPredefinedProperties | Array Predefined Properties | ARRAY <details> <summary> Items </summary> [&#123;STRING\(predefined1), STRING\(predefined2)&#125;] </details> |  | null |
+| bool | Boolean Property and Display Condition | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Display condition string will be shown when this value is set to True. | false |
+| date | Date Property | DATE |  | null |
+| dateTime | Date Time Property | DATE_TIME |  | null |
+| displayCondition | Display Condition | STRING | Will be displayed only if the boolean property is true. | false |
+| dynamicPropertiesLookup | Dynamic Properties Lookup | STRING | Dynamic property will be shown when this value is set. | false |
+| dynamicProperty | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> dynamicPropertiesLookup </details> |  | null |
+| fileEntry | FileEntry Property | FILE_ENTRY |  | null |
+| integerMaxValue | Integer Max Value | INTEGER | Integer maximum value set to 10 | false |
+| integerMinValue | Integer Min Value | INTEGER | Integer minimum value set to 10 | false |
+| numberMaxNumPrecision | Number Max Number Precision | NUMBER | Number max number precision set to 2 | false |
+| numberMinNumPrecision | Number Min Number Precision | NUMBER | Number min number precision set to 2 | false |
+| numberMaxValue | Number Max Value | NUMBER | Number max value set to 5 | false |
+| numberMinValue | Number Min Value | NUMBER | Number min value set to 5 | false |
+| numberPrecision | Number Precision | NUMBER | Number precision set to 3 | false |
+| objectDefaultValues | Object With Default Values | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Default value is &#123; key1 : value1, key2: value2 &#125; | false |
+| objectNoDefaultValues | Object With No Default Values | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  | null |
+| objectNoPredefinedProperties | Object No Predefined Properties | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  | null |
+| objectPredefinedProperties | Object Predefined Properties | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(key), STRING\(value)&#125;]\(array)&#125; </details> |  | null |
+| setForOptionsLookup | Set For Options Lookup | STRING | This has to be set so you can se the options below. | false |
+| optionsLookupDependsOn | Option Lookup Depends On | STRING <details> <summary> Depends On </summary> setForOptionsLookup </details> | This options depend on "Set For Options Lookup" property. | false |
+| optionsMultiselect | Options Multiselect | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | null |
+| optionsNoMultiselect | Options No Multiselect | STRING <details> <summary> Options </summary> <span>1</span>, <span>2</span>, <span>3</span>, <span>4</span> </details> |  | null |
+| stringMaxLength | String Max Length | STRING | Maximum length set to 5. | false |
+| stringMinLength | String Min Length | STRING | Minimum length set to 5. | false |
+| stringRegEx | String Regular Expression | STRING | Regular expression is set to: "[^A-Za-z]". Just letters from a text should be returned. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Testing",
+  "name" : "testingAction",
+  "parameters" : {
+    "arrayDefaultValues" : [ ],
+    "arrayMaxItems" : [ "" ],
+    "arrayMinItems" : [ "" ],
+    "arrayNoDefaultValues" : [ ],
+    "arrayNoPredefinedProperties" : [ ],
+    "arrayPredefinedProperties" : [ {
+      "predefined1" : "",
+      "predefined2" : ""
+    } ],
+    "bool" : false,
+    "date" : "2021-01-01",
+    "dateTime" : "2021-01-01T00:00:00",
+    "displayCondition" : "",
+    "dynamicPropertiesLookup" : "",
+    "dynamicProperty" : { },
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "integerMaxValue" : 1,
+    "integerMinValue" : 1,
+    "numberMaxNumPrecision" : 0.0,
+    "numberMinNumPrecision" : 0.0,
+    "numberMaxValue" : 0.0,
+    "numberMinValue" : 0.0,
+    "numberPrecision" : 0.0,
+    "objectDefaultValues" : { },
+    "objectNoDefaultValues" : { },
+    "objectNoPredefinedProperties" : { },
+    "objectPredefinedProperties" : {
+      "array" : [ {
+        "key" : "",
+        "value" : ""
+      } ]
+    },
+    "setForOptionsLookup" : "",
+    "optionsLookupDependsOn" : "",
+    "optionsMultiselect" : [ "" ],
+    "optionsNoMultiselect" : "",
+    "stringMaxLength" : "",
+    "stringMinLength" : "",
+    "stringRegEx" : ""
+  },
+  "type" : "propertyTesting/v1/testingAction"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+
+
+
+
+
+
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+## Example
+
+This is an example of an example. 
+
+1. Step 1
+2. Step 2
+3. ![An illustration of planets and stars featuring the word “astro”](https://raw.githubusercontent.com/withastro/docs/main/public/default-og-image.png)

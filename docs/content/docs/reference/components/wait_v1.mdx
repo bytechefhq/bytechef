@@ -1,0 +1,182 @@
+---
+title: "Wait"
+description: "Pauses the workflow execution for a specified amount of time or until a webhook call is received."
+---
+
+
+Categories: Helpers
+
+
+Type: wait/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### After Time Interval
+Name: afterTimeInterval
+
+`Pauses the workflow execution for a specified amount of time.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| amount | Amount | INTEGER | The amount of time to wait. | true |
+| unit | Unit | STRING <details> <summary> Options </summary> <span>SECONDS</span>, <span>MINUTES</span>, <span>HOURS</span>, <span>DAYS</span> </details> | The unit of time. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "After Time Interval",
+  "name" : "afterTimeInterval",
+  "parameters" : {
+    "amount" : 1,
+    "unit" : ""
+  },
+  "type" : "wait/v1/afterTimeInterval"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### At Specified Time
+Name: atSpecifiedTime
+
+`Pauses the workflow execution until a specified date and time.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| data | | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(dateTime), STRING\(timezone)&#125; </details> |  | null |
+| resumed | null | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the workflow was resumed by a webhook call. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "At Specified Time",
+  "name" : "atSpecifiedTime",
+  "parameters" : {
+    "data" : {
+      "dateTime" : "2021-01-01T00:00:00",
+      "timezone" : ""
+    },
+    "resumed" : false
+  },
+  "type" : "wait/v1/atSpecifiedTime"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### On Webhook Call
+Name: onWebhookCall
+
+`Suspends the workflow execution until a webhook call is received. An external service can resume the workflow by calling the webhook URL.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| serviceUrl | Service URL | STRING | The URL of the external service to notify with the webhook resume URL when the workflow is suspended. | true |
+| data | Data Schema | STRING | JSON schema defining the structure of the body submitted by the external service when resuming the workflow via the webhook URL. | false |
+| amount | Expires After Amount | INTEGER | The amount of time to wait for the webhook call before the workflow times out. | true |
+| unit | Expires After Unit | STRING <details> <summary> Options </summary> <span>SECONDS</span>, <span>MINUTES</span>, <span>HOURS</span>, <span>DAYS</span> </details> | The unit of time for the expiration. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "On Webhook Call",
+  "name" : "onWebhookCall",
+  "parameters" : {
+    "serviceUrl" : "",
+    "data" : "",
+    "amount" : 1,
+    "unit" : ""
+  },
+  "type" : "wait/v1/onWebhookCall"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+### On Webhook Call Action
+
+The **On Webhook Call** action suspends the workflow execution and waits for an external service to resume it by calling a webhook URL.
+
+#### How It Works
+
+1. When the workflow reaches the **On Webhook Call** step, it suspends and generates a unique **resume URL**.
+2. ByteChef sends a POST request to the configured **Service URL** with the resume URL in the request body:
+    ```json
+    {
+      "resumeUrl": "https://your-bytechef-instance/api/job/resume/{resumeToken}"
+    }
+    ```
+3. The external service stores this resume URL and calls it when ready to continue the workflow.
+
+#### Resuming the Workflow
+
+To resume a suspended workflow, the external service sends a request to the resume URL. The resume endpoint requires authentication via an API key passed in the `Authorization` header.
+
+You can generate an API key in the ByteChef UI under **Settings > API Keys**.
+
+**With data (POST):**
+
+```bash
+curl -X POST "https://your-bytechef-instance/api/platform/v1/job/resume/{resumeToken}" \
+  -H "Authorization: Bearer {your-api-key}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "John",
+    "lastName": "Doe"
+  }'
+```
+
+**Without data (GET):**
+
+```bash
+curl "https://your-bytechef-instance/api/platform/v1/job/resume/{resumeToken}" \
+  -H "Authorization: Bearer {your-api-key}"
+```
+
+The data sent in the POST request body is available in subsequent workflow steps through the action's output.
+
+#### Defining a Data Schema
+
+You can define a **Data Schema** using the JSON Schema Builder to specify the structure of the data that the external service should send when resuming the workflow. This schema is used for output mapping in subsequent workflow steps.
+
+#### Expiration
+
+The action supports an expiration time. If the webhook is not called within the specified time, the workflow times out. Configure this with:
+
+- **Expires After Amount**: The number of time units (default: 30)
+- **Expires After Unit**: Seconds, Minutes, Hours, or Days (default: Days)
+
+
+
+
+

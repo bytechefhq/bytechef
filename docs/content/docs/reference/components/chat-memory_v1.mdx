@@ -1,13 +1,13 @@
 ---
-title: "In Memory Chat Memory"
-description: "In Memory Chat Memory."
+title: "Chat Memory"
+description: "Built-in chat memory."
 ---
 
 
 Categories: Artificial Intelligence
 
 
-Type: inMemoryChatMemory/v1
+Type: chatMemory/v1
 
 <hr />
 
@@ -41,15 +41,34 @@ Name: addMessages
       "content" : ""
     } ]
   },
-  "type" : "inMemoryChatMemory/v1/addMessages"
+  "type" : "chatMemory/v1/addMessages"
 }
 ```
 
 #### Output
 
-This action does not produce any output.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| messageCount | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "messageCount" : 1
+}
+```
 
 
 
@@ -73,7 +92,7 @@ Name: getMessages
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/getMessages"
+  "type" : "chatMemory/v1/getMessages"
 }
 ```
 
@@ -127,7 +146,7 @@ Name: deleteConversation
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/deleteConversation"
+  "type" : "chatMemory/v1/deleteConversation"
 }
 ```
 
@@ -169,7 +188,7 @@ Name: listConversations
 {
   "label" : "List Conversations",
   "name" : "listConversations",
-  "type" : "inMemoryChatMemory/v1/listConversations"
+  "type" : "chatMemory/v1/listConversations"
 }
 ```
 

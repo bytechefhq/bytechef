@@ -80,6 +80,8 @@ Name: search
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | query | Query | STRING | The query to be executed. | true |
+| topK | Top K | INTEGER | The top 'k' similar results to return. | false |
+| similarityThreshold | Similarity Threshold | NUMBER | Similarity threshold score to filter the search response by. Only documents with similarity score equal or greater than the threshold will be returned. A threshold value of 0 means any similarity is accepted. A threshold value of 1 means an exact match is required. | false |
 
 #### Example JSON Structure
 ```json
@@ -87,7 +89,9 @@ Name: search
   "label" : "Search Data",
   "name" : "search",
   "parameters" : {
-    "query" : ""
+    "query" : "",
+    "topK" : 1,
+    "similarityThreshold" : 0.0
   },
   "type" : "neo4j/v1/search"
 }

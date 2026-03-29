@@ -55,6 +55,86 @@ Version: 1
 ## Actions
 
 
+### Create Realtime Speech
+Name: createRealtimeSpeech
+
+`Generate speech in real-time using ElevenLabs WebSocket-based text-to-speech API. Receives text via WebSocket, forwards to ElevenLabs for speech synthesis, and streams generated audio chunks back.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| voiceId | Voice | STRING | Voice to use for converting the text into speech. | true |
+| model_id | Model | STRING <details> <summary> Options </summary> <span>eleven_flash_v2_5</span>, <span>eleven_multilingual_v2</span>, <span>eleven_turbo_v2_5</span>, <span>eleven_turbo_v2</span>, <span>eleven_monolingual_v1</span>, <span>eleven_multilingual_v1</span> </details> | The model to use for text-to-speech generation. | true |
+| stability | Stability | NUMBER | Voice stability (0.0 to 1.0). Lower values produce more variation, higher values produce more consistent speech. | false |
+| similarityBoost | Similarity Boost | NUMBER | Voice similarity boost (0.0 to 1.0). Higher values make the voice more closely match the original voice. | false |
+| outputFormat | Output Format | STRING <details> <summary> Options </summary> <span>mp3_44100_128</span>, <span>mp3_44100_64</span>, <span>mp3_44100_32</span>, <span>pcm_16000</span>, <span>pcm_22050</span>, <span>pcm_24000</span>, <span>pcm_44100</span>, <span>ulaw_8000</span> </details> | The output audio format. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Realtime Speech",
+  "name" : "createRealtimeSpeech",
+  "parameters" : {
+    "voiceId" : "",
+    "model_id" : "",
+    "stability" : 0.0,
+    "similarityBoost" : 0.0,
+    "outputFormat" : ""
+  },
+  "type" : "elevenLabs/v1/createRealtimeSpeech"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Create Realtime Transcript
+Name: createRealtimeTranscript
+
+`Transcribe audio in real-time using ElevenLabs WebSocket-based speech-to-text API. Receives audio via WebSocket, forwards to ElevenLabs for transcription, and streams transcription results back.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model_id | Model | STRING | The model to use for real-time transcription. | true |
+| languageCode | Language Code | STRING | The language code for transcription (e.g., 'en' for English). If not specified, the language is auto-detected. | false |
+| sampleRate | Sample Rate | INTEGER | The sample rate of the audio in Hz. | false |
+| audioFormat | Audio Format | STRING <details> <summary> Options </summary> <span>pcm_16000</span>, <span>pcm_22050</span>, <span>pcm_44100</span>, <span>ulaw_8000</span> </details> | The format of the audio data. | false |
+| includeTimestamps | Include Timestamps | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to include word-level timestamps in the transcription. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Realtime Transcript",
+  "name" : "createRealtimeTranscript",
+  "parameters" : {
+    "model_id" : "",
+    "languageCode" : "",
+    "sampleRate" : 1,
+    "audioFormat" : "",
+    "includeTimestamps" : false
+  },
+  "type" : "elevenLabs/v1/createRealtimeTranscript"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
 ### Create Sound Effect
 Name: createSoundEffect
 
