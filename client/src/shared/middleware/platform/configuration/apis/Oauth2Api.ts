@@ -38,10 +38,9 @@ export interface GetOAuth2AuthorizationParametersOperationRequest {
 export class Oauth2Api extends runtime.BaseAPI {
 
     /**
-     * Retrieves oauth2 authorization parameters.
-     * Retrieves oauth2 authorization parameters
+     * Creates request options for getOAuth2AuthorizationParameters without sending the request
      */
-    async getOAuth2AuthorizationParametersRaw(requestParameters: GetOAuth2AuthorizationParametersOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizationParameters>> {
+    async getOAuth2AuthorizationParametersRequestOpts(requestParameters: GetOAuth2AuthorizationParametersOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['getOAuth2AuthorizationParametersRequest'] == null) {
             throw new runtime.RequiredError(
                 'getOAuth2AuthorizationParametersRequest',
@@ -58,13 +57,22 @@ export class Oauth2Api extends runtime.BaseAPI {
 
         let urlPath = `/oauth2/authorization-parameters`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: GetOAuth2AuthorizationParametersRequestToJSON(requestParameters['getOAuth2AuthorizationParametersRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Retrieves oauth2 authorization parameters.
+     * Retrieves oauth2 authorization parameters
+     */
+    async getOAuth2AuthorizationParametersRaw(requestParameters: GetOAuth2AuthorizationParametersOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizationParameters>> {
+        const requestOptions = await this.getOAuth2AuthorizationParametersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2AuthorizationParametersFromJSON(jsonValue));
     }
@@ -79,10 +87,9 @@ export class Oauth2Api extends runtime.BaseAPI {
     }
 
     /**
-     * Get OAuth2 properties.
-     * Get OAuth2 properties
+     * Creates request options for getOAuth2Properties without sending the request
      */
-    async getOAuth2PropertiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2Properties>> {
+    async getOAuth2PropertiesRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -90,12 +97,21 @@ export class Oauth2Api extends runtime.BaseAPI {
 
         let urlPath = `/oauth2/properties`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get OAuth2 properties.
+     * Get OAuth2 properties
+     */
+    async getOAuth2PropertiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2Properties>> {
+        const requestOptions = await this.getOAuth2PropertiesRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2PropertiesFromJSON(jsonValue));
     }

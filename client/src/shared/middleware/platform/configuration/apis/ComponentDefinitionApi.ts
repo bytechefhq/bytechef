@@ -52,10 +52,9 @@ export interface GetUnifiedApiComponentDefinitionsRequest {
 export class ComponentDefinitionApi extends runtime.BaseAPI {
 
     /**
-     * Get a component definition.
-     * Get a component definition
+     * Creates request options for getComponentDefinition without sending the request
      */
-    async getComponentDefinitionRaw(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinition>> {
+    async getComponentDefinitionRequestOpts(requestParameters: GetComponentDefinitionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -79,12 +78,21 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
         urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a component definition.
+     * Get a component definition
+     */
+    async getComponentDefinitionRaw(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinition>> {
+        const requestOptions = await this.getComponentDefinitionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ComponentDefinitionFromJSON(jsonValue));
     }
@@ -99,10 +107,9 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all component definition versions of a component.
-     * Get all component definition versions of a component
+     * Creates request options for getComponentDefinitionVersions without sending the request
      */
-    async getComponentDefinitionVersionsRaw(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
+    async getComponentDefinitionVersionsRequestOpts(requestParameters: GetComponentDefinitionVersionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -118,12 +125,21 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
         let urlPath = `/component-definitions/{componentName}/versions`;
         urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all component definition versions of a component.
+     * Get all component definition versions of a component
+     */
+    async getComponentDefinitionVersionsRaw(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
+        const requestOptions = await this.getComponentDefinitionVersionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
     }
@@ -138,10 +154,9 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a connection component definition.
-     * Get a connection component definition
+     * Creates request options for getConnectionComponentDefinition without sending the request
      */
-    async getConnectionComponentDefinitionRaw(requestParameters: GetConnectionComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinition>> {
+    async getConnectionComponentDefinitionRequestOpts(requestParameters: GetConnectionComponentDefinitionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -165,12 +180,21 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
         urlPath = urlPath.replace(`{${"connectionVersion"}}`, encodeURIComponent(String(requestParameters['connectionVersion'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a connection component definition.
+     * Get a connection component definition
+     */
+    async getConnectionComponentDefinitionRaw(requestParameters: GetConnectionComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinition>> {
+        const requestOptions = await this.getConnectionComponentDefinitionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ComponentDefinitionFromJSON(jsonValue));
     }
@@ -185,10 +209,9 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all compatible component definitions for a unified API category.
-     * Get all compatible component definitions for a unified API category
+     * Creates request options for getUnifiedApiComponentDefinitions without sending the request
      */
-    async getUnifiedApiComponentDefinitionsRaw(requestParameters: GetUnifiedApiComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
+    async getUnifiedApiComponentDefinitionsRequestOpts(requestParameters: GetUnifiedApiComponentDefinitionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['category'] == null) {
             throw new runtime.RequiredError(
                 'category',
@@ -204,12 +227,21 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
         let urlPath = `/unified-api/{category}/component-definitions`;
         urlPath = urlPath.replace(`{${"category"}}`, encodeURIComponent(String(requestParameters['category'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all compatible component definitions for a unified API category.
+     * Get all compatible component definitions for a unified API category
+     */
+    async getUnifiedApiComponentDefinitionsRaw(requestParameters: GetUnifiedApiComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
+        const requestOptions = await this.getUnifiedApiComponentDefinitionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
     }

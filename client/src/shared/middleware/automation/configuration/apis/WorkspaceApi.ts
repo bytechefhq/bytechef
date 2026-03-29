@@ -32,10 +32,9 @@ export interface GetUserWorkspacesRequest {
 export class WorkspaceApi extends runtime.BaseAPI {
 
     /**
-     * Get all user workspaces.
-     * Get all user workspaces
+     * Creates request options for getUserWorkspaces without sending the request
      */
-    async getUserWorkspacesRaw(requestParameters: GetUserWorkspacesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Workspace>>> {
+    async getUserWorkspacesRequestOpts(requestParameters: GetUserWorkspacesRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -51,12 +50,21 @@ export class WorkspaceApi extends runtime.BaseAPI {
         let urlPath = `/users/{id}/workspaces`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all user workspaces.
+     * Get all user workspaces
+     */
+    async getUserWorkspacesRaw(requestParameters: GetUserWorkspacesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Workspace>>> {
+        const requestOptions = await this.getUserWorkspacesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkspaceFromJSON));
     }

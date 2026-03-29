@@ -42,10 +42,9 @@ export interface GetComponentActionDefinitionsRequest {
 export class ActionDefinitionApi extends runtime.BaseAPI {
 
     /**
-     * Get an action definition of a component.
-     * Get an action definition of a component
+     * Creates request options for getComponentActionDefinition without sending the request
      */
-    async getComponentActionDefinitionRaw(requestParameters: GetComponentActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ActionDefinition>> {
+    async getComponentActionDefinitionRequestOpts(requestParameters: GetComponentActionDefinitionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -77,12 +76,21 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
         urlPath = urlPath.replace(`{${"actionName"}}`, encodeURIComponent(String(requestParameters['actionName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an action definition of a component.
+     * Get an action definition of a component
+     */
+    async getComponentActionDefinitionRaw(requestParameters: GetComponentActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ActionDefinition>> {
+        const requestOptions = await this.getComponentActionDefinitionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ActionDefinitionFromJSON(jsonValue));
     }
@@ -97,10 +105,9 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a list of action definitions for a component.
-     * Get a list of action definitions for a component
+     * Creates request options for getComponentActionDefinitions without sending the request
      */
-    async getComponentActionDefinitionsRaw(requestParameters: GetComponentActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionBasic>>> {
+    async getComponentActionDefinitionsRequestOpts(requestParameters: GetComponentActionDefinitionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -124,12 +131,21 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
         urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a list of action definitions for a component.
+     * Get a list of action definitions for a component
+     */
+    async getComponentActionDefinitionsRaw(requestParameters: GetComponentActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionBasic>>> {
+        const requestOptions = await this.getComponentActionDefinitionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ActionDefinitionBasicFromJSON));
     }

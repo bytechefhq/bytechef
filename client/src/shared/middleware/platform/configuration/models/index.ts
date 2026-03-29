@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './ActionDefinition';
+export * from './ApproveForm';
 export * from './ActionDefinitionBasic';
 export * from './ArrayProperty';
 export * from './Authorization';

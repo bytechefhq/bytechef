@@ -26,10 +26,10 @@ import {
 } from '../models/index';
 
 export interface GetComponentClusterElementDefinitionRequest {
-    clusterElementType?: string;
     componentName: string;
     componentVersion: number;
     clusterElementName: string;
+    clusterElementType?: string;
 }
 
 export interface GetRootComponentClusterElementDefinitionsRequest {
@@ -44,10 +44,9 @@ export interface GetRootComponentClusterElementDefinitionsRequest {
 export class ClusterElementDefinitionApi extends runtime.BaseAPI {
 
     /**
-     * Get a cluster element definition of a component.
-     * Get a cluster element definition of a component
+     * Creates request options for getComponentClusterElementDefinition without sending the request
      */
-    async getComponentClusterElementDefinitionRaw(requestParameters: GetComponentClusterElementDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ClusterElementDefinition>> {
+    async getComponentClusterElementDefinitionRequestOpts(requestParameters: GetComponentClusterElementDefinitionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -83,12 +82,21 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
         urlPath = urlPath.replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a cluster element definition of a component.
+     * Get a cluster element definition of a component
+     */
+    async getComponentClusterElementDefinitionRaw(requestParameters: GetComponentClusterElementDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ClusterElementDefinition>> {
+        const requestOptions = await this.getComponentClusterElementDefinitionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ClusterElementDefinitionFromJSON(jsonValue));
     }
@@ -103,10 +111,9 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a cluster element definitions of a root component.
-     * Get a cluster element definitions of a root component.
+     * Creates request options for getRootComponentClusterElementDefinitions without sending the request
      */
-    async getRootComponentClusterElementDefinitionsRaw(requestParameters: GetRootComponentClusterElementDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ClusterElementDefinitionBasic>>> {
+    async getRootComponentClusterElementDefinitionsRequestOpts(requestParameters: GetRootComponentClusterElementDefinitionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['rootComponentName'] == null) {
             throw new runtime.RequiredError(
                 'rootComponentName',
@@ -138,12 +145,21 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"rootComponentVersion"}}`, encodeURIComponent(String(requestParameters['rootComponentVersion'])));
         urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a cluster element definitions of a root component.
+     * Get a cluster element definitions of a root component.
+     */
+    async getRootComponentClusterElementDefinitionsRaw(requestParameters: GetRootComponentClusterElementDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ClusterElementDefinitionBasic>>> {
+        const requestOptions = await this.getRootComponentClusterElementDefinitionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ClusterElementDefinitionBasicFromJSON));
     }

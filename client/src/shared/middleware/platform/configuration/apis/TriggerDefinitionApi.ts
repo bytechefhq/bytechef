@@ -42,10 +42,9 @@ export interface GetComponentTriggerDefinitionsRequest {
 export class TriggerDefinitionApi extends runtime.BaseAPI {
 
     /**
-     * Get a trigger definition of a component.
-     * Get a trigger definition of a component
+     * Creates request options for getComponentTriggerDefinition without sending the request
      */
-    async getComponentTriggerDefinitionRaw(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerDefinition>> {
+    async getComponentTriggerDefinitionRequestOpts(requestParameters: GetComponentTriggerDefinitionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -77,12 +76,21 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
         urlPath = urlPath.replace(`{${"triggerName"}}`, encodeURIComponent(String(requestParameters['triggerName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a trigger definition of a component.
+     * Get a trigger definition of a component
+     */
+    async getComponentTriggerDefinitionRaw(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerDefinition>> {
+        const requestOptions = await this.getComponentTriggerDefinitionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TriggerDefinitionFromJSON(jsonValue));
     }
@@ -97,10 +105,9 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a list of trigger definitions for a component.
-     * Get a list of trigger definitions for a component
+     * Creates request options for getComponentTriggerDefinitions without sending the request
      */
-    async getComponentTriggerDefinitionsRaw(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TriggerDefinitionBasic>>> {
+    async getComponentTriggerDefinitionsRequestOpts(requestParameters: GetComponentTriggerDefinitionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -124,12 +131,21 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
         urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a list of trigger definitions for a component.
+     * Get a list of trigger definitions for a component
+     */
+    async getComponentTriggerDefinitionsRaw(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TriggerDefinitionBasic>>> {
+        const requestOptions = await this.getComponentTriggerDefinitionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TriggerDefinitionBasicFromJSON));
     }

@@ -135,7 +135,7 @@ export interface Workflow {
     readonly outputs?: Array<WorkflowOutput>;
     /**
      * The type of the source which stores the workflow definition.
-     * @type {string}
+     * @type {WorkflowSourceTypeEnum}
      * @memberof Workflow
      */
     sourceType?: WorkflowSourceTypeEnum;
