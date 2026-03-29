@@ -7,6 +7,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo} from 'react';
+import {toast} from 'sonner';
 
 export default function useAgentEvalsRunsTab(agentEvalTestId: string | null) {
     const queryClient = useQueryClient();
@@ -39,6 +40,9 @@ export default function useAgentEvalsRunsTab(agentEvalTestId: string | null) {
     );
 
     const startRunMutation = useStartAgentEvalRunMutation({
+        onError: (error: Error) => {
+            toast.error('Failed to start eval run: ' + error.message);
+        },
         onSuccess: (data) => {
             invalidateRuns();
 
@@ -49,6 +53,9 @@ export default function useAgentEvalsRunsTab(agentEvalTestId: string | null) {
     });
 
     const cancelRunMutation = useCancelAgentEvalRunMutation({
+        onError: (error: Error) => {
+            toast.error('Failed to cancel eval run: ' + error.message);
+        },
         onSuccess: () => {
             invalidateRuns();
             queryClient.invalidateQueries({queryKey: ['agentEvalRun']});
