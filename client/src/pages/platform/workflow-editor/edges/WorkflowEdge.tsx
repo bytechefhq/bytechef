@@ -59,6 +59,7 @@ export default function WorkflowEdge({
     });
 
     const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
+        borderRadius: 10,
         sourcePosition: correctedSourcePosition,
         sourceX: correctedSourceX,
         sourceY: correctedSourceY,

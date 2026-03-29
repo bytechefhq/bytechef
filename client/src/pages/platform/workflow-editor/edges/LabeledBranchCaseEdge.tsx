@@ -46,6 +46,7 @@ export default function LabeledBranchCaseEdge({
     });
 
     const [edgePath] = getSmoothStepPath({
+        borderRadius: 10,
         sourcePosition: correctedSourcePosition,
         sourceX: correctedSourceX,
         sourceY: correctedSourceY,
