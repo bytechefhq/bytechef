@@ -90,6 +90,25 @@ export default function insertTaskDispatcherSubtask({
         updatedSubtasks = [...subtasks];
 
         updatedSubtasks.splice(context.index, 0, newTask);
+
+        // Clear saved positions for subtasks after the insertion point,
+        // since their positions are now stale due to the shift.
+        for (let subtaskIndex = context.index + 1; subtaskIndex < updatedSubtasks.length; subtaskIndex++) {
+            const subtask = updatedSubtasks[subtaskIndex];
+
+            if (subtask.metadata?.ui?.nodePosition) {
+                updatedSubtasks[subtaskIndex] = {
+                    ...subtask,
+                    metadata: {
+                        ...subtask.metadata,
+                        ui: {
+                            ...subtask.metadata.ui,
+                            nodePosition: undefined,
+                        },
+                    },
+                };
+            }
+        }
     }
 
     const updatedTaskDispatcherTask = updateTaskParameters({context, task: targetTaskDispatcher, updatedSubtasks});
