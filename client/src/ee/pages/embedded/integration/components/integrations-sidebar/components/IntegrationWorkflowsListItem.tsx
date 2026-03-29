@@ -88,9 +88,7 @@ const IntegrationWorkflowsListItem = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <div className="flex flex-col gap-1 text-start">
-                            <span className="max-w-64 overflow-hidden truncate text-sm font-medium">
-                                {workflow.label}
-                            </span>
+                            <span className="overflow-hidden truncate text-sm font-medium">{workflow.label}</span>
 
                             <div className="flex gap-1 text-xs text-content-neutral-secondary">
                                 <span>Edited</span>
