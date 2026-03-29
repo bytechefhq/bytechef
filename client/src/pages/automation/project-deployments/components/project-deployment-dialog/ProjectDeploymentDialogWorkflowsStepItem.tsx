@@ -12,7 +12,7 @@ import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
 export interface ProjectDeploymentDialogWorkflowListItemProps {
     control: Control<ProjectDeployment>;
     formState: FormState<ProjectDeployment>;
-    groupConnections?: boolean;
+    connectionsGrouped?: boolean;
     label?: string;
     setValue: UseFormSetValue<ProjectDeployment>;
     switchHidden?: boolean;
@@ -21,9 +21,9 @@ export interface ProjectDeploymentDialogWorkflowListItemProps {
 }
 
 const ProjectDeploymentDialogWorkflowsStepItem = ({
+    connectionsGrouped,
     control,
     formState,
-    groupConnections,
     label,
     setValue,
     switchHidden = false,
@@ -84,8 +84,8 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
 
                         <ProjectDeploymentDialogWorkflowsStepItemConnections
                             componentConnections={componentConnections}
+                            connectionsGrouped={connectionsGrouped}
                             control={control}
-                            groupConnections={groupConnections}
                             setValue={setValue}
                             workflowIndex={workflowIndex}
                             workflowNodeLabelMap={workflowNodeLabelMap}

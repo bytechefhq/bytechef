@@ -194,9 +194,9 @@ const ProjectDeploymentDialog = ({
         {
             content: workflows && (
                 <ProjectDeploymentDialogWorkflowsStep
+                    connectionsGrouped={connectionsGrouped}
                     control={control}
                     formState={formState}
-                    groupConnections={connectionsGrouped}
                     setValue={setValue}
                     workflows={workflows}
                 />
