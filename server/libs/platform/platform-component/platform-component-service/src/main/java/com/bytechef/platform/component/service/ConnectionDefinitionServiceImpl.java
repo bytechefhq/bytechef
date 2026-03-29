@@ -197,6 +197,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
+    public Context createConnectionRefreshContext(
+        String componentName, ComponentConnection componentConnection) {
+
+        return contextFactory.createContext(componentName, componentConnection);
+    }
+
+    @Override
     public RefreshTokenResponse executeRefresh(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context) {
