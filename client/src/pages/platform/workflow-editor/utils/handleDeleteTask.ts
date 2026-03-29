@@ -327,6 +327,12 @@ export default function handleDeleteTask({
         return;
     }
 
+    // Cancel any in-flight workflow query refetches from previous mutations
+    // to prevent stale server data from overwriting the upcoming optimistic update.
+    queryClient.cancelQueries({
+        predicate: (query) => query.queryKey.includes('projectWorkflows'),
+    });
+
     const updatedDefinition = JSON.stringify(
         {
             ...workflowDefinition,
