@@ -342,9 +342,10 @@ class AgentEvalGraphQlController {
 
     @MutationMapping
     AgentEvalRun startAgentEvalRun(
-        @Argument Long agentEvalTestId, @Argument String name, @Argument Long environmentId) {
+        @Argument Long agentEvalTestId, @Argument String name, @Argument Long environmentId,
+        @Argument @Nullable List<Long> scenarioIds, @Argument @Nullable List<Long> agentJudgeIds) {
 
-        return agentEvalRunFacade.startEvalRun(agentEvalTestId, name, environmentId);
+        return agentEvalRunFacade.startEvalRun(agentEvalTestId, name, environmentId, scenarioIds, agentJudgeIds);
     }
 
     @MutationMapping
