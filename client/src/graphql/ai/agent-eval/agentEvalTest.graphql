@@ -20,6 +20,14 @@ query agentEvalTest($id: ID!) {
                 createdDate
                 lastModifiedDate
             }
+            toolSimulations {
+                id
+                responsePrompt
+                simulationModel
+                toolName
+                createdDate
+                lastModifiedDate
+            }
             createdDate
             lastModifiedDate
         }
