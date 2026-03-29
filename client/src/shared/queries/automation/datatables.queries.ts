@@ -13,7 +13,7 @@ export const DataTableKeys = {
         ['dataTableRowsPage', {environmentId, limit, tableId}] as const,
 };
 
-async function gqlFetch<TData, TVars>(query: string, variables?: TVars): Promise<TData> {
+async function gqlFetch<TData, TVars>(query: string | {toString(): string}, variables?: TVars): Promise<TData> {
     const res = await fetch(endpointUrl as string, {
         method: 'POST',
         ...(fetchParams as RequestInit),
