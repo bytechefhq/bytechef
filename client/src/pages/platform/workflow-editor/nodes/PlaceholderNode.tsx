@@ -40,7 +40,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         >
             <div
                 className={twMerge(
-                    'relative mx-[22px] flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
+                    'nodrag relative mx-[22px] flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
                     isDropzoneActive
                         ? 'absolute ml-2 size-16 scale-150 cursor-pointer bg-blue-100'
                         : 'size-7 bg-gray-300',
