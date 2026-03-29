@@ -56,6 +56,8 @@ public final class AgentEvalScenario {
 
     private int maxTurns;
 
+    private int numberOfRuns = 1;
+
     @CreatedDate
     private Instant createdDate;
 
@@ -141,6 +143,14 @@ public final class AgentEvalScenario {
         this.maxTurns = maxTurns;
     }
 
+    public int getNumberOfRuns() {
+        return numberOfRuns;
+    }
+
+    public void setNumberOfRuns(int numberOfRuns) {
+        this.numberOfRuns = numberOfRuns;
+    }
+
     public Instant getCreatedDate() {
         return createdDate;
     }
@@ -210,6 +220,7 @@ public final class AgentEvalScenario {
             ", expectedOutput='" + expectedOutput + '\'' +
             ", personaPrompt='" + personaPrompt + '\'' +
             ", maxTurns=" + maxTurns +
+            ", numberOfRuns=" + numberOfRuns +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
