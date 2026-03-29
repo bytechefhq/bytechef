@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260330000001" author="Ivica Cardic">
+        <addColumn tableName="agent_eval_scenario">
+            <column name="number_of_runs" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="agent_eval_run">
+            <column name="agent_version" type="VARCHAR(256)"/>
+            <column name="total_input_tokens" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_output_tokens" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="agent_eval_result">
+            <column name="input_tokens" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="output_tokens" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="run_index" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <createTable tableName="agent_scenario_tool_simulation">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_eval_scenario_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tool_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="response_prompt" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="simulation_model" type="VARCHAR(256)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="agent_scenario_tool_simulation" baseColumnNames="agent_eval_scenario_id"
+                                 referencedTableName="agent_eval_scenario" referencedColumnNames="id"
+                                 constraintName="fk_agent_scenario_tool_simulation_scenario" onDelete="CASCADE"/>
+
+        <createIndex tableName="agent_scenario_tool_simulation" indexName="ix_agent_scenario_tool_simulation_scenario">
+            <column name="agent_eval_scenario_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
