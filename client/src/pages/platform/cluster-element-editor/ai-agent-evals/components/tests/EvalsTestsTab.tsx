@@ -33,26 +33,29 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
 
     return (
         <div className="flex flex-1 flex-col gap-3 px-4">
-            {evalTests.length > 0 &&
-                evalTests.map((test) => (
-                    <AgentEvalTestCard
-                        key={test.id}
-                        onCreateScenario={handleCreateScenario}
-                        onDeleteScenario={handleDeleteScenario}
-                        onDeleteTest={handleDeleteTest}
-                        onUpdateScenario={handleUpdateScenario}
-                        test={test}
-                    />
-                ))}
-
             {evalTests.length > 0 && (
-                <button
-                    className="flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-gray-300 py-2.5 text-sm text-gray-500 hover:border-gray-400 hover:text-gray-600"
-                    onClick={() => setShowCreateDialog(true)}
-                >
-                    <PlusIcon className="size-4" />
-                    New Test
-                </button>
+                <>
+                    <div className="flex items-center justify-end">
+                        <button
+                            className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+                            onClick={() => setShowCreateDialog(true)}
+                        >
+                            <PlusIcon className="size-3.5" />
+                            New Test
+                        </button>
+                    </div>
+
+                    {evalTests.map((test) => (
+                        <AgentEvalTestCard
+                            key={test.id}
+                            onCreateScenario={handleCreateScenario}
+                            onDeleteScenario={handleDeleteScenario}
+                            onDeleteTest={handleDeleteTest}
+                            onUpdateScenario={handleUpdateScenario}
+                            test={test}
+                        />
+                    ))}
+                </>
             )}
 
             {evalTests.length === 0 && (
