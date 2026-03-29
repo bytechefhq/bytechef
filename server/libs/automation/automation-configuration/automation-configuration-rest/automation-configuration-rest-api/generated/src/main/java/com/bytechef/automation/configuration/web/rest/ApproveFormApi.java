@@ -5,7 +5,7 @@
  */
 package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
+import com.bytechef.automation.configuration.web.rest.model.ApproveFormModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,44 +35,44 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:20:01.491299+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 @Validated
-@Tag(name = "workspace", description = "The Automation Workspace Internal API")
-public interface WorkspaceApi {
+@Tag(name = "approve-form", description = "The Automation Approve Form Internal API")
+public interface ApproveFormApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
-    String PATH_GET_USER_WORKSPACES = "/users/{id}/workspaces";
+    String PATH_GET_APPROVE_FORM = "/approve-form/{id}";
     /**
-     * GET /users/{id}/workspaces : Get all user workspaces
-     * Get all user workspaces.
+     * GET /approve-form/{id} : Get an approve form
+     * Get an approve form.
      *
-     * @param id The id of a user. (required)
-     * @return The list of user workspaces. (status code 200)
+     * @param id The id of an approve form. (required)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
-        operationId = "getUserWorkspaces",
-        summary = "Get all user workspaces",
-        description = "Get all user workspaces.",
-        tags = { "workspace" },
+        operationId = "getApproveForm",
+        summary = "Get an approve form",
+        description = "Get an approve form.",
+        tags = { "approve-form" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of user workspaces.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkspaceModel.class)))
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ApproveFormModel.class))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = WorkspaceApi.PATH_GET_USER_WORKSPACES,
+        value = ApproveFormApi.PATH_GET_APPROVE_FORM,
         produces = { "application/json" }
     )
-    default ResponseEntity<List<WorkspaceModel>> getUserWorkspaces(
-        @NotNull @Parameter(name = "id", description = "The id of a user.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+    default ResponseEntity<ApproveFormModel> getApproveForm(
+        @NotNull @Parameter(name = "id", description = "The id of an approve form.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0 } ]";
+                    String exampleString = "{ \"inputs\" : [ { \"fieldName\" : \"fieldName\", \"minSelection\" : 1, \"defaultValue\" : \"defaultValue\", \"fieldOptions\" : [ { \"label\" : \"label\", \"value\" : \"value\" }, { \"label\" : \"label\", \"value\" : \"value\" } ], \"fieldLabel\" : \"fieldLabel\", \"fieldDescription\" : \"fieldDescription\", \"maxSelection\" : 6, \"multipleChoice\" : true, \"placeholder\" : \"placeholder\", \"fieldType\" : 0, \"required\" : true }, { \"fieldName\" : \"fieldName\", \"minSelection\" : 1, \"defaultValue\" : \"defaultValue\", \"fieldOptions\" : [ { \"label\" : \"label\", \"value\" : \"value\" }, { \"label\" : \"label\", \"value\" : \"value\" } ], \"fieldLabel\" : \"fieldLabel\", \"fieldDescription\" : \"fieldDescription\", \"maxSelection\" : 6, \"multipleChoice\" : true, \"placeholder\" : \"placeholder\", \"fieldType\" : 0, \"required\" : true } ], \"formDescription\" : \"formDescription\", \"formTitle\" : \"formTitle\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

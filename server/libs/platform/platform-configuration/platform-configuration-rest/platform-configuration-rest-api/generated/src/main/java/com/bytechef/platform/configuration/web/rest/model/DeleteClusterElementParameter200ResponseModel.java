@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("deleteClusterElementParameter_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-02T12:16:06.542836107+01:00[Europe/Zagreb]", comments = "Generator version: 7.19.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:19:54.576402+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 public class DeleteClusterElementParameter200ResponseModel {
 
   @Valid
@@ -155,7 +155,7 @@ public class DeleteClusterElementParameter200ResponseModel {
     this.missingRequiredProperties = missingRequiredProperties;
   }
 
-  public DeleteClusterElementParameter200ResponseModel version(Integer version) {
+  public DeleteClusterElementParameter200ResponseModel version(@Nullable Integer version) {
     this.version = version;
     return this;
   }
@@ -164,14 +164,14 @@ public class DeleteClusterElementParameter200ResponseModel {
    * The updated workflow version.
    * @return version
    */
-
+  
   @Schema(name = "version", description = "The updated workflow version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("version")
-  public Integer getVersion() {
+  public @Nullable Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Integer version) {
+  public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
 
