@@ -10,6 +10,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo} from 'react';
+import {toast} from 'sonner';
 
 export default function useAgentEvalsTestsTab(workflowId: string, workflowNodeName: string) {
     const queryClient = useQueryClient();
@@ -23,12 +24,30 @@ export default function useAgentEvalsTestsTab(workflowId: string, workflowNodeNa
         queryClient.invalidateQueries({queryKey: ['agentEvalTests']});
     }, [queryClient]);
 
-    const createTestMutation = useCreateAgentEvalTestMutation({onSuccess: invalidateTests});
-    const updateTestMutation = useUpdateAgentEvalTestMutation({onSuccess: invalidateTests});
-    const deleteTestMutation = useDeleteAgentEvalTestMutation({onSuccess: invalidateTests});
-    const createScenarioMutation = useCreateAgentEvalScenarioMutation({onSuccess: invalidateTests});
-    const updateScenarioMutation = useUpdateAgentEvalScenarioMutation({onSuccess: invalidateTests});
-    const deleteScenarioMutation = useDeleteAgentEvalScenarioMutation({onSuccess: invalidateTests});
+    const createTestMutation = useCreateAgentEvalTestMutation({
+        onError: (error: Error) => toast.error('Failed to create test: ' + error.message),
+        onSuccess: invalidateTests,
+    });
+    const updateTestMutation = useUpdateAgentEvalTestMutation({
+        onError: (error: Error) => toast.error('Failed to update test: ' + error.message),
+        onSuccess: invalidateTests,
+    });
+    const deleteTestMutation = useDeleteAgentEvalTestMutation({
+        onError: (error: Error) => toast.error('Failed to delete test: ' + error.message),
+        onSuccess: invalidateTests,
+    });
+    const createScenarioMutation = useCreateAgentEvalScenarioMutation({
+        onError: (error: Error) => toast.error('Failed to create scenario: ' + error.message),
+        onSuccess: invalidateTests,
+    });
+    const updateScenarioMutation = useUpdateAgentEvalScenarioMutation({
+        onError: (error: Error) => toast.error('Failed to update scenario: ' + error.message),
+        onSuccess: invalidateTests,
+    });
+    const deleteScenarioMutation = useDeleteAgentEvalScenarioMutation({
+        onError: (error: Error) => toast.error('Failed to delete scenario: ' + error.message),
+        onSuccess: invalidateTests,
+    });
 
     const handleCreateTest = useCallback(
         (name: string, description?: string) => {
