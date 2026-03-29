@@ -20,7 +20,7 @@ import './PropertyMentionsInput.css';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
-import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
+import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -28,7 +28,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {ControlType} from '@/shared/middleware/platform/configuration';
 import {Editor} from '@tiptap/react';
-import {CircleQuestionMarkIcon, EqualIcon, TriangleAlertIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, SquareFunctionIcon, TriangleAlertIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -253,7 +253,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             )}
 
                             {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                                <InputTypeSwitchButton handleClick={handleInputTypeSwitchButtonClick} mentionInput />
+                                <PropertyInputTypeSwitch handleClick={handleInputTypeSwitchButtonClick} mentionInput />
                             )}
 
                             {deletePropertyButton}
@@ -275,7 +275,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 >
                     {leadingIcon && (
                         <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r bg-gray-100 px-3">
-                            {isFormulaMode ? <EqualIcon className="size-4" /> : leadingIcon}
+                            {isFormulaMode ? <SquareFunctionIcon className="size-4" /> : leadingIcon}
                         </span>
                     )}
 
