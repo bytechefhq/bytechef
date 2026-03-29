@@ -16,8 +16,6 @@
 
 package com.bytechef.ai.agent.eval.domain;
 
-import com.bytechef.ai.agent.eval.constant.AgentEvalResultStatus;
-import com.bytechef.file.storage.domain.FileEntry;
 import java.time.Instant;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -27,42 +25,25 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * @author Ivica Cardic
  */
-@Table("agent_eval_result")
-public final class AgentEvalResult {
+@Table("agent_scenario_tool_simulation")
+public final class AgentScenarioToolSimulation {
 
     @Id
     private Long id;
 
-    private Long agentEvalRunId;
-
     private Long agentEvalScenarioId;
 
-    @Column("status")
-    private int status;
+    private String toolName;
+
+    private String responsePrompt;
 
     @Nullable
-    private Double score;
-
-    @Nullable
-    private String errorMessage;
-
-    // Stores a serialized FileEntry identifier (the result of FileEntry.toId());
-    // use getTranscriptFileEntry()/setTranscriptFileEntry() for domain-level access
-    @Column("transcript_file")
-    @Nullable
-    private String transcriptFile;
-
-    private int inputTokens;
-
-    private int outputTokens;
-
-    private int runIndex = 1;
+    private String simulationModel;
 
     @CreatedDate
     private Instant createdDate;
@@ -79,7 +60,7 @@ public final class AgentEvalResult {
     @Version
     private int version;
 
-    public AgentEvalResult() {
+    public AgentScenarioToolSimulation() {
     }
 
     public Long getId() {
@@ -90,14 +71,6 @@ public final class AgentEvalResult {
         this.id = id;
     }
 
-    public Long getAgentEvalRunId() {
-        return agentEvalRunId;
-    }
-
-    public void setAgentEvalRunId(Long agentEvalRunId) {
-        this.agentEvalRunId = agentEvalRunId;
-    }
-
     public Long getAgentEvalScenarioId() {
         return agentEvalScenarioId;
     }
@@ -106,76 +79,29 @@ public final class AgentEvalResult {
         this.agentEvalScenarioId = agentEvalScenarioId;
     }
 
-    public AgentEvalResultStatus getStatus() {
-        return AgentEvalResultStatus.values()[status];
+    public String getToolName() {
+        return toolName;
     }
 
-    public void setStatus(AgentEvalResultStatus status) {
-        this.status = status.ordinal();
+    public void setToolName(String toolName) {
+        this.toolName = toolName;
     }
 
-    @Nullable
-    public Double getScore() {
-        return score;
+    public String getResponsePrompt() {
+        return responsePrompt;
     }
 
-    public void setScore(@Nullable Double score) {
-        this.score = score;
-    }
-
-    @Nullable
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(@Nullable String errorMessage) {
-        this.errorMessage = errorMessage;
+    public void setResponsePrompt(String responsePrompt) {
+        this.responsePrompt = responsePrompt;
     }
 
     @Nullable
-    public String getTranscriptFile() {
-        return transcriptFile;
+    public String getSimulationModel() {
+        return simulationModel;
     }
 
-    @Nullable
-    public FileEntry getTranscriptFileEntry() {
-        if (transcriptFile == null) {
-            return null;
-        }
-
-        return FileEntry.parse(transcriptFile);
-    }
-
-    public void setTranscriptFileEntry(@Nullable FileEntry fileEntry) {
-        if (fileEntry == null) {
-            this.transcriptFile = null;
-        } else {
-            this.transcriptFile = fileEntry.toId();
-        }
-    }
-
-    public int getInputTokens() {
-        return inputTokens;
-    }
-
-    public void setInputTokens(int inputTokens) {
-        this.inputTokens = inputTokens;
-    }
-
-    public int getOutputTokens() {
-        return outputTokens;
-    }
-
-    public void setOutputTokens(int outputTokens) {
-        this.outputTokens = outputTokens;
-    }
-
-    public int getRunIndex() {
-        return runIndex;
-    }
-
-    public void setRunIndex(int runIndex) {
-        this.runIndex = runIndex;
+    public void setSimulationModel(@Nullable String simulationModel) {
+        this.simulationModel = simulationModel;
     }
 
     public Instant getCreatedDate() {
@@ -224,11 +150,11 @@ public final class AgentEvalResult {
             return true;
         }
 
-        if (!(object instanceof AgentEvalResult agentEvalResult)) {
+        if (!(object instanceof AgentScenarioToolSimulation agentScenarioToolSimulation)) {
             return false;
         }
 
-        return Objects.equals(id, agentEvalResult.id);
+        return Objects.equals(id, agentScenarioToolSimulation.id);
     }
 
     @Override
@@ -238,17 +164,12 @@ public final class AgentEvalResult {
 
     @Override
     public String toString() {
-        return "AgentEvalResult{" +
+        return "AgentScenarioToolSimulation{" +
             "id=" + id +
-            ", agentEvalRunId=" + agentEvalRunId +
             ", agentEvalScenarioId=" + agentEvalScenarioId +
-            ", status=" + status +
-            ", score=" + score +
-            ", errorMessage='" + errorMessage + '\'' +
-            ", transcriptFile='" + transcriptFile + '\'' +
-            ", inputTokens=" + inputTokens +
-            ", outputTokens=" + outputTokens +
-            ", runIndex=" + runIndex +
+            ", toolName='" + toolName + '\'' +
+            ", responsePrompt='" + responsePrompt + '\'' +
+            ", simulationModel='" + simulationModel + '\'' +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +

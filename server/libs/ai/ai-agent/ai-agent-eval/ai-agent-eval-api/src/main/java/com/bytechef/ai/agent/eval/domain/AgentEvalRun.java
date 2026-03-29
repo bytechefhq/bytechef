@@ -64,6 +64,13 @@ public final class AgentEvalRun {
     @Nullable
     private Instant completedDate;
 
+    @Nullable
+    private String agentVersion;
+
+    private int totalInputTokens;
+
+    private int totalOutputTokens;
+
     @CreatedDate
     private Instant createdDate;
 
@@ -181,6 +188,31 @@ public final class AgentEvalRun {
         this.completedDate = completedDate;
     }
 
+    @Nullable
+    public String getAgentVersion() {
+        return agentVersion;
+    }
+
+    public void setAgentVersion(@Nullable String agentVersion) {
+        this.agentVersion = agentVersion;
+    }
+
+    public int getTotalInputTokens() {
+        return totalInputTokens;
+    }
+
+    public void setTotalInputTokens(int totalInputTokens) {
+        this.totalInputTokens = totalInputTokens;
+    }
+
+    public int getTotalOutputTokens() {
+        return totalOutputTokens;
+    }
+
+    public void setTotalOutputTokens(int totalOutputTokens) {
+        this.totalOutputTokens = totalOutputTokens;
+    }
+
     public Instant getCreatedDate() {
         return createdDate;
     }
@@ -254,6 +286,9 @@ public final class AgentEvalRun {
             ", completedScenarios=" + completedScenarios +
             ", startedDate=" + startedDate +
             ", completedDate=" + completedDate +
+            ", agentVersion='" + agentVersion + '\'' +
+            ", totalInputTokens=" + totalInputTokens +
+            ", totalOutputTokens=" + totalOutputTokens +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
