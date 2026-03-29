@@ -48,6 +48,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
@@ -94,6 +95,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     private final SharedTemplateService sharedTemplateService;
     private final WorkflowCacheManager workflowCacheManager;
     private final WorkflowFacade workflowFacade;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
@@ -105,7 +107,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, SharedTemplateFileStorage sharedTemplateFileStorage,
         SharedTemplateService sharedTemplateService, WorkflowCacheManager workflowCacheManager,
-        WorkflowFacade workflowFacade, WorkflowService workflowService,
+        WorkflowFacade workflowFacade, List<WorkflowPreDeleteListener> workflowPreDeleteListeners,
+        WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.componentDefinitionHelper = componentDefinitionHelper;
@@ -120,6 +123,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         this.sharedTemplateService = sharedTemplateService;
         this.workflowCacheManager = workflowCacheManager;
         this.workflowFacade = workflowFacade;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -173,6 +177,10 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
         for (ProjectVersion projectVersion : project.getProjectVersions()) {
             projectWorkflowService.delete(project.getId(), projectVersion.getVersion(), workflowId);
+        }
+
+        for (WorkflowPreDeleteListener listener : workflowPreDeleteListeners) {
+            listener.onWorkflowPreDelete(workflowId);
         }
 
         workflowTestConfigurationService.delete(workflowId);
