@@ -9,6 +9,7 @@ import {Outlet, useParams} from 'react-router-dom';
 const WorkflowChatContainer = () => {
     const {workflowExecutionId} = useParams();
 
+    const currentChatName = useWorkflowChatStore((state) => state.currentChatName);
     const reset = useWorkflowChatStore((state) => state.reset);
 
     useEffect(() => {
@@ -20,7 +21,7 @@ const WorkflowChatContainer = () => {
     return (
         <LayoutContainer
             className="bg-surface-main"
-            header={<Header centerTitle position="main" right={<EnvironmentSelect />} title="Workflow Chat" />}
+            header={<Header centerTitle position="main" right={<EnvironmentSelect />} title={currentChatName} />}
             leftSidebarBody={<WorkflowChatSidebar />}
             leftSidebarHeader={<Header position="sidebar" title="Workflow Chat" />}
             leftSidebarWidth="64"

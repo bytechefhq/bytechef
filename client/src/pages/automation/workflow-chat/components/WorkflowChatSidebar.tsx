@@ -4,7 +4,6 @@ import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useW
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useWorkflowChatWorkspaceProjectDeploymentsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {MessageCircleMoreIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {useParams} from 'react-router-dom';
 
