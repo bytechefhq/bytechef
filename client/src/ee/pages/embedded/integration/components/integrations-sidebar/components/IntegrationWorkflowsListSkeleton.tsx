@@ -2,21 +2,21 @@ import {Skeleton} from '@/components/ui/skeleton';
 
 const IntegrationWorkflowsListSkeleton = () => {
     return (
-        <ul className="ml-2 mt-4 flex flex-col gap-7">
-            <li className="flex flex-col gap-1">
+        <ul className="flex flex-col items-center gap-4 pt-4">
+            <li className="flex w-80 flex-col gap-1">
                 <Skeleton className="mb-1 size-5 rounded-full" />
 
-                <Skeleton className="h-6 w-1/3" />
+                <Skeleton className="h-6 w-full" />
 
-                <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="h-6 w-1/2" />
             </li>
 
-            <li className="flex flex-col gap-1">
+            <li className="flex w-80 flex-col gap-1">
                 <Skeleton className="mb-1 size-5 rounded-full" />
 
-                <Skeleton className="h-6 w-1/3" />
+                <Skeleton className="h-6 w-full" />
 
-                <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="h-6 w-1/2" />
             </li>
         </ul>
     );

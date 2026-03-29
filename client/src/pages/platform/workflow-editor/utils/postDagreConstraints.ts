@@ -2131,11 +2131,7 @@ function computeMainAxisGap(predecessorNode: Node, currentNode: Node, direction:
 
     // TB mode: getRenderedMainAxisSize returns 0, so RF position = dagre center.
     // Gap = half dagre heights + ranksep.
-    return getTBDagreHeight(predecessorNode) / 2 + RANKSEP + getTBDagreHeight(currentNode) / 2;
-}
-
-function getTBDagreHeight(node: Node): number {
-    return NODE_HEIGHT;
+    return NODE_HEIGHT / 2 + RANKSEP + NODE_HEIGHT / 2;
 }
 
 function getLRDagreWidth(node: Node): number {
