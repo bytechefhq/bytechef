@@ -17,15 +17,19 @@ extend type Mutation {
     updateAgentEvalTest(id: ID!, name: String, description: String): AgentEvalTest!
     deleteAgentEvalTest(id: ID!): Boolean!
 
-    createAgentEvalScenario(agentEvalTestId: ID!, name: String!, type: AgentScenarioType!, userMessage: String, expectedOutput: String, personaPrompt: String, maxTurns: Int): AgentEvalScenario!
-    updateAgentEvalScenario(id: ID!, name: String, userMessage: String, expectedOutput: String, personaPrompt: String, maxTurns: Int): AgentEvalScenario!
+    createAgentEvalScenario(agentEvalTestId: ID!, name: String!, type: AgentScenarioType!, userMessage: String, expectedOutput: String, personaPrompt: String, maxTurns: Int, numberOfRuns: Int): AgentEvalScenario!
+    updateAgentEvalScenario(id: ID!, name: String, userMessage: String, expectedOutput: String, personaPrompt: String, maxTurns: Int, numberOfRuns: Int): AgentEvalScenario!
     deleteAgentEvalScenario(id: ID!): Boolean!
 
     createAgentScenarioJudge(agentEvalScenarioId: ID!, name: String!, type: AgentJudgeType!, configuration: Map!): AgentScenarioJudge!
     updateAgentScenarioJudge(id: ID!, name: String, configuration: Map): AgentScenarioJudge!
     deleteAgentScenarioJudge(id: ID!): Boolean!
 
-    startAgentEvalRun(agentEvalTestId: ID!, name: String!, environmentId: ID!): AgentEvalRun!
+    createAgentScenarioToolSimulation(agentEvalScenarioId: ID!, toolName: String!, responsePrompt: String!, simulationModel: String): AgentScenarioToolSimulation!
+    updateAgentScenarioToolSimulation(id: ID!, toolName: String, responsePrompt: String, simulationModel: String): AgentScenarioToolSimulation!
+    deleteAgentScenarioToolSimulation(id: ID!): Boolean!
+
+    startAgentEvalRun(agentEvalTestId: ID!, name: String!, environmentId: ID!, scenarioIds: [ID!], agentJudgeIds: [ID!]): AgentEvalRun!
     cancelAgentEvalRun(id: ID!): AgentEvalRun!
 }
 
@@ -55,7 +59,9 @@ type AgentEvalScenario {
     expectedOutput: String
     personaPrompt: String
     maxTurns: Int
+    numberOfRuns: Int
     judges: [AgentScenarioJudge!]!
+    toolSimulations: [AgentScenarioToolSimulation!]!
     createdDate: Long
     lastModifiedDate: Long
 }
@@ -69,6 +75,15 @@ type AgentScenarioJudge {
     lastModifiedDate: Long
 }
 
+type AgentScenarioToolSimulation {
+    id: ID!
+    toolName: String!
+    responsePrompt: String!
+    simulationModel: String
+    createdDate: Long
+    lastModifiedDate: Long
+}
+
 type AgentEvalRun {
     id: ID!
     name: String!
@@ -76,6 +91,9 @@ type AgentEvalRun {
     averageScore: Float
     totalScenarios: Int!
     completedScenarios: Int!
+    agentVersion: String
+    totalInputTokens: Int
+    totalOutputTokens: Int
     startedDate: Long
     completedDate: Long
     results: [AgentEvalResult!]!
@@ -89,6 +107,9 @@ type AgentEvalResult {
     score: Float
     errorMessage: String
     transcriptFile: String
+    inputTokens: Int
+    outputTokens: Int
+    runIndex: Int
     verdicts: [AgentJudgeVerdict!]!
     createdDate: Long
 }
@@ -110,6 +131,8 @@ enum AgentJudgeType {
     RESPONSE_LENGTH
     JSON_SCHEMA
     SIMILARITY
+    STRING_EQUALS
+    TOOL_USAGE
 }
 
 enum AgentJudgeScope {
