@@ -531,8 +531,9 @@ public class AgentEvalRunExecutor {
             return executeMultiTurnScenario(evalRun, scenario, evalRunId, chatClientBuilder);
         }
 
-        String conversationId = UUID.randomUUID()
-            .toString();
+        UUID uuid = UUID.randomUUID();
+
+        String conversationId = uuid.toString();
 
         Map<String, String> toolSimulations = loadToolSimulations(scenario.getId());
 
@@ -565,8 +566,9 @@ public class AgentEvalRunExecutor {
 
         Map<String, String> toolSimulations = loadToolSimulations(scenario.getId());
 
-        String conversationId = UUID.randomUUID()
-            .toString();
+        UUID uuid = UUID.randomUUID();
+
+        String conversationId = uuid.toString();
 
         List<Map<String, String>> conversationHistory = new ArrayList<>();
         List<Map<String, String>> transcriptTurns = new ArrayList<>();
