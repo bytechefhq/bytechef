@@ -63,7 +63,7 @@ public class WaitOnWebHookCallAction {
                     .description(
                         "The URL of the external service to notify with the webhook resume URL when the " +
                             "workflow is suspended.")
-                    .required(false),
+                    .required(true),
                 string(DATA)
                     .label("Data Schema")
                     .description(
