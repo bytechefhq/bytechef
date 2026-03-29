@@ -24,6 +24,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -37,17 +38,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade {
 
     private final ConnectionFacade connectionFacade;
+    private final ConnectionLifecycleFacade connectionLifecycleFacade;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
-        ConnectionFacade connectionFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ConnectionFacade connectionFacade,
+        ConnectionLifecycleFacade connectionLifecycleFacade,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
+        this.connectionLifecycleFacade = connectionLifecycleFacade;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
@@ -59,6 +64,11 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         workspaceConnectionService.create(connectionId, workspaceId);
 
+        ConnectionDTO connection = connectionFacade.getConnection(connectionId);
+
+        connectionLifecycleFacade.scheduleConnectionRefresh(
+            connectionId, connection.parameters(), connection.authorizationType());
+
         return connectionId;
     }
 
@@ -67,6 +77,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
         connectionFacade.delete(connectionId);
+
+        connectionLifecycleFacade.deleteScheduledConnectionRefresh(connectionId);
     }
 
     @Override

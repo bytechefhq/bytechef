@@ -53,6 +53,8 @@ public interface ConnectionDefinitionService extends OperationDefinitionService 
 
     Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection, Context context);
 
+    Context createConnectionRefreshContext(String componentName, ComponentConnection componentConnection);
+
     RefreshTokenResponse executeRefresh(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context);
