@@ -53,6 +53,8 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
                             onDeleteTest={handleDeleteTest}
                             onUpdateScenario={handleUpdateScenario}
                             test={test}
+                            workflowId={workflowId}
+                            workflowNodeName={workflowNodeName}
                         />
                     ))}
                 </>
