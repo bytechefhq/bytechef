@@ -28,6 +28,6 @@ export default function computeBranchCaseLabelPosition({
 
     return {
         x: targetX,
-        y: sourceY,
+        y: sourceY + EDGE_BUTTON_OFFSET,
     };
 }

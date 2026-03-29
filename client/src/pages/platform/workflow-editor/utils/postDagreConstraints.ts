@@ -256,7 +256,12 @@ export function alignBranchCaseChildren(
 
         const sourceData = sourceNode.data as NodeDataType;
 
-        if (!sourceData.branchId) {
+        const dispatcherId =
+            sourceData.branchId ||
+            ((sourceData as Record<string, unknown>).parallelId as string | undefined) ||
+            ((sourceData as Record<string, unknown>).forkJoinId as string | undefined);
+
+        if (!dispatcherId) {
             return;
         }
 
@@ -266,12 +271,12 @@ export function alignBranchCaseChildren(
             return;
         }
 
-        const branchNode = allNodes.find((node) => node.id === sourceData.branchId);
-        const branchCenterCross = branchNode
-            ? branchNode.position[crossAxis] + crossAxisSize / 2
+        const dispatcherNode = allNodes.find((node) => node.id === dispatcherId);
+        const dispatcherCenterCross = dispatcherNode
+            ? dispatcherNode.position[crossAxis] + crossAxisSize / 2
             : sourceNode.position[crossAxis] + CLUSTER_ELEMENT_NODE_WIDTH / 2;
 
-        const targetCross = branchCenterCross - crossAxisSize / 2;
+        const targetCross = dispatcherCenterCross - crossAxisSize / 2;
 
         if (isMiddleCase) {
             targetNode.position = {
@@ -281,17 +286,6 @@ export function alignBranchCaseChildren(
 
             // Walk the chain from the first child and align subsequent nodes
             alignCaseChainNodes(allNodes, edges, targetNode, targetCross, crossAxis);
-        } else {
-            const distance = Math.abs(targetNode.position[crossAxis] - targetCross);
-
-            if (distance <= CLUSTER_ELEMENT_NODE_WIDTH) {
-                targetNode.position = {
-                    ...targetNode.position,
-                    [crossAxis]: targetCross,
-                };
-
-                alignCaseChainNodes(allNodes, edges, targetNode, targetCross, crossAxis);
-            }
         }
     });
 }
