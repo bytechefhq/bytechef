@@ -223,6 +223,25 @@ export default async function saveWorkflowDefinition({
                 updatedWorkflowDefinitionTasks = [...updatedWorkflowDefinitionTasks];
 
                 updatedWorkflowDefinitionTasks.splice(nodeIndex, 0, newTask);
+
+                // Clear saved positions for tasks after the insertion point,
+                // since their positions are now stale due to the shift.
+                for (let taskIndex = nodeIndex + 1; taskIndex < updatedWorkflowDefinitionTasks.length; taskIndex++) {
+                    const task = updatedWorkflowDefinitionTasks[taskIndex];
+
+                    if (task.metadata?.ui?.nodePosition) {
+                        updatedWorkflowDefinitionTasks[taskIndex] = {
+                            ...task,
+                            metadata: {
+                                ...task.metadata,
+                                ui: {
+                                    ...task.metadata.ui,
+                                    nodePosition: undefined,
+                                },
+                            },
+                        };
+                    }
+                }
             } else {
                 updatedWorkflowDefinitionTasks.push(newTask);
             }
