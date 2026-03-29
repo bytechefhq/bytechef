@@ -2269,6 +2269,51 @@ export function alignChainNodesCrossAxis(
         }
     }
 
+    // Validate saved positions: if a predecessor (without saved position) was
+    // placed by dagre at or beyond the saved node's position, push the saved
+    // node forward to maintain the proper gap. This handles the case where a
+    // new node is inserted before a manually positioned node.
+    for (const [nodeId] of anchored) {
+        const predecessorId = predecessorMap.get(nodeId);
+
+        if (!predecessorId) {
+            continue;
+        }
+
+        const nodeIndex = nodeIndexById.get(nodeId);
+        const predecessorIndex = nodeIndexById.get(predecessorId);
+
+        if (nodeIndex === undefined || predecessorIndex === undefined) {
+            continue;
+        }
+
+        const node = allNodes[nodeIndex];
+        const predecessorNode = allNodes[predecessorIndex];
+        const minMainAxisPosition = predecessorNode.position[mainAxis] + computeMainAxisGap(predecessorNode, node, direction);
+
+        if (node.position[mainAxis] < minMainAxisPosition) {
+            const newPosition = {
+                ...node.position,
+                [mainAxis]: minMainAxisPosition,
+            };
+
+            allNodes[nodeIndex] = {
+                ...node,
+                data: {
+                    ...node.data,
+                    metadata: {
+                        ...(node.data as NodeDataType).metadata,
+                        ui: {
+                            ...(node.data as NodeDataType).metadata?.ui,
+                            nodePosition: newPosition,
+                        },
+                    },
+                },
+                position: newPosition,
+            };
+        }
+    }
+
     let changed = true;
 
     while (changed) {
