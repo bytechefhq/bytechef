@@ -61,6 +61,18 @@ public class AgentJudgeFactory {
                 (String) configuration.get("expectedOutput"),
                 ((Number) configuration.get("threshold")).doubleValue(),
                 (String) configuration.get("algorithm"));
+            case STRING_EQUALS -> new StringEqualsJudge(
+                (String) configuration.get("expectedValue"),
+                configuration.containsKey("caseSensitive")
+                    ? (Boolean) configuration.get("caseSensitive")
+                    : true);
+            case TOOL_USAGE -> new ToolUsageJudge(
+                (String) configuration.get("toolName"),
+                (String) configuration.getOrDefault("position", "ANYWHERE"),
+                (String) configuration.getOrDefault("comparison", "AT_LEAST"),
+                configuration.containsKey("count")
+                    ? ((Number) configuration.get("count")).intValue()
+                    : 1);
         };
 
         JudgeType judgeType = (type == AgentJudgeType.LLM_RULE) ? JudgeType.LLM_POWERED : JudgeType.DETERMINISTIC;
