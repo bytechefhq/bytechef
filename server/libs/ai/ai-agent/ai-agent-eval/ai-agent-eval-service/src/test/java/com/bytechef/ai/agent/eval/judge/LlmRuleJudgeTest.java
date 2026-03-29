@@ -33,7 +33,7 @@ class LlmRuleJudgeTest {
 
     private static final String RULE = "The agent must respond politely";
 
-    private final LlmRuleJudge judge = new LlmRuleJudge("PolitenessJudge", null, RULE);
+    private final LlmRuleJudge judge = new LlmRuleJudge("PolitenessJudge", null, RULE, false);
 
     @Test
     void testBuildPromptContainsRule() {
