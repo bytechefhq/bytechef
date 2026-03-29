@@ -59,10 +59,23 @@ class AgentEvalRunFacadeImpl implements AgentEvalRunFacade {
     }
 
     @Override
-    public AgentEvalRun startEvalRun(long agentEvalTestId, String name, long environmentId) {
+    public AgentEvalRun startEvalRun(
+        long agentEvalTestId, String name, long environmentId,
+        List<Long> scenarioIds, List<Long> agentJudgeIds) {
+
         AgentEvalTest agentEvalTest = agentEvalTestService.getAgentEvalTest(agentEvalTestId);
 
-        List<AgentEvalScenario> scenarios = agentEvalScenarioService.getAgentEvalScenarios(agentEvalTestId);
+        List<AgentEvalScenario> allScenarios = agentEvalScenarioService.getAgentEvalScenarios(agentEvalTestId);
+
+        List<AgentEvalScenario> scenarios = (scenarioIds == null || scenarioIds.isEmpty())
+            ? allScenarios
+            : allScenarios.stream()
+                .filter(scenario -> scenarioIds.contains(scenario.getId()))
+                .toList();
+
+        int totalRuns = scenarios.stream()
+            .mapToInt(scenario -> Math.max(1, scenario.getNumberOfRuns()))
+            .sum();
 
         AgentEvalRun agentEvalRun = new AgentEvalRun();
 
@@ -72,18 +85,24 @@ class AgentEvalRunFacadeImpl implements AgentEvalRunFacade {
         agentEvalRun.setEnvironmentId(environmentId);
         agentEvalRun.setName(name);
         agentEvalRun.setStatus(AgentEvalRunStatus.PENDING);
-        agentEvalRun.setTotalScenarios(scenarios.size());
+        agentEvalRun.setTotalScenarios(totalRuns);
         agentEvalRun.setCompletedScenarios(0);
 
         agentEvalRun = agentEvalRunService.createAgentEvalRun(agentEvalRun);
 
         long evalRunId = agentEvalRun.getId();
 
+        List<Long> finalScenarioIds = scenarios.stream()
+            .map(AgentEvalScenario::getId)
+            .toList();
+
+        List<Long> finalAgentJudgeIds = (agentJudgeIds == null) ? List.of() : agentJudgeIds;
+
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
             @Override
             public void afterCommit() {
-                agentEvalRunExecutor.executeRunAsync(evalRunId);
+                agentEvalRunExecutor.executeRunAsync(evalRunId, finalScenarioIds, finalAgentJudgeIds);
             }
         });
 

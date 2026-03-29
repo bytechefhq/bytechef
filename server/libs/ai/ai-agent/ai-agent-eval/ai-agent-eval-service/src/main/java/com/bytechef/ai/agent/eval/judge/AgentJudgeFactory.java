@@ -40,7 +40,8 @@ public class AgentJudgeFactory {
 
         Judge judge = switch (type) {
             case LLM_RULE -> new LlmRuleJudge(
-                name, chatClientBuilder, (String) configuration.get("rule"));
+                name, chatClientBuilder, (String) configuration.get("rule"),
+                Boolean.TRUE.equals(configuration.get("truncateLongConversations")));
             case CONTAINS_TEXT -> new ContainsTextJudge(
                 (String) configuration.get("text"),
                 (String) configuration.get("mode"));

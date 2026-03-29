@@ -17,6 +17,8 @@
 package com.bytechef.ai.agent.eval.judge;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springaicommunity.judge.context.JudgmentContext;
 import org.springaicommunity.judge.llm.LLMJudge;
 import org.springaicommunity.judge.result.Judgment;
@@ -24,6 +26,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * An LLM-based judge that evaluates agent output against a user-defined rule.
@@ -35,14 +38,22 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class LlmRuleJudge extends LLMJudge {
 
+    private static final Logger logger = LoggerFactory.getLogger(LlmRuleJudge.class);
+
+    private static final int MAX_TRANSCRIPT_LENGTH = 100_000;
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final String rule;
+    private final boolean truncateLongConversations;
 
-    public LlmRuleJudge(String name, ChatClient.Builder chatClientBuilder, String rule) {
+    public LlmRuleJudge(String name, ChatClient.Builder chatClientBuilder, String rule,
+        boolean truncateLongConversations) {
+
         super(name, "Evaluates against: " + rule, chatClientBuilder);
 
         this.rule = rule;
+        this.truncateLongConversations = truncateLongConversations;
     }
 
     @Override
@@ -50,6 +61,10 @@ public class LlmRuleJudge extends LLMJudge {
     protected String buildPrompt(JudgmentContext context) {
         String transcript = (String) context.metadata()
             .getOrDefault("transcript", "");
+
+        if (truncateLongConversations && transcript.length() > MAX_TRANSCRIPT_LENGTH) {
+            transcript = truncateTranscript(transcript);
+        }
 
         String agentOutput = context.agentOutput()
             .orElse("");
@@ -101,4 +116,39 @@ public class LlmRuleJudge extends LLMJudge {
         }
     }
 
+    private String truncateTranscript(String transcript) {
+        try {
+            JsonNode rootNode = OBJECT_MAPPER.readTree(transcript);
+
+            JsonNode messagesNode = rootNode.get("messages");
+
+            if (messagesNode == null || !messagesNode.isArray()) {
+                return transcript.substring(transcript.length() - MAX_TRANSCRIPT_LENGTH);
+            }
+
+            ArrayNode messages = (ArrayNode) messagesNode;
+
+            while (messages.size() > 2) {
+                String serialized = OBJECT_MAPPER.writeValueAsString(rootNode);
+
+                if (serialized.length() <= MAX_TRANSCRIPT_LENGTH) {
+                    return serialized;
+                }
+
+                messages.remove(0);
+            }
+
+            String serialized = OBJECT_MAPPER.writeValueAsString(rootNode);
+
+            if (serialized.length() <= MAX_TRANSCRIPT_LENGTH) {
+                return serialized;
+            }
+
+            return serialized.substring(serialized.length() - MAX_TRANSCRIPT_LENGTH);
+        } catch (JacksonException jacksonException) {
+            logger.warn("Failed to parse transcript JSON for truncation, falling back to substring", jacksonException);
+
+            return transcript.substring(transcript.length() - MAX_TRANSCRIPT_LENGTH);
+        }
+    }
 }

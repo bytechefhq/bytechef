@@ -17,13 +17,16 @@
 package com.bytechef.ai.agent.eval.facade;
 
 import com.bytechef.ai.agent.eval.domain.AgentEvalRun;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public interface AgentEvalRunFacade {
 
-    AgentEvalRun startEvalRun(long agentEvalTestId, String name, long environmentId);
+    AgentEvalRun startEvalRun(
+        long agentEvalTestId, String name, long environmentId,
+        List<Long> scenarioIds, List<Long> agentJudgeIds);
 
     AgentEvalRun cancelEvalRun(long id);
 
