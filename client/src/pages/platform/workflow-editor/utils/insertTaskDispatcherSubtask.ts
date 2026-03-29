@@ -1,6 +1,7 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherContextType} from '@/shared/types';
 
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
@@ -91,19 +92,28 @@ export default function insertTaskDispatcherSubtask({
 
         updatedSubtasks.splice(context.index, 0, newTask);
 
-        // Clear saved positions for subtasks after the insertion point,
-        // since their positions are now stale due to the shift.
+        // Clear main-axis of saved positions for subtasks after the insertion
+        // point so dagre can shift them, but preserve cross-axis customization.
+        const direction = useLayoutDirectionStore.getState().layoutDirection;
+        const mainAxis = direction === 'TB' ? 'y' : 'x';
+        const crossAxis = direction === 'TB' ? 'x' : 'y';
+
         for (let subtaskIndex = context.index + 1; subtaskIndex < updatedSubtasks.length; subtaskIndex++) {
             const subtask = updatedSubtasks[subtaskIndex];
 
             if (subtask.metadata?.ui?.nodePosition) {
+                const savedCrossValue = subtask.metadata.ui.nodePosition[crossAxis];
+
                 updatedSubtasks[subtaskIndex] = {
                     ...subtask,
                     metadata: {
                         ...subtask.metadata,
                         ui: {
                             ...subtask.metadata.ui,
-                            nodePosition: undefined,
+                            nodePosition: {
+                                [crossAxis]: savedCrossValue,
+                                [mainAxis]: undefined,
+                            } as {x: number; y: number},
                         },
                     },
                 };
