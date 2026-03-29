@@ -56,8 +56,8 @@ export default function useAgentEvalsRunsTab(agentEvalTestId: string | null) {
     });
 
     const handleStartRun = useCallback(
-        (testId: string, name: string, environmentId: string) => {
-            startRunMutation.mutate({agentEvalTestId: testId, environmentId, name});
+        (testId: string, name: string, environmentId: string, scenarioIds?: string[], agentJudgeIds?: string[]) => {
+            startRunMutation.mutate({agentEvalTestId: testId, agentJudgeIds, environmentId, name, scenarioIds});
         },
         [startRunMutation]
     );
@@ -98,6 +98,8 @@ export default function useAgentEvalsRunsTab(agentEvalTestId: string | null) {
             errorCount,
             failedCount,
             passedCount,
+            totalInputTokens: selectedRun.totalInputTokens,
+            totalOutputTokens: selectedRun.totalOutputTokens,
             totalScenarios: selectedRun.totalScenarios,
         };
     }, [selectedRun]);

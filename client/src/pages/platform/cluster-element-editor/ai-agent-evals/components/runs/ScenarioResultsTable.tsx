@@ -37,7 +37,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
         <>
             <div className="rounded-lg border border-border/50">
                 <div className="border-b border-border/50 px-3 py-2">
-                    <div className="grid grid-cols-[24px_1fr_100px_80px_60px_32px] items-center gap-2 text-xs font-medium text-gray-500">
+                    <div className="grid grid-cols-[24px_1fr_100px_80px_80px_60px_32px] items-center gap-2 text-xs font-medium text-gray-500">
                         <div />
 
                         <div>Scenario</div>
@@ -45,6 +45,8 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                         <div>Type</div>
 
                         <div>Score</div>
+
+                        <div>Tokens</div>
 
                         <div>Judges</div>
 
@@ -56,16 +58,25 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                     const isExpanded = expandedResultId === result.id;
                     const isSingleTurn = result.scenario.type === AgentScenarioType.SingleTurn;
                     const scorePercent = result.score != null ? Math.round(result.score * 100) : null;
+                    const inputTokens = result.inputTokens ?? 0;
+                    const outputTokens = result.outputTokens ?? 0;
+                    const hasTokens = inputTokens > 0 || outputTokens > 0;
+                    const runIndexSuffix =
+                        result.runIndex != null && result.runIndex > 0 ? ` (Run ${result.runIndex + 1})` : '';
 
                     return (
                         <div className="border-b border-border/30 last:border-b-0" key={result.id}>
                             <div
-                                className="grid cursor-pointer grid-cols-[24px_1fr_100px_80px_60px_32px] items-center gap-2 px-3 py-2.5 hover:bg-gray-50"
+                                className="grid cursor-pointer grid-cols-[24px_1fr_100px_80px_80px_60px_32px] items-center gap-2 px-3 py-2.5 hover:bg-gray-50"
                                 onClick={() => setExpandedResultId(isExpanded ? null : result.id)}
                             >
                                 <div>{STATUS_ICONS[result.status]}</div>
 
-                                <div className="truncate text-sm font-medium">{result.scenario.name}</div>
+                                <div className="truncate text-sm font-medium">
+                                    {result.scenario.name}
+
+                                    {runIndexSuffix}
+                                </div>
 
                                 <div>
                                     <span
@@ -102,6 +113,10 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                     ) : (
                                         <span className="text-xs text-gray-400">--</span>
                                     )}
+                                </div>
+
+                                <div className="text-xs text-gray-500">
+                                    {hasTokens ? `${inputTokens + outputTokens}` : '\u2014'}
                                 </div>
 
                                 <div className="text-xs text-gray-500">{result.verdicts.length}</div>

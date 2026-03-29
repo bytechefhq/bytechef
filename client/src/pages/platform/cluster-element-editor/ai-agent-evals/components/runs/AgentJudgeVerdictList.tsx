@@ -11,6 +11,8 @@ const JUDGE_TYPE_LABELS: Record<AgentJudgeType, string> = {
     [AgentJudgeType.RegexMatch]: 'Regex Match',
     [AgentJudgeType.ResponseLength]: 'Response Length',
     [AgentJudgeType.Similarity]: 'Similarity',
+    [AgentJudgeType.StringEquals]: 'String Equals',
+    [AgentJudgeType.ToolUsage]: 'Tool Usage',
 };
 
 const JUDGE_TYPE_COLORS: Record<AgentJudgeType, string> = {
@@ -20,6 +22,8 @@ const JUDGE_TYPE_COLORS: Record<AgentJudgeType, string> = {
     [AgentJudgeType.RegexMatch]: 'border-purple-200 bg-purple-50 text-purple-700',
     [AgentJudgeType.ResponseLength]: 'border-green-200 bg-green-50 text-green-700',
     [AgentJudgeType.Similarity]: 'border-teal-200 bg-teal-50 text-teal-700',
+    [AgentJudgeType.StringEquals]: 'border-cyan-200 bg-cyan-50 text-cyan-700',
+    [AgentJudgeType.ToolUsage]: 'border-orange-200 bg-orange-50 text-orange-700',
 };
 
 const SCOPE_LABELS: Record<AgentJudgeScope, string> = {

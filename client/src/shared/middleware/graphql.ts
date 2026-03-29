@@ -3402,7 +3402,7 @@ export type AgentEvalTestQueryVariables = Exact<{
 }>;
 
 
-export type AgentEvalTestQuery = { __typename?: 'Query', agentEvalTest?: { __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }> } | null };
+export type AgentEvalTestQuery = { __typename?: 'Query', agentEvalTest?: { __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }> } | null };
 
 export type AgentEvalTestsQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -5133,6 +5133,7 @@ export const AgentEvalTestDocument = new TypedDocumentString(`
       expectedOutput
       personaPrompt
       maxTurns
+      numberOfRuns
       judges {
         id
         name

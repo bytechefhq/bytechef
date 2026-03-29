@@ -32,6 +32,8 @@ const JUDGE_TYPE_OPTIONS: Array<{label: string; value: AgentJudgeType}> = [
     {label: 'Response Length', value: AgentJudgeType.ResponseLength},
     {label: 'JSON Schema', value: AgentJudgeType.JsonSchema},
     {label: 'Similarity', value: AgentJudgeType.Similarity},
+    {label: 'String Equals', value: AgentJudgeType.StringEquals},
+    {label: 'Tool Usage', value: AgentJudgeType.ToolUsage},
 ];
 
 interface CreateJudgeDialogProps {
@@ -45,8 +47,10 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
     const editConfig = (editData?.configuration ?? {}) as Record<string, unknown>;
 
     const [algorithm, setAlgorithm] = useState<string>(String(editConfig.algorithm ?? 'COSINE'));
+    const [caseSensitive, setCaseSensitive] = useState(editConfig.caseSensitive !== false);
     const [connectionId, setConnectionId] = useState<string>(String(editConfig.connectionId ?? ''));
     const [expectedOutput, setExpectedOutput] = useState(String(editConfig.expectedOutput ?? ''));
+    const [expectedValue, setExpectedValue] = useState(String(editConfig.expectedValue ?? ''));
     const [jsonSchema, setJsonSchema] = useState(String(editConfig.schema ?? ''));
     const [jsonSchemaError, setJsonSchemaError] = useState('');
     const [judgeType, setJudgeType] = useState<AgentJudgeType>(editData?.type ?? AgentJudgeType.LlmRule);
@@ -61,6 +65,10 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
     const [rule, setRule] = useState(String(editConfig.rule ?? ''));
     const [searchText, setSearchText] = useState(String(editConfig.text ?? ''));
     const [threshold, setThreshold] = useState(String(editConfig.threshold ?? '0.8'));
+    const [toolComparison, setToolComparison] = useState(String(editConfig.comparison ?? 'AT_LEAST'));
+    const [toolCount, setToolCount] = useState(Number(editConfig.count ?? 1));
+    const [toolName, setToolName] = useState(String(editConfig.toolName ?? ''));
+    const [toolPosition, setToolPosition] = useState(String(editConfig.position ?? 'ANYWHERE'));
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -169,6 +177,17 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                     algorithm,
                     expectedOutput: expectedOutput.trim(),
                     threshold: Number(threshold),
+                };
+
+            case AgentJudgeType.StringEquals:
+                return {caseSensitive, expectedValue: expectedValue.trim()};
+
+            case AgentJudgeType.ToolUsage:
+                return {
+                    comparison: toolComparison,
+                    count: toolCount,
+                    position: toolPosition,
+                    toolName: toolName.trim(),
                 };
 
             default:
@@ -747,6 +766,188 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                         Edit Distance
                                     </button>
                                 </div>
+                            </div>
+                        </>
+                    )}
+
+                    {judgeType === AgentJudgeType.StringEquals && (
+                        <>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1">
+                                    <Label htmlFor="judge-expected-value">Expected Value</Label>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-3.5 text-muted-foreground" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent className="max-w-64" side="right">
+                                            The exact text the agent response must match.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+
+                                <Input
+                                    id="judge-expected-value"
+                                    onChange={(event) => setExpectedValue(event.target.value)}
+                                    placeholder="Enter the expected value"
+                                    value={expectedValue}
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1">
+                                    <Label>Case Sensitive</Label>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-3.5 text-muted-foreground" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent className="max-w-64" side="right">
+                                            When enabled, the comparison is case-sensitive.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        className={twMerge(
+                                            'rounded-md border px-3 py-1.5 text-sm',
+                                            caseSensitive
+                                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        )}
+                                        onClick={() => setCaseSensitive(true)}
+                                        type="button"
+                                    >
+                                        Yes
+                                    </button>
+
+                                    <button
+                                        className={twMerge(
+                                            'rounded-md border px-3 py-1.5 text-sm',
+                                            !caseSensitive
+                                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        )}
+                                        onClick={() => setCaseSensitive(false)}
+                                        type="button"
+                                    >
+                                        No
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {judgeType === AgentJudgeType.ToolUsage && (
+                        <>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1">
+                                    <Label htmlFor="judge-tool-name">Tool Name</Label>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-3.5 text-muted-foreground" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent className="max-w-64" side="right">
+                                            The name of the tool that should be used during the conversation.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+
+                                <Input
+                                    id="judge-tool-name"
+                                    onChange={(event) => setToolName(event.target.value)}
+                                    placeholder="Enter tool name"
+                                    value={toolName}
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1">
+                                    <Label>Position</Label>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-3.5 text-muted-foreground" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent className="max-w-64" side="right">
+                                            Where in the conversation the tool should appear.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+
+                                <Select onValueChange={setToolPosition} value={toolPosition}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select position..." />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="ANYWHERE">Anywhere</SelectItem>
+
+                                        <SelectItem value="FIRST">First</SelectItem>
+
+                                        <SelectItem value="LAST">Last</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1">
+                                    <Label>Comparison</Label>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-3.5 text-muted-foreground" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent className="max-w-64" side="right">
+                                            How to compare the actual tool usage count against the expected count.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+
+                                <Select onValueChange={setToolComparison} value={toolComparison}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select comparison..." />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="AT_LEAST">At Least</SelectItem>
+
+                                        <SelectItem value="EXACTLY">Exactly</SelectItem>
+
+                                        <SelectItem value="AT_MOST">At Most</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1">
+                                    <Label htmlFor="judge-tool-count">Count</Label>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-3.5 text-muted-foreground" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent className="max-w-64" side="right">
+                                            The expected number of times the tool should be used.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+
+                                <Input
+                                    id="judge-tool-count"
+                                    min={1}
+                                    onChange={(event) => setToolCount(Number(event.target.value))}
+                                    type="number"
+                                    value={toolCount}
+                                />
                             </div>
                         </>
                     )}

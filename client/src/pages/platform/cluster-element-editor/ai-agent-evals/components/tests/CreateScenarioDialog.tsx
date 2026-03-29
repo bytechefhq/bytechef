@@ -16,6 +16,7 @@ interface CreateScenarioDialogProps {
         id: string;
         maxTurns?: number | null;
         name: string;
+        numberOfRuns?: number | null;
         personaPrompt?: string | null;
         type: AgentScenarioType;
         userMessage?: string | null;
@@ -28,6 +29,7 @@ interface CreateScenarioDialogProps {
         fields: {
             expectedOutput?: string;
             maxTurns?: number;
+            numberOfRuns?: number;
             personaPrompt?: string;
             userMessage?: string;
         }
@@ -48,6 +50,7 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
     const [expectedOutput, setExpectedOutput] = useState(editData?.expectedOutput ?? '');
     const [maxTurns, setMaxTurns] = useState(editData?.maxTurns ?? 10);
     const [name, setName] = useState(editData?.name ?? '');
+    const [numberOfRuns, setNumberOfRuns] = useState(editData?.numberOfRuns ?? 1);
     const [personaPrompt, setPersonaPrompt] = useState(editData?.personaPrompt ?? '');
     const [scenarioType, setScenarioType] = useState<AgentScenarioType>(editData?.type ?? AgentScenarioType.SingleTurn);
     const [userMessage, setUserMessage] = useState(editData?.userMessage ?? '');
@@ -63,11 +66,14 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
             scenarioType === AgentScenarioType.SingleTurn
                 ? {
                       expectedOutput: expectedOutput.trim() || undefined,
+                      numberOfRuns: numberOfRuns > 1 ? numberOfRuns : undefined,
                       userMessage: userMessage.trim() || undefined,
                   }
                 : {
                       maxTurns,
+                      numberOfRuns: numberOfRuns > 1 ? numberOfRuns : undefined,
                       personaPrompt: personaPrompt.trim() || undefined,
+                      userMessage: userMessage.trim() || undefined,
                   };
 
         if (isEditing && editData && onUpdate) {
@@ -240,6 +246,32 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
 
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1">
+                                    <Label htmlFor="scenario-first-message">First Message (Optional)</Label>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InfoIcon className="size-3.5 text-muted-foreground" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent className="max-w-64" side="right">
+                                            Optional fixed opening message. If set, this is sent as the first user
+                                            message before the persona takes over. If empty, the user simulator
+                                            generates the first message.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+
+                                <Textarea
+                                    id="scenario-first-message"
+                                    onChange={(event) => setUserMessage(event.target.value)}
+                                    placeholder="Enter an optional first message"
+                                    rows={2}
+                                    value={userMessage}
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-1">
                                     <Label htmlFor="scenario-max-turns">Max Turns</Label>
 
                                     <Tooltip>
@@ -266,6 +298,32 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                             </div>
                         </>
                     )}
+
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1">
+                            <Label htmlFor="scenario-number-of-runs">Number of Runs</Label>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <InfoIcon className="size-3.5 text-muted-foreground" />
+                                </TooltipTrigger>
+
+                                <TooltipContent className="max-w-64" side="right">
+                                    Run this scenario multiple times to detect non-deterministic behavior. Each run
+                                    produces an independent result.
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+
+                        <Input
+                            id="scenario-number-of-runs"
+                            max={20}
+                            min={1}
+                            onChange={(event) => setNumberOfRuns(Number(event.target.value))}
+                            type="number"
+                            value={numberOfRuns}
+                        />
+                    </div>
                 </fieldset>
 
                 <DialogFooter>
