@@ -97,7 +97,7 @@ export const calculateNodeHeight = (node: Node) => {
     if (isPlaceholderNode || isGhostNode) {
         height = PLACEHOLDER_NODE_HEIGHT;
 
-        if (isBottomGhostNode) {
+        if (isTopGhostNode || isBottomGhostNode) {
             height = 0;
         }
     }
@@ -485,7 +485,11 @@ export const getLayoutElements = async ({
             node.type === 'taskDispatcherLeftGhostNode';
 
         if (effectiveDirection === 'LR') {
-            if (isGhostNode || node.type === 'placeholder') {
+            if (node.type === 'taskDispatcherTopGhostNode') {
+                width = 0;
+            } else if (isGhostNode) {
+                width = PLACEHOLDER_NODE_HEIGHT;
+            } else if (node.type === 'placeholder') {
                 width = height;
             } else if (node.type === 'clusterRoot') {
                 const nodeHasClusterElements =
