@@ -9,7 +9,12 @@
     "help": null,
     "metadata": null,
     "name": "callTool",
-    "outputDefinition": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
     "perform": { },
     "processErrorResponse": null,
     "properties": [ {
