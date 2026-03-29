@@ -2134,13 +2134,7 @@ function computeMainAxisGap(predecessorNode: Node, currentNode: Node, direction:
     return getTBDagreHeight(predecessorNode) / 2 + RANKSEP + getTBDagreHeight(currentNode) / 2;
 }
 
-const CLUSTER_ROOT_NODE_HEIGHT = 150;
-
 function getTBDagreHeight(node: Node): number {
-    if (node.type === 'clusterRoot') {
-        return CLUSTER_ROOT_NODE_HEIGHT;
-    }
-
     return NODE_HEIGHT;
 }
 

@@ -2360,10 +2360,7 @@ describe('alignChainNodesCrossAxis', () => {
         expect(allNodes[1].position).toEqual({x: 250, y: 550});
     });
 
-    it('should use larger main-axis gap when predecessor is AI Agent in TB mode', () => {
-        // AI Agent nodes have dagre height 150 (vs NODE_HEIGHT=100 for regular nodes).
-        // computeMainAxisGap must use the actual dagre height so that the visual gap
-        // between aiAgent bottom edge and successor top edge is consistent with other nodes.
+    it('should use same main-axis gap when predecessor is AI Agent in TB mode', () => {
         const savedAiAgent: Node = {
             data: {
                 clusterElements: {tool_1: {label: 'Tool 1'}},
@@ -2387,11 +2384,11 @@ describe('alignChainNodesCrossAxis', () => {
 
         alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
 
-        // Gap = AI_AGENT_HEIGHT/2 + RANKSEP + NODE_HEIGHT/2 = 75 + 50 + 50 = 175
-        expect(allNodes[1].position.y).toBe(400 + 175);
+        // Gap = NODE_HEIGHT/2 + RANKSEP + NODE_HEIGHT/2 = 50 + 50 + 50 = 150
+        expect(allNodes[1].position.y).toBe(400 + 150);
     });
 
-    it('should use larger main-axis gap when successor is AI Agent in TB mode', () => {
+    it('should use same main-axis gap when successor is AI Agent in TB mode', () => {
         const savedNode: Node = {
             data: {
                 componentName: 'httpClient',
@@ -2418,8 +2415,8 @@ describe('alignChainNodesCrossAxis', () => {
 
         alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
 
-        // Gap = NODE_HEIGHT/2 + RANKSEP + AI_AGENT_HEIGHT/2 = 50 + 50 + 75 = 175
-        expect(allNodes[1].position.y).toBe(400 + 175);
+        // Gap = NODE_HEIGHT/2 + RANKSEP + NODE_HEIGHT/2 = 50 + 50 + 50 = 150
+        expect(allNodes[1].position.y).toBe(400 + 150);
     });
 
     it('should NOT align in TB mode when no saved positions exist', () => {

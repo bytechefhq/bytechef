@@ -18,6 +18,7 @@ import {
     CLUSTER_ELEMENT_LABEL_PADDING,
     CLUSTER_ELEMENT_OVERLAP_PADDING,
     CLUSTER_ROOT_GAP,
+    calculateNodeHeight,
     collectTaskDispatcherData,
     getClusterElementsLayoutElements,
 } from './layoutUtils';
@@ -32,6 +33,59 @@ type TestTaskType = Omit<WorkflowTask, 'parameters'> & {
         tasks?: unknown;
     };
 };
+
+describe('calculateNodeHeight', () => {
+    it('should return NODE_HEIGHT for regular workflow nodes', () => {
+        const node: Node = {data: {}, id: 'node_1', position: {x: 0, y: 0}, type: 'workflow'};
+
+        expect(calculateNodeHeight(node)).toBe(NODE_HEIGHT);
+    });
+
+    it('should return NODE_HEIGHT for cluster root nodes', () => {
+        const node: Node = {data: {clusterRoot: true}, id: 'aiAgent_1', position: {x: 0, y: 0}, type: 'clusterRoot'};
+
+        expect(calculateNodeHeight(node)).toBe(NODE_HEIGHT);
+    });
+
+    it('should return 0 for top ghost nodes', () => {
+        const node: Node = {
+            data: {taskDispatcherId: 'each_1'},
+            id: 'each_1-each-top-ghost',
+            position: {x: 0, y: 0},
+            type: 'taskDispatcherTopGhostNode',
+        };
+
+        expect(calculateNodeHeight(node)).toBe(0);
+    });
+
+    it('should return 0 for bottom ghost nodes', () => {
+        const node: Node = {
+            data: {taskDispatcherId: 'each_1'},
+            id: 'each_1-each-bottom-ghost',
+            position: {x: 0, y: 0},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+
+        expect(calculateNodeHeight(node)).toBe(0);
+    });
+
+    it('should return PLACEHOLDER_NODE_HEIGHT for left ghost nodes', () => {
+        const node: Node = {
+            data: {taskDispatcherId: 'each_1'},
+            id: 'each_1-taskDispatcher-left-ghost',
+            position: {x: 0, y: 0},
+            type: 'taskDispatcherLeftGhostNode',
+        };
+
+        expect(calculateNodeHeight(node)).toBe(PLACEHOLDER_NODE_HEIGHT);
+    });
+
+    it('should return PLACEHOLDER_NODE_HEIGHT for placeholder nodes', () => {
+        const node: Node = {data: {}, id: 'placeholder_1', position: {x: 0, y: 0}, type: 'placeholder'};
+
+        expect(calculateNodeHeight(node)).toBe(PLACEHOLDER_NODE_HEIGHT);
+    });
+});
 
 describe('collectTaskDispatcherData', () => {
     it('should handle non-array caseFalse parameter without throwing error', () => {

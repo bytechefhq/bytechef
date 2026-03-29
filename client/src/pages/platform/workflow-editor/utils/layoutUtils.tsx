@@ -88,11 +88,9 @@ export const calculateNodeHeight = (node: Node) => {
     const isBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
     const isLeftGhostNode = node.type === 'taskDispatcherLeftGhostNode';
     const isPlaceholderNode = node.type === 'placeholder';
-    const isClusterRoot = node.type === 'clusterRoot';
     const isGhostNode = isTopGhostNode || isBottomGhostNode || isLeftGhostNode;
 
     let height = NODE_HEIGHT;
-    const clusterRootNodeHeight = 150;
 
     if (isPlaceholderNode || isGhostNode) {
         height = PLACEHOLDER_NODE_HEIGHT;
@@ -100,10 +98,6 @@ export const calculateNodeHeight = (node: Node) => {
         if (isTopGhostNode || isBottomGhostNode) {
             height = 0;
         }
-    }
-
-    if (isClusterRoot) {
-        height = clusterRootNodeHeight;
     }
 
     return height;
