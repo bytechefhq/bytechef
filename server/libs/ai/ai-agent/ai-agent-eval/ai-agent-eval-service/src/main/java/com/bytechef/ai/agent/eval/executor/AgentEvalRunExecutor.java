@@ -126,7 +126,7 @@ public class AgentEvalRunExecutor {
     }
 
     @Async("agentEvalExecutor")
-    public void executeRunAsync(long evalRunId) {
+    public void executeRunAsync(long evalRunId, List<Long> scenarioIds, List<Long> agentJudgeIds) {
         AgentEvalRun evalRun = agentEvalRunService.getAgentEvalRun(evalRunId);
 
         evalRun.setStatus(AgentEvalRunStatus.RUNNING);
@@ -136,124 +136,140 @@ public class AgentEvalRunExecutor {
 
         ChatClient.Builder judgeChatClientBuilder = buildJudgeChatClientBuilder(evalRun);
 
-        List<AgentEvalScenario> scenarios = agentEvalScenarioService.getAgentEvalScenarios(
+        List<AgentEvalScenario> allScenarios = agentEvalScenarioService.getAgentEvalScenarios(
             evalRun.getAgentEvalTestId());
 
+        List<AgentEvalScenario> scenarios = (scenarioIds == null || scenarioIds.isEmpty())
+            ? allScenarios
+            : allScenarios.stream()
+                .filter(scenario -> scenarioIds.contains(scenario.getId()))
+                .toList();
+
         List<Double> resultScores = new ArrayList<>();
+        int totalInputTokens = 0;
+        int totalOutputTokens = 0;
 
         for (AgentEvalScenario scenario : scenarios) {
-            if (isCancelled(evalRunId)) {
-                logger.info("Eval run {} was cancelled, aborting execution", evalRunId);
+            int numberOfRuns = Math.max(1, scenario.getNumberOfRuns());
 
-                return;
-            }
+            for (int runIndex = 1; runIndex <= numberOfRuns; runIndex++) {
+                if (isCancelled(evalRunId)) {
+                    logger.info("Eval run {} was cancelled, aborting execution", evalRunId);
 
-            AgentEvalResult evalResult = new AgentEvalResult();
-
-            evalResult.setAgentEvalRunId(evalRunId);
-            evalResult.setAgentEvalScenarioId(scenario.getId());
-            evalResult.setStatus(AgentEvalResultStatus.RUNNING);
-
-            evalResult = agentEvalResultService.createAgentEvalResult(evalResult);
-
-            try {
-                ScenarioExecutionResult executionResult = executeScenario(
-                    evalRun, scenario, evalRunId, judgeChatClientBuilder);
-
-                String agentResponse = executionResult.agentResponse();
-                String transcriptJson = executionResult.transcriptJson();
-
-                evalResult.setTranscriptFileEntry(
-                    agentEvalFileStorage.storeTranscriptFile(
-                        "transcript_" + evalResult.getId() + ".json",
-                        transcriptJson.getBytes(StandardCharsets.UTF_8)));
-
-                JudgmentContext.Builder judgmentContextBuilder = JudgmentContext.builder()
-                    .agentOutput(agentResponse)
-                    .status(ExecutionStatus.SUCCESS)
-                    .goal(scenario.getName())
-                    .startedAt(Instant.now())
-                    .executionTime(Duration.ZERO)
-                    .metadata("transcript", transcriptJson)
-                    .metadata("expectedOutput",
-                        scenario.getExpectedOutput() != null ? scenario.getExpectedOutput() : "");
-
-                JudgmentContext judgmentContext = judgmentContextBuilder.build();
-
-                List<Judge> judges = collectJudges(evalRun, scenario, judgeChatClientBuilder);
-
-                if (judges.isEmpty()) {
-                    evalResult.setScore(1.0);
-                    evalResult.setStatus(AgentEvalResultStatus.COMPLETED);
-
-                    evalResult = agentEvalResultService.updateAgentEvalResult(evalResult);
-                } else {
-                    SimpleJury.Builder juryBuilder = SimpleJury.builder()
-                        .votingStrategy(new AverageVotingStrategy())
-                        .parallel(false);
-
-                    for (Judge judge : judges) {
-                        juryBuilder.judge(judge);
-                    }
-
-                    SimpleJury jury = juryBuilder.build();
-
-                    Verdict verdict = jury.vote(judgmentContext);
-
-                    Map<String, Judgment> individualByName = verdict.individualByName();
-
-                    int passedCount = 0;
-                    int totalCount = individualByName.size();
-
-                    for (Map.Entry<String, Judgment> entry : individualByName.entrySet()) {
-                        AgentJudgeVerdict judgeVerdict = new AgentJudgeVerdict();
-
-                        judgeVerdict.setAgentEvalResultId(evalResult.getId());
-                        judgeVerdict.setJudgeName(entry.getKey());
-                        judgeVerdict.setPassed(entry.getValue()
-                            .pass());
-                        judgeVerdict.setScore(entry.getValue()
-                            .pass() ? 1.0 : 0.0);
-                        judgeVerdict.setExplanation(entry.getValue()
-                            .reasoning());
-                        judgeVerdict.setJudgeType(
-                            resolveJudgeType(entry.getKey(), evalRun, scenario));
-                        judgeVerdict.setJudgeScope(
-                            resolveJudgeScope(entry.getKey(), evalRun, scenario));
-
-                        agentJudgeVerdictService.createAgentJudgeVerdict(judgeVerdict);
-
-                        if (entry.getValue()
-                            .pass()) {
-                            passedCount++;
-                        }
-                    }
-
-                    double score = (totalCount > 0) ? ((double) passedCount / totalCount) : 1.0;
-
-                    evalResult.setScore(score);
-                    evalResult.setStatus(AgentEvalResultStatus.COMPLETED);
-
-                    evalResult = agentEvalResultService.updateAgentEvalResult(evalResult);
+                    return;
                 }
 
-                resultScores.add(evalResult.getScore());
-            } catch (Exception exception) {
-                logger.error("Error executing scenario {} for eval run {}", scenario.getId(), evalRunId, exception);
+                AgentEvalResult evalResult = new AgentEvalResult();
 
-                evalResult.setStatus(AgentEvalResultStatus.FAILED);
-                evalResult.setErrorMessage(exception.getMessage());
+                evalResult.setAgentEvalRunId(evalRunId);
+                evalResult.setAgentEvalScenarioId(scenario.getId());
+                evalResult.setStatus(AgentEvalResultStatus.RUNNING);
+                evalResult.setRunIndex(runIndex);
 
-                agentEvalResultService.updateAgentEvalResult(evalResult);
+                evalResult = agentEvalResultService.createAgentEvalResult(evalResult);
 
-                resultScores.add(0.0);
+                try {
+                    ScenarioExecutionResult executionResult = executeScenario(
+                        evalRun, scenario, evalRunId, judgeChatClientBuilder);
+
+                    String agentResponse = executionResult.agentResponse();
+                    String transcriptJson = executionResult.transcriptJson();
+
+                    evalResult.setTranscriptFileEntry(
+                        agentEvalFileStorage.storeTranscriptFile(
+                            "transcript_" + evalResult.getId() + ".json",
+                            transcriptJson.getBytes(StandardCharsets.UTF_8)));
+
+                    JudgmentContext.Builder judgmentContextBuilder = JudgmentContext.builder()
+                        .agentOutput(agentResponse)
+                        .status(ExecutionStatus.SUCCESS)
+                        .goal(scenario.getName())
+                        .startedAt(Instant.now())
+                        .executionTime(Duration.ZERO)
+                        .metadata("transcript", transcriptJson)
+                        .metadata("expectedOutput",
+                            scenario.getExpectedOutput() != null ? scenario.getExpectedOutput() : "");
+
+                    JudgmentContext judgmentContext = judgmentContextBuilder.build();
+
+                    List<Judge> judges = collectJudges(
+                        evalRun, scenario, judgeChatClientBuilder, agentJudgeIds);
+
+                    if (judges.isEmpty()) {
+                        evalResult.setScore(1.0);
+                        evalResult.setStatus(AgentEvalResultStatus.COMPLETED);
+
+                        evalResult = agentEvalResultService.updateAgentEvalResult(evalResult);
+                    } else {
+                        SimpleJury.Builder juryBuilder = SimpleJury.builder()
+                            .votingStrategy(new AverageVotingStrategy())
+                            .parallel(false);
+
+                        for (Judge judge : judges) {
+                            juryBuilder.judge(judge);
+                        }
+
+                        SimpleJury jury = juryBuilder.build();
+
+                        Verdict verdict = jury.vote(judgmentContext);
+
+                        Map<String, Judgment> individualByName = verdict.individualByName();
+
+                        int passedCount = 0;
+                        int totalCount = individualByName.size();
+
+                        for (Map.Entry<String, Judgment> entry : individualByName.entrySet()) {
+                            AgentJudgeVerdict judgeVerdict = new AgentJudgeVerdict();
+
+                            judgeVerdict.setAgentEvalResultId(evalResult.getId());
+                            judgeVerdict.setJudgeName(entry.getKey());
+                            judgeVerdict.setPassed(entry.getValue()
+                                .pass());
+                            judgeVerdict.setScore(entry.getValue()
+                                .pass() ? 1.0 : 0.0);
+                            judgeVerdict.setExplanation(entry.getValue()
+                                .reasoning());
+                            judgeVerdict.setJudgeType(
+                                resolveJudgeType(entry.getKey(), evalRun, scenario));
+                            judgeVerdict.setJudgeScope(
+                                resolveJudgeScope(entry.getKey(), evalRun, scenario));
+
+                            agentJudgeVerdictService.createAgentJudgeVerdict(judgeVerdict);
+
+                            if (entry.getValue()
+                                .pass()) {
+                                passedCount++;
+                            }
+                        }
+
+                        double score = (totalCount > 0) ? ((double) passedCount / totalCount) : 1.0;
+
+                        evalResult.setScore(score);
+                        evalResult.setStatus(AgentEvalResultStatus.COMPLETED);
+
+                        evalResult = agentEvalResultService.updateAgentEvalResult(evalResult);
+                    }
+
+                    resultScores.add(evalResult.getScore());
+                } catch (Exception exception) {
+                    logger.error(
+                        "Error executing scenario {} (run {}) for eval run {}",
+                        scenario.getId(), runIndex, evalRunId, exception);
+
+                    evalResult.setStatus(AgentEvalResultStatus.FAILED);
+                    evalResult.setErrorMessage(exception.getMessage());
+
+                    agentEvalResultService.updateAgentEvalResult(evalResult);
+
+                    resultScores.add(0.0);
+                }
+
+                evalRun = agentEvalRunService.getAgentEvalRun(evalRunId);
+
+                evalRun.setCompletedScenarios(evalRun.getCompletedScenarios() + 1);
+
+                evalRun = agentEvalRunService.updateAgentEvalRun(evalRun);
             }
-
-            evalRun = agentEvalRunService.getAgentEvalRun(evalRunId);
-
-            evalRun.setCompletedScenarios(evalRun.getCompletedScenarios() + 1);
-
-            evalRun = agentEvalRunService.updateAgentEvalRun(evalRun);
         }
 
         double averageScore = resultScores.stream()
@@ -266,6 +282,8 @@ public class AgentEvalRunExecutor {
         evalRun.setAverageScore(averageScore);
         evalRun.setStatus(AgentEvalRunStatus.COMPLETED);
         evalRun.setCompletedDate(Instant.now());
+        evalRun.setTotalInputTokens(totalInputTokens);
+        evalRun.setTotalOutputTokens(totalOutputTokens);
 
         agentEvalRunService.updateAgentEvalRun(evalRun);
     }
@@ -434,7 +452,8 @@ public class AgentEvalRunExecutor {
     }
 
     private List<Judge> collectJudges(
-        AgentEvalRun evalRun, AgentEvalScenario scenario, @Nullable ChatClient.Builder defaultChatClientBuilder) {
+        AgentEvalRun evalRun, AgentEvalScenario scenario, @Nullable ChatClient.Builder defaultChatClientBuilder,
+        List<Long> agentJudgeIds) {
 
         List<Judge> judges = new ArrayList<>();
 
@@ -442,6 +461,10 @@ public class AgentEvalRunExecutor {
             evalRun.getWorkflowId(), evalRun.getWorkflowNodeName());
 
         for (AgentJudge agentJudge : agentJudges) {
+            if (!agentJudgeIds.isEmpty() && !agentJudgeIds.contains(agentJudge.getId())) {
+                continue;
+            }
+
             ChatClient.Builder chatClientBuilder = resolveJudgeChatClientBuilder(
                 agentJudge.getConfiguration(), defaultChatClientBuilder);
 
@@ -557,7 +580,10 @@ public class AgentEvalRunExecutor {
         List<Map<String, String>> conversationHistory = new ArrayList<>();
         List<Map<String, String>> transcriptTurns = new ArrayList<>();
 
-        String userMessage = userSimulator.generateNextMessage(Collections.emptyList());
+        String userMessage = (scenario.getUserMessage() != null && !scenario.getUserMessage()
+            .isBlank())
+                ? scenario.getUserMessage()
+                : userSimulator.generateNextMessage(Collections.emptyList());
 
         String lastAgentResponse = "";
         int turnNumber = 1;
