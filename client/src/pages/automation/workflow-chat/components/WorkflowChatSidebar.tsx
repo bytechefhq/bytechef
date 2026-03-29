@@ -110,7 +110,6 @@ const WorkflowChatSidebar = () => {
 
                                     return (
                                         <LeftSidebarNavItem
-                                            icon={<MessageCircleMoreIcon className="mr-1 size-4" />}
                                             item={{
                                                 current: isActive,
                                                 id: `${workflowData.projectDeploymentId}-${workflowData.workflowId}`,
