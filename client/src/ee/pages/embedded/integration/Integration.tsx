@@ -30,6 +30,7 @@ const Integration = () => {
 
     const {
         bottomResizablePanelRef,
+        cancelWorkflowQueries,
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleIntegrationClick,
@@ -90,6 +91,7 @@ const Integration = () => {
                             <WorkflowEditorProvider
                                 value={{
                                     ConnectionKeys: ConnectionKeys,
+                                    cancelWorkflowQueries,
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,

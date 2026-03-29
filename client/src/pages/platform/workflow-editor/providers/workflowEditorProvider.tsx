@@ -87,6 +87,7 @@ export interface WorkflowReadOnlyStateI {
 
 export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     ConnectionKeys: ConnectionKeysI;
+    cancelWorkflowQueries: () => void;
     deleteClusterElementParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,

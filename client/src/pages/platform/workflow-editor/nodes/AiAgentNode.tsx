@@ -46,7 +46,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
     const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
     const queryClient = useQueryClient();
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {cancelWorkflowQueries, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
     const memoizedIconsList = useMemo(() => {
         if (!workflow.definition) {
@@ -104,6 +104,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const handleDeleteNodeClick = (data: NodeDataType) => {
         if (data) {
             handleDeleteTask({
+                cancelWorkflowQueries: cancelWorkflowQueries!,
                 currentNode,
                 data,
                 invalidateWorkflowQueries: invalidateWorkflowQueries!,

@@ -27,6 +27,7 @@ import {forEachNestedTaskGroup} from './taskTraversalUtils';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface HandleDeleteTaskProps {
+    cancelWorkflowQueries: () => void;
     rootClusterElementNodeData?: NodeDataType;
     clusterElementsCanvasOpen?: boolean;
     currentNode?: NodeDataType;
@@ -40,6 +41,7 @@ interface HandleDeleteTaskProps {
 }
 
 export default function handleDeleteTask({
+    cancelWorkflowQueries,
     clusterElementsCanvasOpen,
     currentNode,
     data,
@@ -329,9 +331,7 @@ export default function handleDeleteTask({
 
     // Cancel any in-flight workflow query refetches from previous mutations
     // to prevent stale server data from overwriting the upcoming optimistic update.
-    queryClient.cancelQueries({
-        predicate: (query) => query.queryKey.includes('projectWorkflows'),
-    });
+    cancelWorkflowQueries();
 
     const updatedDefinition = JSON.stringify(
         {

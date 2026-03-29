@@ -30,6 +30,7 @@ const Project = () => {
 
     const {
         bottomResizablePanelRef,
+        cancelWorkflowQueries,
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleProjectClick,
@@ -91,6 +92,7 @@ const Project = () => {
                             <WorkflowEditorProvider
                                 value={{
                                     ConnectionKeys: ConnectionKeys,
+                                    cancelWorkflowQueries,
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,

@@ -185,6 +185,7 @@ describe('PropertyMentionsInput', () => {
                         connections: [],
                         filteredConnections: () => [],
                     },
+                    cancelWorkflowQueries: () => {},
                     deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
                         DeleteClusterElementParameter200Response,
                         Error,
@@ -300,6 +301,7 @@ describe('PropertyMentionsInput', () => {
                         connections: [],
                         filteredConnections: () => [],
                     },
+                    cancelWorkflowQueries: () => {},
                     deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
                         DeleteClusterElementParameter200Response,
                         Error,
@@ -399,6 +401,7 @@ describe('PropertyMentionsInput', () => {
                         connections: [],
                         filteredConnections: () => [],
                     },
+                    cancelWorkflowQueries: () => {},
                     deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
                         DeleteClusterElementParameter200Response,
                         Error,
@@ -477,6 +480,7 @@ describe('PropertyMentionsInput', () => {
                 connections: [],
                 filteredConnections: () => [],
             },
+            cancelWorkflowQueries: () => {},
             deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
                 DeleteClusterElementParameter200Response,
                 Error,
