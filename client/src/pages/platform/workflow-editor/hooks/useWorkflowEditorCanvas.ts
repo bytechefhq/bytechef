@@ -24,6 +24,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import LabeledBranchCaseEdge from '../edges/LabeledBranchCaseEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
+import RoundedSmoothStepEdge from '../edges/RoundedSmoothStepEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
@@ -116,6 +117,7 @@ const useWorkflowEditorCanvas = ({
         () => ({
             labeledBranchCase: LabeledBranchCaseEdge,
             placeholder: PlaceholderEdge,
+            smoothstep: RoundedSmoothStepEdge,
             workflow: WorkflowEdge,
         }),
         []
