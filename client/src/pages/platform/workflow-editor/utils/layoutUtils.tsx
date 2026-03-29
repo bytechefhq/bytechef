@@ -526,6 +526,12 @@ export const getLayoutElements = async ({
                 edgeLength = 2;
             }
 
+            // Edges from top ghosts to content children need extra space
+            // so the edge add-button (+) has room between the case label and the node.
+            if (sourceNode?.type === 'taskDispatcherTopGhostNode') {
+                edgeLength = 2;
+            }
+
             dagreGraph.setEdge(edge.source, edge.target, {minlen: edgeLength});
         }
     });
