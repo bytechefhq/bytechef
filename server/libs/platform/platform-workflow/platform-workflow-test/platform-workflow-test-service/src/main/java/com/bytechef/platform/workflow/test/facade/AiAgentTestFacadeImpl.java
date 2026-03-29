@@ -116,4 +116,65 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
             null, workflowId, evaluatedParameters, connectionIds, evaluatedExtensions, environmentId, null,
             true, null, null, null);
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Object executeAiAgentAction(
+        String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
+        List<Object> attachments, Map<String, String> toolSimulations) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        WorkflowTask workflowTask = workflow.getTasks(true)
+            .stream()
+            .filter(task -> Objects.equals(task.getName(), workflowNodeName))
+            .findFirst()
+            .orElseThrow(
+                () -> new IllegalArgumentException(
+                    "Workflow task not found: %s".formatted(workflowNodeName)));
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        Map<String, Object> taskParameters = new HashMap<>(workflowTask.getParameters());
+
+        taskParameters.put("conversationId", conversationId);
+        taskParameters.put("userPrompt", message);
+        taskParameters.put("attachments", attachments);
+
+        if (toolSimulations != null && !toolSimulations.isEmpty()) {
+            taskParameters.put("__toolSimulations", toolSimulations);
+        }
+
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
+
+        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflowId, workflowNodeName, environmentId);
+
+        Map<String, Object> evaluatedParameters = evaluator.evaluate(
+            taskParameters, MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
+
+        if (evaluatedParameters.containsKey("attachments")) {
+            evaluatedParameters.put(
+                "attachments", TestAttachmentUtils.getFileEntries(tempFileStorage, evaluatedParameters));
+        }
+
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
+            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                workflowId, workflowNodeName, environmentId);
+
+        Map<String, Long> connectionIds = MapUtils.toMap(
+            workflowTestConfigurationConnections, WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+            WorkflowTestConfigurationConnection::getConnectionId);
+
+        Map<String, ?> extensions = workflowTask.getExtensions();
+
+        Map<String, Object> evaluatedExtensions = evaluator.evaluate(
+            extensions, MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
+
+        return actionDefinitionFacade.executePerform(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null,
+            null, workflowId, evaluatedParameters, connectionIds, evaluatedExtensions, environmentId, null,
+            true, null, null, null);
+    }
 }
