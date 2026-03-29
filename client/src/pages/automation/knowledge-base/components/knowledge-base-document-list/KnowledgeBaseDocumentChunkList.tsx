@@ -25,18 +25,18 @@ const KnowledgeBaseDocumentChunkList = ({
 
     if (chunks.length === 0) {
         return (
-            <p className="ml-7 border-l border-stroke-neutral-tertiary py-2 pl-4 text-sm text-muted-foreground">
+            <p className="ml-7 border-l border-border/50 py-2 pl-4 text-sm text-muted-foreground">
                 No chunks available for this document.
             </p>
         );
     }
 
     return (
-        <div className="ml-7 space-y-2 border-l border-stroke-neutral-tertiary py-2 pl-4">
+        <div className="ml-7 space-y-2 border-l border-border/50 py-2 pl-4">
             <KnowledgeBaseDocumentChunkListSelectionBar />
 
             {chunks.map((chunk, index) => (
-                <div className="rounded-lg border border-stroke-neutral-secondary bg-background p-4" key={chunk.id}>
+                <div className="rounded-lg border border-border/50 bg-background p-4" key={chunk.id}>
                     <div className="mb-2 flex items-center justify-between">
                         <KnowledgeBaseDocumentChunkListItemHeader
                             chunkId={chunk.id}

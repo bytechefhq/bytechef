@@ -24,7 +24,7 @@ const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDo
     } = useKnowledgeBaseDocumentListItemDeleteDialog({knowledgeBaseId});
 
     return (
-        <div className="w-full divide-y divide-stroke-neutral-tertiary">
+        <div className="w-full divide-y divide-border/50">
             {documents.length === 0 ? (
                 <p className="rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-secondary p-8 text-center text-muted-foreground">
                     No documents available. Upload documents to get started.

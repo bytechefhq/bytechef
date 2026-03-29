@@ -8,7 +8,7 @@ interface KnowledgeBaseInfoCardProps {
 
 const KnowledgeBaseInfoCard = ({knowledgeBase}: KnowledgeBaseInfoCardProps) => {
     return (
-        <div className="mb-4 rounded-lg border border-gray-200 bg-white p-4">
+        <div className="mb-4 rounded-lg border border-border/50 bg-white p-4">
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                     <DatabaseIcon className="size-5 text-gray-400" />

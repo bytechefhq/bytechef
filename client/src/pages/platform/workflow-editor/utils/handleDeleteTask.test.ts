@@ -108,8 +108,8 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
-            data: {componentName: 'test', name: 'task_2'} as NodeDataType,
             cancelWorkflowQueries: vi.fn(),
+            data: {componentName: 'test', name: 'task_2'} as NodeDataType,
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -134,12 +134,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
                 conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_1'},
                 name: 'true_child_1',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -167,12 +167,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
                 conditionData: {conditionCase: 'caseFalse', conditionId: 'condition_1'},
                 name: 'false_child',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -196,12 +196,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
                 loopData: {loopId: 'loop_1'},
                 name: 'child_1',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -229,12 +229,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 branchData: {branchId: 'branch_1', caseKey: 'case_0'},
                 componentName: 'test',
                 name: 'case_child_1',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -262,12 +262,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 branchData: {branchId: 'branch_1', caseKey: 'default'},
                 componentName: 'test',
                 name: 'default_child_1',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -291,12 +291,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
                 name: 'par_2',
                 parallelData: {parallelId: 'parallel_1'},
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -323,12 +323,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
                 forkJoinData: {forkJoinId: 'fork-join_1'},
                 name: 'branch_a_1',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -355,12 +355,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
                 forkJoinData: {forkJoinId: 'fork-join_1'},
                 name: 'branch_a_1',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -383,12 +383,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
                 mapData: {index: 1, mapId: 'map_1'},
                 name: 'child_2',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -415,8 +415,8 @@ describe('handleDeleteTask', () => {
         setWorkflowMutating('workflow-1', true);
 
         handleDeleteTask({
-            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             cancelWorkflowQueries: vi.fn(),
+            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -430,8 +430,8 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
-            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             cancelWorkflowQueries: vi.fn(),
+            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -452,8 +452,8 @@ describe('handleDeleteTask', () => {
         };
 
         handleDeleteTask({
-            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             cancelWorkflowQueries: vi.fn(),
+            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -469,9 +469,9 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             currentNode: {componentName: 'test', name: 'task_1'} as NodeDataType,
             data: {componentName: 'test', name: 'task_1'} as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -494,9 +494,9 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             currentNode: {componentName: 'test', name: 'task_1'} as NodeDataType,
             data: {componentName: 'test', name: 'task_1'} as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -513,9 +513,9 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             currentNode: {componentName: 'test', name: 'task_1'} as NodeDataType,
             data: {componentName: 'test', name: 'task_2'} as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -558,8 +558,8 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
-            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             cancelWorkflowQueries: vi.fn(),
+            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -582,8 +582,8 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
-            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             cancelWorkflowQueries: vi.fn(),
+            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,
@@ -620,12 +620,12 @@ describe('handleDeleteTask', () => {
         const mutation = makeMockMutation();
 
         handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
                 eachData: {eachId: 'each_1'},
                 name: 'each_child',
             } as unknown as NodeDataType,
-            cancelWorkflowQueries: vi.fn(),
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
             updateWorkflowMutation: mutation,

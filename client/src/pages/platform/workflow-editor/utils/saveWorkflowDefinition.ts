@@ -231,11 +231,7 @@ export default async function saveWorkflowDefinition({
                 const mainAxis = direction === 'TB' ? 'y' : 'x';
                 const crossAxis = direction === 'TB' ? 'x' : 'y';
 
-                for (
-                    let taskIndex = nodeIndex + 1;
-                    taskIndex < updatedWorkflowDefinitionTasks.length;
-                    taskIndex++
-                ) {
+                for (let taskIndex = nodeIndex + 1; taskIndex < updatedWorkflowDefinitionTasks.length; taskIndex++) {
                     const task = updatedWorkflowDefinitionTasks[taskIndex];
 
                     if (task.metadata?.ui?.nodePosition) {

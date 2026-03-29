@@ -121,6 +121,7 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
             });
         },
         [
+            cancelWorkflowQueries,
             invalidateWorkflowQueries,
             queryClient,
             rootClusterElementNodeData,
