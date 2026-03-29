@@ -1,10 +1,9 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {PlayIcon, SparklesIcon, TextInitialIcon, XIcon, ZapIcon} from 'lucide-react';
+import {PlayIcon, SparklesIcon, TextInitialIcon, ZapIcon} from 'lucide-react';
 
 interface ClusterElementsWorkflowEditorHeaderProps {
     copilotEnabled: boolean;
-    onClose: () => void;
     onCopilotClick: () => void;
     onSkillsClick?: () => void;
     onTestClick: () => void;
@@ -16,7 +15,6 @@ interface ClusterElementsWorkflowEditorHeaderProps {
 
 const ClusterElementsWorkflowEditorHeader = ({
     copilotEnabled,
-    onClose,
     onCopilotClick,
     onSkillsClick,
     onTestClick,
@@ -26,7 +24,7 @@ const ClusterElementsWorkflowEditorHeader = ({
     toggleEditorLabel = 'Switch to simple editor',
 }: ClusterElementsWorkflowEditorHeaderProps) => {
     return (
-        <div className="relative z-10 flex items-center justify-end p-4">
+        <div className="relative z-10 flex items-center justify-end px-4 py-5">
             <div className="flex items-center gap-1 rounded-lg bg-white/70 p-1 backdrop-blur-sm">
                 {showToggleEditor && (
                     <Tooltip>
@@ -90,8 +88,6 @@ const ClusterElementsWorkflowEditorHeader = ({
                         <TooltipContent>Open Copilot panel</TooltipContent>
                     </Tooltip>
                 )}
-
-                <Button icon={<XIcon />} onClick={onClose} size="icon" title="Close the canvas" variant="ghost" />
             </div>
         </div>
     );
