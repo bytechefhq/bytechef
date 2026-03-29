@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.component.remote.client.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -74,6 +76,11 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     public Optional<String> executeBaseUri(
         String componentName, ComponentConnection componentConnection, Context context) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Context createConnectionRefreshContext(String componentName, ComponentConnection componentConnection) {
         throw new UnsupportedOperationException();
     }
 
