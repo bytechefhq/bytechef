@@ -435,7 +435,7 @@ const useWorkflowEditorCanvas = ({
             childDragStartRef.current = new Map();
             draggingPlaceholderRef.current = null;
         },
-        [editorInvalidateWorkflowQueries, layoutDirection, setIsNodeDragging, updateWorkflowMutation, workflow.id]
+        [editorInvalidateWorkflowQueries, layoutDirection, setIsNodeDragging, updateWorkflowMutation]
     );
 
     let canvasWidth = window.innerWidth - 120;
