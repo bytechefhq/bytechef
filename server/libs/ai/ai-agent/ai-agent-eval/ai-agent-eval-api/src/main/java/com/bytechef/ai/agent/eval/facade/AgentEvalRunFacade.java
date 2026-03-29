@@ -17,6 +17,7 @@
 package com.bytechef.ai.agent.eval.facade;
 
 import com.bytechef.ai.agent.eval.domain.AgentEvalRun;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.List;
 
 /**
@@ -26,7 +27,7 @@ public interface AgentEvalRunFacade {
 
     AgentEvalRun startEvalRun(
         long agentEvalTestId, String name, long environmentId,
-        List<Long> scenarioIds, List<Long> agentJudgeIds);
+        @Nullable List<Long> scenarioIds, @Nullable List<Long> agentJudgeIds);
 
     AgentEvalRun cancelEvalRun(long id);
 

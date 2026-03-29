@@ -156,6 +156,8 @@ public class AgentEvalRunExecutor {
                 if (isCancelled(evalRunId)) {
                     logger.info("Eval run {} was cancelled, aborting execution", evalRunId);
 
+                    finalizeRun(evalRunId, resultScores, totalInputTokens, totalOutputTokens);
+
                     return;
                 }
 
@@ -174,6 +176,12 @@ public class AgentEvalRunExecutor {
 
                     String agentResponse = executionResult.agentResponse();
                     String transcriptJson = executionResult.transcriptJson();
+
+                    evalResult.setInputTokens(executionResult.inputTokens());
+                    evalResult.setOutputTokens(executionResult.outputTokens());
+
+                    totalInputTokens += executionResult.inputTokens();
+                    totalOutputTokens += executionResult.outputTokens();
 
                     evalResult.setTranscriptFileEntry(
                         agentEvalFileStorage.storeTranscriptFile(
@@ -257,7 +265,9 @@ public class AgentEvalRunExecutor {
                         scenario.getId(), runIndex, evalRunId, exception);
 
                     evalResult.setStatus(AgentEvalResultStatus.FAILED);
-                    evalResult.setErrorMessage(exception.getMessage());
+                    evalResult.setErrorMessage(
+                        exception.getClass()
+                            .getSimpleName() + ": " + exception.getMessage());
 
                     agentEvalResultService.updateAgentEvalResult(evalResult);
 
@@ -272,20 +282,7 @@ public class AgentEvalRunExecutor {
             }
         }
 
-        double averageScore = resultScores.stream()
-            .mapToDouble(Double::doubleValue)
-            .average()
-            .orElse(0.0);
-
-        evalRun = agentEvalRunService.getAgentEvalRun(evalRunId);
-
-        evalRun.setAverageScore(averageScore);
-        evalRun.setStatus(AgentEvalRunStatus.COMPLETED);
-        evalRun.setCompletedDate(Instant.now());
-        evalRun.setTotalInputTokens(totalInputTokens);
-        evalRun.setTotalOutputTokens(totalOutputTokens);
-
-        agentEvalRunService.updateAgentEvalRun(evalRun);
+        finalizeRun(evalRunId, resultScores, totalInputTokens, totalOutputTokens);
     }
 
     @Nullable
@@ -541,7 +538,7 @@ public class AgentEvalRunExecutor {
         String transcriptJson = buildTranscriptJson(
             scenario.getUserMessage(), agentResponse, scenario.getExpectedOutput());
 
-        return new ScenarioExecutionResult(agentResponse, transcriptJson);
+        return new ScenarioExecutionResult(agentResponse, transcriptJson, 0, 0);
     }
 
     private ScenarioExecutionResult executeMultiTurnScenario(
@@ -549,25 +546,10 @@ public class AgentEvalRunExecutor {
         @Nullable ChatClient.Builder chatClientBuilder) {
 
         if (chatClientBuilder == null) {
-            logger.warn(
-                "No ChatClient available for multi-turn scenario '{}'. " +
-                    "Falling back to single-turn execution with user message.",
-                scenario.getName());
-
-            String conversationId = UUID.randomUUID()
-                .toString();
-
-            String message = (scenario.getUserMessage() != null) ? scenario.getUserMessage() : "";
-
-            Object result = aiAgentTestFacade.executeAiAgentAction(
-                evalRun.getWorkflowId(), evalRun.getWorkflowNodeName(), evalRun.getEnvironmentId(),
-                conversationId, message, List.of());
-
-            String agentResponse = extractAgentResponse(result);
-
-            String transcriptJson = buildTranscriptJson(message, agentResponse, scenario.getExpectedOutput());
-
-            return new ScenarioExecutionResult(agentResponse, transcriptJson);
+            throw new IllegalStateException(
+                "Multi-turn scenario '%s' requires an AI connection for user simulation, "
+                    .formatted(scenario.getName()) +
+                    "but no model connection is configured. Please configure a model connection in the test settings.");
         }
 
         ChatClient chatClient = chatClientBuilder.build();
@@ -636,7 +618,7 @@ public class AgentEvalRunExecutor {
 
         String transcriptJson = buildMultiTurnTranscriptJson(transcriptTurns, scenario.getExpectedOutput());
 
-        return new ScenarioExecutionResult(lastAgentResponse, transcriptJson);
+        return new ScenarioExecutionResult(lastAgentResponse, transcriptJson, 0, 0);
     }
 
     @SuppressWarnings("unchecked")
@@ -713,6 +695,8 @@ public class AgentEvalRunExecutor {
             }
         }
 
+        logger.warn("Could not resolve judge type for judge '{}', defaulting to CONTAINS_TEXT", judgeName);
+
         return AgentJudgeType.CONTAINS_TEXT;
     }
 
@@ -731,6 +715,29 @@ public class AgentEvalRunExecutor {
         return defaultChatClientBuilder;
     }
 
-    private record ScenarioExecutionResult(String agentResponse, String transcriptJson) {
+    private void finalizeRun(
+        long evalRunId, List<Double> resultScores, int totalInputTokens, int totalOutputTokens) {
+
+        double averageScore = resultScores.stream()
+            .mapToDouble(Double::doubleValue)
+            .average()
+            .orElse(0.0);
+
+        AgentEvalRun evalRun = agentEvalRunService.getAgentEvalRun(evalRunId);
+
+        evalRun.setAverageScore(averageScore);
+        evalRun.setCompletedDate(Instant.now());
+        evalRun.setTotalInputTokens(totalInputTokens);
+        evalRun.setTotalOutputTokens(totalOutputTokens);
+
+        if (evalRun.getStatus() != AgentEvalRunStatus.FAILED) {
+            evalRun.setStatus(AgentEvalRunStatus.COMPLETED);
+        }
+
+        agentEvalRunService.updateAgentEvalRun(evalRun);
+    }
+
+    private record ScenarioExecutionResult(String agentResponse, String transcriptJson, int inputTokens,
+        int outputTokens) {
     }
 }
