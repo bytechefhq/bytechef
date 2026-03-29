@@ -86,10 +86,9 @@ export interface UpdateWorkflowNodeParameterOperationRequest {
 export class WorkflowNodeParameterApi extends runtime.BaseAPI {
 
     /**
-     * Deletes a cluster element parameter.
-     * Deletes a cluster element parameter
+     * Creates request options for deleteClusterElementParameter without sending the request
      */
-    async deleteClusterElementParameterRaw(requestParameters: DeleteClusterElementParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+    async deleteClusterElementParameterRequestOpts(requestParameters: DeleteClusterElementParameterOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -149,13 +148,22 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
         urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
             body: DeleteClusterElementParameterRequestToJSON(requestParameters['deleteClusterElementParameterRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Deletes a cluster element parameter.
+     * Deletes a cluster element parameter
+     */
+    async deleteClusterElementParameterRaw(requestParameters: DeleteClusterElementParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+        const requestOptions = await this.deleteClusterElementParameterRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => DeleteClusterElementParameter200ResponseFromJSON(jsonValue));
     }
@@ -170,10 +178,9 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Deletes a workflow node parameter.
-     * Deletes a workflow node parameter
+     * Creates request options for deleteWorkflowNodeParameter without sending the request
      */
-    async deleteWorkflowNodeParameterRaw(requestParameters: DeleteWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+    async deleteWorkflowNodeParameterRequestOpts(requestParameters: DeleteWorkflowNodeParameterRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -217,13 +224,22 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
             body: DeleteClusterElementParameterRequestToJSON(requestParameters['deleteClusterElementParameterRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Deletes a workflow node parameter.
+     * Deletes a workflow node parameter
+     */
+    async deleteWorkflowNodeParameterRaw(requestParameters: DeleteWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+        const requestOptions = await this.deleteWorkflowNodeParameterRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => DeleteClusterElementParameter200ResponseFromJSON(jsonValue));
     }
@@ -238,10 +254,9 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get cluster element options shown in the editor.
-     * Get cluster element property options shown in the editor
+     * Creates request options for getClusterElementParameterDisplayConditions without sending the request
      */
-    async getClusterElementParameterDisplayConditionsRaw(requestParameters: GetClusterElementParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetClusterElementParameterDisplayConditions200Response>> {
+    async getClusterElementParameterDisplayConditionsRequestOpts(requestParameters: GetClusterElementParameterDisplayConditionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -292,12 +307,21 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
         urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get cluster element options shown in the editor.
+     * Get cluster element property options shown in the editor
+     */
+    async getClusterElementParameterDisplayConditionsRaw(requestParameters: GetClusterElementParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetClusterElementParameterDisplayConditions200Response>> {
+        const requestOptions = await this.getClusterElementParameterDisplayConditionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GetClusterElementParameterDisplayConditions200ResponseFromJSON(jsonValue));
     }
@@ -312,10 +336,9 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get action or trigger display conditions shown in the editor.
-     * Get action or trigger display conditions shown in the editor
+     * Creates request options for getWorkflowNodeParameterDisplayConditions without sending the request
      */
-    async getWorkflowNodeParameterDisplayConditionsRaw(requestParameters: GetWorkflowNodeParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetClusterElementParameterDisplayConditions200Response>> {
+    async getWorkflowNodeParameterDisplayConditionsRequestOpts(requestParameters: GetWorkflowNodeParameterDisplayConditionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -350,12 +373,21 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get action or trigger display conditions shown in the editor.
+     * Get action or trigger display conditions shown in the editor
+     */
+    async getWorkflowNodeParameterDisplayConditionsRaw(requestParameters: GetWorkflowNodeParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetClusterElementParameterDisplayConditions200Response>> {
+        const requestOptions = await this.getWorkflowNodeParameterDisplayConditionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GetClusterElementParameterDisplayConditions200ResponseFromJSON(jsonValue));
     }
@@ -370,10 +402,9 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Updates a cluster element parameter.
-     * Updates a cluster element parameter
+     * Creates request options for updateClusterElementParameter without sending the request
      */
-    async updateClusterElementParameterRaw(requestParameters: UpdateClusterElementParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+    async updateClusterElementParameterRequestOpts(requestParameters: UpdateClusterElementParameterOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -433,13 +464,22 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
         urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
             body: UpdateClusterElementParameterRequestToJSON(requestParameters['updateClusterElementParameterRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Updates a cluster element parameter.
+     * Updates a cluster element parameter
+     */
+    async updateClusterElementParameterRaw(requestParameters: UpdateClusterElementParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+        const requestOptions = await this.updateClusterElementParameterRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => DeleteClusterElementParameter200ResponseFromJSON(jsonValue));
     }
@@ -454,10 +494,9 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
     }
 
     /**
-     * Updates a workflow node parameter.
-     * Updates a workflow node parameter
+     * Creates request options for updateWorkflowNodeParameter without sending the request
      */
-    async updateWorkflowNodeParameterRaw(requestParameters: UpdateWorkflowNodeParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+    async updateWorkflowNodeParameterRequestOpts(requestParameters: UpdateWorkflowNodeParameterOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -501,13 +540,22 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
             body: UpdateWorkflowNodeParameterRequestToJSON(requestParameters['updateWorkflowNodeParameterRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Updates a workflow node parameter.
+     * Updates a workflow node parameter
+     */
+    async updateWorkflowNodeParameterRaw(requestParameters: UpdateWorkflowNodeParameterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteClusterElementParameter200Response>> {
+        const requestOptions = await this.updateWorkflowNodeParameterRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => DeleteClusterElementParameter200ResponseFromJSON(jsonValue));
     }

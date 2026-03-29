@@ -41,10 +41,9 @@ export interface GetComponentConnectionDefinitionsRequest {
 export class ConnectionDefinitionApi extends runtime.BaseAPI {
 
     /**
-     * Get connection definition for a component.
-     * Get connection definition for a component
+     * Creates request options for getComponentConnectionDefinition without sending the request
      */
-    async getComponentConnectionDefinitionRaw(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionDefinition>> {
+    async getComponentConnectionDefinitionRequestOpts(requestParameters: GetComponentConnectionDefinitionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -64,12 +63,21 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
         let urlPath = `/component-definitions/{componentName}/connection-definition`;
         urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get connection definition for a component.
+     * Get connection definition for a component
+     */
+    async getComponentConnectionDefinitionRaw(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionDefinition>> {
+        const requestOptions = await this.getComponentConnectionDefinitionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionDefinitionFromJSON(jsonValue));
     }
@@ -84,10 +92,9 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all compatible connection definitions for a component.
-     * Get all compatible connection definitions for a component
+     * Creates request options for getComponentConnectionDefinitions without sending the request
      */
-    async getComponentConnectionDefinitionsRaw(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionDefinitionBasic>>> {
+    async getComponentConnectionDefinitionsRequestOpts(requestParameters: GetComponentConnectionDefinitionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['componentName'] == null) {
             throw new runtime.RequiredError(
                 'componentName',
@@ -107,12 +114,21 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
         let urlPath = `/component-definitions/{componentName}/connection-definitions`;
         urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all compatible connection definitions for a component.
+     * Get all compatible connection definitions for a component
+     */
+    async getComponentConnectionDefinitionsRaw(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionDefinitionBasic>>> {
+        const requestOptions = await this.getComponentConnectionDefinitionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionDefinitionBasicFromJSON));
     }

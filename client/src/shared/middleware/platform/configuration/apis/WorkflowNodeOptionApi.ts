@@ -48,10 +48,9 @@ export interface GetWorkflowNodeOptionsRequest {
 export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
     /**
-     * Get a cluster element property options shown in the editor.
-     * Get a cluster element property options shown in the editor
+     * Creates request options for getClusterElementNodeOptions without sending the request
      */
-    async getClusterElementNodeOptionsRaw(requestParameters: GetClusterElementNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
+    async getClusterElementNodeOptionsRequestOpts(requestParameters: GetClusterElementNodeOptionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -118,12 +117,21 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
         urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a cluster element property options shown in the editor.
+     * Get a cluster element property options shown in the editor
+     */
+    async getClusterElementNodeOptionsRaw(requestParameters: GetClusterElementNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
+        const requestOptions = await this.getClusterElementNodeOptionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionFromJSON));
     }
@@ -138,10 +146,9 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an action or trigger property options shown in the editor.
-     * Get an action or trigger property options shown in the editor
+     * Creates request options for getWorkflowNodeOptions without sending the request
      */
-    async getWorkflowNodeOptionsRaw(requestParameters: GetWorkflowNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
+    async getWorkflowNodeOptionsRequestOpts(requestParameters: GetWorkflowNodeOptionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -192,12 +199,21 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
         urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an action or trigger property options shown in the editor.
+     * Get an action or trigger property options shown in the editor
+     */
+    async getWorkflowNodeOptionsRaw(requestParameters: GetWorkflowNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
+        const requestOptions = await this.getWorkflowNodeOptionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionFromJSON));
     }

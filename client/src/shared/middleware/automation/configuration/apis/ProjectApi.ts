@@ -86,10 +86,9 @@ export interface UpdateProjectRequest {
 export class ProjectApi extends runtime.BaseAPI {
 
     /**
-     * Create a new project.
-     * Create a new project.
+     * Creates request options for createProject without sending the request
      */
-    async createProjectRaw(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createProjectRequestOpts(requestParameters: CreateProjectRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['project'] == null) {
             throw new runtime.RequiredError(
                 'project',
@@ -106,13 +105,22 @@ export class ProjectApi extends runtime.BaseAPI {
 
         let urlPath = `/projects`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ProjectToJSON(requestParameters['project']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new project.
+     * Create a new project.
+     */
+    async createProjectRaw(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createProjectRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -131,10 +139,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete a project.
-     * Delete a project.
+     * Creates request options for deleteProject without sending the request
      */
-    async deleteProjectRaw(requestParameters: DeleteProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteProjectRequestOpts(requestParameters: DeleteProjectRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -150,12 +157,21 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete a project.
+     * Delete a project.
+     */
+    async deleteProjectRaw(requestParameters: DeleteProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteProjectRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -169,10 +185,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Duplicates existing project.
-     * Duplicates existing project.
+     * Creates request options for duplicateProject without sending the request
      */
-    async duplicateProjectRaw(requestParameters: DuplicateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
+    async duplicateProjectRequestOpts(requestParameters: DuplicateProjectRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -188,12 +203,21 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}/duplicate`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Duplicates existing project.
+     * Duplicates existing project.
+     */
+    async duplicateProjectRaw(requestParameters: DuplicateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
+        const requestOptions = await this.duplicateProjectRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ProjectFromJSON(jsonValue));
     }
@@ -208,10 +232,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Export project as a zip file.
-     * Export project.
+     * Creates request options for exportProject without sending the request
      */
-    async exportProjectRaw(requestParameters: ExportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+    async exportProjectRequestOpts(requestParameters: ExportProjectRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -227,12 +250,21 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}/export`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Export project as a zip file.
+     * Export project.
+     */
+    async exportProjectRaw(requestParameters: ExportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        const requestOptions = await this.exportProjectRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.BlobApiResponse(response);
     }
@@ -247,10 +279,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a project by id.
-     * Get a project by id.
+     * Creates request options for getProject without sending the request
      */
-    async getProjectRaw(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
+    async getProjectRequestOpts(requestParameters: GetProjectRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -266,12 +297,21 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a project by id.
+     * Get a project by id.
+     */
+    async getProjectRaw(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
+        const requestOptions = await this.getProjectRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ProjectFromJSON(jsonValue));
     }
@@ -286,10 +326,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a project versions.
-     * Get a project versions.
+     * Creates request options for getProjectVersions without sending the request
      */
-    async getProjectVersionsRaw(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectVersion>>> {
+    async getProjectVersionsRequestOpts(requestParameters: GetProjectVersionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -305,12 +344,21 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}/versions`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a project versions.
+     * Get a project versions.
+     */
+    async getProjectVersionsRaw(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectVersion>>> {
+        const requestOptions = await this.getProjectVersionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectVersionFromJSON));
     }
@@ -325,10 +373,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get projects by workspace id.
-     * Get projects by workspace id
+     * Creates request options for getWorkspaceProjects without sending the request
      */
-    async getWorkspaceProjectsRaw(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Project>>> {
+    async getWorkspaceProjectsRequestOpts(requestParameters: GetWorkspaceProjectsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -368,12 +415,21 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}/projects`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get projects by workspace id.
+     * Get projects by workspace id
+     */
+    async getWorkspaceProjectsRaw(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Project>>> {
+        const requestOptions = await this.getWorkspaceProjectsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectFromJSON));
     }
@@ -388,10 +444,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Import project from a zip file.
-     * Import project.
+     * Creates request options for importProject without sending the request
      */
-    async importProjectRaw(requestParameters: ImportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async importProjectRequestOpts(requestParameters: ImportProjectRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['workspaceId'] == null) {
             throw new runtime.RequiredError(
                 'workspaceId',
@@ -434,13 +489,22 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{workspaceId}/projects/import`;
         urlPath = urlPath.replace(`{${"workspaceId"}}`, encodeURIComponent(String(requestParameters['workspaceId'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: formParams,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Import project from a zip file.
+     * Import project.
+     */
+    async importProjectRaw(requestParameters: ImportProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.importProjectRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -459,10 +523,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Publishes existing project.
-     * Publishes existing project.
+     * Creates request options for publishProject without sending the request
      */
-    async publishProjectRaw(requestParameters: PublishProjectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async publishProjectRequestOpts(requestParameters: PublishProjectOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -480,13 +543,22 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}/publish`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: PublishProjectRequestToJSON(requestParameters['publishProjectRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Publishes existing project.
+     * Publishes existing project.
+     */
+    async publishProjectRaw(requestParameters: PublishProjectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.publishProjectRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -500,10 +572,9 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing project.
-     * Update an existing project.
+     * Creates request options for updateProject without sending the request
      */
-    async updateProjectRaw(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateProjectRequestOpts(requestParameters: UpdateProjectRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -528,13 +599,22 @@ export class ProjectApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: ProjectToJSON(requestParameters['project']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing project.
+     * Update an existing project.
+     */
+    async updateProjectRaw(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateProjectRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

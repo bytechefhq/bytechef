@@ -28,10 +28,9 @@ import {
 export class CategoryApi extends runtime.BaseAPI {
 
     /**
-     * Get categories.
-     * Get categories
+     * Creates request options for getProjectCategories without sending the request
      */
-    async getProjectCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Category>>> {
+    async getProjectCategoriesRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -39,12 +38,21 @@ export class CategoryApi extends runtime.BaseAPI {
 
         let urlPath = `/projects/categories`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get categories.
+     * Get categories
+     */
+    async getProjectCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Category>>> {
+        const requestOptions = await this.getProjectCategoriesRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryFromJSON));
     }

@@ -16,6 +16,7 @@ Name | Type
 `outputFunctionDefined` | boolean
 `outputSchemaDefined` | boolean
 `properties` | [Array&lt;Property&gt;](Property.md)
+`resumePerformFunctionDefined` | boolean
 `sseStreamResponse` | boolean
 `title` | string
 `workflowNodeDescriptionDefined` | boolean
@@ -36,6 +37,7 @@ const example = {
   "outputFunctionDefined": null,
   "outputSchemaDefined": null,
   "properties": null,
+  "resumePerformFunctionDefined": null,
   "sseStreamResponse": null,
   "title": null,
   "workflowNodeDescriptionDefined": null,

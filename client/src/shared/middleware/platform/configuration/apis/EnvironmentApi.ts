@@ -28,10 +28,9 @@ import {
 export class EnvironmentApi extends runtime.BaseAPI {
 
     /**
-     * Retrieves environments.
-     * Retrieves oauth2 authorization parameters
+     * Creates request options for getEnvironments without sending the request
      */
-    async getEnvironmentsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Environment>>> {
+    async getEnvironmentsRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -39,12 +38,21 @@ export class EnvironmentApi extends runtime.BaseAPI {
 
         let urlPath = `/environments`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Retrieves environments.
+     * Retrieves oauth2 authorization parameters
+     */
+    async getEnvironmentsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Environment>>> {
+        const requestOptions = await this.getEnvironmentsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EnvironmentFromJSON));
     }

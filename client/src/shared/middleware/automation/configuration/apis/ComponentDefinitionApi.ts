@@ -35,10 +35,9 @@ export interface GetComponentDefinitionsRequest {
 export class ComponentDefinitionApi extends runtime.BaseAPI {
 
     /**
-     * Get all component definitions.
-     * Get all component definitions
+     * Creates request options for getComponentDefinitions without sending the request
      */
-    async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
+    async getComponentDefinitionsRequestOpts(requestParameters: GetComponentDefinitionsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['actionDefinitions'] != null) {
@@ -62,12 +61,21 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
         let urlPath = `/component-definitions`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all component definitions.
+     * Get all component definitions
+     */
+    async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
+        const requestOptions = await this.getComponentDefinitionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
     }

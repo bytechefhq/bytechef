@@ -48,10 +48,9 @@ export interface GetWorkflowNodeOutputRequest {
 export class WorkflowNodeOutputApi extends runtime.BaseAPI {
 
     /**
-     * Get cluster element node output used in a workflow.
-     * Get cluster element node output used in a workflow
+     * Creates request options for getClusterElementOutput without sending the request
      */
-    async getClusterElementOutputRaw(requestParameters: GetClusterElementOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeOutput>> {
+    async getClusterElementOutputRequestOpts(requestParameters: GetClusterElementOutputRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -102,12 +101,21 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
         urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get cluster element node output used in a workflow.
+     * Get cluster element node output used in a workflow
+     */
+    async getClusterElementOutputRaw(requestParameters: GetClusterElementOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeOutput>> {
+        const requestOptions = await this.getClusterElementOutputRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeOutputFromJSON(jsonValue));
     }
@@ -122,10 +130,9 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all workflow node outputs used in a workflow.
-     * Get all dynamic workflow node outputs used in a workflow
+     * Creates request options for getPreviousWorkflowNodeOutputs without sending the request
      */
-    async getPreviousWorkflowNodeOutputsRaw(requestParameters: GetPreviousWorkflowNodeOutputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowNodeOutput>>> {
+    async getPreviousWorkflowNodeOutputsRequestOpts(requestParameters: GetPreviousWorkflowNodeOutputsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -156,12 +163,21 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
         let urlPath = `/workflows/{id}/outputs`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all workflow node outputs used in a workflow.
+     * Get all dynamic workflow node outputs used in a workflow
+     */
+    async getPreviousWorkflowNodeOutputsRaw(requestParameters: GetPreviousWorkflowNodeOutputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowNodeOutput>>> {
+        const requestOptions = await this.getPreviousWorkflowNodeOutputsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowNodeOutputFromJSON));
     }
@@ -176,10 +192,9 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get workflow node output of an action task or trigger used in a workflow.
-     * Get workflow node output of an action task or trigger used in a workflow
+     * Creates request options for getWorkflowNodeOutput without sending the request
      */
-    async getWorkflowNodeOutputRaw(requestParameters: GetWorkflowNodeOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeOutput>> {
+    async getWorkflowNodeOutputRequestOpts(requestParameters: GetWorkflowNodeOutputRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -214,12 +229,21 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get workflow node output of an action task or trigger used in a workflow.
+     * Get workflow node output of an action task or trigger used in a workflow
+     */
+    async getWorkflowNodeOutputRaw(requestParameters: GetWorkflowNodeOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeOutput>> {
+        const requestOptions = await this.getWorkflowNodeOutputRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeOutputFromJSON(jsonValue));
     }

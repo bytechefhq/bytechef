@@ -41,10 +41,9 @@ export interface GetWorkflowNodeDescriptionRequest {
 export class WorkflowNodeDescriptionApi extends runtime.BaseAPI {
 
     /**
-     * Get an action description shown in the editor.
-     * Get an action description shown in the editor
+     * Creates request options for getClusterElementWorkflowNodeDescription without sending the request
      */
-    async getClusterElementWorkflowNodeDescriptionRaw(requestParameters: GetClusterElementWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeDescription200Response>> {
+    async getClusterElementWorkflowNodeDescriptionRequestOpts(requestParameters: GetClusterElementWorkflowNodeDescriptionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -87,12 +86,21 @@ export class WorkflowNodeDescriptionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
         urlPath = urlPath.replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an action description shown in the editor.
+     * Get an action description shown in the editor
+     */
+    async getClusterElementWorkflowNodeDescriptionRaw(requestParameters: GetClusterElementWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeDescription200Response>> {
+        const requestOptions = await this.getClusterElementWorkflowNodeDescriptionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GetWorkflowNodeDescription200ResponseFromJSON(jsonValue));
     }
@@ -107,10 +115,9 @@ export class WorkflowNodeDescriptionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an action description shown in the editor.
-     * Get an action description shown in the editor
+     * Creates request options for getWorkflowNodeDescription without sending the request
      */
-    async getWorkflowNodeDescriptionRaw(requestParameters: GetWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeDescription200Response>> {
+    async getWorkflowNodeDescriptionRequestOpts(requestParameters: GetWorkflowNodeDescriptionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -145,12 +152,21 @@ export class WorkflowNodeDescriptionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an action description shown in the editor.
+     * Get an action description shown in the editor
+     */
+    async getWorkflowNodeDescriptionRaw(requestParameters: GetWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeDescription200Response>> {
+        const requestOptions = await this.getWorkflowNodeDescriptionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GetWorkflowNodeDescription200ResponseFromJSON(jsonValue));
     }

@@ -46,10 +46,9 @@ export interface GetWorkflowNodeDynamicPropertiesRequest {
 export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
 
     /**
-     * Get dynamic properties for an action or trigger property shown in the editor.
-     * Get dynamic properties for an action or trigger property shown in the editor
+     * Creates request options for getClusterElementNodeDynamicProperties without sending the request
      */
-    async getClusterElementNodeDynamicPropertiesRaw(requestParameters: GetClusterElementNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Property>>> {
+    async getClusterElementNodeDynamicPropertiesRequestOpts(requestParameters: GetClusterElementNodeDynamicPropertiesRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -112,12 +111,21 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
         urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get dynamic properties for an action or trigger property shown in the editor.
+     * Get dynamic properties for an action or trigger property shown in the editor
+     */
+    async getClusterElementNodeDynamicPropertiesRaw(requestParameters: GetClusterElementNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Property>>> {
+        const requestOptions = await this.getClusterElementNodeDynamicPropertiesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyFromJSON));
     }
@@ -132,10 +140,9 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get dynamic properties for an action or trigger property shown in the editor.
-     * Get dynamic properties for an action or trigger property shown in the editor
+     * Creates request options for getWorkflowNodeDynamicProperties without sending the request
      */
-    async getWorkflowNodeDynamicPropertiesRaw(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Property>>> {
+    async getWorkflowNodeDynamicPropertiesRequestOpts(requestParameters: GetWorkflowNodeDynamicPropertiesRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -182,12 +189,21 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
         urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get dynamic properties for an action or trigger property shown in the editor.
+     * Get dynamic properties for an action or trigger property shown in the editor
+     */
+    async getWorkflowNodeDynamicPropertiesRaw(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Property>>> {
+        const requestOptions = await this.getWorkflowNodeDynamicPropertiesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyFromJSON));
     }

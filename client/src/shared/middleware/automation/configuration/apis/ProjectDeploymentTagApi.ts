@@ -36,10 +36,9 @@ export interface UpdateProjectDeploymentTagsRequest {
 export class ProjectDeploymentTagApi extends runtime.BaseAPI {
 
     /**
-     * Get project deployment tags.
-     * Get project deployment tags
+     * Creates request options for getProjectDeploymentTags without sending the request
      */
-    async getProjectDeploymentTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+    async getProjectDeploymentTagsRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -47,12 +46,21 @@ export class ProjectDeploymentTagApi extends runtime.BaseAPI {
 
         let urlPath = `/project-deployments/tags`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get project deployment tags.
+     * Get project deployment tags
+     */
+    async getProjectDeploymentTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+        const requestOptions = await this.getProjectDeploymentTagsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagFromJSON));
     }
@@ -67,10 +75,9 @@ export class ProjectDeploymentTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Updates tags of an existing project deployment.
-     * Updates tags of an existing project deployment
+     * Creates request options for updateProjectDeploymentTags without sending the request
      */
-    async updateProjectDeploymentTagsRaw(requestParameters: UpdateProjectDeploymentTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateProjectDeploymentTagsRequestOpts(requestParameters: UpdateProjectDeploymentTagsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -95,13 +102,22 @@ export class ProjectDeploymentTagApi extends runtime.BaseAPI {
         let urlPath = `/project-deployments/{id}/tags`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: UpdateTagsRequestToJSON(requestParameters['updateTagsRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Updates tags of an existing project deployment.
+     * Updates tags of an existing project deployment
+     */
+    async updateProjectDeploymentTagsRaw(requestParameters: UpdateProjectDeploymentTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateProjectDeploymentTagsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

@@ -11,7 +11,7 @@ All URIs are relative to */api/platform/internal*
 
 ## getComponentClusterElementDefinition
 
-> ClusterElementDefinition getComponentClusterElementDefinition(componentName, componentVersion, clusterElementName)
+> ClusterElementDefinition getComponentClusterElementDefinition(componentName, componentVersion, clusterElementName, clusterElementType)
 
 Get a cluster element definition of a component
 
@@ -37,6 +37,8 @@ async function example() {
     componentVersion: 56,
     // string | The name of a cluster element to get.
     clusterElementName: clusterElementName_example,
+    // string | The type of the cluster element (e.g. PROCESSOR, TOOLS, SOURCE, DESTINATION). (optional)
+    clusterElementType: clusterElementType_example,
   } satisfies GetComponentClusterElementDefinitionRequest;
 
   try {
@@ -59,6 +61,7 @@ example().catch(console.error);
 | **componentName** | `string` | The name of a component. | [Defaults to `undefined`] |
 | **componentVersion** | `number` | The version of a component. | [Defaults to `undefined`] |
 | **clusterElementName** | `string` | The name of a cluster element to get. | [Defaults to `undefined`] |
+| **clusterElementType** | `string` | The type of the cluster element (e.g. PROCESSOR, TOOLS, SOURCE, DESTINATION). | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 

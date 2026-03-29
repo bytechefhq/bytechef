@@ -10,6 +10,7 @@ Name | Type
 `parameters` | { [key: string]: any; }
 `displayConditions` | { [key: string]: boolean; }
 `missingRequiredProperties` | Array&lt;string&gt;
+`version` | number
 
 ## Example
 
@@ -22,6 +23,7 @@ const example = {
   "parameters": null,
   "displayConditions": null,
   "missingRequiredProperties": null,
+  "version": null,
 } satisfies DeleteClusterElementParameter200Response
 
 console.log(example)

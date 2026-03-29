@@ -558,7 +558,7 @@ No authorization required
 
 ## updateWorkflow
 
-> updateWorkflow(id, workflow)
+> Workflow updateWorkflow(id, workflow)
 
 Update an existing workflow
 
@@ -606,7 +606,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**Workflow**](Workflow.md)
 
 ### Authorization
 
@@ -615,13 +615,13 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: `application/json`
-- **Accept**: Not defined
+- **Accept**: `application/json`
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **204** | Successful operation. |  -  |
+| **200** | The updated workflow object. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

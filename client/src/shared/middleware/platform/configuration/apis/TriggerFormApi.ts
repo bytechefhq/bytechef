@@ -32,10 +32,9 @@ export interface GetTriggerFormRequest {
 export class TriggerFormApi extends runtime.BaseAPI {
 
     /**
-     * Get a trigger form.
-     * Get a trigger form
+     * Creates request options for getTriggerForm without sending the request
      */
-    async getTriggerFormRaw(requestParameters: GetTriggerFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerForm>> {
+    async getTriggerFormRequestOpts(requestParameters: GetTriggerFormRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -51,12 +50,21 @@ export class TriggerFormApi extends runtime.BaseAPI {
         let urlPath = `/trigger-form/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a trigger form.
+     * Get a trigger form
+     */
+    async getTriggerFormRaw(requestParameters: GetTriggerFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerForm>> {
+        const requestOptions = await this.getTriggerFormRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TriggerFormFromJSON(jsonValue));
     }

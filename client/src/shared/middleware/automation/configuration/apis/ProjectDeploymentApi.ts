@@ -81,10 +81,9 @@ export interface UpdateProjectDeploymentWorkflowRequest {
 export class ProjectDeploymentApi extends runtime.BaseAPI {
 
     /**
-     * Create a new project deployment.
-     * Create a new project deployment
+     * Creates request options for createProjectDeployment without sending the request
      */
-    async createProjectDeploymentRaw(requestParameters: CreateProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createProjectDeploymentRequestOpts(requestParameters: CreateProjectDeploymentRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['projectDeployment'] == null) {
             throw new runtime.RequiredError(
                 'projectDeployment',
@@ -101,13 +100,22 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
 
         let urlPath = `/project-deployments`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ProjectDeploymentToJSON(requestParameters['projectDeployment']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new project deployment.
+     * Create a new project deployment
+     */
+    async createProjectDeploymentRaw(requestParameters: CreateProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createProjectDeploymentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -126,10 +134,9 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a request for running a new job.
-     * Create a request for running a new job
+     * Creates request options for createProjectDeploymentWorkflowJob without sending the request
      */
-    async createProjectDeploymentWorkflowJobRaw(requestParameters: CreateProjectDeploymentWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectDeploymentWorkflowJob200Response>> {
+    async createProjectDeploymentWorkflowJobRequestOpts(requestParameters: CreateProjectDeploymentWorkflowJobRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -153,12 +160,21 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a request for running a new job.
+     * Create a request for running a new job
+     */
+    async createProjectDeploymentWorkflowJobRaw(requestParameters: CreateProjectDeploymentWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectDeploymentWorkflowJob200Response>> {
+        const requestOptions = await this.createProjectDeploymentWorkflowJobRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CreateProjectDeploymentWorkflowJob200ResponseFromJSON(jsonValue));
     }
@@ -173,10 +189,9 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete a project deployment.
-     * Delete a project deployment
+     * Creates request options for deleteProjectDeployment without sending the request
      */
-    async deleteProjectDeploymentRaw(requestParameters: DeleteProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteProjectDeploymentRequestOpts(requestParameters: DeleteProjectDeploymentRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -192,12 +207,21 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
         let urlPath = `/project-deployments/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete a project deployment.
+     * Delete a project deployment
+     */
+    async deleteProjectDeploymentRaw(requestParameters: DeleteProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteProjectDeploymentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -211,10 +235,9 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
     }
 
     /**
-     * Enable/disable a project deployment.
-     * Enable/disable a project deployment
+     * Creates request options for enableProjectDeployment without sending the request
      */
-    async enableProjectDeploymentRaw(requestParameters: EnableProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableProjectDeploymentRequestOpts(requestParameters: EnableProjectDeploymentRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -238,12 +261,21 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Enable/disable a project deployment.
+     * Enable/disable a project deployment
+     */
+    async enableProjectDeploymentRaw(requestParameters: EnableProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.enableProjectDeploymentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -257,10 +289,9 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
     }
 
     /**
-     * Enable/disable a workflow of a project deployment.
-     * Enable/disable a workflow of a project deployment
+     * Creates request options for enableProjectDeploymentWorkflow without sending the request
      */
-    async enableProjectDeploymentWorkflowRaw(requestParameters: EnableProjectDeploymentWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableProjectDeploymentWorkflowRequestOpts(requestParameters: EnableProjectDeploymentWorkflowRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -292,12 +323,21 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
         urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Enable/disable a workflow of a project deployment.
+     * Enable/disable a workflow of a project deployment
+     */
+    async enableProjectDeploymentWorkflowRaw(requestParameters: EnableProjectDeploymentWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.enableProjectDeploymentWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -311,10 +351,9 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a project deployment by id.
-     * Get a project deployment by id
+     * Creates request options for getProjectDeployment without sending the request
      */
-    async getProjectDeploymentRaw(requestParameters: GetProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectDeployment>> {
+    async getProjectDeploymentRequestOpts(requestParameters: GetProjectDeploymentRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -330,12 +369,21 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
         let urlPath = `/project-deployments/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a project deployment by id.
+     * Get a project deployment by id
+     */
+    async getProjectDeploymentRaw(requestParameters: GetProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectDeployment>> {
+        const requestOptions = await this.getProjectDeploymentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ProjectDeploymentFromJSON(jsonValue));
     }
@@ -350,10 +398,9 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get project deployments.
-     * Get project deployments
+     * Creates request options for getWorkspaceProjectDeployments without sending the request
      */
-    async getWorkspaceProjectDeploymentsRaw(requestParameters: GetWorkspaceProjectDeploymentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectDeployment>>> {
+    async getWorkspaceProjectDeploymentsRequestOpts(requestParameters: GetWorkspaceProjectDeploymentsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -385,12 +432,21 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}/project-deployments`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get project deployments.
+     * Get project deployments
+     */
+    async getWorkspaceProjectDeploymentsRaw(requestParameters: GetWorkspaceProjectDeploymentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectDeployment>>> {
+        const requestOptions = await this.getWorkspaceProjectDeploymentsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectDeploymentFromJSON));
     }
@@ -405,10 +461,9 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing project deployment.
-     * Update an existing project deployment
+     * Creates request options for updateProjectDeployment without sending the request
      */
-    async updateProjectDeploymentRaw(requestParameters: UpdateProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateProjectDeploymentRequestOpts(requestParameters: UpdateProjectDeploymentRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -433,13 +488,22 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
         let urlPath = `/project-deployments/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: ProjectDeploymentToJSON(requestParameters['projectDeployment']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing project deployment.
+     * Update an existing project deployment
+     */
+    async updateProjectDeploymentRaw(requestParameters: UpdateProjectDeploymentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateProjectDeploymentRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -453,10 +517,9 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing project deployment workflow.
-     * Update an existing project deployment workflow
+     * Creates request options for updateProjectDeploymentWorkflow without sending the request
      */
-    async updateProjectDeploymentWorkflowRaw(requestParameters: UpdateProjectDeploymentWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateProjectDeploymentWorkflowRequestOpts(requestParameters: UpdateProjectDeploymentWorkflowRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -489,13 +552,22 @@ export class ProjectDeploymentApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"projectDeploymentWorkflowId"}}`, encodeURIComponent(String(requestParameters['projectDeploymentWorkflowId'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: ProjectDeploymentWorkflowToJSON(requestParameters['projectDeploymentWorkflow']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing project deployment workflow.
+     * Update an existing project deployment workflow
+     */
+    async updateProjectDeploymentWorkflowRaw(requestParameters: UpdateProjectDeploymentWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateProjectDeploymentWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
