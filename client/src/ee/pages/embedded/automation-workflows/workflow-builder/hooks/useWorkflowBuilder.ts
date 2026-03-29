@@ -100,6 +100,26 @@ export const useWorkflowBuilder = () => {
 
     const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
 
+    const cancelWorkflowQueries = () => {
+        if (workflowUuid) {
+            const queryKey = ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid);
+
+            return queryClient.cancelQueries({queryKey});
+        }
+
+        return Promise.resolve();
+    };
+
+    const invalidateWorkflowQueries = () => {
+        if (workflowUuid) {
+            const queryKey = ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid);
+
+            return queryClient.invalidateQueries({queryKey});
+        }
+
+        return Promise.resolve();
+    };
+
     const handleWorkflowExecutionsTestOutputCloseClick = () => {
         setShowBottomPanelOpen(false);
 
@@ -174,12 +194,14 @@ export const useWorkflowBuilder = () => {
 
     return {
         bottomResizablePanelRef,
+        cancelWorkflowQueries,
         connectedUserProjectWorkflow,
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleWorkflowExecutionsTestOutputCloseClick,
         includeComponents,
         initialized,
+        invalidateWorkflowQueries,
         projectId: connectedUserProjectWorkflow?.projectId,
         sharedConnectionIds,
         updateClusterElementParameterMutation,

@@ -32,7 +32,7 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
             }))
         );
 
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {cancelWorkflowQueries, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
     const queryClient = useQueryClient();
 
     const handleConfigureTool = useCallback(
@@ -108,9 +108,10 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
             };
 
             handleDeleteTask({
+                cancelWorkflowQueries: cancelWorkflowQueries!,
                 clusterElementsCanvasOpen: true,
                 data: toolNodeData,
-                invalidateWorkflowQueries,
+                invalidateWorkflowQueries: invalidateWorkflowQueries!,
                 queryClient,
                 rootClusterElementNodeData,
                 setCurrentNode,

@@ -126,6 +126,12 @@ export const useIntegration = () => {
 
     const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
 
+    const cancelWorkflowQueries = () => {
+        const queryKey = IntegrationWorkflowKeys.integrationWorkflows(+integrationId!);
+
+        return queryClient.cancelQueries({queryKey});
+    };
+
     const invalidateWorkflowQueries = () => {
         const queryKey = IntegrationWorkflowKeys.integrationWorkflows(+integrationId!);
 
@@ -198,6 +204,7 @@ export const useIntegration = () => {
 
     return {
         bottomResizablePanelRef,
+        cancelWorkflowQueries,
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         handleIntegrationClick,

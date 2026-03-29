@@ -525,7 +525,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         }))
     );
 
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {cancelWorkflowQueries, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -618,6 +618,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const handleDeleteNodeClick = (data: NodeDataType) => {
         if (data) {
             handleDeleteTask({
+                cancelWorkflowQueries: cancelWorkflowQueries!,
                 clusterElementsCanvasOpen,
                 currentNode,
                 data,

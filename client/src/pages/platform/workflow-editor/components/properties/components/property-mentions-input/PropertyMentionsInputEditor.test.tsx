@@ -119,6 +119,7 @@ const editorProviderValue = {
         connections: [],
         filteredConnections: () => [],
     },
+    cancelWorkflowQueries: () => {},
     deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,

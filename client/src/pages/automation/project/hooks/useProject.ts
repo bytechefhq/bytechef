@@ -154,6 +154,12 @@ export const useProject = () => {
 
     const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
 
+    const cancelWorkflowQueries = () => {
+        const queryKey = ProjectWorkflowKeys.projectWorkflows(+projectId!);
+
+        return queryClient.cancelQueries({queryKey});
+    };
+
     const invalidateWorkflowQueries = () => {
         const queryKey = ProjectWorkflowKeys.projectWorkflows(+projectId!);
 
@@ -225,6 +231,7 @@ export const useProject = () => {
 
     return {
         bottomResizablePanelRef,
+        cancelWorkflowQueries,
         categories,
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
