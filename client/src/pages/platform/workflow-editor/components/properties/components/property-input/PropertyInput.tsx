@@ -2,7 +2,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
+import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
@@ -107,7 +107,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
 
                     <div className="flex items-center">
                         {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                            <InputTypeSwitchButton
+                            <PropertyInputTypeSwitch
                                 handleClick={handleInputTypeSwitchButtonClick}
                                 mentionInput={mentionInput}
                             />

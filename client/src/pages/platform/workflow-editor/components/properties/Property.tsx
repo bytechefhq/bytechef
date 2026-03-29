@@ -9,7 +9,7 @@ import ObjectProperty from '@/pages/platform/workflow-editor/components/properti
 import FormControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/FormControlledArrayItems';
 import FormControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/FormControlledObjectEntries';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
-import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
+import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
 import PropertyMultiSelect from '@/pages/platform/workflow-editor/components/properties/components/PropertyMultiSelect';
@@ -30,7 +30,7 @@ import {
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
-import {CircleQuestionMarkIcon, EqualIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, SquareFunctionIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
@@ -263,14 +263,14 @@ const Property = ({
 
                                         <div className="flex items-center gap-1">
                                             {showInputTypeSwitchButton && (
-                                                <InputTypeSwitchButton
+                                                <PropertyInputTypeSwitch
                                                     handleClick={handleInputTypeSwitchButtonClick}
                                                     mentionInput={mentionInput}
                                                 />
                                             )}
 
                                             {!showInputTypeSwitchButton && control && isToolsClusterElement && (
-                                                <InputTypeSwitchButton
+                                                <PropertyInputTypeSwitch
                                                     handleClick={() =>
                                                         handleControlledModeSwitch(!controlledDynamicMode)
                                                     }
@@ -343,7 +343,7 @@ const Property = ({
                                         label={label || name}
                                         leadingIcon={
                                             isExpressionMode || isFieldFromAi ? (
-                                                <EqualIcon className="size-4" />
+                                                <SquareFunctionIcon className="size-4" />
                                             ) : (
                                                 typeIcon
                                             )
@@ -495,7 +495,7 @@ const Property = ({
                                                 label={label || name}
                                                 leadingIcon={
                                                     isExpressionMode || isFieldFromAi ? (
-                                                        <EqualIcon className="size-4" />
+                                                        <SquareFunctionIcon className="size-4" />
                                                     ) : (
                                                         typeIcon
                                                     )

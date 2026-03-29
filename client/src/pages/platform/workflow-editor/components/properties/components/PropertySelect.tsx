@@ -8,7 +8,7 @@ import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import InputTypeSwitchButton from './InputTypeSwitchButton';
+import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
 
 interface PropertySelectProps {
     defaultValue?: string;
@@ -64,7 +64,7 @@ const PropertySelect = ({
 
                 <div className="flex items-center">
                     {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                        <InputTypeSwitchButton handleClick={handleInputTypeSwitchButtonClick} mentionInput={false} />
+                        <PropertyInputTypeSwitch handleClick={handleInputTypeSwitchButtonClick} mentionInput={false} />
                     )}
 
                     {deletePropertyButton}

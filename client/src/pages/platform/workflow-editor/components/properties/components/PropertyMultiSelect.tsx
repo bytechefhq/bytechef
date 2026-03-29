@@ -17,7 +17,7 @@ import {useShallow} from 'zustand/shallow';
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
-import InputTypeSwitchButton from './InputTypeSwitchButton';
+import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
 
 interface PropertyMultiSelectProps {
     defaultValue?: string[];
@@ -271,7 +271,7 @@ const PropertyMultiSelect = ({
 
                     <div className="flex items-center">
                         {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                            <InputTypeSwitchButton
+                            <PropertyInputTypeSwitch
                                 handleClick={handleInputTypeSwitchButtonClick}
                                 mentionInput={false}
                             />
