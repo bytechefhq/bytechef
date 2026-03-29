@@ -2,7 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import CreateJudgeDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/CreateJudgeDialog';
 import {
-    AgentEvalScenario,
+    type AgentEvalTestQuery,
     AgentJudgeType,
     AgentScenarioType,
     useCreateAgentScenarioJudgeMutation,
@@ -13,14 +13,13 @@ import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, ChevronRightIcon, GavelIcon, PencilIcon, PlusIcon, TrashIcon} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
-import type {AgentEvalTestQuery} from '@/shared/middleware/graphql';
-
-type ScenarioJudgeType = NonNullable<AgentEvalTestQuery['agentEvalTest']>['scenarios'][number]['judges'][number];
+type AgentEvalScenarioFromQueryType = NonNullable<AgentEvalTestQuery['agentEvalTest']>['scenarios'][number];
+type ScenarioJudgeType = AgentEvalScenarioFromQueryType['judges'][number];
 
 interface AgentEvalScenarioRowProps {
     onDelete: (id: string) => void;
-    onEdit: (scenario: AgentEvalScenario) => void;
-    scenario: AgentEvalScenario;
+    onEdit: (scenario: AgentEvalScenarioFromQueryType) => void;
+    scenario: AgentEvalScenarioFromQueryType;
 }
 
 const AgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AgentEvalScenarioRowProps) => {

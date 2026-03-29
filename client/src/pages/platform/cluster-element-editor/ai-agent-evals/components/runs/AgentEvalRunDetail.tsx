@@ -11,6 +11,8 @@ interface RunSummaryI {
     errorCount: number;
     failedCount: number;
     passedCount: number;
+    totalInputTokens?: number | null;
+    totalOutputTokens?: number | null;
     totalScenarios: number;
 }
 

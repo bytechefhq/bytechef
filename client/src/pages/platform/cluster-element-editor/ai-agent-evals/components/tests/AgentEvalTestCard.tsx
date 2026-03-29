@@ -11,7 +11,7 @@ import AgentEvalScenarioRow from '@/pages/platform/cluster-element-editor/ai-age
 import CreateScenarioDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/CreateScenarioDialog';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import {
-    AgentEvalScenario,
+    type AgentEvalTestQuery,
     AgentEvalTestsQuery,
     AgentScenarioType,
     useAgentEvalTestQuery,
@@ -28,6 +28,7 @@ import {
 import {useState} from 'react';
 
 type AgentEvalTestListItemType = AgentEvalTestsQuery['agentEvalTests'][number];
+type AgentEvalScenarioType = NonNullable<AgentEvalTestQuery['agentEvalTest']>['scenarios'][number];
 
 interface AgentEvalTestCardProps {
     onCreateScenario: (
@@ -37,6 +38,7 @@ interface AgentEvalTestCardProps {
         fields: {
             expectedOutput?: string;
             maxTurns?: number;
+            numberOfRuns?: number;
             personaPrompt?: string;
             userMessage?: string;
         }
@@ -64,7 +66,7 @@ const AgentEvalTestCard = ({
     test,
 }: AgentEvalTestCardProps) => {
     const {setEvalsTab, setSelectedTestId} = useAiAgentEvalsStore();
-    const [editingScenario, setEditingScenario] = useState<AgentEvalScenario | null>(null);
+    const [editingScenario, setEditingScenario] = useState<AgentEvalScenarioType | null>(null);
     const [expanded, setExpanded] = useState(false);
     const [showCreateScenarioDialog, setShowCreateScenarioDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -203,6 +205,7 @@ const AgentEvalTestCard = ({
                         id: editingScenario.id,
                         maxTurns: editingScenario.maxTurns,
                         name: editingScenario.name,
+                        numberOfRuns: editingScenario.numberOfRuns,
                         personaPrompt: editingScenario.personaPrompt,
                         type: editingScenario.type,
                         userMessage: editingScenario.userMessage,

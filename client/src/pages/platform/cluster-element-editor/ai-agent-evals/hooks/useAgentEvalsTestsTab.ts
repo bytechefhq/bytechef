@@ -52,6 +52,7 @@ export default function useAgentEvalsTestsTab(workflowId: string, workflowNodeNa
             fields: {
                 expectedOutput?: string;
                 maxTurns?: number;
+                numberOfRuns?: number;
                 personaPrompt?: string;
                 userMessage?: string;
             }
