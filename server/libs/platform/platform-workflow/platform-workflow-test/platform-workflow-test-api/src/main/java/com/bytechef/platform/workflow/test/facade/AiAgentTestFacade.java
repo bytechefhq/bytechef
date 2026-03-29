@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.test.facade;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Facade for executing AI agent test actions. Resolves workflow task parameters, evaluates expressions, resolves
@@ -40,4 +41,20 @@ public interface AiAgentTestFacade {
     Object executeAiAgentAction(
         String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
         List<Object> attachments);
+
+    /**
+     * Executes an AI agent action for testing purposes with tool simulations.
+     *
+     * @param workflowId       the workflow identifier
+     * @param workflowNodeName the name of the workflow node (task) to execute
+     * @param environmentId    the environment identifier
+     * @param conversationId   the conversation identifier for the AI agent
+     * @param message          the user prompt message
+     * @param attachments      the list of attachments
+     * @param toolSimulations  map of tool name to simulated response prompt
+     * @return the result of the action execution
+     */
+    Object executeAiAgentAction(
+        String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
+        List<Object> attachments, Map<String, String> toolSimulations);
 }
