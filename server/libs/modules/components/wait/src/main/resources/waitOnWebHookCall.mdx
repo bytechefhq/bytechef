@@ -1,0 +1,52 @@
+### On Webhook Call Action
+
+The **On Webhook Call** action suspends the workflow execution and waits for an external service to resume it by calling a webhook URL.
+
+#### How It Works
+
+1. When the workflow reaches the **On Webhook Call** step, it suspends and generates a unique **resume URL**.
+2. ByteChef sends a POST request to the configured **Service URL** with the resume URL in the request body:
+    ```json
+    {
+      "resumeUrl": "https://your-bytechef-instance/api/job/resume/{resumeToken}"
+    }
+    ```
+3. The external service stores this resume URL and calls it when ready to continue the workflow.
+
+#### Resuming the Workflow
+
+To resume a suspended workflow, the external service sends a request to the resume URL. The resume endpoint requires authentication via an API key passed in the `Authorization` header.
+
+You can generate an API key in the ByteChef UI under **Settings > API Keys**.
+
+**With data (POST):**
+
+```bash
+curl -X POST "https://your-bytechef-instance/api/platform/v1/job/resume/{resumeToken}" \
+  -H "Authorization: Bearer {your-api-key}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "John",
+    "lastName": "Doe"
+  }'
+```
+
+**Without data (GET):**
+
+```bash
+curl "https://your-bytechef-instance/api/platform/v1/job/resume/{resumeToken}" \
+  -H "Authorization: Bearer {your-api-key}"
+```
+
+The data sent in the POST request body is available in subsequent workflow steps through the action's output.
+
+#### Defining a Data Schema
+
+You can define a **Data Schema** using the JSON Schema Builder to specify the structure of the data that the external service should send when resuming the workflow. This schema is used for output mapping in subsequent workflow steps.
+
+#### Expiration
+
+The action supports an expiration time. If the webhook is not called within the specified time, the workflow times out. Configure this with:
+
+- **Expires After Amount**: The number of time units (default: 30)
+- **Expires After Unit**: Seconds, Minutes, Hours, or Days (default: Days)

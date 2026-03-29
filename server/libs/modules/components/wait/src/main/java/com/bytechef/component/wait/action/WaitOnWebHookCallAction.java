@@ -89,7 +89,8 @@ public class WaitOnWebHookCallAction {
             .output(waitOnWebHookCallAction::output)
             .perform(waitOnWebHookCallAction::perform)
             .beforeSuspend(waitOnWebHookCallAction::beforeSuspend)
-            .resumePerform(waitOnWebHookCallAction::resumePerform);
+            .resumePerform(waitOnWebHookCallAction::resumePerform)
+            .help("", "https://docs.bytechef.io/reference/components/wait_v1#on-web-hook-call");
     }
 
     protected OutputResponse output(

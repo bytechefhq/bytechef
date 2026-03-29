@@ -296,7 +296,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Suspends the workflow execution until a webhook call is received. An external service can resume the workflow by calling the webhook URL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wait_v1#on-web-hook-call"
+    },
     "metadata": null,
     "name": "onWebhookCall",
     "outputDefinition": {
