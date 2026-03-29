@@ -51,7 +51,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
 
         return resultsWithChunkIndex.map(({chunkIndex, documentName, index, result}) => (
             <div
-                className="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+                className="rounded-lg border border-border/50 bg-white p-4 transition-shadow hover:shadow-md"
                 key={result.id}
             >
                 <div className="mb-2 flex items-center justify-between">
@@ -95,7 +95,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
 
     return (
         <div className="space-y-4">
-            <form className="space-y-4 rounded-lg border border-gray-200 bg-white p-4" onSubmit={handleSearch}>
+            <form className="space-y-4 rounded-lg border border-border/50 bg-white p-4" onSubmit={handleSearch}>
                 <fieldset className="space-y-4 border-0">
                     <div className="space-y-2">
                         <Label htmlFor="query">Search Query</Label>

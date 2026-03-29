@@ -428,8 +428,7 @@ export function separateOverlappingConditionChildren(allNodes: Node[], edges: Ed
         }
 
         // Process conditions nested inside another condition or a branch
-        const parentDispatcherId =
-            conditionData.conditionData?.conditionId || conditionData.branchData?.branchId;
+        const parentDispatcherId = conditionData.conditionData?.conditionId || conditionData.branchData?.branchId;
 
         if (!parentDispatcherId) {
             return;
@@ -2769,11 +2768,7 @@ export function centerDispatcherChildrenOnMainAxis(allNodes: Node[], edges: Edge
         for (const outgoingEdge of outgoingEdges) {
             const firstChild = allNodes.find((node) => node.id === outgoingEdge.target);
 
-            if (
-                !firstChild ||
-                firstChild.type === 'placeholder' ||
-                firstChild.type === 'taskDispatcherLeftGhostNode'
-            ) {
+            if (!firstChild || firstChild.type === 'placeholder' || firstChild.type === 'taskDispatcherLeftGhostNode') {
                 continue;
             }
 
