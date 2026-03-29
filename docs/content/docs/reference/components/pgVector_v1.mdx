@@ -1,13 +1,13 @@
 ---
-title: "Redis"
-description: "Redis is an open-source, in-memory data structure store used as a database, cache, and message broker, known for its high performance and support for various data structures like strings, hashes, lists, sets, and more."
+title: "PGVector"
+description: "PGVector is an open-source PostgreSQL extension for vector similarity search."
 ---
 
 
 Categories: Artificial Intelligence
 
 
-Type: redis/v1
+Type: pgVector/v1
 
 <hr />
 
@@ -25,10 +25,16 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| publicEndpoint | Public Endpoint | STRING |  | true |
-| username | Username | STRING |  | true |
-| password | Password | STRING |  | true |
-| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to initialize the schema. | true |
+| url | URL | STRING | The JDBC URL of the PostgreSQL instance (e.g. jdbc:postgresql://localhost:5432/postgres). | true |
+| username | Username | STRING | The username for this connection. | true |
+| password | Password | STRING | The password for this connection. | true |
+| schemaName | Schema Name | STRING | The name of the PostgreSQL schema that contains the vector store table. | true |
+| tableName | Table Name | STRING | The name of the table to use for storing vectors. | true |
+| dimensions | Dimensions | INTEGER | The number of dimensions in the embedding vector. | true |
+| distanceType | Distance Type | STRING <details> <summary> Options </summary> <span>COSINE_DISTANCE</span>, <span>EUCLIDEAN_DISTANCE</span>, <span>NEGATIVE_INNER_PRODUCT</span> </details> | The distance function to use for similarity search. | true |
+| indexType | Index Type | STRING <details> <summary> Options </summary> <span>HNSW</span>, <span>IVFFLAT</span>, <span>NONE</span> </details> | The index algorithm to use for approximate nearest neighbor search. | true |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to initialize the schema on startup. | true |
+| maxDocumentBatchSize | Max Document Batch Size | INTEGER | The maximum number of documents to process in a single batch. | true |
 
 
 
@@ -64,7 +70,7 @@ Name: search
     "topK" : 1,
     "similarityThreshold" : 0.0
   },
-  "type" : "redis/v1/search"
+  "type" : "pgVector/v1/search"
 }
 ```
 
@@ -87,7 +93,7 @@ Name: load
 {
   "label" : "Load Data",
   "name" : "load",
-  "type" : "redis/v1/load"
+  "type" : "pgVector/v1/load"
 }
 ```
 

@@ -1,0 +1,93 @@
+---
+title: "Knowledge Base"
+description: "Search ByteChef's internal knowledge base to retrieve relevant document chunks using semantic similarity search powered by vector embeddings."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: knowledgeBase/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Load Data
+Name: load
+
+`Loads data into the vector store using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| knowledgeBaseId | Knowledge Base | INTEGER | The knowledge base to load documents into. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Load Data",
+  "name" : "load",
+  "parameters" : {
+    "knowledgeBaseId" : 1
+  },
+  "type" : "knowledgeBase/v1/load"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Search Data
+Name: search
+
+`Query data from the knowledge base. Supports three modes: tag-only search, vector search, or combined tag filtering with vector search.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| knowledgeBaseId | Knowledge Base | INTEGER | The knowledge base to search. | true |
+| query | Query | STRING | The search query for semantic similarity search. Leave empty for tag-only search. | false |
+| tagIds | Tags | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Filter results by tags. Documents with ANY of the selected tags will be returned (OR logic). | false |
+| topK | Top K | INTEGER | Maximum number of results to return. | false |
+| similarityThreshold | Similarity Threshold | NUMBER | Minimum similarity score (0.0 to 1.0). Only results with similarity above this threshold will be returned. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Data",
+  "name" : "search",
+  "parameters" : {
+    "knowledgeBaseId" : 1,
+    "query" : "",
+    "tagIds" : [ 1 ],
+    "topK" : 1,
+    "similarityThreshold" : 0.0
+  },
+  "type" : "knowledgeBase/v1/search"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+
+

@@ -1,13 +1,13 @@
 ---
-title: "Pinecone"
-description: "Pinecone is a vector database designed for efficient similarity search and storage of high-dimensional data, commonly used in machine learning and AI applications."
+title: "MariaDB Vector Store"
+description: "MariaDB Vector Store uses MariaDB 11.7+ native vector storage and similarity search capabilities to store and query document embeddings."
 ---
 
 
 Categories: Artificial Intelligence
 
 
-Type: pinecone/v1
+Type: mariaDbVectorStore/v1
 
 <hr />
 
@@ -25,8 +25,14 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| apiKey | Pinecone API Key | STRING | The API key for the Pinecone API. | true |
-| host | Host | STRING | Url of the host. | true |
+| url | JDBC URL | STRING | MariaDB JDBC connection URL (e.g., jdbc:mariadb://localhost:3306/mydb). | true |
+| username | Username | STRING | MariaDB database username. | true |
+| password | Password | STRING | MariaDB database password. | true |
+| tableName | Table Name | STRING | Name of the database table used to store vector embeddings. | false |
+| schemaName | Schema Name | STRING | Database schema name. If not specified, the default schema is used. | false |
+| distanceType | Distance Type | STRING <details> <summary> Options </summary> <span>COSINE</span>, <span>EUCLIDEAN</span> </details> | Distance function used for vector similarity comparison. | false |
+| dimensions | Dimensions | INTEGER | Number of dimensions for the vector embeddings. If not specified, inferred from the embedding model. | false |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to create the vector store table automatically if it does not exist. | false |
 
 
 
@@ -49,7 +55,7 @@ Name: load
 {
   "label" : "Load Data",
   "name" : "load",
-  "type" : "pinecone/v1/load"
+  "type" : "mariaDbVectorStore/v1/load"
 }
 ```
 
@@ -85,7 +91,7 @@ Name: search
     "topK" : 1,
     "similarityThreshold" : 0.0
   },
-  "type" : "pinecone/v1/search"
+  "type" : "mariaDbVectorStore/v1/search"
 }
 ```
 

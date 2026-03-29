@@ -1,13 +1,13 @@
 ---
-title: "Pinecone"
-description: "Pinecone is a vector database designed for efficient similarity search and storage of high-dimensional data, commonly used in machine learning and AI applications."
+title: "S3 Vector Store"
+description: "Amazon S3 Vector Store uses AWS S3 as a persistent storage backend for vector embeddings, enabling scalable and durable similarity search."
 ---
 
 
 Categories: Artificial Intelligence
 
 
-Type: pinecone/v1
+Type: s3VectorStore/v1
 
 <hr />
 
@@ -25,8 +25,11 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| apiKey | Pinecone API Key | STRING | The API key for the Pinecone API. | true |
-| host | Host | STRING | Url of the host. | true |
+| accessKeyId | Access Key ID | STRING | AWS access key ID for authentication. | true |
+| secretAccessKey | Secret Access Key | STRING | AWS secret access key for authentication. | true |
+| region | Region | STRING <details> <summary> Options </summary> <span>us-east-1</span>, <span>us-east-2</span>, <span>us-west-1</span>, <span>us-west-2</span>, <span>ca-central-1</span>, <span>ap-east-1</span>, <span>ap-south-1</span>, <span>ap-south-2</span>, <span>ap-northeast-3</span>, <span>ap-northeast-2</span>, <span>ap-southeast-1</span>, <span>ap-southeast-2</span>, <span>ap-southeast-3</span>, <span>ap-southeast-4</span>, <span>ap-northeast-1</span>, <span>me-south-1</span>, <span>me-central-1</span>, <span>eu-central-1</span>, <span>eu-central-2</span>, <span>eu-west-1</span>, <span>eu-west-2</span>, <span>eu-south-1</span>, <span>eu-south-2</span>, <span>eu-west-3</span>, <span>eu-north-1</span>, <span>af-south-1</span>, <span>sa-east-1</span>, <span>cn-north-1</span>, <span>cn-northwest-1</span> </details> | AWS region where the S3 bucket is located. | true |
+| bucketName | Bucket Name | STRING | The name of the S3 bucket where the vector store data is persisted. | true |
+| key | Key | STRING | The S3 object key (file path) used to store the vector store JSON data. | true |
 
 
 
@@ -49,7 +52,7 @@ Name: load
 {
   "label" : "Load Data",
   "name" : "load",
-  "type" : "pinecone/v1/load"
+  "type" : "s3VectorStore/v1/load"
 }
 ```
 
@@ -85,7 +88,7 @@ Name: search
     "topK" : 1,
     "similarityThreshold" : 0.0
   },
-  "type" : "pinecone/v1/search"
+  "type" : "s3VectorStore/v1/search"
 }
 ```
 

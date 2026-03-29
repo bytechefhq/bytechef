@@ -1,0 +1,105 @@
+---
+title: "MCP Client"
+description: "Connects to external MCP servers to discover and call their tools."
+---
+
+
+Categories: Helpers, Developer Tools
+
+
+Type: mcpClient/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| authorizationUrl | Authorization URL | STRING |  | true |
+| tokenUrl | Token URL | STRING |  | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+| headerPrefix | Header Prefix | STRING |  | null |
+| scopes | Scopes | STRING | Optional comma-delimited list of scopes | false |
+
+
+
+### OAuth2 Client Credentials
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| tokenUrl | Token URL | STRING |  | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+| headerPrefix | Header Prefix | STRING |  | null |
+| scopes | Scopes | STRING | Optional comma-delimited list of scopes | false |
+
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Call Tool
+Name: callTool
+
+`Connects to an MCP server and calls a specific tool with the provided arguments.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| toolName | Tool Name | STRING | The name of the tool to call on the MCP server. | true |
+| toolArguments | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> toolName </details> |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Call Tool",
+  "name" : "callTool",
+  "parameters" : {
+    "toolName" : "",
+    "toolArguments" : { }
+  },
+  "type" : "mcpClient/v1/callTool"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+
+

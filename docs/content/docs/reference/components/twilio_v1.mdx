@@ -39,6 +39,69 @@ Version: 1
 ## Actions
 
 
+### Make Outbound Call
+Name: makeCall
+
+`Initiates an outbound voice call and executes a real-time workflow synchronously during the call. The action blocks until the call completes, allowing real-time audio processing and AI conversations.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| To | To | STRING | The phone number to call in E.164 format. | true |
+| From | From | STRING | Your Twilio phone number in E.164 format. | true |
+| subWorkflow | Real-Time Workflow | STRING | The workflow ID to execute synchronously during the phone call. This workflow handles real-time audio processing and AI responses via WebSocket streaming. | true |
+| timeout | Ring Timeout | INTEGER | Maximum time in seconds to wait for the call to be answered. If not answered within this time, the call fails. | false |
+| maxDuration | Max Call Duration | INTEGER | Maximum duration in minutes to wait for the call to complete. After this time, the action returns with a timeout status. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Make Outbound Call",
+  "name" : "makeCall",
+  "parameters" : {
+    "To" : "",
+    "From" : "",
+    "subWorkflow" : "",
+    "timeout" : 1,
+    "maxDuration" : 1
+  },
+  "type" : "twilio/v1/makeCall"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| callSid | STRING | Unique identifier for the call |
+| status | STRING | Final call status (completed, failed, busy, no-answer, timeout) |
+| duration | INTEGER | Call duration in seconds |
+| direction | STRING | Call direction (outbound-api) |
+
+
+
+
+#### Output Example
+```json
+{
+  "callSid" : "",
+  "status" : "",
+  "duration" : 1,
+  "direction" : ""
+}
+```
+
+
+
+
 ### Send SMS
 Name: sendSMS
 
@@ -259,6 +322,55 @@ Type: OBJECT
 
 
 ## Triggers
+
+
+### Inbound Voice Call
+Name: inboundCall
+
+`Triggers when an inbound voice call is received. Returns TwiML that establishes a WebSocket connection for real-time audio streaming and AI conversation.`
+
+Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| subWorkflow | Real-Time Workflow | STRING | The workflow ID to execute synchronously during the phone call. This workflow handles real-time audio processing and AI responses. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| callSid | STRING | Unique identifier for the call |
+| from | STRING | Caller phone number |
+| to | STRING | Called phone number |
+| direction | STRING | Call direction (inbound/outbound) |
+| accountSid | STRING | Twilio account SID |
+| callStatus | STRING | Call status |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Inbound Voice Call",
+  "name" : "inboundCall",
+  "parameters" : {
+    "subWorkflow" : ""
+  },
+  "type" : "twilio/v1/inboundCall"
+}
+```
+
 
 
 ### New WhatsApp Message

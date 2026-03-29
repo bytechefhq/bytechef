@@ -1,11 +1,13 @@
 ---
-title: "Oracle SQL"
-description: "Select, insert, update and delete data from Oracle Databases."
+title: "Oracle Vector Store"
+description: "Oracle Vector Store uses Oracle Database 23ai's native vector storage and similarity search capabilities to store and query document embeddings."
 ---
 
 
+Categories: Artificial Intelligence
 
-Type: oracleSql/v1
+
+Type: oracleVectorStore/v1
 
 <hr />
 
@@ -23,8 +25,14 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| username | Username | STRING |  | true |
-| password | Password | STRING |  | true |
+| url | JDBC URL | STRING | Oracle JDBC connection URL (e.g., jdbc:oracle:thin:@localhost:1521/FREEPDB1). | true |
+| username | Username | STRING | Oracle database username. | true |
+| password | Password | STRING | Oracle database password. | true |
+| tableName | Table Name | STRING | Name of the database table used to store vector embeddings. | false |
+| indexType | Index Type | STRING <details> <summary> Options </summary> <span>NONE</span>, <span>HNSW</span>, <span>IVF</span> </details> | Vector index type to use for similarity search. | false |
+| distanceType | Distance Type | STRING <details> <summary> Options </summary> <span>COSINE</span>, <span>DOT</span>, <span>EUCLIDEAN</span>, <span>EUCLIDEAN_SQUARED</span>, <span>MANHATTAN</span> </details> | Distance function used for vector similarity comparison. | false |
+| dimensions | Dimensions | INTEGER | Number of dimensions for the vector embeddings. Use -1 to infer from the embedding model. | false |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to create the vector store table automatically if it does not exist. | false |
 
 
 
@@ -37,28 +45,53 @@ Version: 1
 ## Actions
 
 
-### Query
-Name: query
+### Load Data
+Name: load
 
-`Execute an SQL query.`
+`Loads data into the vector store using LLM embeddings.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Load Data",
+  "name" : "load",
+  "type" : "oracleVectorStore/v1/load"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Search Data
+Name: search
+
+`Query data from the vector store using LLM embeddings.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| query | Query | STRING | The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
-| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The list of properties which should be used as query parameters. | false |
+| query | Query | STRING | The query to be executed. | true |
+| topK | Top K | INTEGER | The top 'k' similar results to return. | false |
+| similarityThreshold | Similarity Threshold | NUMBER | Similarity threshold score to filter the search response by. Only documents with similarity score equal or greater than the threshold will be returned. A threshold value of 0 means any similarity is accepted. A threshold value of 1 means an exact match is required. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Query",
-  "name" : "query",
+  "label" : "Search Data",
+  "name" : "search",
   "parameters" : {
     "query" : "",
-    "parameters" : { }
+    "topK" : 1,
+    "similarityThreshold" : 0.0
   },
-  "type" : "oracleSql/v1/query"
+  "type" : "oracleVectorStore/v1/search"
 }
 ```
 
@@ -68,204 +101,6 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-
-
-
-### Insert
-Name: insert
-
-`Insert rows in database.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| schema | Schema | STRING | Name of the schema the table belongs to. | true |
-| table | Table | STRING | Name of the table in which to insert data to. | true |
-| columns | Columns | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | The list of the table column names where corresponding values would be inserted. | false |
-| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Insert",
-  "name" : "insert",
-  "parameters" : {
-    "schema" : "",
-    "table" : "",
-    "columns" : [ {
-      "name" : "",
-      "type" : ""
-    } ],
-    "values" : { }
-  },
-  "type" : "oracleSql/v1/insert"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-### Update
-Name: update
-
-`Update rows in database.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| schema | Schema | STRING | Name of the schema the table belongs to. | true |
-| table | Table | STRING | Name of the table in which to update data in. | true |
-| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
-| columns | Columns | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | The list of the table column names where corresponding values would be updated. | false |
-| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Update",
-  "name" : "update",
-  "parameters" : {
-    "schema" : "",
-    "table" : "",
-    "condition" : "",
-    "columns" : [ {
-      "name" : "",
-      "type" : ""
-    } ],
-    "values" : { }
-  },
-  "type" : "oracleSql/v1/update"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-### Delete
-Name: delete
-
-`Delete rows from database.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| schema | Schema | STRING | Name of the schema the table belongs to. | true |
-| table | Table | STRING | Name of the table in which to update data in. | true |
-| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Delete",
-  "name" : "delete",
-  "parameters" : {
-    "schema" : "",
-    "table" : "",
-    "condition" : ""
-  },
-  "type" : "oracleSql/v1/delete"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-### Execute
-Name: execute
-
-`Execute an SQL DML or DML statement.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| execute | Execute | STRING | The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
-| columns | Fields to select | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of fields to select from. | false |
-| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The list of values which should be used to replace corresponding criteria parameters. | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Execute",
-  "name" : "execute",
-  "parameters" : {
-    "execute" : "",
-    "columns" : [ { } ],
-    "parameters" : { }
-  },
-  "type" : "oracleSql/v1/execute"
-}
-```
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-
-
-
-
-
-
-## Triggers
-
-
-### New Row
-Name: newRow
-
-`Triggers when new row is added.`
-
-Type: POLLING
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| schema | Schema | STRING | Name of the schema the table belongs to. | true |
-| table | Table | STRING | Name of the table in which to update data in. | true |
-| orderBy | Colum To Order By | STRING | Use something like a created timestamp or an auto-incrementing ID. | true |
-| orderDirection | Order Direction | STRING <details> <summary> Options </summary> <span>ASC</span>, <span>DESC</span> </details> | The direction to sort by such that the newest rows are fetched first. | true |
-
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
-```json
-{
-  "label" : "New Row",
-  "name" : "newRow",
-  "parameters" : {
-    "schema" : "",
-    "table" : "",
-    "orderBy" : "",
-    "orderDirection" : ""
-  },
-  "type" : "oracleSql/v1/newRow"
-}
-```
 
 
 

@@ -1,0 +1,91 @@
+---
+title: "Workflow"
+description: "Triggers and actions for workflow-to-workflow communication."
+---
+
+
+Categories: Helpers
+
+
+Type: workflow/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Response to Workflow Call
+Name: responseToWorkflowCall
+
+`Respond and send back data to the calling workflow. Must be the last step in a callable workflow.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| outputSchema | Output Schema | STRING | The schema definition for the response data sent back to the calling workflow. | false |
+| response | null | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> outputSchema </details> | The response data to send back to the calling workflow. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Response to Workflow Call",
+  "name" : "responseToWorkflowCall",
+  "parameters" : {
+    "outputSchema" : "",
+    "response" : { }
+  },
+  "type" : "workflow/v1/responseToWorkflowCall"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+
+## Triggers
+
+
+### New Workflow Call
+Name: newWorkflowCall
+
+`Triggers when this workflow is called from another workflow. Define the input schema to specify what data the calling workflow should provide.`
+
+Type: CALLABLE
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputSchema | Inputs | STRING | The schema definition for the input data this workflow expects from callers. | false |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Workflow Call",
+  "name" : "newWorkflowCall",
+  "parameters" : {
+    "inputSchema" : ""
+  },
+  "type" : "workflow/v1/newWorkflowCall"
+}
+```
+
+
+
+
+

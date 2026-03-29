@@ -1,17 +1,39 @@
 ---
-title: "In Memory Chat Memory"
-description: "In Memory Chat Memory."
+title: "Redis Chat Memory"
+description: "Redis Chat Memory stores conversation history in Redis for fast, persistent storage."
 ---
 
 
 Categories: Artificial Intelligence
 
 
-Type: inMemoryChatMemory/v1
+Type: redisChatMemory/v1
 
 <hr />
 
 
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | The Redis username (optional, for Redis 6.0+ ACL). | false |
+| password | Password | STRING | The Redis password. | false |
+
+
+
+
+
+
+<hr />
 
 
 ## Actions
@@ -41,15 +63,34 @@ Name: addMessages
       "content" : ""
     } ]
   },
-  "type" : "inMemoryChatMemory/v1/addMessages"
+  "type" : "redisChatMemory/v1/addMessages"
 }
 ```
 
 #### Output
 
-This action does not produce any output.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| messageCount | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "conversationId" : "",
+  "messageCount" : 1
+}
+```
 
 
 
@@ -73,7 +114,7 @@ Name: getMessages
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/getMessages"
+  "type" : "redisChatMemory/v1/getMessages"
 }
 ```
 
@@ -127,7 +168,7 @@ Name: deleteConversation
   "parameters" : {
     "conversationId" : ""
   },
-  "type" : "inMemoryChatMemory/v1/deleteConversation"
+  "type" : "redisChatMemory/v1/deleteConversation"
 }
 ```
 
@@ -169,7 +210,7 @@ Name: listConversations
 {
   "label" : "List Conversations",
   "name" : "listConversations",
-  "type" : "inMemoryChatMemory/v1/listConversations"
+  "type" : "redisChatMemory/v1/listConversations"
 }
 ```
 
