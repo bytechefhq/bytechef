@@ -437,6 +437,12 @@ export default function useWorkflowNodeDetailsPanel({
             }
         }
 
+        if (currentOperationDefinition) {
+            if (!currentOperationDefinition.outputDefined) {
+                return false;
+            }
+        }
+
         return true;
     }, [currentNode?.clusterElementType, currentOperationDefinition, rootClusterElementNodeData?.workflowNodeName]);
 
