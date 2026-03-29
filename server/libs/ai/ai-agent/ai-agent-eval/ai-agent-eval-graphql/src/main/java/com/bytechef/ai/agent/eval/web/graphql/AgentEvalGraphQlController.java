@@ -25,6 +25,7 @@ import com.bytechef.ai.agent.eval.domain.AgentEvalTest;
 import com.bytechef.ai.agent.eval.domain.AgentJudge;
 import com.bytechef.ai.agent.eval.domain.AgentJudgeVerdict;
 import com.bytechef.ai.agent.eval.domain.AgentScenarioJudge;
+import com.bytechef.ai.agent.eval.domain.AgentScenarioToolSimulation;
 import com.bytechef.ai.agent.eval.facade.AgentEvalRunFacade;
 import com.bytechef.ai.agent.eval.file.storage.AgentEvalFileStorage;
 import com.bytechef.ai.agent.eval.service.AgentEvalResultService;
@@ -34,6 +35,7 @@ import com.bytechef.ai.agent.eval.service.AgentEvalTestService;
 import com.bytechef.ai.agent.eval.service.AgentJudgeService;
 import com.bytechef.ai.agent.eval.service.AgentJudgeVerdictService;
 import com.bytechef.ai.agent.eval.service.AgentScenarioJudgeService;
+import com.bytechef.ai.agent.eval.service.AgentScenarioToolSimulationService;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
@@ -62,13 +64,15 @@ class AgentEvalGraphQlController {
     private final AgentJudgeService agentJudgeService;
     private final AgentJudgeVerdictService agentJudgeVerdictService;
     private final AgentScenarioJudgeService agentScenarioJudgeService;
+    private final AgentScenarioToolSimulationService agentScenarioToolSimulationService;
 
     AgentEvalGraphQlController(
         AgentEvalFileStorage agentEvalFileStorage, AgentEvalResultService agentEvalResultService,
         AgentEvalRunFacade agentEvalRunFacade, AgentEvalRunService agentEvalRunService,
         AgentEvalScenarioService agentEvalScenarioService, AgentEvalTestService agentEvalTestService,
         AgentJudgeService agentJudgeService, AgentJudgeVerdictService agentJudgeVerdictService,
-        AgentScenarioJudgeService agentScenarioJudgeService) {
+        AgentScenarioJudgeService agentScenarioJudgeService,
+        AgentScenarioToolSimulationService agentScenarioToolSimulationService) {
 
         this.agentEvalFileStorage = agentEvalFileStorage;
         this.agentEvalResultService = agentEvalResultService;
@@ -79,6 +83,7 @@ class AgentEvalGraphQlController {
         this.agentJudgeService = agentJudgeService;
         this.agentJudgeVerdictService = agentJudgeVerdictService;
         this.agentScenarioJudgeService = agentScenarioJudgeService;
+        this.agentScenarioToolSimulationService = agentScenarioToolSimulationService;
     }
 
     // Query mappings
@@ -240,7 +245,8 @@ class AgentEvalGraphQlController {
     AgentEvalScenario createAgentEvalScenario(
         @Argument Long agentEvalTestId, @Argument String name, @Argument AgentScenarioType type,
         @Argument @Nullable String userMessage, @Argument @Nullable String expectedOutput,
-        @Argument @Nullable String personaPrompt, @Argument @Nullable Integer maxTurns) {
+        @Argument @Nullable String personaPrompt, @Argument @Nullable Integer maxTurns,
+        @Argument @Nullable Integer numberOfRuns) {
 
         AgentEvalScenario agentEvalScenario = new AgentEvalScenario();
 
@@ -255,6 +261,10 @@ class AgentEvalGraphQlController {
             agentEvalScenario.setMaxTurns(maxTurns);
         }
 
+        if (numberOfRuns != null) {
+            agentEvalScenario.setNumberOfRuns(numberOfRuns);
+        }
+
         return agentEvalScenarioService.createAgentEvalScenario(agentEvalScenario);
     }
 
@@ -262,7 +272,7 @@ class AgentEvalGraphQlController {
     AgentEvalScenario updateAgentEvalScenario(
         @Argument Long id, @Argument @Nullable String name, @Argument @Nullable String userMessage,
         @Argument @Nullable String expectedOutput, @Argument @Nullable String personaPrompt,
-        @Argument @Nullable Integer maxTurns) {
+        @Argument @Nullable Integer maxTurns, @Argument @Nullable Integer numberOfRuns) {
 
         AgentEvalScenario agentEvalScenario = agentEvalScenarioService.getAgentEvalScenario(id);
 
@@ -284,6 +294,10 @@ class AgentEvalGraphQlController {
 
         if (maxTurns != null) {
             agentEvalScenario.setMaxTurns(maxTurns);
+        }
+
+        if (numberOfRuns != null) {
+            agentEvalScenario.setNumberOfRuns(numberOfRuns);
         }
 
         return agentEvalScenarioService.updateAgentEvalScenario(agentEvalScenario);
@@ -338,6 +352,51 @@ class AgentEvalGraphQlController {
         return true;
     }
 
+    // Mutation mappings - AgentScenarioToolSimulation
+
+    @MutationMapping
+    AgentScenarioToolSimulation createAgentScenarioToolSimulation(
+        @Argument Long agentEvalScenarioId, @Argument String toolName,
+        @Argument String responsePrompt, @Argument @Nullable String simulationModel) {
+
+        AgentScenarioToolSimulation toolSimulation = new AgentScenarioToolSimulation();
+
+        toolSimulation.setAgentEvalScenarioId(agentEvalScenarioId);
+        toolSimulation.setToolName(toolName);
+        toolSimulation.setResponsePrompt(responsePrompt);
+        toolSimulation.setSimulationModel(simulationModel);
+
+        return agentScenarioToolSimulationService.createAgentScenarioToolSimulation(toolSimulation);
+    }
+
+    @MutationMapping
+    AgentScenarioToolSimulation updateAgentScenarioToolSimulation(
+        @Argument Long id, @Argument @Nullable String toolName,
+        @Argument @Nullable String responsePrompt, @Argument @Nullable String simulationModel) {
+
+        AgentScenarioToolSimulation toolSimulation =
+            agentScenarioToolSimulationService.getAgentScenarioToolSimulation(id);
+
+        if (toolName != null) {
+            toolSimulation.setToolName(toolName);
+        }
+
+        if (responsePrompt != null) {
+            toolSimulation.setResponsePrompt(responsePrompt);
+        }
+
+        toolSimulation.setSimulationModel(simulationModel);
+
+        return agentScenarioToolSimulationService.updateAgentScenarioToolSimulation(toolSimulation);
+    }
+
+    @MutationMapping
+    boolean deleteAgentScenarioToolSimulation(@Argument Long id) {
+        agentScenarioToolSimulationService.deleteAgentScenarioToolSimulation(id);
+
+        return true;
+    }
+
     // Mutation mappings - AgentEvalRun
 
     @MutationMapping
@@ -363,6 +422,11 @@ class AgentEvalGraphQlController {
     @SchemaMapping(typeName = "AgentEvalScenario", field = "judges")
     List<AgentScenarioJudge> agentEvalScenarioJudges(AgentEvalScenario agentEvalScenario) {
         return agentScenarioJudgeService.getAgentScenarioJudges(agentEvalScenario.getId());
+    }
+
+    @SchemaMapping(typeName = "AgentEvalScenario", field = "toolSimulations")
+    List<AgentScenarioToolSimulation> scenarioToolSimulations(AgentEvalScenario scenario) {
+        return agentScenarioToolSimulationService.getAgentScenarioToolSimulations(scenario.getId());
     }
 
     @SchemaMapping(typeName = "AgentEvalRun", field = "results")
