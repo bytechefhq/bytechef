@@ -37,23 +37,23 @@ describe('computeBranchCaseLabelPosition', () => {
     });
 
     describe('TB layout', () => {
-        it('should position at (targetX, sourceY)', () => {
+        it('should position at (targetX, sourceY + offset)', () => {
             const result = computeBranchCaseLabelPosition({
                 ...defaultCoords,
                 layoutDirection: 'TB',
             });
 
-            expect(result).toEqual({x: 300, y: 200});
+            expect(result).toEqual({x: 300, y: 210});
         });
 
-        it('should ignore hasEdgeButton in TB mode', () => {
+        it('should always apply offset in TB mode regardless of hasEdgeButton', () => {
             const result = computeBranchCaseLabelPosition({
                 ...defaultCoords,
                 hasEdgeButton: true,
                 layoutDirection: 'TB',
             });
 
-            expect(result).toEqual({x: 300, y: 200});
+            expect(result).toEqual({x: 300, y: 210});
         });
     });
 });
