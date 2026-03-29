@@ -10,6 +10,7 @@ import {
     alignDispatcherGhostsCrossAxis,
     alignTrailingPlaceholder,
     applySavedPositions,
+    centerDispatcherChildrenOnMainAxis,
     centerDispatcherPlaceholdersOnMainAxis,
     centerLRSmallNodes,
     centerNodesAfterBottomGhost,
@@ -343,8 +344,8 @@ describe('alignBranchCaseChildren', () => {
 
         alignBranchCaseChildren(allNodes, edges, 'y', NODE_WIDTH);
 
-        // Child was 10px from branch center, within 72px threshold → aligned
-        expect(nearCenterChild.position.y).toBe(2125);
+        // Side-case children are no longer aligned — position unchanged
+        expect(nearCenterChild.position.y).toBe(2135);
     });
 
     it('should not align side-case child that is far from branch center', () => {
@@ -560,6 +561,108 @@ describe('alignBranchCaseChildren', () => {
         expect(savedChild.position.x).toBe(800);
         // Third child still aligned (chain continues past saved node)
         expect(thirdChild.position.x).toBe(200);
+    });
+
+    it('should align middle-case child to parallel dispatcher center', () => {
+        const parallelNode: Node = {
+            data: {componentName: 'parallel', taskDispatcher: true, taskDispatcherId: 'parallel_1'},
+            id: 'parallel_1',
+            position: {x: 300, y: 100},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {parallelId: 'parallel_1', taskDispatcherId: 'parallel_1'},
+            id: 'parallel_1-top-ghost',
+            position: {x: 300, y: 50},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const childNode: Node = {
+            data: {componentName: 'httpClient', parallelData: {index: 0, parallelId: 'parallel_1'}},
+            id: 'httpClient_1',
+            position: {x: 600, y: 200},
+            type: 'workflow',
+        };
+        const allNodes = [parallelNode, topGhost, childNode];
+        const edges = [
+            {
+                id: 'parallel_1-top-ghost=>httpClient_1',
+                source: 'parallel_1-top-ghost',
+                sourceHandle: 'parallel_1-top-ghost-bottom',
+                target: 'httpClient_1',
+                type: 'workflow',
+            },
+        ];
+
+        alignBranchCaseChildren(allNodes, edges, 'x', NODE_WIDTH);
+
+        // Parallel center cross = 300 + 240/2 = 420, target = 420 - 240/2 = 300
+        expect(childNode.position.x).toBe(300);
+    });
+
+    it('should align middle-case child to fork-join dispatcher center', () => {
+        const forkJoinNode: Node = {
+            data: {componentName: 'fork-join', taskDispatcher: true, taskDispatcherId: 'fork-join_1'},
+            id: 'fork-join_1',
+            position: {x: 400, y: 100},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {forkJoinId: 'fork-join_1', taskDispatcherId: 'fork-join_1'},
+            id: 'fork-join_1-top-ghost',
+            position: {x: 400, y: 50},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const childNode: Node = {
+            data: {componentName: 'httpClient', forkJoinData: {branchIndex: 0, forkJoinId: 'fork-join_1', index: 0}},
+            id: 'httpClient_2',
+            position: {x: 700, y: 200},
+            type: 'workflow',
+        };
+        const allNodes = [forkJoinNode, topGhost, childNode];
+        const edges = [
+            {
+                id: 'fork-join_1-top-ghost=>httpClient_2',
+                source: 'fork-join_1-top-ghost',
+                sourceHandle: 'fork-join_1-top-ghost-bottom',
+                target: 'httpClient_2',
+                type: 'workflow',
+            },
+        ];
+
+        alignBranchCaseChildren(allNodes, edges, 'x', NODE_WIDTH);
+
+        // Fork-join center cross = 400 + 240/2 = 520, target = 520 - 240/2 = 400
+        expect(childNode.position.x).toBe(400);
+    });
+
+    it('should skip edges from ghost nodes without any dispatcher id', () => {
+        const topGhost: Node = {
+            data: {taskDispatcherId: 'unknown_1'},
+            id: 'unknown_1-top-ghost',
+            position: {x: 200, y: 50},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const childNode: Node = {
+            data: {componentName: 'httpClient'},
+            id: 'httpClient_1',
+            position: {x: 500, y: 200},
+            type: 'workflow',
+        };
+        const allNodes = [topGhost, childNode];
+        const edges = [
+            {
+                id: 'unknown_1-top-ghost=>httpClient_1',
+                source: 'unknown_1-top-ghost',
+                sourceHandle: 'unknown_1-top-ghost-bottom',
+                target: 'httpClient_1',
+                type: 'workflow',
+            },
+        ];
+
+        alignBranchCaseChildren(allNodes, edges, 'x', NODE_WIDTH);
+
+        // No branchId, parallelId, or forkJoinId — child position unchanged
+        expect(childNode.position.x).toBe(500);
     });
 });
 
@@ -4963,5 +5066,344 @@ describe('adjustBottomGhostForMovedChildren — map dispatcher', () => {
         // Parent bottom ghost should be shifted by map_1's incremental delta on main axis (y=0 here since delta.y=0)
         // Since incremental delta on y is 0, no shift should happen
         expect(parentBottomGhost.position).toEqual({x: 400, y: 700});
+    });
+});
+
+describe('centerDispatcherChildrenOnMainAxis', () => {
+    it('should center a single child between top and bottom ghosts on y axis', () => {
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-top-ghost',
+            position: {x: 200, y: 100},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-bottom-ghost',
+            position: {x: 200, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const childNode: Node = {
+            data: {componentName: 'httpClient'},
+            id: 'httpClient_1',
+            position: {x: 300, y: 150},
+            type: 'workflow',
+        };
+        const allNodes = [topGhost, bottomGhost, childNode];
+        const edges: Edge[] = [
+            {id: 'top=>child', source: 'condition_1-top-ghost', target: 'httpClient_1'},
+            {id: 'child=>bottom', source: 'httpClient_1', target: 'condition_1-bottom-ghost'},
+        ];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // Available: top=102, bottom=500, center=301
+        // Chain: min=150, max=150+100=250, center=200
+        // Shift = 301 - 200 = 101
+        expect(childNode.position.y).toBe(251);
+    });
+
+    it('should not shift chains with user-adjusted positions', () => {
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-top-ghost',
+            position: {x: 200, y: 100},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-bottom-ghost',
+            position: {x: 200, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const childNode: Node = {
+            data: {componentName: 'httpClient', metadata: {ui: {nodePosition: {x: 300, y: 150}}}},
+            id: 'httpClient_1',
+            position: {x: 300, y: 150},
+            type: 'workflow',
+        };
+        const allNodes = [topGhost, bottomGhost, childNode];
+        const edges: Edge[] = [
+            {id: 'top=>child', source: 'condition_1-top-ghost', target: 'httpClient_1'},
+            {id: 'child=>bottom', source: 'httpClient_1', target: 'condition_1-bottom-ghost'},
+        ];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // User-saved position — should not be shifted
+        expect(childNode.position.y).toBe(150);
+    });
+
+    it('should not shift chains with chain-aligned positions', () => {
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-top-ghost',
+            position: {x: 200, y: 100},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-bottom-ghost',
+            position: {x: 200, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const childNode: Node = {
+            data: {componentName: 'httpClient', metadata: {ui: {chainAlignedPosition: {x: 300, y: 150}}}},
+            id: 'httpClient_1',
+            position: {x: 300, y: 150},
+            type: 'workflow',
+        };
+        const allNodes = [topGhost, bottomGhost, childNode];
+        const edges: Edge[] = [
+            {id: 'top=>child', source: 'condition_1-top-ghost', target: 'httpClient_1'},
+            {id: 'child=>bottom', source: 'httpClient_1', target: 'condition_1-bottom-ghost'},
+        ];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // Chain-aligned position — should not be shifted
+        expect(childNode.position.y).toBe(150);
+    });
+
+    it('should skip placeholder targets', () => {
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-top-ghost',
+            position: {x: 200, y: 100},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-bottom-ghost',
+            position: {x: 200, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const placeholder: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-placeholder',
+            position: {x: 300, y: 150},
+            type: 'placeholder',
+        };
+        const allNodes = [topGhost, bottomGhost, placeholder];
+        const edges: Edge[] = [
+            {id: 'top=>placeholder', source: 'condition_1-top-ghost', target: 'condition_1-placeholder'},
+        ];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // Placeholder — should not be shifted
+        expect(placeholder.position.y).toBe(150);
+    });
+
+    it('should skip left ghost targets', () => {
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-top-ghost',
+            position: {x: 200, y: 100},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-bottom-ghost',
+            position: {x: 200, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const leftGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-left-ghost',
+            position: {x: 100, y: 150},
+            type: 'taskDispatcherLeftGhostNode',
+        };
+        const allNodes = [topGhost, bottomGhost, leftGhost];
+        const edges: Edge[] = [{id: 'top=>left', source: 'condition_1-top-ghost', target: 'condition_1-left-ghost'}];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // Left ghost — should not be shifted
+        expect(leftGhost.position.y).toBe(150);
+    });
+
+    it('should skip when bottom ghost is at or above top ghost', () => {
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-top-ghost',
+            position: {x: 200, y: 300},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-bottom-ghost',
+            position: {x: 200, y: 300},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const childNode: Node = {
+            data: {componentName: 'httpClient'},
+            id: 'httpClient_1',
+            position: {x: 300, y: 310},
+            type: 'workflow',
+        };
+        const allNodes = [topGhost, bottomGhost, childNode];
+        const edges: Edge[] = [
+            {id: 'top=>child', source: 'condition_1-top-ghost', target: 'httpClient_1'},
+            {id: 'child=>bottom', source: 'httpClient_1', target: 'condition_1-bottom-ghost'},
+        ];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // No available space — child should not be moved
+        expect(childNode.position.y).toBe(310);
+    });
+
+    it('should center a chain of two nodes between ghosts', () => {
+        const topGhost: Node = {
+            data: {loopId: 'loop_1', taskDispatcherId: 'loop_1'},
+            id: 'loop_1-top-ghost',
+            position: {x: 200, y: 100},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {loopId: 'loop_1', taskDispatcherId: 'loop_1'},
+            id: 'loop_1-bottom-ghost',
+            position: {x: 200, y: 600},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const firstChild: Node = {
+            data: {componentName: 'httpClient'},
+            id: 'httpClient_1',
+            position: {x: 300, y: 150},
+            type: 'workflow',
+        };
+        const secondChild: Node = {
+            data: {componentName: 'dataStorage'},
+            id: 'dataStorage_1',
+            position: {x: 300, y: 260},
+            type: 'workflow',
+        };
+        const allNodes = [topGhost, bottomGhost, firstChild, secondChild];
+        const edges: Edge[] = [
+            {id: 'top=>first', source: 'loop_1-top-ghost', target: 'httpClient_1'},
+            {id: 'first=>second', source: 'httpClient_1', target: 'dataStorage_1'},
+            {id: 'second=>bottom', source: 'dataStorage_1', target: 'loop_1-bottom-ghost'},
+        ];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // Available: top=102, bottom=600, center=351
+        // Chain: min=150, max=260+100=360, center=255
+        // Shift = 351 - 255 = 96
+        expect(firstChild.position.y).toBe(246);
+        expect(secondChild.position.y).toBe(356);
+    });
+
+    it('should skip non-top-ghost nodes', () => {
+        const regularNode: Node = {
+            data: {componentName: 'httpClient'},
+            id: 'httpClient_1',
+            position: {x: 200, y: 100},
+            type: 'workflow',
+        };
+        const allNodes = [regularNode];
+        const edges: Edge[] = [];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // Regular node, not a top ghost — should not be affected
+        expect(regularNode.position.y).toBe(100);
+    });
+
+    it('should center on x axis for LR layout', () => {
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-top-ghost',
+            position: {x: 100, y: 200},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-bottom-ghost',
+            position: {x: 600, y: 200},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const childNode: Node = {
+            data: {componentName: 'httpClient'},
+            id: 'httpClient_1',
+            position: {x: 150, y: 300},
+            type: 'workflow',
+        };
+        const allNodes = [topGhost, bottomGhost, childNode];
+        const edges: Edge[] = [
+            {id: 'top=>child', source: 'condition_1-top-ghost', target: 'httpClient_1'},
+            {id: 'child=>bottom', source: 'httpClient_1', target: 'condition_1-bottom-ghost'},
+        ];
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'x');
+
+        // Available: top=102, bottom=600, center=351
+        // Chain: min=150, max=150+240=390, center=270
+        // Shift = 351 - 270 = 81
+        expect(childNode.position.x).toBe(231);
+    });
+
+    it('should also shift nested dispatcher nodes when centering', () => {
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-top-ghost',
+            position: {x: 200, y: 100},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-bottom-ghost',
+            position: {x: 200, y: 600},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const loopNode: Node = {
+            data: {componentName: 'loop', taskDispatcher: true, taskDispatcherId: 'loop_1'},
+            id: 'loop_1',
+            position: {x: 300, y: 150},
+            type: 'workflow',
+        };
+        const loopTopGhost: Node = {
+            data: {loopId: 'loop_1', taskDispatcherId: 'loop_1'},
+            id: 'loop_1-top-ghost',
+            position: {x: 300, y: 160},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const loopChild: Node = {
+            data: {componentName: 'httpClient', loopData: {index: 0, loopId: 'loop_1'}},
+            id: 'httpClient_nested',
+            position: {x: 310, y: 200},
+            type: 'workflow',
+        };
+        const loopBottomGhost: Node = {
+            data: {loopId: 'loop_1', taskDispatcherId: 'loop_1'},
+            id: 'loop_1-loop-bottom-ghost',
+            position: {x: 300, y: 350},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const allNodes = [topGhost, bottomGhost, loopNode, loopTopGhost, loopChild, loopBottomGhost];
+        const edges: Edge[] = [
+            {id: 'top=>loop', source: 'condition_1-top-ghost', target: 'loop_1'},
+            {
+                id: 'loop-bottom=>condition-bottom',
+                source: 'loop_1-loop-bottom-ghost',
+                target: 'condition_1-bottom-ghost',
+            },
+        ];
+
+        const originalLoopY = loopNode.position.y;
+        const originalNestedY = loopChild.position.y;
+        const originalLoopTopY = loopTopGhost.position.y;
+        const originalLoopBottomY = loopBottomGhost.position.y;
+
+        centerDispatcherChildrenOnMainAxis(allNodes, edges, 'y');
+
+        // All nested nodes should be shifted by the same amount
+        const shift = loopNode.position.y - originalLoopY;
+
+        expect(shift).not.toBe(0);
+        expect(loopChild.position.y).toBe(originalNestedY + shift);
+        expect(loopTopGhost.position.y).toBe(originalLoopTopY + shift);
+        expect(loopBottomGhost.position.y).toBe(originalLoopBottomY + shift);
     });
 });
