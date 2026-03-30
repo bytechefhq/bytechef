@@ -42,6 +42,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.util.Optional;
@@ -112,6 +113,7 @@ public class DataStorageAwaitGetValueAction {
             string(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
+                .controlType(ControlType.TEXT_AREA)
                 .displayCondition("type == '%s'".formatted(ValueType.STRING))
                 .required(false),
             time(DEFAULT_VALUE)
