@@ -67,8 +67,7 @@ public class AgentJudgeFactory {
                 Objects.requireNonNull(
                     (String) configuration.get("expectedValue"),
                     "STRING_EQUALS judge requires 'expectedValue' in configuration"),
-                !configuration.containsKey("caseSensitive")
-                    || (Boolean) configuration.get("caseSensitive"));
+                Boolean.TRUE.equals(configuration.getOrDefault("caseSensitive", true)));
             case TOOL_USAGE -> new ToolUsageJudge(
                 Objects.requireNonNull(
                     (String) configuration.get("toolName"),

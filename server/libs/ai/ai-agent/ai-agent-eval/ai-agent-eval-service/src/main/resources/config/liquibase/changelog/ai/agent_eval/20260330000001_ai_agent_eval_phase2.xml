@@ -59,7 +59,9 @@
             <column name="last_modified_by" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="BIGINT"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <addForeignKeyConstraint baseTableName="agent_scenario_tool_simulation" baseColumnNames="agent_eval_scenario_id"

@@ -62,7 +62,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                     const outputTokens = result.outputTokens ?? 0;
                     const hasTokens = inputTokens > 0 || outputTokens > 0;
                     const runIndexSuffix =
-                        result.runIndex != null && result.runIndex > 0 ? ` (Run ${result.runIndex + 1})` : '';
+                        result.runIndex != null && result.runIndex > 0 ? ` (Run ${result.runIndex})` : '';
 
                     return (
                         <div className="border-b border-border/30 last:border-b-0" key={result.id}>
