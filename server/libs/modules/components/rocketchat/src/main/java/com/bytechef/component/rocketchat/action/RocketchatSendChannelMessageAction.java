@@ -42,7 +42,7 @@ public class RocketchatSendChannelMessageAction {
         .properties(
             string(ROOM_ID)
                 .label("Channel Name")
-                .description("Channel name to send the message to.")
+                .description("Channel name to send the message to. Must have the # prefix.")
                 .options((OptionsFunction<String>) RocketchatUtils::getChannelsOptions)
                 .required(true),
             string(TEXT)
