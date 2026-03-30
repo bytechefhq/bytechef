@@ -52,17 +52,14 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const isLlmRule = judgeType === AgentJudgeType.LlmRule;
-    const isEditing = !!editData;
-
     const {data: modelProviders = []} = useGetRootComponentClusterElementDefinitions(
         {clusterElementType: 'model', rootComponentName: 'aiAgent', rootComponentVersion: 1},
-        isLlmRule
+        judgeType === AgentJudgeType.LlmRule
     );
 
     const {data: allConnections = []} = useGetWorkspaceConnectionsQuery(
         {componentName: provider || undefined, id: currentWorkspaceId!},
-        isLlmRule && currentWorkspaceId != null && !!provider
+        judgeType === AgentJudgeType.LlmRule && currentWorkspaceId != null && !!provider
     );
 
     const selectedProviderVersion = useMemo(
@@ -72,8 +69,11 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
 
     const {data: clusterElementDefinition} = useGetClusterElementDefinitionQuery(
         {clusterElementName: 'model', componentName: provider, componentVersion: selectedProviderVersion ?? 1},
-        isLlmRule && !!provider && selectedProviderVersion != null
+        judgeType === AgentJudgeType.LlmRule && !!provider && selectedProviderVersion != null
     );
+
+    const isLlmRule = judgeType === AgentJudgeType.LlmRule;
+    const isEditing = !!editData;
 
     const modelOptions = useMemo(() => {
         const modelProperty = clusterElementDefinition?.properties?.find((property) => property.name === 'model') as
