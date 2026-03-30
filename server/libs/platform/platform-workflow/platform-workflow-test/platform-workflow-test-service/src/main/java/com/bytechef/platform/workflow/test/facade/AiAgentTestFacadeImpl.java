@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.TokenUsageHolder;
+import com.bytechef.commons.util.TokenUsageHolder.TokenUsage;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
@@ -138,11 +139,17 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
 
         TokenUsageHolder.getAndClear();
 
-        Object result = executeAiAgentAction(
-            workflowId, workflowNodeName, environmentId, conversationId, message, attachments, toolSimulations);
+        try {
+            Object result = executeAiAgentAction(
+                workflowId, workflowNodeName, environmentId, conversationId, message, attachments, toolSimulations);
 
-        int[] tokenUsage = TokenUsageHolder.getAndClear();
+            TokenUsage tokenUsage = TokenUsageHolder.getAndClear();
 
-        return new AiAgentTestResult(result, tokenUsage[0], tokenUsage[1]);
+            return new AiAgentTestResult(result, tokenUsage.promptTokens(), tokenUsage.completionTokens());
+        } catch (Exception exception) {
+            TokenUsageHolder.getAndClear();
+
+            throw exception;
+        }
     }
 }

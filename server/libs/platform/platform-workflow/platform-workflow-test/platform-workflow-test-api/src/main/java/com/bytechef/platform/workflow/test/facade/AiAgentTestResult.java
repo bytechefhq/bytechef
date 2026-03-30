@@ -16,13 +16,20 @@
 
 package com.bytechef.platform.workflow.test.facade;
 
+import java.util.Objects;
+
 /**
  * Wraps the result of an AI agent action execution along with token usage metadata.
  *
- * @param output           the action execution result
+ * @param output           the action execution result, typically a String or a Map containing the agent response
  * @param promptTokens     the number of tokens used in the prompt (input)
  * @param completionTokens the number of tokens used in the completion (output)
  * @author Ivica Cardic
  */
 public record AiAgentTestResult(Object output, int promptTokens, int completionTokens) {
+
+    public AiAgentTestResult {
+        Objects.requireNonNull(output, "output must not be null");
+    }
+
 }
