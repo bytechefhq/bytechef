@@ -8,14 +8,23 @@ import {
 } from '@/components/ui/context-menu';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {NodeDataType} from '@/shared/types';
-import {ArrowLeftRightIcon, RefreshCcwIcon, TextCursorInputIcon, Trash2Icon} from 'lucide-react';
+import {
+    ArrowLeftRightIcon,
+    ClipboardPasteIcon,
+    CopyIcon,
+    RefreshCcwIcon,
+    TextCursorInputIcon,
+    Trash2Icon,
+} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 
 interface WorkflowNodeContextMenuProps {
     children: ReactNode;
     data: NodeDataType;
     hasSavedPosition: boolean;
+    onCopy: () => void;
     onDelete: () => void;
+    onPaste: () => void;
     onRename: () => void;
     onResetPosition: () => void;
     onSwitch: () => void;
@@ -25,13 +34,16 @@ const WorkflowNodeContextMenu = ({
     children,
     data,
     hasSavedPosition,
+    onCopy,
     onDelete,
+    onPaste,
     onRename,
     onResetPosition,
     onSwitch,
 }: WorkflowNodeContextMenuProps) => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+    const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const setContextMenuOpen = useWorkflowEditorStore((state) => state.setContextMenuOpen);
 
     return (
@@ -54,6 +66,20 @@ const WorkflowNodeContextMenu = ({
                         </>
                     ) : (
                         <>
+                            <ContextMenuItem onClick={onCopy}>
+                                <CopyIcon />
+                                Copy
+                            </ContextMenuItem>
+
+                            {copiedNode && (
+                                <ContextMenuItem onClick={onPaste}>
+                                    <ClipboardPasteIcon />
+                                    Paste After
+                                </ContextMenuItem>
+                            )}
+
+                            <ContextMenuSeparator />
+
                             <ContextMenuItem onClick={onRename}>
                                 <TextCursorInputIcon />
                                 Rename
