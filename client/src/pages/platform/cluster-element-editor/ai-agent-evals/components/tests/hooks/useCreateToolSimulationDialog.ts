@@ -34,6 +34,8 @@ export default function useCreateToolSimulationDialog({
 
         setSubmitting(true);
 
+        let succeeded = false;
+
         try {
             if (isEditing && editData && onUpdate) {
                 await onUpdate(
@@ -46,11 +48,15 @@ export default function useCreateToolSimulationDialog({
                 await onCreate(toolName.trim(), responsePrompt.trim(), simulationModel.trim() || undefined);
             }
 
-            onClose();
-        } catch {
-            // Error is handled by the mutation's onError callback
+            succeeded = true;
+        } catch (error: unknown) {
+            console.error('Tool simulation submission failed:', error);
         } finally {
             setSubmitting(false);
+        }
+
+        if (succeeded) {
+            onClose();
         }
     };
 

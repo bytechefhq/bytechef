@@ -1,7 +1,7 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {InfoIcon} from 'lucide-react';
 
-interface RunSummaryI {
+export interface RunSummaryI {
     agentVersion?: string | null;
     averageScore?: number | null;
     errorCount: number;

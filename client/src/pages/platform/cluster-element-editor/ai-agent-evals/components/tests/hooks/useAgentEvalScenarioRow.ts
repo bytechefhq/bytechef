@@ -19,9 +19,18 @@ export default function useAgentEvalScenarioRow(scenarioId: string) {
         [queryClient]
     );
 
-    const createJudgeMutation = useCreateAgentScenarioJudgeMutation({onSuccess: invalidateTest});
-    const deleteJudgeMutation = useDeleteAgentScenarioJudgeMutation({onSuccess: invalidateTest});
-    const updateJudgeMutation = useUpdateAgentScenarioJudgeMutation({onSuccess: invalidateTest});
+    const createJudgeMutation = useCreateAgentScenarioJudgeMutation({
+        onError: (error: Error) => toast.error('Failed to create judge: ' + error.message),
+        onSuccess: invalidateTest,
+    });
+    const deleteJudgeMutation = useDeleteAgentScenarioJudgeMutation({
+        onError: (error: Error) => toast.error('Failed to delete judge: ' + error.message),
+        onSuccess: invalidateTest,
+    });
+    const updateJudgeMutation = useUpdateAgentScenarioJudgeMutation({
+        onError: (error: Error) => toast.error('Failed to update judge: ' + error.message),
+        onSuccess: invalidateTest,
+    });
 
     const createToolSimulationMutation = useCreateAgentScenarioToolSimulationMutation({
         onError: (error: Error) => toast.error('Failed to create tool simulation: ' + error.message),

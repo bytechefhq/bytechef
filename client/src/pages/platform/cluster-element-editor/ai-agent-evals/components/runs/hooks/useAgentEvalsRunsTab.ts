@@ -10,8 +10,9 @@ import {useCallback, useMemo} from 'react';
 import {toast} from 'sonner';
 
 export default function useAgentEvalsRunsTab(agentEvalTestId: string | null) {
-    const queryClient = useQueryClient();
     const {selectedRunId, setSelectedRunId} = useAiAgentEvalsStore();
+
+    const queryClient = useQueryClient();
 
     const {data: runsData, isLoading: runsLoading} = useAgentEvalRunsQuery(
         {agentEvalTestId: agentEvalTestId!},

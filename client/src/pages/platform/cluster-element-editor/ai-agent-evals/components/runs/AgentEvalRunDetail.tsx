@@ -1,5 +1,7 @@
 import Button from '@/components/Button/Button';
-import RunSummaryCards from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/RunSummaryCards';
+import RunSummaryCards, {
+    type RunSummaryI,
+} from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/RunSummaryCards';
 import ScenarioResultsTable from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/ScenarioResultsTable';
 import {
     RUN_STATUS_COLORS,
@@ -10,16 +12,6 @@ import {ArrowLeftIcon, Loader2Icon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 type SelectedRunType = NonNullable<AgentEvalRunQuery['agentEvalRun']>;
-
-interface RunSummaryI {
-    averageScore?: number | null;
-    errorCount: number;
-    failedCount: number;
-    passedCount: number;
-    totalInputTokens?: number | null;
-    totalOutputTokens?: number | null;
-    totalScenarios: number;
-}
 
 interface AgentEvalRunDetailProps {
     onBack: () => void;
