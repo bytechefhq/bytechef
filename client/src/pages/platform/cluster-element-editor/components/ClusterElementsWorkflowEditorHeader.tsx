@@ -26,8 +26,8 @@ const ClusterElementsWorkflowEditorHeader = ({
     toggleEditorLabel = 'Switch to simple editor',
 }: ClusterElementsWorkflowEditorHeaderProps) => {
     return (
-        <div className="relative z-10 flex items-center justify-end px-4 py-5">
-            <div className="flex items-center gap-1 rounded-lg bg-white/70 p-1 backdrop-blur-sm">
+        <div className="relative z-10 flex items-center justify-end px-4 py-6">
+            <div className="flex items-center gap-1 rounded-lg bg-white/70 backdrop-blur-sm">
                 {showToggleEditor && (
                     <Tooltip>
                         <TooltipTrigger asChild>
