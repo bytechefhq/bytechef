@@ -39,7 +39,11 @@ const CreateToolSimulationDialog = ({editData, onClose, onCreate, onUpdate}: Cre
         try {
             if (isEditing && editData && onUpdate) {
                 await onUpdate(
-                    editData.id, toolName.trim(), responsePrompt.trim(), simulationModel.trim() || undefined);
+                    editData.id,
+                    toolName.trim(),
+                    responsePrompt.trim(),
+                    simulationModel.trim() || undefined
+                );
             } else {
                 await onCreate(toolName.trim(), responsePrompt.trim(), simulationModel.trim() || undefined);
             }
