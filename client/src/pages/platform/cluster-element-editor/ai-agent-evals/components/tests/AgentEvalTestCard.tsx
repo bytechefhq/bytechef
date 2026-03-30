@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,7 +9,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import AgentEvalScenarioRow from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/AgentEvalScenarioRow';
 import CreateScenarioDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/CreateScenarioDialog';
-import DeleteTestAlertDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/DeleteTestAlertDialog';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import {
     AgentEvalScenario,
@@ -177,12 +177,13 @@ const AgentEvalTestCard = ({
             </div>
 
             {showDeleteDialog && (
-                <DeleteTestAlertDialog
-                    onClose={() => setShowDeleteDialog(false)}
+                <DeleteAlertDialog
+                    onCancel={() => setShowDeleteDialog(false)}
                     onDelete={() => {
                         onDeleteTest(test.id);
                         setShowDeleteDialog(false);
                     }}
+                    open={true}
                 />
             )}
 
