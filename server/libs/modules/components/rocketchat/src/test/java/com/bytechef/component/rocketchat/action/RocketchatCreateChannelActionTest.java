@@ -21,57 +21,70 @@ import static com.bytechef.component.rocketchat.constant.RocketchatConstants.MEM
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAME;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.READ_ONLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.LinkedHashMap;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class RocketchatCreateChannelActionTest {
 
-    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    protected Context mockedContext = mock(Context.class);
-    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected Object mockedObject = mock(Object.class);
-    protected Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(NAME, "test", MEMBERS, List.of("user1", "user2"), READ_ONLY, "false", EXCLUDE_SELF, "false"));
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Object result = RocketchatCreateChannelAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = RocketchatCreateChannelAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expected = new LinkedHashMap<>();
-        expected.put(NAME, "test");
-        expected.put(MEMBERS, List.of("user1", "user2"));
-        expected.put(READ_ONLY, false);
-        expected.put(EXCLUDE_SELF, false);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertEquals(expected, body.getContent());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/channels.create", stringArgumentCaptor.getValue());
+
+        Body body = bodyArgumentCaptor.getValue();
+        assertEquals(
+            Map.of(NAME, "test", MEMBERS, List.of("user1", "user2"), READ_ONLY, false, EXCLUDE_SELF, false),
+            body.getContent());
     }
 }
