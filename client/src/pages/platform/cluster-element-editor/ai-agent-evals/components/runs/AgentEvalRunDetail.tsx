@@ -1,6 +1,10 @@
 import Button from '@/components/Button/Button';
 import RunSummaryCards from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/RunSummaryCards';
 import ScenarioResultsTable from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/ScenarioResultsTable';
+import {
+    RUN_STATUS_COLORS,
+    RUN_STATUS_LABELS,
+} from '@/pages/platform/cluster-element-editor/ai-agent-evals/utils/evalRunUtils';
 import {type AgentEvalRunQuery, AgentEvalRunStatus} from '@/shared/middleware/graphql';
 import {ArrowLeftIcon, Loader2Icon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
@@ -16,20 +20,6 @@ interface RunSummaryI {
     totalOutputTokens?: number | null;
     totalScenarios: number;
 }
-
-const STATUS_LABELS: Record<AgentEvalRunStatus, string> = {
-    [AgentEvalRunStatus.Completed]: 'Completed',
-    [AgentEvalRunStatus.Failed]: 'Failed',
-    [AgentEvalRunStatus.Pending]: 'Pending',
-    [AgentEvalRunStatus.Running]: 'Running',
-};
-
-const STATUS_COLORS: Record<AgentEvalRunStatus, string> = {
-    [AgentEvalRunStatus.Completed]: 'border-green-200 bg-green-50 text-green-700',
-    [AgentEvalRunStatus.Failed]: 'border-red-200 bg-red-50 text-red-700',
-    [AgentEvalRunStatus.Pending]: 'border-gray-200 bg-gray-50 text-gray-600',
-    [AgentEvalRunStatus.Running]: 'border-yellow-200 bg-yellow-50 text-yellow-700',
-};
 
 interface AgentEvalRunDetailProps {
     onBack: () => void;
@@ -52,12 +42,12 @@ const AgentEvalRunDetail = ({onBack, run, summary}: AgentEvalRunDetailProps) => 
                 <span
                     className={twMerge(
                         'ml-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium',
-                        STATUS_COLORS[run.status]
+                        RUN_STATUS_COLORS[run.status]
                     )}
                 >
                     {run.status === AgentEvalRunStatus.Running && <Loader2Icon className="size-3 animate-spin" />}
 
-                    {STATUS_LABELS[run.status]}
+                    {RUN_STATUS_LABELS[run.status]}
                 </span>
             </div>
 

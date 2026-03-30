@@ -1,37 +1,15 @@
 import Button from '@/components/Button/Button';
 import RunProgressIndicator from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/RunProgressIndicator';
+import {
+    RUN_STATUS_COLORS,
+    RUN_STATUS_LABELS,
+    formatRunDate,
+} from '@/pages/platform/cluster-element-editor/ai-agent-evals/utils/evalRunUtils';
 import {AgentEvalRunStatus, type AgentEvalRunsQuery} from '@/shared/middleware/graphql';
 import {HistoryIcon, Loader2Icon, SquareIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 type RunListItemType = AgentEvalRunsQuery['agentEvalRuns'][number];
-
-const STATUS_LABELS: Record<AgentEvalRunStatus, string> = {
-    [AgentEvalRunStatus.Completed]: 'Completed',
-    [AgentEvalRunStatus.Failed]: 'Failed',
-    [AgentEvalRunStatus.Pending]: 'Pending',
-    [AgentEvalRunStatus.Running]: 'Running',
-};
-
-const STATUS_COLORS: Record<AgentEvalRunStatus, string> = {
-    [AgentEvalRunStatus.Completed]: 'border-green-200 bg-green-50 text-green-700',
-    [AgentEvalRunStatus.Failed]: 'border-red-200 bg-red-50 text-red-700',
-    [AgentEvalRunStatus.Pending]: 'border-gray-200 bg-gray-50 text-gray-600',
-    [AgentEvalRunStatus.Running]: 'border-yellow-200 bg-yellow-50 text-yellow-700',
-};
-
-function formatDate(epochMillis: number | null | undefined): string {
-    if (epochMillis == null) {
-        return '--';
-    }
-
-    return new Date(epochMillis).toLocaleString(undefined, {
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        month: 'short',
-    });
-}
 
 interface AgentEvalRunListProps {
     onCancelRun: (id: string) => void;
@@ -90,14 +68,14 @@ const AgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AgentEvalRunListProp
                                 <span
                                     className={twMerge(
                                         'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium',
-                                        STATUS_COLORS[run.status]
+                                        RUN_STATUS_COLORS[run.status]
                                     )}
                                 >
                                     {run.status === AgentEvalRunStatus.Running && (
                                         <Loader2Icon className="size-3 animate-spin" />
                                     )}
 
-                                    {STATUS_LABELS[run.status]}
+                                    {RUN_STATUS_LABELS[run.status]}
                                 </span>
                             </div>
 
@@ -133,7 +111,7 @@ const AgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AgentEvalRunListProp
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500">{formatDate(run.createdDate)}</span>
+                                <span className="text-xs text-gray-500">{formatRunDate(run.createdDate)}</span>
 
                                 {isRunning && (
                                     <Button

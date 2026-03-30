@@ -11,8 +11,8 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useCreateTestDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useCreateTestDialog';
 import {InfoIcon} from 'lucide-react';
-import {useState} from 'react';
 
 interface CreateTestDialogProps {
     onClose: () => void;
@@ -20,17 +20,7 @@ interface CreateTestDialogProps {
 }
 
 const CreateTestDialog = ({onClose, onCreate}: CreateTestDialogProps) => {
-    const [description, setDescription] = useState('');
-    const [name, setName] = useState('');
-
-    const handleCreate = () => {
-        if (!name.trim()) {
-            return;
-        }
-
-        onCreate(name.trim(), description.trim() || undefined);
-        onClose();
-    };
+    const {description, handleCreate, name, setDescription, setName} = useCreateTestDialog({onClose, onCreate});
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={true}>
