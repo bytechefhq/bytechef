@@ -54,6 +54,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.workflow.test.constant.AiAgentTestConstants;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -708,10 +709,10 @@ public class AgentEvalRunExecutor {
                     simulation -> {
                         Map<String, String> config = new HashMap<>();
 
-                        config.put("responsePrompt", simulation.getResponsePrompt());
+                        config.put(AiAgentTestConstants.RESPONSE_PROMPT, simulation.getResponsePrompt());
 
                         if (simulation.getSimulationModel() != null) {
-                            config.put("simulationModel", simulation.getSimulationModel());
+                            config.put(AiAgentTestConstants.SIMULATION_MODEL, simulation.getSimulationModel());
                         }
 
                         return config;
