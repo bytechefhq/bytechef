@@ -21,16 +21,16 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.ai.constant.AiAgentSimulationConstants;
+import com.bytechef.platform.ai.util.TokenUsageHolder;
+import com.bytechef.platform.ai.util.TokenUsageHolder.TokenUsage;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.bytechef.platform.workflow.test.constant.AiAgentTestConstants;
 import com.bytechef.platform.workflow.test.util.TestAttachmentUtils;
-import com.bytechef.platform.workflow.test.util.TokenUsageHolder;
-import com.bytechef.platform.workflow.test.util.TokenUsageHolder.TokenUsage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -96,7 +96,7 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
         taskParameters.put("attachments", attachments);
 
         if (toolSimulations != null && !toolSimulations.isEmpty()) {
-            taskParameters.put(AiAgentTestConstants.TOOL_SIMULATIONS, toolSimulations);
+            taskParameters.put(AiAgentSimulationConstants.TOOL_SIMULATIONS, toolSimulations);
         }
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
@@ -137,7 +137,7 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
         String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
         List<Object> attachments, Map<String, Map<String, String>> toolSimulations) {
 
-        TokenUsageHolder.getAndClear();
+        TokenUsageHolder.start();
 
         try {
             Object result = executeAiAgentAction(

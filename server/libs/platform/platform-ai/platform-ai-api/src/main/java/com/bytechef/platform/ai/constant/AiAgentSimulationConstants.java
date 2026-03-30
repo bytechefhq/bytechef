@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.constant;
+package com.bytechef.platform.ai.constant;
 
 /**
  * @author Ivica Cardic
  */
-public class AiAgentTestConstants {
+public final class AiAgentSimulationConstants {
+
+    private AiAgentSimulationConstants() {
+    }
 
     public static final String RESPONSE_PROMPT = "responsePrompt";
     public static final String SIMULATION_MODEL = "simulationModel";

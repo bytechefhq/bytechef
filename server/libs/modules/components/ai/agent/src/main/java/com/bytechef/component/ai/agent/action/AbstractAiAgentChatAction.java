@@ -17,13 +17,13 @@
 package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CONVERSATION_ID;
+import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.RESPONSE_PROMPT;
+import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.SIMULATION_MODEL;
+import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.TOOL_SIMULATIONS;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
-import static com.bytechef.platform.workflow.test.constant.AiAgentTestConstants.RESPONSE_PROMPT;
-import static com.bytechef.platform.workflow.test.constant.AiAgentTestConstants.SIMULATION_MODEL;
-import static com.bytechef.platform.workflow.test.constant.AiAgentTestConstants.TOOL_SIMULATIONS;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
