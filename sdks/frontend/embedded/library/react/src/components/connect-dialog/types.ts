@@ -92,7 +92,7 @@ export interface FormType {
         name: string;
         defaultValue: string;
         ref: (element: HTMLInputElement) => void;
-        onInput: (event: React.FormEvent<HTMLInputElement>) => void;
+        onInput: (event: React.FormEvent<HTMLInputElement | HTMLSelectElement>) => void;
     };
     handleSubmit: (callback: (data: {[key: string]: unknown}) => void) => (event?: React.FormEvent) => boolean;
     formState: {
