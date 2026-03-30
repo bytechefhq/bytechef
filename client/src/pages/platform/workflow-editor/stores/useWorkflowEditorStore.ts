@@ -12,6 +12,9 @@ export interface WorkflowEditorI {
     contextMenuOpen: boolean;
     setContextMenuOpen: (contextMenuOpen: boolean) => void;
 
+    copiedNode: NodeDataType | undefined;
+    setCopiedNode: (copiedNode: NodeDataType | undefined) => void;
+
     mainClusterRootComponentDefinition: ComponentDefinition | undefined;
     setMainClusterRootComponentDefinition: (
         mainClusterRootComponentDefinition: ComponentDefinition | undefined
@@ -66,6 +69,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setContextMenuOpen: (contextMenuOpen) =>
                 set(() => ({
                     contextMenuOpen,
+                })),
+
+            copiedNode: undefined,
+            setCopiedNode: (copiedNode) =>
+                set(() => ({
+                    copiedNode,
                 })),
 
             mainClusterRootComponentDefinition: undefined,
