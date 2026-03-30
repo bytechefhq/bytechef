@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectTagFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.platform.configuration.web.rest.config.PlatformConfigurationRestTestConfiguration;
-import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
-import org.junit.jupiter.api.BeforeEach;
+import com.bytechef.platform.category.service.CategoryService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -43,28 +46,43 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = PlatformConfigurationRestTestConfiguration.class)
+@ContextConfiguration(classes = AutomationConfigurationRestTestConfiguration.class)
 @WebMvcTest(TriggerFormApiController.class)
-@WorkflowConfigurationRestTestConfigurationSharedMocks
-@ExtendWith(ObjectMapperSetupExtension.class)
+@AutomationConfigurationRestConfigurationSharedMocks
 public class TriggerFormApiControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private CategoryService categoryService;
+
+    @MockitoBean
+    private ProjectCategoryFacade projectCategoryFacade;
+
+    @MockitoBean
+    private ProjectDeploymentFacade projectDeploymentFacade;
+
+    @MockitoBean
+    private ProjectFacade projectFacade;
+
+    @MockitoBean
+    private ProjectService projectService;
+
+    @MockitoBean
+    private ProjectTagFacade projectTagFacade;
+
+    @MockitoBean
+    private ProjectWorkflowFacade projectWorkflowFacade;
 
     @Autowired
+    private ProjectWorkflowService projectWorkflowService;
+
+    @MockitoBean
     private WorkflowService workflowService;
 
     @MockitoBean
-    private JobPrincipalAccessor jobPrincipalAccessor;
-
-    @BeforeEach
-    public void beforeEach() {
-        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(any())).thenReturn(jobPrincipalAccessor);
-    }
+    private WorkspaceFacade workspaceFacade;
 
     @Test
     public void testGetTriggerFormInvalidId() throws Exception {
@@ -78,7 +96,7 @@ public class TriggerFormApiControllerIntTest {
         String id = EncodingUtils.base64EncodeToString("tenant:0:1:workflowUuid:triggerName");
         Workflow workflow = new Workflow("workflowId", "label: workflow", Workflow.Format.YAML);
 
-        when(jobPrincipalAccessor.getWorkflowId(anyLong(), anyString())).thenReturn("workflowId");
+        when(projectWorkflowService.getProjectWorkflowWorkflowId(anyLong(), anyString())).thenReturn("workflowId");
         when(workflowService.getWorkflow("workflowId")).thenReturn(workflow);
 
         // workflow.getExtensions will return an empty list if not present
