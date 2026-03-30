@@ -29,8 +29,7 @@ const WorkflowChatSidebar = () => {
     const {workflowExecutionId} = useParams();
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    const reset = useWorkflowChatStore((state) => state.reset);
-
+    const isRunning = useWorkflowChatStore((state) => state.isRunning);
     const {data, isLoading} = useWorkflowChatWorkspaceProjectDeploymentsQuery({
         environmentId: String(currentEnvironmentId),
         workspaceId: String(currentWorkspaceId),
@@ -106,18 +105,22 @@ const WorkflowChatSidebar = () => {
                                 {workflows.map((workflowData) => {
                                     const chatUrl = `/automation/chat/${workflowData.workflowExecutionId}`;
                                     const isActive = workflowExecutionId === workflowData.workflowExecutionId;
+                                    const isDisabled = isRunning && !isActive;
 
                                     return (
-                                        <LeftSidebarNavItem
-                                            item={{
-                                                current: isActive,
-                                                id: `${workflowData.projectDeploymentId}-${workflowData.workflowId}`,
-                                                name: workflowData.workflowLabel,
-                                                onItemClick: () => reset(),
-                                            }}
+                                        <div
+                                            className={isDisabled ? 'pointer-events-none opacity-50' : ''}
                                             key={`${workflowData.projectDeploymentId}-${workflowData.workflowId}`}
-                                            toLink={chatUrl}
-                                        />
+                                        >
+                                            <LeftSidebarNavItem
+                                                item={{
+                                                    current: isActive,
+                                                    id: `${workflowData.projectDeploymentId}-${workflowData.workflowId}`,
+                                                    name: workflowData.workflowLabel,
+                                                }}
+                                                toLink={chatUrl}
+                                            />
+                                        </div>
                                     );
                                 })}
                             </>

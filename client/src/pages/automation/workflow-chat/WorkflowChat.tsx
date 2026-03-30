@@ -14,6 +14,15 @@ const WorkflowChat = () => {
 
     const environmentName = useMemo(() => toEnvironmentName(currentEnvironmentId), [currentEnvironmentId]);
 
+    const setCurrentChatName = useWorkflowChatStore((state) => state.setCurrentChatName);
+    const switchChat = useWorkflowChatStore((state) => state.switchChat);
+
+    useEffect(() => {
+        if (workflowExecutionId) {
+            switchChat(workflowExecutionId);
+        }
+    }, [workflowExecutionId, switchChat]);
+
     const {data} = useWorkflowChatProjectDeploymentWorkflowQuery(
         {
             id: workflowExecutionId!,
@@ -22,8 +31,6 @@ const WorkflowChat = () => {
             enabled: !!workflowExecutionId,
         }
     );
-
-    const setCurrentChatName = useWorkflowChatStore((state) => state.setCurrentChatName);
 
     const chatName = useMemo(() => {
         if (data?.projectDeploymentWorkflow) {
