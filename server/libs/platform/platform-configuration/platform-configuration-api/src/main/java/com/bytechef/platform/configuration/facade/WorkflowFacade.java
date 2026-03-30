@@ -30,5 +30,7 @@ public interface WorkflowFacade {
 
     boolean hasSseStreamResponse(String workflowId);
 
+    boolean hasSseStreamResponse(WorkflowDTO workflowDTO);
+
     void update(String id, String definition, Integer version);
 }

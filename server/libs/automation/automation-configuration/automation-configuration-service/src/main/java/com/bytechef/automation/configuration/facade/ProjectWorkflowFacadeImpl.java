@@ -26,6 +26,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO.WorkflowInfo;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
@@ -298,9 +299,10 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     public ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(projectWorkflowId);
 
+        WorkflowDTO workflowDTO = workflowFacade.getWorkflow(projectWorkflow.getWorkflowId());
+
         return new ProjectWorkflowDTO(
-            workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow,
-            workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId()));
+            workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO));
     }
 
     @Override
@@ -308,9 +310,10 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     public ProjectWorkflowDTO getProjectWorkflow(String workflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
+        WorkflowDTO workflowDTO = workflowFacade.getWorkflow(workflowId);
+
         return new ProjectWorkflowDTO(
-            workflowFacade.getWorkflow(workflowId), projectWorkflow,
-            workflowFacade.hasSseStreamResponse(workflowId));
+            workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO));
     }
 
     @Override
@@ -320,8 +323,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             .stream()
             .map(projectWorkflow -> workflowFacade.fetchWorkflow(projectWorkflow.getWorkflowId())
                 .map(workflowDTO -> new ProjectWorkflowDTO(
-                    workflowDTO, projectWorkflow,
-                    workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId())))
+                    workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO)))
                 .orElse(null))
             .filter(Objects::nonNull)
             .toList();
@@ -335,9 +337,12 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         return projectWorkflowService
             .getProjectWorkflows(project.getId(), project.getLastProjectVersion())
             .stream()
-            .map(projectWorkflow -> new ProjectWorkflowDTO(
-                workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow,
-                workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId())))
+            .map(projectWorkflow -> {
+                WorkflowDTO workflowDTO = workflowFacade.getWorkflow(projectWorkflow.getWorkflowId());
+
+                return new ProjectWorkflowDTO(
+                    workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO));
+            })
             .sorted(
                 (projectWorkflow1, projectWorkflow2) -> {
                     String label1 = projectWorkflow1.getLabel();
@@ -356,9 +361,12 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         if (includeAllFields) {
             return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
                 .stream()
-                .map(projectWorkflow -> new ProjectWorkflowDTO(
-                    workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow,
-                    workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId())))
+                .map(projectWorkflow -> {
+                    WorkflowDTO workflowDTO = workflowFacade.getWorkflow(projectWorkflow.getWorkflowId());
+
+                    return new ProjectWorkflowDTO(
+                        workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO));
+                })
                 .toList();
         } else {
             return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
