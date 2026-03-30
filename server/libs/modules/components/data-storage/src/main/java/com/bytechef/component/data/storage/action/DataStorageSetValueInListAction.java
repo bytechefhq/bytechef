@@ -41,6 +41,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import java.util.List;
 import java.util.Optional;
 
@@ -119,6 +120,7 @@ public class DataStorageSetValueInListAction {
                 .required(true),
             string(VALUE)
                 .label("Value")
+                .controlType(ControlType.TEXT_AREA)
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == '%s'".formatted(ValueType.STRING))
                 .required(true),
