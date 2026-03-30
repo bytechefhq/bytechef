@@ -33,16 +33,24 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
     sseStreamResponse?: boolean;
     children: ReactNode;
 }>) {
-    const [isRunning, setIsRunning] = useState(false);
     const [streamRequest, setStreamRequest] = useState<{
         url: string;
         init?: RequestInit;
     } | null>(null);
 
-    const {appendToLastAssistantMessage, messages, setLastAssistantMessageContent, setMessage} = useWorkflowChatStore(
+    const {
+        appendToLastAssistantMessage,
+        isRunning,
+        messages,
+        setIsRunning,
+        setLastAssistantMessageContent,
+        setMessage,
+    } = useWorkflowChatStore(
         useShallow((state) => ({
             appendToLastAssistantMessage: state.appendToLastAssistantMessage,
+            isRunning: state.isRunning,
             messages: state.messages,
+            setIsRunning: state.setIsRunning,
             setLastAssistantMessageContent: state.setLastAssistantMessageContent,
             setMessage: state.setMessage,
         }))
@@ -51,7 +59,7 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
     const handleError = useCallback(() => {
         setIsRunning(false);
         setStreamRequest(null);
-    }, []);
+    }, [setIsRunning]);
 
     const handleResult = useCallback(
         (data: unknown) => {
@@ -71,7 +79,7 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
                 setStreamRequest(null);
             }
         },
-        [setLastAssistantMessageContent]
+        [setIsRunning, setLastAssistantMessageContent]
     );
 
     const handleStream = useCallback(
@@ -170,7 +178,7 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
                 setIsRunning(false);
             }
         },
-        [environmentName, setMessage, sseStreamResponse, workflowExecutionId]
+        [environmentName, setIsRunning, setMessage, sseStreamResponse, workflowExecutionId]
     );
 
     const runtime = useExternalStoreRuntime(
@@ -194,7 +202,7 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
         if (connectionState === 'CLOSED' || connectionState === 'ERROR') {
             setIsRunning(false);
         }
-    }, [connectionState]);
+    }, [connectionState, setIsRunning]);
 
     return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
 });

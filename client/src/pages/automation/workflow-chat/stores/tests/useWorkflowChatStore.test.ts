@@ -8,7 +8,7 @@ describe('useWorkflowChatStore', () => {
         const {result} = renderHook(() => useWorkflowChatStore());
 
         act(() => {
-            result.current.reset();
+            result.current.resetAll();
         });
     });
 
@@ -26,7 +26,7 @@ describe('useWorkflowChatStore', () => {
         const id1 = result1.current.conversationId;
 
         act(() => {
-            result1.current.reset();
+            result1.current.resetAll();
         });
 
         const id2 = result1.current.conversationId;
@@ -142,23 +142,27 @@ describe('useWorkflowChatStore', () => {
         expect(result.current.messages).toEqual([]);
     });
 
-    it('resets conversation ID and messages', () => {
+    it('resets all state including conversation cache', () => {
         const {result} = renderHook(() => useWorkflowChatStore());
 
         const originalId = result.current.conversationId;
 
         act(() => {
+            result.current.switchChat('chat-1');
             result.current.setMessage({content: 'Message 1', role: 'user'});
-            result.current.setMessage({content: 'Message 2', role: 'assistant'});
+            result.current.switchChat('chat-2');
+            result.current.setMessage({content: 'Message 2', role: 'user'});
         });
 
         act(() => {
-            result.current.reset();
+            result.current.resetAll();
         });
 
         expect(result.current.messages).toEqual([]);
         expect(result.current.conversationId).not.toBe(originalId);
         expect(result.current.conversationId.length).toBe(32);
+        expect(result.current.activeWorkflowExecutionId).toBeNull();
+        expect(result.current.conversationCache).toEqual({});
     });
 
     it('preserves message attachments when setting message', () => {
@@ -239,5 +243,84 @@ describe('useWorkflowChatStore', () => {
 
         expect(result.current.messages).toHaveLength(1);
         expect(result.current.messages[0]).toEqual({content: 'Hello world!', role: 'assistant'});
+    });
+
+    it('preserves messages when switching between chats', () => {
+        const {result} = renderHook(() => useWorkflowChatStore());
+
+        act(() => {
+            result.current.switchChat('chat-1');
+            result.current.setMessage({content: 'Hello from chat 1', role: 'user'});
+            result.current.setMessage({content: 'Reply in chat 1', role: 'assistant'});
+        });
+
+        act(() => {
+            result.current.switchChat('chat-2');
+            result.current.setMessage({content: 'Hello from chat 2', role: 'user'});
+        });
+
+        expect(result.current.messages).toHaveLength(1);
+        expect(result.current.messages[0]).toEqual({content: 'Hello from chat 2', role: 'user'});
+
+        act(() => {
+            result.current.switchChat('chat-1');
+        });
+
+        expect(result.current.messages).toHaveLength(2);
+        expect(result.current.messages[0]).toEqual({content: 'Hello from chat 1', role: 'user'});
+        expect(result.current.messages[1]).toEqual({content: 'Reply in chat 1', role: 'assistant'});
+    });
+
+    it('preserves conversationId when switching back to a cached chat', () => {
+        const {result} = renderHook(() => useWorkflowChatStore());
+
+        act(() => {
+            result.current.switchChat('chat-1');
+        });
+
+        const chat1ConversationId = result.current.conversationId;
+
+        act(() => {
+            result.current.switchChat('chat-2');
+        });
+
+        const chat2ConversationId = result.current.conversationId;
+
+        expect(chat1ConversationId).not.toBe(chat2ConversationId);
+
+        act(() => {
+            result.current.switchChat('chat-1');
+        });
+
+        expect(result.current.conversationId).toBe(chat1ConversationId);
+    });
+
+    it('creates a fresh conversation for a new chat', () => {
+        const {result} = renderHook(() => useWorkflowChatStore());
+
+        act(() => {
+            result.current.switchChat('new-chat');
+        });
+
+        expect(result.current.messages).toEqual([]);
+        expect(result.current.conversationId).toBeDefined();
+        expect(result.current.conversationId.length).toBe(32);
+        expect(result.current.activeWorkflowExecutionId).toBe('new-chat');
+    });
+
+    it('sets activeWorkflowExecutionId on switch', () => {
+        const {result} = renderHook(() => useWorkflowChatStore());
+
+        act(() => {
+            result.current.switchChat('chat-abc');
+        });
+
+        expect(result.current.activeWorkflowExecutionId).toBe('chat-abc');
+
+        act(() => {
+            result.current.switchChat('chat-xyz');
+        });
+
+        expect(result.current.activeWorkflowExecutionId).toBe('chat-xyz');
     });
 });
