@@ -2,7 +2,7 @@ import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {ClickedDefinitionType} from '@/shared/types';
+import {ClickedDefinitionType, UpdateWorkflowMutationType} from '@/shared/types';
 import {ClipboardPasteIcon, ClipboardXIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -36,8 +36,7 @@ interface WorkflowNodesTabsProps {
     sourceNodeId?: string;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     triggerComponentDefinitions: Array<ComponentDefinitionBasic>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    updateWorkflowMutation?: any;
+    updateWorkflowMutation?: UpdateWorkflowMutationType;
 }
 
 const WorkflowNodesTabs = ({
@@ -64,21 +63,33 @@ const WorkflowNodesTabs = ({
 
     const [pasteDismissed, setPasteDismissed] = useState(false);
 
-    const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
-
-    const {edges, nodes} = useWorkflowDataStore(
+    const {copiedNode, copiedWorkflowId} = useWorkflowEditorStore(
         useShallow((state) => ({
-            edges: state.edges,
-            nodes: state.nodes,
+            copiedNode: state.copiedNode,
+            copiedWorkflowId: state.copiedWorkflowId,
         }))
     );
 
+    const {edges, nodes, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            edges: state.edges,
+            nodes: state.nodes,
+            workflow: state.workflow,
+        }))
+    );
+
+    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+
     const handlePasteClick = () => {
-        if (!copiedNode || !updateWorkflowMutation) {
+        if (!canPaste || !updateWorkflowMutation) {
             return;
         }
 
         const nodeSourceName = sourceNodeId || edgeId?.split('=>')[0];
+
+        if (!nodeSourceName) {
+            return;
+        }
 
         const edge = edges.find((currentEdge) => currentEdge.id === edgeId);
         const sourceNode = nodes.find((currentNode) => currentNode.id === sourceNodeId);
@@ -88,10 +99,6 @@ const WorkflowNodesTabs = ({
             node: edge?.type === 'workflow' ? undefined : sourceNode,
             nodes,
         });
-
-        if (!nodeSourceName) {
-            return;
-        }
 
         pasteNode({
             nodeSourceName,
@@ -292,7 +299,7 @@ const WorkflowNodesTabs = ({
                 />
             )}
 
-            {copiedNode && !pasteDismissed && (
+            {canPaste && !pasteDismissed && (
                 <div className="px-3 py-2">
                     <div
                         className="group/paste flex w-full cursor-pointer items-center justify-between self-stretch rounded-md border-2 border-stroke-brand-primary bg-surface-neutral-primary px-4 py-2 hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"

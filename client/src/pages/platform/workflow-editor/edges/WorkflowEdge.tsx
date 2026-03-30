@@ -29,16 +29,19 @@ export default function WorkflowEdge({
     targetX,
     targetY,
 }: EdgeProps) {
-    const {edges, nodes} = useWorkflowDataStore(
+    const {edges, nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
             nodes: state.nodes,
+            workflow: state.workflow,
         }))
     );
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
+    const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);
+    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
     const {updateWorkflowMutation} = useWorkflowEditor();
 
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
@@ -191,7 +194,7 @@ export default function WorkflowEdge({
                         }}
                     >
                         <ContextMenu>
-                            <ContextMenuTrigger asChild disabled={!copiedNode}>
+                            <ContextMenuTrigger asChild disabled={!canPaste}>
                                 <div
                                     className={twMerge(
                                         'flex cursor-pointer items-center justify-center rounded transition-all',
@@ -212,7 +215,7 @@ export default function WorkflowEdge({
 
                             <ContextMenuContent>
                                 <ContextMenuItem
-                                    disabled={!copiedNode}
+                                    disabled={!canPaste}
                                     onClick={() => {
                                         const edge = edges.find((edge) => edge.id === id);
 

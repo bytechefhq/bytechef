@@ -21,13 +21,20 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
-    const {nodes} = useWorkflowDataStore(
+    const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
+            workflow: state.workflow,
         }))
     );
 
-    const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
+    const {copiedNode, copiedWorkflowId} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            copiedNode: state.copiedNode,
+            copiedWorkflowId: state.copiedWorkflowId,
+        }))
+    );
+
     const {updateWorkflowMutation} = useWorkflowEditor();
 
     const nodeIndex = nodes.findIndex((node) => node.id === id);
@@ -35,9 +42,11 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const rootClusterElementId = id.split('-')[0];
     const effectiveDirection = isClusterElement ? 'TB' : layoutDirection;
 
+    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+
     return (
         <ContextMenu>
-            <ContextMenuTrigger asChild disabled={!copiedNode}>
+            <ContextMenuTrigger asChild disabled={!canPaste}>
                 <div>
                     <WorkflowNodesPopoverMenu
                         clusterElementType={data.clusterElementType}

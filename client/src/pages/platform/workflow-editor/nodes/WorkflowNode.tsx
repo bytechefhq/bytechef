@@ -507,22 +507,28 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const {
         clusterElementsCanvasOpen,
         contextMenuOpen,
+        copiedNode,
+        copiedWorkflowId,
         mainClusterRootComponentDefinition,
         nestedClusterRootsComponentDefinitions,
         renamingNodeName,
         rootClusterElementNodeData,
         setCopiedNode,
+        setCopiedWorkflowId,
         setRenamingNodeName,
         setRootClusterElementNodeData,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
             contextMenuOpen: state.contextMenuOpen,
+            copiedNode: state.copiedNode,
+            copiedWorkflowId: state.copiedWorkflowId,
             mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
             nestedClusterRootsComponentDefinitions: state.nestedClusterRootsComponentDefinitions,
             renamingNodeName: state.renamingNodeName,
             rootClusterElementNodeData: state.rootClusterElementNodeData,
             setCopiedNode: state.setCopiedNode,
+            setCopiedWorkflowId: state.setCopiedWorkflowId,
             setRenamingNodeName: state.setRenamingNodeName,
             setRootClusterElementNodeData: state.setRootClusterElementNodeData,
         }))
@@ -693,6 +699,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const handleCopyNode = () => {
         setTimeout(() => {
             setCopiedNode(data);
+            setCopiedWorkflowId(workflow.id);
         }, 200);
     };
 
@@ -709,6 +716,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const isRenaming = renamingNodeName === data.name;
 
     const suppressHover = contextMenuOpen || isRenaming || switchPopoverOpen;
+
+    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
 
     const nodeDescription =
         workflowNodeDescription?.description && !data.clusterElementType
@@ -752,6 +761,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     if (isRegularNode) {
         return (
             <WorkflowNodeContextMenu
+                canPaste={canPaste}
                 data={data}
                 hasSavedPosition={!!hasSavedNodePosition}
                 onCopy={handleCopyNode}

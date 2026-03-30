@@ -15,6 +15,9 @@ export interface WorkflowEditorI {
     copiedNode: NodeDataType | undefined;
     setCopiedNode: (copiedNode: NodeDataType | undefined) => void;
 
+    copiedWorkflowId: string | undefined;
+    setCopiedWorkflowId: (copiedWorkflowId: string | undefined) => void;
+
     mainClusterRootComponentDefinition: ComponentDefinition | undefined;
     setMainClusterRootComponentDefinition: (
         mainClusterRootComponentDefinition: ComponentDefinition | undefined
@@ -75,6 +78,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setCopiedNode: (copiedNode) =>
                 set(() => ({
                     copiedNode,
+                })),
+
+            copiedWorkflowId: undefined,
+            setCopiedWorkflowId: (copiedWorkflowId) =>
+                set(() => ({
+                    copiedWorkflowId,
                 })),
 
             mainClusterRootComponentDefinition: undefined,
