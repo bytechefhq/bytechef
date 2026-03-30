@@ -691,7 +691,8 @@ public class AgentEvalRunExecutor {
                         }
 
                         return config;
-                    }));
+                    },
+                    (existing, replacement) -> replacement));
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
