@@ -1105,10 +1105,10 @@
       },
       "minItems": null,
       "multipleValues": null,
-      "name": "people",
+      "name": "__items",
       "options": null,
       "optionsDataSource": null,
-      "placeholder": "Add to People",
+      "placeholder": "Add to Items",
       "required": true,
       "type": "ARRAY"
     } ],
