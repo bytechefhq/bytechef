@@ -1,7 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './ActionDefinition';
-export * from './ApproveForm';
 export * from './ActionDefinitionBasic';
 export * from './ArrayProperty';
 export * from './Authorization';
@@ -58,7 +57,6 @@ export * from './TaskProperty';
 export * from './TimeProperty';
 export * from './TriggerDefinition';
 export * from './TriggerDefinitionBasic';
-export * from './TriggerForm';
 export * from './TriggerFormInput';
 export * from './TriggerType';
 export * from './UnifiedApiCategory';

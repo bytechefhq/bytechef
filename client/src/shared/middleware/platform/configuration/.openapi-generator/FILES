@@ -6,7 +6,6 @@ apis/EnvironmentApi.ts
 apis/Oauth2Api.ts
 apis/TaskDispatcherDefinitionApi.ts
 apis/TriggerDefinitionApi.ts
-apis/TriggerFormApi.ts
 apis/WorkflowNodeDescriptionApi.ts
 apis/WorkflowNodeDynamicPropertiesApi.ts
 apis/WorkflowNodeOptionApi.ts
@@ -80,8 +79,6 @@ docs/TimeProperty.md
 docs/TriggerDefinition.md
 docs/TriggerDefinitionApi.md
 docs/TriggerDefinitionBasic.md
-docs/TriggerForm.md
-docs/TriggerFormApi.md
 docs/TriggerFormInput.md
 docs/TriggerType.md
 docs/UnifiedApiCategory.md
@@ -164,7 +161,6 @@ models/TaskProperty.ts
 models/TimeProperty.ts
 models/TriggerDefinition.ts
 models/TriggerDefinitionBasic.ts
-models/TriggerForm.ts
 models/TriggerFormInput.ts
 models/TriggerType.ts
 models/UnifiedApiCategory.ts

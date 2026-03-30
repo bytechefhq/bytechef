@@ -1,6 +1,6 @@
 # TriggerFormApi
 
-All URIs are relative to */api/platform/internal*
+All URIs are relative to */api/automation/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|

@@ -24,6 +24,7 @@ export * from './ProjectVersion';
 export * from './PublishProjectRequest';
 export * from './StartWebhookTriggerTest200Response';
 export * from './Tag';
+export * from './TriggerForm';
 export * from './TriggerFormInput';
 export * from './UpdateConnectionRequest';
 export * from './UpdateTagsRequest';

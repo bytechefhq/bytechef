@@ -7,6 +7,7 @@ apis/ProjectApi.ts
 apis/ProjectDeploymentApi.ts
 apis/ProjectDeploymentTagApi.ts
 apis/ProjectTagApi.ts
+apis/TriggerFormApi.ts
 apis/WebhookTriggerTestApi.ts
 apis/WorkflowApi.ts
 apis/WorkspaceApi.ts
@@ -44,6 +45,8 @@ docs/ProjectVersion.md
 docs/PublishProjectRequest.md
 docs/StartWebhookTriggerTest200Response.md
 docs/Tag.md
+docs/TriggerForm.md
+docs/TriggerFormApi.md
 docs/TriggerFormInput.md
 docs/UpdateConnectionRequest.md
 docs/UpdateTagsRequest.md
@@ -85,6 +88,7 @@ models/ProjectVersion.ts
 models/PublishProjectRequest.ts
 models/StartWebhookTriggerTest200Response.ts
 models/Tag.ts
+models/TriggerForm.ts
 models/TriggerFormInput.ts
 models/UpdateConnectionRequest.ts
 models/UpdateTagsRequest.ts

@@ -9,6 +9,7 @@ export * from './ProjectApi';
 export * from './ProjectDeploymentApi';
 export * from './ProjectDeploymentTagApi';
 export * from './ProjectTagApi';
+export * from './TriggerFormApi';
 export * from './WebhookTriggerTestApi';
 export * from './WorkflowApi';
 export * from './WorkspaceApi';
