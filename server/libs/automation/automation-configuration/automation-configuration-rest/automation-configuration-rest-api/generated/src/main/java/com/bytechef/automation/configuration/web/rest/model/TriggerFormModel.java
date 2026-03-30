@@ -1,8 +1,7 @@
-package com.bytechef.platform.configuration.web.rest.model;
+package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.configuration.web.rest.model.TriggerFormInputModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -25,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("TriggerForm")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:19:54.576402+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:41:23.992586+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 public class TriggerFormModel {
 
   private @Nullable String buttonLabel;
@@ -45,7 +44,7 @@ public class TriggerFormModel {
   private @Nullable Boolean useWorkflowTimezone;
 
   @Valid
-  private List<@Valid TriggerFormInputModel> inputs = new ArrayList<>();
+  private List<com.bytechef.platform.configuration.web.rest.model.@Valid TriggerFormInputModel> inputs = new ArrayList<>();
 
   public TriggerFormModel buttonLabel(@Nullable String buttonLabel) {
     this.buttonLabel = buttonLabel;
@@ -207,12 +206,12 @@ public class TriggerFormModel {
     this.useWorkflowTimezone = useWorkflowTimezone;
   }
 
-  public TriggerFormModel inputs(List<@Valid TriggerFormInputModel> inputs) {
+  public TriggerFormModel inputs(List<com.bytechef.platform.configuration.web.rest.model.@Valid TriggerFormInputModel> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public TriggerFormModel addInputsItem(TriggerFormInputModel inputsItem) {
+  public TriggerFormModel addInputsItem(com.bytechef.platform.configuration.web.rest.model.TriggerFormInputModel inputsItem) {
     if (this.inputs == null) {
       this.inputs = new ArrayList<>();
     }
@@ -227,11 +226,11 @@ public class TriggerFormModel {
   @Valid 
   @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
-  public List<@Valid TriggerFormInputModel> getInputs() {
+  public List<com.bytechef.platform.configuration.web.rest.model.@Valid TriggerFormInputModel> getInputs() {
     return inputs;
   }
 
-  public void setInputs(List<@Valid TriggerFormInputModel> inputs) {
+  public void setInputs(List<com.bytechef.platform.configuration.web.rest.model.@Valid TriggerFormInputModel> inputs) {
     this.inputs = inputs;
   }
 

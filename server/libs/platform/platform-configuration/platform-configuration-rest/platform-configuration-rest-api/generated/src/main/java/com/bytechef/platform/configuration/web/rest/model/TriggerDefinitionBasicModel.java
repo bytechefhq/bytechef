@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinitionBasic", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:19:54.576402+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:41:23.947667+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 public class TriggerDefinitionBasicModel {
 
   private String componentName;

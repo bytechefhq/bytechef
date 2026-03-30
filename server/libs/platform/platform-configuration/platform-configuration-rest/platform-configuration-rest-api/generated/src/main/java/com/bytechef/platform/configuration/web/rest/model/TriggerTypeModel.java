@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets TriggerType
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:19:54.576402+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:41:23.947667+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 public enum TriggerTypeModel {
   
   CALLABLE("CALLABLE"),
