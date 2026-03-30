@@ -10,13 +10,13 @@ const WorkflowChatContainer = () => {
     const {workflowExecutionId} = useParams();
 
     const currentChatName = useWorkflowChatStore((state) => state.currentChatName);
-    const reset = useWorkflowChatStore((state) => state.reset);
+    const resetAll = useWorkflowChatStore((state) => state.resetAll);
 
     useEffect(() => {
         return () => {
-            reset();
+            resetAll();
         };
-    }, [reset]);
+    }, [resetAll]);
 
     return (
         <LayoutContainer

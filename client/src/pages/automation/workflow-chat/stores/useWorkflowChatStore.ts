@@ -3,22 +3,29 @@ import {
     setLastAssistantMessageContent as setContentHelper,
 } from '@/shared/util/assistant-message-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
-
-/* eslint-disable sort-keys */
-
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
+interface ConversationCacheEntryI {
+    conversationId: string;
+    messages: ThreadMessageLike[];
+}
+
 interface WorkflowChatStateI {
+    activeWorkflowExecutionId: string | null;
+    conversationCache: Record<string, ConversationCacheEntryI>;
     conversationId: string;
     currentChatName: string | null;
+    isRunning: boolean;
     messages: ThreadMessageLike[];
-    setCurrentChatName: (name: string | null) => void;
-    setMessage: (message: ThreadMessageLike) => void;
     appendToLastAssistantMessage: (delta: string) => void;
-    setLastAssistantMessageContent: (content: string) => void;
+    resetAll: () => void;
     resetMessages: () => void;
-    reset: () => void;
+    setCurrentChatName: (name: string | null) => void;
+    setIsRunning: (isRunning: boolean) => void;
+    setLastAssistantMessageContent: (content: string) => void;
+    setMessage: (message: ThreadMessageLike) => void;
+    switchChat: (workflowExecutionId: string) => void;
 }
 
 const generateId = () =>
@@ -28,28 +35,57 @@ const generateId = () =>
         .join('');
 
 const initialState = {
+    activeWorkflowExecutionId: null as string | null,
+    conversationCache: {} as Record<string, ConversationCacheEntryI>,
     conversationId: generateId(),
     currentChatName: null as string | null,
+    isRunning: false,
     messages: [] as ThreadMessageLike[],
 };
 
 export const useWorkflowChatStore = create<WorkflowChatStateI>()(
     devtools((set) => ({
         ...initialState,
-        setCurrentChatName: (name) => set({currentChatName: name}),
-        setMessage: (message) =>
-            set((state) => ({
-                messages: [...state.messages, message],
-            })),
         appendToLastAssistantMessage: (delta: string) =>
             set((state) => ({
                 messages: appendHelper(state.messages, delta),
             })),
+        resetAll: () => set({...initialState, conversationCache: {}, conversationId: generateId()}),
+        resetMessages: () => set({messages: []}),
+        setCurrentChatName: (name) => set({currentChatName: name}),
+        setIsRunning: (isRunning) => set({isRunning}),
         setLastAssistantMessageContent: (content: string) =>
             set((state) => ({
                 messages: setContentHelper(state.messages, content),
             })),
-        resetMessages: () => set({messages: []}),
-        reset: () => set({...initialState, conversationId: generateId()}),
+        setMessage: (message) =>
+            set((state) => ({
+                messages: [...state.messages, message],
+            })),
+        switchChat: (workflowExecutionId: string) =>
+            set((state) => {
+                if (state.isRunning) {
+                    return state;
+                }
+
+                const updatedCache = {...state.conversationCache};
+
+                if (state.activeWorkflowExecutionId) {
+                    updatedCache[state.activeWorkflowExecutionId] = {
+                        conversationId: state.conversationId,
+                        messages: state.messages,
+                    };
+                }
+
+                const cached = updatedCache[workflowExecutionId];
+
+                return {
+                    activeWorkflowExecutionId: workflowExecutionId,
+                    conversationCache: updatedCache,
+                    conversationId: cached?.conversationId ?? generateId(),
+                    currentChatName: null,
+                    messages: cached?.messages ?? [],
+                };
+            }),
     }))
 );

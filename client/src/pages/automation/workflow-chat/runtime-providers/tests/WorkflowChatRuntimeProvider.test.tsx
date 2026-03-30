@@ -9,7 +9,9 @@ vi.mock('@/pages/automation/workflow-chat/stores/useWorkflowChatStore', () => ({
     useWorkflowChatStore: vi.fn((selector) =>
         selector({
             appendToLastAssistantMessage: vi.fn(),
+            isRunning: false,
             messages: [],
+            setIsRunning: vi.fn(),
             setLastAssistantMessageContent: vi.fn(),
             setMessage: vi.fn(),
         })
