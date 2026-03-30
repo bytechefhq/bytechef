@@ -51,9 +51,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 }));
 
 vi.mock('@/shared/queries/platform/workflowNodeOutputs.queries', () => ({
-    WorkflowNodeOutputKeys: {
-        filteredPreviousWorkflowNodeOutputs: vi.fn().mockReturnValue(['mock-key']),
-    },
+    invalidatePreviousWorkflowNodeOutputsForWorkflow: vi.fn(),
 }));
 
 // ── Helpers ──────────────────────────────────────────────────────────

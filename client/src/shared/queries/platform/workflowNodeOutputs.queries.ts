@@ -7,7 +7,7 @@ import {
     WorkflowNodeOutputApi,
 } from '@/shared/middleware/platform/configuration';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
-import {useQuery} from '@tanstack/react-query';
+import {QueryClient, useQuery} from '@tanstack/react-query';
 
 export const WorkflowNodeOutputKeys = {
     clusterElementOutput: (request: GetClusterElementOutputRequest) => [
@@ -34,6 +34,13 @@ export const WorkflowNodeOutputKeys = {
     ],
     workflowNodeOutputs: ['workflowNodeOutputs'] as const,
 };
+
+/** Drops all cached previous-node-output entries for a workflow (see query key shape). */
+export function invalidatePreviousWorkflowNodeOutputsForWorkflow(queryClient: QueryClient, workflowId: string): void {
+    queryClient.invalidateQueries({
+        queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId, 'previousWorkflowNodeOutputs'],
+    });
+}
 
 export const useGetClusterElementOutputQuery = (request: GetClusterElementOutputRequest, enabled?: boolean) =>
     useQuery<WorkflowNodeOutput, Error>({

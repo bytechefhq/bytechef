@@ -9,6 +9,7 @@ import {
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {invalidatePreviousWorkflowNodeOutputsForWorkflow} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {
     ClickedDefinitionType,
@@ -147,6 +148,7 @@ interface SaveDroppedNodeProps {
         taskDispatcherContext?: TaskDispatcherContextType;
     };
 
+    queryClient: QueryClient;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
@@ -155,6 +157,7 @@ async function saveDroppedNode({
     nodeData,
     operationName,
     options,
+    queryClient,
     updateWorkflowMutation,
 }: SaveDroppedNodeProps) {
     if (nodeData.trigger) {
@@ -165,9 +168,16 @@ async function saveDroppedNode({
         captureComponentUsed(nodeData.componentName, undefined, undefined);
     }
 
+    const workflowId = useWorkflowDataStore.getState().workflow.id;
+
     saveWorkflowDefinition({
         ...options,
         nodeData,
+        onSuccess: () => {
+            if (workflowId) {
+                invalidatePreviousWorkflowNodeOutputsForWorkflow(queryClient, workflowId);
+            }
+        },
         updateWorkflowMutation,
     });
 }
@@ -200,6 +210,7 @@ export default function useHandleDrop({
                 placeholderId: targetNode.id,
                 taskDispatcherContext: getTaskDispatcherContext({node: targetNode}),
             },
+            queryClient,
             updateWorkflowMutation: updateWorkflowMutation!,
         });
     }
@@ -222,6 +233,7 @@ export default function useHandleDrop({
                 nodeIndex: insertIndex,
                 taskDispatcherContext: getTaskDispatcherContext({edge: targetEdge, nodes}),
             },
+            queryClient,
             updateWorkflowMutation: updateWorkflowMutation!,
         });
     }
@@ -237,6 +249,7 @@ export default function useHandleDrop({
             captureComponentUsed,
             nodeData,
             operationName,
+            queryClient,
             updateWorkflowMutation: updateWorkflowMutation!,
         });
     }

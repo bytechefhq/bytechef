@@ -53,12 +53,14 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             setShowWorkflowOutputsSheet: state.setShowWorkflowOutputsSheet,
         }))
     );
-    const {currentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            currentNode: state.currentNode,
-            setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
-        }))
-    );
+    const {currentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                currentNode: state.currentNode,
+                setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
+                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+            }))
+        );
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({
@@ -101,6 +103,12 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
+    const shouldFetchPreviousWorkflowNodeOutputs =
+        (dataPillPanelOpen || workflowNodeDetailsPanelOpen) &&
+        !!workflowNodes?.length &&
+        !!currentNode &&
+        !!currentNode?.name;
+
     const {data: workflowNodeOutputs, isPending: isWorkflowNodeOutputsPending} = useGetPreviousWorkflowNodeOutputsQuery(
         {
             environmentId: currentEnvironmentId,
@@ -109,15 +117,17 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
                 ? rootClusterElementNodeData?.workflowNodeName
                 : currentNode?.name,
         },
-        dataPillPanelOpen && !!workflowNodes?.length && !!currentNode && !!currentNode?.name
+        shouldFetchPreviousWorkflowNodeOutputs
     );
+
+    const workflowNodeOutputsForFilter = shouldFetchPreviousWorkflowNodeOutputs ? workflowNodeOutputs : undefined;
 
     let filteredWorkflowNodeOutputs;
     let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
 
-    if (workflowNodeOutputs && componentDefinitions) {
+    if (workflowNodeOutputsForFilter && componentDefinitions) {
         const filteredNodeOutputs = filterWorkflowNodeOutputs(
-            workflowNodeOutputs,
+            workflowNodeOutputsForFilter,
             componentDefinitions,
             taskDispatcherDefinitions ?? []
         );

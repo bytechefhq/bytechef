@@ -3,6 +3,22 @@
         @apply w-full;
     }
 
+    .tiptap .property-mention--unavailable {
+        @apply inline-flex;
+        @apply items-stretch;
+        @apply overflow-hidden;
+        @apply rounded-full;
+        @apply bg-surface-destructive-secondary;
+        @apply py-0;
+        @apply pl-0;
+        @apply pr-0.5;
+        @apply text-content-destructive;
+    }
+
+    .tiptap .property-mention--unavailable .property-mention-chip {
+        @apply rounded-none;
+    }
+
     .tiptap {
         /* placeholder */
         p.is-editor-empty:first-child::before {
@@ -13,5 +29,4 @@
             @apply pointer-events-none;
         }
     }
-
 }
