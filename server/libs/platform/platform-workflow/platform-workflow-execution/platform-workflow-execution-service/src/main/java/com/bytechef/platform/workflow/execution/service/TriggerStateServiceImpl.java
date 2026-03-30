@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Ivica Cardic
  */
-@Service("triggerStorageService")
+@Service
 @Transactional
 public class TriggerStateServiceImpl implements TriggerStateService {
 

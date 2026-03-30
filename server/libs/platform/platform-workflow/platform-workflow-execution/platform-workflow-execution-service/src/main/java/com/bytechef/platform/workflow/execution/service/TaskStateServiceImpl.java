@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Ivica Cardic
  */
-@Service("taskStateService")
+@Service
 @Transactional
 public class TaskStateServiceImpl implements TaskStateService {
 
