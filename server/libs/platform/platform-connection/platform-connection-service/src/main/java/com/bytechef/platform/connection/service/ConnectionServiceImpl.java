@@ -64,13 +64,13 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public Connection create(
         @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
-        int environmentId, String name, Map<String, Object> parameters, PlatformType type) {
+        int environmentId, String name, Map<String, Object> parameters, PlatformType platformType) {
 
         Assert.hasText(componentName, "'componentName' must not be empty");
         Assert.hasText(name, "'name' must not be empty");
         Assert.notNull(environmentId, "'environment' must not be null");
         Assert.notNull(parameters, "'parameters' must not be null");
-        Assert.notNull(type, "'type' must not be null");
+        Assert.notNull(platformType, "'platformType' must not be null");
 
         Connection connection = new Connection();
 
@@ -80,7 +80,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setEnvironmentId(environmentId);
         connection.setName(name);
         connection.setParameters(parameters);
-        connection.setType(type);
+        connection.setType(platformType);
 
         if (logger.isTraceEnabled()) {
             logger.trace("Saved..: {}", FormatUtils.toString(parameters));
