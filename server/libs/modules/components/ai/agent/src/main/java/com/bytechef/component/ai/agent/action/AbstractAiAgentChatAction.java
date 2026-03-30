@@ -44,6 +44,7 @@ import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderF
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -321,6 +322,7 @@ public abstract class AbstractAiAgentChatAction {
         };
     }
 
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     private static String getSimulatedResult(
         String toolInput, Map<String, String> simulation, ChatModel chatModel, ActionContext context) {
 
