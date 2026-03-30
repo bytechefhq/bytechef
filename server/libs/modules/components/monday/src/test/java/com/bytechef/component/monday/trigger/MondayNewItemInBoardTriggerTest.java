@@ -60,7 +60,7 @@ class MondayNewItemInBoardTriggerTest {
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Parameters parameters = MockParametersFactory.create(Map.of(BOARD_ID, "12345"));
+    private Parameters parameters = MockParametersFactory.create(Map.of(BOARD_ID, "12345"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -75,13 +75,30 @@ class MondayNewItemInBoardTriggerTest {
                 parameters, parameters, "testWebhookUrl", "testWorkflowExecutionId",
                 mockedTriggerContext);
 
-            WebhookEnableOutput expectedWebhookEnableOutput =
-                new WebhookEnableOutput(Map.of(ID, "123"), null);
+            WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
             assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
             assertEquals(
                 "mutation{create_webhook(board_id: 12345, url: \"testWebhookUrl\", event: create_item){id}}",
                 stringArgumentCaptor.getValue());
+            assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
+        }
+    }
+
+    @Test
+    void testWebhookDisable() {
+        Parameters outputParameters = MockParametersFactory.create(Map.of(ID, "123"));
+
+        try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
+            mondayUtilsMockedStatic
+                .when(() -> MondayUtils.executeGraphQLQuery(
+                    stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
+                .thenReturn(Map.of());
+
+            MondayNewItemInBoardTrigger.webhookDisable(
+                parameters, parameters, outputParameters, "testWorkflowExecutionId", mockedTriggerContext);
+
+            assertEquals("mutation{delete_webhook(id: 123){id}}", stringArgumentCaptor.getValue());
             assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
         }
     }
