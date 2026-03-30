@@ -1,5 +1,5 @@
 import {FormDescription} from '@/components/ui/form';
-import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
 import sanitize from 'sanitize-html';
 
 interface CustomHTMLFieldRendererProps {

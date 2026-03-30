@@ -1,5 +1,5 @@
 import {FormField} from '@/components/ui/form';
-import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
 import {UseFormReturn} from 'react-hook-form';
 
 interface HiddenFieldRendererProps {
