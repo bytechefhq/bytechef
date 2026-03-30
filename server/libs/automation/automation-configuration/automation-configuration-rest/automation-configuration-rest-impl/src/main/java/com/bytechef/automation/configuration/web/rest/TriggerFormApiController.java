@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.web.rest.model.TriggerFormModel;
 import com.bytechef.commons.util.HtmlSanitizerUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.web.rest.model.TriggerFormModel;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -41,7 +41,7 @@ import org.springframework.web.server.ResponseStatusException;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnCoordinator
 public class TriggerFormApiController implements TriggerFormApi {
 

@@ -30,6 +30,8 @@ tags:
     description: "The Automation Workspace Internal API"
   - name: "approve-form"
     description: "The Automation Approve Form Internal API"
+  - name: "trigger-form"
+    description: "The Automation Trigger Form Internal API"
 paths:
   /approve-form/{id}:
     get:
@@ -52,6 +54,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApproveForm"
+  /trigger-form/{id}:
+    get:
+      description: "Get a trigger form."
+      summary: "Get a trigger form"
+      tags:
+        - "trigger-form"
+      operationId: "getTriggerForm"
+      parameters:
+        - name: "id"
+          description: "The id of a trigger form."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriggerForm"
   /component-definitions:
     get:
       description: "Get all component definitions."
@@ -1582,6 +1605,29 @@ components:
           type: "string"
         formTitle:
           type: "string"
+        inputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TriggerFormInput"
+    TriggerForm:
+      type: "object"
+      properties:
+        buttonLabel:
+          type: "string"
+        customFormStyling:
+          type: "string"
+        formDescription:
+          type: "string"
+        formPath:
+          type: "string"
+        formTitle:
+          type: "string"
+        appendAttribution:
+          type: "boolean"
+        ignoreBots:
+          type: "boolean"
+        useWorkflowTimezone:
+          type: "boolean"
         inputs:
           type: "array"
           items:
