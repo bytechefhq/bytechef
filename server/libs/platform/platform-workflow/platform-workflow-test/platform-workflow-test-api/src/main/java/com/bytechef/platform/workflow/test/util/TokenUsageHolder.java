@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.util;
+package com.bytechef.platform.workflow.test.util;
 
 /**
  * Thread-local holder for accumulating LLM token usage from chat responses. Allows token metadata to be passed across
