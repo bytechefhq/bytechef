@@ -1,5 +1,5 @@
 import ConnectDialog from './ConnectDialog';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {type FormEvent, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import useOAuth2 from './useOAuth2';
 import {
@@ -525,13 +525,13 @@ export default function useConnectDialog({
                         inputRefs.current[name] = element;
                     }
                 },
-                onInput: (event: React.FormEvent<HTMLInputElement>) => {
+                onInput: (event: FormEvent<HTMLInputElement>) => {
                     const value = event.currentTarget.value;
 
                     setFormValues((previous: Record<string, string>) => ({...previous, [name]: value}));
                 },
             }),
-            handleSubmit: (callback: (data: {[key: string]: unknown}) => void) => (event?: React.FormEvent) => {
+            handleSubmit: (callback: (data: {[key: string]: unknown}) => void) => (event?: FormEvent) => {
                 if (event) {
                     event.preventDefault();
                 }
@@ -644,7 +644,7 @@ export default function useConnectDialog({
     }, [fetch, currentIntegrationInstanceId]);
 
     const handleClick = useCallback(
-        (event: React.MouseEvent<HTMLButtonElement>) => {
+        (event: MouseEvent<HTMLButtonElement>) => {
             if ((event.target as HTMLButtonElement).name === 'disconnectButton') {
                 handleDisconnect()
                     .then(() => closeDialog())
