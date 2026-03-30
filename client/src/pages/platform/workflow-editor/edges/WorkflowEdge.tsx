@@ -1,12 +1,18 @@
+import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from '@/components/ui/context-menu';
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
-import {PlusIcon} from 'lucide-react';
+import {ClipboardPasteIcon, PlusIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
+import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
+import pasteNode from '../utils/pasteNode';
 import BranchCaseLabel from './BranchCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
@@ -23,9 +29,17 @@ export default function WorkflowEdge({
     targetX,
     targetY,
 }: EdgeProps) {
-    const nodes = useWorkflowDataStore((state) => state.nodes);
+    const {edges, nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            edges: state.edges,
+            nodes: state.nodes,
+        }))
+    );
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
+
+    const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
 
@@ -176,22 +190,50 @@ export default function WorkflowEdge({
                             zIndex: isDropzoneActive ? 40 : 'auto',
                         }}
                     >
-                        <div
-                            className={twMerge(
-                                'flex cursor-pointer items-center justify-center rounded transition-all',
-                                isDropzoneActive
-                                    ? 'size-16 border-2 border-blue-100 bg-blue-100'
-                                    : 'size-6 border-2 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
-                            )}
-                            id={`${id}-button`}
-                        >
-                            <PlusIcon
-                                className={twMerge(
-                                    `text-muted-foreground`,
-                                    isDropzoneActive ? 'size-14 text-muted-foreground/50' : 'size-3.5'
-                                )}
-                            />
-                        </div>
+                        <ContextMenu>
+                            <ContextMenuTrigger asChild disabled={!copiedNode}>
+                                <div
+                                    className={twMerge(
+                                        'flex cursor-pointer items-center justify-center rounded transition-all',
+                                        isDropzoneActive
+                                            ? 'size-16 border-2 border-blue-100 bg-blue-100'
+                                            : 'size-6 border-2 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
+                                    )}
+                                    id={`${id}-button`}
+                                >
+                                    <PlusIcon
+                                        className={twMerge(
+                                            `text-muted-foreground`,
+                                            isDropzoneActive ? 'size-14 text-muted-foreground/50' : 'size-3.5'
+                                        )}
+                                    />
+                                </div>
+                            </ContextMenuTrigger>
+
+                            <ContextMenuContent>
+                                <ContextMenuItem
+                                    disabled={!copiedNode}
+                                    onClick={() => {
+                                        const edge = edges.find((edge) => edge.id === id);
+
+                                        const taskDispatcherContext = getTaskDispatcherContext({
+                                            edge,
+                                            node: edge?.type === 'workflow' ? undefined : sourceNode,
+                                            nodes,
+                                        });
+
+                                        pasteNode({
+                                            nodeSourceName: sourceNodeId,
+                                            taskDispatcherContext,
+                                            updateWorkflowMutation: updateWorkflowMutation!,
+                                        });
+                                    }}
+                                >
+                                    <ClipboardPasteIcon />
+                                    Paste Here
+                                </ContextMenuItem>
+                            </ContextMenuContent>
+                        </ContextMenu>
                     </div>
                 </WorkflowNodesPopoverMenu>
             </EdgeLabelRenderer>
