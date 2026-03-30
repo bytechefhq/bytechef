@@ -34,6 +34,7 @@ import com.bytechef.component.google.mail.action.GoogleMailRemoveLabelsAction;
 import com.bytechef.component.google.mail.action.GoogleMailReplyToEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSendEmailAction;
+import com.bytechef.component.google.mail.cluster.GoogleMailApprovalChannel;
 import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailPollingTrigger;
 import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailTrigger;
 import com.google.auto.service.AutoService;
@@ -70,6 +71,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             GoogleMailNewEmailTrigger.TRIGGER_DEFINITION,
             GoogleMailNewEmailPollingTrigger.TRIGGER_DEFINITION)
         .clusterElements(
+            GoogleMailApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
             tool(GoogleMailAddLabelsAction.ACTION_DEFINITION),
             tool(GoogleMailArchiveEmailAction.ACTION_DEFINITION),
             tool(GoogleMailCreateLabelAction.ACTION_DEFINITION),

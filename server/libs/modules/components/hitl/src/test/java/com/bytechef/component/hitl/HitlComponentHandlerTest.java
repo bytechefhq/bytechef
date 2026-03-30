@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.task.dto;
+package com.bytechef.component.hitl;
 
-import java.time.Instant;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * @author Ivica Cardic
+ * @author Marija Horvat
  */
-public record ApprovalTaskDTO(
-    String createdBy,
-    Instant createdDate,
-    String description,
-    Long id,
-    String lastModifiedBy,
-    Instant lastModifiedDate,
-    String name,
-    int version) {
+class HitlComponentHandlerTest {
+
+    @Test
+    void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals("definition/hitl.json", new HitlComponentHandler().getDefinition());
+    }
 }

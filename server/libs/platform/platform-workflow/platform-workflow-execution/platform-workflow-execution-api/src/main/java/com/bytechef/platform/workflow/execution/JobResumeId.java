@@ -27,23 +27,20 @@ import java.util.UUID;
  */
 public class JobResumeId implements Serializable {
 
-    private final boolean approved;
     private final long jobId;
     private final String tenantId;
     private final String uuid;
 
-    private JobResumeId(String tenantId, long jobId, String uuid, boolean approved) {
-        this.approved = approved;
+    private JobResumeId(String tenantId, long jobId, String uuid) {
         this.jobId = jobId;
         this.tenantId = tenantId;
-
         this.uuid = uuid;
     }
 
-    public static JobResumeId of(long jobId, boolean approved) {
+    public static JobResumeId of(long jobId) {
         UUID uuid = UUID.randomUUID();
 
-        return new JobResumeId(TenantContext.getCurrentTenantId(), jobId, uuid.toString(), approved);
+        return new JobResumeId(TenantContext.getCurrentTenantId(), jobId, uuid.toString());
     }
 
     public static JobResumeId parse(String id) {
@@ -51,12 +48,12 @@ public class JobResumeId implements Serializable {
 
         String[] items = decoded.split(":");
 
-        if (items.length != 4) {
+        if (items.length != 3) {
             throw new IllegalArgumentException(
-                "Invalid JobResumeId format, expected 4 colon-separated parts but got " + items.length);
+                "Invalid JobResumeId format, expected 3 colon-separated parts but got " + items.length);
         }
 
-        return new JobResumeId(items[0], Long.parseLong(items[1]), items[2], Boolean.parseBoolean(items[3]));
+        return new JobResumeId(items[0], Long.parseLong(items[1]), items[2]);
     }
 
     public long getJobId() {
@@ -71,10 +68,6 @@ public class JobResumeId implements Serializable {
         return uuid;
     }
 
-    public boolean isApproved() {
-        return approved;
-    }
-
     @Override
     public boolean equals(Object object) {
         if (this == object) {
@@ -85,15 +78,14 @@ public class JobResumeId implements Serializable {
             return false;
         }
 
-        return approved == jobResumeId.approved &&
-            jobId == jobResumeId.jobId &&
+        return jobId == jobResumeId.jobId &&
             Objects.equals(tenantId, jobResumeId.tenantId) &&
             Objects.equals(uuid, jobResumeId.uuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(approved, jobId, tenantId, uuid);
+        return Objects.hash(jobId, tenantId, uuid);
     }
 
     @Override
@@ -103,8 +95,6 @@ public class JobResumeId implements Serializable {
                 ":" +
                 jobId +
                 ":" +
-                uuid +
-                ":" +
-                approved);
+                uuid);
     }
 }

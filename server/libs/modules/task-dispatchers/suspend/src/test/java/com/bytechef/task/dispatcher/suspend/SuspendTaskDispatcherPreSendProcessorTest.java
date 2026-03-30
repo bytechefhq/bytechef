@@ -59,7 +59,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
 
         job.setId(100L);
 
-        String jobResumeIdString = createJobResumeIdString(100L, true);
+        String jobResumeIdString = createJobResumeIdString(100L);
 
         job.setMetadata(Map.of(MetadataConstants.JOB_RESUME_ID, jobResumeIdString));
 
@@ -89,7 +89,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
 
     @Test
     void testProcessRecoversSuspendStateAndCleansUp() {
-        String jobResumeIdString = createJobResumeIdString(100L, true);
+        String jobResumeIdString = createJobResumeIdString(100L);
         Suspend suspend = new Suspend(Map.of("key", "value"), null);
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -119,7 +119,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
 
     @Test
     void testProcessHandlesMissingSuspendState() {
-        String jobResumeIdString = createJobResumeIdString(100L, true);
+        String jobResumeIdString = createJobResumeIdString(100L);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .build();
@@ -146,8 +146,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
         verify(taskStateService).delete(any(JobResumeId.class));
     }
 
-    private static String createJobResumeIdString(long jobId, boolean approved) {
-        return EncodingUtils.base64EncodeToString(
-            "public:" + jobId + ":" + UUID.randomUUID() + ":" + approved);
+    private static String createJobResumeIdString(long jobId) {
+        return EncodingUtils.base64EncodeToString("public:" + jobId + ":" + UUID.randomUUID());
     }
 }

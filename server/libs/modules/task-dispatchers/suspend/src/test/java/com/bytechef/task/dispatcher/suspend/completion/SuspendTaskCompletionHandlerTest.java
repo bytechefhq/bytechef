@@ -79,7 +79,7 @@ class SuspendTaskCompletionHandlerTest {
 
     @Test
     void testCanHandleReturnsTrueWhenNoParentAndHasResumeId() {
-        String jobResumeIdString = createJobResumeIdString(100L, true);
+        String jobResumeIdString = createJobResumeIdString(100L);
         Suspend suspend = new Suspend(Map.of(), null);
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -112,7 +112,7 @@ class SuspendTaskCompletionHandlerTest {
 
     @Test
     void testHandleSavesStateAndStopsJob() {
-        String jobResumeIdString = createJobResumeIdString(100L, true);
+        String jobResumeIdString = createJobResumeIdString(100L);
         Suspend suspend = new Suspend(Map.of("key", "value"), null);
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -169,7 +169,7 @@ class SuspendTaskCompletionHandlerTest {
 
     @Test
     void testHandleThrowsWhenJobNotFound() {
-        String jobResumeIdString = createJobResumeIdString(100L, true);
+        String jobResumeIdString = createJobResumeIdString(100L);
         Suspend suspend = new Suspend(Map.of(), null);
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -191,8 +191,7 @@ class SuspendTaskCompletionHandlerTest {
         assertThrows(IllegalStateException.class, () -> suspendTaskCompletionHandler.handle(taskExecution));
     }
 
-    private static String createJobResumeIdString(long jobId, boolean approved) {
-        return EncodingUtils.base64EncodeToString(
-            "public:" + jobId + ":" + UUID.randomUUID() + ":" + approved);
+    private static String createJobResumeIdString(long jobId) {
+        return EncodingUtils.base64EncodeToString("public:" + jobId + ":" + UUID.randomUUID());
     }
 }
