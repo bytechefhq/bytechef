@@ -69,7 +69,6 @@ public class MondayGetBoardValuesAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         List<String> columns = inputParameters.getList(COLUMNS, String.class);
 
         String columnFilter = "";
