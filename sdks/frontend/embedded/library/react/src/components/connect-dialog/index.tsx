@@ -525,7 +525,7 @@ export default function useConnectDialog({
                         inputRefs.current[name] = element;
                     }
                 },
-                onInput: (event: FormEvent<HTMLInputElement>) => {
+                onInput: (event: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
                     const value = event.currentTarget.value;
 
                     setFormValues((previous: Record<string, string>) => ({...previous, [name]: value}));
