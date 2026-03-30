@@ -78,9 +78,13 @@ export default function useAgentEvalsRunsTab(agentEvalTestId: string | null) {
 
     const handleSelectRun = useCallback(
         (id: string | null) => {
+            if (id === null) {
+                queryClient.invalidateQueries({queryKey: ['agentEvalRuns']});
+            }
+
             setSelectedRunId(id);
         },
-        [setSelectedRunId]
+        [queryClient, setSelectedRunId]
     );
 
     const runSummary = useMemo(() => {

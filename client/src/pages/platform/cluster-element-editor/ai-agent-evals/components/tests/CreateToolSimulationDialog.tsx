@@ -11,15 +11,10 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useCreateToolSimulationDialog, {
+    type ToolSimulationEditDataI,
+} from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useCreateToolSimulationDialog';
 import {InfoIcon, Loader2Icon} from 'lucide-react';
-import {useState} from 'react';
-
-interface ToolSimulationEditDataI {
-    id: string;
-    responsePrompt: string;
-    simulationModel?: string | null;
-    toolName: string;
-}
 
 interface CreateToolSimulationDialogProps {
     editData?: ToolSimulationEditDataI;
@@ -29,39 +24,17 @@ interface CreateToolSimulationDialogProps {
 }
 
 const CreateToolSimulationDialog = ({editData, onClose, onCreate, onUpdate}: CreateToolSimulationDialogProps) => {
-    const [responsePrompt, setResponsePrompt] = useState(editData?.responsePrompt ?? '');
-    const [simulationModel, setSimulationModel] = useState(editData?.simulationModel ?? '');
-    const [submitting, setSubmitting] = useState(false);
-    const [toolName, setToolName] = useState(editData?.toolName ?? '');
-
-    const isEditing = !!editData;
-
-    const handleSubmit = async () => {
-        if (!toolName.trim() || !responsePrompt.trim()) {
-            return;
-        }
-
-        setSubmitting(true);
-
-        try {
-            if (isEditing && editData && onUpdate) {
-                await onUpdate(
-                    editData.id,
-                    toolName.trim(),
-                    responsePrompt.trim(),
-                    simulationModel.trim() || undefined
-                );
-            } else {
-                await onCreate(toolName.trim(), responsePrompt.trim(), simulationModel.trim() || undefined);
-            }
-
-            onClose();
-        } catch {
-            // Error is handled by the mutation's onError callback
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    const {
+        handleSubmit,
+        isEditing,
+        responsePrompt,
+        setResponsePrompt,
+        setSimulationModel,
+        setToolName,
+        simulationModel,
+        submitting,
+        toolName,
+    } = useCreateToolSimulationDialog({editData, onClose, onCreate, onUpdate});
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={true}>

@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import AgentEvalTestCard from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/AgentEvalTestCard';
 import CreateTestDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/CreateTestDialog';
-import useAgentEvalsTestsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvalsTestsTab';
+import useAgentEvalsTestsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useAgentEvalsTestsTab';
 import {FlaskConicalIcon, Loader2Icon, PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 
