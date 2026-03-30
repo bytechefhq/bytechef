@@ -6,6 +6,7 @@ declare module '@tiptap/core' {
     // eslint-disable-next-line  @typescript-eslint/naming-convention
     interface Storage {
         MentionStorage: {
+            controlType?: string;
             dataPills: DataPillType[];
         };
     }

@@ -1,7 +1,6 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {invalidatePreviousWorkflowNodeOutputsForWorkflow} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {NodeDataType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 
@@ -42,22 +41,6 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
     }
 }
 
-export default function handleComponentAddedSuccess({
-    nodeData,
-    queryClient,
-    workflow,
-}: HandleComponentAddedSuccessProps) {
-    if (nodeData.clusterElements) {
-        return;
-    }
-
-    const {currentNode} = useWorkflowNodeDetailsPanelStore.getState();
-
-    queryClient.invalidateQueries({
-        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-            environmentId: environmentStore.getState().currentEnvironmentId,
-            id: workflow.id!,
-            lastWorkflowNodeName: currentNode?.name,
-        }),
-    });
+export default function handleComponentAddedSuccess({queryClient, workflow}: HandleComponentAddedSuccessProps) {
+    invalidatePreviousWorkflowNodeOutputsForWorkflow(queryClient, workflow.id!);
 }

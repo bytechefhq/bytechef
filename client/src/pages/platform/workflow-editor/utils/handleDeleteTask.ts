@@ -6,8 +6,7 @@ import {
     SPACE,
 } from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {invalidatePreviousWorkflowNodeOutputsForWorkflow} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {
     BranchCaseType,
     NodeDataType,
@@ -378,13 +377,7 @@ export default function handleDeleteTask({
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
 
-                queryClient.invalidateQueries({
-                    queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                        environmentId: environmentStore.getState().currentEnvironmentId,
-                        id: workflow.id!,
-                        lastWorkflowNodeName: currentNode?.name,
-                    }),
-                });
+                invalidatePreviousWorkflowNodeOutputsForWorkflow(queryClient, workflow.id!);
 
                 invalidateWorkflowQueries();
             },
