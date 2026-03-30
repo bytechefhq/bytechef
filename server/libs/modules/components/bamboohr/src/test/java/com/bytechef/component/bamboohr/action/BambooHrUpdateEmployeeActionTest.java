@@ -33,6 +33,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -69,18 +70,14 @@ class BambooHrUpdateEmployeeActionTest {
         Object result = BambooHrUpdateEmployeeAction.perform(mockedParameters, null, mockedContext);
 
         assertNull(result);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/employees/1", stringArgumentCaptor.getValue());
 
-        Body body = bodyArgumentCaptor.getValue();
         Map<String, Object> expectedBody = Map.of(
             FIRST_NAME, "test", LAST_NAME, "test",
             JOB_TITLE, "Software Engineer", LOCATION, "London, UK",
             EMPLOYMENT_STATUS, "Full-Time", HIRE_DATE, "04/01/2025");
 
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

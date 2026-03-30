@@ -69,19 +69,14 @@ class BambooHrUtilsTest {
             null, null, null, null, mockedContext);
 
         assertEquals(List.of(option("name - 1", "1")), result);
-        assertEquals(List.of("/employees/directory", "accept", "application/json"),
-            stringArgumentCaptor.getAllValues());
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertEquals(
+            List.of("/employees/directory", "accept", "application/json"), stringArgumentCaptor.getAllValues());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -103,19 +98,15 @@ class BambooHrUtilsTest {
             mockedParameters, null, null, null, mockedContext);
 
         assertEquals(List.of(option("name", "1")), result);
-        assertEquals(List.of("/employees/1/files/view", "accept", "application/xml"),
-            stringArgumentCaptor.getAllValues());
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertEquals(
+            List.of("/employees/1/files/view", "accept", "application/xml"), stringArgumentCaptor.getAllValues());
 
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.XML, responseType.getType());
+        assertEquals(ResponseType.XML, configuration.getResponseType());
     }
 
     @Test
@@ -136,17 +127,12 @@ class BambooHrUtilsTest {
 
         assertEquals(List.of(option("name", "alias")), result);
         assertEquals(List.of("/meta/fields", "accept", "application/json"), stringArgumentCaptor.getAllValues());
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -172,16 +158,11 @@ class BambooHrUtilsTest {
 
         assertEquals(List.of(option("London, UK", "London, UK")), locations);
         assertEquals(List.of("/meta/lists", "accept", "application/json"), stringArgumentCaptor.getAllValues());
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }

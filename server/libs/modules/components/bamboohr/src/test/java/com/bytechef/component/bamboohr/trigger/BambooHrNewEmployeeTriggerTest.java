@@ -49,8 +49,8 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class BambooHrNewEmployeeTriggerTest {
 
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(ALL_EMPLOYEES, List.of("1", "2", "3")));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(ALL_EMPLOYEES, List.of("1", "2", "3")));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -70,20 +70,16 @@ class BambooHrNewEmployeeTriggerTest {
             mockedParameters, null, mockedParameters, mockedTriggerContext);
 
         assertEquals(
-            new PollOutput(List.of("4"), Map.of(ALL_EMPLOYEES, List.of("2", "3", "4")), false), pollOutput);
-        assertEquals(List.of("/employees/directory", "accept", "application/json"),
-            stringArgumentCaptor.getAllValues());
+            new PollOutput(List.of("4"), Map.of(ALL_EMPLOYEES, List.of("2", "3", "4")), false),
+            pollOutput);
+        assertEquals(
+            List.of("/employees/directory", "accept", "application/json"), stringArgumentCaptor.getAllValues());
 
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }

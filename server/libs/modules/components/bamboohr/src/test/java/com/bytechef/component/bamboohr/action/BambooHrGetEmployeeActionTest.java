@@ -21,7 +21,6 @@ import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +33,6 @@ import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
@@ -66,26 +64,20 @@ class BambooHrGetEmployeeActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
         Object result = BambooHrGetEmployeeAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
-
-        assertEquals(List.of("/employees/1", FIELDS, "firstName,lastName,employeeNumber", "accept", "application/json"),
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            List.of("/employees/1", FIELDS, "firstName,lastName,employeeNumber", "accept", "application/json"),
             stringArgumentCaptor.getAllValues());
     }
 }

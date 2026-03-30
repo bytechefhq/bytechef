@@ -91,18 +91,12 @@ class BambooHrUpdatedEmployeeTriggerTest {
             "format", "json");
 
         assertEquals(expectedBody, body.getContent());
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
-        ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -121,14 +115,12 @@ class BambooHrUpdatedEmployeeTriggerTest {
             null, null, mockedParameters, "testWorkflowExecutionId", mockedTriggerContext);
 
         assertEquals(List.of("/webhooks/1", "accept", "application/json"), stringArgumentCaptor.getAllValues());
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
     }
 
     @Test
     void testWebhookRequest() {
-
         List<Map<String, Map<String, Map<String, String>>>> employees = List.of(
             Map.of(
                 "fields", Map.of(

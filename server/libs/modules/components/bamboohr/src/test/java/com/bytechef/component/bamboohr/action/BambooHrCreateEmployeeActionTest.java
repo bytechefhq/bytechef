@@ -47,8 +47,8 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class BambooHrCreateEmployeeActionTest {
 
-    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             EMPLOYEE_NUMBER, "1", FIRST_NAME, "test", LAST_NAME, "test",
@@ -72,10 +72,7 @@ class BambooHrCreateEmployeeActionTest {
         Object result = BambooHrCreateEmployeeAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of("url", url, ID, "1"), result);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals(List.of("/employees/", "location"), stringArgumentCaptor.getAllValues());
 
         Map<String, Object> expectedBody = Map.of(
@@ -83,8 +80,6 @@ class BambooHrCreateEmployeeActionTest {
             JOB_TITLE, "Software Engineer", LOCATION, "London, UK",
             EMPLOYMENT_STATUS, "Full-Time", HIRE_DATE, "04/01/2025");
 
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(Body.of(expectedBody, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }
