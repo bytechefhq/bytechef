@@ -82,4 +82,14 @@ class TextHelperGetTextBetweenActionTest {
 
         assertEquals("", result);
     }
+
+    @Test
+    void testExtractBetweenSamePattern() {
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(TEXT, "Hello world! Hello again!", PATTERN_START, "Hello", PATTERN_END, "Hello"));
+
+        String result = TextHelperGetTextBetweenAction.perform(mockedParameters, mockedParameters, null);
+
+        assertEquals(" world! ", result);
+    }
 }
