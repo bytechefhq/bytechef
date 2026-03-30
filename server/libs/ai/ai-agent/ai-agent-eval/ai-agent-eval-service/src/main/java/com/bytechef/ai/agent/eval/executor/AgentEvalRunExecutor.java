@@ -592,7 +592,6 @@ public class AgentEvalRunExecutor {
             lastAgentResponse, transcriptJson, accumulatedPromptTokens, accumulatedCompletionTokens);
     }
 
-    @SuppressWarnings("unchecked")
     private String extractAgentResponse(Object result) {
         if (result instanceof String stringResult) {
             return stringResult;
