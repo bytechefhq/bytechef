@@ -48,7 +48,7 @@ public class SuspendTaskExecutionPostOutputProcessor implements TaskExecutionPos
             String jobResumeIdString = (String) continueParametersMap.get(MetadataConstants.JOB_RESUME_ID);
 
             if (jobResumeIdString == null) {
-                JobResumeId jobResumeId = JobResumeId.of(jobId, true);
+                JobResumeId jobResumeId = JobResumeId.of(jobId);
 
                 jobResumeIdString = jobResumeId.toString();
             }

@@ -17,8 +17,8 @@
 package com.bytechef.automation.task.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.task.dto.ApprovalTaskDTO;
-import com.bytechef.automation.task.facade.ApprovalTaskFacade;
+import com.bytechef.automation.task.domain.ApprovalTask;
+import com.bytechef.automation.task.service.ApprovalTaskService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -33,57 +33,54 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ApprovalTaskGraphQlController {
 
-    private final ApprovalTaskFacade approvalTaskFacade;
+    private final ApprovalTaskService approvalTaskService;
 
     @SuppressFBWarnings("EI")
-    public ApprovalTaskGraphQlController(ApprovalTaskFacade approvalTaskFacade) {
-        this.approvalTaskFacade = approvalTaskFacade;
+    public ApprovalTaskGraphQlController(ApprovalTaskService approvalTaskService) {
+        this.approvalTaskService = approvalTaskService;
     }
 
     @MutationMapping
-    public ApprovalTaskDTO createApprovalTask(@Argument ApprovalTaskInput approvalTask) {
-        return approvalTaskFacade.createApprovalTask(toApprovalTaskDTO(approvalTask));
+    public ApprovalTask createApprovalTask(@Argument ApprovalTaskInput approvalTask) {
+        return approvalTaskService.create(toApprovalTask(approvalTask));
     }
 
     @MutationMapping
     public boolean deleteApprovalTask(@Argument long id) {
-        approvalTaskFacade.deleteApprovalTask(id);
+        approvalTaskService.delete(id);
 
         return true;
     }
 
     @QueryMapping
-    public ApprovalTaskDTO approvalTask(@Argument long id) {
-        return approvalTaskFacade.getApprovalTask(id);
+    public ApprovalTask approvalTask(@Argument long id) {
+        return approvalTaskService.getApprovalTask(id);
     }
 
     @QueryMapping
-    public List<ApprovalTaskDTO> approvalTasks() {
-        return approvalTaskFacade.getApprovalTasks();
+    public List<ApprovalTask> approvalTasks() {
+        return approvalTaskService.getApprovalTasks();
     }
 
     @QueryMapping
-    public List<ApprovalTaskDTO> approvalTasksByIds(@Argument List<Long> ids) {
-        return approvalTaskFacade.getApprovalTasks(ids);
+    public List<ApprovalTask> approvalTasksByIds(@Argument List<Long> ids) {
+        return approvalTaskService.getApprovalTasks(ids);
     }
 
     @MutationMapping
-    public ApprovalTaskDTO updateApprovalTask(@Argument ApprovalTaskInput approvalTask) {
-        return approvalTaskFacade.updateApprovalTask(toApprovalTaskDTO(approvalTask));
+    public ApprovalTask updateApprovalTask(@Argument ApprovalTaskInput approvalTask) {
+        return approvalTaskService.update(toApprovalTask(approvalTask));
     }
 
-    private ApprovalTaskDTO toApprovalTaskDTO(ApprovalTaskInput approvalTaskInput) {
-        return new ApprovalTaskDTO(
-            null,
-            null,
-            approvalTaskInput.description(),
-            approvalTaskInput.id(),
-            null,
-            null,
-            approvalTaskInput.name(),
-            approvalTaskInput.version() == null ? 0 : approvalTaskInput.version());
+    private ApprovalTask toApprovalTask(ApprovalTaskInput approvalTaskInput) {
+        return ApprovalTask.builder()
+            .id(approvalTaskInput.id())
+            .name(approvalTaskInput.name())
+            .description(approvalTaskInput.description())
+            .version(approvalTaskInput.version() == null ? 0 : approvalTaskInput.version())
+            .build();
     }
 
-    record ApprovalTaskInput(Long id, String name, String description, Integer version) {
+    public record ApprovalTaskInput(Long id, String name, String description, Integer version) {
     }
 }

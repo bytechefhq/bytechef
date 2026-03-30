@@ -17,11 +17,9 @@
 package com.bytechef.platform.workflow.execution;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.tenant.TenantContext;
 import java.nio.charset.StandardCharsets;
@@ -42,29 +40,18 @@ class JobResumeIdTest {
     void testOfCreatesValidInstance() {
         TenantContext.setCurrentTenantId("test-tenant");
 
-        JobResumeId jobResumeId = JobResumeId.of(42L, true);
+        JobResumeId jobResumeId = JobResumeId.of(42L);
 
         assertEquals(42L, jobResumeId.getJobId());
         assertEquals("test-tenant", jobResumeId.getTenantId());
-        assertTrue(jobResumeId.isApproved());
         assertNotNull(jobResumeId.getUuidAsString());
-    }
-
-    @Test
-    void testOfWithApprovedFalse() {
-        TenantContext.setCurrentTenantId("public");
-
-        JobResumeId jobResumeId = JobResumeId.of(100L, false);
-
-        assertEquals(100L, jobResumeId.getJobId());
-        assertFalse(jobResumeId.isApproved());
     }
 
     @Test
     void testToStringAndParseRoundTrip() {
         TenantContext.setCurrentTenantId("my-tenant");
 
-        JobResumeId original = JobResumeId.of(99L, true);
+        JobResumeId original = JobResumeId.of(99L);
 
         String encoded = original.toString();
 
@@ -75,27 +62,12 @@ class JobResumeIdTest {
         assertEquals(original.getJobId(), parsed.getJobId());
         assertEquals(original.getTenantId(), parsed.getTenantId());
         assertEquals(original.getUuidAsString(), parsed.getUuidAsString());
-        assertEquals(original.isApproved(), parsed.isApproved());
-    }
-
-    @Test
-    void testParseWithApprovedFalseRoundTrip() {
-        TenantContext.setCurrentTenantId("public");
-
-        JobResumeId original = JobResumeId.of(50L, false);
-
-        String encoded = original.toString();
-
-        JobResumeId parsed = JobResumeId.parse(encoded);
-
-        assertEquals(50L, parsed.getJobId());
-        assertFalse(parsed.isApproved());
     }
 
     @Test
     void testParseThrowsForInvalidFormat() {
         String invalidBase64 = java.util.Base64.getEncoder()
-            .encodeToString("only:two:parts".getBytes(StandardCharsets.UTF_8));
+            .encodeToString("only:two".getBytes(StandardCharsets.UTF_8));
 
         assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(invalidBase64));
     }
@@ -104,7 +76,7 @@ class JobResumeIdTest {
     void testParseThrowsForTooManyParts() {
         String tooManyParts = java.util.Base64.getEncoder()
             .encodeToString(
-                "a:b:c:d:e".getBytes(StandardCharsets.UTF_8));
+                "a:b:c:d".getBytes(StandardCharsets.UTF_8));
 
         assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(tooManyParts));
     }
@@ -113,7 +85,7 @@ class JobResumeIdTest {
     void testEqualsAndHashCode() {
         TenantContext.setCurrentTenantId("tenant1");
 
-        JobResumeId first = JobResumeId.of(1L, true);
+        JobResumeId first = JobResumeId.of(1L);
 
         String encoded = first.toString();
 
@@ -127,8 +99,8 @@ class JobResumeIdTest {
     void testNotEqualsDifferentUuid() {
         TenantContext.setCurrentTenantId("public");
 
-        JobResumeId first = JobResumeId.of(1L, true);
-        JobResumeId second = JobResumeId.of(1L, true);
+        JobResumeId first = JobResumeId.of(1L);
+        JobResumeId second = JobResumeId.of(1L);
 
         assertNotEquals(first, second);
     }
@@ -137,8 +109,8 @@ class JobResumeIdTest {
     void testNotEqualsDifferentJobId() {
         TenantContext.setCurrentTenantId("public");
 
-        JobResumeId first = JobResumeId.of(1L, true);
-        JobResumeId second = JobResumeId.of(2L, true);
+        JobResumeId first = JobResumeId.of(1L);
+        JobResumeId second = JobResumeId.of(2L);
 
         assertNotEquals(first, second);
     }
@@ -147,7 +119,7 @@ class JobResumeIdTest {
     void testEqualsSameInstance() {
         TenantContext.setCurrentTenantId("public");
 
-        JobResumeId jobResumeId = JobResumeId.of(1L, true);
+        JobResumeId jobResumeId = JobResumeId.of(1L);
 
         assertEquals(jobResumeId, jobResumeId);
     }
@@ -156,7 +128,7 @@ class JobResumeIdTest {
     void testNotEqualsNull() {
         TenantContext.setCurrentTenantId("public");
 
-        JobResumeId jobResumeId = JobResumeId.of(1L, true);
+        JobResumeId jobResumeId = JobResumeId.of(1L);
 
         assertNotEquals(null, jobResumeId);
     }

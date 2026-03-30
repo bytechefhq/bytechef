@@ -14,30 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.task.facade;
+package com.bytechef.component.definition.hitl;
 
-import com.bytechef.automation.task.dto.ApprovalTaskDTO;
-import java.util.List;
-import java.util.Optional;
+import com.bytechef.component.definition.ClusterElementContext;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Ivica Cardic
  */
-public interface ApprovalTaskFacade {
+@FunctionalInterface
+public interface ApprovalChannelFunction {
 
-    long countApprovalTasks();
+    ClusterElementType APPROVAL_CHANNELS =
+        new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Approval Channels", true, false);
 
-    ApprovalTaskDTO createApprovalTask(ApprovalTaskDTO approvalTaskDTO);
-
-    void deleteApprovalTask(long id);
-
-    Optional<ApprovalTaskDTO> fetchApprovalTask(String name);
-
-    ApprovalTaskDTO getApprovalTask(long id);
-
-    List<ApprovalTaskDTO> getApprovalTasks();
-
-    List<ApprovalTaskDTO> getApprovalTasks(List<Long> ids);
-
-    ApprovalTaskDTO updateApprovalTask(ApprovalTaskDTO approvalTaskDTO);
+    Object apply(
+        Parameters inputParameters, Parameters connectionParameters, String formUrl,
+        ClusterElementContext context) throws Exception;
 }

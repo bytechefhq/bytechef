@@ -272,7 +272,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return null;
         }
 
-        JobResumeId jobResumeId = JobResumeId.of(jobId, true);
+        JobResumeId jobResumeId = JobResumeId.of(jobId);
 
         this.jobResumeId = jobResumeId.toString();
 

@@ -28,7 +28,30 @@ tags:
     description: "The Automation Workflow Internal API"
   - name: "workspace"
     description: "The Automation Workspace Internal API"
+  - name: "approve-form"
+    description: "The Automation Approve Form Internal API"
 paths:
+  /approve-form/{id}:
+    get:
+      description: "Get an approve form."
+      summary: "Get an approve form"
+      tags:
+        - "approve-form"
+      operationId: "getApproveForm"
+      parameters:
+        - name: "id"
+          description: "The id of an approve form."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApproveForm"
   /component-definitions:
     get:
       description: "Get all component definitions."
@@ -1552,3 +1575,48 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    ApproveForm:
+      type: "object"
+      properties:
+        formDescription:
+          type: "string"
+        formTitle:
+          type: "string"
+        inputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TriggerFormInput"
+    FieldOption:
+      type: "object"
+      properties:
+        label:
+          type: "string"
+        value:
+          type: "string"
+    TriggerFormInput:
+      type: "object"
+      properties:
+        defaultValue:
+          type: "string"
+        fieldDescription:
+          type: "string"
+        fieldLabel:
+          type: "string"
+        fieldName:
+          type: "string"
+        fieldOptions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/FieldOption"
+        fieldType:
+          type: "integer"
+        maxSelection:
+          type: "integer"
+        minSelection:
+          type: "integer"
+        multipleChoice:
+          type: "boolean"
+        placeholder:
+          type: "string"
+        required:
+          type: "boolean"
