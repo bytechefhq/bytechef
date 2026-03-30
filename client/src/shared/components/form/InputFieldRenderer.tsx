@@ -1,7 +1,7 @@
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {FieldType} from '@/pages/automation/trigger-form/TriggerForm';
-import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
 import {UseFormReturn} from 'react-hook-form';
 
 const getInputTypeFromFieldType = (fieldType?: number): string => {

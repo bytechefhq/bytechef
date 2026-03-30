@@ -1,7 +1,7 @@
 import {FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
-import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
 import {UseFormReturn} from 'react-hook-form';
 
 interface RadioFieldRendererProps {

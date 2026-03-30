@@ -7,15 +7,15 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useParams} from 'react-router-dom';
 
-import {CheckboxFieldRenderer} from './components/CheckboxFieldRenderer';
-import {CustomHTMLFieldRenderer} from './components/CustomHTMLFieldRenderer';
-import {DateTimeFieldRenderer} from './components/DateTimeFieldRenderer';
-import {FileInputFieldRenderer} from './components/FileInputFieldRenderer';
-import {HiddenFieldRenderer} from './components/HiddenFieldRenderer';
-import {InputFieldRenderer} from './components/InputFieldRenderer';
-import {RadioFieldRenderer} from './components/RadioFieldRenderer';
-import {SelectFieldRenderer} from './components/SelectFieldRenderer';
-import {TextAreaFieldRenderer} from './components/TextAreaFieldRenderer';
+import {CheckboxFieldRenderer} from '@/shared/components/form/CheckboxFieldRenderer';
+import {CustomHTMLFieldRenderer} from '@/shared/components/form/CustomHTMLFieldRenderer';
+import {DateTimeFieldRenderer} from '@/shared/components/form/DateTimeFieldRenderer';
+import {FileInputFieldRenderer} from '@/shared/components/form/FileInputFieldRenderer';
+import {HiddenFieldRenderer} from '@/shared/components/form/HiddenFieldRenderer';
+import {InputFieldRenderer} from '@/shared/components/form/InputFieldRenderer';
+import {RadioFieldRenderer} from '@/shared/components/form/RadioFieldRenderer';
+import {SelectFieldRenderer} from '@/shared/components/form/SelectFieldRenderer';
+import {TextAreaFieldRenderer} from '@/shared/components/form/TextAreaFieldRenderer';
 
 export enum FieldType {
     CHECKBOX = 1,

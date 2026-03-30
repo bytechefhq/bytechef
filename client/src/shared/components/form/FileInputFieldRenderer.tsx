@@ -1,5 +1,5 @@
 import {FormControl, FormDescription, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
 import {Controller, UseFormReturn} from 'react-hook-form';
 
 interface FileInputFieldRendererProps {
