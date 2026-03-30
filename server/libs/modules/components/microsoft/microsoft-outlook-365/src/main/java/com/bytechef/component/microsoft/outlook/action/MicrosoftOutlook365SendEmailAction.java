@@ -22,12 +22,15 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ATTACHMENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
@@ -42,6 +45,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.microsoft.outlook.constant.ContentType;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -50,9 +54,14 @@ public class MicrosoftOutlook365SendEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
         .title("Send Email")
-        .description("Sends a new email message from the signed-in user's mailbox.")
+        .description("Sends a new email message.")
         .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#send-email")
         .properties(
+            string(FROM)
+                .label("From")
+                .description("The email address sending the mail.")
+                .controlType(ControlType.EMAIL)
+                .required(true),
             array(TO_RECIPIENTS)
                 .label("To Recipients")
                 .description("The To: recipients for the message.")
@@ -119,6 +128,7 @@ public class MicrosoftOutlook365SendEmailAction {
                 Http.Body.of(
                     "message",
                     new Object[] {
+                        FROM, Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, inputParameters.getRequiredString(FROM))),
                         SUBJECT, inputParameters.getRequiredString(SUBJECT),
                         BODY, inputParameters.get(BODY),
                         TO_RECIPIENTS, createRecipientList(inputParameters.getList(TO_RECIPIENTS, String.class)),
