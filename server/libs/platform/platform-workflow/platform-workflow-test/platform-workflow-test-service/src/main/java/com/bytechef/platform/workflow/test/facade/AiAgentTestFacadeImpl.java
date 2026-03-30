@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.TokenUsageHolder;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
@@ -128,5 +129,20 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null,
             null, workflowId, evaluatedParameters, connectionIds, evaluatedExtensions, environmentId, null,
             true, null, null, null);
+    }
+
+    @Override
+    public AiAgentTestResult executeAiAgentActionWithUsage(
+        String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
+        List<Object> attachments, Map<String, Map<String, String>> toolSimulations) {
+
+        TokenUsageHolder.getAndClear();
+
+        Object result = executeAiAgentAction(
+            workflowId, workflowNodeName, environmentId, conversationId, message, attachments, toolSimulations);
+
+        int[] tokenUsage = TokenUsageHolder.getAndClear();
+
+        return new AiAgentTestResult(result, tokenUsage[0], tokenUsage[1]);
     }
 }

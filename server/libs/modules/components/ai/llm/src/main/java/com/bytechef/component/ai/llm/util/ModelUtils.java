@@ -29,6 +29,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROMPT;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.commons.util.TokenUsageHolder;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.Format;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
@@ -54,6 +55,8 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.metadata.ChatResponseMetadata;
+import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.content.Media;
@@ -97,6 +100,8 @@ public class ModelUtils {
                 ChatResponse chatResponse = callResponseSpec.chatResponse();
 
                 if (chatResponse != null) {
+                    captureTokenUsage(chatResponse);
+
                     Generation result = chatResponse.getResult();
 
                     if (result != null) {
@@ -254,6 +259,23 @@ public class ModelUtils {
                 }
             }
         };
+    }
+
+    private static void captureTokenUsage(ChatResponse chatResponse) {
+        ChatResponseMetadata metadata = chatResponse.getMetadata();
+
+        if (metadata != null) {
+            Usage usage = metadata.getUsage();
+
+            if (usage != null) {
+                Integer promptTokens = usage.getPromptTokens();
+                Integer completionTokens = usage.getCompletionTokens();
+
+                TokenUsageHolder.capture(
+                    promptTokens != null ? promptTokens : 0,
+                    completionTokens != null ? completionTokens : 0);
+            }
+        }
     }
 
     private static String processText(String messageContent) {
