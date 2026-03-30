@@ -5,7 +5,7 @@ dependencies {
     api("org.springframework.boot:spring-boot")
 
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation("org.springframework.ai:spring-ai-retry")
     implementation("org.springframework.boot:spring-boot-http-client")
 }
