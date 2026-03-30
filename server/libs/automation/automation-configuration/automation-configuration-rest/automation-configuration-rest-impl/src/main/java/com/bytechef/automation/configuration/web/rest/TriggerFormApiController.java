@@ -19,12 +19,11 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.web.rest.model.TriggerFormModel;
 import com.bytechef.commons.util.HtmlSanitizerUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -46,16 +45,16 @@ import org.springframework.web.server.ResponseStatusException;
 public class TriggerFormApiController implements TriggerFormApi {
 
     private final ConversionService conversionService;
-    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerFormApiController(
-        ConversionService conversionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        ConversionService conversionService, ProjectWorkflowService projectWorkflowService,
         WorkflowService workflowService) {
 
         this.conversionService = conversionService;
-        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
     }
 
@@ -69,10 +68,7 @@ public class TriggerFormApiController implements TriggerFormApi {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, e);
         }
 
-        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
-            workflowExecutionId.getType());
-
-        String workflowId = jobPrincipalAccessor.getWorkflowId(
+        String workflowId = projectWorkflowService.getProjectWorkflowWorkflowId(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
