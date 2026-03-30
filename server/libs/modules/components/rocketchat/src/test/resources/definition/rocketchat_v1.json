@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send messages to users on your workspace.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rocketchat_v1#send-direct-message"
+    },
     "metadata": null,
     "name": "sendDirectMessage",
     "outputDefinition": {
@@ -1009,7 +1012,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send messages to channel on your workspace.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rocketchat_v1#send-channel-message"
+    },
     "metadata": null,
     "name": "sendChannelMessage",
     "outputDefinition": {
@@ -1960,7 +1966,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Channel name to send the message to.",
+      "description": "Channel name to send the message to. Must have the # prefix.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2012,7 +2018,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a public channel.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rocketchat_v1#create-channel"
+    },
     "metadata": null,
     "name": "createChannel",
     "outputDefinition": {
@@ -2903,7 +2912,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": false,
-      "description": "Set if the channel is read only or not.",
+      "description": "Whether the channel is read only.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4907,7 +4916,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Channel name to send the message to.",
+      "description": "Channel name to send the message to. Must have the # prefix.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -5850,7 +5859,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": false,
-      "description": "Set if the channel is read only or not.",
+      "description": "Whether the channel is read only.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -5997,14 +6006,20 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rocketchat_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developer.rocket.chat/apidocs"
+  },
   "description": "Rocket.Chat is a communication platform that enables team collaboration through messaging, audio/video calls, and integrations, all customizable and self-hostable.",
   "icon": "path:assets/rocketchat.svg",
   "metadata": null,
@@ -6018,7 +6033,10 @@
     "deprecated": null,
     "description": "Trigger off whenever a new message is posted to any public channel, private group or direct messages.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/rocketchat_v1#new-message"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newMessage",
