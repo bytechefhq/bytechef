@@ -4,6 +4,8 @@ description: "Monday.com is a work operating system that powers teams to run pro
 ---
 
 
+Categories: Project Management
+
 
 Type: monday/v1
 
@@ -99,7 +101,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| create_board | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(board_name)&#125; </details> |  |
+| create_board | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> |  |
 
 
 
@@ -109,7 +111,7 @@ Type: OBJECT
 {
   "create_board" : {
     "id" : "",
-    "board_name" : ""
+    "name" : ""
   }
 }
 ```
@@ -120,14 +122,14 @@ Type: OBJECT
 ### Create Column
 Name: createColumn
 
-`Create a new column in board.`
+`Create a new column in an existing board.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | false |
-| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | Id of the board where the new column should be created. | true |
+| workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where the new column should be created. | true |
 | title | Title | STRING | The new column's title. | true |
 | column_type | Column Type | STRING <details> <summary> Options </summary> <span>auto_number</span>, <span>board_relation</span>, <span>button</span>, <span>checkbox</span>, <span>color_picker</span>, <span>country</span>, <span>creation_log</span>, <span>date</span>, <span>dependency</span>, <span>doc</span>, <span>dropdown</span>, <span>email</span>, <span>file</span>, <span>formula</span>, <span>hour</span>, <span>item_assignees</span>, <span>item_id</span>, <span>last_updated</span>, <span>link</span>, <span>location</span>, <span>long_text</span>, <span>mirror</span>, <span>name</span>, <span>numbers</span>, <span>people</span>, <span>phone</span>, <span>progress</span>, <span>rating</span>, <span>status</span>, <span>subtasks</span>, <span>tags</span>, <span>team</span>, <span>text</span>, <span>timeline</span>, <span>time_tracking</span>, <span>vote</span>, <span>week</span>, <span>world_clock</span>, <span>unsupported</span> </details> | The type of column to create. | true |
 
@@ -172,21 +174,28 @@ Type: OBJECT
 }
 ```
 
+#### Find Workspace ID
+
+To find the Workspace ID, click [here](/reference/components/monday_v1#how-to-find-workspace-id).
+
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/monday_v1#how-to-find-board-id).
 
 
 
 ### Create Group
 Name: createGroup
 
-`Creates a new group in board.`
+`Creates a new group in an existing board.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | false |
-| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | Id of the board where new item will be created. | true |
-| group_name | Group Name | STRING |  | true |
+| workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where new item will be created. | true |
+| group_name | Group Name | STRING | The new group's name. | true |
 
 #### Example JSON Structure
 ```json
@@ -228,19 +237,26 @@ Type: OBJECT
 }
 ```
 
+#### Find Workspace ID
+
+To find the Workspace ID, click [here](/reference/components/monday_v1#how-to-find-workspace-id).
+
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/monday_v1#how-to-find-board-id).
 
 
 
 ### Create Item
 Name: createItem
 
-`Create a new item in a board.`
+`Create a new item in an existing board.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | false |
+| workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where new item will be created. | true |
 | group_id | Group ID | STRING <details> <summary> Depends On </summary> workspace_id, board_id </details> | The item's group. | false |
 | item_name | Item Name | STRING | The item's name. | true |
@@ -288,19 +304,30 @@ Type: OBJECT
 }
 ```
 
+#### Find Workspace ID
+
+To find the Workspace ID, click [here](/reference/components/monday_v1#how-to-find-workspace-id).
+
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/monday_v1#how-to-find-board-id).
+
+#### Find Group ID
+
+To find the Group ID, click [here](/reference/components/monday_v1#how-to-find-group-id).
 
 
 
 ### Delete Item
 Name: deleteItem
 
-`Deletes an item from a board.`
+`Deletes an item from an existing board.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | false |
+| workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where the item is located. | false |
 | item_id | Item ID | STRING <details> <summary> Depends On </summary> board_id, workspace_id </details> | ID of the item to delete. | true |
 
@@ -324,6 +351,144 @@ This action does not produce any output.
 
 
 
+#### Find Workspace ID
+
+To find the Workspace ID, click [here](/reference/components/monday_v1#how-to-find-workspace-id).
+
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/monday_v1#how-to-find-board-id).
+
+#### Find Item ID
+
+To find the Item ID, click [here](/reference/components/monday_v1#how-to-find-item-id).
+
+
+
+### Get Board Values
+Name: getBoardValues
+
+`Get a list of board's items.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board to return values for. | true |
+| columns | Columns | ARRAY <details> <summary> Items </summary> [STRING] </details> | Select specific columns to return values for. If empty, all columns will be returned. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Board Values",
+  "name" : "getBoardValues",
+  "parameters" : {
+    "workspace_id" : "",
+    "board_id" : "",
+    "columns" : [ "" ]
+  },
+  "type" : "monday/v1/getBoardValues"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+#### Find Workspace ID
+
+To find the Workspace ID, click [here](/reference/components/monday_v1#how-to-find-workspace-id).
+
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/monday_v1#how-to-find-board-id).
+
+#### Find Column ID
+
+To find the Column ID, click [here](/reference/components/monday_v1#how-to-find-column-id).
+
+
+
+### Update Item Status
+Name: updateItemStatus
+
+`Update status column on a specific item. Available only for boards that have defined status column.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where the item is located. Returns only boards with defined status column. | true |
+| column_id | Column ID | STRING <details> <summary> Depends On </summary> workspace_id, board_id </details> | Column ID. | true |
+| item_id | Item ID | STRING <details> <summary> Depends On </summary> board_id, workspace_id </details> | ID of the item to update. | true |
+| status | Status | STRING <details> <summary> Depends On </summary> board_id, column_id </details> | The status label. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Item Status",
+  "name" : "updateItemStatus",
+  "parameters" : {
+    "workspace_id" : "",
+    "board_id" : "",
+    "column_id" : "",
+    "item_id" : "",
+    "status" : ""
+  },
+  "type" : "monday/v1/updateItemStatus"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| change_column_value | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "change_column_value" : {
+    "id" : "",
+    "name" : ""
+  }
+}
+```
+
+#### Find Workspace ID
+
+To find the Workspace ID, click [here](/reference/components/monday_v1#how-to-find-workspace-id).
+
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/monday_v1#how-to-find-board-id).
+
+#### Find Column ID
+
+To find the Column ID, click [here](/reference/components/monday_v1#how-to-find-column-id).
+
+#### Find Item ID
+
+To find the Item ID, click [here](/reference/components/monday_v1#how-to-find-item-id).
+
+#### Find Status
+
+To find the Status, click [here](/reference/components/monday_v1#how-to-find-status).
+
 
 
 
@@ -342,8 +507,8 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | false |
-| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> |  | true |
+| workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board to monitor for new items. | true |
 
 
 #### Output
@@ -362,8 +527,80 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "monday/v1/newItemInBoard"
 }
 ```
+#### Find Workspace ID
+
+To find the Workspace ID, click [here](/reference/components/monday_v1#how-to-find-workspace-id).
+
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/monday_v1#how-to-find-board-id).
 
 
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find Workspace ID
+
+- **Method 1: Via UI**
+
+To find a Workspace ID, open the workspace. In URL you can find the Workspace ID. For example if URL is `https://bytechef.monday.com/workspaces/123`, your ID is 123.
+
+- **Method 2: Via API**
+
+You can use `query{workspaces{id name}}`.
+
+### How to find Board ID
+
+- **Method 1: Via UI**
+
+To find a Board ID, open the board. In URL you can find the Board ID. For example if URL is `https://bytechef.monday.com/boards/123`, your ID is 123.
+
+- **Method 2: Via API**
+
+You can use `query{boards(workspace_ids: WORKSPACE_ID, order_by: created_at){id name}}`.
+
+### How to find Group ID
+
+- **Method 1: Via UI**
+
+To find Group ID, open the board where group is located. Click on three dots in front of group name and there you will find Group ID.
+
+- **Method 2: Via API**
+
+You can use `query{boards(ids: BOARD_ID){groups{id title}}}`.
+
+### How to find Item ID
+
+- **Method 1: Via UI**
+
+To find Item ID, open the item page. In URL you can find the Item ID. For example if URL is `https://bytechef.monday.com/boards/123/pulses/456`, your ID is 456.
+
+- **Method 2: Via API**
+
+You can use `query{boards(ids: BOARD_ID){items_page{items{id name}}}}`.
+
+### How to find Column ID
+
+- **Method 1: Via UI**
+
+To find Column ID, open the board. Click on three dots next to the column name and there you will find Column ID.
+
+- **Method 2: Via API**
+
+You can use `query{boards(ids: BOARD_ID){columns {id title}}}`.
+
+### How to find Status
+
+- **Method 1: Via UI**
+
+To find status labels, open the board. By clicking on status field for each item, you can find available status labels.
