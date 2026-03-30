@@ -10,6 +10,7 @@ import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
 import Register from '@/pages/account/public/Register';
 import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
 import VerifyEmail from '@/pages/account/public/VerifyEmail';
+import ApproveForm from '@/pages/automation/approve-form/ApproveForm';
 import TriggerForm from '@/pages/automation/trigger-form/TriggerForm';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
@@ -433,6 +434,10 @@ export const getRouter = (queryClient: QueryClient) =>
                 </AccessControl>
             ),
             path: '/verify-email',
+        },
+        {
+            element: <ApproveForm />,
+            path: 'resume/:id',
         },
         {
             element: <TriggerForm />,
