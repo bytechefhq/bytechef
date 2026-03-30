@@ -31,9 +31,10 @@ export default function useRunTestDialog({onClose, test, workflowId, workflowNod
     const [selectedJudgeIds, setSelectedJudgeIds] = useState<Set<string>>(new Set());
     const [selectedScenarioIds, setSelectedScenarioIds] = useState<Set<string>>(new Set());
 
-    const queryClient = useQueryClient();
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {setEvalsTab, setSelectedRunId, setSelectedTestId} = useAiAgentEvalsStore();
+
+    const queryClient = useQueryClient();
 
     const {data: testDetailData} = useAgentEvalTestQuery({id: test.id});
     const {data: judgesData} = useAgentJudgesQuery({workflowId, workflowNodeName});

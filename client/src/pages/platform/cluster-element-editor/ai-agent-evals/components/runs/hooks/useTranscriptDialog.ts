@@ -37,7 +37,9 @@ export default function useTranscriptDialog(resultId: string) {
 
         try {
             return JSON.parse(transcriptString) as TranscriptDataI;
-        } catch {
+        } catch (parseError) {
+            console.error('Failed to parse transcript JSON:', parseError);
+
             return null;
         }
     }, [data]);
