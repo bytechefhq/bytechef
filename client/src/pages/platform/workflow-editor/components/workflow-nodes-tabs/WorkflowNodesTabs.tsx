@@ -3,9 +3,15 @@ import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/u
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
+import {ClipboardPasteIcon, ClipboardXIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 import {useComponentFiltering} from '../../hooks/useComponentFiltering';
+import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
+import getTaskDispatcherContext from '../../utils/getTaskDispatcherContext';
+import pasteNode from '../../utils/pasteNode';
 import ComponentsFilter from '../filters/ComponentsFilter';
 import WorkflowNodesTabContent from './WorkflowNodesTabContent';
 
@@ -18,34 +24,85 @@ interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasic>;
     clusterElementComponentDefinitions?: Array<ComponentDefinitionBasic>;
     clusterElementType?: string;
+    edgeId?: string;
     hideActionComponents?: boolean;
     hideClusterElementComponents?: boolean;
     hideTaskDispatchers?: boolean;
     hideTriggerComponents?: boolean;
     itemsDraggable?: boolean;
     onItemClick?: (clickedItem: ClickedDefinitionType) => void;
+    onPasteClose?: () => void;
     selectedComponentName?: string;
+    sourceNodeId?: string;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     triggerComponentDefinitions: Array<ComponentDefinitionBasic>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateWorkflowMutation?: any;
 }
 
 const WorkflowNodesTabs = ({
     actionComponentDefinitions,
     clusterElementComponentDefinitions,
     clusterElementType,
+    edgeId,
     hideActionComponents = false,
     hideClusterElementComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
     itemsDraggable = false,
     onItemClick,
+    onPasteClose,
     selectedComponentName,
+    sourceNodeId,
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
+    updateWorkflowMutation,
 }: WorkflowNodesTabsProps) => {
     const [activeTab, setActiveTab] = useState(
         !hideActionComponents ? 'components' : !hideClusterElementComponents ? 'clusterElements' : 'triggers'
     );
+
+    const [pasteDismissed, setPasteDismissed] = useState(false);
+
+    const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
+
+    const {edges, nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            edges: state.edges,
+            nodes: state.nodes,
+        }))
+    );
+
+    const handlePasteClick = () => {
+        if (!copiedNode || !updateWorkflowMutation) {
+            return;
+        }
+
+        const nodeSourceName = sourceNodeId || edgeId?.split('=>')[0];
+
+        const edge = edges.find((currentEdge) => currentEdge.id === edgeId);
+        const sourceNode = nodes.find((currentNode) => currentNode.id === sourceNodeId);
+
+        const taskDispatcherContext = getTaskDispatcherContext({
+            edge,
+            node: edge?.type === 'workflow' ? undefined : sourceNode,
+            nodes,
+        });
+
+        if (!nodeSourceName) {
+            return;
+        }
+
+        pasteNode({
+            nodeSourceName,
+            taskDispatcherContext,
+            updateWorkflowMutation,
+        });
+
+        if (onPasteClose) {
+            onPasteClose();
+        }
+    };
 
     const ff_1057 = useFeatureFlagsStore()('ff-1057');
 
@@ -233,6 +290,50 @@ const WorkflowNodesTabs = ({
                     setSearchValue={actionFiltering.setSearchValue}
                     toggleCategory={actionFiltering.toggleCategory}
                 />
+            )}
+
+            {copiedNode && !pasteDismissed && (
+                <div className="px-3 py-2">
+                    <div
+                        className="group/paste flex w-full cursor-pointer items-center justify-between self-stretch rounded-md border-2 border-stroke-brand-primary bg-surface-neutral-primary px-4 py-2 hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"
+                        onClick={handlePasteClick}
+                    >
+                        <div className="flex min-w-0 flex-1 items-center gap-2">
+                            <ClipboardPasteIcon className="size-4 shrink-0 text-content-neutral-primary group-active/paste:text-content-brand-primary" />
+
+                            <span className="text-sm font-medium text-content-neutral-primary group-active/paste:text-content-brand-primary">
+                                Paste
+                            </span>
+
+                            {copiedNode.icon && (
+                                <span className="flex size-5 shrink-0 items-center justify-center [&_svg]:size-5">
+                                    {copiedNode.icon}
+                                </span>
+                            )}
+
+                            <span className="min-w-0 flex-1 truncate text-sm text-content-neutral-primary group-active/paste:text-content-brand-primary">
+                                <span className="font-medium">{copiedNode.label || copiedNode.componentName}</span>
+
+                                {copiedNode.operationName && (
+                                    <span className="font-normal text-content-neutral-secondary group-active/paste:text-content-brand-primary">
+                                        {` (${copiedNode.operationName})`}
+                                    </span>
+                                )}
+                            </span>
+                        </div>
+
+                        <button
+                            className="shrink-0 text-content-neutral-primary opacity-50 hover:opacity-100"
+                            onClick={(event) => {
+                                event.stopPropagation();
+
+                                setPasteDismissed(true);
+                            }}
+                        >
+                            <ClipboardXIcon className="size-4" />
+                        </button>
+                    </div>
+                </div>
             )}
 
             {!hideClusterElementComponents && (

@@ -181,8 +181,10 @@ const WorkflowNodesPopoverMenu = ({
                         hideClusterElementComponents={hideClusterElementComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
+                        onPasteClose={() => setPopoverOpen(false)}
                         selectedComponentName={componentDefinitionToBeAdded?.name}
                         sourceNodeId={sourceNodeId}
+                        updateWorkflowMutation={updateWorkflowMutation}
                     />
 
                     {actionPanelOpen && componentDefinitionToBeAdded && (
