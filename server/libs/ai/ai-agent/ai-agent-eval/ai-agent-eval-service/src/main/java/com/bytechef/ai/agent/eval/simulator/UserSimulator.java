@@ -24,6 +24,9 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.metadata.ChatResponseMetadata;
+import org.springframework.ai.chat.metadata.Usage;
+import org.springframework.ai.chat.model.ChatResponse;
 
 /**
  * Simulates a user persona in multi-turn conversations with an AI agent.
@@ -48,7 +51,7 @@ public class UserSimulator {
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    public String generateNextMessage(List<Map<String, String>> conversationHistory) {
+    public SimulationResult generateNextMessage(List<Map<String, String>> conversationHistory) {
         String systemPrompt = """
             You are simulating a user in a conversation with an AI agent.
             Your persona: %s
@@ -73,11 +76,36 @@ public class UserSimulator {
             }
         }
 
-        return chatClient.prompt()
+        ChatResponse chatResponse = chatClient.prompt()
             .system(systemPrompt)
             .messages(chatMessages)
             .call()
-            .content();
+            .chatResponse();
+
+        String message = "";
+        int promptTokens = 0;
+        int completionTokens = 0;
+
+        if (chatResponse != null) {
+            if (chatResponse.getResult() != null) {
+                message = chatResponse.getResult()
+                    .getOutput()
+                    .getText();
+            }
+
+            ChatResponseMetadata metadata = chatResponse.getMetadata();
+
+            if (metadata != null) {
+                Usage usage = metadata.getUsage();
+
+                if (usage != null) {
+                    promptTokens = usage.getPromptTokens() != null ? usage.getPromptTokens() : 0;
+                    completionTokens = usage.getCompletionTokens() != null ? usage.getCompletionTokens() : 0;
+                }
+            }
+        }
+
+        return new SimulationResult(message != null ? message : "", promptTokens, completionTokens);
     }
 
     public boolean isConversationComplete(String message) {
@@ -85,6 +113,9 @@ public class UserSimulator {
             .contains(CONVERSATION_COMPLETE_MARKER) ||
             message.toLowerCase()
                 .contains("conversation complete");
+    }
+
+    public record SimulationResult(String message, int promptTokens, int completionTokens) {
     }
 
 }
