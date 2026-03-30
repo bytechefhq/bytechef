@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import RunSummaryCards from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/RunSummaryCards';
 import ScenarioResultsTable from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/ScenarioResultsTable';
 import {type AgentEvalRunQuery, AgentEvalRunStatus} from '@/shared/middleware/graphql';
@@ -40,13 +41,9 @@ const AgentEvalRunDetail = ({onBack, run, summary}: AgentEvalRunDetailProps) => 
     return (
         <div className="flex flex-1 flex-col gap-4 px-4">
             <div className="flex items-center gap-2">
-                <button className="text-gray-400 hover:text-gray-600" onClick={onBack}>
-                    <ArrowLeftIcon className="size-4" />
-                </button>
+                <Button icon={<ArrowLeftIcon />} onClick={onBack} size="iconXs" variant="ghost" />
 
-                <button className="text-sm text-gray-500 hover:text-gray-700" onClick={onBack}>
-                    All Runs
-                </button>
+                <Button label="All Runs" onClick={onBack} size="sm" variant="ghost" />
 
                 <span className="text-sm text-gray-400">/</span>
 

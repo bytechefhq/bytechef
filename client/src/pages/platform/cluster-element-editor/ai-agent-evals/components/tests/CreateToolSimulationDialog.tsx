@@ -1,5 +1,12 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
@@ -59,8 +66,10 @@ const CreateToolSimulationDialog = ({editData, onClose, onCreate, onUpdate}: Cre
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={true}>
             <DialogContent className="max-w-lg">
-                <DialogHeader>
+                <DialogHeader className="flex flex-row items-center justify-between">
                     <DialogTitle>{isEditing ? 'Edit Tool Simulation' : 'Add Tool Simulation'}</DialogTitle>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <fieldset className="flex flex-col gap-4 border-0 p-0">

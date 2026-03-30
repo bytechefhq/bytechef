@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import RunProgressIndicator from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/RunProgressIndicator';
 import {AgentEvalRunStatus, type AgentEvalRunsQuery} from '@/shared/middleware/graphql';
 import {HistoryIcon, Loader2Icon, SquareIcon} from 'lucide-react';
@@ -135,16 +136,16 @@ const AgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AgentEvalRunListProp
                                 <span className="text-xs text-gray-500">{formatDate(run.createdDate)}</span>
 
                                 {isRunning && (
-                                    <button
-                                        className="text-gray-400 hover:text-red-500"
+                                    <Button
+                                        icon={<SquareIcon />}
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             onCancelRun(run.id);
                                         }}
+                                        size="iconXs"
                                         title="Cancel run"
-                                    >
-                                        <SquareIcon className="size-3.5" />
-                                    </button>
+                                        variant="destructiveGhost"
+                                    />
                                 )}
                             </div>
                         </div>
