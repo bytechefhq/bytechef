@@ -61,8 +61,10 @@ public class TextHelperGetTextBetweenAction {
         String startPattern = inputParameters.getRequiredString(PATTERN_START);
         String endPattern = inputParameters.getRequiredString(PATTERN_END);
 
+        int matchNumberEndPattern = startPattern.equals(endPattern) ? 2 : 1;
+
         int startPatternEndIndex = getPatternEndIndex(startPattern, text, 1);
-        int endPatternIndex = getPatternEndIndex(endPattern, text, 1) - endPattern.length();
+        int endPatternIndex = getPatternEndIndex(endPattern, text, matchNumberEndPattern) - endPattern.length();
 
         return text.substring(startPatternEndIndex, endPatternIndex);
     }
