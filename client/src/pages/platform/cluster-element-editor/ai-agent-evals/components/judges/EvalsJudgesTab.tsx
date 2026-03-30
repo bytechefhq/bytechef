@@ -36,13 +36,12 @@ const EvalsJudgesTab = ({workflowId, workflowNodeName}: EvalsJudgesTabProps) => 
             {judges.length > 0 ? (
                 <>
                     <div className="flex items-center justify-end">
-                        <button
-                            className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+                        <Button
+                            icon={<PlusIcon />}
+                            label="New Judge"
                             onClick={() => setShowCreateDialog(true)}
-                        >
-                            <PlusIcon className="size-3.5" />
-                            New Judge
-                        </button>
+                            size="sm"
+                        />
                     </div>
 
                     {judges.map((judge) => (

@@ -201,13 +201,14 @@ const AgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AgentEvalScenarioRow
                             <div className="py-2 text-center text-xs text-gray-400">No scenario-level judges</div>
                         )}
 
-                        <button
-                            className="mt-1 flex w-full items-center justify-center gap-1 rounded border border-dashed border-gray-300 py-1.5 text-xs text-gray-500 hover:border-gray-400 hover:text-gray-600"
+                        <Button
+                            className="mt-1 w-full border-dashed py-4"
+                            icon={<PlusIcon />}
+                            label="Add Judge"
                             onClick={() => setShowCreateJudgeDialog(true)}
-                        >
-                            <PlusIcon className="size-3" />
-                            Add Judge
-                        </button>
+                            size="xs"
+                            variant="outline"
+                        />
                     </div>
 
                     <div className="ml-8 mt-1 rounded-md border border-border/30 bg-gray-50/50 p-2">
@@ -257,13 +258,14 @@ const AgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AgentEvalScenarioRow
                             <div className="py-2 text-center text-xs text-gray-400">No tool simulations</div>
                         )}
 
-                        <button
-                            className="mt-1 flex w-full items-center justify-center gap-1 rounded border border-dashed border-gray-300 py-1.5 text-xs text-gray-500 hover:border-gray-400 hover:text-gray-600"
+                        <Button
+                            className="mt-1 w-full border-dashed py-4"
+                            icon={<PlusIcon />}
+                            label="Add Tool Simulation"
                             onClick={() => setShowCreateToolSimulationDialog(true)}
-                        >
-                            <PlusIcon className="size-3" />
-                            Add Tool Simulation
-                        </button>
+                            size="xs"
+                            variant="outline"
+                        />
                     </div>
                 </>
             )}

@@ -2,10 +2,27 @@ import AgentEvalRunDetail from '@/pages/platform/cluster-element-editor/ai-agent
 import AgentEvalRunList from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AgentEvalRunList';
 import useAgentEvalsRunsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvalsRunsTab';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
+import {useAgentEvalTestsQuery} from '@/shared/middleware/graphql';
 import {Loader2Icon, PlayCircleIcon} from 'lucide-react';
+import {useEffect, useMemo} from 'react';
 
-const EvalsRunsTab = () => {
-    const {selectedTestId} = useAiAgentEvalsStore();
+interface EvalsRunsTabProps {
+    workflowId: string;
+    workflowNodeName: string;
+}
+
+const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
+    const {selectedTestId, setSelectedTestId} = useAiAgentEvalsStore();
+
+    const {data: evalTestsData} = useAgentEvalTestsQuery({workflowId, workflowNodeName});
+
+    const evalTests = useMemo(() => evalTestsData?.agentEvalTests ?? [], [evalTestsData]);
+
+    useEffect(() => {
+        if (selectedTestId == null && evalTests.length > 0) {
+            setSelectedTestId(evalTests[0].id);
+        }
+    }, [evalTests, selectedTestId, setSelectedTestId]);
 
     const {handleCancelRun, handleSelectRun, runSummary, runs, runsLoading, selectedRun, selectedRunId} =
         useAgentEvalsRunsTab(selectedTestId);
@@ -21,10 +38,10 @@ const EvalsRunsTab = () => {
                     <PlayCircleIcon className="size-6 text-blue-600" />
                 </div>
 
-                <h3 className="text-sm font-semibold">No test selected</h3>
+                <h3 className="text-sm font-semibold">No tests yet</h3>
 
                 <p className="max-w-xs text-center text-xs text-gray-500">
-                    Run a test from the Tests tab to see results here.
+                    Create a test in the Tests tab, then run it to see results here.
                 </p>
             </div>
         );

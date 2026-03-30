@@ -170,13 +170,14 @@ const AgentEvalTestCard = ({
                             <div className="py-4 text-center text-sm text-gray-500">No scenarios yet</div>
                         )}
 
-                        <button
-                            className="mt-2 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-gray-300 py-2 text-sm text-gray-500 hover:border-gray-400 hover:text-gray-600"
+                        <Button
+                            className="mt-2 w-full border-dashed py-4"
+                            icon={<PlusIcon />}
+                            label="Add Scenario"
                             onClick={() => setShowCreateScenarioDialog(true)}
-                        >
-                            <PlusIcon className="size-4" />
-                            Add Scenario
-                        </button>
+                            size="sm"
+                            variant="outline"
+                        />
                     </div>
                 )}
             </div>
