@@ -56,15 +56,15 @@ function getConfigurationSummary(type: AgentJudgeType, configuration: Record<str
             const minLength = configuration.minLength as number | undefined;
             const maxLength = configuration.maxLength as number | undefined;
 
-            if (minLength && maxLength) {
+            if (minLength != null && maxLength != null) {
                 return `Length: ${minLength} - ${maxLength}`;
             }
 
-            if (minLength) {
+            if (minLength != null) {
                 return `Min length: ${minLength}`;
             }
 
-            if (maxLength) {
+            if (maxLength != null) {
                 return `Max length: ${maxLength}`;
             }
 

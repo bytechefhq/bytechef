@@ -13,6 +13,7 @@ interface CreateScenarioDialogProps {
     agentEvalTestId: string;
     editData?: {
         expectedOutput?: string | null;
+        id: string;
         maxTurns?: number | null;
         name: string;
         personaPrompt?: string | null;
@@ -31,9 +32,19 @@ interface CreateScenarioDialogProps {
             userMessage?: string;
         }
     ) => void;
+    onUpdate?: (
+        id: string,
+        name: string,
+        fields: {
+            expectedOutput?: string;
+            maxTurns?: number;
+            personaPrompt?: string;
+            userMessage?: string;
+        }
+    ) => void;
 }
 
-const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate}: CreateScenarioDialogProps) => {
+const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onUpdate}: CreateScenarioDialogProps) => {
     const [expectedOutput, setExpectedOutput] = useState(editData?.expectedOutput ?? '');
     const [maxTurns, setMaxTurns] = useState(editData?.maxTurns ?? 10);
     const [name, setName] = useState(editData?.name ?? '');
@@ -59,7 +70,12 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate}: Cr
                       personaPrompt: personaPrompt.trim() || undefined,
                   };
 
-        onCreate(agentEvalTestId, name.trim(), scenarioType, fields);
+        if (isEditing && editData && onUpdate) {
+            onUpdate(editData.id, name.trim(), fields);
+        } else {
+            onCreate(agentEvalTestId, name.trim(), scenarioType, fields);
+        }
+
         onClose();
     };
 
