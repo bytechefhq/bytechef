@@ -41,6 +41,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -114,6 +115,7 @@ public class DataStorageAppendValueToListAction {
             string(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
+                .controlType(ControlType.TEXT_AREA)
                 .displayCondition("type == '%s'".formatted(ValueType.STRING))
                 .required(true),
             time(VALUE)

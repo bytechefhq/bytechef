@@ -40,6 +40,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Ivica Cardic
@@ -114,6 +115,7 @@ public class DataStorageSetValueAction {
                 .label("Value")
                 .description("The value to set under the specified key.")
                 .displayCondition("type == '%s'".formatted(ValueType.STRING))
+                .controlType(ControlType.TEXT_AREA)
                 .required(true),
             time(VALUE)
                 .label("Value")
