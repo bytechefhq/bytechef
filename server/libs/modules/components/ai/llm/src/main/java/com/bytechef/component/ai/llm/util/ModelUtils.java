@@ -29,7 +29,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROMPT;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.commons.util.TokenUsageHolder;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.Format;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
@@ -44,6 +43,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseProperty;
+import com.bytechef.platform.workflow.test.util.TokenUsageHolder;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
