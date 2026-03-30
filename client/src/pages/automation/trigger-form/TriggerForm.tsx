@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {PRODUCTION_ENVIRONMENT, toEnvironmentName} from '@/shared/constants';
-import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
 import {useGetTriggerFormQuery} from '@/shared/queries/platform/triggerForms.queries';
 import React, {useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';

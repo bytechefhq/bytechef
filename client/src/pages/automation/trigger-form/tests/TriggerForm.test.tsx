@@ -1,4 +1,4 @@
-import {TriggerForm as TriggerFormType} from '@/shared/middleware/platform/configuration';
+import {TriggerForm as TriggerFormType} from '@/shared/middleware/automation/configuration';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {fireEvent, render, screen, waitFor} from '../../../../shared/util/test-utils';
