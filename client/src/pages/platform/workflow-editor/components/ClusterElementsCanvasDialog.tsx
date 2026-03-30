@@ -62,6 +62,7 @@ const ClusterElementsCanvasDialog = ({
         (state) => state.workflowNodeDetailsPanelOpen
     );
     const ff_4070 = useFeatureFlagsStore()('ff-4070');
+    const ff_4553 = useFeatureFlagsStore()('ff-4553');
 
     const {handleClose: handleEvalsClose} = useAgentEvals();
     const {handleClose: handleSkillsClose} = useAgentSkills({enabled: skillsPanelOpen});
@@ -187,7 +188,9 @@ const ClusterElementsCanvasDialog = ({
                             <ClusterElementsWorkflowEditorHeader
                                 copilotEnabled={ff_4070 && copilotEnabled}
                                 onCopilotClick={handleCopilotClick}
-                                onEvalsClick={isAiAgentClusterRoot ? () => setEvalsPanelOpen(true) : undefined}
+                                onEvalsClick={
+                                    ff_4553 && isAiAgentClusterRoot ? () => setEvalsPanelOpen(true) : undefined
+                                }
                                 onSkillsClick={isAiAgentClusterRoot ? () => setSkillsPanelOpen(true) : undefined}
                                 onTestClick={handleTestClick}
                                 onToggleEditor={handleToggleEditor}

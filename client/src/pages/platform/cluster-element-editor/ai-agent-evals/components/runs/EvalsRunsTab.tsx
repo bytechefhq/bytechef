@@ -4,6 +4,7 @@ import AgentEvalRunList from '@/pages/platform/cluster-element-editor/ai-agent-e
 import useAgentEvalsRunsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvalsRunsTab';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import {useAgentEvalTestsQuery} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Loader2Icon, PlayCircleIcon, PlayIcon} from 'lucide-react';
 import {useEffect, useMemo} from 'react';
 
@@ -23,6 +24,7 @@ function generateRunName(): string {
 
 const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
     const {selectedTestId, setSelectedRunId, setSelectedTestId} = useAiAgentEvalsStore();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {data: evalTestsData} = useAgentEvalTestsQuery({workflowId, workflowNodeName});
 
@@ -78,7 +80,9 @@ const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
                 <button
                     className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                     disabled={validSelectedTestId == null}
-                    onClick={() => handleStartRun(validSelectedTestId!, generateRunName(), '1')}
+                    onClick={() =>
+                        handleStartRun(validSelectedTestId!, generateRunName(), String(currentEnvironmentId))
+                    }
                 >
                     <PlayIcon className="size-3.5" />
                     Run Test
