@@ -36,7 +36,7 @@ export default function ApprovalTaskDetail() {
 
     if (!approvalTask) {
         return (
-            <div className="flex h-full items-center justify-center text-center">
+            <div className="flex h-full flex-col items-center justify-center text-center">
                 <CircleIcon className="mx-auto mb-4 size-12 text-muted-foreground" />
 
                 <h2 className="text-lg font-medium text-foreground">Select an approval task</h2>
