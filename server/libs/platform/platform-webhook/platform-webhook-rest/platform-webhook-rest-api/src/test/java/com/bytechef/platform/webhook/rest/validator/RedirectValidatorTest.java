@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.util;
+package com.bytechef.platform.webhook.rest.validator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

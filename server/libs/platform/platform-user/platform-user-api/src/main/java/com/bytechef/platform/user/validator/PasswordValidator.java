@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.util;
+package com.bytechef.platform.user.validator;
 
 import com.bytechef.platform.user.exception.InvalidPasswordException;
 import java.util.regex.Matcher;
