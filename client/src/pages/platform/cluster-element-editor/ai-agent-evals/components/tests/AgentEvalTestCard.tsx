@@ -43,10 +43,26 @@ interface AgentEvalTestCardProps {
     ) => void;
     onDeleteScenario: (id: string) => void;
     onDeleteTest: (id: string) => void;
+    onUpdateScenario: (
+        id: string,
+        name: string,
+        fields: {
+            expectedOutput?: string;
+            maxTurns?: number;
+            personaPrompt?: string;
+            userMessage?: string;
+        }
+    ) => void;
     test: AgentEvalTestListItemType;
 }
 
-const AgentEvalTestCard = ({onCreateScenario, onDeleteScenario, onDeleteTest, test}: AgentEvalTestCardProps) => {
+const AgentEvalTestCard = ({
+    onCreateScenario,
+    onDeleteScenario,
+    onDeleteTest,
+    onUpdateScenario,
+    test,
+}: AgentEvalTestCardProps) => {
     const {setEvalsTab, setSelectedTestId} = useAiAgentEvalsStore();
     const [editingScenario, setEditingScenario] = useState<AgentEvalScenario | null>(null);
     const [expanded, setExpanded] = useState(false);
@@ -183,6 +199,7 @@ const AgentEvalTestCard = ({onCreateScenario, onDeleteScenario, onDeleteTest, te
                     agentEvalTestId={test.id}
                     editData={{
                         expectedOutput: editingScenario.expectedOutput,
+                        id: editingScenario.id,
                         maxTurns: editingScenario.maxTurns,
                         name: editingScenario.name,
                         personaPrompt: editingScenario.personaPrompt,
@@ -191,6 +208,7 @@ const AgentEvalTestCard = ({onCreateScenario, onDeleteScenario, onDeleteTest, te
                     }}
                     onClose={() => setEditingScenario(null)}
                     onCreate={onCreateScenario}
+                    onUpdate={onUpdateScenario}
                 />
             )}
         </>

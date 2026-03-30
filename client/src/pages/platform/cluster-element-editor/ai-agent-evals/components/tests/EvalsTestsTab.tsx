@@ -13,8 +13,15 @@ interface EvalsTestsTabProps {
 const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-    const {evalTests, handleCreateScenario, handleCreateTest, handleDeleteScenario, handleDeleteTest, isLoading} =
-        useAgentEvalsTestsTab(workflowId, workflowNodeName);
+    const {
+        evalTests,
+        handleCreateScenario,
+        handleCreateTest,
+        handleDeleteScenario,
+        handleDeleteTest,
+        handleUpdateScenario,
+        isLoading,
+    } = useAgentEvalsTestsTab(workflowId, workflowNodeName);
 
     if (isLoading) {
         return (
@@ -33,6 +40,7 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
                         onCreateScenario={handleCreateScenario}
                         onDeleteScenario={handleDeleteScenario}
                         onDeleteTest={handleDeleteTest}
+                        onUpdateScenario={handleUpdateScenario}
                         test={test}
                     />
                 ))}

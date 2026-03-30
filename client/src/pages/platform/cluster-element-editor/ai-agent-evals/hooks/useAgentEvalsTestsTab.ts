@@ -61,6 +61,22 @@ export default function useAgentEvalsTestsTab(workflowId: string, workflowNodeNa
         [createScenarioMutation]
     );
 
+    const handleUpdateScenario = useCallback(
+        (
+            id: string,
+            name: string,
+            fields: {
+                expectedOutput?: string;
+                maxTurns?: number;
+                personaPrompt?: string;
+                userMessage?: string;
+            }
+        ) => {
+            updateScenarioMutation.mutate({id, name, ...fields});
+        },
+        [updateScenarioMutation]
+    );
+
     const handleDeleteScenario = useCallback(
         (id: string) => {
             deleteScenarioMutation.mutate({id});
@@ -76,6 +92,7 @@ export default function useAgentEvalsTestsTab(workflowId: string, workflowNodeNa
         handleCreateTest,
         handleDeleteScenario,
         handleDeleteTest,
+        handleUpdateScenario,
         isLoading,
         updateScenarioMutation,
         updateTestMutation,
