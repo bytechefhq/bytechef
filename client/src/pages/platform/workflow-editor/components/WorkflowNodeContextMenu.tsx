@@ -19,6 +19,7 @@ import {
 import {ReactNode, useState} from 'react';
 
 interface WorkflowNodeContextMenuProps {
+    canPaste: boolean;
     children: ReactNode;
     data: NodeDataType;
     hasSavedPosition: boolean;
@@ -31,6 +32,7 @@ interface WorkflowNodeContextMenuProps {
 }
 
 const WorkflowNodeContextMenu = ({
+    canPaste,
     children,
     data,
     hasSavedPosition,
@@ -43,7 +45,6 @@ const WorkflowNodeContextMenu = ({
 }: WorkflowNodeContextMenuProps) => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-    const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const setContextMenuOpen = useWorkflowEditorStore((state) => state.setContextMenuOpen);
 
     return (
@@ -71,7 +72,7 @@ const WorkflowNodeContextMenu = ({
                                 Copy
                             </ContextMenuItem>
 
-                            {copiedNode && (
+                            {canPaste && (
                                 <ContextMenuItem onClick={onPaste}>
                                     <ClipboardPasteIcon />
                                     Paste After

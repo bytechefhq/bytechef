@@ -151,13 +151,17 @@ export default function pasteNode({
     taskDispatcherContext,
     updateWorkflowMutation,
 }: PasteNodeI) {
-    const copiedNode = useWorkflowEditorStore.getState().copiedNode;
+    const {copiedNode, copiedWorkflowId} = useWorkflowEditorStore.getState();
 
     if (!copiedNode) {
         return;
     }
 
     const {workflow} = useWorkflowDataStore.getState();
+
+    if (copiedWorkflowId !== workflow.id) {
+        return;
+    }
 
     let definitionTasks: Array<{name: string}>;
 
@@ -175,7 +179,7 @@ export default function pasteNode({
         if (!taskDispatcherContext?.taskDispatcherId) {
             let sourceIndex = definitionTasks.findIndex((task) => task.name === nodeSourceName);
 
-            if (sourceIndex === -1 && nodeSourceName) {
+            if (sourceIndex === -1) {
                 const {nodes} = useWorkflowDataStore.getState();
                 const sourceNode = nodes.find((node) => node.id === nodeSourceName);
                 const resolvedName = sourceNode?.data?.taskDispatcherId as string | undefined;
