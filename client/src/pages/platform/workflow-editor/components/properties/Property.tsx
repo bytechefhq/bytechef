@@ -9,9 +9,9 @@ import ObjectProperty from '@/pages/platform/workflow-editor/components/properti
 import FormControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/FormControlledArrayItems';
 import FormControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/FormControlledObjectEntries';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
-import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
+import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import PropertyMultiSelect from '@/pages/platform/workflow-editor/components/properties/components/PropertyMultiSelect';
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
 import PropertyTextArea from '@/pages/platform/workflow-editor/components/properties/components/PropertyTextArea';

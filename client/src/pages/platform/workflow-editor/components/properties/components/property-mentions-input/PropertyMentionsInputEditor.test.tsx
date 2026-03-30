@@ -98,6 +98,7 @@ import {
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
+import {waitFor} from '@testing-library/react';
 import * as React from 'react';
 import {type Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -506,12 +507,11 @@ describe('PropertyMentionsInputEditor', () => {
         it('should render data pill syntax as mention spans', async () => {
             renderEditor({value: 'Hello ${trigger_1.name}'});
 
-            await microtaskTick(2);
-
             const textbox = screen.getByRole('textbox', {name: 'Editor'});
-            const mention = textbox.querySelector('[data-type="mention"]');
 
-            expect(mention).toBeInTheDocument();
+            await waitFor(() => {
+                expect(textbox.querySelector('.property-mention')).toBeInTheDocument();
+            });
         });
 
         it('should render plain text without data pills as plain text', async () => {
@@ -522,7 +522,7 @@ describe('PropertyMentionsInputEditor', () => {
             const textbox = screen.getByRole('textbox', {name: 'Editor'});
 
             expect(textbox.textContent).toBe('just plain text');
-            expect(textbox.querySelector('[data-type="mention"]')).not.toBeInTheDocument();
+            expect(textbox.querySelector('.property-mention')).not.toBeInTheDocument();
         });
     });
 

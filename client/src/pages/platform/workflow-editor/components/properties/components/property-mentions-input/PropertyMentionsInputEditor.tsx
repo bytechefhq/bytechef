@@ -9,13 +9,11 @@ import {
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {TYPE_ICONS} from '@/shared/typeIcons';
 import {DataPillDragPayloadType, DataPillType} from '@/shared/types';
 import {Extension, mergeAttributes} from '@tiptap/core';
 import Document from '@tiptap/extension-document';
@@ -25,11 +23,10 @@ import {Placeholder} from '@tiptap/extension-placeholder';
 import {Text} from '@tiptap/extension-text';
 import {TextSelection} from '@tiptap/pm/state';
 import {EditorView} from '@tiptap/pm/view';
-import {Editor, EditorContent, useEditor} from '@tiptap/react';
+import {Editor, EditorContent, ReactNodeViewRenderer, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -37,6 +34,14 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
 import {MentionStorage} from './MentionStorage.extension';
+import PropertyMentionNodeView from './PropertyMentionNodeView';
+import {getDataPillIconSource} from './getDataPillIconSource';
+import {
+    PROPERTY_MENTION_CHIP_CLASS,
+    PROPERTY_MENTION_LABEL_CLASS,
+    PROPERTY_MENTION_ROOT_CLASS,
+    replaceMentionNodesInHtmlWithVariables,
+} from './propertyMentionDom';
 
 interface PropertyMentionsInputEditorProps {
     className?: string;
@@ -115,28 +120,14 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
         const getComponentIcon = useCallback(
-            (mentionValue: string) => {
-                let componentName = mentionValue?.split('_')[0].replace('${', '');
-
-                if (componentName === 'trigger') {
-                    componentName = workflow.workflowTriggerComponentNames?.[0] || '';
-                }
-
-                if (TASK_DISPATCHER_NAMES.includes(componentName)) {
-                    return taskDispatcherDefinitions.find((component) => component.name === componentName)?.icon;
-                }
-
-                const componentIcon = componentDefinitions.find((component) => component.name === componentName)?.icon;
-
-                if (componentIcon) {
-                    return componentIcon;
-                }
-
-                const svgString = renderToStaticMarkup(TYPE_ICONS.STRING);
-
-                return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
-            },
-            [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
+            (mentionValue: string) =>
+                getDataPillIconSource({
+                    componentDefinitions,
+                    mentionDisplay: mentionValue,
+                    taskDispatcherDefinitions,
+                    workflow,
+                }),
+            [componentDefinitions, taskDispatcherDefinitions, workflow]
         );
 
         const extensions = useMemo(() => {
@@ -169,10 +160,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     setIsFormulaMode: setIsFormulaMode || (() => {}),
                 }),
                 MentionStorage,
-                Mention.configure({
-                    HTMLAttributes: {
-                        class: 'property-mention',
+                Mention.extend({
+                    addNodeView() {
+                        return ReactNodeViewRenderer(PropertyMentionNodeView);
                     },
+                }).configure({
+                    HTMLAttributes: {},
                     deleteTriggerWithBackspace: true,
                     renderHTML({node, options}) {
                         const svg = getComponentIcon(node.attrs.label ?? node.attrs.id);
@@ -181,26 +174,36 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             'span',
                             mergeAttributes(options.HTMLAttributes, {
                                 class: twMerge(
-                                    'not-prose relative inline-flex items-center gap-0.5 rounded-full bg-muted px-2 hover:bg-foreground/15',
-                                    controlType !== 'RICH_TEXT' &&
-                                        controlType !== 'TEXT_AREA' &&
-                                        controlType !== 'FORMULA_MODE' &&
-                                        'text-sm'
+                                    PROPERTY_MENTION_ROOT_CLASS,
+                                    'not-prose inline-flex max-w-full items-stretch'
                                 ),
                             }),
                             [
-                                'img',
-                                {
-                                    class: 'size-4 absolute',
-                                    src: svg,
-                                },
-                            ],
-                            [
                                 'span',
                                 {
-                                    class: 'ml-5',
+                                    class: twMerge(
+                                        PROPERTY_MENTION_CHIP_CLASS,
+                                        'relative inline-flex items-center gap-0.5 rounded-full bg-muted px-2 hover:bg-foreground/15',
+                                        controlType !== 'RICH_TEXT' &&
+                                            controlType !== 'TEXT_AREA' &&
+                                            controlType !== 'FORMULA_MODE' &&
+                                            'text-sm'
+                                    ),
                                 },
-                                `${node.attrs.label ?? node.attrs.id}`,
+                                [
+                                    'img',
+                                    {
+                                        class: 'size-4 absolute',
+                                        src: svg,
+                                    },
+                                ],
+                                [
+                                    'span',
+                                    {
+                                        class: twMerge(PROPERTY_MENTION_LABEL_CLASS, 'ml-5'),
+                                    },
+                                    `${node.attrs.label ?? node.attrs.id}`,
+                                ],
                             ],
                         ];
                     },
@@ -355,17 +358,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     value = matchedParagraphs.map((match) => match.replace(/<\/?p>/g, '')).join('\n');
                 }
 
-                const mentionSpanRegex = /<span data-type="mention"[^>]*data-id="([^"]+)"[^>]*>.*?<\/span>/g;
-
-                const foundMentions = value.match(mentionSpanRegex);
-
-                if (foundMentions) {
-                    const dataIdRegex = /data-id="([^"]+)"/;
-
-                    foundMentions.forEach((match) => {
-                        value = value.replace(match, `\${${match.match(dataIdRegex)?.[1]}}`);
-                    });
-                }
+                value = replaceMentionNodesInHtmlWithVariables(value);
 
                 const valueChanged = value !== editorValue;
 
@@ -432,7 +425,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     for (const match of matches) {
                         content = content.replace(
                             `\${${match}}`,
-                            `<span data-type="mention" class="property-mention" data-id="${match}"></span>`
+                            `<span data-type="mention" class="${PROPERTY_MENTION_ROOT_CLASS}" data-id="${match}"></span>`
                         );
                     }
                 }
@@ -607,12 +600,15 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             };
         }, [editor, ref]);
 
-        // Update data pills in MentionStorage when they change
+        // MentionStorage: suggestion list + NodeView controlType (icon sizing); dataPills also drive NodeView via store
         useEffect(() => {
-            if (editor) {
-                editor.storage.MentionStorage.dataPills = dataPills;
+            if (!editor) {
+                return;
             }
-        }, [dataPills, editor]);
+
+            editor.storage.MentionStorage.dataPills = dataPills;
+            editor.storage.MentionStorage.controlType = controlType;
+        }, [controlType, dataPills, editor]);
 
         // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {
