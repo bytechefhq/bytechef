@@ -136,7 +136,7 @@ Name: sendChannelMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| roomId | Channel Name | STRING | Channel name to send the message to. | true |
+| roomId | Channel Name | STRING | Channel name to send the message to. Must have the # prefix. | true |
 | text | Message | STRING | The message to send. | true |
 
 #### Example JSON Structure
@@ -214,7 +214,7 @@ Name: createChannel
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Channel Name | STRING | The name of the channel. | true |
 | members | Members | ARRAY <details> <summary> Items </summary> [STRING] </details> | An array of the users to be added to the channel when it is created. | false |
-| readOnly | Read Only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Set if the channel is read only or not. | false |
+| readOnly | Read Only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the channel is read only. | false |
 | excludeSelf | Exclude Self | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If set to true, the user calling the endpoint is not automatically added as a member of the channel. | false |
 
 #### Example JSON Structure
@@ -306,4 +306,10 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
