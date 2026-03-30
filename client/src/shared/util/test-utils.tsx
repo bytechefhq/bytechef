@@ -1,6 +1,6 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {cleanup, render} from '@testing-library/react';
-import {ReactElement} from 'react';
+import {ReactElement, ReactNode} from 'react';
 import {afterEach, vi} from 'vitest';
 
 afterEach(() => {
@@ -18,6 +18,14 @@ const createTestQueryClient = () =>
             },
         },
     });
+
+export const createTestQueryClientWrapper = () => {
+    const testQueryClient = createTestQueryClient();
+
+    return ({children}: {children: ReactNode}) => (
+        <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>
+    );
+};
 
 const customRender = (ui: ReactElement, options = {}) => {
     const testQueryClient = createTestQueryClient();
