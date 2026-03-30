@@ -194,75 +194,9 @@ public class AgentEvalRunExecutor {
                             "transcript_" + evalResult.getId() + ".json",
                             transcriptJson.getBytes(StandardCharsets.UTF_8)));
 
-                    JudgmentContext.Builder judgmentContextBuilder = JudgmentContext.builder()
-                        .agentOutput(agentResponse)
-                        .status(ExecutionStatus.SUCCESS)
-                        .goal(scenario.getName())
-                        .startedAt(Instant.now())
-                        .executionTime(Duration.ZERO)
-                        .metadata("transcript", transcriptJson)
-                        .metadata("expectedOutput",
-                            scenario.getExpectedOutput() != null ? scenario.getExpectedOutput() : "");
-
-                    JudgmentContext judgmentContext = judgmentContextBuilder.build();
-
-                    List<Judge> judges = collectJudges(
-                        evalRun, scenario, judgeChatClientBuilder, agentJudgeIds);
-
-                    if (judges.isEmpty()) {
-                        evalResult.setScore(1.0);
-                        evalResult.setStatus(AgentEvalResultStatus.COMPLETED);
-
-                        evalResult = agentEvalResultService.updateAgentEvalResult(evalResult);
-                    } else {
-                        SimpleJury.Builder juryBuilder = SimpleJury.builder()
-                            .votingStrategy(new AverageVotingStrategy())
-                            .parallel(false);
-
-                        for (Judge judge : judges) {
-                            juryBuilder.judge(judge);
-                        }
-
-                        SimpleJury jury = juryBuilder.build();
-
-                        Verdict verdict = jury.vote(judgmentContext);
-
-                        Map<String, Judgment> individualByName = verdict.individualByName();
-
-                        int passedCount = 0;
-                        int totalCount = individualByName.size();
-
-                        for (Map.Entry<String, Judgment> entry : individualByName.entrySet()) {
-                            AgentJudgeVerdict judgeVerdict = new AgentJudgeVerdict();
-
-                            judgeVerdict.setAgentEvalResultId(evalResult.getId());
-                            judgeVerdict.setJudgeName(entry.getKey());
-                            judgeVerdict.setPassed(entry.getValue()
-                                .pass());
-                            judgeVerdict.setScore(entry.getValue()
-                                .pass() ? 1.0 : 0.0);
-                            judgeVerdict.setExplanation(entry.getValue()
-                                .reasoning());
-                            judgeVerdict.setJudgeType(
-                                resolveJudgeType(entry.getKey(), evalRun, scenario));
-                            judgeVerdict.setJudgeScope(
-                                resolveJudgeScope(entry.getKey(), evalRun, scenario));
-
-                            agentJudgeVerdictService.createAgentJudgeVerdict(judgeVerdict);
-
-                            if (entry.getValue()
-                                .pass()) {
-                                passedCount++;
-                            }
-                        }
-
-                        double score = (totalCount > 0) ? ((double) passedCount / totalCount) : 1.0;
-
-                        evalResult.setScore(score);
-                        evalResult.setStatus(AgentEvalResultStatus.COMPLETED);
-
-                        evalResult = agentEvalResultService.updateAgentEvalResult(evalResult);
-                    }
+                    evalResult = judgeResult(
+                        evalRun, scenario, evalResult, agentResponse, transcriptJson,
+                        judgeChatClientBuilder, agentJudgeIds);
 
                     resultScores.add(evalResult.getScore());
                 } catch (Exception exception) {
@@ -660,6 +594,77 @@ public class AgentEvalRunExecutor {
         }
 
         return result.toString();
+    }
+
+    private AgentEvalResult judgeResult(
+        AgentEvalRun evalRun, AgentEvalScenario scenario, AgentEvalResult evalResult, String agentResponse,
+        String transcriptJson, @Nullable ChatClient.Builder judgeChatClientBuilder, List<Long> agentJudgeIds) {
+
+        JudgmentContext judgmentContext = JudgmentContext.builder()
+            .agentOutput(agentResponse)
+            .status(ExecutionStatus.SUCCESS)
+            .goal(scenario.getName())
+            .startedAt(Instant.now())
+            .executionTime(Duration.ZERO)
+            .metadata("transcript", transcriptJson)
+            .metadata("expectedOutput",
+                scenario.getExpectedOutput() != null ? scenario.getExpectedOutput() : "")
+            .build();
+
+        List<Judge> judges = collectJudges(evalRun, scenario, judgeChatClientBuilder, agentJudgeIds);
+
+        if (judges.isEmpty()) {
+            evalResult.setScore(1.0);
+            evalResult.setStatus(AgentEvalResultStatus.COMPLETED);
+
+            return agentEvalResultService.updateAgentEvalResult(evalResult);
+        }
+
+        SimpleJury.Builder juryBuilder = SimpleJury.builder()
+            .votingStrategy(new AverageVotingStrategy())
+            .parallel(false);
+
+        for (Judge judge : judges) {
+            juryBuilder.judge(judge);
+        }
+
+        SimpleJury jury = juryBuilder.build();
+
+        Verdict verdict = jury.vote(judgmentContext);
+
+        Map<String, Judgment> individualByName = verdict.individualByName();
+
+        int passedCount = 0;
+        int totalCount = individualByName.size();
+
+        for (Map.Entry<String, Judgment> entry : individualByName.entrySet()) {
+            AgentJudgeVerdict judgeVerdict = new AgentJudgeVerdict();
+
+            judgeVerdict.setAgentEvalResultId(evalResult.getId());
+            judgeVerdict.setJudgeName(entry.getKey());
+            judgeVerdict.setPassed(entry.getValue()
+                .pass());
+            judgeVerdict.setScore(entry.getValue()
+                .pass() ? 1.0 : 0.0);
+            judgeVerdict.setExplanation(entry.getValue()
+                .reasoning());
+            judgeVerdict.setJudgeType(resolveJudgeType(entry.getKey(), evalRun, scenario));
+            judgeVerdict.setJudgeScope(resolveJudgeScope(entry.getKey(), evalRun, scenario));
+
+            agentJudgeVerdictService.createAgentJudgeVerdict(judgeVerdict);
+
+            if (entry.getValue()
+                .pass()) {
+                passedCount++;
+            }
+        }
+
+        double score = (totalCount > 0) ? ((double) passedCount / totalCount) : 1.0;
+
+        evalResult.setScore(score);
+        evalResult.setStatus(AgentEvalResultStatus.COMPLETED);
+
+        return agentEvalResultService.updateAgentEvalResult(evalResult);
     }
 
     private boolean isCancelled(long evalRunId) {
