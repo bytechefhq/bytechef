@@ -6,5 +6,5 @@ dependencies {
     implementation(project(":server:libs:core:evaluator:evaluator-api"))
 
     implementation(project(":server:libs:modules:components:ai:llm"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
 }

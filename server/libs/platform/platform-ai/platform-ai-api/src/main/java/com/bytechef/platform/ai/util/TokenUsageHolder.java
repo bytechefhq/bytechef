@@ -14,40 +14,56 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.util;
+package com.bytechef.platform.ai.util;
 
 /**
  * Thread-local holder for accumulating LLM token usage from chat responses. Allows token metadata to be passed across
  * layers without changing method signatures.
  *
  * <p>
- * This holder uses an accumulation model: multiple calls to {@link #capture(int, int)} on the same thread add to the
- * running totals rather than overwriting previous values. Call {@link #getAndClear()} before the operation of interest
- * to reset the counters, and again afterward to read the accumulated totals.
+ * This holder uses an opt-in accumulation model: call {@link #start()} to enable tracking on the current thread, then
+ * {@link #capture(int, int)} to accumulate counts, and {@link #getAndClear()} to read the totals and reset all state.
+ * Calls to {@code capture()} are no-ops unless tracking has been started, preventing unintended accumulation across
+ * unrelated requests on pooled threads.
  * </p>
  *
  * <p>
- * <strong>Thread safety:</strong> Both {@code capture()} and {@code getAndClear()} must be called on the same thread.
- * The data is not visible across thread boundaries.
+ * <strong>Thread safety:</strong> All methods must be called on the same thread. The data is not visible across thread
+ * boundaries.
  * </p>
  *
  * @author Ivica Cardic
  */
 public class TokenUsageHolder {
 
+    private static final ThreadLocal<Boolean> TRACKING_ENABLED = new ThreadLocal<>();
     private static final ThreadLocal<TokenUsage> TOKEN_USAGE = new ThreadLocal<>();
 
     private TokenUsageHolder() {
     }
 
     /**
-     * Accumulates token usage for the current thread. If token usage was already captured on this thread, the counts
-     * are added to the existing totals.
+     * Starts token usage tracking on the current thread. Must be called before {@link #capture(int, int)} to enable
+     * accumulation. Resets any previously accumulated counts.
+     */
+    public static void start() {
+        TRACKING_ENABLED.set(Boolean.TRUE);
+
+        TOKEN_USAGE.remove();
+    }
+
+    /**
+     * Accumulates token usage for the current thread. This is a no-op unless {@link #start()} has been called on the
+     * current thread, preventing unintended accumulation across unrelated requests on pooled threads.
      *
      * @param promptTokens     the number of tokens used in the prompt (input)
      * @param completionTokens the number of tokens used in the completion (output)
      */
     public static void capture(int promptTokens, int completionTokens) {
+        if (!Boolean.TRUE.equals(TRACKING_ENABLED.get())) {
+            return;
+        }
+
         TokenUsage existing = TOKEN_USAGE.get();
 
         if (existing != null) {
@@ -59,7 +75,7 @@ public class TokenUsageHolder {
     }
 
     /**
-     * Returns the accumulated token usage and clears the stored value.
+     * Returns the accumulated token usage and clears all tracking state including the enabled flag.
      *
      * @return the accumulated token usage, or {@link TokenUsage#EMPTY} if no usage was captured
      */
@@ -67,6 +83,7 @@ public class TokenUsageHolder {
         TokenUsage usage = TOKEN_USAGE.get();
 
         TOKEN_USAGE.remove();
+        TRACKING_ENABLED.remove();
 
         return usage != null ? usage : TokenUsage.EMPTY;
     }

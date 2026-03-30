@@ -43,7 +43,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseProperty;
-import com.bytechef.platform.workflow.test.util.TokenUsageHolder;
+import com.bytechef.platform.ai.util.TokenUsageHolder;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -127,6 +127,10 @@ public class ModelUtils {
             }
         } catch (org.springframework.ai.retry.NonTransientAiException e) {
             String message = e.getMessage();
+
+            if (message == null) {
+                throw new ProviderException(e.toString());
+            }
 
             int openBrace = message.indexOf("{");
             int closeBrace = message.lastIndexOf("}");
@@ -281,7 +285,15 @@ public class ModelUtils {
     private static void captureTokenUsage(ChatResponse chatResponse) {
         ChatResponseMetadata metadata = chatResponse.getMetadata();
 
+        if (metadata == null) {
+            return;
+        }
+
         Usage usage = metadata.getUsage();
+
+        if (usage == null) {
+            return;
+        }
 
         TokenUsageHolder.capture(usage.getPromptTokens(), usage.getCompletionTokens());
     }

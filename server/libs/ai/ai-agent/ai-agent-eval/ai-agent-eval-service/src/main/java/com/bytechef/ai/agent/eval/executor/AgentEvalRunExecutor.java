@@ -44,6 +44,7 @@ import com.bytechef.ai.agent.eval.simulator.UserSimulator.SimulationResult;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.platform.ai.constant.AiAgentSimulationConstants;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
@@ -54,7 +55,6 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.workflow.test.constant.AiAgentTestConstants;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -709,10 +709,10 @@ public class AgentEvalRunExecutor {
                     simulation -> {
                         Map<String, String> config = new HashMap<>();
 
-                        config.put(AiAgentTestConstants.RESPONSE_PROMPT, simulation.getResponsePrompt());
+                        config.put(AiAgentSimulationConstants.RESPONSE_PROMPT, simulation.getResponsePrompt());
 
                         if (simulation.getSimulationModel() != null) {
-                            config.put(AiAgentTestConstants.SIMULATION_MODEL, simulation.getSimulationModel());
+                            config.put(AiAgentSimulationConstants.SIMULATION_MODEL, simulation.getSimulationModel());
                         }
 
                         return config;

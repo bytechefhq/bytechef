@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
     implementation(project(":server:libs:platform:platform-job-sync"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
