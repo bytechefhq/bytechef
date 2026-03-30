@@ -1,10 +1,7 @@
 import AgentEvalRunDetail from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AgentEvalRunDetail';
 import AgentEvalRunList from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AgentEvalRunList';
-import useAgentEvalsRunsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvalsRunsTab';
-import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
-import {useAgentEvalTestsQuery} from '@/shared/middleware/graphql';
+import useEvalsRunsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/hooks/useEvalsRunsTab';
 import {Loader2Icon, PlayCircleIcon} from 'lucide-react';
-import {useEffect, useMemo} from 'react';
 
 interface EvalsRunsTabProps {
     workflowId: string;
@@ -12,20 +9,16 @@ interface EvalsRunsTabProps {
 }
 
 const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
-    const {selectedTestId, setSelectedTestId} = useAiAgentEvalsStore();
-
-    const {data: evalTestsData} = useAgentEvalTestsQuery({workflowId, workflowNodeName});
-
-    const evalTests = useMemo(() => evalTestsData?.agentEvalTests ?? [], [evalTestsData]);
-
-    useEffect(() => {
-        if (selectedTestId == null && evalTests.length > 0) {
-            setSelectedTestId(evalTests[0].id);
-        }
-    }, [evalTests, selectedTestId, setSelectedTestId]);
-
-    const {handleCancelRun, handleSelectRun, runSummary, runs, runsLoading, selectedRun, selectedRunId} =
-        useAgentEvalsRunsTab(selectedTestId);
+    const {
+        handleCancelRun,
+        handleSelectRun,
+        runSummary,
+        runs,
+        runsLoading,
+        selectedRun,
+        selectedRunId,
+        selectedTestId,
+    } = useEvalsRunsTab(workflowId, workflowNodeName);
 
     if (selectedRunId && selectedRun) {
         return <AgentEvalRunDetail onBack={() => handleSelectRun(null)} run={selectedRun} summary={runSummary} />;

@@ -6,28 +6,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import {useAgentEvalResultTranscriptQuery} from '@/shared/middleware/graphql';
+import useTranscriptDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/hooks/useTranscriptDialog';
 import {AlertCircleIcon, BotIcon, Loader2Icon, UserIcon} from 'lucide-react';
-import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
-
-interface TranscriptMessageI {
-    content: string;
-    role: string;
-    toolCalls?: TranscriptToolCallI[];
-    turnNumber?: number;
-}
-
-interface TranscriptToolCallI {
-    input?: string;
-    name: string;
-    output?: string;
-}
-
-interface TranscriptDataI {
-    expectedOutput?: string;
-    messages: TranscriptMessageI[];
-}
 
 interface TranscriptDialogProps {
     onClose: () => void;
@@ -36,57 +17,7 @@ interface TranscriptDialogProps {
 }
 
 const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogProps) => {
-    const {data, error, isLoading} = useAgentEvalResultTranscriptQuery({id: resultId});
-
-    const transcriptData = useMemo<TranscriptDataI | null>(() => {
-        const transcriptString = data?.agentEvalResultTranscript;
-
-        if (!transcriptString) {
-            return null;
-        }
-
-        try {
-            return JSON.parse(transcriptString) as TranscriptDataI;
-        } catch {
-            return null;
-        }
-    }, [data]);
-
-    const groupedTurns = useMemo(() => {
-        if (!transcriptData?.messages) {
-            return [];
-        }
-
-        const turns: {assistantMessage?: TranscriptMessageI; turnIndex: number; userMessage?: TranscriptMessageI}[] =
-            [];
-
-        let currentTurn: {assistantMessage?: TranscriptMessageI; turnIndex: number; userMessage?: TranscriptMessageI} =
-            {turnIndex: 1};
-
-        for (const message of transcriptData.messages) {
-            if (message.role === 'user') {
-                if (currentTurn.userMessage) {
-                    turns.push(currentTurn);
-
-                    currentTurn = {turnIndex: turns.length + 1};
-                }
-
-                currentTurn.userMessage = message;
-            } else if (message.role === 'assistant') {
-                currentTurn.assistantMessage = message;
-
-                turns.push(currentTurn);
-
-                currentTurn = {turnIndex: turns.length + 1};
-            }
-        }
-
-        if (currentTurn.userMessage || currentTurn.assistantMessage) {
-            turns.push(currentTurn);
-        }
-
-        return turns;
-    }, [transcriptData]);
+    const {error, groupedTurns, isLoading, transcriptData} = useTranscriptDialog(resultId);
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={true}>

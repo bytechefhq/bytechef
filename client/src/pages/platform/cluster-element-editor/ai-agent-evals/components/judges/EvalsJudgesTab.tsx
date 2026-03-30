@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import AgentJudgeCard from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/AgentJudgeCard';
 import CreateJudgeDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/CreateJudgeDialog';
-import useAgentEvalsJudgesTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvalsJudgesTab';
+import useAgentEvalsJudgesTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/hooks/useAgentEvalsJudgesTab';
 import {GavelIcon, Loader2Icon, PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 

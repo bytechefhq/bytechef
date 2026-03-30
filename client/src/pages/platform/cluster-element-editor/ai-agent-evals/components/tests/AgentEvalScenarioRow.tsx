@@ -2,21 +2,10 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import CreateJudgeDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/CreateJudgeDialog';
 import CreateToolSimulationDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/CreateToolSimulationDialog';
-import {
-    type AgentEvalTestQuery,
-    AgentJudgeType,
-    AgentScenarioType,
-    useCreateAgentScenarioJudgeMutation,
-    useCreateAgentScenarioToolSimulationMutation,
-    useDeleteAgentScenarioJudgeMutation,
-    useDeleteAgentScenarioToolSimulationMutation,
-    useUpdateAgentScenarioJudgeMutation,
-    useUpdateAgentScenarioToolSimulationMutation,
-} from '@/shared/middleware/graphql';
-import {useQueryClient} from '@tanstack/react-query';
+import useAgentEvalScenarioRow from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useAgentEvalScenarioRow';
+import {type AgentEvalTestQuery, AgentScenarioType} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, ChevronRightIcon, GavelIcon, PencilIcon, PlusIcon, TrashIcon, WrenchIcon} from 'lucide-react';
-import {useCallback, useState} from 'react';
-import {toast} from 'sonner';
+import {useState} from 'react';
 
 type AgentEvalScenarioFromQueryType = NonNullable<AgentEvalTestQuery['agentEvalTest']>['scenarios'][number];
 type ScenarioJudgeType = AgentEvalScenarioFromQueryType['judges'][number];
@@ -35,83 +24,16 @@ const AgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AgentEvalScenarioRow
     const [showCreateJudgeDialog, setShowCreateJudgeDialog] = useState(false);
     const [showCreateToolSimulationDialog, setShowCreateToolSimulationDialog] = useState(false);
 
-    const queryClient = useQueryClient();
+    const {
+        handleCreateJudge,
+        handleCreateToolSimulation,
+        handleDeleteJudge,
+        handleDeleteToolSimulation,
+        handleUpdateJudge,
+        handleUpdateToolSimulation,
+    } = useAgentEvalScenarioRow(scenario.id);
 
     const isSingleTurn = scenario.type === AgentScenarioType.SingleTurn;
-
-    const invalidateTest = useCallback(
-        () => queryClient.invalidateQueries({queryKey: ['agentEvalTest']}),
-        [queryClient]
-    );
-
-    const createJudgeMutation = useCreateAgentScenarioJudgeMutation({onSuccess: invalidateTest});
-    const deleteJudgeMutation = useDeleteAgentScenarioJudgeMutation({onSuccess: invalidateTest});
-    const updateJudgeMutation = useUpdateAgentScenarioJudgeMutation({onSuccess: invalidateTest});
-
-    const createToolSimulationMutation = useCreateAgentScenarioToolSimulationMutation({
-        onError: (error: Error) => toast.error('Failed to create tool simulation: ' + error.message),
-        onSuccess: invalidateTest,
-    });
-    const deleteToolSimulationMutation = useDeleteAgentScenarioToolSimulationMutation({
-        onError: (error: Error) => toast.error('Failed to delete tool simulation: ' + error.message),
-        onSuccess: invalidateTest,
-    });
-    const updateToolSimulationMutation = useUpdateAgentScenarioToolSimulationMutation({
-        onError: (error: Error) => toast.error('Failed to update tool simulation: ' + error.message),
-        onSuccess: invalidateTest,
-    });
-
-    const handleCreateJudge = useCallback(
-        (name: string, type: AgentJudgeType, configuration: Record<string, unknown>) => {
-            createJudgeMutation.mutate({
-                agentEvalScenarioId: scenario.id,
-                configuration,
-                name,
-                type,
-            });
-        },
-        [createJudgeMutation, scenario.id]
-    );
-
-    const handleUpdateJudge = useCallback(
-        (id: string, name?: string, configuration?: Record<string, unknown>) => {
-            updateJudgeMutation.mutate({configuration, id, name});
-        },
-        [updateJudgeMutation]
-    );
-
-    const handleDeleteJudge = useCallback(
-        (id: string) => {
-            deleteJudgeMutation.mutate({id});
-        },
-        [deleteJudgeMutation]
-    );
-
-    const handleCreateToolSimulation = useCallback(
-        async (toolName: string, responsePrompt: string, simulationModel?: string) => {
-            await createToolSimulationMutation.mutateAsync({
-                agentEvalScenarioId: scenario.id,
-                responsePrompt,
-                simulationModel,
-                toolName,
-            });
-        },
-        [createToolSimulationMutation, scenario.id]
-    );
-
-    const handleDeleteToolSimulation = useCallback(
-        (id: string) => {
-            deleteToolSimulationMutation.mutate({id});
-        },
-        [deleteToolSimulationMutation]
-    );
-
-    const handleUpdateToolSimulation = useCallback(
-        async (id: string, toolName?: string, responsePrompt?: string, simulationModel?: string) => {
-            await updateToolSimulationMutation.mutateAsync({id, responsePrompt, simulationModel, toolName});
-        },
-        [updateToolSimulationMutation]
-    );
 
     return (
         <div className="py-1">
