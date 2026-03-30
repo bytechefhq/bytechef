@@ -27,6 +27,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.test.constant.AiAgentTestConstants;
 import com.bytechef.platform.workflow.test.util.TestAttachmentUtils;
 import com.bytechef.platform.workflow.test.util.TokenUsageHolder;
 import com.bytechef.platform.workflow.test.util.TokenUsageHolder.TokenUsage;
@@ -84,8 +85,7 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
             .filter(task -> Objects.equals(task.getName(), workflowNodeName))
             .findFirst()
             .orElseThrow(
-                () -> new IllegalArgumentException(
-                    "Workflow task not found: %s".formatted(workflowNodeName)));
+                () -> new IllegalArgumentException("Workflow task not found: %s".formatted(workflowNodeName)));
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
@@ -96,7 +96,7 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
         taskParameters.put("attachments", attachments);
 
         if (toolSimulations != null && !toolSimulations.isEmpty()) {
-            taskParameters.put("__toolSimulations", toolSimulations);
+            taskParameters.put(AiAgentTestConstants.TOOL_SIMULATIONS, toolSimulations);
         }
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(

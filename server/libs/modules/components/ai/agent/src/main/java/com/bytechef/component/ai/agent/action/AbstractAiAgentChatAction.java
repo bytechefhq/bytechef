@@ -21,6 +21,9 @@ import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunc
 import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
+import static com.bytechef.platform.workflow.test.constant.AiAgentTestConstants.RESPONSE_PROMPT;
+import static com.bytechef.platform.workflow.test.constant.AiAgentTestConstants.SIMULATION_MODEL;
+import static com.bytechef.platform.workflow.test.constant.AiAgentTestConstants.TOOL_SIMULATIONS;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
@@ -55,6 +58,7 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -95,6 +99,10 @@ public abstract class AbstractAiAgentChatAction {
                 MapUtils.concat(new HashMap<>(inputParameters.toMap()), new HashMap<>(clusterElement.getParameters()))),
             ParametersFactory.create(componentConnection.getParameters()), true);
 
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, String>> toolSimulations =
+            (Map<String, Map<String, String>>) inputParameters.get(TOOL_SIMULATIONS);
+
         ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
 
@@ -105,7 +113,7 @@ public abstract class AbstractAiAgentChatAction {
             .toolCallbacks(
                 getToolCallbacks(
                     clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                    context.isEditorEnvironment(), toolExecutionListener, context));
+                    context.isEditorEnvironment(), toolExecutionListener, toolSimulations, chatModel, context));
     }
 
     private List<Advisor> getAdvisors(
@@ -211,7 +219,8 @@ public abstract class AbstractAiAgentChatAction {
 
     private List<ToolCallback> getToolCallbacks(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
-        boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener, ActionContext context) {
+        boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener,
+        @Nullable Map<String, Map<String, String>> toolSimulations, ChatModel chatModel, ActionContext context) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
@@ -244,6 +253,17 @@ public abstract class AbstractAiAgentChatAction {
             }
         }
 
+        if (toolSimulations != null && !toolSimulations.isEmpty()) {
+            List<ToolCallback> simulatedCallbacks = new ArrayList<>();
+
+            for (ToolCallback toolCallback : toolCallbacks) {
+                simulatedCallbacks.add(
+                    createSimulationAwareToolCallback(toolCallback, toolSimulations, chatModel, context));
+            }
+
+            toolCallbacks = simulatedCallbacks;
+        }
+
         if (toolExecutionListener == null) {
             return toolCallbacks;
         }
@@ -265,6 +285,77 @@ public abstract class AbstractAiAgentChatAction {
                 .build();
 
         return Arrays.asList(augmentedToolCallbackProvider.getToolCallbacks());
+    }
+
+    private static ToolCallback createSimulationAwareToolCallback(
+        ToolCallback delegate, Map<String, Map<String, String>> toolSimulations, ChatModel chatModel,
+        ActionContext context) {
+
+        String toolName = delegate.getToolDefinition()
+            .name();
+
+        Map<String, String> simulation = toolSimulations.get(toolName);
+
+        if (simulation == null) {
+            return delegate;
+        }
+
+        return new ToolCallback() {
+
+            private final ToolDefinition toolDefinition = delegate.getToolDefinition();
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return toolDefinition;
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return getSimulatedResult(toolInput, simulation, chatModel, context);
+            }
+
+            @Override
+            public String call(String toolInput, @Nullable ToolContext toolContext) {
+                return getSimulatedResult(toolInput, simulation, chatModel, context);
+            }
+        };
+    }
+
+    private static String getSimulatedResult(
+        String toolInput, Map<String, String> simulation, ChatModel chatModel, ActionContext context) {
+
+        String responsePrompt = simulation.get(RESPONSE_PROMPT);
+        String simulationModel = simulation.get(SIMULATION_MODEL);
+
+        try {
+            ChatClient simulationClient = ChatClient.builder(chatModel)
+                .build();
+
+            String prompt =
+                "Given this tool call input: %s\n\nGenerate a realistic response following these instructions: %s"
+                    .formatted(toolInput, responsePrompt);
+
+            ChatClient.ChatClientRequestSpec requestSpec = simulationClient.prompt()
+                .user(prompt);
+
+            if (simulationModel != null && !simulationModel.isEmpty()) {
+                requestSpec = requestSpec.options(
+                    ChatOptions.builder()
+                        .model(simulationModel)
+                        .build());
+            }
+
+            String generatedResponse = requestSpec.call()
+                .content();
+
+            return generatedResponse != null ? generatedResponse : responsePrompt;
+        } catch (Exception exception) {
+            context.log(
+                log -> log.warn(
+                    "Failed to generate simulated response, falling back to verbatim: {}", exception.getMessage()));
+
+            return responsePrompt;
+        }
     }
 
     private static ToolCallback createObservableToolCallback(
