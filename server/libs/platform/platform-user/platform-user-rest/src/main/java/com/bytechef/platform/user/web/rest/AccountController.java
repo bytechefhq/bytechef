@@ -32,7 +32,7 @@ import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
-import com.bytechef.platform.user.util.PasswordValidator;
+import com.bytechef.platform.user.validator.PasswordValidator;
 import com.bytechef.platform.user.web.rest.exception.AccountErrorType;
 import com.bytechef.platform.user.web.rest.exception.AccountResourceException;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;

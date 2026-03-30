@@ -18,7 +18,7 @@ import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
-import com.bytechef.platform.user.util.PasswordValidator;
+import com.bytechef.platform.user.validator.PasswordValidator;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
