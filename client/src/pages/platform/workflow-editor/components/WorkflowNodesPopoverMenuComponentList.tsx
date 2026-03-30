@@ -24,8 +24,11 @@ interface WorkflowNodesListProps {
     hideClusterElementComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
+    onPasteClose?: () => void;
     selectedComponentName?: string;
     sourceNodeId?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateWorkflowMutation?: any;
 }
 
 const hasClusterElementType = (component: ComponentDefinitionWithActionsProps, clusterElementType: string): boolean => {
@@ -50,8 +53,10 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         hideClusterElementComponents = false,
         hideTaskDispatchers = false,
         hideTriggerComponents = false,
+        onPasteClose,
         selectedComponentName,
         sourceNodeId,
+        updateWorkflowMutation,
     }: WorkflowNodesListProps) => {
         const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore(
             useShallow((state) => ({
@@ -164,14 +169,18 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         actionComponentDefinitions={filteredActionComponentDefinitions}
                         clusterElementComponentDefinitions={filteredClusterElementComponentDefinitions}
                         clusterElementType={clusterElementType}
+                        edgeId={edgeId}
                         hideActionComponents={hideActionComponents}
                         hideClusterElementComponents={hideClusterElementComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
                         onItemClick={handleComponentClick}
+                        onPasteClose={onPasteClose}
                         selectedComponentName={selectedComponentName}
+                        sourceNodeId={sourceNodeId}
                         taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                         triggerComponentDefinitions={filteredTriggerComponentDefinitions}
+                        updateWorkflowMutation={updateWorkflowMutation}
                     />
                 </div>
             </div>
