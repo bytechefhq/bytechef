@@ -36,13 +36,12 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
             {evalTests.length > 0 ? (
                 <>
                     <div className="flex items-center justify-end">
-                        <button
-                            className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+                        <Button
+                            icon={<PlusIcon />}
+                            label="New Test"
                             onClick={() => setShowCreateDialog(true)}
-                        >
-                            <PlusIcon className="size-3.5" />
-                            New Test
-                        </button>
+                            size="sm"
+                        />
                     </div>
 
                     {evalTests.map((test) => (

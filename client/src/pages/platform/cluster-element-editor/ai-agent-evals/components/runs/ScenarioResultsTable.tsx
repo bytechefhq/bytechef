@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import AgentJudgeVerdictList from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AgentJudgeVerdictList';
 import TranscriptDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/TranscriptDialog';
 import {AgentEvalResultStatus, type AgentEvalRunQuery, AgentScenarioType} from '@/shared/middleware/graphql';
@@ -37,7 +38,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
         <>
             <div className="rounded-lg border border-border/50">
                 <div className="border-b border-border/50 px-3 py-2">
-                    <div className="grid grid-cols-[24px_1fr_100px_80px_80px_60px_32px] items-center gap-2 text-xs font-medium text-gray-500">
+                    <div className="grid grid-cols-[24px_1fr_100px_80px_80px_90px_56px] items-center gap-2 text-xs font-medium text-gray-500">
                         <div />
 
                         <div>Scenario</div>
@@ -50,7 +51,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
 
                         <div>Judges</div>
 
-                        <div />
+                        <div>Transcript</div>
                     </div>
                 </div>
 
@@ -67,7 +68,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                     return (
                         <div className="border-b border-border/30 last:border-b-0" key={result.id}>
                             <div
-                                className="grid cursor-pointer grid-cols-[24px_1fr_100px_80px_80px_60px_32px] items-center gap-2 px-3 py-2.5 hover:bg-gray-50"
+                                className="grid cursor-pointer grid-cols-[24px_1fr_100px_80px_80px_90px_56px] items-center gap-2 px-3 py-2.5 hover:bg-gray-50"
                                 onClick={() => setExpandedResultId(isExpanded ? null : result.id)}
                             >
                                 <div>{STATUS_ICONS[result.status]}</div>
@@ -119,20 +120,24 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                     {hasTokens ? `${inputTokens + outputTokens}` : '\u2014'}
                                 </div>
 
-                                <div className="text-xs text-gray-500">{result.verdicts.length}</div>
+                                <div className="text-xs text-gray-500">
+                                    {result.verdicts.length > 0
+                                        ? `${result.verdicts.filter((verdict) => verdict.passed).length}/${result.verdicts.length} passed`
+                                        : '\u2014'}
+                                </div>
 
                                 <div className="flex items-center gap-1">
                                     {result.transcriptFile && (
-                                        <button
-                                            className="text-gray-400 hover:text-gray-600"
+                                        <Button
+                                            icon={<FileTextIcon />}
                                             onClick={(event) => {
                                                 event.stopPropagation();
                                                 setTranscriptResult(result);
                                             }}
+                                            size="iconXs"
                                             title="View transcript"
-                                        >
-                                            <FileTextIcon className="size-3.5" />
-                                        </button>
+                                            variant="ghost"
+                                        />
                                     )}
 
                                     {isExpanded ? (

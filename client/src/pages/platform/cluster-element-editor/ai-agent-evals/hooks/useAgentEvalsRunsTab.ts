@@ -101,6 +101,7 @@ export default function useAgentEvalsRunsTab(agentEvalTestId: string | null) {
         const errorCount = results.filter((result) => result.status === 'FAILED').length;
 
         return {
+            agentVersion: selectedRun.agentVersion,
             averageScore: selectedRun.averageScore,
             errorCount,
             failedCount,

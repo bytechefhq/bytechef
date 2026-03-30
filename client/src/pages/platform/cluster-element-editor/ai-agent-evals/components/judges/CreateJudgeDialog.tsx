@@ -1,5 +1,12 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -218,8 +225,10 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={true}>
             <DialogContent className="max-w-lg">
-                <DialogHeader>
+                <DialogHeader className="flex flex-row items-center justify-between">
                     <DialogTitle>{isEditing ? 'Edit Judge' : 'Create Judge'}</DialogTitle>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <fieldset className="flex max-h-[60vh] flex-col gap-4 overflow-y-auto border-0 p-0">

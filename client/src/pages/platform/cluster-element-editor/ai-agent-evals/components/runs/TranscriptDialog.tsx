@@ -1,4 +1,11 @@
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {useAgentEvalResultTranscriptQuery} from '@/shared/middleware/graphql';
 import {AlertCircleIcon, BotIcon, Loader2Icon, UserIcon} from 'lucide-react';
 import {useMemo} from 'react';
@@ -84,10 +91,14 @@ const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogPro
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={true}>
             <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>Conversation Transcript - {scenarioName}</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <DialogTitle>Conversation Transcript - {scenarioName}</DialogTitle>
 
-                    <DialogDescription>Conversation transcript for this scenario result.</DialogDescription>
+                        <DialogDescription>Conversation transcript for this scenario result.</DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 {isLoading && (

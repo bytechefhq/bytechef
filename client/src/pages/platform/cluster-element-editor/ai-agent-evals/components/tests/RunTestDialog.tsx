@@ -1,5 +1,12 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import {
     type AgentEvalTestsQuery,
@@ -143,8 +150,10 @@ const RunTestDialog = ({onClose, test, workflowId, workflowNodeName}: RunTestDia
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={true}>
             <DialogContent className="max-w-lg">
-                <DialogHeader>
+                <DialogHeader className="flex flex-row items-center justify-between">
                     <DialogTitle>Run Test — {test.name}</DialogTitle>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <fieldset className="flex flex-col gap-4 border-0 p-0">
