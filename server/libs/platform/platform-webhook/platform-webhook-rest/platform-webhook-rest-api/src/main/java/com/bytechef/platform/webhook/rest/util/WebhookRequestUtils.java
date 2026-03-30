@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.webhook.rest;
+package com.bytechef.platform.webhook.rest.util;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ConvertUtils;
