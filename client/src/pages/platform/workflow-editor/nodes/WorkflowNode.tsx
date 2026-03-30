@@ -30,7 +30,9 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {mapHandlePosition} from '../utils/directionUtils';
+import {getContextFromTaskNodeData} from '../utils/getTaskDispatcherContext';
 import handleDeleteTask from '../utils/handleDeleteTask';
+import pasteNode from '../utils/pasteNode';
 import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
@@ -509,6 +511,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         nestedClusterRootsComponentDefinitions,
         renamingNodeName,
         rootClusterElementNodeData,
+        setCopiedNode,
         setRenamingNodeName,
         setRootClusterElementNodeData,
     } = useWorkflowEditorStore(
@@ -519,6 +522,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             nestedClusterRootsComponentDefinitions: state.nestedClusterRootsComponentDefinitions,
             renamingNodeName: state.renamingNodeName,
             rootClusterElementNodeData: state.rootClusterElementNodeData,
+            setCopiedNode: state.setCopiedNode,
             setRenamingNodeName: state.setRenamingNodeName,
             setRootClusterElementNodeData: state.setRootClusterElementNodeData,
         }))
@@ -687,6 +691,22 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         setRenamingNodeName(data.name);
     };
 
+    const handleCopyNode = () => {
+        setTimeout(() => {
+            setCopiedNode(data);
+        }, 200);
+    };
+
+    const handlePasteNode = () => {
+        const taskDispatcherContext = getContextFromTaskNodeData(data, 1);
+
+        pasteNode({
+            nodeSourceName: data.name,
+            taskDispatcherContext,
+            updateWorkflowMutation: updateWorkflowMutation!,
+        });
+    };
+
     const isRenaming = renamingNodeName === data.name;
 
     const suppressHover = contextMenuOpen || isRenaming || switchPopoverOpen;
@@ -735,7 +755,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             <WorkflowNodeContextMenu
                 data={data}
                 hasSavedPosition={!!hasSavedNodePosition}
+                onCopy={handleCopyNode}
                 onDelete={() => handleDeleteNodeClick(data)}
+                onPaste={handlePasteNode}
                 onRename={handleStartRename}
                 onResetPosition={() => handleRemoveNodePosition(data.name)}
                 onSwitch={() => setSwitchPopoverOpen(true)}
