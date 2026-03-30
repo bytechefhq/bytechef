@@ -57,4 +57,20 @@ public interface AiAgentTestFacade {
     Object executeAiAgentAction(
         String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
         List<Object> attachments, Map<String, Map<String, String>> toolSimulations);
+
+    /**
+     * Executes an AI agent action for testing purposes with tool simulations and returns token usage metadata.
+     *
+     * @param workflowId       the workflow identifier
+     * @param workflowNodeName the name of the workflow node (task) to execute
+     * @param environmentId    the environment identifier
+     * @param conversationId   the conversation identifier for the AI agent
+     * @param message          the user prompt message
+     * @param attachments      the list of attachments
+     * @param toolSimulations  map of tool name to simulation config (keys: responsePrompt, simulationModel)
+     * @return the result of the action execution with token usage
+     */
+    AiAgentTestResult executeAiAgentActionWithUsage(
+        String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
+        List<Object> attachments, Map<String, Map<String, String>> toolSimulations);
 }

@@ -40,6 +40,7 @@ import com.bytechef.ai.agent.eval.service.AgentJudgeVerdictService;
 import com.bytechef.ai.agent.eval.service.AgentScenarioJudgeService;
 import com.bytechef.ai.agent.eval.service.AgentScenarioToolSimulationService;
 import com.bytechef.ai.agent.eval.simulator.UserSimulator;
+import com.bytechef.ai.agent.eval.simulator.UserSimulator.SimulationResult;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -54,6 +55,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
+import com.bytechef.platform.workflow.test.facade.AiAgentTestResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -135,6 +137,9 @@ public class AgentEvalRunExecutor {
     public void executeRunAsync(long evalRunId, List<Long> scenarioIds, List<Long> agentJudgeIds) {
         AgentEvalRun evalRun = agentEvalRunService.getAgentEvalRun(evalRunId);
 
+        Workflow workflow = workflowService.getWorkflow(evalRun.getWorkflowId());
+
+        evalRun.setAgentVersion("v" + workflow.getVersion());
         evalRun.setStatus(AgentEvalRunStatus.RUNNING);
         evalRun.setStartedDate(Instant.now());
 
@@ -472,16 +477,17 @@ public class AgentEvalRunExecutor {
 
         Map<String, Map<String, String>> toolSimulations = loadToolSimulations(scenario.getId());
 
-        Object result = aiAgentTestFacade.executeAiAgentAction(
+        AiAgentTestResult testResult = aiAgentTestFacade.executeAiAgentActionWithUsage(
             evalRun.getWorkflowId(), evalRun.getWorkflowNodeName(), evalRun.getEnvironmentId(),
             conversationId, scenario.getUserMessage(), List.of(), toolSimulations);
 
-        String agentResponse = extractAgentResponse(result);
+        String agentResponse = extractAgentResponse(testResult.output());
 
         String transcriptJson = buildTranscriptJson(
             scenario.getUserMessage(), agentResponse, scenario.getExpectedOutput());
 
-        return new ScenarioExecutionResult(agentResponse, transcriptJson, 0, 0);
+        return new ScenarioExecutionResult(
+            agentResponse, transcriptJson, testResult.promptTokens(), testResult.completionTokens());
     }
 
     private ScenarioExecutionResult executeMultiTurnScenario(
@@ -508,20 +514,35 @@ public class AgentEvalRunExecutor {
         List<Map<String, String>> conversationHistory = new ArrayList<>();
         List<Map<String, String>> transcriptTurns = new ArrayList<>();
 
-        String userMessage = (scenario.getUserMessage() != null && !scenario.getUserMessage()
-            .isBlank())
-                ? scenario.getUserMessage()
-                : userSimulator.generateNextMessage(Collections.emptyList());
+        int accumulatedPromptTokens = 0;
+        int accumulatedCompletionTokens = 0;
+
+        String userMessage;
+
+        if (scenario.getUserMessage() != null && !scenario.getUserMessage()
+            .isBlank()) {
+
+            userMessage = scenario.getUserMessage();
+        } else {
+            SimulationResult initialSimulation = userSimulator.generateNextMessage(Collections.emptyList());
+
+            userMessage = initialSimulation.message();
+            accumulatedPromptTokens += initialSimulation.promptTokens();
+            accumulatedCompletionTokens += initialSimulation.completionTokens();
+        }
 
         String lastAgentResponse = "";
         int turnNumber = 1;
 
         for (int turnIndex = 0; turnIndex < scenario.getMaxTurns(); turnIndex++) {
-            Object result = aiAgentTestFacade.executeAiAgentAction(
+            AiAgentTestResult testResult = aiAgentTestFacade.executeAiAgentActionWithUsage(
                 evalRun.getWorkflowId(), evalRun.getWorkflowNodeName(), evalRun.getEnvironmentId(),
                 conversationId, userMessage, List.of(), toolSimulations);
 
-            String agentResponse = extractAgentResponse(result);
+            String agentResponse = extractAgentResponse(testResult.output());
+
+            accumulatedPromptTokens += testResult.promptTokens();
+            accumulatedCompletionTokens += testResult.completionTokens();
 
             lastAgentResponse = agentResponse;
 
@@ -552,19 +573,23 @@ public class AgentEvalRunExecutor {
             }
 
             if (turnIndex < scenario.getMaxTurns() - 1) {
-                String nextUserMessage = userSimulator.generateNextMessage(conversationHistory);
+                SimulationResult simulationResult = userSimulator.generateNextMessage(conversationHistory);
 
-                if (userSimulator.isConversationComplete(nextUserMessage)) {
+                accumulatedPromptTokens += simulationResult.promptTokens();
+                accumulatedCompletionTokens += simulationResult.completionTokens();
+
+                if (userSimulator.isConversationComplete(simulationResult.message())) {
                     break;
                 }
 
-                userMessage = nextUserMessage;
+                userMessage = simulationResult.message();
             }
         }
 
         String transcriptJson = buildMultiTurnTranscriptJson(transcriptTurns, scenario.getExpectedOutput());
 
-        return new ScenarioExecutionResult(lastAgentResponse, transcriptJson, 0, 0);
+        return new ScenarioExecutionResult(
+            lastAgentResponse, transcriptJson, accumulatedPromptTokens, accumulatedCompletionTokens);
     }
 
     @SuppressWarnings("unchecked")

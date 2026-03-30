@@ -25,12 +25,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.agent.eval.simulator.UserSimulator.SimulationResult;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.metadata.ChatResponseMetadata;
+import org.springframework.ai.chat.metadata.DefaultUsage;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 
 /**
  * @author ByteChef
@@ -83,16 +89,19 @@ class UserSimulatorTest {
         when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.messages(anyList())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
-        when(callResponseSpec.content()).thenReturn("I need help with my order");
+        when(callResponseSpec.chatResponse()).thenReturn(
+            buildChatResponse("I need help with my order", 10, 5));
 
         UserSimulator simulator = new UserSimulator(chatClient, "frustrated customer");
 
         List<Map<String, String>> conversationHistory = List.of(
             Map.of("role", "assistant", "content", "Hello, how can I help you?"));
 
-        String response = simulator.generateNextMessage(conversationHistory);
+        SimulationResult result = simulator.generateNextMessage(conversationHistory);
 
-        assertEquals("I need help with my order", response);
+        assertEquals("I need help with my order", result.message());
+        assertEquals(10, result.promptTokens());
+        assertEquals(5, result.completionTokens());
     }
 
     @Test
@@ -105,7 +114,7 @@ class UserSimulatorTest {
         when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.messages(anyList())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
-        when(callResponseSpec.content()).thenReturn("response");
+        when(callResponseSpec.chatResponse()).thenReturn(buildChatResponse("response", 0, 0));
 
         String persona = "impatient business executive";
 
@@ -131,7 +140,7 @@ class UserSimulatorTest {
         when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.messages(anyList())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
-        when(callResponseSpec.content()).thenReturn("response");
+        when(callResponseSpec.chatResponse()).thenReturn(buildChatResponse("response", 0, 0));
 
         UserSimulator simulator = new UserSimulator(chatClient, "test persona");
 
@@ -150,6 +159,19 @@ class UserSimulatorTest {
         List<Message> capturedMessages = messagesCaptor.getValue();
 
         assertEquals(3, capturedMessages.size());
+    }
+
+    private ChatResponse buildChatResponse(String content, int promptTokens, int completionTokens) {
+        Generation generation = new Generation(new AssistantMessage(content));
+
+        ChatResponseMetadata metadata = ChatResponseMetadata.builder()
+            .usage(new DefaultUsage(promptTokens, completionTokens))
+            .build();
+
+        return ChatResponse.builder()
+            .generations(List.of(generation))
+            .metadata(metadata)
+            .build();
     }
 
 }
