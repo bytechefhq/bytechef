@@ -73,11 +73,13 @@ public class MondayOptionUtils {
         for (Map<String, ?> board : boards) {
             if (board.get(COLUMNS) instanceof List<?> columns) {
                 boolean hasStatus = columns.stream()
-                    .anyMatch(c -> {
-                        if (c instanceof Map<?, ?> columnMap) {
-                            return columnMap.get(TYPE)
-                                .equals("status");
+                    .anyMatch(column -> {
+                        if (column instanceof Map<?, ?> columnMap) {
+                            String type = (String) columnMap.get(TYPE);
+
+                            return type.equals("status");
                         }
+
                         return false;
                     });
 
