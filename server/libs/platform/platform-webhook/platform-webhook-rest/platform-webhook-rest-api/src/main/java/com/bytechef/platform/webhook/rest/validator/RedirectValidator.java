@@ -72,8 +72,9 @@ public final class RedirectValidator {
         }
 
         // Block javascript: and data: URLs which could execute code
-        String lowerUrl = redirectUrl.toLowerCase()
-            .trim();
+        String lowerCase = redirectUrl.toLowerCase();
+
+        String lowerUrl = lowerCase.trim();
 
         if (lowerUrl.startsWith("javascript:") || lowerUrl.startsWith("data:")) {
             return false;
@@ -95,7 +96,7 @@ public final class RedirectValidator {
             }
 
             // Same-host redirect is always allowed
-            if (serverHost != null && host.equalsIgnoreCase(serverHost)) {
+            if (host.equalsIgnoreCase(serverHost)) {
                 return true;
             }
 
@@ -114,6 +115,25 @@ public final class RedirectValidator {
             // Invalid URL - reject
             return false;
         }
+    }
+
+    /**
+     * Sanitizes a redirect URL by returning it only if valid, or null if unsafe.
+     *
+     * @param redirectUrl    the URL to validate
+     * @param serverHost     the current server's host
+     * @param allowedDomains optional set of allowed external domains
+     * @return the URL if valid, null otherwise
+     */
+    @Nullable
+    public static String sanitizeRedirectUrl(
+        String redirectUrl, @Nullable String serverHost, @Nullable Set<String> allowedDomains) {
+
+        if (isValidRedirect(redirectUrl, serverHost, allowedDomains)) {
+            return redirectUrl;
+        }
+
+        return null;
     }
 
     /**
@@ -148,24 +168,5 @@ public final class RedirectValidator {
 
         // Subdomain match (host ends with .domain)
         return lowerHost.endsWith("." + lowerDomain);
-    }
-
-    /**
-     * Sanitizes a redirect URL by returning it only if valid, or null if unsafe.
-     *
-     * @param redirectUrl    the URL to validate
-     * @param serverHost     the current server's host
-     * @param allowedDomains optional set of allowed external domains
-     * @return the URL if valid, null otherwise
-     */
-    @Nullable
-    public static String sanitizeRedirectUrl(
-        String redirectUrl, @Nullable String serverHost, @Nullable Set<String> allowedDomains) {
-
-        if (isValidRedirect(redirectUrl, serverHost, allowedDomains)) {
-            return redirectUrl;
-        }
-
-        return null;
     }
 }

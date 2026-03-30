@@ -279,21 +279,11 @@ public class ModelUtils {
     }
 
     private static void captureTokenUsage(ChatResponse chatResponse) {
-        int promptTokens = 0;
-        int completionTokens = 0;
-
         ChatResponseMetadata metadata = chatResponse.getMetadata();
 
-        if (metadata != null) {
-            Usage usage = metadata.getUsage();
+        Usage usage = metadata.getUsage();
 
-            if (usage != null) {
-                promptTokens = usage.getPromptTokens() != null ? usage.getPromptTokens() : 0;
-                completionTokens = usage.getCompletionTokens() != null ? usage.getCompletionTokens() : 0;
-            }
-        }
-
-        TokenUsageHolder.capture(promptTokens, completionTokens);
+        TokenUsageHolder.capture(usage.getPromptTokens(), usage.getCompletionTokens());
     }
 
     private static String processText(String messageContent) {
