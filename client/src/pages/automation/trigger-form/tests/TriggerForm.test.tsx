@@ -18,8 +18,9 @@ const {mockGetTriggerForm} = vi.hoisted(() => ({
     mockGetTriggerForm: vi.fn(),
 }));
 
-vi.mock('@/shared/middleware/platform/configuration', async (importOriginal) => {
+vi.mock('@/shared/middleware/automation/configuration', async (importOriginal) => {
     const actual = (await importOriginal()) as Record<string, unknown>;
+
     return {
         ...actual,
         TriggerFormApi: vi.fn().mockImplementation(function () {
