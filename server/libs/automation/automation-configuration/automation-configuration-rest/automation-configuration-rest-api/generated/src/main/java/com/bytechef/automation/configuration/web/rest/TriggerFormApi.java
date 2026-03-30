@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.platform.configuration.web.rest.model.TriggerFormModel;
+import com.bytechef.automation.configuration.web.rest.model.TriggerFormModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:19:54.576402+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:41:23.992586+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 @Validated
-@Tag(name = "trigger-form", description = "The Platform Trigger Form Internal API")
+@Tag(name = "trigger-form", description = "The Automation Trigger Form Internal API")
 public interface TriggerFormApi {
 
     default Optional<NativeWebRequest> getRequest() {
