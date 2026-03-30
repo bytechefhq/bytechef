@@ -95,13 +95,13 @@ public class ModelUtils {
             responseFormat = parameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
         }
 
-        if (responseFormat == TEXT) {
-            try {
-                ChatResponse chatResponse = callResponseSpec.chatResponse();
+        try {
+            ChatResponse chatResponse = callResponseSpec.chatResponse();
 
-                if (chatResponse != null) {
-                    captureTokenUsage(chatResponse);
+            if (chatResponse != null) {
+                captureTokenUsage(chatResponse);
 
+                if (responseFormat == TEXT) {
                     Generation result = chatResponse.getResult();
 
                     if (result != null) {
@@ -109,21 +109,38 @@ public class ModelUtils {
 
                         response = output.getText();
                     }
-                }
-            } catch (org.springframework.ai.retry.NonTransientAiException e) {
-                String message = e.getMessage();
+                } else {
+                    Generation result = chatResponse.getResult();
 
+                    if (result != null) {
+                        String text = result.getOutput()
+                            .getText();
+
+                        if (text != null) {
+                            JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
+                                parameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
+
+                            response = converter.convert(text);
+                        }
+                    }
+                }
+            }
+        } catch (org.springframework.ai.retry.NonTransientAiException e) {
+            String message = e.getMessage();
+
+            int openBrace = message.indexOf("{");
+            int closeBrace = message.lastIndexOf("}");
+
+            if (openBrace >= 0 && closeBrace > openBrace) {
                 String providerMessage = context.json(
                     json -> json.read(
-                        message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1), "error.message",
+                        message.substring(openBrace, closeBrace + 1), "error.message",
                         new TypeReference<>() {}));
 
                 throw new ProviderException(providerMessage);
             }
-        } else {
-            response = callResponseSpec.entity(
-                new JsonSchemaStructuredOutputConverter(
-                    parameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context));
+
+            throw new ProviderException(message);
         }
 
         return response;
@@ -262,20 +279,21 @@ public class ModelUtils {
     }
 
     private static void captureTokenUsage(ChatResponse chatResponse) {
+        int promptTokens = 0;
+        int completionTokens = 0;
+
         ChatResponseMetadata metadata = chatResponse.getMetadata();
 
         if (metadata != null) {
             Usage usage = metadata.getUsage();
 
             if (usage != null) {
-                Integer promptTokens = usage.getPromptTokens();
-                Integer completionTokens = usage.getCompletionTokens();
-
-                TokenUsageHolder.capture(
-                    promptTokens != null ? promptTokens : 0,
-                    completionTokens != null ? completionTokens : 0);
+                promptTokens = usage.getPromptTokens() != null ? usage.getPromptTokens() : 0;
+                completionTokens = usage.getCompletionTokens() != null ? usage.getCompletionTokens() : 0;
             }
         }
+
+        TokenUsageHolder.capture(promptTokens, completionTokens);
     }
 
     private static String processText(String messageContent) {

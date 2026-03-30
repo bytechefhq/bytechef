@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Facade for executing AI agent test actions. Resolves workflow task parameters, evaluates expressions, resolves
- * connections and extensions, and delegates to the action definition for execution.
+ * Facade for executing AI agent actions in a test context, providing both plain execution and execution with token
+ * usage tracking.
  *
  * @author Ivica Cardic
  */
@@ -68,7 +68,7 @@ public interface AiAgentTestFacade {
      * @param message          the user prompt message
      * @param attachments      the list of attachments
      * @param toolSimulations  map of tool name to simulation config (keys: responsePrompt, simulationModel)
-     * @return the result of the action execution with token usage
+     * @return the result of the action execution including token usage for this single invocation only
      */
     AiAgentTestResult executeAiAgentActionWithUsage(
         String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,

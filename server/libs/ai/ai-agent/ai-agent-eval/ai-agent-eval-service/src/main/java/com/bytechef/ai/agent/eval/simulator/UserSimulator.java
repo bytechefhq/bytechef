@@ -20,6 +20,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -27,6 +30,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 
 /**
  * Simulates a user persona in multi-turn conversations with an AI agent.
@@ -39,6 +43,8 @@ import org.springframework.ai.chat.model.ChatResponse;
  * @author ByteChef
  */
 public class UserSimulator {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserSimulator.class);
 
     private static final String CONVERSATION_COMPLETE_MARKER = "[CONVERSATION_COMPLETE]";
 
@@ -86,11 +92,16 @@ public class UserSimulator {
         int promptTokens = 0;
         int completionTokens = 0;
 
-        if (chatResponse != null) {
-            if (chatResponse.getResult() != null) {
-                message = chatResponse.getResult()
-                    .getOutput()
-                    .getText();
+        if (chatResponse == null) {
+            logger.warn("UserSimulator received null ChatResponse for persona: {}", personaPrompt);
+        } else {
+            Generation result = chatResponse.getResult();
+
+            if (result != null && result.getOutput() != null) {
+                message = Objects.toString(result.getOutput()
+                    .getText(), "");
+            } else {
+                logger.warn("UserSimulator received null result from ChatResponse for persona: {}", personaPrompt);
             }
 
             ChatResponseMetadata metadata = chatResponse.getMetadata();
@@ -105,7 +116,7 @@ public class UserSimulator {
             }
         }
 
-        return new SimulationResult(message != null ? message : "", promptTokens, completionTokens);
+        return new SimulationResult(message, promptTokens, completionTokens);
     }
 
     public boolean isConversationComplete(String message) {
@@ -116,6 +127,11 @@ public class UserSimulator {
     }
 
     public record SimulationResult(String message, int promptTokens, int completionTokens) {
+
+        public SimulationResult {
+            Objects.requireNonNull(message, "message must not be null");
+        }
+
     }
 
 }
