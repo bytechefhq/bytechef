@@ -1951,9 +1951,7 @@ public class ComponentInitOpenApiGenerator {
                                     null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
                                     openAPI, bodySchema));
                         } else {
-                            propertyName = StringUtils.isEmpty(propertyName)
-                                ? schema.getTitle() == null ? "__items" : buildPropertyNameFromTitle(schema.getTitle())
-                                : propertyName;
+                            propertyName = StringUtils.isEmpty(propertyName) ? "__items" : propertyName;
 
                             builder.add(
                                 "array($S).items($L)",
