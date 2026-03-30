@@ -33,43 +33,44 @@ import java.util.Map;
 public class MondayConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-            .title("OAuth2 Authorization Code")
-            .properties(
-                string(CLIENT_ID)
-                    .label("Client Id")
-                    .required(true),
-                string(CLIENT_SECRET)
-                    .label("Client Secret")
-                    .required(true))
-            .authorizationUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/authorize")
-            .scopes((connection, context) -> {
-                Map<String, Boolean> map = new LinkedHashMap<>();
+        .authorizations(
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                .title("OAuth2 Authorization Code")
+                .properties(
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true))
+                .authorizationUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/authorize")
+                .scopes((connection, context) -> {
+                    Map<String, Boolean> map = new LinkedHashMap<>();
 
-                map.put("account:read", false);
-                map.put("assets:read", false);
-                map.put("boards:read", true);
-                map.put("boards:write", true);
-                map.put("docs:read", false);
-                map.put("docs:write", false);
-                map.put("me:read", false);
-                map.put("notifications:write", false);
-                map.put("tags:read", false);
-                map.put("teams:read", false);
-                map.put("teams:write", false);
-                map.put("updates:read", false);
-                map.put("updates:write", false);
-                map.put("users:read", false);
-                map.put("users:write", false);
-                map.put("webhooks:read", false);
-                map.put("webhooks:write", true);
-                map.put("workspaces:read", true);
-                map.put("workspaces:write", false);
+                    map.put("account:read", false);
+                    map.put("assets:read", false);
+                    map.put("boards:read", true);
+                    map.put("boards:write", true);
+                    map.put("docs:read", false);
+                    map.put("docs:write", false);
+                    map.put("me:read", false);
+                    map.put("notifications:write", false);
+                    map.put("tags:read", false);
+                    map.put("teams:read", false);
+                    map.put("teams:write", false);
+                    map.put("updates:read", false);
+                    map.put("updates:write", false);
+                    map.put("users:read", false);
+                    map.put("users:write", false);
+                    map.put("webhooks:read", false);
+                    map.put("webhooks:write", true);
+                    map.put("workspaces:read", true);
+                    map.put("workspaces:write", false);
 
-                return map;
-            })
-            .tokenUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token")
-            .refreshUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token"))
+                    return map;
+                })
+                .tokenUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token")
+                .refreshUrl((connectionParameters, context) -> "https://auth.monday.com/oauth2/token"))
         .baseUri((connectionParameters, context) -> "https://api.monday.com/v2")
         .help("", "https://docs.bytechef.io/reference/components/monday_v1#connection-setup")
         .version(1);

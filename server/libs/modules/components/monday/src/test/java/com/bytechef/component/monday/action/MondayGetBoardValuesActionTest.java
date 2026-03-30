@@ -47,8 +47,8 @@ class MondayGetBoardValuesActionTest {
 
     @Test
     void testPerform() {
-        Parameters parameters =
-            MockParametersFactory.create(Map.of(WORKSPACE_ID, 1, BOARD_ID, 2, COLUMNS, List.of(3, 4, 5)));
+        Parameters parameters = MockParametersFactory.create(
+            Map.of(WORKSPACE_ID, 1, BOARD_ID, 2, COLUMNS, List.of(3, 4, 5)));
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
             mondayUtilsMockedStatic
