@@ -41,6 +41,7 @@ public class DropboxSearchAction {
             "Searches for files and folders. Can only be used to retrieve a maximum of 10,000 matches. Recent " +
                 "changes may not immediately be reflected in search results due to a short delay in indexing. " +
                 "Duplicate results may be returned across pages. Some results may not be returned.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#search")
         .properties(
             string(QUERY)
                 .label("Search String")

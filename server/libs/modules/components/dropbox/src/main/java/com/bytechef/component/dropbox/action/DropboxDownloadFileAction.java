@@ -37,6 +37,7 @@ public class DropboxDownloadFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
         .title("Download File")
         .description("Download a file from Dropbox.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#download-file")
         .properties(
             string(PATH)
                 .label("File Path")

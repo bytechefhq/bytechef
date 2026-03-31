@@ -51,6 +51,7 @@ public class DropboxComponentHandler implements ComponentHandler {
                 "and client software.")
         .icon("path:assets/dropbox.svg")
         .customAction(true)
+        .customActionHelp("", "https://www.dropbox.com/developers/documentation/http/documentation")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(DropboxConnection.CONNECTION_DEFINITION)
         .actions(
@@ -80,7 +81,8 @@ public class DropboxComponentHandler implements ComponentHandler {
             tool(DropboxMoveFileAction.ACTION_DEFINITION),
             tool(DropboxMoveFolderAction.ACTION_DEFINITION),
             tool(DropboxSearchAction.ACTION_DEFINITION),
-            tool(DropboxUploadFileAction.ACTION_DEFINITION));
+            tool(DropboxUploadFileAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

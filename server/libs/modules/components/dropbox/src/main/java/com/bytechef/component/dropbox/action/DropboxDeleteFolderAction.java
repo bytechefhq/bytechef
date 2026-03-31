@@ -35,6 +35,7 @@ public class DropboxDeleteFolderAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFolder")
         .title("Delete Folder")
         .description("Delete the folder at a given path. All its contents will be deleted too.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#delete-folder")
         .properties(
             string(PATH)
                 .label("Path")

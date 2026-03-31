@@ -39,6 +39,7 @@ public class DropboxListFolderAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFolder")
         .title("List Folder")
         .description("List the contents of a folder.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#list-folder")
         .properties(
             string(PATH)
                 .label("Path")

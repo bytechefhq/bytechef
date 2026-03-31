@@ -39,6 +39,7 @@ public class DropboxMoveFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("moveFile")
         .title("Move File")
         .description("Move a file to a different location in the user's Dropbox.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#move-file")
         .properties(
             string(FROM_PATH)
                 .label("Source Path")

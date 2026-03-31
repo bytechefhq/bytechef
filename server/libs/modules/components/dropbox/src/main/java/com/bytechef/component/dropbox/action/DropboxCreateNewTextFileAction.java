@@ -45,6 +45,7 @@ public class DropboxCreateNewTextFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTextFile")
         .title("Create New Paper File")
         .description("Create a new .paper file on which you can write at a given path")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#create-text-file")
         .properties(
             string(PATH)
                 .label("Path")
