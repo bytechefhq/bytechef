@@ -43,8 +43,11 @@ export function collectAllDescendantNodes(dispatcherId: string, allNodes: Node[]
 
                 const nodeData = node.data as NodeDataType;
 
-                if (nodeData.taskDispatcher && nodeData.taskDispatcherId) {
-                    collect(nodeData.taskDispatcherId);
+                // Use node.id (the dispatcher's own ID) instead of
+                // nodeData.taskDispatcherId, which may be overwritten to the
+                // parent dispatcher's ID by buildGenericNodeData.
+                if (nodeData.taskDispatcher) {
+                    collect(node.id);
                 }
             }
         });

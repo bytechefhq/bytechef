@@ -296,6 +296,39 @@ describe('collectAllDescendantNodes', () => {
         expect(descendants.has('case_task')).toBe(true);
         expect(descendants.has('default_task')).toBe(true);
     });
+
+    it('should collect three levels deep even when taskDispatcherId is overwritten to parent ID', () => {
+        // In production, buildGenericNodeData overwrites taskDispatcherId
+        // to the parent dispatcher's ID. The recursion must use node.id
+        // instead of nodeData.taskDispatcherId to descend correctly.
+        const nodes: Node[] = [
+            makeNode('each_1', undefined, {taskDispatcher: true, taskDispatcherId: 'each_1'}),
+            makeNode(
+                'fork-join_1',
+                {eachData: {eachId: 'each_1'}},
+                {taskDispatcher: true, taskDispatcherId: 'each_1'}
+            ),
+            makeGhostNode('fork-join_1', 'top-ghost'),
+            makeNode(
+                'condition_2',
+                {forkJoinData: {branchIndex: 0, forkJoinId: 'fork-join_1', index: 0}},
+                {taskDispatcher: true, taskDispatcherId: 'fork-join_1'}
+            ),
+            makeGhostNode('condition_2', 'top-ghost'),
+            makeGhostNode('condition_2', 'bottom-ghost'),
+            makeNode('inner_task', {
+                conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_2', index: 0},
+            }),
+        ];
+
+        const descendants = collectAllDescendantNodes('each_1', nodes);
+
+        expect(descendants.has('fork-join_1')).toBe(true);
+        expect(descendants.has('condition_2')).toBe(true);
+        expect(descendants.has('condition_2-condition-top-ghost')).toBe(true);
+        expect(descendants.has('condition_2-condition-bottom-ghost')).toBe(true);
+        expect(descendants.has('inner_task')).toBe(true);
+    });
 });
 
 function makeEdge(source: string, target: string): Edge {
