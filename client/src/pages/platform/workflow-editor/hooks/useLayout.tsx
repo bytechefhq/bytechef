@@ -27,6 +27,7 @@ import {useStoreWithEqualityFn} from 'zustand/traditional';
 import useDataPillPanelStore from '../stores/useDataPillPanelStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import animateNodePositions from '../utils/animateNodePositions';
 import createBranchEdges from '../utils/createBranchEdges';
@@ -625,6 +626,20 @@ export default function useLayout({
 
     useEffect(() => {
         if (!useWorkflowDataStore.getState().isWorkflowLoaded) {
+            previousCopilotPanelOpenRef.current = copilotPanelOpen;
+            previousDataPillPanelOpenRef.current = dataPillPanelOpen;
+            previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
+            previousLeftSidebarOpenRef.current = leftSidebarOpen;
+
+            return;
+        }
+
+        // Skip layout reset when the cluster elements canvas is open or
+        // closing — the dialog covers the graph so shifting is unnecessary
+        // and causes a visible jump during the dialog transition.
+        const {clusterElementsCanvasOpen} = useWorkflowEditorStore.getState();
+
+        if (clusterElementsCanvasOpen) {
             previousCopilotPanelOpenRef.current = copilotPanelOpen;
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
