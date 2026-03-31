@@ -86,7 +86,8 @@ public class TelegramSendMediaAction {
                         bool("ok"),
                         object("result")
                             .properties(MESSAGE_OUTPUT_PROPERTIES))))
-        .perform(TelegramSendMediaAction::perform);
+        .perform(TelegramSendMediaAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/telegram_v1#send-media");
 
     private TelegramSendMediaAction() {
     }

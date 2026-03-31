@@ -64,7 +64,8 @@ public class TelegramSendMessageAction {
                         bool("ok"),
                         object("result")
                             .properties(MESSAGE_OUTPUT_PROPERTIES))))
-        .perform(TelegramSendMessageAction::perform);
+        .perform(TelegramSendMessageAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/telegram_v1#send-message");
 
     private TelegramSendMessageAction() {
     }
