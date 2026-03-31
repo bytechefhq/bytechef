@@ -16,7 +16,6 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.dropbox.action.DropboxGetFileLinkAction.POST_TEMPORARY_LINK_CONTEXT_FUNCTION;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +47,7 @@ class DropboxGetFileLinkActionTest extends AbstractDropboxActionTest {
             .when(() -> DropboxUtils.getFullPath(pathArgumentCaptor.capture(), fileNameArgumentCaptor.capture()))
             .thenReturn(fullPath);
 
-        when(mockedContext.http(POST_TEMPORARY_LINK_CONTEXT_FUNCTION))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);

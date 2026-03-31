@@ -26,10 +26,9 @@ import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -80,22 +79,19 @@ public class DropboxGetFileLinkAction {
                                     "expires after four hours."))))
         .perform(DropboxGetFileLinkAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_TEMPORARY_LINK_CONTEXT_FUNCTION =
-        http -> http.post("https://api.dropboxapi.com/2/files/get_temporary_link");
-
     private DropboxGetFileLinkAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(POST_TEMPORARY_LINK_CONTEXT_FUNCTION)
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/get_temporary_link"))
             .body(
-                Http.Body.of(
+                Body.of(
                     Map.of(
                         PATH,
                         getFullPath(
                             inputParameters.getRequiredString(PATH), inputParameters.getRequiredString(FILENAME)))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

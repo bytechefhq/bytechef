@@ -27,10 +27,8 @@ import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Mario Cvjetojevic
@@ -79,22 +77,19 @@ public class DropboxCopyAction {
                                     .description("ID of the copied file or folder.")))))
         .perform(DropboxCopyAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_COPY_CONTEXT_FUNCTION =
-        http -> http.post("https://api.dropboxapi.com/2/files/copy_v2");
-
     private DropboxCopyAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String filename = inputParameters.getRequiredString(FILENAME);
 
-        return context.http(POST_COPY_CONTEXT_FUNCTION)
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/copy_v2"))
             .body(
                 Http.Body.of(
                     FROM_PATH, getFullPath(inputParameters.getRequiredString(FROM_PATH), filename),
                     TO_PATH, getFullPath(inputParameters.getRequiredString(TO_PATH), filename)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
