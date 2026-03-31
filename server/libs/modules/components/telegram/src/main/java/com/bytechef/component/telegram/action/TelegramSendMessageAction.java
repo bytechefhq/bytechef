@@ -43,7 +43,9 @@ public class TelegramSendMessageAction {
         .properties(
             string(CHAT_ID)
                 .label("Chat ID")
-                .description("Unique identifier for the target chat or username of the target channel.")
+                .description(
+                    "Unique identifier for the target chat or username of the target channel. Your bot has to be " +
+                        "member of that chat or group.")
                 .required(true),
             string(TEXT)
                 .label("Text")
