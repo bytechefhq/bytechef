@@ -32,6 +32,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -70,19 +71,13 @@ class RocketchatUtilsTest {
                     Map.of(USERNAME, "user1"),
                     Map.of(USERNAME, "user2"))));
 
-        List<Option<String>> expectedOptions = List.of(
-            option("user1", "user1"),
-            option("user2", "user2"));
-
         List<Option<String>> result = RocketchatUtils.getUsersOptions(
             null, null, null, null, mockedContext);
 
-        assertEquals(result, expectedOptions);
-
+        assertEquals(result, List.of(option("user1", "user1"), option("user2", "user2")));
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
@@ -103,19 +98,13 @@ class RocketchatUtilsTest {
                     Map.of(NAME, "channel1"),
                     Map.of(NAME, "channel2"))));
 
-        List<Option<String>> expectedOptions = List.of(
-            option("channel1", "#channel1"),
-            option("channel2", "#channel2"));
-
         List<Option<String>> result = RocketchatUtils.getChannelsOptions(
             null, null, null, null, mockedContext);
 
-        assertEquals(result, expectedOptions);
-
+        assertEquals(result, List.of(option("channel1", "#channel1"), option("channel2", "#channel2")));
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
@@ -138,18 +127,15 @@ class RocketchatUtilsTest {
         Object result = RocketchatUtils.sendMessage("test", "This is test.", mockedContext);
 
         assertEquals(result, mockedObject);
-
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/chat.postMessage", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of(ROOM_ID, "test", TEXT, "This is test."), body.getContent());
+        assertEquals(
+            Body.of(Map.of(ROOM_ID, "test", TEXT, "This is test."), BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }

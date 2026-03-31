@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -72,7 +73,6 @@ class RocketchatCreateChannelActionTest {
         Object result = RocketchatCreateChannelAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
-
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
@@ -81,10 +81,10 @@ class RocketchatCreateChannelActionTest {
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/channels.create", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
         assertEquals(
-            Map.of(NAME, "test", MEMBERS, List.of("user1", "user2"), READ_ONLY, false, EXCLUDE_SELF, false),
-            body.getContent());
+            Body.of(
+                Map.of(NAME, "test", MEMBERS, List.of("user1", "user2"), READ_ONLY, false, EXCLUDE_SELF, false),
+                BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }
