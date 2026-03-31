@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -77,33 +78,29 @@ class RocketchatNewMessageTriggerTest {
         WebhookEnableOutput webhookEnableOutput = RocketchatNewMessageTrigger.webhookEnable(
             null, null, webhookUrl, null, mockedTriggerContext);
 
-        WebhookEnableOutput expectedWebhookEnableOutput =
-            new WebhookEnableOutput(Map.of(ID, "123"), null);
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
-
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/integrations.create", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
         assertEquals(
-            Map.of(
-                "type", "webhook-outgoing",
-                USERNAME, "rocket.cat",
-                "channel", "all_public_channels, all_private_groups, all_direct_messages",
-                "event", "sendMessage",
-                "urls", List.of(webhookUrl),
-                "enabled", true,
-                NAME, "Message Sent Trigger",
-                "scriptEnabled", false),
-            body.getContent());
+            Body.of(
+                Map.of(
+                    "type", "webhook-outgoing",
+                    USERNAME, "rocket.cat",
+                    "channel", "all_public_channels, all_private_groups, all_direct_messages",
+                    "event", "sendMessage",
+                    "urls", List.of(webhookUrl),
+                    "enabled", true,
+                    NAME, "Message Sent Trigger",
+                    "scriptEnabled", false),
+                BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 
     @Test
@@ -120,18 +117,14 @@ class RocketchatNewMessageTriggerTest {
             null, null, mockedParameters, null, mockedTriggerContext);
 
         assertNotNull(httpFunctionArgumentCaptor.getValue());
-
         assertEquals("/integrations.remove", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
         assertEquals(
-            Map.of("integrationId", "id", "type", "webhook-outgoing"), body.getContent());
+            Body.of(Map.of("integrationId", "id", "type", "webhook-outgoing"), BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 
     @Test
     void testWebhookRequest() {
-
         when(mockedWebhookBody.getContent())
             .thenReturn(mockedObject);
 

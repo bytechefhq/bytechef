@@ -44,8 +44,8 @@ class RocketchatSendChannelMessageActionTest {
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(ROOM_ID, "test", TEXT, "This is test."));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(ROOM_ID, "test", TEXT, "This is test."));
 
     @Test
     void testPerform(Context mockedContext) {
@@ -55,8 +55,7 @@ class RocketchatSendChannelMessageActionTest {
                     stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(mockedObject);
 
-            Object result =
-                RocketchatSendChannelMessageAction.perform(mockedParameters, null, mockedContext);
+            Object result = RocketchatSendChannelMessageAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(mockedObject, result);
             assertEquals(List.of("test", "This is test."), stringArgumentCaptor.getAllValues());
