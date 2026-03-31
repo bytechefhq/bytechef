@@ -22,13 +22,16 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.dropbox.action.DropboxCopyAction;
+import com.bytechef.component.dropbox.action.DropboxCopyFileAction;
+import com.bytechef.component.dropbox.action.DropboxCopyFolderAction;
 import com.bytechef.component.dropbox.action.DropboxCreateNewFolderAction;
 import com.bytechef.component.dropbox.action.DropboxCreateNewTextFileAction;
-import com.bytechef.component.dropbox.action.DropboxDeleteAction;
+import com.bytechef.component.dropbox.action.DropboxDeleteFileAction;
+import com.bytechef.component.dropbox.action.DropboxDeleteFolderAction;
 import com.bytechef.component.dropbox.action.DropboxGetFileLinkAction;
 import com.bytechef.component.dropbox.action.DropboxListFolderAction;
-import com.bytechef.component.dropbox.action.DropboxMoveAction;
+import com.bytechef.component.dropbox.action.DropboxMoveFileAction;
+import com.bytechef.component.dropbox.action.DropboxMoveFolderAction;
 import com.bytechef.component.dropbox.action.DropboxSearchAction;
 import com.bytechef.component.dropbox.action.DropboxUploadFileAction;
 import com.bytechef.component.dropbox.connection.DropboxConnection;
@@ -50,23 +53,29 @@ public class DropboxComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(DropboxConnection.CONNECTION_DEFINITION)
         .actions(
-            DropboxCopyAction.ACTION_DEFINITION,
+            DropboxCopyFileAction.ACTION_DEFINITION,
+            DropboxCopyFolderAction.ACTION_DEFINITION,
             DropboxCreateNewFolderAction.ACTION_DEFINITION,
             DropboxCreateNewTextFileAction.ACTION_DEFINITION,
-            DropboxDeleteAction.ACTION_DEFINITION,
+            DropboxDeleteFileAction.ACTION_DEFINITION,
+            DropboxDeleteFolderAction.ACTION_DEFINITION,
             DropboxGetFileLinkAction.ACTION_DEFINITION,
             DropboxListFolderAction.ACTION_DEFINITION,
-            DropboxMoveAction.ACTION_DEFINITION,
+            DropboxMoveFileAction.ACTION_DEFINITION,
+            DropboxMoveFolderAction.ACTION_DEFINITION,
             DropboxSearchAction.ACTION_DEFINITION,
             DropboxUploadFileAction.ACTION_DEFINITION)
         .clusterElements(
-            tool(DropboxCopyAction.ACTION_DEFINITION),
+            tool(DropboxCopyFileAction.ACTION_DEFINITION),
+            tool(DropboxCopyFolderAction.ACTION_DEFINITION),
             tool(DropboxCreateNewFolderAction.ACTION_DEFINITION),
             tool(DropboxCreateNewTextFileAction.ACTION_DEFINITION),
-            tool(DropboxDeleteAction.ACTION_DEFINITION),
+            tool(DropboxDeleteFileAction.ACTION_DEFINITION),
+            tool(DropboxDeleteFolderAction.ACTION_DEFINITION),
             tool(DropboxGetFileLinkAction.ACTION_DEFINITION),
             tool(DropboxListFolderAction.ACTION_DEFINITION),
-            tool(DropboxMoveAction.ACTION_DEFINITION),
+            tool(DropboxMoveFileAction.ACTION_DEFINITION),
+            tool(DropboxMoveFolderAction.ACTION_DEFINITION),
             tool(DropboxSearchAction.ACTION_DEFINITION),
             tool(DropboxUploadFileAction.ACTION_DEFINITION));
 
