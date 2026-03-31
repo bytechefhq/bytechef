@@ -25,6 +25,7 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_BYTES;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
@@ -67,7 +68,7 @@ class MicrosoftOutlook365SendEmailActionTest {
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            SUBJECT, "testSubject", BODY, Map.of(CONTENT, "test", CONTENT_TYPE, "text"),
+            FROM, "test@mail.com", SUBJECT, "testSubject", BODY, Map.of(CONTENT, "test", CONTENT_TYPE, "text"),
             TO_RECIPIENTS, List.of("address1"), CC_RECIPIENTS, List.of("address2"),
             BCC_RECIPIENTS, List.of("address3"), REPLY_TO, List.of("address4"), ATTACHMENTS, List.of(mockedFileEntry)));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -126,6 +127,7 @@ class MicrosoftOutlook365SendEmailActionTest {
             Map<String, Map<String, Object>> expectedBody = Map.of(
                 "message",
                 Map.of(
+                    FROM, Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "test@mail.com")),
                     SUBJECT, "testSubject",
                     BODY, Map.of(CONTENT, "test", CONTENT_TYPE, "text"),
                     TO_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
