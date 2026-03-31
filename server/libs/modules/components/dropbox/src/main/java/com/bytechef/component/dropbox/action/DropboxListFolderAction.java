@@ -25,10 +25,9 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -69,20 +68,17 @@ public class DropboxListFolderAction {
                                             .description("ID of the file or folder."))))))
         .perform(DropboxListFolderAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_LIST_FOLDER_CONTEXT_FUNCTION =
-        http -> http.post("https://api.dropboxapi.com/2/files/list_folder");
-
     private DropboxListFolderAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(POST_LIST_FOLDER_CONTEXT_FUNCTION)
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/list_folder"))
             .body(
-                Http.Body.of(
+                Body.of(
                     Map.of(
                         PATH, inputParameters.getString(PATH, ""))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

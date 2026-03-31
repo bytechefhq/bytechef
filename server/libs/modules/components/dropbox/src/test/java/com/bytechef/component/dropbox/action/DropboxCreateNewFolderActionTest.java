@@ -16,7 +16,6 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.dropbox.action.DropboxCreateNewFolderAction.POST_CREATE_FOLDER_CONTEXT_FUNCTION;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +38,7 @@ class DropboxCreateNewFolderActionTest extends AbstractDropboxActionTest {
 
     @Test
     void testPerform() {
-        when(mockedContext.http(POST_CREATE_FOLDER_CONTEXT_FUNCTION))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);

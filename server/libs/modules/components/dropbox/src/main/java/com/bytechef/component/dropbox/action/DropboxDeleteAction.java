@@ -26,10 +26,9 @@ import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -74,22 +73,19 @@ public class DropboxDeleteAction {
                                     .description("ID of the deleted file or folder.")))))
         .perform(DropboxDeleteAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_DELETE_CONTEXT_FUNCTION =
-        http -> http.post("https://api.dropboxapi.com/2/files/delete_v2");
-
     private DropboxDeleteAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(POST_DELETE_CONTEXT_FUNCTION)
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/delete_v2"))
             .body(
-                Http.Body.of(
+                Body.of(
                     Map.of(
                         PATH,
-                        getFullPath(
-                            inputParameters.getRequiredString(PATH), inputParameters.getRequiredString(FILENAME)))))
+                        getFullPath(inputParameters.getRequiredString(PATH),
+                            inputParameters.getRequiredString(FILENAME)))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

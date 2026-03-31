@@ -114,8 +114,7 @@ public class DropboxCreateNewTextFileAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         FileEntry fileEntry = context.file(
             file -> file.storeContent(
-                inputParameters.getRequiredString(FILENAME) + ".paper",
-                inputParameters.getRequiredString(TEXT)));
+                inputParameters.getRequiredString(FILENAME) + ".paper", inputParameters.getRequiredString(TEXT)));
 
         return uploadFile(inputParameters, context, fileEntry);
     }

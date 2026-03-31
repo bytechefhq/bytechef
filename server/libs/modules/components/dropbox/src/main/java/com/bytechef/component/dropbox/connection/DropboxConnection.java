@@ -27,7 +27,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import java.util.Map;
 
 /**
- * Provides the component connection definition.
  *
  * @author Mario Cvjetojevic
  */

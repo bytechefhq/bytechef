@@ -24,10 +24,8 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Mario Cvjetojevic
@@ -65,17 +63,14 @@ public class DropboxCreateNewFolderAction {
                                     .description("ID for the newly created folder within Dropbox.")))))
         .perform(DropboxCreateNewFolderAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_CREATE_FOLDER_CONTEXT_FUNCTION =
-        http -> http.post("https://api.dropboxapi.com/2/files/create_folder_v2");
-
     private DropboxCreateNewFolderAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(POST_CREATE_FOLDER_CONTEXT_FUNCTION)
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/create_folder_v2"))
             .body(Http.Body.of(PATH, inputParameters.getRequired(PATH)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
