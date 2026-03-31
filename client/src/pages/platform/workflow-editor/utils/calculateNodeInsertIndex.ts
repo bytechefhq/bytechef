@@ -95,8 +95,29 @@ export function calculateNodeInsertIndexFromTasks(targetId: string, tasks: Workf
     );
 }
 
+/**
+ * Calculates the insertion index for a new node before the target task.
+ * Uses the workflow definition's top-level task array (the actual array
+ * that will be spliced into) rather than the flat runtime task array,
+ * which avoids fragile nested subtask counting.
+ */
 export default function calculateNodeInsertIndex(targetId: string): number {
     const workflow = useWorkflowDataStore.getState().workflow;
+
+    if (workflow.definition) {
+        try {
+            const definition = JSON.parse(workflow.definition);
+            const definitionTasks: WorkflowTask[] = definition.tasks ?? [];
+            const targetIndex = definitionTasks.findIndex((task) => task.name === targetId);
+
+            if (targetIndex !== -1) {
+                return targetIndex;
+            }
+        } catch {
+            // Fall through to flat task calculation
+        }
+    }
+
     const {tasks} = workflow;
 
     if (!tasks) {
