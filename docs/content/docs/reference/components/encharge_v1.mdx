@@ -153,7 +153,7 @@ Name: createPeople
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| people | People | ARRAY <details> <summary> Items </summary> [&#123;STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)&#125;] </details> |  | true |
+| __items | People | ARRAY <details> <summary> Items </summary> [&#123;STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)&#125;] </details> |  | true |
 
 #### Example JSON Structure
 ```json
@@ -161,7 +161,7 @@ Name: createPeople
   "label" : "Create People",
   "name" : "createPeople",
   "parameters" : {
-    "people" : [ {
+    "__items" : [ {
       "email" : "",
       "firstName" : "",
       "lastName" : "",

@@ -89,7 +89,7 @@ Name: createContacts
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| contacts | Contacts | ARRAY <details> <summary> Items </summary> [&#123;STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)&#125;] </details> |  | true |
+| __items | Contacts | ARRAY <details> <summary> Items </summary> [&#123;STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)&#125;] </details> |  | true |
 
 #### Example JSON Structure
 ```json
@@ -97,7 +97,7 @@ Name: createContacts
   "label" : "Create Contacts",
   "name" : "createContacts",
   "parameters" : {
-    "contacts" : [ {
+    "__items" : [ {
       "email" : "",
       "firstname" : "",
       "lastname" : "",
@@ -150,7 +150,7 @@ Name: createTasks
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| tasks | Tasks | ARRAY <details> <summary> Items </summary> [&#123;STRING\(description), DATE\(reminder_date)&#125;] </details> |  | true |
+| __items | Tasks | ARRAY <details> <summary> Items </summary> [&#123;STRING\(description), DATE\(reminder_date)&#125;] </details> |  | true |
 
 #### Example JSON Structure
 ```json
@@ -158,7 +158,7 @@ Name: createTasks
   "label" : "Create Tasks",
   "name" : "createTasks",
   "parameters" : {
-    "tasks" : [ {
+    "__items" : [ {
       "description" : "",
       "reminder_date" : "2021-01-01"
     } ]
