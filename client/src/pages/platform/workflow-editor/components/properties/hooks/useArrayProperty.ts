@@ -62,7 +62,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
 
-    const {additionalProperties, maxItems, name} = property;
+    const {additionalProperties, maxItems, minItems, name} = property;
 
     const items = useMemo(() => {
         let resolvedItems = property.items;
@@ -76,10 +76,65 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
 
     const isAddDisabled = maxItems != null && arrayItems.length >= maxItems;
 
-    const addButtonTooltip = useMemo(
-        () => (isAddDisabled && maxItems != null ? `Maximum number of items (${maxItems}) reached` : undefined),
-        [isAddDisabled, maxItems]
-    );
+    type ArrayConstraintHintType =
+        | {variant: 'none'}
+        | {text: string; textColor: string; variant: 'max'}
+        | {text: string; textColor: string; variant: 'min'}
+        | {text: string; textColor: string; variant: 'range'};
+
+    const arrayConstraintHint = useMemo<ArrayConstraintHintType>(() => {
+        const arrayItemCount = arrayItems.length;
+
+        if (minItems != null && maxItems != null) {
+            if (arrayItemCount < minItems) {
+                return {
+                    text: `Minimum ${minItems.toString()} items`,
+                    textColor: 'text-content-destructive-primary',
+                    variant: 'min',
+                };
+            }
+
+            if (isAddDisabled) {
+                return {
+                    text: `Maximum ${maxItems.toString()} items`,
+                    textColor: 'text-content-warning-primary',
+                    variant: 'max',
+                };
+            }
+
+            return {
+                text: `Between ${minItems.toString()} and ${maxItems.toString()} items`,
+                textColor: 'text-content-warning-primary',
+                variant: 'range',
+            };
+        }
+
+        if (minItems != null) {
+            if (arrayItemCount < minItems) {
+                return {
+                    text: `Minimum ${minItems.toString()} items`,
+                    textColor: 'text-content-destructive-primary',
+                    variant: 'min',
+                };
+            }
+
+            return {variant: 'none'};
+        }
+
+        if (maxItems != null) {
+            if (isAddDisabled) {
+                return {
+                    text: `Maximum ${maxItems.toString()} items`,
+                    textColor: 'text-content-warning-primary',
+                    variant: 'max',
+                };
+            }
+
+            return {variant: 'none'};
+        }
+
+        return {variant: 'none'};
+    }, [arrayItems.length, isAddDisabled, maxItems, minItems]);
 
     const handleAddItemClick = useCallback(() => {
         if (!currentComponent || !name) {
@@ -450,7 +505,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
     }, []);
 
     return {
-        addButtonTooltip,
+        arrayConstraintHint,
         arrayItems,
         availablePropertyTypes,
         currentComponent,

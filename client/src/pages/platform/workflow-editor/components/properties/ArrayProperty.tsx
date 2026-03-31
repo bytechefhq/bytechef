@@ -1,11 +1,11 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ArrayPropertyItem from '@/pages/platform/workflow-editor/components/properties/components/ArrayPropertyItem';
 import SubPropertyPopover from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
 import {useArrayProperty} from '@/pages/platform/workflow-editor/components/properties/hooks/useArrayProperty';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
-import {PlusIcon} from 'lucide-react';
+import {CircleAlertIcon, PlusIcon} from 'lucide-react';
 import {Fragment} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string) => void;
@@ -16,7 +16,7 @@ interface ArrayPropertyProps {
 
 const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayPropertyProps) => {
     const {
-        addButtonTooltip,
+        arrayConstraintHint,
         arrayItems,
         availablePropertyTypes,
         currentComponent,
@@ -64,48 +64,40 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 )}
             </ul>
 
-            {availablePropertyTypes.length > 1 && !!newPropertyType ? (
-                <SubPropertyPopover
-                    array
-                    availablePropertyTypes={availablePropertyTypes}
-                    buttonLabel={property.placeholder ?? parentArrayItems?.[0]?.placeholder}
-                    condition={currentComponent?.componentName === 'condition'}
-                    disabled={isAddDisabled}
-                    disabledTooltip={addButtonTooltip}
-                    handleClick={handleAddItemClick}
-                    key={`${path}_${name}_subPropertyPopoverButton`}
-                    newPropertyType={newPropertyType}
-                    setNewPropertyType={setNewPropertyType}
-                />
-            ) : isAddDisabled && addButtonTooltip ? (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <span className="inline-block">
-                            <Button
-                                className="mt-3 rounded-sm"
-                                disabled
-                                icon={<PlusIcon />}
-                                key={`${path}_${name}_addPropertyPopoverButton`}
-                                label={property.placeholder || 'Add array item'}
-                                size="sm"
-                                variant="secondary"
-                            />
-                        </span>
-                    </TooltipTrigger>
+            <div className="mt-3 flex items-center gap-3">
+                {availablePropertyTypes.length > 1 && !!newPropertyType ? (
+                    <SubPropertyPopover
+                        array
+                        availablePropertyTypes={availablePropertyTypes}
+                        buttonLabel={property.placeholder ?? parentArrayItems?.[0]?.placeholder}
+                        disabled={isAddDisabled}
+                        handleClick={handleAddItemClick}
+                        insideConditionTaskDispatcher={currentComponent?.componentName === 'condition'}
+                        key={`${path}_${name}_subPropertyPopoverButton`}
+                        newPropertyType={newPropertyType}
+                        setNewPropertyType={setNewPropertyType}
+                    />
+                ) : (
+                    <Button
+                        className="rounded-sm"
+                        disabled={isAddDisabled}
+                        icon={<PlusIcon />}
+                        key={`${path}_${name}_addPropertyPopoverButton`}
+                        label={property.placeholder || 'Add array item'}
+                        onClick={handleAddItemClick}
+                        size="sm"
+                        variant="secondary"
+                    />
+                )}
 
-                    <TooltipContent>{addButtonTooltip}</TooltipContent>
-                </Tooltip>
-            ) : (
-                <Button
-                    className="mt-3 rounded-sm"
-                    icon={<PlusIcon />}
-                    key={`${path}_${name}_addPropertyPopoverButton`}
-                    label={property.placeholder || 'Add array item'}
-                    onClick={handleAddItemClick}
-                    size="sm"
-                    variant="secondary"
-                />
-            )}
+                {arrayConstraintHint.variant !== 'none' && (
+                    <div className={twMerge('flex items-center gap-1.5', arrayConstraintHint.textColor)}>
+                        <CircleAlertIcon aria-hidden="true" className="size-4" />
+
+                        <span className="text-sm">{arrayConstraintHint.text}</span>
+                    </div>
+                )}
+            </div>
         </Fragment>
     );
 };
