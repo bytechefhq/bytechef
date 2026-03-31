@@ -26,6 +26,7 @@ interface WorkflowNodesListProps {
     hideTaskDispatchers?: boolean;
     onPasteClose?: () => void;
     selectedComponentName?: string;
+    showPaste?: boolean;
     sourceNodeId?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updateWorkflowMutation?: any;
@@ -55,6 +56,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         hideTriggerComponents = false,
         onPasteClose,
         selectedComponentName,
+        showPaste = false,
         sourceNodeId,
         updateWorkflowMutation,
     }: WorkflowNodesListProps) => {
@@ -177,6 +179,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         onItemClick={handleComponentClick}
                         onPasteClose={onPasteClose}
                         selectedComponentName={selectedComponentName}
+                        showPaste={showPaste}
                         sourceNodeId={sourceNodeId}
                         taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                         triggerComponentDefinitions={filteredTriggerComponentDefinitions}

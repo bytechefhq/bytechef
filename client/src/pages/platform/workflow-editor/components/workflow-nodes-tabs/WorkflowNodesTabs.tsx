@@ -33,6 +33,7 @@ interface WorkflowNodesTabsProps {
     onItemClick?: (clickedItem: ClickedDefinitionType) => void;
     onPasteClose?: () => void;
     selectedComponentName?: string;
+    showPaste?: boolean;
     sourceNodeId?: string;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     triggerComponentDefinitions: Array<ComponentDefinitionBasic>;
@@ -52,6 +53,7 @@ const WorkflowNodesTabs = ({
     onItemClick,
     onPasteClose,
     selectedComponentName,
+    showPaste = false,
     sourceNodeId,
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
@@ -78,7 +80,7 @@ const WorkflowNodesTabs = ({
         }))
     );
 
-    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+    const canPaste = showPaste && !!copiedNode && copiedWorkflowId === workflow.id;
 
     const handlePasteClick = () => {
         if (!canPaste || !updateWorkflowMutation) {
@@ -312,16 +314,16 @@ const WorkflowNodesTabs = ({
                                 Paste
                             </span>
 
-                            {copiedNode.icon && (
+                            {copiedNode?.icon && (
                                 <span className="flex size-5 shrink-0 items-center justify-center [&_svg]:size-5">
                                     {copiedNode.icon}
                                 </span>
                             )}
 
                             <span className="min-w-0 flex-1 truncate text-sm text-content-neutral-primary group-active/paste:text-content-brand-primary">
-                                <span className="font-medium">{copiedNode.label || copiedNode.componentName}</span>
+                                <span className="font-medium">{copiedNode?.label || copiedNode?.componentName}</span>
 
-                                {copiedNode.operationName && (
+                                {copiedNode?.operationName && (
                                     <span className="font-normal text-content-neutral-secondary group-active/paste:text-content-brand-primary">
                                         {` (${copiedNode.operationName})`}
                                     </span>
