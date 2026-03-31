@@ -601,7 +601,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
+                                            <LazyLoadWrapper hasLeftSidebar>
                                                 <ProjectDeployments />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
@@ -646,7 +646,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper>
+                                            <LazyLoadWrapper hasLeftSidebar>
                                                 <McpServers />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
@@ -726,7 +726,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                             path: ':workflowExecutionId',
                                         },
                                     ],
-                                    element: <WorkflowChatContainer />,
+                                    element: (
+                                        <LazyLoadWrapper hasLeftSidebar>
+                                            <WorkflowChatContainer />
+                                        </LazyLoadWrapper>
+                                    ),
                                     path: 'chat',
                                 },
                                 {
