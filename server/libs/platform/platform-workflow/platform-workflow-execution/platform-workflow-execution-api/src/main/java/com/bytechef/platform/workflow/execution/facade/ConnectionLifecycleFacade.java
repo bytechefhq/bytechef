@@ -26,5 +26,5 @@ public interface ConnectionLifecycleFacade {
 
     void scheduleConnectionRefresh(Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType);
 
-    void deleteScheduledConnectionRefresh(Long connectionId);
+    void deleteScheduledConnectionRefresh(Long connectionId, AuthorizationType authorizationType);
 }

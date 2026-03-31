@@ -74,11 +74,19 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     @Override
     public void delete(long connectionId) {
-        workspaceConnectionService.deleteWorkspaceConnection(connectionId);
+        ConnectionDTO connection = connectionFacade.getConnection(connectionId);
 
-        connectionFacade.delete(connectionId);
+        try {
+            connectionLifecycleFacade.deleteScheduledConnectionRefresh(connectionId, connection.authorizationType());
 
-        connectionLifecycleFacade.deleteScheduledConnectionRefresh(connectionId);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+
+        } finally {
+            workspaceConnectionService.deleteWorkspaceConnection(connectionId);
+
+            connectionFacade.delete(connectionId);
+        }
     }
 
     @Override
