@@ -37,7 +37,9 @@ public class TelegramConnection {
                 .properties(
                     string(BOT_TOKEN)
                         .label("Bot Token")
-                        .required(true)));
+                        .required(true)))
+        .help("", "https://docs.bytechef.io/reference/components/telegram_v1#connection-setup")
+        .version(1);
 
     private TelegramConnection() {
     }

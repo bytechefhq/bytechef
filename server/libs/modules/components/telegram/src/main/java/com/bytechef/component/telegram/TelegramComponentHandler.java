@@ -42,13 +42,16 @@ public class TelegramComponentHandler implements ComponentHandler {
         .icon("path:assets/telegram.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(TelegramConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("", "https://core.telegram.org/bots/api")
         .actions(
             TelegramSendMediaAction.ACTION_DEFINITION,
             TelegramSendMessageAction.ACTION_DEFINITION)
         .clusterElements(
             tool(TelegramSendMediaAction.ACTION_DEFINITION),
             tool(TelegramSendMessageAction.ACTION_DEFINITION))
-        .triggers(TelegramNewMessageTrigger.TRIGGER_DEFINITION);
+        .triggers(TelegramNewMessageTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
