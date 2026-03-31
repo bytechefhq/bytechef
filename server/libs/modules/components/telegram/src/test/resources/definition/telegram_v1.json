@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a media message through a Telegram bot.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/telegram_v1#send-media"
+    },
     "metadata": null,
     "name": "sendMedia",
     "outputDefinition": {
@@ -2857,7 +2860,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Unique identifier for the target chat or username of the target channel.",
+      "description": "Unique identifier for the target chat or username of the target channel. Your bot has to be member of that chat or group.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -3239,7 +3242,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a message through a Telegram bot.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/telegram_v1#send-message"
+    },
     "metadata": null,
     "name": "sendMessage",
     "outputDefinition": {
@@ -6090,7 +6096,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Unique identifier for the target chat or username of the target channel.",
+      "description": "Unique identifier for the target chat or username of the target channel. Your bot has to be member of that chat or group.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -9006,7 +9012,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Unique identifier for the target chat or username of the target channel.",
+      "description": "Unique identifier for the target chat or username of the target channel. Your bot has to be member of that chat or group.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -12239,7 +12245,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Unique identifier for the target chat or username of the target channel.",
+      "description": "Unique identifier for the target chat or username of the target channel. Your bot has to be member of that chat or group.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -12359,14 +12365,20 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/telegram_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://core.telegram.org/bots/api"
+  },
   "description": "Telegram is a cloud-based messaging platform that enables users to send messages, media, and files, and supports automation and integrations through its API.",
   "icon": "path:assets/telegram.svg",
   "metadata": null,
@@ -12378,9 +12390,12 @@
     "batch": null,
     "deduplicate": null,
     "deprecated": null,
-    "description": "Trigger on new incoming message of any kind — text, photo, sticker, and so on.",
+    "description": "Trigger on new incoming message of any kind — text, photo, sticker, and so on. Incoming message has to be in a group that your bot is member of.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/telegram_v1#new-message"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newMessage",
