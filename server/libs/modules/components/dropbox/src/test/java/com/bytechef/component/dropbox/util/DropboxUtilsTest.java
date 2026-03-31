@@ -17,7 +17,6 @@
 package com.bytechef.component.dropbox.util;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILE_ENTRY;
-import static com.bytechef.component.dropbox.util.DropboxUtils.POST_FILES_UPLOAD_CONTEXT_FUNCTION;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,7 +65,7 @@ class DropboxUtilsTest {
     void testUploadFile() {
         when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
             .thenReturn(mockedFileEntry);
-        when(mockedContext.http(POST_FILES_UPLOAD_CONTEXT_FUNCTION))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.headers(headersArgumentCapture.capture()))
             .thenReturn(mockedExecutor);

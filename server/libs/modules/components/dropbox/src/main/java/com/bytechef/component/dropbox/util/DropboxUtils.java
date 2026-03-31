@@ -23,11 +23,9 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CONFLICT;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 
@@ -36,9 +34,6 @@ import java.util.Map;
  * @author Monika Kušter
  */
 public class DropboxUtils {
-
-    protected static final ContextFunction<Http, Http.Executor> POST_FILES_UPLOAD_CONTEXT_FUNCTION =
-        http -> http.post("https://content.dropboxapi.com/2/files/upload");
 
     public static String getFullPath(String path, String filename) {
         return (path.endsWith("/") ? path : path + "/") + filename;
@@ -59,11 +54,11 @@ public class DropboxUtils {
             return json.write(ime);
         });
 
-        return context.http(POST_FILES_UPLOAD_CONTEXT_FUNCTION)
+        return context.http(http -> http.post("https://content.dropboxapi.com/2/files/upload"))
             .headers(Map.of("Dropbox-API-Arg", List.of(headerJson)))
             .body(Http.Body.of(fileEntry, "application/octet-stream"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

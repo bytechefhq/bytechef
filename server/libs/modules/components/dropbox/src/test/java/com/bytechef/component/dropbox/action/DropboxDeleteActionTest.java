@@ -16,7 +16,6 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.dropbox.action.DropboxDeleteAction.POST_DELETE_CONTEXT_FUNCTION;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +47,7 @@ class DropboxDeleteActionTest extends AbstractDropboxActionTest {
             .when(() -> DropboxUtils.getFullPath(pathArgumentCaptor.capture(), fileNameArgumentCaptor.capture()))
             .thenReturn(fullPath);
 
-        when(mockedContext.http(POST_DELETE_CONTEXT_FUNCTION))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);

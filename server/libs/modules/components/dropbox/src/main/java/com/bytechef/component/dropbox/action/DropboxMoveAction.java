@@ -27,10 +27,9 @@ import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Mario Cvjetojevic
@@ -79,22 +78,19 @@ public class DropboxMoveAction {
                                     .description("ID of the moved file or folder.")))))
         .perform(DropboxMoveAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_MOVE_CONTEXT_FUNCTION =
-        http -> http.post("https://api.dropboxapi.com/2/files/move_v2");
-
     private DropboxMoveAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String filename = inputParameters.getRequiredString(FILENAME);
 
-        return context.http(POST_MOVE_CONTEXT_FUNCTION)
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/move_v2"))
             .body(
-                Http.Body.of(
+                Body.of(
                     FROM_PATH, getFullPath(inputParameters.getRequiredString(FROM_PATH), filename),
                     TO_PATH, getFullPath(inputParameters.getRequiredString(TO_PATH), filename)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

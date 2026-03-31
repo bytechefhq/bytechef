@@ -16,7 +16,6 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.dropbox.action.DropboxMoveAction.POST_MOVE_CONTEXT_FUNCTION;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
@@ -49,7 +48,7 @@ class DropboxMoveActionTest extends AbstractDropboxActionTest {
         dropboxUtilsMockedStatic.when(() -> DropboxUtils.getFullPath(anyString(), fileNameArgumentCaptor.capture()))
             .thenReturn(fullPath);
 
-        when(mockedContext.http(POST_MOVE_CONTEXT_FUNCTION))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
