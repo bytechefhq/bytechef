@@ -34,6 +34,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +87,7 @@ public class TaskTools {
 
                     yield new TaskInfo(
                         actionDetailedInfo.name(), actionDetailedInfo.title(), actionDetailedInfo.description(),
-                        "action", actionDetailedInfo.componentName(), actionDetailedInfo.properties(),
+                        "action", actionDetailedInfo.componentName(), actionDetailedInfo.properties(), actionDetailedInfo.clusterElements(),
                         actionDetailedInfo.outputProperties());
                 }
                 case "trigger" -> {
@@ -97,7 +99,7 @@ public class TaskTools {
 
                     yield new TaskInfo(
                         triggerDetailedInfo.name(), triggerDetailedInfo.title(), triggerDetailedInfo.description(),
-                        "trigger", triggerDetailedInfo.componentName(), triggerDetailedInfo.properties(),
+                        "trigger", triggerDetailedInfo.componentName(), triggerDetailedInfo.properties(), null,
                         triggerDetailedInfo.outputProperties());
                 }
                 case "taskdispatcher" -> {
@@ -105,7 +107,8 @@ public class TaskTools {
 
                     yield new TaskInfo(
                         taskDispatcherInfo.name(), taskDispatcherInfo.title(), taskDispatcherInfo.description(),
-                        "taskDispatcher", null, taskDispatcherInfo.properties(), taskDispatcherInfo.outputProperties());
+                        "taskDispatcher", null, taskDispatcherInfo.properties(), null,
+                        taskDispatcherInfo.outputProperties());
                 }
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
             };
@@ -440,6 +443,7 @@ public class TaskTools {
         @JsonProperty("type") @JsonPropertyDescription("The type of the task: action, trigger, or taskDispatcher") String type,
         @JsonProperty("componentName") @JsonPropertyDescription("The name of the component (null for taskDispatchers)") String componentName,
         @JsonProperty("properties") @JsonPropertyDescription("The properties of the task as JSON string") String properties,
+        @JsonProperty("clusterElements") @JsonPropertyDescription("The cluster elements defined in the action. Value contains information on containing multiple elements") Map<String, Boolean> clusterElements,
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the task as JSON string") String outputProperties) {
     }
 
