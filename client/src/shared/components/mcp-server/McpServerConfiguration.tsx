@@ -11,8 +11,7 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
       "command": "npx",
       "args": [
         "-y",
-        "supergateway",
-        "--streamableHttp",
+        "mcp-remote",
         "${mcpServerUrl}"
       ]
     }
