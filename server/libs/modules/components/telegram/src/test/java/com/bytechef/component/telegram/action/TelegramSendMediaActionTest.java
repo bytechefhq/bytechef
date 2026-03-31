@@ -23,53 +23,42 @@ import static com.bytechef.component.telegram.constant.TelegramConstants.DIRECT_
 import static com.bytechef.component.telegram.constant.TelegramConstants.DOCUMENT;
 import static com.bytechef.component.telegram.constant.TelegramConstants.MEDIA_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
-import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class TelegramSendMediaActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        ArgumentCaptor.forClass(ContextFunction.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(CHAT_ID, "123", DIRECT_MESSAGES_TOPIC_ID, "abc", MEDIA_TYPE, DOCUMENT, DOCUMENT, mockedFileEntry));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() throws Exception {
-        when(mockedParameters.getRequiredString(CHAT_ID))
-            .thenReturn("123");
-        when(mockedParameters.getString(DIRECT_MESSAGES_TOPIC_ID))
-            .thenReturn("abc");
-        when(mockedParameters.getRequiredString(MEDIA_TYPE))
-            .thenReturn(DOCUMENT);
-        when(mockedParameters.getRequiredFileEntry(DOCUMENT))
-            .thenReturn(mockedFileEntry);
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> httpFunctionArgumentCaptor.getValue()
-                .apply(mockedHttp));
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(
@@ -78,26 +67,21 @@ class TelegramSendMediaActionTest {
                 .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Optional<? extends BasePerformFunction> basePerformFunction = TelegramSendMediaAction.ACTION_DEFINITION
-            .getPerform();
-
-        assertTrue(basePerformFunction.isPresent());
-
-        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
-
-        Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
+        Object result = TelegramSendMediaAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
         assertEquals(
             List.of("/sendDocument", CHAT_ID, "123", DIRECT_MESSAGES_TOPIC_ID, "abc"),
             stringArgumentCaptor.getAllValues());
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
