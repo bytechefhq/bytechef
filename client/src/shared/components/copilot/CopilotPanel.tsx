@@ -6,7 +6,7 @@ import CopilotPanelBoundary from '@/shared/components/copilot/CopilotPanelBounda
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {BotMessageSquareIcon, MessageSquareOffIcon, XIcon} from 'lucide-react';
+import {BotMessageSquareIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -94,7 +94,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose}: Omit<Copilot
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                icon={<MessageSquareOffIcon />}
+                                icon={<MessageSquareXIcon />}
                                 onClick={handleCleanMessages}
                                 size="icon"
                                 variant="ghost"
