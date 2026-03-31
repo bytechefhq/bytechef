@@ -41,7 +41,9 @@ public class TelegramNewMessageTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newMessage")
         .title("New Message")
-        .description("Trigger on new incoming message of any kind — text, photo, sticker, and so on.")
+        .description(
+            "Trigger on new incoming message of any kind — text, photo, sticker, and so on. Incoming message has to " +
+                "be in a group that your bot is member of.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
             outputSchema(
