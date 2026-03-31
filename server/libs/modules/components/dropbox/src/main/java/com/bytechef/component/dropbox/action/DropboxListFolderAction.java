@@ -42,7 +42,7 @@ public class DropboxListFolderAction {
         .properties(
             string(PATH)
                 .label("Path")
-                .description("Path of the filename. Inputting nothing searches root.")
+                .description("The path of the folder to be listed. Inputting nothing searches root.")
                 .required(false))
         .output(
             outputSchema(

@@ -21,13 +21,11 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH
 import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.dropbox.util.DropboxUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -36,7 +34,7 @@ import org.junit.jupiter.api.Test;
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-class DropboxMoveActionTest extends AbstractDropboxActionTest {
+class DropboxMoveFileActionTest extends AbstractDropboxActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FILENAME, "filename.txt", FROM_PATH, "from", TO_PATH, "to"));
@@ -44,9 +42,6 @@ class DropboxMoveActionTest extends AbstractDropboxActionTest {
     @Test
     void testPerform() {
         String fullPath = "fullPath";
-
-        dropboxUtilsMockedStatic.when(() -> DropboxUtils.getFullPath(anyString(), fileNameArgumentCaptor.capture()))
-            .thenReturn(fullPath);
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -59,7 +54,7 @@ class DropboxMoveActionTest extends AbstractDropboxActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = DropboxMoveAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = DropboxMoveFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
 

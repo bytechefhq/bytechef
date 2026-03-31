@@ -17,7 +17,8 @@
 package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -25,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.dropbox.util.DropboxUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,18 +34,14 @@ import org.junit.jupiter.api.Test;
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-class DropboxDeleteActionTest extends AbstractDropboxActionTest {
+class DropboxCopyFileActionTest extends AbstractDropboxActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FILENAME, "filename.txt", PATH, "/path/1/2"));
+        Map.of(FILENAME, "filename.txt", FROM_PATH, "from", TO_PATH, "to"));
 
     @Test
     void testPerform() {
         String fullPath = "fullPath";
-
-        dropboxUtilsMockedStatic
-            .when(() -> DropboxUtils.getFullPath(pathArgumentCaptor.capture(), fileNameArgumentCaptor.capture()))
-            .thenReturn(fullPath);
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -58,16 +54,15 @@ class DropboxDeleteActionTest extends AbstractDropboxActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = DropboxDeleteAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = DropboxCopyFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        Map<String, String> expectedBody = Map.of(PATH, fullPath);
+        Map<String, String> expectedBody = Map.of(FROM_PATH, fullPath, TO_PATH, fullPath);
 
         assertEquals(expectedBody, body.getContent());
         assertEquals("filename.txt", fileNameArgumentCaptor.getValue());
-        assertEquals("/path/1/2", pathArgumentCaptor.getValue());
     }
 }

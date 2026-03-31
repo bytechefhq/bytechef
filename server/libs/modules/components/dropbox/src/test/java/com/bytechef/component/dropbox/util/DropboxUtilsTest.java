@@ -17,7 +17,6 @@
 package com.bytechef.component.dropbox.util;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILE_ENTRY;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -47,19 +46,6 @@ class DropboxUtilsTest {
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-
-    @Test
-    void testGetFullPath() {
-        String path1 = "folder1/";
-        String filename1 = "file1.txt";
-
-        assertEquals("folder1/file1.txt", getFullPath(path1, filename1));
-
-        String path2 = "folder2";
-        String filename2 = "file2.txt";
-
-        assertEquals("folder2/file2.txt", getFullPath(path2, filename2));
-    }
 
     @Test
     void testUploadFile() {
