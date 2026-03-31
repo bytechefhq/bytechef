@@ -52,7 +52,8 @@ public class TelegramNewMessageTrigger {
                             .properties(MESSAGE_OUTPUT_PROPERTIES))))
         .webhookEnable(TelegramNewMessageTrigger::webhookEnable)
         .webhookDisable(TelegramNewMessageTrigger::webhookDisable)
-        .webhookRequest(TelegramNewMessageTrigger::webhookRequest);
+        .webhookRequest(TelegramNewMessageTrigger::webhookRequest)
+        .help("", "https://docs.bytechef.io/reference/components/telegram_v1#new-message");
 
     private TelegramNewMessageTrigger() {
     }
