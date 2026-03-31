@@ -36,6 +36,7 @@ public class DropboxCreateNewFolderAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFolder")
         .title("Create New Folder")
         .description("Create a folder at a given path.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#create-folder")
         .properties(
             string(PATH)
                 .label("Folder Path/Name")

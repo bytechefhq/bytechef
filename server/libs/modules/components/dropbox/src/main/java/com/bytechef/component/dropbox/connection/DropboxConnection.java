@@ -31,7 +31,9 @@ import java.util.Map;
  * @author Mario Cvjetojevic
  */
 public final class DropboxConnection {
+
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#connection-setup")
         .authorizations(
             authorization(OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
@@ -45,7 +47,8 @@ public final class DropboxConnection {
                 .authorizationUrl((connection, context) -> "https://www.dropbox.com/oauth2/authorize")
                 .oAuth2AuthorizationExtraQueryParameters(Map.of("token_access_type", "offline"))
                 .tokenUrl((connection, context) -> "https://api.dropboxapi.com/oauth2/token")
-                .refreshUrl((connection, context) -> "https://api.dropboxapi.com/oauth2/token"));
+                .refreshUrl((connection, context) -> "https://api.dropboxapi.com/oauth2/token"))
+        .version(1);
 
     private DropboxConnection() {
     }
