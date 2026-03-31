@@ -20,6 +20,7 @@ interface WorkflowChatStateI {
     messages: ThreadMessageLike[];
     appendToLastAssistantMessage: (delta: string) => void;
     resetAll: () => void;
+    resetCurrentChat: () => void;
     resetMessages: () => void;
     setCurrentChatName: (name: string | null) => void;
     setIsRunning: (isRunning: boolean) => void;
@@ -51,6 +52,24 @@ export const useWorkflowChatStore = create<WorkflowChatStateI>()(
                 messages: appendHelper(state.messages, delta),
             })),
         resetAll: () => set({...initialState, conversationCache: {}, conversationId: generateId()}),
+        resetCurrentChat: () =>
+            set((state) => {
+                if (state.isRunning) {
+                    return state;
+                }
+
+                const updatedCache = {...state.conversationCache};
+
+                if (state.activeWorkflowExecutionId) {
+                    delete updatedCache[state.activeWorkflowExecutionId];
+                }
+
+                return {
+                    conversationCache: updatedCache,
+                    conversationId: generateId(),
+                    messages: [],
+                };
+            }),
         resetMessages: () => set({messages: []}),
         setCurrentChatName: (name) => set({currentChatName: name}),
         setIsRunning: (isRunning) => set({isRunning}),
