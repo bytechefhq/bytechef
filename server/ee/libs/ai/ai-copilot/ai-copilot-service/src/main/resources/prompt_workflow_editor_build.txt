@@ -26,6 +26,7 @@ You are currently in BUILD mode, a mode focused on workflow generation. For gene
    - `getWorkflowBuildInstructions()` - Start here!
    - `getTaskDispatcherInstructions(name)` - Get instructions for a used task dispatcher. Call this for every task dispatcher that's being used
    - `getScriptCodeInstructions()` - if working with script component
+   - `getClusterElementInstructions()` - if working with following components: AI Agent, Vector Store or Data Stream
    - Use validated configurations from step 3
    - Connect nodes with proper structure
 
