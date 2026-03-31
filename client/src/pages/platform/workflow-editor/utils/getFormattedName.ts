@@ -5,7 +5,7 @@ import {isPlainObject} from '../../cluster-element-editor/utils/clusterElementsU
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getAllTasksRecursively from './getAllTasksRecursively';
 
-export default function getFormattedName(itemName: string): string {
+export default function getFormattedName(itemName: string, reservedNames?: Set<string>): string {
     const {nodes, workflow} = useWorkflowDataStore.getState();
 
     const nodeNames = nodes.map((node) => (node.data as NodeDataType).name);
@@ -66,7 +66,9 @@ export default function getFormattedName(itemName: string): string {
         return names?.includes(itemName) ? [names] : [];
     });
 
-    const allExistingNodes = [...existingNodes, ...existingClusterElementNodes];
+    const reservedMatchingNames = reservedNames ? [...reservedNames].filter((name) => name?.includes(itemName)) : [];
+
+    const allExistingNodes = [...existingNodes, ...existingClusterElementNodes, ...reservedMatchingNames];
 
     if (!allExistingNodes.length) {
         return `${itemName}_1`;
