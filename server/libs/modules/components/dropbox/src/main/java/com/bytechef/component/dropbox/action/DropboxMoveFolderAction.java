@@ -40,6 +40,7 @@ public class DropboxMoveFolderAction {
         .title("Move Folder")
         .description(
             "Move a folder to a different location in the user's Dropbox. All content of the folder will be moved.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#move-folder")
         .properties(
             string(FROM_PATH)
                 .label("Source Path")

@@ -37,6 +37,7 @@ public class DropboxGetFileLinkAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFileLink")
         .title("Get File Link")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#get-file-link")
         .description(
             "Get a temporary link to stream content of a file. This link will expire in four hours and afterwards " +
                 "you will get 410 Gone. This URL should not be used to display content directly in the browser. " +

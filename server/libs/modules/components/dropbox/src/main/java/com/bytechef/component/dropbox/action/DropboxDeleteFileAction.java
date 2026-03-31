@@ -36,6 +36,7 @@ public class DropboxDeleteFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFile")
         .title("Delete File")
         .description("Delete the file at a given path.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#delete-file")
         .properties(
             string(PATH)
                 .label("Path")

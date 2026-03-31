@@ -39,6 +39,7 @@ public class DropboxCopyFolderAction {
         .title("Copy Folder")
         .description(
             "Copy folder to a different location in the user's Dropbox. All content of the folder will be copied.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#copy-folder")
         .properties(
             string(FROM_PATH)
                 .label("From Path")

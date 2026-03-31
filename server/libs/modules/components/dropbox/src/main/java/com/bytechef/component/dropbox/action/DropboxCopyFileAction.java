@@ -39,6 +39,7 @@ public class DropboxCopyFileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("copyFile")
         .title("Copy File")
         .description("Copy a file to a different location in the user's Dropbox.")
+        .help("", "https://docs.bytechef.io/reference/components/dropbox_v1#copy-file")
         .properties(
             string(FROM_PATH)
                 .label("Source Path")
