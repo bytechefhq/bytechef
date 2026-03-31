@@ -140,42 +140,49 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
                     url: '/webhooks/' + workflowExecutionId + '/sse',
                 });
             } else {
-                const result = await fetch('/webhooks/' + workflowExecutionId, {
-                    body: formData,
-                    headers: {
-                        'X-Environment': environmentName,
-                    },
-                    method: 'POST',
-                    // if the user hits the "cancel" button or escape keyboard key, cancel the request
-                    // signal: abortSignal,
-                }).then(async (res) => {
-                    if (res.status >= 400) {
-                        const result = await res.json();
+                try {
+                    const result = await fetch('/webhooks/' + workflowExecutionId, {
+                        body: formData,
+                        headers: {
+                            'X-Environment': environmentName,
+                        },
+                        method: 'POST',
+                    }).then(async (res) => {
+                        if (res.status >= 400) {
+                            const result = await res.json();
 
-                        return {
-                            error: {
-                                detail: result.detail,
-                                message: 'An error occurred',
-                            },
-                        };
-                    } else {
-                        return res.json();
-                    }
-                });
+                            return {
+                                error: {
+                                    detail: result.detail,
+                                    message: 'An error occurred',
+                                },
+                            };
+                        } else {
+                            return res.json();
+                        }
+                    });
 
-                const content =
-                    result?.message ??
-                    (result?.error
-                        ? (result.error.message ?? 'An error occurred') +
-                          (result.error.detail ? '\n' + result.error.detail : '')
-                        : 'An unknown error occurred');
+                    const content =
+                        result?.message ??
+                        (result?.error
+                            ? (result.error.message ?? 'An error occurred') +
+                              (result.error.detail ? '\n' + result.error.detail : '')
+                            : 'An unknown error occurred');
 
-                setMessage({
-                    content,
-                    role: 'assistant',
-                });
+                    setMessage({
+                        content,
+                        role: 'assistant',
+                    });
+                } catch (error) {
+                    console.error('Failed to send chat message:', error);
 
-                setIsRunning(false);
+                    setMessage({
+                        content: 'An error occurred while sending the message.',
+                        role: 'assistant',
+                    });
+                } finally {
+                    setIsRunning(false);
+                }
             }
         },
         [environmentName, setIsRunning, setMessage, sseStreamResponse, workflowExecutionId]
@@ -203,6 +210,13 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
             setIsRunning(false);
         }
     }, [connectionState, setIsRunning]);
+
+    // Reset isRunning on unmount to prevent permanently blocked navigation
+    useEffect(() => {
+        return () => {
+            setIsRunning(false);
+        };
+    }, [setIsRunning]);
 
     return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
 });

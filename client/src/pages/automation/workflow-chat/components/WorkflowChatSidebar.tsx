@@ -105,22 +105,18 @@ const WorkflowChatSidebar = () => {
                                 {workflows.map((workflowData) => {
                                     const chatUrl = `/automation/chat/${workflowData.workflowExecutionId}`;
                                     const isActive = workflowExecutionId === workflowData.workflowExecutionId;
-                                    const isDisabled = isRunning && !isActive;
 
                                     return (
-                                        <div
-                                            className={isDisabled ? 'pointer-events-none opacity-50' : ''}
+                                        <LeftSidebarNavItem
+                                            disabled={isRunning && !isActive}
+                                            item={{
+                                                current: isActive,
+                                                id: `${workflowData.projectDeploymentId}-${workflowData.workflowId}`,
+                                                name: workflowData.workflowLabel,
+                                            }}
                                             key={`${workflowData.projectDeploymentId}-${workflowData.workflowId}`}
-                                        >
-                                            <LeftSidebarNavItem
-                                                item={{
-                                                    current: isActive,
-                                                    id: `${workflowData.projectDeploymentId}-${workflowData.workflowId}`,
-                                                    name: workflowData.workflowLabel,
-                                                }}
-                                                toLink={chatUrl}
-                                            />
-                                        </div>
+                                            toLink={chatUrl}
+                                        />
                                     );
                                 })}
                             </>
