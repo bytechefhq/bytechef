@@ -16,6 +16,7 @@ const WorkflowChat = () => {
     const environmentName = useMemo(() => toEnvironmentName(currentEnvironmentId), [currentEnvironmentId]);
 
     const activeWorkflowExecutionId = useWorkflowChatStore((state) => state.activeWorkflowExecutionId);
+    const isRunning = useWorkflowChatStore((state) => state.isRunning);
     const setCurrentChatName = useWorkflowChatStore((state) => state.setCurrentChatName);
     const switchChat = useWorkflowChatStore((state) => state.switchChat);
 
@@ -27,10 +28,15 @@ const WorkflowChat = () => {
 
     // If switchChat was blocked (isRunning), redirect back to the active chat
     useEffect(() => {
-        if (activeWorkflowExecutionId && workflowExecutionId && activeWorkflowExecutionId !== workflowExecutionId) {
+        if (
+            isRunning &&
+            activeWorkflowExecutionId &&
+            workflowExecutionId &&
+            activeWorkflowExecutionId !== workflowExecutionId
+        ) {
             navigate(`/automation/chat/${activeWorkflowExecutionId}`, {replace: true});
         }
-    }, [activeWorkflowExecutionId, navigate, workflowExecutionId]);
+    }, [activeWorkflowExecutionId, isRunning, navigate, workflowExecutionId]);
 
     const effectiveWorkflowExecutionId = activeWorkflowExecutionId || workflowExecutionId;
 
