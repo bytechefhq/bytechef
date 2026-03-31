@@ -133,24 +133,37 @@ export function collectChainSuccessorNodes(
 
         successorPositions.set(targetId, {...targetNode.position});
 
-        // If this successor is itself a task dispatcher, also collect its descendants
+        // If this successor is itself a task dispatcher, recursively collect
+        // all its descendants (ghosts, children, and nested dispatchers).
         const targetNodeData = targetNode.data as NodeDataType;
 
-        if (targetNodeData.taskDispatcher && targetNodeData.taskDispatcherId) {
-            allNodes.forEach((node) => {
-                if (
-                    !visited.has(node.id) &&
-                    !descendantIds.has(node.id) &&
-                    !successorPositions.has(node.id) &&
-                    isChildNodeOfDispatcher(node, targetNodeData.taskDispatcherId!)
-                ) {
-                    successorPositions.set(node.id, {...node.position});
-                    visited.add(node.id);
+        if (targetNodeData.taskDispatcher) {
+            const nestedDescendants = collectAllDescendantNodes(targetId, allNodes);
+
+            nestedDescendants.forEach((position, nodeId) => {
+                if (!visited.has(nodeId) && !descendantIds.has(nodeId) && !successorPositions.has(nodeId)) {
+                    successorPositions.set(nodeId, position);
+                    visited.add(nodeId);
                 }
             });
+
+            // Continue the chain from the dispatcher's bottom ghost since
+            // descendants were added to visited and the normal edge walk
+            // from targetId would stop at the top ghost.
+            const nestedBottomGhostId = [...nestedDescendants.keys()].find((nodeId) => nodeId.includes('bottom-ghost'));
+
+            if (nestedBottomGhostId) {
+                const bottomGhostTargets = edgesBySource.get(nestedBottomGhostId) || [];
+
+                for (const nextTarget of bottomGhostTargets) {
+                    if (!visited.has(nextTarget)) {
+                        queue.push(nextTarget);
+                    }
+                }
+            }
         }
 
-        // Continue following the chain
+        // Continue following the chain from the current node
         const nextTargets = edgesBySource.get(targetId) || [];
 
         for (const nextTarget of nextTargets) {

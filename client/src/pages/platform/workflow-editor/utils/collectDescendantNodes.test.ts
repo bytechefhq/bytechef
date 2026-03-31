@@ -303,11 +303,7 @@ describe('collectAllDescendantNodes', () => {
         // instead of nodeData.taskDispatcherId to descend correctly.
         const nodes: Node[] = [
             makeNode('each_1', undefined, {taskDispatcher: true, taskDispatcherId: 'each_1'}),
-            makeNode(
-                'fork-join_1',
-                {eachData: {eachId: 'each_1'}},
-                {taskDispatcher: true, taskDispatcherId: 'each_1'}
-            ),
+            makeNode('fork-join_1', {eachData: {eachId: 'each_1'}}, {taskDispatcher: true, taskDispatcherId: 'each_1'}),
             makeGhostNode('fork-join_1', 'top-ghost'),
             makeNode(
                 'condition_2',
@@ -430,22 +426,58 @@ describe('collectChainSuccessorNodes', () => {
         expect(successors.has('task_2')).toBe(true);
     });
 
-    it('should also collect children of a successor task dispatcher', () => {
+    it('should recursively collect all descendants of a successor task dispatcher', () => {
         const nodes: Node[] = [
             makeNode('condition_1', undefined, {taskDispatcher: true, taskDispatcherId: 'condition_1'}),
             makeGhostNode('condition_1', 'bottom-ghost'),
-            makeNode('loop_1', undefined, {taskDispatcher: true, taskDispatcherId: 'loop_1'}),
-            makeNode('inner_task', {loopData: {index: 0, loopId: 'loop_1'}}),
+            makeNode('condition_2', undefined, {taskDispatcher: true, taskDispatcherId: 'condition_2'}),
+            makeGhostNode('condition_2', 'top-ghost'),
+            makeGhostNode('condition_2', 'bottom-ghost'),
+            makeNode('inner_task', {
+                conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_2', index: 0},
+            }),
         ];
 
-        const edges: Edge[] = [makeEdge('condition_1-condition-bottom-ghost', 'loop_1')];
+        const edges: Edge[] = [makeEdge('condition_1-condition-bottom-ghost', 'condition_2')];
 
         const descendantIds = new Set(['condition_1-condition-bottom-ghost']);
 
         const successors = collectChainSuccessorNodes('condition_1', nodes, edges, descendantIds);
 
-        expect(successors.has('loop_1')).toBe(true);
+        expect(successors.has('condition_2')).toBe(true);
+        expect(successors.has('condition_2-condition-top-ghost')).toBe(true);
+        expect(successors.has('condition_2-condition-bottom-ghost')).toBe(true);
         expect(successors.has('inner_task')).toBe(true);
+    });
+
+    it('should continue the chain past a successor dispatcher via its bottom ghost', () => {
+        const nodes: Node[] = [
+            makeNode('condition_1', undefined, {taskDispatcher: true, taskDispatcherId: 'condition_1'}),
+            makeGhostNode('condition_1', 'bottom-ghost'),
+            makeNode('condition_2', undefined, {taskDispatcher: true, taskDispatcherId: 'condition_2'}),
+            makeGhostNode('condition_2', 'top-ghost'),
+            makeGhostNode('condition_2', 'bottom-ghost'),
+            makeNode('loop_1', undefined, {taskDispatcher: true, taskDispatcherId: 'loop_1'}),
+            makeNode('task_after_loop'),
+        ];
+
+        const edges: Edge[] = [
+            makeEdge('condition_1-condition-bottom-ghost', 'condition_2'),
+            makeEdge('condition_2', 'condition_2-condition-top-ghost'),
+            makeEdge('condition_2-condition-bottom-ghost', 'loop_1'),
+            makeEdge('loop_1', 'task_after_loop'),
+            makeEdge('task_after_loop', 'mmm1ubf269tdnz993fl'),
+        ];
+
+        const descendantIds = new Set(['condition_1-condition-bottom-ghost']);
+
+        const successors = collectChainSuccessorNodes('condition_1', nodes, edges, descendantIds);
+
+        expect(successors.has('condition_2')).toBe(true);
+        expect(successors.has('condition_2-condition-top-ghost')).toBe(true);
+        expect(successors.has('condition_2-condition-bottom-ghost')).toBe(true);
+        expect(successors.has('loop_1')).toBe(true);
+        expect(successors.has('task_after_loop')).toBe(true);
     });
 
     it('should return empty map when no bottom ghost exists', () => {
