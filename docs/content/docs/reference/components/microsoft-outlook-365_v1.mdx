@@ -510,12 +510,13 @@ The output for this action is dynamic and may vary depending on the input parame
 ### Send Email
 Name: sendEmail
 
-`Sends a new email message from the signed-in user's mailbox.`
+`Sends a new email message.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from | From | STRING | The email address sending the mail. | true |
 | toRecipients | To Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The To: recipients for the message. | true |
 | subject | Subject | STRING | The subject of the message. | true |
 | bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
@@ -530,6 +531,7 @@ Name: sendEmail
   "label" : "Send Email",
   "name" : "sendEmail",
   "parameters" : {
+    "from" : "",
     "toRecipients" : [ "" ],
     "subject" : "",
     "bccRecipients" : [ "" ],
