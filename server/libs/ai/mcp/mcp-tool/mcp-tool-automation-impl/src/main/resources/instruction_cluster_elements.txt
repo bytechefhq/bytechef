@@ -1,0 +1,29 @@
+Some actions contain cluster elements — sub-components nested within a task.
+Rules:
+- Before building any action that has cluster elements, call searchActions() for each cluster element to retrieve its schema. If the cluster element value is true, this indicates that it's a list of actions, otherwise it's a single action.
+- Once retrieved, nest cluster elements inside the action under clusterElements property, keyed by their type:
+"tasks": [
+  {
+    "label": "action with cluster elements",
+    "name": "action_1",
+    "type": "<action type>",
+    "parameters": { ... }
+    "clusterElements": {
+      "clusterElementType1": {
+        "label": "cluster element with false value",
+        "name": "<clusterElementTypeName>_1",
+        "type": "<type from searchActions()>",
+        "parameters": { ... }
+      },
+      "clusterElementType2": [
+        {
+          "label": "cluster element with true value",
+          "name": "<clusterElementTypeName>_1",
+          "type": "<type from searchActions()>",
+          "parameters": { ... }
+        }
+      ]
+    }
+  }
+]
+- After building, call validateTask() on every nested action. Never assume a cluster element's schema.
