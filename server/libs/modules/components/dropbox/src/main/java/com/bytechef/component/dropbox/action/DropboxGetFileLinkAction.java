@@ -20,9 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -45,13 +43,9 @@ public class DropboxGetFileLinkAction {
                 "The Content-Type of the link is determined automatically by the file's mime type.")
         .properties(
             string(PATH)
-                .label("Namepath to the File")
-                .description("The path to the file you want a temporary link to.  Root is /.")
-                .required(true),
-            string(FILENAME)
-                .label("Filename")
-                .description(
-                    "Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect)")
+                .label("File Path")
+                .description("The path to the file you want a temporary link to.")
+                .exampleValue("/folder1/sourceFile.txt")
                 .required(true))
         .output(
             outputSchema(
@@ -84,12 +78,7 @@ public class DropboxGetFileLinkAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("https://api.dropboxapi.com/2/files/get_temporary_link"))
-            .body(
-                Body.of(
-                    Map.of(
-                        PATH,
-                        getFullPath(
-                            inputParameters.getRequiredString(PATH), inputParameters.getRequiredString(FILENAME)))))
+            .body(Body.of(Map.of(PATH, inputParameters.getRequiredString(PATH))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();

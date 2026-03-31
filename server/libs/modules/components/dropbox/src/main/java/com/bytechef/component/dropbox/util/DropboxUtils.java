@@ -18,12 +18,15 @@ package com.bytechef.component.dropbox.util;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.AUTORENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.MUTE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CONFLICT;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
@@ -35,11 +38,39 @@ import java.util.Map;
  */
 public class DropboxUtils {
 
-    public static String getFullPath(String path, String filename) {
-        return (path.endsWith("/") ? path : path + "/") + filename;
+    private DropboxUtils() {
     }
 
-    private DropboxUtils() {
+    public static Object copy(Parameters inputParameters, Context context) {
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/copy_v2"))
+            .body(
+                Body.of(
+                    FROM_PATH, inputParameters.getRequiredString(FROM_PATH),
+                    TO_PATH, inputParameters.getRequiredString(TO_PATH),
+                    AUTORENAME, inputParameters.getBoolean(AUTORENAME)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody();
+    }
+
+    public static Object delete(Parameters inputParameters, Context context) {
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/delete_v2"))
+            .body(Body.of(Map.of(PATH, inputParameters.getRequiredString(PATH))))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody();
+    }
+
+    public static Object move(Parameters inputParameters, Context context) {
+        return context.http(http -> http.post("https://api.dropboxapi.com/2/files/move_v2"))
+            .body(
+                Body.of(
+                    FROM_PATH, inputParameters.getRequiredString(FROM_PATH),
+                    TO_PATH, inputParameters.getRequiredString(TO_PATH),
+                    AUTORENAME, inputParameters.getBoolean(AUTORENAME)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody();
     }
 
     public static Object uploadFile(Parameters inputParameters, Context context, FileEntry fileEntry) {
@@ -56,9 +87,13 @@ public class DropboxUtils {
 
         return context.http(http -> http.post("https://content.dropboxapi.com/2/files/upload"))
             .headers(Map.of("Dropbox-API-Arg", List.of(headerJson)))
-            .body(Http.Body.of(fileEntry, "application/octet-stream"))
+            .body(Body.of(fileEntry, "application/octet-stream"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();
+    }
+
+    private static String getFullPath(String path, String filename) {
+        return (path.endsWith("/") ? path : path + "/") + filename;
     }
 }
