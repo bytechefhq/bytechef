@@ -45,8 +45,7 @@ ByteChef exposes a [Model Context Protocol (MCP)](https://modelcontextprotocol.i
          "command": "npx",
          "args": [
            "-y",
-           "supergateway",
-           "--streamableHttp",
+           "mcp-remote",
            "https://<your-host>/api/management/<secret-key>/mcp"
          ]
        }
