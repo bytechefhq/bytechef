@@ -23,7 +23,7 @@ import {
     LayoutTemplateIcon,
     Link2Icon,
     LucideIcon,
-    MessageCircleMoreIcon,
+    MessageSquareIcon,
     ServerIcon,
     Settings2Icon,
     SquareIcon,
@@ -83,7 +83,7 @@ const automationNavigation: NavigationType[] = [
         icon: VectorSquareIcon,
         name: 'Knowledge Base',
     },
-    {href: '/automation/chat', icon: MessageCircleMoreIcon, name: 'Workflow Chat'},
+    {href: '/automation/chat', icon: MessageSquareIcon, name: 'Chat'},
     {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
 ];
 

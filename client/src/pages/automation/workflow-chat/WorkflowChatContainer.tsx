@@ -3,6 +3,7 @@ import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useW
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {MessageSquareIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {Outlet, useParams} from 'react-router-dom';
 
@@ -23,16 +24,18 @@ const WorkflowChatContainer = () => {
             className="bg-surface-main"
             header={<Header centerTitle position="main" right={<EnvironmentSelect />} title={currentChatName} />}
             leftSidebarBody={<WorkflowChatSidebar />}
-            leftSidebarHeader={<Header position="sidebar" title="Workflow Chat" />}
+            leftSidebarHeader={<Header position="sidebar" title="Chat" />}
             leftSidebarWidth="64"
         >
             {workflowExecutionId ? (
                 <Outlet />
             ) : (
-                <div className="flex flex-1 items-center justify-center">
-                    <div className="text-center text-muted-foreground">
-                        <p className="text-lg">No Chat selected. Please selected the one.</p>
-                    </div>
+                <div className="flex flex-1 flex-col items-center justify-center text-center">
+                    <MessageSquareIcon className="mx-auto mb-4 size-12 text-muted-foreground" />
+
+                    <h2 className="text-lg font-medium text-foreground">Select a chat</h2>
+
+                    <p className="text-sm text-muted-foreground">Choose a chat from the sidebar to start messaging</p>
                 </div>
             )}
         </LayoutContainer>

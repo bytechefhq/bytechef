@@ -95,7 +95,7 @@ const WorkflowChatSidebar = () => {
         <>
             {workflowsByProject.size === 0 ? (
                 <div className="mb-4 px-2">
-                    <span className="px-3 text-xs">No chat workflows found</span>
+                    <span className="px-3 text-xs">No chats found</span>
                 </div>
             ) : (
                 Array.from(workflowsByProject.entries()).map(([projectId, {projectName, workflows}]) => (
