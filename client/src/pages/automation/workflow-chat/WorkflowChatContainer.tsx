@@ -1,9 +1,11 @@
+import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowChatSidebar from '@/pages/automation/workflow-chat/components/WorkflowChatSidebar';
 import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {MessageSquareIcon} from 'lucide-react';
+import {MessageSquareIcon, MessageSquareXIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {Outlet, useParams} from 'react-router-dom';
 
@@ -11,7 +13,9 @@ const WorkflowChatContainer = () => {
     const {workflowExecutionId} = useParams();
 
     const currentChatName = useWorkflowChatStore((state) => state.currentChatName);
+    const isRunning = useWorkflowChatStore((state) => state.isRunning);
     const resetAll = useWorkflowChatStore((state) => state.resetAll);
+    const resetCurrentChat = useWorkflowChatStore((state) => state.resetCurrentChat);
 
     useEffect(() => {
         return () => {
@@ -22,7 +26,35 @@ const WorkflowChatContainer = () => {
     return (
         <LayoutContainer
             className="bg-surface-main"
-            header={<Header centerTitle position="main" right={<EnvironmentSelect />} title={currentChatName} />}
+            header={
+                <Header
+                    centerTitle
+                    position="main"
+                    right={
+                        <div className="flex items-center gap-4">
+                            <EnvironmentSelect />
+
+                            {workflowExecutionId && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            aria-label="Clear messages"
+                                            disabled={isRunning}
+                                            icon={<MessageSquareXIcon />}
+                                            onClick={resetCurrentChat}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Clear messages</TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
+                    }
+                    title={currentChatName}
+                />
+            }
             leftSidebarBody={<WorkflowChatSidebar />}
             leftSidebarHeader={<Header position="sidebar" title="Chat" />}
             leftSidebarWidth="64"

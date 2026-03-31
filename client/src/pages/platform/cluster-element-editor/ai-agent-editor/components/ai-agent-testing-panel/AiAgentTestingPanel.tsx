@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiAgentTestRuntimeProvider from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/runtime-providers/AiAgentTestRuntimeProvider';
-import {MessageSquareOffIcon, PlayIcon, SparklesIcon, WorkflowIcon, XIcon} from 'lucide-react';
+import {MessageSquareXIcon, PlayIcon, SparklesIcon, WorkflowIcon, XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 import {Thread} from './AiAgentTestingPanelThread';
@@ -55,12 +55,7 @@ export default function AiAgentTestingPanel({contentClassName, headerClassName, 
                 <div className="flex items-center gap-2">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
-                                icon={<MessageSquareOffIcon />}
-                                onClick={handleReset}
-                                size="iconSm"
-                                variant="ghost"
-                            />
+                            <Button icon={<MessageSquareXIcon />} onClick={handleReset} size="iconSm" variant="ghost" />
                         </TooltipTrigger>
 
                         <TooltipContent>Reset conversation</TooltipContent>
