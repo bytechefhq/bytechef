@@ -5,15 +5,17 @@ import {toEnvironmentName} from '@/shared/constants';
 import {useWorkflowChatProjectDeploymentWorkflowQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo} from 'react';
-import {useParams} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 
 const WorkflowChat = () => {
     const {workflowExecutionId} = useParams();
+    const navigate = useNavigate();
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const environmentName = useMemo(() => toEnvironmentName(currentEnvironmentId), [currentEnvironmentId]);
 
+    const activeWorkflowExecutionId = useWorkflowChatStore((state) => state.activeWorkflowExecutionId);
     const setCurrentChatName = useWorkflowChatStore((state) => state.setCurrentChatName);
     const switchChat = useWorkflowChatStore((state) => state.switchChat);
 
@@ -23,12 +25,21 @@ const WorkflowChat = () => {
         }
     }, [workflowExecutionId, switchChat]);
 
+    // If switchChat was blocked (isRunning), redirect back to the active chat
+    useEffect(() => {
+        if (activeWorkflowExecutionId && workflowExecutionId && activeWorkflowExecutionId !== workflowExecutionId) {
+            navigate(`/automation/chat/${activeWorkflowExecutionId}`, {replace: true});
+        }
+    }, [activeWorkflowExecutionId, navigate, workflowExecutionId]);
+
+    const effectiveWorkflowExecutionId = activeWorkflowExecutionId || workflowExecutionId;
+
     const {data} = useWorkflowChatProjectDeploymentWorkflowQuery(
         {
-            id: workflowExecutionId!,
+            id: effectiveWorkflowExecutionId!,
         },
         {
-            enabled: !!workflowExecutionId,
+            enabled: !!effectiveWorkflowExecutionId,
         }
     );
 
@@ -51,7 +62,7 @@ const WorkflowChat = () => {
             <WorkflowChatRuntimeProvider
                 environmentName={environmentName}
                 sseStreamResponse={data?.projectDeploymentWorkflow?.projectWorkflow?.sseStreamResponse}
-                workflowExecutionId={workflowExecutionId!}
+                workflowExecutionId={effectiveWorkflowExecutionId!}
             >
                 <div className="relative flex size-full flex-col">
                     <Thread />

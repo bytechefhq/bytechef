@@ -25,6 +25,7 @@ const LeftSidebarNav = ({body, className, title}: LeftSidebarNavProps) => (
 );
 
 interface LeftSidebarNavItemProps {
+    disabled?: boolean;
     item: {
         current: boolean;
         name: string;
@@ -35,15 +36,33 @@ interface LeftSidebarNavItemProps {
     icon?: ReactNode;
 }
 
-const LeftSidebarNavItem = ({icon, item: {current, id, name, onItemClick}, toLink = ''}: LeftSidebarNavItemProps) => (
+const LeftSidebarNavItem = ({
+    disabled = false,
+    icon,
+    item: {current, id, name, onItemClick},
+    toLink = '',
+}: LeftSidebarNavItemProps) => (
     <Link
         aria-current={current ? 'page' : undefined}
+        aria-disabled={disabled || undefined}
         className={cn(
             buttonVariants({variant: 'ghost'}),
             current ? 'bg-accent hover:bg-accent' : 'hover:bg-accent',
-            'w-full justify-start px-2 font-normal'
+            'w-full justify-start px-2 font-normal',
+            disabled && 'pointer-events-none opacity-50'
         )}
-        onClick={() => (onItemClick ? onItemClick(id) : null)}
+        onClick={(event) => {
+            if (disabled) {
+                event.preventDefault();
+
+                return;
+            }
+
+            if (onItemClick) {
+                onItemClick(id);
+            }
+        }}
+        tabIndex={disabled ? -1 : undefined}
         to={toLink}
     >
         {icon}

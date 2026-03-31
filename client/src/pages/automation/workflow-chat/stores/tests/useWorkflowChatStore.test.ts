@@ -323,4 +323,53 @@ describe('useWorkflowChatStore', () => {
 
         expect(result.current.activeWorkflowExecutionId).toBe('chat-xyz');
     });
+
+    it('blocks switchChat when isRunning is true', () => {
+        const {result} = renderHook(() => useWorkflowChatStore());
+
+        act(() => {
+            result.current.switchChat('chat-1');
+            result.current.setMessage({content: 'Hello', role: 'user'});
+            result.current.setMessage({content: 'Reply', role: 'assistant'});
+        });
+
+        const conversationIdBeforeBlock = result.current.conversationId;
+
+        act(() => {
+            result.current.setIsRunning(true);
+        });
+
+        act(() => {
+            result.current.switchChat('chat-2');
+        });
+
+        expect(result.current.activeWorkflowExecutionId).toBe('chat-1');
+        expect(result.current.conversationId).toBe(conversationIdBeforeBlock);
+        expect(result.current.messages).toHaveLength(2);
+        expect(result.current.conversationCache).toEqual({});
+    });
+
+    it('allows switchChat after isRunning becomes false', () => {
+        const {result} = renderHook(() => useWorkflowChatStore());
+
+        act(() => {
+            result.current.switchChat('chat-1');
+            result.current.setMessage({content: 'Hello', role: 'user'});
+            result.current.setIsRunning(true);
+        });
+
+        act(() => {
+            result.current.switchChat('chat-2');
+        });
+
+        expect(result.current.activeWorkflowExecutionId).toBe('chat-1');
+
+        act(() => {
+            result.current.setIsRunning(false);
+            result.current.switchChat('chat-2');
+        });
+
+        expect(result.current.activeWorkflowExecutionId).toBe('chat-2');
+        expect(result.current.messages).toEqual([]);
+    });
 });
