@@ -27,6 +27,8 @@ public interface ReadProjectWorkflowTools {
 
     String getScriptCodeInstructions();
 
+    String getClusterElementsInstructions();
+
     WorkflowInfo getWorkflow(String workflowId);
 
     String getWorkflowBuildInstructions();
