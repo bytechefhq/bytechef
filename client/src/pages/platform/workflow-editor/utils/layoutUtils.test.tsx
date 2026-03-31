@@ -519,7 +519,7 @@ describe('getClusterElementsLayoutElements new node positioning with moved sibli
             makeChildNode('child-2'), // New node, no saved position
         ];
 
-        const result = getClusterElementsLayoutElements({canvasWidth, edges: [], nodes});
+        const result = getClusterElementsLayoutElements({canvasHeight: 800, canvasWidth, edges: [], nodes});
         const newNode = result.nodes.find((node) => node.id === 'child-2');
         const secondSibling = result.nodes.find((node) => node.id === 'child-1');
 
@@ -540,7 +540,7 @@ describe('getClusterElementsLayoutElements new node positioning with moved sibli
             makeChildNode('child-1'), // New node
         ];
 
-        const result = getClusterElementsLayoutElements({canvasWidth, edges: [], nodes});
+        const result = getClusterElementsLayoutElements({canvasHeight: 800, canvasWidth, edges: [], nodes});
         const newNode = result.nodes.find((node) => node.id === 'child-1');
 
         expect(newNode).toBeDefined();
@@ -552,7 +552,7 @@ describe('getClusterElementsLayoutElements new node positioning with moved sibli
     it('should use the default position when no siblings have saved positions', () => {
         const nodes: Node[] = [makeRootNode(), makeChildNode('child-0'), makeChildNode('child-1')];
 
-        const result = getClusterElementsLayoutElements({canvasWidth, edges: [], nodes});
+        const result = getClusterElementsLayoutElements({canvasHeight: 800, canvasWidth, edges: [], nodes});
         const firstNode = result.nodes.find((node) => node.id === 'child-0');
         const secondNode = result.nodes.find((node) => node.id === 'child-1');
 

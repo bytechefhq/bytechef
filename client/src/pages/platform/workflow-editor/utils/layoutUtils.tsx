@@ -177,11 +177,15 @@ interface GetLayoutElementsProps {
 }
 
 export const getClusterElementsLayoutElements = ({
+    canvasHeight,
     canvasWidth,
+    currentRootPosition,
     edges,
     nodes,
 }: {
+    canvasHeight: number;
     canvasWidth: number;
+    currentRootPosition?: {x: number; y: number};
     edges: Edge[];
     nodes: Node[];
 }): {edges: Edge[]; nodes: Node[]} => {
@@ -442,6 +446,91 @@ export const getClusterElementsLayoutElements = ({
                     sibling.position = {...sibling.position, x: sibling.position.x - leftShift};
                 }
             }
+        }
+    }
+
+    // Center the entire graph when there are children beyond the root.
+    // When only the root exists, keep its current centered position.
+    if (positionedNodes.length > 1) {
+        const absolutePositionMap = new Map<string, {x: number; y: number}>();
+
+        const getAbsolutePosition = (nodeId: string): {x: number; y: number} => {
+            const cached = absolutePositionMap.get(nodeId);
+
+            if (cached) {
+                return cached;
+            }
+
+            const node = positionedNodes.find((positioned) => positioned.id === nodeId);
+
+            if (!node || !node.parentId) {
+                const position = node?.position ?? {x: 0, y: 0};
+
+                absolutePositionMap.set(nodeId, position);
+
+                return position;
+            }
+
+            const parentAbsolutePosition = getAbsolutePosition(node.parentId);
+
+            const absolutePosition = {
+                x: parentAbsolutePosition.x + node.position.x,
+                y: parentAbsolutePosition.y + node.position.y,
+            };
+
+            absolutePositionMap.set(nodeId, absolutePosition);
+
+            return absolutePosition;
+        };
+
+        let graphMinX = Infinity;
+        let graphMaxX = -Infinity;
+        let graphMinY = Infinity;
+        let graphMaxY = -Infinity;
+
+        for (const node of positionedNodes) {
+            const absolutePosition = getAbsolutePosition(node.id);
+            const isClusterRoot = !!node.data.clusterElementTypesCount;
+
+            const nodeWidth = isClusterRoot
+                ? calculateNodeWidth(node.data.clusterElementTypesCount as number) || ROOT_CLUSTER_WIDTH
+                : CLUSTER_ELEMENT_NODE_WIDTH;
+
+            graphMinX = Math.min(graphMinX, absolutePosition.x);
+            graphMaxX = Math.max(graphMaxX, absolutePosition.x + nodeWidth);
+            graphMinY = Math.min(graphMinY, absolutePosition.y);
+            graphMaxY = Math.max(graphMaxY, absolutePosition.y + NODE_HEIGHT);
+        }
+
+        const viewportWidth = canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM;
+        const viewportHeight = canvasHeight / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM;
+        const canvasCenterY = viewportHeight / 2;
+        const graphCenterX = (graphMinX + graphMaxX) / 2;
+        const graphCenterY = (graphMinY + graphMaxY) / 2;
+        const graphHeight = graphMaxY - graphMinY;
+        const rootPadding = NODE_HEIGHT;
+
+        // When currentRootPosition is provided (re-layout after drag), preserve
+        // the horizontal position to avoid shifting the graph. Always recompute
+        // vertical position since it must adapt as the graph grows.
+        const horizontalShift = currentRootPosition ? 0 : canvasCenterX - graphCenterX;
+
+        // Only center vertically when the graph fits within the viewport.
+        // When the graph is taller, keep the root near the top so it's visible.
+        const verticalShift = graphHeight < viewportHeight ? canvasCenterY - graphCenterY : 0;
+
+        const mainRootPositioned = positionedNodes.find((node) => node.id === mainRootNode.id);
+
+        if (mainRootPositioned) {
+            const newRootX = currentRootPosition
+                ? currentRootPosition.x
+                : mainRootPositioned.position.x + horizontalShift;
+            const newRootY = mainRootPositioned.position.y + verticalShift;
+
+            mainRootPositioned.position = {
+                x: Math.max(rootPadding, Math.min(newRootX, viewportWidth - mainRootWidth - rootPadding)),
+                y: Math.max(rootPadding, Math.min(newRootY, viewportHeight - NODE_HEIGHT - rootPadding)),
+            };
         }
     }
 
