@@ -343,27 +343,28 @@ const useWorkflowEditorCanvas = ({
 
             let placeholderPosition: {id: string; position: {x: number; y: number}} | null = null;
 
-            if (draggingPlaceholderRef.current && childPositions) {
-                const trackedNodePosition = childPositions.get(draggingPlaceholderRef.current.nodeId);
+            if (draggingPlaceholderRef.current) {
+                // The tracked node may be the dragged node itself (in changes)
+                // or a descendant (in childPositions).
+                let trackedNodePosition = childPositions?.get(draggingPlaceholderRef.current.nodeId);
+
+                if (!trackedNodePosition) {
+                    const trackedChange = changes.find(
+                        (change) =>
+                            change.type === 'position' &&
+                            change.id === draggingPlaceholderRef.current!.nodeId &&
+                            change.position
+                    );
+
+                    if (trackedChange && trackedChange.type === 'position') {
+                        trackedNodePosition = trackedChange.position;
+                    }
+                }
 
                 if (trackedNodePosition) {
                     placeholderPosition = {
                         id: FINAL_PLACEHOLDER_NODE_ID,
                         position: computePlaceholderDragPosition(draggingPlaceholderRef.current, trackedNodePosition),
-                    };
-                }
-            } else if (draggingPlaceholderRef.current) {
-                const trackedChange = changes.find(
-                    (change) =>
-                        change.type === 'position' &&
-                        change.id === draggingPlaceholderRef.current!.nodeId &&
-                        change.position
-                );
-
-                if (trackedChange && trackedChange.type === 'position' && trackedChange.position) {
-                    placeholderPosition = {
-                        id: FINAL_PLACEHOLDER_NODE_ID,
-                        position: computePlaceholderDragPosition(draggingPlaceholderRef.current, trackedChange.position),
                     };
                 }
             }
