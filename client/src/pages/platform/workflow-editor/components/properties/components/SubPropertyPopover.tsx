@@ -12,10 +12,10 @@ interface SubPropertyPopoverProps {
     array?: boolean;
     availablePropertyTypes: Array<{label: string; value: string}>;
     buttonLabel?: string;
-    condition?: boolean;
     disabled?: boolean;
     disabledTooltip?: string;
     handleClick: () => void;
+    insideConditionTaskDispatcher?: boolean;
     newPropertyName?: string;
     newPropertyType: keyof typeof VALUE_PROPERTY_CONTROL_TYPES | string;
     propertyName?: string;
@@ -27,10 +27,10 @@ const SubPropertyPopover = ({
     array,
     availablePropertyTypes,
     buttonLabel,
-    condition,
     disabled,
     disabledTooltip,
     handleClick,
+    insideConditionTaskDispatcher,
     newPropertyName,
     newPropertyType,
     propertyName,
@@ -112,7 +112,7 @@ const SubPropertyPopover = ({
                         />
                     )}
 
-                    {condition && availablePropertyTypes?.length > 1 && (
+                    {insideConditionTaskDispatcher && availablePropertyTypes?.length > 1 && (
                         <PropertySelect
                             label="Type"
                             onValueChange={(value) =>
@@ -126,7 +126,7 @@ const SubPropertyPopover = ({
                         />
                     )}
 
-                    {!condition &&
+                    {!insideConditionTaskDispatcher &&
                         (availablePropertyTypes?.length > 1 ? (
                             <PropertySelect
                                 label="Type"
