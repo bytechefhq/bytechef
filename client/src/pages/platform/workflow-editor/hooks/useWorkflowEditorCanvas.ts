@@ -70,11 +70,12 @@ const useWorkflowEditorCanvas = ({
         workflow = {...workflow, ...readOnlyWorkflow};
     }
 
-    const {incrementLayoutResetCounter, onNodesChange, setIsNodeDragging} = useWorkflowDataStore(
+    const {incrementLayoutResetCounter, onNodesChange, setIsNodeDragging, setNodes} = useWorkflowDataStore(
         useShallow((state) => ({
             incrementLayoutResetCounter: state.incrementLayoutResetCounter,
             onNodesChange: state.onNodesChange,
             setIsNodeDragging: state.setIsNodeDragging,
+            setNodes: state.setNodes,
         }))
     );
     const {layoutDirection, setWorkflowId} = useLayoutDirectionStore(
@@ -315,7 +316,7 @@ const useWorkflowEditorCanvas = ({
 
     const handleNodesChange = useCallback(
         (changes: NodeChange<Node>[]) => {
-            const allChanges: NodeChange<Node>[] = [...changes];
+            let childPositions: Map<string, {x: number; y: number}> | null = null;
 
             if (draggingDispatcherIdRef.current && dispatcherDragStartRef.current) {
                 const dispatcherChange = changes.find(
@@ -329,22 +330,30 @@ const useWorkflowEditorCanvas = ({
                         y: dispatcherChange.position.y - dispatcherDragStartRef.current.y,
                     };
 
+                    childPositions = new Map();
+
                     childDragStartRef.current.forEach((startPosition, childId) => {
-                        allChanges.push({
-                            dragging: true,
-                            id: childId,
-                            position: {
-                                x: startPosition.x + delta.x,
-                                y: startPosition.y + delta.y,
-                            },
-                            type: 'position',
+                        childPositions!.set(childId, {
+                            x: startPosition.x + delta.x,
+                            y: startPosition.y + delta.y,
                         });
                     });
                 }
             }
 
-            if (draggingPlaceholderRef.current) {
-                const trackedChange = allChanges.find(
+            let placeholderPosition: {id: string; position: {x: number; y: number}} | null = null;
+
+            if (draggingPlaceholderRef.current && childPositions) {
+                const trackedNodePosition = childPositions.get(draggingPlaceholderRef.current.nodeId);
+
+                if (trackedNodePosition) {
+                    placeholderPosition = {
+                        id: FINAL_PLACEHOLDER_NODE_ID,
+                        position: computePlaceholderDragPosition(draggingPlaceholderRef.current, trackedNodePosition),
+                    };
+                }
+            } else if (draggingPlaceholderRef.current) {
+                const trackedChange = changes.find(
                     (change) =>
                         change.type === 'position' &&
                         change.id === draggingPlaceholderRef.current!.nodeId &&
@@ -352,20 +361,51 @@ const useWorkflowEditorCanvas = ({
                 );
 
                 if (trackedChange && trackedChange.type === 'position' && trackedChange.position) {
-                    allChanges.push({
+                    placeholderPosition = {
                         id: FINAL_PLACEHOLDER_NODE_ID,
-                        position: computePlaceholderDragPosition(
-                            draggingPlaceholderRef.current,
-                            trackedChange.position
-                        ),
-                        type: 'position',
-                    });
+                        position: computePlaceholderDragPosition(draggingPlaceholderRef.current, trackedChange.position),
+                    };
                 }
             }
 
-            onNodesChange(allChanges);
+            // Apply the dragged node's change via onNodesChange (React Flow's
+            // native drag), then directly set new node objects for descendants
+            // so React Flow detects reference changes and recalculates edges.
+            if (childPositions) {
+                onNodesChange(changes);
+
+                const currentNodes = useWorkflowDataStore.getState().nodes;
+
+                setNodes(
+                    currentNodes.map((node) => {
+                        const newPosition = childPositions!.get(node.id);
+
+                        if (newPosition) {
+                            return {...node, dragging: true, position: newPosition};
+                        }
+
+                        if (placeholderPosition && node.id === placeholderPosition.id) {
+                            return {...node, position: placeholderPosition.position};
+                        }
+
+                        return node;
+                    })
+                );
+            } else {
+                const allChanges: NodeChange<Node>[] = [...changes];
+
+                if (placeholderPosition) {
+                    allChanges.push({
+                        id: placeholderPosition.id,
+                        position: placeholderPosition.position,
+                        type: 'position',
+                    });
+                }
+
+                onNodesChange(allChanges);
+            }
         },
-        [onNodesChange]
+        [onNodesChange, setNodes]
     );
 
     const handleNodeDragStop = useCallback(
