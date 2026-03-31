@@ -19,6 +19,7 @@ package com.bytechef.ai.mcp.tool.platform;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import com.bytechef.ai.mcp.tool.platform.exception.ComponentToolErrorType;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -41,6 +42,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -429,9 +432,16 @@ public class ComponentTools {
                         outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
                     }
 
+                    Map<String, Boolean> clusterElementTypeKeys = null;
+                    if (componentDefinition.isClusterElement()) {
+                        clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
+                            .stream()
+                            .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key, ClusterElementDefinition.ClusterElementType::multipleElements));
+                    }
+
                     return new ActionDetailedInfo(
                         action.getName(), action.getTitle(), action.getDescription(), componentDefinition.getName(),
-                        ToolUtils.generateParametersJson(action.getProperties()), outputPropertiesJson);
+                        ToolUtils.generateParametersJson(action.getProperties()), clusterElementTypeKeys, outputPropertiesJson);
                 })
                 .orElseThrow(() -> new ExecutionException(
                     String.format(ACTION_NOT_FOUND, actionName, componentName), ComponentToolErrorType.GET_ACTION));
@@ -713,6 +723,7 @@ public class ComponentTools {
         @JsonProperty("description") @JsonPropertyDescription("The description of the action") String description,
         @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this action") String componentName,
         @JsonProperty("properties") @JsonPropertyDescription("The properties defined in the action") String properties,
+        @JsonProperty("clusterElements") @JsonPropertyDescription("The cluster elements defined in the action. Value contains information on containing multiple elements") Map<String, Boolean> clusterElements,
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the action (if output is defined)") String outputProperties) {
     }
 
@@ -744,7 +755,6 @@ public class ComponentTools {
         @JsonProperty("name") @JsonPropertyDescription("The name of the component") String name,
         @JsonProperty("description") @JsonPropertyDescription("The description of the component") String description,
         @JsonProperty("version") @JsonPropertyDescription("The version of the component") int version) {
-
     }
 
     /**
