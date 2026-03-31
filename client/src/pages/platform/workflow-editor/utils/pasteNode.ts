@@ -27,7 +27,11 @@ const TASK_DISPATCHER_NAMES = new Set([
 
 const isTaskDispatcher = (componentName: string): boolean => TASK_DISPATCHER_NAMES.has(componentName);
 
-function renameNestedTasks(parameters: TaskParametersType, componentName: string): TaskParametersType {
+function renameNestedTasks(
+    parameters: TaskParametersType,
+    componentName: string,
+    reservedNames: Set<string>
+): TaskParametersType {
     const renameTask = (task: WorkflowTask) => {
         const subtaskComponentName = task.type?.split('/')?.[0];
 
@@ -35,10 +39,14 @@ function renameNestedTasks(parameters: TaskParametersType, componentName: string
             return;
         }
 
-        task.name = getFormattedName(subtaskComponentName);
+        const newName = getFormattedName(subtaskComponentName, reservedNames);
+
+        reservedNames.add(newName);
+
+        task.name = newName;
 
         if (isTaskDispatcher(subtaskComponentName) && task.parameters) {
-            task.parameters = renameNestedTasks(task.parameters, subtaskComponentName);
+            task.parameters = renameNestedTasks(task.parameters, subtaskComponentName, reservedNames);
         }
     };
 
@@ -197,12 +205,16 @@ export default function pasteNode({
         }
     }
 
-    const newName = getFormattedName(copiedNode.componentName);
+    const reservedNames = new Set<string>();
+
+    const newName = getFormattedName(copiedNode.componentName, reservedNames);
+
+    reservedNames.add(newName);
 
     const clonedParameters = structuredClone(copiedNode.parameters ?? {});
 
     if (isTaskDispatcher(copiedNode.componentName)) {
-        renameNestedTasks(clonedParameters, copiedNode.componentName);
+        renameNestedTasks(clonedParameters, copiedNode.componentName, reservedNames);
     }
 
     const newNodeData = {
