@@ -1,0 +1,191 @@
+openapi: "3.0.2"
+info:
+  title: "NASA"
+  description: "NASA is a United States government agency that provides public APIs offering access to space-related data, including astronomy images, Mars rover photos, and other scientific information for developers and applications."
+  version: "v1"
+servers:
+  - url: "https://api.nasa.gov"
+paths:
+  /planetary/apod:
+    get:
+      summary: "Get Astronomy Picture of the Day"
+      description: "Returns NASA's Astronomy Picture of the Day."
+      operationId: "getPictureOfTheDay"
+      x-help: "https://docs.bytechef.io/reference/components/nasa_v1#get-astronomy-picture-of-the-day"
+      parameters:
+        - name: "date"
+          in: "query"
+          description: "The date of the APOD image to retrieve."
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+        - name: "start_date"
+          in: "query"
+          description: "The start of a date range."
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+        - name: "end_date"
+          in: "query"
+          description: "The end of the date range."
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+        - name: "count"
+          in: "query"
+          description: "If specified, returns a randomly chosen images."
+          required: false
+          schema:
+            type: "integer"
+        - name: "thumbs"
+          in: "query"
+          description: "Return the URL of video thumbnail."
+          required: false
+          schema:
+            type: "boolean"
+      responses:
+        "200":
+          description: "Successful response containing APOD data."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  date:
+                    type: "string"
+                    format: "date"
+                    description: "The date of the Astronomy Picture of the Day."
+                  explanation:
+                    type: "string"
+                    description: "A detailed explanation of the image or video provided by NASA."
+                  media_type:
+                    type: "string"
+                    description: "The type of media returned (e.g., 'image' or 'video')."
+                  service_version:
+                    type: "string"
+                    description: "The version of the NASA API service used to generate this response."
+                  title:
+                    type: "string"
+                    description: "The title of the Astronomy Picture of the Day."
+                  url:
+                    type: "string"
+                    description: "The URL where the standard resolution image or video can be accessed."
+                  hdurl:
+                    type: "string"
+                    description: "The URL for the high-definition version of the image, if available."
+                additionalProperties: true
+  /neo/rest/v1/neo/{asteroidId}:
+    get:
+      summary: "Get Asteroid"
+      description: "Lookup a specific Asteroid based on its NASA JPL small body (SPK-ID) ID."
+      operationId: "getAsteroid"
+      x-help: "https://docs.bytechef.io/reference/components/nasa_v1#get-asteroid"
+      parameters:
+        - name: "asteroidId"
+          in: "path"
+          description: "Asteroid SPK-ID correlates to the NASA JPL small body."
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "Successful response containing asteroid data."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    description: "The unique identifier of the asteroid."
+                  neo_reference_id:
+                    type: "string"
+                    description: "NASA's Near Earth Object reference ID for the asteroid."
+                  name:
+                    type: "string"
+                    description: "The official name or designation of the asteroid."
+                  nasa_jpl_url:
+                    type: "string"
+                    description: "A URL to the NASA JPL page with detailed information about the asteroid."
+                  absolute_magnitude_h:
+                    type: "number"
+                    description: "The absolute magnitude of the asteroid, representing its intrinsic brightness."
+                  is_potentially_hazardous_asteroid:
+                    type: "boolean"
+                    description: "Indicates whether the asteroid is considered potentially hazardous to Earth."
+                  estimated_diameter:
+                    type: "object"
+                    description: "Estimated diameter measurements of the asteroid in various units."
+                    properties:
+                      kilometers:
+                        type: "object"
+                        description: "Estimated diameter range expressed in kilometers."
+                        properties:
+                          estimated_diameter_min:
+                            type: "number"
+                            description: "The minimum estimated diameter of the asteroid in kilometers."
+                          estimated_diameter_max:
+                            type: "number"
+                            description: "The maximum estimated diameter of the asteroid in kilometers."
+                  close_approach_data:
+                    type: "array"
+                    description: "A list of records describing close approaches of the asteroid to celestial bodies."
+                    items:
+                      type: "object"
+                      properties:
+                        close_approach_date:
+                          type: "string"
+                          description: "The date when the asteroid makes its close approach."
+                        relative_velocity:
+                          type: "object"
+                          description: "The velocity of the asteroid relative to the body it approaches."
+                          properties:
+                            kilometers_per_second:
+                              type: "string"
+                              description: "The relative velocity in kilometers per second."
+                            kilometers_per_hour:
+                              type: "string"
+                              description: "The relative velocity in kilometers per hour."
+                        miss_distance:
+                          type: "object"
+                          description: "The distance by which the asteroid misses the celestial body."
+                          properties:
+                            kilometers:
+                              type: "string"
+                              description: "The miss distance measured in kilometers."
+                            lunar:
+                              type: "string"
+                              description: "The miss distance expressed in lunar distances (distance from Earth to Moon)."
+                        orbiting_body:
+                          type: "string"
+                          description: "The celestial body that the asteroid is approaching (e.g., Earth)."
+                  orbital_data:
+                    type: "object"
+                    description: "Orbital parameters describing the asteroid's trajectory."
+                    properties:
+                      orbit_id:
+                        type: "string"
+                        description: "A unique identifier for the asteroid's orbit solution."
+                      eccentricity:
+                        type: "string"
+                        description: "A measure of how much the orbit deviates from a perfect circle."
+                      semi_major_axis:
+                        type: "string"
+                        description: "The semi-major axis of the asteroid's orbit, representing its average distance from the Sun."
+                      inclination:
+                        type: "string"
+                        description: "The tilt of the asteroid's orbit relative to the plane of the solar system."
+                      orbital_period:
+                        type: "string"
+                        description: "The time it takes for the asteroid to complete one full orbit around the Sun."
+                additionalProperties: true
+components:
+  securitySchemes:
+    api_key:
+      type: "apiKey"
+      name: "api_key"
+      in: "query"
+      x-title: "API Key"
