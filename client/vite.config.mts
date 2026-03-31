@@ -53,6 +53,7 @@ export default ({mode}) => {
             isHttps() && basicSsl(),
         ],
         resolve: {
+            dedupe: ['react', 'react-dom'],
             tsconfigPaths: true,
             alias: {
                 '@': path.resolve(__dirname, './src'),
