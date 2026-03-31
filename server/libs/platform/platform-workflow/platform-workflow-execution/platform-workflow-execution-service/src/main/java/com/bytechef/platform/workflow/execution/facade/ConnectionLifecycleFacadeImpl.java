@@ -64,7 +64,11 @@ public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade 
     }
 
     @Override
-    public void deleteScheduledConnectionRefresh(Long connectionId) {
-        connectionRefreshScheduler.cancelConnectionRefresh(connectionId);
+    public void deleteScheduledConnectionRefresh(Long connectionId, AuthorizationType authorizationType) {
+        if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
+            authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+
+            connectionRefreshScheduler.cancelConnectionRefresh(connectionId);
+        }
     }
 }
