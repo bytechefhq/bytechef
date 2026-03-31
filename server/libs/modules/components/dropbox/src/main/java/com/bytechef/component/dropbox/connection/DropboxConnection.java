@@ -37,10 +37,10 @@ public final class DropboxConnection {
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)
-                        .label("Client Id")
+                        .label("App Key")
                         .required(true),
                     string(CLIENT_SECRET)
-                        .label("Client Secret")
+                        .label("App Secret")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://www.dropbox.com/oauth2/authorize")
                 .oAuth2AuthorizationExtraQueryParameters(Map.of("token_access_type", "offline"))
