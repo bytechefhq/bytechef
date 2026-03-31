@@ -122,6 +122,9 @@ const useClusterElementsLayout = () => {
         return width;
     }, [copilotPanelOpen, dataPillPanelOpen, workflowNodeDetailsPanelOpen]);
 
+    // Dialog uses h-[calc(100vh-64px)]
+    const canvasHeight = window.innerHeight - 64;
+
     const previousCanvasWidthRef = useRef(canvasWidth);
     const cancelAnimationRef = useRef<(() => void) | null>(null);
 
@@ -330,9 +333,18 @@ const useClusterElementsLayout = () => {
         rootClusterElementDefinition,
     ]);
 
-    // Structural layout: runs when nodes/edges change, NOT on panel toggle
+    // Structural layout: runs when nodes/edges change, NOT on panel toggle.
+    // Wait for nested cluster root definitions before running the first layout
+    // to avoid a visible re-layout when they load asynchronously.
     useEffect(() => {
         if (isNodeDragging || isPositionSaving) {
+            return;
+        }
+
+        if (
+            clusterRootQueryParameters.length > 0 &&
+            Object.keys(nestedClusterRootsComponentDefinitions || {}).length === 0
+        ) {
             return;
         }
 
@@ -343,8 +355,13 @@ const useClusterElementsLayout = () => {
             return;
         }
 
+        const currentNodes = useClusterElementsDataStore.getState().nodes;
+        const currentRootNode = currentNodes.find((node) => node.id === rootClusterElementNodeData?.workflowNodeName);
+
         const elements = getClusterElementsLayoutElements({
+            canvasHeight,
             canvasWidth,
+            currentRootPosition: currentRootNode?.position,
             edges,
             nodes: layoutNodes,
         });
