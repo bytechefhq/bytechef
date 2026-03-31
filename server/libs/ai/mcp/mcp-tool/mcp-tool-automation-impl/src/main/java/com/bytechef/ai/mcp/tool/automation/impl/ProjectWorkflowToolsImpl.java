@@ -23,19 +23,17 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowInfo;
 import com.bytechef.ai.mcp.tool.automation.api.WorkflowValidationResult;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
-import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.ai.mcp.tool.platform.exception.ProjectWorkflowToolErrorType;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.workflow.validator.WorkflowValidator;
-import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacadeImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -77,27 +75,36 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
 
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final String scriptCodeInstructions;
-    private final TaskTools taskTools;
     private final String workflowBuildInstructions;
+    private final String clusterElementsInstructions;
+    private final WorkflowValidatorFacadeImpl workflowValidatorFacade;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
     })
     public ProjectWorkflowToolsImpl(
-        ProjectWorkflowFacade projectWorkflowFacade, TaskTools taskTools,
+        ProjectWorkflowFacade projectWorkflowFacade, WorkflowValidatorFacadeImpl workflowValidatorFacade,
         @Value("classpath:instruction_script_code.txt") Resource scriptCodeInstructionsResource,
+        @Value("classpath:instruction_cluster_elements.txt") Resource clusterElementsInstructionsResource,
         @Value("classpath:instruction_workflow_build.txt") Resource workflowBuildInstructionsResource) {
 
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.scriptCodeInstructions = readResource(scriptCodeInstructionsResource);
-        this.taskTools = taskTools;
+        this.workflowValidatorFacade = workflowValidatorFacade;
         this.workflowBuildInstructions = readResource(workflowBuildInstructionsResource);
+        this.clusterElementsInstructions = readResource(clusterElementsInstructionsResource);
     }
 
     @Override
     @Tool(description = "Instructions for writing custom code in Script component")
     public String getScriptCodeInstructions() {
         return scriptCodeInstructions;
+    }
+
+    @Override
+    @Tool(description = "Instructions for working with cluster elements")
+    public String getClusterElementsInstructions() {
+        return clusterElementsInstructions;
     }
 
     @Override
@@ -216,22 +223,12 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
 
         try {
-            StringBuilder errors = new StringBuilder("[");
-            StringBuilder warnings = new StringBuilder("[");
+            WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult = workflowValidatorFacade.validateWorkflow(workflow);
 
-            WorkflowValidator.validateWorkflow(
-                workflow, this::getTaskProperties, this::getTaskOutputProperty, null, new HashMap<>(),
-                new HashMap<>(), new HashMap<>(), errors, warnings);
-
-            errors.append("]");
-
-            String errorMessages = StringUtils.trim(errors.toString());
+            String errorMessages = workflowValidationResult.errors().toString();
+            String warningMessages = workflowValidationResult.warnings().toString();
 
             boolean isValid = errorMessages.equals("[]");
-
-            warnings.append("]");
-
-            String warningMessages = StringUtils.trim(warnings.toString());
 
             if (logger.isDebugEnabled()) {
                 logger.debug(
@@ -331,40 +328,6 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
 
             throw new ExecutionException("Failed to update workflow: " + e.getMessage(), e,
                 ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
-        }
-    }
-
-    protected PropertyInfo getTaskOutputProperty(String type, String taskType, StringBuilder warnings) {
-        String[] split = type.split("/");
-
-        int version = Integer.parseInt(split[1].substring(1));
-
-        try {
-            if (split.length == 2) {
-                return taskTools.getTaskOutputProperty("taskDispatcher", split[0], split[0], version);
-            } else if (taskType.equals("trigger")) {
-                return taskTools.getTaskOutputProperty(taskType, split[2], split[0], version);
-            } else {
-                return taskTools.getTaskOutputProperty("action", split[2], split[0], version);
-            }
-        } catch (Exception e) {
-            warnings.append(e.getMessage());
-
-            return null;
-        }
-    }
-
-    protected List<PropertyInfo> getTaskProperties(String type, String taskType) {
-        String[] split = type.split("/");
-
-        int version = Integer.parseInt(split[1].substring(1));
-
-        if (split.length == 2) {
-            return taskTools.getTaskProperties("taskDispatcher", split[0], split[0], version);
-        } else if (taskType.equals("trigger")) {
-            return taskTools.getTaskProperties(taskType, split[2], split[0], version);
-        } else {
-            return taskTools.getTaskProperties("action", split[2], split[0], version);
         }
     }
 

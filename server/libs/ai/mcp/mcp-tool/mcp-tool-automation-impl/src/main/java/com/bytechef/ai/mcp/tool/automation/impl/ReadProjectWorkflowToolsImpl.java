@@ -50,6 +50,11 @@ public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
         return delegate.getScriptCodeInstructions();
     }
 
+    @Override
+    public String getClusterElementsInstructions() {
+        return this.delegate.getClusterElementsInstructions();
+    }
+
     @Tool(
         description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
