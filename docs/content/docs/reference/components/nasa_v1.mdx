@@ -1,0 +1,237 @@
+---
+title: "NASA"
+description: "NASA is a United States government agency that provides public APIs offering access to space-related data, including astronomy images, Mars rover photos, and other scientific information for developers and applications."
+---
+
+
+Categories: Developer Tools
+
+
+Type: nasa/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | API Key | STRING |  | true |
+| addTo | Add to | STRING |  | true |
+
+
+
+## Connection Setup
+
+### Create API Key
+
+1. Navigate to [NASA](https://api.nasa.gov/).
+2. Locate the API key signup form.
+3. Enter your first name, last name and email address.
+4. Click Sign Up.
+5. Check your email inbox.
+6. You will receive an email containing your API key.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(52.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/b65dbc47-46fd-4072-acc8-4975a8a4cede?type=1&scrollType=0&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Get Asteroid
+Name: getAsteroid
+
+`Lookup a specific Asteroid based on its NASA JPL small body (SPK-ID) ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| asteroidId | Asteroid Id | INTEGER | Asteroid SPK-ID correlates to the NASA JPL small body. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Asteroid",
+  "name" : "getAsteroid",
+  "parameters" : {
+    "asteroidId" : 1
+  },
+  "type" : "nasa/v1/getAsteroid"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique identifier of the asteroid. |
+| neo_reference_id | STRING | NASA's Near Earth Object reference ID for the asteroid. |
+| name | STRING | The official name or designation of the asteroid. |
+| nasa_jpl_url | STRING | A URL to the NASA JPL page with detailed information about the asteroid. |
+| absolute_magnitude_h | NUMBER | The absolute magnitude of the asteroid, representing its intrinsic brightness. |
+| is_potentially_hazardous_asteroid | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the asteroid is considered potentially hazardous to Earth. |
+| estimated_diameter | OBJECT <details> <summary> Properties </summary> &#123;&#123;NUMBER\(estimated_diameter_min), NUMBER\(estimated_diameter_max)&#125;\(kilometers)&#125; </details> | Estimated diameter measurements of the asteroid in various units. |
+| close_approach_data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(close_approach_date), &#123;STRING\(kilometers_per_second), STRING\(kilometers_per_hour)&#125;\(relative_velocity), &#123;STRING\(kilometers), STRING\(lunar)&#125;\(miss_distance), STRING\(orbiting_body)&#125;] </details> | A list of records describing close approaches of the asteroid to celestial bodies. |
+| orbital_data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(orbit_id), STRING\(eccentricity), STRING\(semi_major_axis), STRING\(inclination), STRING\(orbital_period)&#125; </details> | Orbital parameters describing the asteroid's trajectory. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "neo_reference_id" : "",
+  "name" : "",
+  "nasa_jpl_url" : "",
+  "absolute_magnitude_h" : 0.0,
+  "is_potentially_hazardous_asteroid" : false,
+  "estimated_diameter" : {
+    "kilometers" : {
+      "estimated_diameter_min" : 0.0,
+      "estimated_diameter_max" : 0.0
+    }
+  },
+  "close_approach_data" : [ {
+    "close_approach_date" : "",
+    "relative_velocity" : {
+      "kilometers_per_second" : "",
+      "kilometers_per_hour" : ""
+    },
+    "miss_distance" : {
+      "kilometers" : "",
+      "lunar" : ""
+    },
+    "orbiting_body" : ""
+  } ],
+  "orbital_data" : {
+    "orbit_id" : "",
+    "eccentricity" : "",
+    "semi_major_axis" : "",
+    "inclination" : "",
+    "orbital_period" : ""
+  }
+}
+```
+
+#### Find Asteroid ID
+
+To find asteroid ID, click [here](/reference/components/nasa_v1#how-to-find-asteroid-id).
+
+
+
+### Get Astronomy Picture of the Day
+Name: getPictureOfTheDay
+
+`Returns NASA's Astronomy Picture of the Day.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| queryType | Fetch Method | STRING <details> <summary> Options </summary> <span>single</span>, <span>range</span>, <span>random</span> </details> | Select how you want to fetch the picture of the day. | true |
+| date | Date | DATE | The date of the APOD image to retrieve. | false |
+| start_date | Start Date | DATE | The start of a date range. | false |
+| end_date | End Date | DATE | The end of the date range. | false |
+| count | Count | INTEGER | If specified, returns a randomly chosen images. | false |
+| thumbs | Thumbs | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Return the URL of video thumbnail. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Astronomy Picture of the Day",
+  "name" : "getPictureOfTheDay",
+  "parameters" : {
+    "queryType" : "",
+    "date" : "2021-01-01",
+    "start_date" : "2021-01-01",
+    "end_date" : "2021-01-01",
+    "count" : 1,
+    "thumbs" : false
+  },
+  "type" : "nasa/v1/getPictureOfTheDay"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| date | DATE | The date of the Astronomy Picture of the Day. |
+| explanation | STRING | A detailed explanation of the image or video provided by NASA. |
+| media_type | STRING | The type of media returned (e.g., 'image' or 'video'). |
+| service_version | STRING | The version of the NASA API service used to generate this response. |
+| title | STRING | The title of the Astronomy Picture of the Day. |
+| url | STRING | The URL where the standard resolution image or video can be accessed. |
+| hdurl | STRING | The URL for the high-definition version of the image, if available. |
+
+
+
+
+#### Output Example
+```json
+{
+  "date" : "2021-01-01",
+  "explanation" : "",
+  "media_type" : "",
+  "service_version" : "",
+  "title" : "",
+  "url" : "",
+  "hdurl" : ""
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find Asteroid ID
+
+1. Go to the [NASA Small-Body Database Browser](https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/).
+2. Search for the asteroid by name (e.g., Apophis) or designation (e.g., 99942).
+3. Open the asteroid’s detail page.
+4. Look for SPK-ID or Object ID e.g., 2000433. This number is the asteroid’s NASA ID used in many systems.
+
+
