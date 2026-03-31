@@ -331,6 +331,7 @@ const useWorkflowEditorCanvas = ({
 
                     childDragStartRef.current.forEach((startPosition, childId) => {
                         allChanges.push({
+                            dragging: true,
                             id: childId,
                             position: {
                                 x: startPosition.x + delta.x,
