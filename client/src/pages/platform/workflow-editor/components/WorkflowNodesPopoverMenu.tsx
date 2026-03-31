@@ -183,6 +183,7 @@ const WorkflowNodesPopoverMenu = ({
                         hideTriggerComponents={hideTriggerComponents}
                         onPasteClose={() => setPopoverOpen(false)}
                         selectedComponentName={componentDefinitionToBeAdded?.name}
+                        showPaste
                         sourceNodeId={sourceNodeId}
                         updateWorkflowMutation={updateWorkflowMutation}
                     />
