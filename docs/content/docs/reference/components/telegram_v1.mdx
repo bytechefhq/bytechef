@@ -63,7 +63,7 @@ Name: sendMedia
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| chat_id | Chat ID | STRING | Unique identifier for the target chat or username of the target channel. | true |
+| chat_id | Chat ID | STRING | Unique identifier for the target chat or username of the target channel. Your bot has to be member of that chat or group. | true |
 | mediaType | null | STRING <details> <summary> Options </summary> <span>document</span>, <span>photo</span>, <span>video</span> </details> | Type of media to send. | true |
 | document | Document | FILE_ENTRY | Document to send. | true |
 | photo | Photo | FILE_ENTRY | Photo to send. | true |
@@ -194,6 +194,14 @@ Type: OBJECT
 }
 ```
 
+#### Find Chat or Group ID
+
+To find the Chat or Group ID, click [here](/reference/components/telegram_v1#how-to-find-chat-or-group-id).
+
+#### Find Direct Message Topic ID
+
+To find the Direct Message Topic ID, click [here](/reference/components/telegram_v1#how-to-find-direct-message-topic-id).
+
 
 
 
@@ -206,7 +214,7 @@ Name: sendMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| chat_id | Chat ID | STRING | Unique identifier for the target chat or username of the target channel. | true |
+| chat_id | Chat ID | STRING | Unique identifier for the target chat or username of the target channel. Your bot has to be member of that chat or group. | true |
 | text | Text | STRING | Text of the message to be sent. | true |
 | direct_messages_topic_id | Direct Messages Topic ID | STRING | Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat. | false |
 
@@ -316,6 +324,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Chat or Group ID
+
+To find the Chat or Group ID, click [here](/reference/components/telegram_v1#how-to-find-chat-or-group-id).
+
+#### Find Direct Message Topic ID
+
+To find the Direct Message Topic ID, click [here](/reference/components/telegram_v1#how-to-find-direct-message-topic-id).
 
 
 
@@ -326,7 +341,7 @@ Type: OBJECT
 ### New Message
 Name: newMessage
 
-`Trigger on new incoming message of any kind — text, photo, sticker, and so on.`
+`Trigger on new incoming message of any kind — text, photo, sticker, and so on. Incoming message has to be in a group that your bot is member of.`
 
 Type: DYNAMIC_WEBHOOK
 
@@ -356,8 +371,41 @@ Type: OBJECT
   "type" : "telegram/v1/newMessage"
 }
 ```
+#### Find Chat or Group ID
+
+To find the Chat or Group ID, click [here](/reference/components/telegram_v1#how-to-find-chat-or-group-id).
 
 
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find Chat or Group ID
+
+- **Method 1: Telegram Web URL**
+
+1. Login to Telegram Web.
+2. Open chat or group you want to find ID of.
+3. URL will be in the format: `https://web.telegram.org/k/#-5291165340`
+4. Extract the number after `#-` to get the Chat ID or Group ID.
+
+- **Method 2: Using ByteChef Telegram Trigger Output**
+
+1. Create a ByteChef workflow that includes a Telegram trigger.
+2. Run the workflow and observe the output from the Telegram trigger.
+3. Look for the `id` in the `chat` object in the JSON response to get the Chat ID or Group ID.
+
+### How to find Direct Message Topic ID
+
+1. Create a ByteChef workflow that includes a Telegram trigger.
+2. Run the workflow and observe the output from the Telegram trigger.
+3. Look for the `topic_id` in the `direct_messages_topic` object in the JSON response to get the Chat ID or Group ID.
