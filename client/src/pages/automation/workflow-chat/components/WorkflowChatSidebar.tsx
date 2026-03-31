@@ -80,12 +80,10 @@ const WorkflowChatSidebar = () => {
     if (isLoading) {
         return (
             <div className="space-y-2 p-4">
-                {[1, 2, 3].map((value) => (
-                    <div className="flex items-center space-x-2" key={value}>
-                        <Skeleton className="size-5" />
+                <Skeleton className="h-4 w-1/2" />
 
-                        <Skeleton className="h-4 flex-1" />
-                    </div>
+                {[1, 2, 3].map((value) => (
+                    <Skeleton className="h-6" key={value} />
                 ))}
             </div>
         );
@@ -93,7 +91,7 @@ const WorkflowChatSidebar = () => {
 
     return (
         <>
-            {workflowsByProject.size === 0 ? (
+            {workflowsByProject.size === 0 && data ? (
                 <div className="mb-4 px-2">
                     <span className="px-3 text-xs">No chats found</span>
                 </div>
