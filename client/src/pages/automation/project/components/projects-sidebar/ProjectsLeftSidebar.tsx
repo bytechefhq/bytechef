@@ -12,6 +12,7 @@ import WorkflowsListSkeleton from '@/pages/automation/project/components/project
 import {useProjectsLeftSidebar} from '@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
+import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -52,6 +53,7 @@ const ProjectsLeftSidebar = ({
     const projectHiddenFileInputRef = useRef<HTMLInputElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const workflowHiddenFileInputRef = useRef<HTMLInputElement>(null);
+    const converterHiddenFileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
     const {captureProjectWorkflowImported} = useAnalytics();
@@ -272,6 +274,16 @@ const ProjectsLeftSidebar = ({
                             >
                                 <UploadIcon /> Import Workflow
                             </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => {
+                                    if (converterHiddenFileInputRef.current) {
+                                        converterHiddenFileInputRef.current.click();
+                                    }
+                                }}
+                            >
+                                <UploadIcon /> Import n8n Workflow
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </ButtonGroup>
@@ -336,6 +348,15 @@ const ProjectsLeftSidebar = ({
                 className="hidden"
                 onChange={(event) => handleImportWorkflow(event, selectedProjectId, importProjectWorkflowMutation)}
                 ref={workflowHiddenFileInputRef}
+                type="file"
+            />
+
+            <input
+                accept=".json"
+                alt="file"
+                className="hidden"
+                onChange={(event) => handleImportN8nWorkflow(event)}
+                ref={converterHiddenFileInputRef}
                 type="file"
             />
 

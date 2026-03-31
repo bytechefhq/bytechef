@@ -14,6 +14,7 @@ export enum MODE {
 export enum Source {
     WORKFLOW_EDITOR = 'WORKFLOW_EDITOR',
     CODE_EDITOR = 'CODE_EDITOR',
+    CONVERTER = 'CONVERTER',
 }
 
 export type ContextType = {
