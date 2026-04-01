@@ -37,6 +37,7 @@ public final class ResendConstants {
     public static final String FROM = "from";
     public static final String HEADERS = "headers";
     public static final String HTML = "html";
+    public static final String ID = "id";
     public static final String NAME = "name";
     public static final String REPLY_TO = "reply_to";
     public static final String SUBJECT = "subject";
