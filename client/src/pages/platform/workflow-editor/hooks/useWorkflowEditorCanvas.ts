@@ -382,7 +382,7 @@ const useWorkflowEditorCanvas = ({
                         const newPosition = childPositions!.get(node.id);
 
                         if (newPosition) {
-                            return {...node, dragging: true, position: newPosition};
+                            return {...node, position: newPosition};
                         }
 
                         if (placeholderPosition && node.id === placeholderPosition.id) {
