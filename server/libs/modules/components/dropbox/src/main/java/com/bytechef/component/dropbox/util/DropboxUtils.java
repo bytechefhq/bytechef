@@ -75,14 +75,14 @@ public class DropboxUtils {
 
     public static Object uploadFile(Parameters inputParameters, Context context, FileEntry fileEntry) {
         String headerJson = context.json(json -> {
-            Map<String, Object> ime = Map.of(
-                AUTORENAME, inputParameters.getBoolean(AUTORENAME),
+            Map<String, Object> map = Map.of(
+                AUTORENAME, inputParameters.getBoolean(AUTORENAME, false),
                 "mode", "add",
-                MUTE, inputParameters.getBoolean(MUTE),
+                MUTE, inputParameters.getBoolean(MUTE, false),
                 PATH, getFullPath(inputParameters.getRequiredString(PATH), inputParameters.getRequiredString(FILENAME)),
-                STRICT_CONFLICT, inputParameters.getBoolean(STRICT_CONFLICT));
+                STRICT_CONFLICT, inputParameters.getBoolean(STRICT_CONFLICT, false));
 
-            return json.write(ime);
+            return json.write(map);
         });
 
         return context.http(http -> http.post("https://content.dropboxapi.com/2/files/upload"))
