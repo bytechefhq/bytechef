@@ -219,9 +219,13 @@ export const useProperty = ({
     const [propertyParameterValue, setPropertyParameterValue] = useState(() =>
         parameterValue !== undefined ? parameterValue : property.defaultValue || ''
     );
-    const [selectValue, setSelectValue] = useState(
-        property.defaultValue !== undefined ? property.defaultValue : 'null'
-    );
+    const [selectValue, setSelectValue] = useState(() => {
+        if (parameterValue !== undefined && parameterValue !== null) {
+            return typeof parameterValue === 'boolean' ? parameterValue.toString() : parameterValue;
+        }
+
+        return property.defaultValue !== undefined ? property.defaultValue : 'null';
+    });
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
     );
@@ -903,6 +907,8 @@ export const useProperty = ({
             setSelectValue(value);
             setPropertyParameterValue(value);
 
+            isSavingRef.current = true;
+
             let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
 
             if (type === 'INTEGER' && typeof mentionInputValue === 'string' && !mentionInputValue.includes('${')) {
@@ -929,6 +935,8 @@ export const useProperty = ({
                     }
 
                     if (actualValue === propertyParameterValue) {
+                        isSavingRef.current = false;
+
                         return;
                     }
 
@@ -1530,6 +1538,12 @@ export const useProperty = ({
     // so that remounted Property components pick up the latest saved values after tab switching).
     useEffect(() => {
         if (control) {
+            return;
+        }
+
+        if (isSavingRef.current) {
+            isSavingRef.current = false;
+
             return;
         }
 
