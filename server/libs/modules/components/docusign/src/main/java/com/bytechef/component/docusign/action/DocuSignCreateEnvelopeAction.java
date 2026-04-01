@@ -127,7 +127,7 @@ public class DocuSignCreateEnvelopeAction {
                     EMAIL_SUBJECT, inputParameters.getRequiredString(EMAIL_SUBJECT),
                     DOCUMENTS, getDocumentsList(documentRecords, context),
                     RECIPIENTS, Map.of(SIGNERS, inputParameters.getRequiredList(SIGNERS),
-                        CARBON_COPIES, inputParameters.getRequiredList(CARBON_COPIES))))
+                        CARBON_COPIES, inputParameters.getList(CARBON_COPIES, Object.class, List.of()))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
