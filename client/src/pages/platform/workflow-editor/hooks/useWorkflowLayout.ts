@@ -39,14 +39,12 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         }))
     );
     const {
-        clusterElementsCanvasOpen,
         rootClusterElementNodeData,
         setShowWorkflowCodeEditorSheet,
         setShowWorkflowInputsSheet,
         setShowWorkflowOutputsSheet,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
-            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
             rootClusterElementNodeData: state.rootClusterElementNodeData,
             setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
             setShowWorkflowInputsSheet: state.setShowWorkflowInputsSheet,
@@ -81,15 +79,11 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
 
     const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
 
-    let componentDefinitionsQueryParameters: object = {
+    const componentDefinitionsQueryParameters: object = {
         actionDefinitions: true,
         include: includeComponents,
         triggerDefinitions: true,
     };
-
-    if (clusterElementsCanvasOpen) {
-        componentDefinitionsQueryParameters = {};
-    }
 
     const {
         data: componentDefinitions,
