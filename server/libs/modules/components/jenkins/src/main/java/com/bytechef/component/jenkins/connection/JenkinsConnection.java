@@ -47,7 +47,9 @@ public class JenkinsConnection {
                     string(BASE_URI)
                         .label("Base URI")
                         .description("Complete base URI of your jenkins server.")
-                        .required(true)));
+                        .required(true)))
+        .help("", "https://docs.bytechef.io/reference/components/jenkins_v1#connection-setup")
+        .version(1);
 
     private JenkinsConnection() {
     }

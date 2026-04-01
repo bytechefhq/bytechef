@@ -83,7 +83,9 @@ public class JenkinsNewJobStatusNotificationTrigger {
                                     .description("Additional notes of the Jenkins job build."),
                                 object("artifacts")
                                     .description("Artifacts of Jenkins job build.")))))
-        .webhookRequest(JenkinsNewJobStatusNotificationTrigger::webhookRequest);
+        .webhookRequest(JenkinsNewJobStatusNotificationTrigger::webhookRequest)
+        .help(
+            "", "https://docs.bytechef.io/reference/components/jenkins_v1#new-job-status-notification");
 
     private JenkinsNewJobStatusNotificationTrigger() {
     }
