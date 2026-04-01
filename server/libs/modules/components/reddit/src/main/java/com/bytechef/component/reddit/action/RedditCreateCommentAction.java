@@ -39,6 +39,7 @@ public class RedditCreateCommentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createComment")
         .title("Create Comment")
         .description("Creates comment on a Reddit post or replies to a comment.")
+        .help("", "https://docs.bytechef.io/reference/components/reddit_v1#create-comment")
         .properties(
             string(THING_ID)
                 .label("Parent ID")
