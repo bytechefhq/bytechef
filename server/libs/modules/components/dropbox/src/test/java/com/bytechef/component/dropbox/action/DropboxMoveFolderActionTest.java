@@ -29,10 +29,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-class DropboxDeleteFileActionTest {
+class DropboxMoveFolderActionTest {
 
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final Context mockedContext = mock(Context.class);
@@ -43,11 +42,11 @@ class DropboxDeleteFileActionTest {
     @Test
     void testPerform() {
         try (MockedStatic<DropboxUtils> dropboxUtilsMockedStatic = mockStatic(DropboxUtils.class)) {
-            dropboxUtilsMockedStatic.when(() -> DropboxUtils.delete(
+            dropboxUtilsMockedStatic.when(() -> DropboxUtils.move(
                 parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(mockedObject);
 
-            Object result = DropboxDeleteFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result = DropboxMoveFolderAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedObject, result);
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());

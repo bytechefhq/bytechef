@@ -16,53 +16,42 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.Map;
+import com.bytechef.component.dropbox.util.DropboxUtils;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-class DropboxMoveFileActionTest extends AbstractDropboxActionTest {
+class DropboxMoveFileActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FILENAME, "filename.txt", FROM_PATH, "from", TO_PATH, "to"));
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() {
-        String fullPath = "fullPath";
+        try (MockedStatic<DropboxUtils> dropboxUtilsMockedStatic = mockStatic(DropboxUtils.class)) {
+            dropboxUtilsMockedStatic.when(() -> DropboxUtils.move(
+                parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
+                .thenReturn(mockedObject);
 
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedObject);
+            Object result = DropboxMoveFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Object result = DropboxMoveFileAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(mockedObject, result);
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, String> expectedBody = Map.of(FROM_PATH, fullPath, TO_PATH, fullPath);
-
-        assertEquals(expectedBody, body.getContent());
-        assertEquals("filename.txt", fileNameArgumentCaptor.getValue());
+            assertEquals(mockedObject, result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+        }
     }
 }
