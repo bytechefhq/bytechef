@@ -223,10 +223,13 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
 
         try {
-            WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult = workflowValidatorFacade.validateWorkflow(workflow);
+            WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+                workflowValidatorFacade.validateWorkflow(workflow);
 
-            String errorMessages = workflowValidationResult.errors().toString();
-            String warningMessages = workflowValidationResult.warnings().toString();
+            String errorMessages = workflowValidationResult.errors()
+                .toString();
+            String warningMessages = workflowValidationResult.warnings()
+                .toString();
 
             boolean isValid = errorMessages.equals("[]");
 
