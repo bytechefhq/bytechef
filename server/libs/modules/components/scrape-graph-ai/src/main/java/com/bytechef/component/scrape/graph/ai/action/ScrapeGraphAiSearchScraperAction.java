@@ -67,7 +67,8 @@ public class ScrapeGraphAiSearchScraperAction {
                     .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#search-scraper");
 
     private ScrapeGraphAiSearchScraperAction() {
     }
