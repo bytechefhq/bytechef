@@ -456,6 +456,85 @@ public class ComponentTools {
     }
 
     @Tool(
+        description = "Search components that support a specific cluster element type. Returns a list of components that have cluster elements matching the given cluster element type key")
+    public List<ComponentMinimalInfo> searchClusterElements(
+        @ToolParam(description = "The cluster element type key to search for in snake_case") String clusterElementType) {
+
+        try {
+            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+
+            List<ComponentMinimalInfo> matchingComponents = componentDefinitions.stream()
+                .filter(component -> !component.getClusterElements().isEmpty())
+                .filter(component -> component.getClusterElements()
+                    .stream()
+                    .anyMatch(clusterElement -> clusterElement.getName().equals(clusterElementType)))
+                .map(component -> new ComponentMinimalInfo(
+                    component.getName(), component.getDescription(), component.getVersion()))
+                .toList();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} components matching cluster element type '{}'", matchingComponents.size(),
+                    clusterElementType);
+            }
+
+            return matchingComponents;
+        } catch (Exception e) {
+            logger.error("Failed to search cluster elements with type '{}'", clusterElementType, e);
+
+            throw new ExecutionException(FAILED_TO_SEARCH_ACTIONS, e, ComponentToolErrorType.SEARCH_ACTIONS);
+        }
+    }
+
+    @Tool(
+        description = "Get detailed information about a specific cluster element. Returns comprehensive cluster element information including properties and configuration")
+    public ActionDetailedInfo getClusterElement(
+        @ToolParam(
+            description = "The name of the component that contains the cluster element in camel case") String componentName,
+        @ToolParam(description = "The name of the cluster element to retrieve in camel case") String clusterElementName,
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
+
+        try {
+            ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
+
+            return componentDefinition.getClusterElements()
+                .stream()
+                .filter(clusterElementDefinition -> clusterElementDefinition.getName().equals(clusterElementName))
+                .findFirst()
+                .map(clusterElement -> {
+                    String outputPropertiesJson = null;
+                    OutputResponse outputResponse = clusterElement.getOutputResponse();
+
+                    if (outputResponse != null && outputResponse.outputSchema() != null) {
+                        outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
+                    }
+
+                    Map<String, Boolean> clusterElementTypeKeys = null;
+                    if (componentDefinition.isClusterElement()) {
+                        clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
+                            .stream()
+                            .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key, ClusterElementDefinition.ClusterElementType::multipleElements));
+                    }
+
+                    return new ActionDetailedInfo(
+                        clusterElement.getName(), clusterElement.getTitle(), clusterElement.getDescription(),
+                        componentDefinition.getName(),
+                        ToolUtils.generateParametersJson(clusterElement.getProperties()), clusterElementTypeKeys, outputPropertiesJson);
+                })
+                .orElseThrow(() -> new ExecutionException(
+                    String.format(ACTION_NOT_FOUND, clusterElementName, componentName),
+                    ComponentToolErrorType.GET_ACTION));
+
+        } catch (ExecutionException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Failed to get cluster element '{}' from component '{}'", clusterElementName, componentName,
+                e);
+
+            throw new ExecutionException(FAILED_TO_GET_ACTION, e, ComponentToolErrorType.GET_ACTION);
+        }
+    }
+
+    @Tool(
         description = "Search actions across all components. Returns a list of actions matching the search query in name or description")
     public List<ActionMinimalInfo> searchActions(
         @ToolParam(description = "The search query to match against action names and descriptions") String query) {
@@ -534,12 +613,12 @@ public class ComponentTools {
     }
 
     @Tool(
-        description = "Get the output property of a specific trigger or action. Returns the structure of the output property")
+        description = "Get the output property of a specific trigger, action or cluster element. Returns the structure of the output property")
     public PropertyInfo getOutputProperty(
         @ToolParam(
-            description = "The name of the component that contains the trigger or action in camel case") String componentName,
+            description = "The name of the component that contains the trigger, action or cluster element in camel case") String componentName,
         @ToolParam(
-            description = "The name of the trigger or action to retrieve output properties for in camel case") String operationName,
+            description = "The name of the trigger, action or cluster element to retrieve output properties for in camel case") String operationName,
         @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
@@ -614,9 +693,23 @@ public class ComponentTools {
                         }
                     }
                 } else {
-                    throw new ExecutionException(
-                        String.format(OPERATION_NOT_FOUND, operationName, componentName),
-                        ComponentToolErrorType.OPERATION_NOT_FOUND);
+                    // If not found in actions, try cluster elements
+                    var clusterElementOptional = componentDefinition.getClusterElements()
+                        .stream()
+                        .filter(clusterElement -> clusterElement.getName().equals(operationName))
+                        .findFirst();
+
+                    if (clusterElementOptional.isPresent()) {
+                        var clusterElement = clusterElementOptional.get();
+
+                        if (clusterElement.isOutputDefined() && clusterElement.isOutputSchemaDefined()) {
+                            outputResponse = clusterElement.getOutputResponse();
+                        }
+                    } else {
+                        throw new ExecutionException(
+                            String.format(OPERATION_NOT_FOUND, operationName, componentName),
+                            ComponentToolErrorType.OPERATION_NOT_FOUND);
+                    }
                 }
             }
 
@@ -641,12 +734,12 @@ public class ComponentTools {
     }
 
     @Tool(
-        description = "Get all properties of a specific trigger or action. Returns a hierarchical list of properties including nested properties")
+        description = "Get all properties of a specific trigger, action or cluster element. Returns a hierarchical list of properties including nested properties")
     public List<PropertyInfo> getProperties(
         @ToolParam(
-            description = "The name of the component that contains the trigger or action in camel case") String componentName,
+            description = "The name of the component that contains the trigger, action or cluster element in camel case") String componentName,
         @ToolParam(
-            description = "The name of the trigger or action to retrieve properties for in camel case") String operationName,
+            description = "The name of the trigger, action or cluster element to retrieve properties for in camel case") String operationName,
         @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
@@ -684,9 +777,19 @@ public class ComponentTools {
 
                     properties = actionDefinition.getProperties();
                 } else {
-                    throw new ExecutionException(
-                        String.format(OPERATION_NOT_FOUND, operationName, componentName),
-                        ComponentToolErrorType.OPERATION_NOT_FOUND);
+                    // If not found in actions, try cluster elements
+                    var clusterElementOptional = componentDefinition.getClusterElements()
+                        .stream()
+                        .filter(clusterElement -> clusterElement.getName().equals(operationName))
+                        .findFirst();
+
+                    if (clusterElementOptional.isPresent()) {
+                        properties = clusterElementOptional.get().getProperties();
+                    } else {
+                        throw new ExecutionException(
+                            String.format(OPERATION_NOT_FOUND, operationName, componentName),
+                            ComponentToolErrorType.OPERATION_NOT_FOUND);
+                    }
                 }
             }
 
