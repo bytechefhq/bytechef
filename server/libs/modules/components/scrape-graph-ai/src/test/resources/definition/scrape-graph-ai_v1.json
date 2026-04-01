@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the status and results of a previous smartcrawl request.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#get-crawl-status"
+    },
     "metadata": {
       "method": "GET",
       "path": "/crawl/{task_id}"
@@ -522,7 +525,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Convert any webpage into clean, readable Markdown format.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#markdownify"
+    },
     "metadata": {
       "path": "/markdownify",
       "mimeType": "application/json",
@@ -836,7 +842,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Start a AI-powered web search request.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#search-scraper"
+    },
     "metadata": {
       "path": "/searchscraper",
       "mimeType": "application/json",
@@ -1232,7 +1241,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract content from a webpage using AI by providing a natural language prompt and a URL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#smart-scraper"
+    },
     "metadata": {
       "path": "/smartscraper",
       "mimeType": "application/json",
@@ -1609,7 +1621,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Start a new web crawl request with AI extraction or markdown conversion.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#start-crawl"
+    },
     "metadata": {
       "path": "/crawl",
       "mimeType": "application/json",
@@ -2257,14 +2272,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://docs.scrapegraphai.com/api-reference/introduction"
+  },
   "description": "ScrapeGraphAI is a web scraping python library that uses LLM and direct graph logic to create scraping pipelines for websites and local documents.",
   "icon": "path:assets/scrape-graph-ai.svg",
   "metadata": null,
