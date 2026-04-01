@@ -19,6 +19,7 @@ package com.bytechef.component.scrape.graph.ai;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -31,6 +32,18 @@ public class ScrapeGraphAiComponentHandler extends AbstractScrapeGraphAiComponen
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .icon("path:assets/scrape-graph-ai.svg")
-            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE);
+            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+            .customAction(true)
+            .customActionHelp("", "https://docs.scrapegraphai.com/api-reference/introduction")
+            .version(1);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#connection-setup")
+            .version(1);
     }
 }

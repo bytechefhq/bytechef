@@ -12,6 +12,7 @@ paths:
       summary: "Search Scraper"
       description: "Start a AI-powered web search request."
       operationId: "searchScraper"
+      x-help: "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#search-scraper"
       requestBody:
         content:
           application/json:
@@ -57,6 +58,7 @@ paths:
       summary: "Markdownify"
       description: "Convert any webpage into clean, readable Markdown format."
       operationId: "markdownify"
+      x-help: "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#markdownify"
       requestBody:
         content:
           application/json:
@@ -97,6 +99,7 @@ paths:
       summary: "Smart Scraper"
       description: "Extract content from a webpage using AI by providing a natural language prompt and a URL."
       operationId: "smartScraper"
+      x-help: "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#smart-scraper"
       requestBody:
         content:
           application/json:
@@ -145,6 +148,7 @@ paths:
       summary: "Start SmartCrawler"
       description: "Start a new web crawl request with AI extraction or markdown conversion."
       operationId: "startCrawl"
+      x-help: "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#start-crawl"
       requestBody:
         content:
           application/json:
@@ -252,6 +256,7 @@ paths:
       summary: "Get SmartCrawler Status"
       description: "Get the status and results of a previous smartcrawl request."
       operationId: "getCrawlStatus"
+      x-help: "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#get-crawl-status"
       parameters:
         - name: "task_id"
           in: "path"
