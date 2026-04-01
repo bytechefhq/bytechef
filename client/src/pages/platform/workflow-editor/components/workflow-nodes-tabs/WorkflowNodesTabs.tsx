@@ -1,4 +1,5 @@
 import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -303,43 +304,58 @@ const WorkflowNodesTabs = ({
 
             {canPaste && !pasteDismissed && (
                 <div className="px-3 py-2">
-                    <div
-                        className="group/paste flex w-full cursor-pointer items-center justify-between self-stretch rounded-md border-2 border-stroke-brand-primary bg-surface-neutral-primary px-4 py-2 hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"
-                        onClick={handlePasteClick}
-                    >
-                        <div className="flex min-w-0 flex-1 items-center gap-2">
-                            <ClipboardPasteIcon className="size-4 shrink-0 text-content-neutral-primary group-active/paste:text-content-brand-primary" />
+                    <div className="flex w-full overflow-hidden rounded-md border-2 border-stroke-brand-primary bg-surface-neutral-primary">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div
+                                    className="group/paste flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-2 px-2 hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"
+                                    onClick={handlePasteClick}
+                                >
+                                    <ClipboardPasteIcon className="size-4 shrink-0 text-content-neutral-primary group-active/paste:text-content-brand-primary" />
 
-                            <span className="text-sm font-medium text-content-neutral-primary group-active/paste:text-content-brand-primary">
-                                Paste
-                            </span>
-
-                            {copiedNode?.icon && (
-                                <span className="flex size-5 shrink-0 items-center justify-center [&_svg]:size-5">
-                                    {copiedNode.icon}
-                                </span>
-                            )}
-
-                            <span className="min-w-0 flex-1 truncate text-sm text-content-neutral-primary group-active/paste:text-content-brand-primary">
-                                <span className="font-medium">{copiedNode?.label || copiedNode?.componentName}</span>
-
-                                {copiedNode?.operationName && (
-                                    <span className="font-normal text-content-neutral-secondary group-active/paste:text-content-brand-primary">
-                                        {` (${copiedNode.operationName})`}
+                                    <span className="text-sm font-medium text-content-neutral-primary group-active/paste:text-content-brand-primary">
+                                        Paste
                                     </span>
-                                )}
-                            </span>
-                        </div>
+
+                                    {copiedNode?.icon && (
+                                        <span className="flex size-5 shrink-0 items-center justify-center [&_svg]:size-5">
+                                            {copiedNode.icon}
+                                        </span>
+                                    )}
+
+                                    <span className="min-w-0 flex-1 truncate text-sm text-content-neutral-primary group-active/paste:text-content-brand-primary">
+                                        <span className="font-medium">
+                                            {copiedNode?.label || copiedNode?.componentName}
+                                        </span>
+
+                                        {copiedNode?.operationName && (
+                                            <span className="font-normal text-content-neutral-secondary group-active/paste:text-content-brand-primary">
+                                                {` (${copiedNode.operationName})`}
+                                            </span>
+                                        )}
+                                    </span>
+                                </div>
+                            </TooltipTrigger>
+
+                            <TooltipContent side="top">
+                                {[
+                                    copiedNode?.label || copiedNode?.componentName,
+                                    copiedNode?.operationName ? `(${copiedNode.operationName})` : null,
+                                ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                            </TooltipContent>
+                        </Tooltip>
 
                         <button
-                            className="shrink-0 text-content-neutral-primary opacity-50 hover:opacity-100"
-                            onClick={(event) => {
-                                event.stopPropagation();
-
+                            className="group/discard flex min-w-9 cursor-pointer items-center justify-center self-stretch hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 setPasteDismissed(true);
                             }}
+                            type="button"
                         >
-                            <ClipboardXIcon className="size-4" />
+                            <ClipboardXIcon className="size-4 text-content-neutral-primary opacity-50 group-hover/discard:opacity-100 group-active/discard:text-content-brand-primary group-active/discard:opacity-100" />
                         </button>
                     </div>
                 </div>
