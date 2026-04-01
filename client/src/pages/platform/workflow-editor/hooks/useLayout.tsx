@@ -613,6 +613,15 @@ export default function useLayout({
     });
 
     useEffect(() => {
+        // Skip shift updates while the cluster elements canvas covers the main
+        // graph — the canvasWidth change from the dialog's panel is transient
+        // and would produce incorrect shifts for saved-position nodes.
+        const {clusterElementsCanvasOpen} = useWorkflowEditorStore.getState();
+
+        if (clusterElementsCanvasOpen) {
+            return;
+        }
+
         const canvasCrossDimension = layoutDirection === 'LR' && canvasHeight ? canvasHeight : canvasWidth;
 
         if (initialCanvasCrossDimRef.current === undefined || initialDirectionRef.current !== layoutDirection) {
@@ -640,11 +649,6 @@ export default function useLayout({
         const {clusterElementsCanvasOpen} = useWorkflowEditorStore.getState();
 
         if (clusterElementsCanvasOpen) {
-            previousCopilotPanelOpenRef.current = copilotPanelOpen;
-            previousDataPillPanelOpenRef.current = dataPillPanelOpen;
-            previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-            previousLeftSidebarOpenRef.current = leftSidebarOpen;
-
             return;
         }
 
