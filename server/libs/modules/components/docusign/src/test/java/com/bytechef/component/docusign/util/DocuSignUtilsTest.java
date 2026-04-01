@@ -23,35 +23,41 @@ import static com.bytechef.component.docusign.constant.DocuSignConstants.EMAIL_S
 import static com.bytechef.component.docusign.constant.DocuSignConstants.ENVELOPE_ID;
 import static com.bytechef.component.docusign.constant.DocuSignConstants.FROM_DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.docusign.constant.DocuSignConstants.DocumentRecord;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class DocuSignUtilsTest {
 
     private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        ACCOUNT_ID, List.of(), FROM_DATE, LocalDate.of(2025, 6, 4), ENVELOPE_ID, "1"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+        ACCOUNT_ID, "accountId", FROM_DATE, LocalDate.of(2025, 6, 4), ENVELOPE_ID, "1"));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
@@ -96,15 +102,15 @@ class DocuSignUtilsTest {
     }
 
     @Test
-    void testGetEnvelopeIdOptions() {
-        when(mockedContext.http(any()))
+    void testGetEnvelopeIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("envelopes", List.of(Map.of(ENVELOPE_ID, "1", EMAIL_SUBJECT, "emailSubject"))));
 
@@ -114,17 +120,29 @@ class DocuSignUtilsTest {
         List<Option<String>> expected = List.of(option("emailSubject", "1"));
 
         assertEquals(expected, result);
-        assertEquals(List.of("from_date", "2025-06-04"), stringArgumentCaptor.getAllValues());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(
+            List.of("/restapi/v2.1/accounts/accountId/envelopes", "from_date", "2025-06-04"),
+            stringArgumentCaptor.getAllValues());
     }
 
     @Test
-    void testGetDocumentIdOptions() {
-        when(mockedContext.http(any()))
+    void testGetDocumentIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("envelopeDocuments", List.of(Map.of(DOCUMENT_ID, "1", "name", "name"))));
 
@@ -134,5 +152,17 @@ class DocuSignUtilsTest {
         List<Option<String>> expected = List.of(option("name", "1"));
 
         assertEquals(expected, result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(
+            "/restapi/v2.1/accounts/accountId/envelopes/1/documents", stringArgumentCaptor.getValue());
     }
 }
