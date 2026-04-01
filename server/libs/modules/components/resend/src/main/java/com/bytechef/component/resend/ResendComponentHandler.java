@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.resend.action.ResendSendEmailAction;
 import com.bytechef.component.resend.connection.ResendConnection;
+import com.bytechef.component.resend.trigger.ResendEmailDeliveredTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -40,6 +41,7 @@ public class ResendComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(ResendConnection.CONNECTION_DEFINITION)
         .actions(ResendSendEmailAction.ACTION_DEFINITION)
+        .triggers(ResendEmailDeliveredTrigger.TRIGGER_DEFINITION)
         .version(1);
 
     @Override
