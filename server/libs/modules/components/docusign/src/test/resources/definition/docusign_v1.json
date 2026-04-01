@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new envelope.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/docusign_v1#create-envelope"
+    },
     "metadata": null,
     "name": "createEnvelope",
     "outputDefinition": {
@@ -675,7 +678,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Downloads a single document or all documents from an envelope.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/docusign_v1#download-envelope-document"
+    },
     "metadata": null,
     "name": "downloadEnvelopeDocument",
     "outputDefinition": {
@@ -2067,14 +2073,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/docusign_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.docusign.com/docs/esign-rest-api/reference/"
+  },
   "description": "DocuSign is a cloud-based e-signature platform that enables secure digital document signing and workflow automation.",
   "icon": "path:assets/docusign.svg",
   "metadata": null,
