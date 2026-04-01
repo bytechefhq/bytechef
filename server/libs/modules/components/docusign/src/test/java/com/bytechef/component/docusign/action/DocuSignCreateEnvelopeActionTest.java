@@ -24,21 +24,28 @@ import static com.bytechef.component.docusign.constant.DocuSignConstants.RECIPIE
 import static com.bytechef.component.docusign.constant.DocuSignConstants.SIGNERS;
 import static com.bytechef.component.docusign.constant.DocuSignConstants.STATUS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.docusign.constant.DocuSignConstants.DocumentRecord;
 import com.bytechef.component.docusign.util.DocuSignUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -46,30 +53,30 @@ import org.mockito.Mockito;
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class DocuSignCreateEnvelopeActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final ArgumentCaptor<List<DocumentRecord>> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         DOCUMENTS, List.of(), STATUS, "sent", EMAIL_SUBJECT, "emailSubject", SIGNERS, List.of(), CARBON_COPIES,
         List.of(),
-        ACCOUNT_ID, List.of()));
+        ACCOUNT_ID, "accountId"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of();
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -90,10 +97,22 @@ class DocuSignCreateEnvelopeActionTest {
                 STATUS, "sent", EMAIL_SUBJECT, "emailSubject", DOCUMENTS, List.of(), RECIPIENTS,
                 Map.of(SIGNERS, List.of(), CARBON_COPIES, List.of()));
 
+            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            Http.Configuration.ConfigurationBuilder configurationBuilder =
+                configurationBuilderArgumentCaptor.getValue();
+            Http.Configuration configuration = configurationBuilder.build();
+            Http.ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+
             assertEquals(expectedBody, body.getContent());
 
             assertEquals(List.of(), listArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
+            assertEquals("/restapi/v2.1/accounts/accountId/envelopes", stringArgumentCaptor.getValue());
         }
     }
 }
