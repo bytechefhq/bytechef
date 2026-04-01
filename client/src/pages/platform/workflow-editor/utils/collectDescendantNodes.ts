@@ -150,7 +150,9 @@ export function collectChainSuccessorNodes(
             // Continue the chain from the dispatcher's bottom ghost since
             // descendants were added to visited and the normal edge walk
             // from targetId would stop at the top ghost.
-            const nestedBottomGhostId = [...nestedDescendants.keys()].find((nodeId) => nodeId.includes('bottom-ghost'));
+            const nestedBottomGhostId = [...nestedDescendants.keys()].find(
+                (nodeId) => nodeId.startsWith(`${targetId}-`) && nodeId.includes('bottom-ghost')
+            );
 
             if (nestedBottomGhostId) {
                 const bottomGhostTargets = edgesBySource.get(nestedBottomGhostId) || [];

@@ -504,6 +504,7 @@ export const getClusterElementsLayoutElements = ({
 
         const viewportWidth = canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM;
         const viewportHeight = canvasHeight / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM;
+        const canvasCenterX = viewportWidth / 2;
         const canvasCenterY = viewportHeight / 2;
         const graphCenterX = (graphMinX + graphMaxX) / 2;
         const graphCenterY = (graphMinY + graphMaxY) / 2;
