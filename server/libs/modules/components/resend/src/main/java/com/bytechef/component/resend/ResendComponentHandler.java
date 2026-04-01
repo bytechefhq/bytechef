@@ -35,10 +35,12 @@ public class ResendComponentHandler implements ComponentHandler {
         .title("Resend")
         .description("Resend is the email API for developers.")
         .customAction(true)
+        .customActionHelp("Resend API Reference", "https://resend.com/docs/api-reference/introduction")
         .icon("path:assets/resend.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(ResendConnection.CONNECTION_DEFINITION)
-        .actions(ResendSendEmailAction.ACTION_DEFINITION);
+        .actions(ResendSendEmailAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
