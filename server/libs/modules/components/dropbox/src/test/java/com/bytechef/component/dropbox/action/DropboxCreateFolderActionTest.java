@@ -45,7 +45,7 @@ import org.mockito.ArgumentCaptor;
  * @author Monika Kušter
  */
 @ExtendWith(MockContextSetupExtension.class)
-class DropboxCreateNewFolderActionTest {
+class DropboxCreateFolderActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Object mockedObject = mock(Object.class);
@@ -65,7 +65,7 @@ class DropboxCreateNewFolderActionTest {
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Object result = DropboxCreateNewFolderAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = DropboxCreateFolderAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
