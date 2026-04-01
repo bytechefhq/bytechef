@@ -38,6 +38,6 @@ public final class ResendConnection {
             .title("Bearer Token")
             .properties(
                 string(TOKEN)
-                    .label("Token")
+                    .label("API Key")
                     .required(true)));
 }
