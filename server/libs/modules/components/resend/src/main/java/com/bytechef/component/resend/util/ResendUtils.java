@@ -18,7 +18,6 @@ package com.bytechef.component.resend.util;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +26,6 @@ import java.util.Map;
  */
 public class ResendUtils {
 
-    private static final Base64.Encoder ENCODER = Base64.getEncoder();
-
     private ResendUtils() {
     }
 
@@ -36,7 +33,9 @@ public class ResendUtils {
         return fileEntries.stream()
             .map(fileEntry -> {
                 byte[] fileBytes = actionContext.file(file -> file.readAllBytes(fileEntry));
-                return Map.of("filename", fileEntry.getName(), "content", ENCODER.encodeToString(fileBytes));
+                String encoded = actionContext.encoder(encoder -> encoder.base64Encode(fileBytes));
+
+                return Map.of("filename", fileEntry.getName(), "content", encoded);
             })
             .toList();
     }
