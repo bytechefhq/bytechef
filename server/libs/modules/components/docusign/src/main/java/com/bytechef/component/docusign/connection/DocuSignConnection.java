@@ -45,6 +45,8 @@ public class DocuSignConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> connectionParameters.getRequiredString(BASE_URI))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/docusign_v1#connection-setup")
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .properties(
