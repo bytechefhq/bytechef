@@ -5,9 +5,6 @@ import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeCha
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-import defaultAiAgentEdges from '../edges/defaultAiAgentEdges';
-import defaultAiAgentNodes from '../nodes/defaultAiAgentNodes';
-
 interface ClusterElementsDataStoreI {
     edges: Edge[];
     setEdges: (edges: Edge[]) => void;
@@ -35,7 +32,7 @@ interface ClusterElementsDataStoreI {
 const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
     devtools(
         (set, get) => ({
-            edges: defaultAiAgentEdges,
+            edges: [],
             setEdges: (edges) => {
                 set({edges});
             },
@@ -45,7 +42,7 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
                 });
             },
 
-            nodes: defaultAiAgentNodes,
+            nodes: [],
             setNodes: (nodes) => {
                 set({nodes});
             },
