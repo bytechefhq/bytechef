@@ -62,7 +62,9 @@ public class DocuSignDownloadEnvelopeDocumentAction {
                 .optionsLookupDependsOn(ENVELOPE_ID)
                 .options((OptionsFunction<String>) DocuSignUtils::getDocumentIdOptions))
         .output(outputSchema(fileEntry().description("Downloaded document.")))
-        .perform(DocuSignDownloadEnvelopeDocumentAction::perform);
+        .perform(DocuSignDownloadEnvelopeDocumentAction::perform)
+        .help(
+            "", "https://docs.bytechef.io/reference/components/docusign_v1#download-envelope-document");
 
     private DocuSignDownloadEnvelopeDocumentAction() {
     }
