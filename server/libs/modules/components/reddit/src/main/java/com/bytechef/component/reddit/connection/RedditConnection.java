@@ -109,7 +109,9 @@ public class RedditConnection {
                     }
 
                     return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
-                }));
+                }))
+        .help("", "https://docs.bytechef.io/reference/components/reddit_v1#connection-setup")
+        .version(1);
 
     private RedditConnection() {
     }

@@ -40,6 +40,7 @@ public class RedditComponentHandler implements ComponentHandler {
                 "vote on content organized into communities called subreddits.")
         .icon("path:assets/reddit.svg")
         .customAction(true)
+        .customActionHelp("", "https://www.reddit.com/dev/api/")
         .categories(ComponentCategory.SOCIAL_MEDIA)
         .connection(RedditConnection.CONNECTION_DEFINITION)
         .actions(
@@ -47,7 +48,8 @@ public class RedditComponentHandler implements ComponentHandler {
             RedditCreatePostAction.ACTION_DEFINITION)
         .clusterElements(
             tool(RedditCreateCommentAction.ACTION_DEFINITION),
-            tool(RedditCreatePostAction.ACTION_DEFINITION));
+            tool(RedditCreatePostAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

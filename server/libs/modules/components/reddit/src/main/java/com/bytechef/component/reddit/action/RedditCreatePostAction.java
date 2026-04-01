@@ -43,6 +43,7 @@ public class RedditCreatePostAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPost")
         .title("Create Post")
         .description("Creates a new reddit post.")
+        .help("", "https://docs.bytechef.io/reference/components/reddit_v1#create-post")
         .properties(
             string(SUBREDDIT_NAME)
                 .label("Subreddit Name")
