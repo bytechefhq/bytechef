@@ -24,7 +24,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.dropbox.action.DropboxCopyFileAction;
 import com.bytechef.component.dropbox.action.DropboxCopyFolderAction;
-import com.bytechef.component.dropbox.action.DropboxCreateNewFolderAction;
+import com.bytechef.component.dropbox.action.DropboxCreateFolderAction;
 import com.bytechef.component.dropbox.action.DropboxCreateNewTextFileAction;
 import com.bytechef.component.dropbox.action.DropboxDeleteFileAction;
 import com.bytechef.component.dropbox.action.DropboxDeleteFolderAction;
@@ -57,7 +57,7 @@ public class DropboxComponentHandler implements ComponentHandler {
         .actions(
             DropboxCopyFileAction.ACTION_DEFINITION,
             DropboxCopyFolderAction.ACTION_DEFINITION,
-            DropboxCreateNewFolderAction.ACTION_DEFINITION,
+            DropboxCreateFolderAction.ACTION_DEFINITION,
             DropboxCreateNewTextFileAction.ACTION_DEFINITION,
             DropboxDeleteFileAction.ACTION_DEFINITION,
             DropboxDeleteFolderAction.ACTION_DEFINITION,
@@ -71,7 +71,7 @@ public class DropboxComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(DropboxCopyFileAction.ACTION_DEFINITION),
             tool(DropboxCopyFolderAction.ACTION_DEFINITION),
-            tool(DropboxCreateNewFolderAction.ACTION_DEFINITION),
+            tool(DropboxCreateFolderAction.ACTION_DEFINITION),
             tool(DropboxCreateNewTextFileAction.ACTION_DEFINITION),
             tool(DropboxDeleteFileAction.ACTION_DEFINITION),
             tool(DropboxDeleteFolderAction.ACTION_DEFINITION),
