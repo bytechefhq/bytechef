@@ -41,12 +41,15 @@ public class DocuSignComponentHandler implements ComponentHandler {
         .icon("path:assets/docusign.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(DocuSignConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("", "https://developers.docusign.com/docs/esign-rest-api/reference/")
         .actions(
             DocuSignCreateEnvelopeAction.ACTION_DEFINITION,
             DocuSignDownloadEnvelopeDocumentAction.ACTION_DEFINITION)
         .clusterElements(
             tool(DocuSignCreateEnvelopeAction.ACTION_DEFINITION),
-            tool(DocuSignDownloadEnvelopeDocumentAction.ACTION_DEFINITION));
+            tool(DocuSignDownloadEnvelopeDocumentAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -107,7 +107,8 @@ public class DocuSignCreateEnvelopeAction {
                             .description("The DateTime that the envelope changed status (i.e. was created or sent.)"),
                         string("status")
                             .description("Indicates the envelope status."))))
-        .perform(DocuSignCreateEnvelopeAction::perform);
+        .perform(DocuSignCreateEnvelopeAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/docusign_v1#create-envelope");
 
     private DocuSignCreateEnvelopeAction() {
     }
