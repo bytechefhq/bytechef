@@ -79,7 +79,8 @@ public class UrlscanScanAction {
                     .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/urlscan_v1#scan");
 
     private UrlscanScanAction() {
     }

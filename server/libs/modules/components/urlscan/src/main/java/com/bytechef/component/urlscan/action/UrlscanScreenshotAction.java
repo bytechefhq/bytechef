@@ -34,7 +34,7 @@ import java.util.Map;
 public class UrlscanScreenshotAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("screenshot")
         .title("Screenshot")
-        .description("Use the scan UUID to retrieve the screenshot for a scan once the scan has finished.")
+        .description("Use the scan ID to retrieve the screenshot for a scan once the scan has finished.")
         .metadata(
             Map.of(
                 "method", "GET",
@@ -49,7 +49,8 @@ public class UrlscanScreenshotAction {
                     "type", PropertyType.PATH)))
         .output(outputSchema(fileEntry().metadata(
             Map.of(
-                "responseType", ResponseType.binary("image/png")))));
+                "responseType", ResponseType.binary("image/png")))))
+        .help("", "https://docs.bytechef.io/reference/components/urlscan_v1#screenshot");
 
     private UrlscanScreenshotAction() {
     }
