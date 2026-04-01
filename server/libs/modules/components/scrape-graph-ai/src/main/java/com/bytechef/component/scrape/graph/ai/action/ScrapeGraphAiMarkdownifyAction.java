@@ -61,7 +61,8 @@ public class ScrapeGraphAiMarkdownifyAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#markdownify");
 
     private ScrapeGraphAiMarkdownifyAction() {
     }

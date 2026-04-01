@@ -72,7 +72,8 @@ public class ScrapeGraphAiGetCrawlStatusAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/scrape-graph-ai_v1#get-crawl-status");
 
     private ScrapeGraphAiGetCrawlStatusAction() {
     }
