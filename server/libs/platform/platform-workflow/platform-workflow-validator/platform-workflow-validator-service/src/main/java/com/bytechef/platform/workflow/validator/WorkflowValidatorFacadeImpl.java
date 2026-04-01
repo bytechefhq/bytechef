@@ -26,6 +26,7 @@ import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -49,16 +50,20 @@ import org.springframework.stereotype.Service;
 public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
     private final ActionDefinitionService actionDefinitionService;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
 
     public WorkflowValidatorFacadeImpl(
-        ActionDefinitionService actionDefinitionService, ComponentDefinitionService componentDefinitionService,
+        ActionDefinitionService actionDefinitionService,
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ComponentDefinitionService componentDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionService triggerDefinitionService) {
 
         this.actionDefinitionService = actionDefinitionService;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -102,16 +107,24 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                     .stream()
                     .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
                     .toList();
+            } else if ("clusterElement".equals(kind)) {
+                com.bytechef.platform.component.domain.ClusterElementDefinition clusterElementDefinition =
+                    clusterElementDefinitionService.getClusterElementDefinition(
+                        workflowNodeType.name(), workflowNodeType.version(),
+                        Objects.requireNonNull(workflowNodeType.operation()));
+
+                return clusterElementDefinition.getProperties()
+                    .stream()
+                    .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                    .toList();
             } else if (workflowNodeType.operation() != null) {
                 ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
 
-                List<PropertyInfo> propertyInfos = actionDefinition.getProperties()
+                return actionDefinition.getProperties()
                     .stream()
                     .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
                     .toList();
-
-                return propertyInfos;
             } else {
                 TaskDispatcherDefinition taskDispatcherDefinition =
                     taskDispatcherDefinitionService.getTaskDispatcherDefinition(
@@ -141,6 +154,13 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                     Objects.requireNonNull(workflowNodeType.operation()));
 
                 outputResponse = triggerDefinition.getOutputResponse();
+            } else if ("clusterElement".equals(kind)) {
+                com.bytechef.platform.component.domain.ClusterElementDefinition clusterElementDefinition =
+                    clusterElementDefinitionService.getClusterElementDefinition(
+                        workflowNodeType.name(), workflowNodeType.version(),
+                        Objects.requireNonNull(workflowNodeType.operation()));
+
+                outputResponse = clusterElementDefinition.getOutputResponse();
             } else if (workflowNodeType.operation() != null) {
                 ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());

@@ -325,8 +325,10 @@ public class WorkflowValidator {
 
                         String type = typeJsonNode.asString();
 
-                        taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, ""));
-                        taskOutputMap.putIfAbsent(type, taskOutputProvider.getTaskOutputProperty(type, "", warnings));
+                        taskDefinitionMap.putIfAbsent(type,
+                            taskDefinitionProvider.getTaskProperties(type, "clusterElement"));
+                        taskOutputMap.putIfAbsent(type,
+                            taskOutputProvider.getTaskOutputProperty(type, "clusterElement", warnings));
                     }
                 }
             } else if (clusterElementJsonNode.isObject() &&
@@ -336,8 +338,9 @@ public class WorkflowValidator {
 
                 String type = typeJsonNode.asString();
 
-                taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, ""));
-                taskOutputMap.putIfAbsent(type, taskOutputProvider.getTaskOutputProperty(type, "", warnings));
+                taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, "clusterElement"));
+                taskOutputMap.putIfAbsent(type,
+                    taskOutputProvider.getTaskOutputProperty(type, "clusterElement", warnings));
 
                 List<String> clusterElementTypes = clusterTypesProvider.getClusterElementTypes(type);
 
