@@ -19,6 +19,7 @@ package com.bytechef.component.urlscan;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -32,6 +33,17 @@ public class UrlscanComponentHandler extends AbstractUrlscanComponentHandler {
         return modifiableComponentDefinition
             .icon("path:assets/urlscan.svg")
             .categories(ComponentCategory.HELPERS)
-            .customAction(true);
+            .customAction(true)
+            .customActionHelp("", "https://docs.urlscan.io/apis/urlscan-openapi")
+            .version(1);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/urlscan_v1#connection-setup")
+            .version(1);
     }
 }

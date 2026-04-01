@@ -12,6 +12,7 @@ paths:
       summary: "Scan"
       description: "Submit a URL to be scanned and control options for how the scan should be performed."
       operationId: "scan"
+      x-help: "https://docs.bytechef.io/reference/components/urlscan_v1#scan"
       x-ai-agent-tool: true
       requestBody:
         content:
@@ -62,8 +63,9 @@ paths:
   /api/v1/result/{scanId}/:
     get:
       summary: "Result"
-      description: "Using the Scan ID, you can use the Result API to poll for the scan."
+      description: "Get scan results for a specific scan ID."
       operationId: "result"
+      x-help: "https://docs.bytechef.io/reference/components/urlscan_v1#result"
       x-ai-agent-tool: true
       parameters:
         - name: "scanId"
@@ -1000,8 +1002,9 @@ paths:
   /screenshots/{scanId}.png:
     get:
       summary: "Screenshot"
-      description: "Use the scan UUID to retrieve the screenshot for a scan once the scan has finished."
+      description: "Use the scan ID to retrieve the screenshot for a scan once the scan has finished."
       operationId: "screenshot"
+      x-help: "https://docs.bytechef.io/reference/components/urlscan_v1#screenshot"
       x-ai-agent-tool: true
       parameters:
         - name: "scanId"
