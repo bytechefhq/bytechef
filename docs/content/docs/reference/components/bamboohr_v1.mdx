@@ -213,7 +213,7 @@ Name: updateEmployeeFile
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Employee ID | STRING | The ID of the employee. | true |
 | fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | The ID of the employee file being updated. | true |
-| name | Updated Name Of The File | STRING | Use if you want to rename the file. | false |
+| name | Updated File Name | STRING | Use if you want to rename the file. | false |
 | categoryId | Updated Category ID | STRING | Use if you want to move the file to a different category. | false |
 | shareWithEmployee | Update Sharing The File | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Use if you want to update whether this file is shared or not. | false |
 
@@ -321,6 +321,12 @@ Type: STRING
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
 <hr />
 
 # Additional Instructions
@@ -328,6 +334,11 @@ Type: STRING
 ### How to find Employee ID
 
 Use the `GET /employees/directory` endpoint to retrieve a list of all employees and their IDs.
+
+The Employee ID can also be found in the output of the following actions and triggers:
+* **Create Employee**
+* **New Employee** trigger
+* **Updated Employee** trigger
 
 ### How to find Fields
 
