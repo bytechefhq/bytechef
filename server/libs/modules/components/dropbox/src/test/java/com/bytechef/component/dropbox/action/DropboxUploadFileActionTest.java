@@ -18,33 +18,47 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILE_ENTRY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.dropbox.util.DropboxUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
+class DropboxUploadFileActionTest {
 
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = forClass(FileEntry.class);
+    private final Context mockedContext = mock(Context.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ENTRY, mockedFileEntry));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
     void testPerform() {
-        when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
-            .thenReturn(mockedFileEntry);
+        try (MockedStatic<DropboxUtils> dropboxUtilsMockedStatic = mockStatic(DropboxUtils.class)) {
+            dropboxUtilsMockedStatic.when(() -> DropboxUtils.uploadFile(
+                parametersArgumentCaptor.capture(), contextArgumentCaptor.capture(), fileEntryArgumentCaptor.capture()))
+                .thenReturn(mockedObject);
 
-        dropboxUtilsMockedStatic.when(() -> DropboxUtils.uploadFile(mockedParameters, mockedContext, mockedFileEntry))
-            .thenReturn(mockedObject);
+            Object result = DropboxUploadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Object result = DropboxUploadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(mockedObject, result);
+            assertEquals(mockedObject, result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+            assertEquals(mockedFileEntry, fileEntryArgumentCaptor.getValue());
+        }
     }
 }
