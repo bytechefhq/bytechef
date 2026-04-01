@@ -11,6 +11,7 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import com.bytechef.ai.mcp.tool.automation.impl.ClusterElementTools;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ReadProjectToolsImpl;
@@ -23,6 +24,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
+import com.bytechef.ee.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;
@@ -86,6 +88,8 @@ public class CopilotConfiguration {
     private final Resource promptWorkflowEditorBuildResource;
     private final Resource promptCodeEditorAskResource;
     private final Resource promptCodeEditorBuildResource;
+    private final Resource promptClusterElementAskResource;
+    private final Resource promptClusterElementBuildResource;
     private final State state = new State();
 
     @SuppressFBWarnings("EI")
@@ -94,7 +98,9 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_workflow_editor_ask.txt") Resource promptWorkflowEditorAskResource,
         @Value("classpath:prompt_workflow_editor_build.txt") Resource promptWorkflowEditorBuildResource,
         @Value("classpath:prompt_code_editor_ask.txt") Resource promptCodeEditorAskResource,
-        @Value("classpath:prompt_code_editor_build.txt") Resource promptCodeEditorBuildResource) {
+        @Value("classpath:prompt_code_editor_build.txt") Resource promptCodeEditorBuildResource,
+        @Value("classpath:prompt_cluster_element_ask.txt") Resource promptClusterElementAskResource,
+        @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource) {
 
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
@@ -133,6 +139,8 @@ public class CopilotConfiguration {
         this.promptWorkflowEditorBuildResource = promptWorkflowEditorBuildResource;
         this.promptCodeEditorAskResource = promptCodeEditorAskResource;
         this.promptCodeEditorBuildResource = promptCodeEditorBuildResource;
+        this.promptClusterElementAskResource = promptClusterElementAskResource;
+        this.promptClusterElementBuildResource = promptClusterElementBuildResource;
     }
 
     @Bean
@@ -218,6 +226,40 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorBuildResource))
             .tools(List.of(readProjectWorkflowToolsImpl, scriptTools, componentTools))
+            .state(state)
+            .build();
+    }
+
+    @Bean
+    ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
+        ComponentTools componentTools) throws AGUIException {
+        String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.ASK.name();
+
+        return ClusterElementSpringAIAgent.builder()
+            .agentId(name.toLowerCase())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptClusterElementAskResource))
+            .tools(List.of(readProjectWorkflowToolsImpl, componentTools))
+            .state(state)
+            .build();
+    }
+
+    @Bean
+    ClusterElementSpringAIAgent clusterElementBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ClusterElementTools clusterElementTools,
+        ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
+        ComponentTools componentTools)
+        throws AGUIException {
+        String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.BUILD.name();
+
+        return ClusterElementSpringAIAgent.builder()
+            .agentId(name.toLowerCase())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
+            .tools(List.of(readProjectWorkflowToolsImpl, clusterElementTools, componentTools))
             .state(state)
             .build();
     }
