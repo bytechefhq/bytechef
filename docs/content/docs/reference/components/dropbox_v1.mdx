@@ -25,8 +25,8 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING |  | true |
-| clientSecret | Client Secret | STRING |  | true |
+| clientId | App Key | STRING |  | true |
+| clientSecret | App Secret | STRING |  | true |
 
 
 
@@ -45,7 +45,7 @@ Connect Dropbox to ByteChef using OAuth 2.0 (Authorization Code).
 4. Click on **Show**.
 5. Copy the **App key** and **Secret**.
 6. Go to **Permissions** tab.
-7. Select scopes: `files.metadata.write`, `files.content.write` and `openId`.
+7. Select scopes: `files.metadata.write`, `files.content.write`, `files.content.read` and `openId`.
 8. Click **Submit**.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
@@ -60,30 +60,30 @@ Connect Dropbox to ByteChef using OAuth 2.0 (Authorization Code).
 ## Actions
 
 
-### Copy
-Name: copy
+### Copy File
+Name: copyFile
 
-`Copy a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be copied.`
+`Copy a file to a different location in the user's Dropbox.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| filename | Filename | STRING | Name of the file with the extension. Don't fill in if you want a folder. | false |
-| from_path | Source Path | STRING | The path which the file or folder should be copied from.  Root is /. | true |
-| to_path | Destination Path | STRING | The path which the file or folder should be copied to.  Root is /. | true |
+| from_path | Source Path | STRING | The source path of the file. | true |
+| to_path | Destination Path | STRING | The destination path for the copied file. | true |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If there's a conflict, have the Dropbox server try to autorename the file to avoid the conflict. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Copy",
-  "name" : "copy",
+  "label" : "Copy File",
+  "name" : "copyFile",
   "parameters" : {
-    "filename" : "",
     "from_path" : "",
-    "to_path" : ""
+    "to_path" : "",
+    "autorename" : false
   },
-  "type" : "dropbox/v1/copy"
+  "type" : "dropbox/v1/copyFile"
 }
 ```
 
@@ -98,7 +98,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the copied file or folder. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the copied file. |
 
 
 
@@ -115,13 +115,77 @@ Type: OBJECT
 }
 ```
 
+#### Find File Path
+
+To find the file path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
 
 
 
-### Create New Folder
+### Copy Folder
+Name: copyFolder
+
+`Copy folder to a different location in the user's Dropbox. All content of the folder will be copied.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from_path | From Path | STRING | The source path of the folder. | true |
+| to_path | Destination Path | STRING | The destination path for the copied folder. | true |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If there's a conflict, have the Dropbox server try to autorename the folder to avoid the conflict. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Copy Folder",
+  "name" : "copyFolder",
+  "parameters" : {
+    "from_path" : "",
+    "to_path" : "",
+    "autorename" : false
+  },
+  "type" : "dropbox/v1/copyFolder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the copied folder. |
+
+
+
+
+#### Output Example
+```json
+{
+  "metadata" : {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
+  }
+}
+```
+
+#### Find Folder Path
+
+To find the folder path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
+
+
+
+### Create Folder
 Name: createFolder
 
-`Create a folder at a given path.`
+`Creates an empty folder at a given path.`
 
 #### Properties
 
@@ -132,7 +196,7 @@ Name: createFolder
 #### Example JSON Structure
 ```json
 {
-  "label" : "Create New Folder",
+  "label" : "Create Folder",
   "name" : "createFolder",
   "parameters" : {
     "path" : ""
@@ -169,6 +233,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder Path
+
+To find the folder path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
 
 
 
@@ -240,31 +307,32 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder Path
+
+To find the folder path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
 
 
 
-### Delete
-Name: delete
+### Delete File
+Name: deleteFile
 
-`Delete the file or folder at a given path. If the path is a folder, all its contents will be deleted too.`
+`Delete the file at a given path.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Path | STRING | Path of the file or folder. Root is /. | true |
-| filename | Filename | STRING | Name of the file. Leave empty if you want to delete a folder. | false |
+| path | Path | STRING | Path of the file to be deleted. | true |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Delete",
-  "name" : "delete",
+  "label" : "Delete File",
+  "name" : "deleteFile",
   "parameters" : {
-    "path" : "",
-    "filename" : ""
+    "path" : ""
   },
-  "type" : "dropbox/v1/delete"
+  "type" : "dropbox/v1/deleteFile"
 }
 ```
 
@@ -279,7 +347,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the deleted file or folder. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the deleted file. |
 
 
 
@@ -296,6 +364,124 @@ Type: OBJECT
 }
 ```
 
+#### Find File Path
+
+To find the file path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
+
+
+
+### Delete Folder
+Name: deleteFolder
+
+`Delete the folder at a given path. All its contents will be deleted too.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | Path of the folder to be deleted. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Folder",
+  "name" : "deleteFolder",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "dropbox/v1/deleteFolder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the deleted folder. |
+
+
+
+
+#### Output Example
+```json
+{
+  "metadata" : {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
+  }
+}
+```
+
+#### Find Folder Path
+
+To find the folder path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
+
+
+
+### Download File
+Name: downloadFile
+
+`Download a file from Dropbox.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | File Path | STRING | The path of the file to download. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Download File",
+  "name" : "downloadFile",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "dropbox/v1/downloadFile"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+#### Find File Path
+
+To find the file path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
 
 
 
@@ -308,8 +494,7 @@ Name: getFileLink
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Namepath to the File | STRING | The path to the file you want a temporary link to.  Root is /. | true |
-| filename | Filename | STRING | Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect) | true |
+| path | File Path | STRING | The path to the file you want a temporary link to. | true |
 
 #### Example JSON Structure
 ```json
@@ -317,8 +502,7 @@ Name: getFileLink
   "label" : "Get File Link",
   "name" : "getFileLink",
   "parameters" : {
-    "path" : "",
-    "filename" : ""
+    "path" : ""
   },
   "type" : "dropbox/v1/getFileLink"
 }
@@ -354,6 +538,9 @@ Type: OBJECT
 }
 ```
 
+#### Find File Path
+
+To find the file path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
 
 
 
@@ -366,7 +553,7 @@ Name: listFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Path | STRING | Path of the filename. Inputting nothing searches root. | false |
+| path | Path | STRING | The path of the folder to be listed. Inputting nothing searches root. | false |
 
 #### Example JSON Structure
 ```json
@@ -408,33 +595,36 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder Path
+
+To find the folder path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
 
 
 
-### Move
-Name: move
+### Move File
+Name: moveFile
 
-`Move a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be moved. Note that we do not currently support case-only renaming.`
+`Move a file to a different location in the user's Dropbox.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| filename | Filename | STRING | Name of the file with the extension. Don't fill in if you want a folder. | false |
-| from_path | Source Path | STRING | Path in the user's Dropbox to be moved.  Root is /. | true |
-| to_path | Destination Path | STRING | Path in the user's Dropbox that is the destination. Root is /. | true |
+| from_path | Source Path | STRING | Path of the file in the user's Dropbox to be moved. | true |
+| to_path | Destination Path | STRING | Path in the user's Dropbox that is the destination. | true |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If there's a conflict, have the Dropbox server try to autorename the file to avoid the conflict. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Move",
-  "name" : "move",
+  "label" : "Move File",
+  "name" : "moveFile",
   "parameters" : {
-    "filename" : "",
     "from_path" : "",
-    "to_path" : ""
+    "to_path" : "",
+    "autorename" : false
   },
-  "type" : "dropbox/v1/move"
+  "type" : "dropbox/v1/moveFile"
 }
 ```
 
@@ -449,7 +639,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the moved file or folder. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the moved file. |
 
 
 
@@ -466,6 +656,70 @@ Type: OBJECT
 }
 ```
 
+#### Find File Path
+
+To find the file path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
+
+
+
+### Move Folder
+Name: moveFolder
+
+`Move a folder to a different location in the user's Dropbox. All content of the folder will be moved.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from_path | Source Path | STRING | Path in the user's Dropbox to be moved. | true |
+| to_path | Destination Path | STRING | Path in the user's Dropbox that is the destination. | true |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If there's a conflict, have the Dropbox server try to autorename the folder to avoid the conflict. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Move Folder",
+  "name" : "moveFolder",
+  "parameters" : {
+    "from_path" : "",
+    "to_path" : "",
+    "autorename" : false
+  },
+  "type" : "dropbox/v1/moveFolder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)&#125; </details> | Metadata containing details about the moved folder. |
+
+
+
+
+#### Output Example
+```json
+{
+  "metadata" : {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
+  }
+}
+```
+
+#### Find Folder Path
+
+To find the folder path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
 
 
 
@@ -598,6 +852,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Folder Path
+
+To find the folder path, click [here](/reference/components/dropbox_v1#how-to-find-file-or-folder-path).
 
 
 
@@ -609,3 +866,26 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find File or Folder path
+
+Finding the source path of a file or folder in Dropbox depends on whether you are using the desktop application, the website, or the API.
+The source path is generally the path relative to the root of your Dropbox folder (e.g., /Photos/vacation.jpg).
+
+The path of the file or folder can be found in the output of the following actions. In the output, you will find a `path_lower` property, which represents the path of the file or folder in lowercase letters.
+
+* **Copy File**
+* **Copy Folder**
+* **Create Folder**
+* **Create New Paper File**
+* **Delete File**
+* **Delete Folder**
+* **Get File Link**
+* **List Folder**
+* **Move File**
+* **Move Folder**
+* **Search**
+* **Upload File**
