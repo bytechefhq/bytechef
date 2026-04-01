@@ -38,7 +38,7 @@ import java.util.Map;
 public class UrlscanResultAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("result")
         .title("Result")
-        .description("Using the Scan ID, you can use the Result API to poll for the scan.")
+        .description("Get scan results for a specific scan ID.")
         .metadata(
             Map.of(
                 "method", "GET",
@@ -456,7 +456,8 @@ public class UrlscanResultAction {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON))));
+                        "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/urlscan_v1#result");
 
     private UrlscanResultAction() {
     }
