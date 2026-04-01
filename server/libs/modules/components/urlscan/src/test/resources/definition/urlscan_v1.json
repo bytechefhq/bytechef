@@ -5,8 +5,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Using the Scan ID, you can use the Result API to poll for the scan.",
-    "help": null,
+    "description": "Get scan results for a specific scan ID.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/urlscan_v1#result"
+    },
     "metadata": {
       "method": "GET",
       "path": "/api/v1/result/{scanId}/"
@@ -17744,7 +17747,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Submit a URL to be scanned and control options for how the scan should be performed.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/urlscan_v1#scan"
+    },
     "metadata": {
       "path": "/api/v1/scan",
       "mimeType": "application/json",
@@ -18096,8 +18102,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Use the scan UUID to retrieve the screenshot for a scan once the scan has finished.",
-    "help": null,
+    "description": "Use the scan ID to retrieve the screenshot for a scan once the scan has finished.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/urlscan_v1#screenshot"
+    },
     "metadata": {
       "method": "GET",
       "path": "/screenshots/{scanId}.png"
@@ -18355,7 +18364,7 @@
   } ],
   "clusterElements": [ {
     "name": "result",
-    "description": "Using the Scan ID, you can use the Result API to poll for the scan.",
+    "description": "Get scan results for a specific scan ID.",
     "element": null,
     "help": null,
     "outputDefinition": {
@@ -36438,7 +36447,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "screenshot",
-    "description": "Use the scan UUID to retrieve the screenshot for a scan once the scan has finished.",
+    "description": "Use the scan ID to retrieve the screenshot for a scan once the scan has finished.",
     "element": null,
     "help": null,
     "outputDefinition": {
@@ -36767,14 +36776,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/urlscan_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://docs.urlscan.io/apis/urlscan-openapi"
+  },
   "description": "Urlscan.io is an online service that allows you to safely analyze websites and URLs to determine potential security threats and risks.",
   "icon": "path:assets/urlscan.svg",
   "metadata": null,
