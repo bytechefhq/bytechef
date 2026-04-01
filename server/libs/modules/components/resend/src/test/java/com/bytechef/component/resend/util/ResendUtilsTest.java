@@ -17,43 +17,72 @@
 package com.bytechef.component.resend.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Encoder;
+import com.bytechef.component.definition.Context.File;
+import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.FileEntry;
-import java.util.Base64;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class ResendUtilsTest {
 
+    private final ArgumentCaptor<byte[]> bytesArgumentCaptor = forClass(byte[].class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Encoder, Executor>> encoderFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = forClass(FileEntry.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<File, Executor>> fileFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Encoder mockedEncoder = mock(Encoder.class);
+    private final File mockedFile = mock(File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
 
     @Test
-    void testGetAttachments() {
-        Base64.Encoder encoder = Base64.getEncoder();
-        List<FileEntry> fileEntries = List.of(mockedFileEntry);
+    void testGetAttachments() throws IOException {
         byte[] bytes = {};
 
         when(mockedFileEntry.getName())
             .thenReturn("fileName");
-        when(mockedContext.file(any()))
+
+        when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<File, Executor> value = fileFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedFile);
+            });
+        when(mockedFile.readAllBytes(fileEntryArgumentCaptor.capture()))
             .thenReturn(bytes);
 
-        List<Map<String, String>> result = ResendUtils.getAttachments(fileEntries, mockedContext);
+        when(mockedContext.encoder(encoderFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Encoder, Executor> value = encoderFunctionArgumentCaptor.getValue();
 
-        assertEquals(1, result.size());
+                return value.apply(mockedEncoder);
+            });
+        when(mockedEncoder.base64Encode(bytesArgumentCaptor.capture()))
+            .thenReturn("encoded");
 
-        Map<String, String> fileEntry = result.getFirst();
+        List<Map<String, String>> result = ResendUtils.getAttachments(List.of(mockedFileEntry), mockedContext);
 
-        assertEquals("fileName", fileEntry.get("filename"));
-        assertEquals(encoder.encodeToString(bytes), fileEntry.get("content"));
+        assertEquals(List.of(Map.of("filename", "fileName", "content", "encoded")), result);
+        assertNotNull(fileFunctionArgumentCaptor.getValue());
+        assertNotNull(encoderFunctionArgumentCaptor.getValue());
+        assertEquals(mockedFileEntry, fileEntryArgumentCaptor.getValue());
+        assertEquals(bytes, bytesArgumentCaptor.getValue());
     }
 }
