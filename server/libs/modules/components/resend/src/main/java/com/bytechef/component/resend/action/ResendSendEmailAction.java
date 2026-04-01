@@ -61,6 +61,7 @@ public final class ResendSendEmailAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
         .title("Send Email")
         .description("Send an email")
+        .help("", "https://docs.bytechef.io/reference/components/resend_v1#send-email")
         .properties(
             string(FROM)
                 .label("From")

@@ -34,10 +34,12 @@ public final class ResendConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.resend.com")
+        .help("", "https://docs.bytechef.io/reference/components/resend_v1#connection-setup")
         .authorizations(authorization(BEARER_TOKEN)
             .title("Bearer Token")
             .properties(
                 string(TOKEN)
                     .label("API Key")
-                    .required(true)));
+                    .required(true)))
+        .version(1);
 }
