@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -436,12 +435,14 @@ public class ComponentTools {
                     if (componentDefinition.isClusterElement()) {
                         clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
                             .stream()
-                            .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key, ClusterElementDefinition.ClusterElementType::multipleElements));
+                            .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key,
+                                ClusterElementDefinition.ClusterElementType::multipleElements));
                     }
 
                     return new ActionDetailedInfo(
                         action.getName(), action.getTitle(), action.getDescription(), componentDefinition.getName(),
-                        ToolUtils.generateParametersJson(action.getProperties()), clusterElementTypeKeys, outputPropertiesJson);
+                        ToolUtils.generateParametersJson(action.getProperties()), clusterElementTypeKeys,
+                        outputPropertiesJson);
                 })
                 .orElseThrow(() -> new ExecutionException(
                     String.format(ACTION_NOT_FOUND, actionName, componentName), ComponentToolErrorType.GET_ACTION));
@@ -458,16 +459,19 @@ public class ComponentTools {
     @Tool(
         description = "Search components that support a specific cluster element type. Returns a list of components that have cluster elements matching the given cluster element type key")
     public List<ComponentMinimalInfo> searchClusterElements(
-        @ToolParam(description = "The cluster element type key to search for in snake_case") String clusterElementType) {
+        @ToolParam(
+            description = "The cluster element type key to search for in snake_case") String clusterElementType) {
 
         try {
             List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
             List<ComponentMinimalInfo> matchingComponents = componentDefinitions.stream()
-                .filter(component -> !component.getClusterElements().isEmpty())
+                .filter(component -> !component.getClusterElements()
+                    .isEmpty())
                 .filter(component -> component.getClusterElements()
                     .stream()
-                    .anyMatch(clusterElement -> clusterElement.getName().equals(clusterElementType)))
+                    .anyMatch(clusterElement -> clusterElement.getName()
+                        .equals(clusterElementType)))
                 .map(component -> new ComponentMinimalInfo(
                     component.getName(), component.getDescription(), component.getVersion()))
                 .toList();
@@ -498,7 +502,8 @@ public class ComponentTools {
 
             return componentDefinition.getClusterElements()
                 .stream()
-                .filter(clusterElementDefinition -> clusterElementDefinition.getName().equals(clusterElementName))
+                .filter(clusterElementDefinition -> clusterElementDefinition.getName()
+                    .equals(clusterElementName))
                 .findFirst()
                 .map(clusterElement -> {
                     String outputPropertiesJson = null;
@@ -512,13 +517,15 @@ public class ComponentTools {
                     if (componentDefinition.isClusterElement()) {
                         clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
                             .stream()
-                            .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key, ClusterElementDefinition.ClusterElementType::multipleElements));
+                            .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key,
+                                ClusterElementDefinition.ClusterElementType::multipleElements));
                     }
 
                     return new ActionDetailedInfo(
                         clusterElement.getName(), clusterElement.getTitle(), clusterElement.getDescription(),
                         componentDefinition.getName(),
-                        ToolUtils.generateParametersJson(clusterElement.getProperties()), clusterElementTypeKeys, outputPropertiesJson);
+                        ToolUtils.generateParametersJson(clusterElement.getProperties()), clusterElementTypeKeys,
+                        outputPropertiesJson);
                 })
                 .orElseThrow(() -> new ExecutionException(
                     String.format(ACTION_NOT_FOUND, clusterElementName, componentName),
@@ -696,7 +703,8 @@ public class ComponentTools {
                     // If not found in actions, try cluster elements
                     var clusterElementOptional = componentDefinition.getClusterElements()
                         .stream()
-                        .filter(clusterElement -> clusterElement.getName().equals(operationName))
+                        .filter(clusterElement -> clusterElement.getName()
+                            .equals(operationName))
                         .findFirst();
 
                     if (clusterElementOptional.isPresent()) {
@@ -780,11 +788,13 @@ public class ComponentTools {
                     // If not found in actions, try cluster elements
                     var clusterElementOptional = componentDefinition.getClusterElements()
                         .stream()
-                        .filter(clusterElement -> clusterElement.getName().equals(operationName))
+                        .filter(clusterElement -> clusterElement.getName()
+                            .equals(operationName))
                         .findFirst();
 
                     if (clusterElementOptional.isPresent()) {
-                        properties = clusterElementOptional.get().getProperties();
+                        properties = clusterElementOptional.get()
+                            .getProperties();
                     } else {
                         throw new ExecutionException(
                             String.format(OPERATION_NOT_FOUND, operationName, componentName),
