@@ -39,12 +39,15 @@ public class JenkinsComponentHandler implements ComponentHandler {
             "Jenkins is leading open source automation server, Jenkins provides hundreds of plugins to support " +
                 "building, deploying and automating any project.")
         .icon("path:assets/jenkins.svg")
+        .customAction(true)
+        .customActionHelp("", "https://www.jenkins.io/doc/book/using/remote-access-api/")
         .categories(ComponentCategory.DEVELOPER_TOOLS)
         .actions(JenkinsCreateJobAction.ACTION_DEFINITION)
         .clusterElements(tool(JenkinsCreateJobAction.ACTION_DEFINITION))
         .connection(JenkinsConnection.CONNECTION_DEFINITION)
         .triggers(JenkinsNewJobStatusNotificationTrigger.TRIGGER_DEFINITION)
-        .customAction(true);
+        .customAction(true)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

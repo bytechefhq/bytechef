@@ -43,7 +43,8 @@ public class JenkinsCreateJobAction {
                 .label("Config XML")
                 .description("Content of the config.xml file.")
                 .required(true))
-        .perform(JenkinsCreateJobAction::perform);
+        .perform(JenkinsCreateJobAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/jenkins_v1#create-job");
 
     private JenkinsCreateJobAction() {
     }
