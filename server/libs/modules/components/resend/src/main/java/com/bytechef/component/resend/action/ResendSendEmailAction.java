@@ -45,7 +45,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.resend.util.ResendUtils;
 import java.util.List;
 
@@ -141,7 +140,8 @@ public final class ResendSendEmailAction {
             outputSchema(
                 object()
                     .properties(
-                        string("id"))))
+                        string("id")
+                            .description("ID of the email."))))
         .perform(ResendSendEmailAction::perform);
 
     private ResendSendEmailAction() {
