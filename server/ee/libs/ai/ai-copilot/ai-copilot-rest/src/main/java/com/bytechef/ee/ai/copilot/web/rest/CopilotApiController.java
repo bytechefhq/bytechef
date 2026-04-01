@@ -69,6 +69,12 @@ public class CopilotApiController {
             } else {
                 agentId = "code_editor_ask";
             }
+        } else if (agentId.equals("cluster_element")) {
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "cluster_element_build";
+            } else {
+                agentId = "cluster_element_ask";
+            }
         }
 
         LocalAgent localAgent = localAgentMap.get(agentId);
