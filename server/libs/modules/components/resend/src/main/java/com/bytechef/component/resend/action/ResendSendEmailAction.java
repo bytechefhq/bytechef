@@ -167,6 +167,6 @@ public final class ResendSendEmailAction {
                     TAGS, inputParameters.getList(TAGS)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
