@@ -47,7 +47,9 @@ public class TrelloConnection {
                 .apply((connectionParameters, context) -> ApplyResponse.ofQueryParameters(
                     Map.of(
                         KEY, List.of(connectionParameters.getRequiredString(KEY)),
-                        TOKEN, List.of(connectionParameters.getRequiredString(TOKEN))))));
+                        TOKEN, List.of(connectionParameters.getRequiredString(TOKEN))))))
+        .help("", "https://docs.bytechef.io/reference/components/trello_v1#connection-setup")
+        .version(1);
 
     private TrelloConnection() {
     }

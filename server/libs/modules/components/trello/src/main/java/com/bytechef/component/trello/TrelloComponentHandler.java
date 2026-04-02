@@ -38,9 +38,10 @@ public class TrelloComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("trello")
         .title("Trello")
         .description(
-            "Trello is a project management tool that uses boards, lists, and cards to help users organize tasks " +
+            "Trello is a project management tool that uses boards, lists and cards to help users organize tasks " +
                 "and collaborate with teams.")
         .customAction(true)
+        .customActionHelp("", "https://developer.atlassian.com/cloud/trello/rest/api-group-actions/")
         .icon("path:assets/trello.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(TrelloConnection.CONNECTION_DEFINITION)
@@ -52,7 +53,8 @@ public class TrelloComponentHandler implements ComponentHandler {
             tool(TrelloCreateBoardAction.ACTION_DEFINITION),
             tool(TrelloCreateCardAction.ACTION_DEFINITION),
             tool(TrelloGetCardAction.ACTION_DEFINITION))
-        .triggers(TrelloNewCardTrigger.TRIGGER_DEFINITION);
+        .triggers(TrelloNewCardTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
