@@ -170,8 +170,8 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         setContext({
             ...currentContext,
             mode: MODE.ASK,
-            parameters: {},
-            source: Source.WORKFLOW_EDITOR,
+            parameters: {componentName: rootClusterElementNodeData?.name},
+            source: Source.CLUSTER_ELEMENT,
         });
 
         setCopilotPanelOpen(true);
