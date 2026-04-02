@@ -37,7 +37,6 @@ Scripts execute inside a GraalVM Polyglot engine — a synchronous, sandboxed en
 ## Important Rules when getting Errors:
 - Ignore Warnings for Script component
 - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
-- Display condition is located in metadata if the property is an object. If the condition is false: the object is not part of the JSON definition. Otherwise it is a part of it.
 - Every task must have a unique name in format: componentName_{number}
 - Required fields must be filled, the other fields are optional
 - If an array in taskDefinition contains multiple objects, you can use any of the objects for that array
