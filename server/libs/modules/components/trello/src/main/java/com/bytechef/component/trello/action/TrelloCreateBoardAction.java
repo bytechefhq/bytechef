@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.trello.constant.TrelloConstants.DESC;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 
@@ -52,9 +52,9 @@ public class TrelloCreateBoardAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        actionContext
+        context
             .http(http -> http.post("/boards"))
             .queryParameters(
                 NAME, inputParameters.getRequiredString(NAME),
