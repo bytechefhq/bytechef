@@ -19,9 +19,9 @@ package com.bytechef.component.docusign.action;
 import static com.bytechef.component.docusign.constant.DocuSignConstants.ACCOUNT_ID;
 import static com.bytechef.component.docusign.constant.DocuSignConstants.DOCUMENT_ID;
 import static com.bytechef.component.docusign.constant.DocuSignConstants.ENVELOPE_ID;
-import static com.bytechef.component.docusign.constant.DocuSignConstants.FROM_DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,16 +29,16 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
-import com.bytechef.component.definition.Context.Http.ResponseType.Type;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.time.LocalDate;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,9 +51,9 @@ import org.mockito.ArgumentCaptor;
 class DocuSignDownloadEnvelopeDocumentActionTest {
 
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        ACCOUNT_ID, "accountId", FROM_DATE, LocalDate.of(2025, 6, 4), ENVELOPE_ID, "1", DOCUMENT_ID, "1"));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(ACCOUNT_ID, "accountId", ENVELOPE_ID, "1", DOCUMENT_ID, "1"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
@@ -69,18 +69,15 @@ class DocuSignDownloadEnvelopeDocumentActionTest {
         FileEntry result = DocuSignDownloadEnvelopeDocumentAction.perform(
             mockedParameters, mockedParameters, mockedContext);
 
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Type.BINARY, responseType.getType());
-
         assertEquals(mockedFileEntry, result);
-        assertEquals(
-            "/restapi/v2.1/accounts/accountId/envelopes/1/documents/1", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/restapi/v2.1/accounts/accountId/envelopes/1/documents/1", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(ResponseType.Type.BINARY, responseType.getType());
+        assertEquals("application/pdf", responseType.getContentType());
     }
 }
