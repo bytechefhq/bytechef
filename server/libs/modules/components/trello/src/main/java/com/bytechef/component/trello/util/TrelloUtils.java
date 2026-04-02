@@ -40,8 +40,8 @@ public class TrelloUtils {
     }
 
     public static List<Option<String>> getBoardOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/members/" + getAuthorisedUserId(context) + "/boards"))
@@ -53,8 +53,8 @@ public class TrelloUtils {
     }
 
     public static List<Option<String>> getCardOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/boards/" + inputParameters.getRequiredString(ID_BOARD) + "/cards"))
@@ -66,8 +66,8 @@ public class TrelloUtils {
     }
 
     public static List<Option<String>> getListOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/boards/" + inputParameters.getRequiredString(ID_BOARD) + "/lists"))
