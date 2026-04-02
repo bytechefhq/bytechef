@@ -19,65 +19,64 @@ package com.bytechef.component.trello.trigger;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class TrelloNewCardTriggerTest {
 
-    private final Parameters mockedDynamicWebhookEnableOutput = mock(Parameters.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
-    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
-    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
-    private static final String TEST_WORKFLOW_EXECUTION_ID = "testWorkflowExecutionId";
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testWebhookEnable() {
+    void testWebhookEnable(
+        TriggerContext mockedTriggerContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         String webhookUrl = "testWebhookUrl";
 
         when(mockedParameters.getString(ID_LIST))
             .thenReturn("listId");
-        when(mockedTriggerContext.http(any()))
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "abc"));
 
         WebhookEnableOutput webhookEnableOutput = TrelloNewCardTrigger.dynamicWebhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, TEST_WORKFLOW_EXECUTION_ID, mockedTriggerContext);
+            mockedParameters, null, webhookUrl, null, mockedTriggerContext);
 
         Map<String, ?> parameters = webhookEnableOutput.parameters();
         Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
@@ -85,48 +84,70 @@ class TrelloNewCardTriggerTest {
         assertEquals(Map.of(ID, "abc"), parameters);
         assertNull(webhookExpirationDate);
 
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/webhooks", stringArgumentCaptor.getValue());
+
         Object[] query = queryArgumentCaptor.getValue();
 
         assertEquals(List.of("callbackURL", webhookUrl, "idModel", "listId"), Arrays.asList(query));
     }
 
     @Test
-    void testDynamicWebhookDisable() {
-        when(mockedTriggerContext.http(any()))
+    void testDynamicWebhookDisable(
+        TriggerContext mockedTriggerContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedParameters.getString(ID))
+            .thenReturn("abc");
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         TrelloNewCardTrigger.dynamicWebhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, TEST_WORKFLOW_EXECUTION_ID, mockedTriggerContext);
+            null, null, mockedParameters, null, mockedTriggerContext);
 
-        verify(mockedTriggerContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).configuration(any());
-        verify(mockedExecutor, times(1)).execute();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/webhooks/abc", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testDynamicWebhookRequest() {
+    void testDynamicWebhookRequest(
+        TriggerContext mockedTriggerContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> map = Map.of(ID, "123");
 
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
             .thenReturn(Map.of("action", Map.of("type", "createCard", "data", Map.of("card", Map.of(ID, "abc")))));
 
-        when(mockedTriggerContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
         Object result = TrelloNewCardTrigger.dynamicWebhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedDynamicWebhookEnableOutput, mockedTriggerContext);
+            null, null, null, null, mockedWebhookBody,
+            null, null, mockedTriggerContext);
 
         assertEquals(map, result);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/cards/abc", stringArgumentCaptor.getValue());
     }
 }
