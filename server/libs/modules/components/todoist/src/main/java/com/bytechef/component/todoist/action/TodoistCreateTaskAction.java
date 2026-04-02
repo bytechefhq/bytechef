@@ -18,6 +18,8 @@ package com.bytechef.component.todoist.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -50,20 +52,19 @@ public class TodoistCreateTaskAction {
             Map.of(
                 "type", PropertyType.BODY))
             .label("Content")
-            .description("Task content. It may contain some markdown-formatted text and hyperlinks.")
+            .description("Task content.")
             .required(true),
             string("description").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Description")
-                .description(
-                    "A description for the task. This value may contain some markdown-formatted text and hyperlinks.")
+                .description("A description for the task.")
                 .required(false),
             string("project_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Project ID")
-                .description("Task project ID. If not set, task is put to user's Inbox.")
+                .description("ID of the project to add the task to. If not set, task is put to user's Inbox.")
                 .required(false)
                 .options((ActionDefinition.OptionsFunction<String>) TodoistUtils::getProjectIdOptions),
             integer("priority").metadata(
@@ -72,10 +73,49 @@ public class TodoistCreateTaskAction {
                 .label("Priority")
                 .description("Task priority from 1 (normal) to 4 (urgent).")
                 .options(option("1", 1), option("2", 2), option("3", 3), option("4", 4))
+                .required(false),
+            array("labels").items(string().metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .description("List of labels to be applied to the task."))
+                .placeholder("Add to Labels")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Labels")
+                .description("List of labels to be applied to the task.")
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<String>) TodoistUtils::getLabelsOptions),
+            string("section_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Section ID")
+                .description("ID of the section to add the task to.")
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<String>) TodoistUtils::getSectionIdOptions)
+                .optionsLookupDependsOn("project_id"),
+            string("parent_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Parent Task ID")
+                .description("ID of the parent task.")
                 .required(false))
-        .output(outputSchema(object().properties(string("id").description("ID of the task.")
+        .output(outputSchema(object().properties(string("user_id").description("ID of the user.")
             .required(false),
+            string("id").description("ID of the task.")
+                .required(false),
             string("project_id").description("ID of the project.")
+                .required(false),
+            string("section_id").description("ID of the section.")
+                .required(false),
+            string("parent_id").description("ID of the parent task.")
+                .required(false),
+            array("labels").items(string().description("List of labels applied to the task."))
+                .description("List of labels applied to the task.")
+                .required(false),
+            bool("checked").description("Whether the task is checked.")
+                .required(false),
+            bool("is_deleted").description("Whether the task is deleted.")
                 .required(false),
             string("content").description("Task content.")
                 .required(false),
@@ -85,7 +125,8 @@ public class TodoistCreateTaskAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/todoist_v1#create-task");
 
     private TodoistCreateTaskAction() {
     }

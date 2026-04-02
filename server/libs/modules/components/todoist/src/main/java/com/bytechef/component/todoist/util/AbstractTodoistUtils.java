@@ -36,7 +36,31 @@ public abstract class AbstractTodoistUtils {
         return List.of();
     }
 
+    public static List<Option<Long>> getWorkspaceIdOptions(
+        Parameters inputParameters,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
+        Context context) {
+
+        return List.of();
+    }
+
     public static List<Option<String>> getProjectIdOptions(
+        Parameters inputParameters,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
+        Context context) {
+
+        return List.of();
+    }
+
+    public static List<Option<String>> getLabelsOptions(
+        Parameters inputParameters,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
+        Context context) {
+
+        return List.of();
+    }
+
+    public static List<Option<String>> getSectionIdOptions(
         Parameters inputParameters,
         Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {

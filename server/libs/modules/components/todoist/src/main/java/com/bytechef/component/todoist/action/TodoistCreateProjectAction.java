@@ -19,13 +19,16 @@ package com.bytechef.component.todoist.action;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.todoist.util.TodoistUtils;
 import java.util.Map;
 
 /**
@@ -49,30 +52,56 @@ public class TodoistCreateProjectAction {
             .label("Name")
             .description("Name of the project.")
             .required(true),
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
+                .description("Description of the project.")
+                .required(false),
+            string("parent_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Parent Project ID")
+                .description("ID of the parent project.")
+                .required(false),
             string("color").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Color")
+                .description("Color of the project icon.")
                 .required(false),
             bool("is_favorite").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Is Project a Favorite?")
                 .description("Whether the project is a favorite.")
-                .required(false))
+                .required(false),
+            integer("workspace_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Workspace ID")
+                .description(
+                    "ID of the workspace. If provided, creates a workspace project instead of a personal project.")
+                .required(false)
+                .options((ActionDefinition.OptionsFunction<Long>) TodoistUtils::getWorkspaceIdOptions))
         .output(outputSchema(object().properties(string("id").description("ID of the project.")
             .required(false),
             string("name").description("Name of the project.")
+                .required(false),
+            string("description").description("Description of the project.")
                 .required(false),
             string("color").description("Color of the project icon.")
                 .required(false),
             string("is_favorite").description("Whether the project is a favorite.")
                 .required(false),
             string("url").description("URL of the project.")
+                .required(false),
+            string("parent_id").description("ID of the parent project.")
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/todoist_v1#create-project");
 
     private TodoistCreateProjectAction() {
     }

@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class TodoistConnection {
     public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.todoist.com/rest/v2")
+        .baseUri((connectionParameters, context) -> "https://api.todoist.com/api/v1")
         .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
             .title("OAuth2 Authorization Code")
             .properties(
