@@ -429,6 +429,7 @@ Name: replyToEmail
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Message ID | STRING | The ID of the message to reply to. | true |
+| from | From | STRING | The email address sending the mail. | true |
 | bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
 | ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Cc recipients for the message. | false |
 | contentType | Content Type | STRING <details> <summary> Options </summary> <span>TEXT</span>, <span>HTML</span> </details> | The type of the content. | false |
@@ -443,6 +444,7 @@ Name: replyToEmail
   "name" : "replyToEmail",
   "parameters" : {
     "id" : "",
+    "from" : "",
     "bccRecipients" : [ "" ],
     "ccRecipients" : [ "" ],
     "contentType" : "",
