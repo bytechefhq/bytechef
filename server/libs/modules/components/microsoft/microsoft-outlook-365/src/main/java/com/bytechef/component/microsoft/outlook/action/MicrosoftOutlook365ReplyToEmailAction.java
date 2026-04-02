@@ -21,12 +21,15 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ATTACHMENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.COMMENT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createRecipientList;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getAttachments;
@@ -59,6 +62,11 @@ public class MicrosoftOutlook365ReplyToEmailAction {
                 .label("Message ID")
                 .description("The ID of the message to reply to.")
                 .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
+                .required(true),
+            string(FROM)
+                .label("From")
+                .description("The email address sending the mail.")
+                .controlType(ControlType.EMAIL)
                 .required(true),
             array(BCC_RECIPIENTS)
                 .label("Bcc Recipients")
@@ -104,6 +112,7 @@ public class MicrosoftOutlook365ReplyToEmailAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Map<String, Object> message = new HashMap<>();
 
+        message.put(FROM, Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, inputParameters.getRequiredString(FROM))));
         addRecipients(inputParameters, message, CC_RECIPIENTS);
         addRecipients(inputParameters, message, BCC_RECIPIENTS);
         addAttachments(inputParameters.getList(ATTACHMENTS, FileEntry.class), context, message);
