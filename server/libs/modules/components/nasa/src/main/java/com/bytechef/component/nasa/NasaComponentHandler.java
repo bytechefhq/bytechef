@@ -42,27 +42,7 @@ import java.util.Optional;
 public class NasaComponentHandler extends AbstractNasaComponentHandler {
 
     @Override
-    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
-        return modifiableComponentDefinition
-            .customAction(true)
-            .customActionHelp(
-                "NASA Web API documentation", "https://api.nasa.gov/")
-            .icon("path:assets/nasa.svg")
-            .categories(ComponentCategory.DEVELOPER_TOOLS);
-    }
-
-    @Override
-    public ModifiableConnectionDefinition modifyConnection(
-        ModifiableConnectionDefinition modifiableConnectionDefinition) {
-
-        return modifiableConnectionDefinition
-            .help("", "https://docs.bytechef.io/reference/components/nasa_v1#connection-setup")
-            .version(1);
-    }
-
-    @Override
     public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
-
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             if (Objects.equals(modifiableActionDefinition.getName(), "getPictureOfTheDay")) {
                 Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
@@ -72,7 +52,7 @@ public class NasaComponentHandler extends AbstractNasaComponentHandler {
                 properties.addFirst(
                     string("queryType")
                         .label("Fetch Method")
-                        .description("Select how you want to fetch the Picture of the Day.")
+                        .description("Select how you want to fetch the picture of the day.")
                         .options(
                             option("Single Date", "single"),
                             option("Date Range", "range"),
@@ -87,29 +67,49 @@ public class NasaComponentHandler extends AbstractNasaComponentHandler {
     }
 
     @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .customAction(true)
+            .customActionHelp("NASA Web API documentation", "https://api.nasa.gov/")
+            .icon("path:assets/nasa.svg")
+            .categories(ComponentCategory.DEVELOPER_TOOLS);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/nasa_v1#connection-setup")
+            .version(1);
+    }
+
+    @Override
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        String name = modifiableProperty.getName();
+        if (Objects.equals(actionDefinition.getName(), "getPictureOfTheDay")) {
+            String name = modifiableProperty.getName();
 
-        if (Objects.equals(name, "date")) {
-            ((ModifiableDateProperty) modifiableProperty)
-                .displayCondition("queryType == 'single'");
-        }
+            if (Objects.equals(name, "date")) {
+                ((ModifiableDateProperty) modifiableProperty)
+                    .displayCondition("queryType == 'single'");
+            }
 
-        if (Objects.equals(name, "start_date")) {
-            ((ModifiableDateProperty) modifiableProperty)
-                .displayCondition("queryType == 'range'");
-        }
+            else if (Objects.equals(name, "start_date")) {
+                ((ModifiableDateProperty) modifiableProperty)
+                    .displayCondition("queryType == 'range'");
+            }
 
-        if (Objects.equals(name, "end_date")) {
-            ((ModifiableDateProperty) modifiableProperty)
-                .displayCondition("queryType == 'range'");
-        }
+            else if (Objects.equals(name, "end_date")) {
+                ((ModifiableDateProperty) modifiableProperty)
+                    .displayCondition("queryType == 'range'");
+            }
 
-        if (Objects.equals(name, "count")) {
-            ((ModifiableIntegerProperty) modifiableProperty)
-                .displayCondition("queryType == 'random'");
+            else if (Objects.equals(name, "count")) {
+                ((ModifiableIntegerProperty) modifiableProperty)
+                    .displayCondition("queryType == 'random'");
+            }
         }
 
         return modifiableProperty;
