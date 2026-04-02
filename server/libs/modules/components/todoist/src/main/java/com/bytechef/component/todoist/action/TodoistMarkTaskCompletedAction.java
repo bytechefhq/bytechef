@@ -33,7 +33,7 @@ import java.util.Map;
 public class TodoistMarkTaskCompletedAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("markTaskCompleted")
         .title("Mark Task as Completed")
-        .description("Mark a tas as being completed.")
+        .description("Marks a task as being completed.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -46,7 +46,8 @@ public class TodoistMarkTaskCompletedAction {
             .options((ActionDefinition.OptionsFunction<String>) TodoistUtils::getTaskIdOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.PATH)));
+                    "type", PropertyType.PATH)))
+        .help("", "https://docs.bytechef.io/reference/components/todoist_v1#mark-task-completed");
 
     private TodoistMarkTaskCompletedAction() {
     }
