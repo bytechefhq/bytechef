@@ -22,8 +22,8 @@ Scripts execute inside a GraalVM Polyglot engine — a synchronous, sandboxed en
 
 ## Code Writing Workflow
 
-1. **Code Writing Phase** - Create the workflow:
-    - `getScriptCodeInstructions()` - Start here!
+1. **Initial Phase** - Read the instructions:
+    - `getScriptCodeInstructions()`
 
 2. **Context** - Get the context of the user's current workflow. It's important because it includes the current input structure in Script
    - `getWorkflow(workflowId)` - Get current workflow by id
@@ -33,12 +33,14 @@ Scripts execute inside a GraalVM Polyglot engine — a synchronous, sandboxed en
    - `getProperties(componentName, actionName, version)` - Get more detailed descriptions of actions' properties
    - `getActionDefinition(componentName, actionName, version)` - Optional. Basic structure of the action
 
-3. **Workflow Validation Phase** - Validate the complete workflow with the modified Script component:
+3. **Code Writing Phase** - Write the code for the Script component
+
+4. **Workflow Validation Phase** - Validate the complete workflow with the modified Script component:
    - `validateWorkflow(workflow)` - Complete validation
    - Fix any errors found. Repeat workflow validation until all errors are gone. If the only error is the one where the user needs to make a connection, deploy the workflow anyway
    - Write the resulting code in JSON
 
-4. **Deployment** - Deploy it on ByteChef:
+5. **Deployment** - Deploy it on ByteChef:
    - `updateScriptComponentCode(workflowId, code, scriptName)` - update the script component code
 
 ## Validation Strategy
@@ -48,13 +50,13 @@ Scripts execute inside a GraalVM Polyglot engine — a synchronous, sandboxed en
 
 ## Generic Workflow for a single prompt
 
-### 1. Code Writing
+### 1. Initial
 getScriptCodeInstructions()
 
 ### 2. Context
 getWorkflow(workflowId)
 
-### 3. Create code
+### 3. Code Writing
 
 ### 4. Workflow Validation
 validateWorkflow()
@@ -65,7 +67,6 @@ updateWorkflow(workflowId, workflow)
 ## Important Rules when getting Errors:
 - Ignore Warnings for Script component
 - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
-- Display condition is located in metadata if the property is an object. If the condition is false: the object is not part of the JSON definition. Otherwise it is a part of it.
 - Every task must have a unique name in format: componentName_{number}
 - Required fields must be filled, the other fields are optional
 - If an array in taskDefinition contains multiple objects, you can use any of the objects for that array
