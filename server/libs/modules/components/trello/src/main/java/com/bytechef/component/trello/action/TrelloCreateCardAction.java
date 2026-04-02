@@ -25,9 +25,9 @@ import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -69,9 +69,9 @@ public class TrelloCreateCardAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return actionContext
+        return context
             .http(http -> http.post("/cards"))
             .queryParameters(
                 ID_LIST, inputParameters.getRequiredString(ID_LIST),
