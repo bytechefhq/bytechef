@@ -34,6 +34,7 @@ public class TrelloCreateBoardAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createBoard")
         .title("Create Board")
         .description("Creates a new board.")
+        .help("", "https://docs.bytechef.io/reference/components/trello_v1#create-board")
         .properties(
             string(NAME)
                 .label("Name")

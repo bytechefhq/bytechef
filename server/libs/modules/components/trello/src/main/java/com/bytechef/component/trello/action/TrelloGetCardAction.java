@@ -39,6 +39,7 @@ public class TrelloGetCardAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getCard")
         .title("Get Card")
         .description("Gets a card details.")
+        .help("", "https://docs.bytechef.io/reference/components/trello_v1#get-card")
         .properties(
             string(ID_BOARD)
                 .label("Board ID")

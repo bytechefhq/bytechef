@@ -41,6 +41,7 @@ public class TrelloCreateCardAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCard")
         .title("Create Card")
         .description("Creates a new card.")
+        .help("", "https://docs.bytechef.io/reference/components/trello_v1#create-card")
         .properties(
             string(ID_BOARD)
                 .label("Board ID")
