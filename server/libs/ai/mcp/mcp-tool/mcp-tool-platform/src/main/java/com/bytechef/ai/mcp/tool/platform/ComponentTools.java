@@ -53,6 +53,7 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -108,7 +109,8 @@ public class ComponentTools {
     @SuppressFBWarnings("EI")
     public ComponentTools(ComponentDefinitionService componentDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        ConnectionService connectionService, @Autowired(required = false) VectorStore vectorStore) {
+        ConnectionService connectionService,
+        @Autowired(required = false) @Qualifier("aiCopilotPgVectorStore") VectorStore vectorStore) {
         this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
