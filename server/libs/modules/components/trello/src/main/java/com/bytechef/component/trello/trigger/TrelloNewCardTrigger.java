@@ -50,6 +50,7 @@ public class TrelloNewCardTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newCard")
         .title("New Card")
         .description("Triggers when a new card is created on specified board or list.")
+        .help("", "https://docs.bytechef.io/reference/components/trello_v1#new-card")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(ID_BOARD)
