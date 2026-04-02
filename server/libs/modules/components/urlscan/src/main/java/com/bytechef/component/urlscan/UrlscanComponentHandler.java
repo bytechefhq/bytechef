@@ -34,8 +34,7 @@ public class UrlscanComponentHandler extends AbstractUrlscanComponentHandler {
             .icon("path:assets/urlscan.svg")
             .categories(ComponentCategory.HELPERS)
             .customAction(true)
-            .customActionHelp("", "https://docs.urlscan.io/apis/urlscan-openapi")
-            .version(1);
+            .customActionHelp("", "https://docs.urlscan.io/apis/urlscan-openapi");
     }
 
     @Override
