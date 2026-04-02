@@ -22,19 +22,25 @@ import static com.bytechef.component.telegram.constant.TelegramConstants.CHAT_ID
 import static com.bytechef.component.telegram.constant.TelegramConstants.DIRECT_MESSAGES_TOPIC_ID;
 import static com.bytechef.component.telegram.constant.TelegramConstants.DOCUMENT;
 import static com.bytechef.component.telegram.constant.TelegramConstants.MEDIA_TYPE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,12 +52,13 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class TelegramSendMediaActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(CHAT_ID, "123", DIRECT_MESSAGES_TOPIC_ID, "abc", MEDIA_TYPE, DOCUMENT, DOCUMENT, mockedFileEntry));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
@@ -61,10 +68,8 @@ class TelegramSendMediaActionTest {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody())
@@ -73,19 +78,20 @@ class TelegramSendMediaActionTest {
         Object result = TelegramSendMediaAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/sendDocument", stringArgumentCaptor.getValue());
+
+        Object[] queryParameters = {
+            CHAT_ID, "123", DIRECT_MESSAGES_TOPIC_ID, "abc"
+        };
+
+        assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals(
-            List.of("/sendDocument", CHAT_ID, "123", DIRECT_MESSAGES_TOPIC_ID, "abc"),
-            stringArgumentCaptor.getAllValues());
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of(DOCUMENT, mockedFileEntry), body.getContent());
-        assertEquals(Http.BodyContentType.FORM_DATA, body.getContentType());
+            Body.of(Map.of(DOCUMENT, mockedFileEntry), BodyContentType.FORM_DATA), bodyArgumentCaptor.getValue());
     }
 }

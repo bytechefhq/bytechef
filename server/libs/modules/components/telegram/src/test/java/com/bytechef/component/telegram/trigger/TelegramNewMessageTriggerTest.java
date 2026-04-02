@@ -17,16 +17,19 @@
 package com.bytechef.component.telegram.trigger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -44,14 +47,14 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class TelegramNewMessageTriggerTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Object mockedObject = mock(Object.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testWebhookEnable(
-        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        TriggerContext mockedContext, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
@@ -66,36 +69,31 @@ class TelegramNewMessageTriggerTest {
             null, null, webhookUrl, "", mockedContext);
 
         assertEquals(new WebhookEnableOutput(null, null), webhookEnableOutput);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/setWebhook", stringArgumentCaptor.getValue());
 
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of("url", webhookUrl, "allowed_updates", List.of("message")), body.getContent());
-        assertEquals(Http.BodyContentType.JSON, body.getContentType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            Body.of(Map.of("url", webhookUrl, "allowed_updates", List.of("message")), BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 
     @Test
     void testWebhookDisable(
-        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        TriggerContext mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
         when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         TelegramNewMessageTrigger.webhookDisable(
             null, null, null, "", mockedContext);
 
         assertEquals("/deleteWebhook", stringArgumentCaptor.getValue());
-        verify(mockedExecutor, times(1)).execute();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
     }
 
     @Test
