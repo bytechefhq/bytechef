@@ -23,6 +23,7 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,9 +61,8 @@ class MicrosoftOutlook365ReplyToEmailActionTest {
     private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            ID, "xy",
-            CONTENT_TYPE, ContentType.TEXT.name(), CONTENT, "test", CC_RECIPIENTS, List.of("address1"),
-            BCC_RECIPIENTS, List.of("address2")));
+            ID, "xy", FROM, "groupMail@mail.com", CONTENT_TYPE, ContentType.TEXT.name(), CONTENT, "test",
+            CC_RECIPIENTS, List.of("address1"), BCC_RECIPIENTS, List.of("address2")));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -94,6 +94,7 @@ class MicrosoftOutlook365ReplyToEmailActionTest {
 
             Map<String, Object> expectedBody = Map.of(
                 "message", Map.of(
+                    FROM, Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "groupMail@mail.com")),
                     CC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
                     BCC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2")))),
                 COMMENT, "test");
