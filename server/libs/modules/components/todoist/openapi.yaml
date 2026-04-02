@@ -5,7 +5,7 @@ info:
   description: "Todoist is a task management application that helps users organize and prioritize their to-do lists."
   version: "v1"
 servers:
-  - url: "https://api.todoist.com/rest/v2"
+  - url: "https://api.todoist.com/api/v1"
 paths:
   /tasks:
     post:
@@ -13,6 +13,7 @@ paths:
       description: "Creates a new task."
       operationId: "createTask"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/todoist_v1#create-task"
       security:
         - "oauth2":
             - "task:add"
@@ -28,13 +29,13 @@ paths:
               properties:
                 content:
                   type: "string"
-                  description: "Task content. It may contain some markdown-formatted text and hyperlinks."
+                  description: "Task content."
                 description:
                   type: "string"
-                  description: "A description for the task. This value may contain some markdown-formatted text and hyperlinks."
+                  description: "A description for the task."
                 project_id:
                   type: "string"
-                  description: "Task project ID. If not set, task is put to user's Inbox."
+                  description: "ID of the project to add the task to. If not set, task is put to user's Inbox."
                   title: "Project ID"
                   x-dynamic-options: true
                 priority:
@@ -45,6 +46,23 @@ paths:
                     - 2
                     - 3
                     - 4
+                labels:
+                  type: "array"
+                  description: "List of labels to be applied to the task."
+                  items:
+                    type: "string"
+                  x-dynamic-options: true
+                section_id:
+                  type: "string"
+                  description: "ID of the section to add the task to."
+                  title: "Section ID"
+                  x-dynamic-options: true
+                  x-dynamic-options-dependency:
+                    - "project_id"
+                parent_id:
+                  type: "string"
+                  description: "ID of the parent task."
+                  title: "Parent Task ID"
       responses:
         200:
           description: "Successful operation"
@@ -53,12 +71,32 @@ paths:
               schema:
                 type: "object"
                 properties:
+                  user_id:
+                    type: "string"
+                    description: "ID of the user."
                   id:
                     type: "string"
                     description: "ID of the task."
                   project_id:
                     type: "string"
                     description: "ID of the project."
+                  section_id:
+                    type: "string"
+                    description: "ID of the section."
+                  parent_id:
+                    type: "string"
+                    description: "ID of the parent task."
+                  labels:
+                    type: "array"
+                    description: "List of labels applied to the task."
+                    items:
+                      type: "string"
+                  checked:
+                    type: "boolean"
+                    description: "Whether the task is checked."
+                  is_deleted:
+                    type: "boolean"
+                    description: "Whether the task is deleted."
                   content:
                     type: "string"
                     description: "Task content."
@@ -71,9 +109,10 @@ paths:
   /tasks/{taskId}/close:
     post:
       summary: "Mark Task as Completed"
-      description: "Mark a tas as being completed."
+      description: "Marks a task as being completed."
       operationId: "markTaskCompleted"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/todoist_v1#mark-task-completed"
       security:
         - "oauth2":
             - "data:read_write"
@@ -87,7 +126,7 @@ paths:
             type: "string"
             x-dynamic-options: true
       responses:
-        204:
+        200:
           description: "Successful operation"
   /projects:
     post:
@@ -95,6 +134,7 @@ paths:
       description: "Creates a new project."
       operationId: "createProject"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/todoist_v1#create-project"
       security:
         - "oauth2":
             - "data:read_write"
@@ -110,12 +150,25 @@ paths:
                 name:
                   type: "string"
                   description: "Name of the project."
+                description:
+                  type: "string"
+                  description: "Description of the project."
+                parent_id:
+                  type: "string"
+                  description: "ID of the parent project."
+                  title: "Parent Project ID"
                 color:
                   type: "string"
+                  description: "Color of the project icon."
                 is_favorite:
                   type: "boolean"
                   title: "Is Project a Favorite?"
                   description: "Whether the project is a favorite."
+                workspace_id:
+                  type: "integer"
+                  description: "ID of the workspace. If provided, creates a workspace project instead of a personal project."
+                  title: "Workspace ID"
+                  x-dynamic-options: true
       responses:
         200:
           description: "Successful operation"
@@ -130,6 +183,9 @@ paths:
                   name:
                     type: "string"
                     description: "Name of the project."
+                  description:
+                    type: "string"
+                    description: "Description of the project."
                   color:
                     type: "string"
                     description: "Color of the project icon."
@@ -139,6 +195,9 @@ paths:
                   url:
                     type: "string"
                     description: "URL of the project."
+                  parent_id:
+                    type: "string"
+                    description: "ID of the parent project."
 components:
   securitySchemes:
     oauth2:
