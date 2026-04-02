@@ -19,32 +19,61 @@ package com.bytechef.component.trello.action;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
-class TrelloGetCardActionTest extends AbstractTrelloActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class TrelloGetCardActionTest {
 
-    private static final Object mockedObject = mock(Object.class);
+    private final Object mockedObject = mock(Object.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(ID_BOARD, "abc", ID, "card"));
 
     @Test
-    void testPerform() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(ID_BOARD, "abc", ID, "card"));
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
         assertEquals(mockedObject,
-            TrelloGetCardAction.perform(mockedParameters, mockedParameters, mockedActionContext));
+            TrelloGetCardAction.perform(mockedParameters, null, mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/cards/card", stringArgumentCaptor.getValue());
+
     }
 }

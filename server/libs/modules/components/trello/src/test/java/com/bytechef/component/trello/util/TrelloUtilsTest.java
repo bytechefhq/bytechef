@@ -18,25 +18,37 @@ package com.bytechef.component.trello.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID;
+import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class TrelloUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("new", "abc"));
@@ -44,37 +56,82 @@ class TrelloUtilsTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
-    @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
+    @Test
+    void testGetBoardOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(ID, "123"))
+            .thenReturn(List.of(Map.of(NAME, "new", ID, "abc")));
+
+        assertEquals(
+            expectedOptions, TrelloUtils.getBoardOptions(
+                null, null, null, null, mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(List.of("/members/me", "/members/123/boards"), stringArgumentCaptor.getAllValues());
+    }
+
+    @Test
+    void testGetCardOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedParameters.getRequiredString(ID_BOARD))
+            .thenReturn("boardId");
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of(NAME, "new", ID, "abc")));
+
+        assertEquals(
+            expectedOptions, TrelloUtils.getCardOptions(
+                mockedParameters, null, null, null, mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/boards/boardId/cards", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetBoardOptions() {
-        assertEquals(
-            expectedOptions,
-            TrelloUtils.getBoardOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
-    }
+    void testGetListOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-    @Test
-    void testGetCardOptions() {
-        assertEquals(
-            expectedOptions,
-            TrelloUtils.getBoardOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
-    }
+        when(mockedParameters.getRequiredString(ID_BOARD))
+            .thenReturn("boardId");
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(List.of(Map.of(NAME, "new", ID, "abc")));
 
-    @Test
-    void testGetListOptions() {
         assertEquals(
-            expectedOptions,
-            TrelloUtils.getListOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            expectedOptions, TrelloUtils.getListOptions(
+                mockedParameters, null, null, null, mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/boards/boardId/lists", stringArgumentCaptor.getValue());
     }
 }

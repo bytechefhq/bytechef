@@ -19,26 +19,59 @@ package com.bytechef.component.trello.action;
 import static com.bytechef.component.trello.constant.TrelloConstants.DESC;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
-class TrelloCreateBoardActionTest extends AbstractTrelloActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class TrelloCreateBoardActionTest {
+
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(NAME, "new board", DESC, "new board description"));
 
     @Test
-    void testPerform() {
-        Parameters parameters = MockParametersFactory.create(
-            Map.of(NAME, "new board", DESC, "new board description"));
+    void testPerform(
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        assertNull(TrelloCreateBoardAction.perform(parameters, parameters, mockedActionContext));
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+
+        assertNull(TrelloCreateBoardAction.perform(mockedParameters, null, mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/boards", stringArgumentCaptor.getValue());
 
         Object[] query = queryArgumentCaptor.getValue();
 
