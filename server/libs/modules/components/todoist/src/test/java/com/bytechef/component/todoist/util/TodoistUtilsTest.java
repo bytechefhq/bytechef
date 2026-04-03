@@ -17,61 +17,195 @@
 package com.bytechef.component.todoist.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class TodoistUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("ime", "123"));
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Context mockedContext = mock(Context.class);
-
-    @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-    }
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
     @Test
-    void getTaskIdOptions() {
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(List.of(Map.of("id", "123", "content", "ime")));
+    void getLabelsIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        List<? extends Option<String>> result = TodoistUtils.getTaskIdOptions(
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("results", List.of(Map.of("id", "123", "name", "ime"))));
+
+        List<? extends Option<String>> result = TodoistUtils.getLabelsOptions(
             mockedParameters, mockedParameters, null, "", mockedContext);
 
         assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/labels", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        Object[] queryParameters = {
+            "cursor", null, "limit", 200
+        };
+
+        assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
     }
 
     @Test
-    void getProjectIdOptions() {
+    void getProjectIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(List.of(Map.of("id", "123", "name", "ime")));
+            .thenReturn(Map.of("results", List.of(Map.of("id", "123", "name", "ime"))));
 
         List<? extends Option<String>> result = TodoistUtils.getProjectIdOptions(
             mockedParameters, mockedParameters, null, "", mockedContext);
 
         assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/projects", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        Object[] queryParameters = {
+            "cursor", null, "limit", 200
+        };
+
+        assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
+    }
+
+    @Test
+    void getSectionIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedInputParameters = MockParametersFactory.create(Map.of("project_id", "123"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("results", List.of(Map.of("id", "123", "name", "ime"))));
+
+        List<? extends Option<String>> result = TodoistUtils.getSectionIdOptions(
+            mockedInputParameters, mockedParameters, null, "", mockedContext);
+
+        assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/sections", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        Object[] queryParameters = {
+            "cursor", null, "limit", 200, "project_id", "123"
+        };
+
+        assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
+    }
+
+    @Test
+    void getTaskIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("results", List.of(Map.of("id", "123", "content", "ime"))));
+
+        List<? extends Option<String>> result = TodoistUtils.getTaskIdOptions(
+            mockedParameters, mockedParameters, null, "", mockedContext);
+
+        assertEquals(expectedOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/tasks", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        Object[] queryParameters = {
+            "cursor", null, "limit", 200
+        };
+
+        assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
+    }
+
+    @Test
+    void getWorkspaceIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(List.of(Map.of("id", 123, "name", "ime")));
+
+        List<? extends Option<Long>> result = TodoistUtils.getWorkspaceIdOptions(
+            mockedParameters, mockedParameters, null, "", mockedContext);
+
+        assertEquals(List.of(option("ime", 123L)), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/workspaces", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
