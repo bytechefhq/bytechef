@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send email.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/contiguity_v1#send-email"
+    },
     "metadata": {
       "path": "/send/email",
       "mimeType": "application/json",
@@ -559,7 +562,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send SMS.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/contiguity_v1#send-sms"
+    },
     "metadata": {
       "path": "/send/text",
       "mimeType": "application/json",
@@ -2074,14 +2080,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/contiguity_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://docs.contiguity.com/api-reference/product/email/send"
+  },
   "description": "Contiguity is an SMS service for your needs - quick and simple.",
   "icon": "path:assets/contiguity.svg",
   "metadata": null,
