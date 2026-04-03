@@ -48,7 +48,7 @@ public class StripeCreateCustomerAction {
                 Map.of(
                     "type", PropertyType.BODY))
             .label("Email")
-            .description("Customer’s email address.")
+            .description("The customer’s email address.")
             .required(false),
             string("name").metadata(
                 Map.of(
@@ -60,29 +60,37 @@ public class StripeCreateCustomerAction {
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Description")
+                .description("A description of the customer.")
                 .required(false),
             string("phone").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Phone")
+                .description("The customer’s phone number.")
                 .required(false),
             object("address").properties(string("city").label("City")
+                .description("City.")
                 .required(false),
                 string("country").label("Country")
+                    .description("Country.")
                     .required(false),
                 string("line1").label("Address Line 1")
+                    .description("Address line 1.")
                     .required(false),
                 string("line2").label("Address Line 2")
+                    .description("Address line 2.")
                     .required(false),
                 string("postal_code").label("Postal Code")
+                    .description("Postal code.")
                     .required(false),
                 string("state").label("State")
-                    .description("State, country, province, or region.")
+                    .description("State, country, province or region.")
                     .required(false))
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY))
                 .label("Address")
+                .description("The customer's address.")
                 .required(false))
         .output(outputSchema(object().properties(string("id").description("ID of the customer.")
             .required(false),
@@ -110,7 +118,8 @@ public class StripeCreateCustomerAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/stripe_v1#create-customer");
 
     private StripeCreateCustomerAction() {
     }
