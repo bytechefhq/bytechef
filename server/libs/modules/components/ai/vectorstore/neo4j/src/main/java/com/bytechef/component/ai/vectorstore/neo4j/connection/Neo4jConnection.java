@@ -35,6 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property;
 import org.springframework.ai.vectorstore.neo4j.Neo4jVectorStore;
 
 /**
@@ -58,6 +59,7 @@ public class Neo4jConnection {
                     string(PASSWORD)
                         .label("Password")
                         .description("Password for authentication with Neo4j.")
+                        .controlType(Property.ControlType.PASSWORD)
                         .required(true),
                     bool(INITIALIZE_SCHEMA)
                         .label("Initialize Schema")

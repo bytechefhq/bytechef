@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Monika Kušter
@@ -47,6 +48,7 @@ public class RedisConnection {
                         .required(true),
                     string(PASSWORD)
                         .label("Password")
+                        .controlType(ControlType.PASSWORD)
                         .required(true),
                     bool(INITIALIZE_SCHEMA)
                         .label("Initialize Schema")

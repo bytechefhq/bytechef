@@ -25,6 +25,7 @@ import static com.bytechef.component.vtiger.constant.VTigerConstants.INSTANCE_UR
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Luka Ljubić
@@ -44,6 +45,7 @@ public class VTigerConnection {
                         .required(true),
                     string(PASSWORD)
                         .label("Access Key")
+                        .controlType(ControlType.PASSWORD)
                         .required(true),
                     string(INSTANCE_URL)
                         .label("VTiger Instance URL")

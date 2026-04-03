@@ -31,6 +31,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property;
 
 /**
  * @author Monika Kušter
@@ -64,6 +65,7 @@ public class MilvusConnection {
                         .label("Password")
                         .description("The password for this connection.")
                         .defaultValue("milvus")
+                        .controlType(Property.ControlType.PASSWORD)
                         .required(true),
                     string(COLLECTION)
                         .label("Collection Name")
