@@ -19,19 +19,23 @@ package com.bytechef.component.stripe.trigger;
 import static com.bytechef.component.stripe.constant.StripeConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.stripe.util.StripeUtils;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class StripeNewInvoiceTriggerTest extends AbstractStripeTriggerTest {
 
     @Test
-    void testWebhookEnable() {
+    void testWebhookEnable(TriggerContext mockedContext) {
         String webhookUrl = "testWebhookUrl";
 
         stripeUtilsMockedStatic.when(
@@ -40,23 +44,23 @@ class StripeNewInvoiceTriggerTest extends AbstractStripeTriggerTest {
             .thenReturn("123");
 
         WebhookEnableOutput webhookEnableOutput = StripeNewInvoiceTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            null, null, webhookUrl, null, mockedContext);
 
         WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
         assertEquals(List.of(webhookUrl, "invoice.created"), stringArgumentCaptor.getAllValues());
-        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
+        assertEquals(mockedContext, triggerContextArgumentCaptor.getValue());
     }
 
     @Test
-    void testWebhookDisable() {
+    void testWebhookDisable(TriggerContext mockedContext) {
         StripeNewInvoiceTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            null, null, mockedParameters, null, mockedContext);
 
         stripeUtilsMockedStatic
-            .verify(() -> StripeUtils.unsubscribeWebhook("abc", mockedTriggerContext));
+            .verify(() -> StripeUtils.unsubscribeWebhook("abc", mockedContext));
     }
 
     @Test
@@ -66,8 +70,8 @@ class StripeNewInvoiceTriggerTest extends AbstractStripeTriggerTest {
             .thenReturn(mockedObject);
 
         Object result = StripeNewInvoiceTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            null, null, null, null, mockedWebhookBody,
+            null, null, null);
 
         assertEquals(mockedObject, result);
         assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());

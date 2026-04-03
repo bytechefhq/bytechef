@@ -19,59 +19,65 @@ package com.bytechef.component.stripe.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.stripe.constant.StripeConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class StripeUtilsTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-
-    @BeforeEach()
-    void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-    }
+    private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
 
     @Test
-    void testGetCustomerOptions() {
+    void testGetCustomerOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("data", List.of(Map.of("name", "some name", ID, "abc"))));
 
-        assertEquals(List.of(option("some name", "abc")),
-            StripeUtils.getCustomerOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        assertEquals(List.of(option("some name", "abc")), StripeUtils.getCustomerOptions(
+            null, null, null, null, mockedContext));
+
+        assertEquals("/customers", stringArgumentCaptor.getValue());
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -83,26 +89,57 @@ class StripeUtilsTest {
     }
 
     @Test
-    void testSubscribeWebhook() {
+    void testSubscribeWebhook(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "123"));
 
-        String id = StripeUtils.subscribeWebhook("webhookUrl", mockedTriggerContext, "event");
+        String id = StripeUtils.subscribeWebhook("webhookUrl", mockedContext, "event");
 
         assertEquals("123", id);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("enabled_events", List.of("event"), "url", "webhookUrl"), body.getContent());
         assertEquals(Http.BodyContentType.FORM_URL_ENCODED, body.getContentType());
+
+        assertEquals("/webhook_endpoints", stringArgumentCaptor.getValue());
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testUnsubscribeWebhook() {
-        StripeUtils.unsubscribeWebhook("", mockedTriggerContext);
+    void testUnsubscribeWebhook(
+        TriggerContext mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        verify(mockedTriggerContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).configuration(any());
-        verify(mockedExecutor, times(1)).execute();
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+
+        StripeUtils.unsubscribeWebhook("webhookId", mockedContext);
+
+        assertEquals("/webhook_endpoints/webhookId", stringArgumentCaptor.getValue());
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
