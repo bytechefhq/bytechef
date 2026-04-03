@@ -19,6 +19,7 @@ package com.bytechef.component.contiguity;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -32,6 +33,16 @@ public class ContiguityComponentHandler extends AbstractContiguityComponentHandl
         return modifiableComponentDefinition
             .icon("path:assets/contiguity.svg")
             .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
-            .customAction(true);
+            .customAction(true)
+            .customActionHelp("", "https://docs.contiguity.com/api-reference/product/email/send");
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/contiguity_v1#connection-setup")
+            .version(1);
     }
 }
