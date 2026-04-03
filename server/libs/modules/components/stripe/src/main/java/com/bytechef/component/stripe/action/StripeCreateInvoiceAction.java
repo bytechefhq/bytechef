@@ -74,7 +74,8 @@ public class StripeCreateInvoiceAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/stripe_v1#create-invoice");
 
     private StripeCreateInvoiceAction() {
     }
