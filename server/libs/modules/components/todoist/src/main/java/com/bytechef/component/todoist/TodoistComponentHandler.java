@@ -20,11 +20,13 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.todoist.util.TodoistUtils;
 import com.google.auto.service.AutoService;
 import java.util.Objects;
 
@@ -56,29 +58,39 @@ public class TodoistComponentHandler extends AbstractTodoistComponentHandler {
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(modifiableProperty.getName(), "color")) {
+        if (Objects.equals(actionDefinition.getName(), "createProject")) {
+            if (Objects.equals(modifiableProperty.getName(), "color")) {
+                ((ModifiableStringProperty) modifiableProperty)
+                    .options(
+                        option("Berry red", "beryy_red"),
+                        option("Red", "red"),
+                        option("Orange", "orange"),
+                        option("Yellow", "yellow"),
+                        option("Olive green", "olive_green"),
+                        option("Lime green", "lime_green"),
+                        option("Green", "green"),
+                        option("Mint green", "mint_green"),
+                        option("Teal", "teal"),
+                        option("Sky blue", "sky_blue"),
+                        option("Light blue", "light_blue"),
+                        option("Blue", "blue"),
+                        option("Grape", "grape"),
+                        option("Violet", "violet"),
+                        option("Lavender", "lavender"),
+                        option("Magenta", "magenta"),
+                        option("Salmon", "salmon"),
+                        option("Charcoal", "charcoal"),
+                        option("Grey", "grey"),
+                        option("Taupe", "taupe"));
+            } else if (Objects.equals(modifiableProperty.getName(), "parent_id")) {
+                ((ModifiableStringProperty) modifiableProperty)
+                    .options((OptionsFunction<String>) TodoistUtils::getProjectIdOptions);
+            }
+        } else if (Objects.equals(actionDefinition.getName(), "createTask") &&
+            Objects.equals(modifiableProperty.getName(), "parent_id")) {
+
             ((ModifiableStringProperty) modifiableProperty)
-                .options(
-                    option("Berry red", "beryy_red"),
-                    option("Red", "red"),
-                    option("Orange", "orange"),
-                    option("Yellow", "yellow"),
-                    option("Olive green", "olive_green"),
-                    option("Lime green", "lime_green"),
-                    option("Green", "green"),
-                    option("Mint green", "mint_green"),
-                    option("Teal", "teal"),
-                    option("Sky blue", "sky_blue"),
-                    option("Light blue", "light_blue"),
-                    option("Blue", "blue"),
-                    option("Grape", "grape"),
-                    option("Violet", "violet"),
-                    option("Lavender", "lavender"),
-                    option("Magenta", "magenta"),
-                    option("Salmon", "salmon"),
-                    option("Charcoal", "charcoal"),
-                    option("Grey", "grey"),
-                    option("Taupe", "taupe"));
+                .options((OptionsFunction<String>) TodoistUtils::getTaskIdOptions);
         }
 
         return modifiableProperty;
