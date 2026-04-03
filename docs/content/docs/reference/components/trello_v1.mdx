@@ -1,6 +1,6 @@
 ---
 title: "Trello"
-description: "Trello is a project management tool that uses boards, lists, and cards to help users organize tasks and collaborate with teams."
+description: "Trello is a project management tool that uses boards, lists and cards to help users organize tasks and collaborate with teams."
 ---
 
 
@@ -155,6 +155,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/trello_v1#how-to-find-board-id).
+
+#### Find List ID
+
+To find the List ID, click [here](/reference/components/trello_v1#how-to-find-list-id).
 
 
 
@@ -214,6 +221,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/trello_v1#how-to-find-board-id).
+
+#### Find Card ID
+
+To find the Card ID, click [here](/reference/components/trello_v1#how-to-find-card-id).
 
 
 
@@ -268,6 +282,13 @@ Type: OBJECT
   "type" : "trello/v1/newCard"
 }
 ```
+#### Find Board ID
+
+To find the Board ID, click [here](/reference/components/trello_v1#how-to-find-board-id).
+
+#### Find List ID
+
+To find the List ID, click [here](/reference/components/trello_v1#how-to-find-list-id).
 
 
 
@@ -279,3 +300,51 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find Board ID
+
+- **Method 1: Via API**
+
+Use the `GET /members/AUTHORIZED_USER_ID/boards` endpoint to retrieve a list of all boards and their IDs.
+
+- **Method 2: Via UI**
+
+Open the Trello board on your browser and add .json to the end of URL so that you have something like `https://trello.com/b/123/my-trello-board.json`. The board ID is first value in that json listed under key `id`.
+
+The Board ID can also be found in the output of the following actions and triggers:
+* **Create Card**
+* **Get Card**
+* **New Card** trigger
+
+### How to find List ID
+
+- **Method 1: Via API**
+
+Use the `GET /boards/BOARD_ID/lists` endpoint to retrieve a list of all lists and their IDs.
+
+- **Method 2: Via UI**
+
+Open the Trello board on your browser and add .json to the end of URL so that you have something like `https://trello.com/b/123/my-trello-board.json`. Search for the name of your list and above the name should be a field with key `id` and value is your list ID.
+
+The List ID can also be found in the output of the following actions and triggers:
+* **Create Card**
+* **Get Card**
+* **New Card** trigger
+
+### How to find Card ID
+
+- **Method 1: Via API**
+
+Use the `GET /boards/BOARD_ID/cards` endpoint to retrieve a list of all cards and their IDs.
+
+- **Method 2: Via UI**
+
+Open the Trello board on your browser where your card is located. Open the card you want and you can find card ID in the URL. For example in `https://trello.com/c/123/my-trello-card`, card ID is 123.
+
+The Card ID can also be found in the output of the following actions and triggers:
+* **Create Card**
+* **Get Card**
+* **New Card** trigger

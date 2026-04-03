@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new board.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/trello_v1#create-board"
+    },
     "metadata": null,
     "name": "createBoard",
     "outputDefinition": null,
@@ -65,7 +68,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new card.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/trello_v1#create-card"
+    },
     "metadata": null,
     "name": "createCard",
     "outputDefinition": {
@@ -431,7 +437,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets a card details.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/trello_v1#get-card"
+    },
     "metadata": null,
     "name": "getCard",
     "outputDefinition": {
@@ -1570,15 +1579,21 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/trello_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
-  "description": "Trello is a project management tool that uses boards, lists, and cards to help users organize tasks and collaborate with teams.",
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developer.atlassian.com/cloud/trello/rest/api-group-actions/"
+  },
+  "description": "Trello is a project management tool that uses boards, lists and cards to help users organize tasks and collaborate with teams.",
   "icon": "path:assets/trello.svg",
   "metadata": null,
   "name": "trello",
@@ -1591,7 +1606,10 @@
     "deprecated": null,
     "description": "Triggers when a new card is created on specified board or list.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/trello_v1#new-card"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newCard",
