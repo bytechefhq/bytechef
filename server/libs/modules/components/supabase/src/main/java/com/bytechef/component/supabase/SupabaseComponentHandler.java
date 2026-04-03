@@ -41,7 +41,10 @@ public class SupabaseComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.DEVELOPER_TOOLS)
         .connection(SupabaseConnection.CONNECTION_DEFINITION)
         .actions(SupabaseUploadFileAction.ACTION_DEFINITION)
-        .clusterElements(tool(SupabaseUploadFileAction.ACTION_DEFINITION));
+        .clusterElements(tool(SupabaseUploadFileAction.ACTION_DEFINITION))
+        .customAction(true)
+        .customActionHelp("", "https://supabase.com/docs/guides/api")
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
