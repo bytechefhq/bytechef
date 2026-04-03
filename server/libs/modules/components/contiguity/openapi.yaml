@@ -13,6 +13,7 @@ paths:
       description: "Send SMS."
       operationId: "sendSms"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/contiguity_v1#send-sms"
       requestBody:
         content:
           application/json:
@@ -70,6 +71,7 @@ paths:
       description: "Send email."
       operationId: "sendEmail"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/contiguity_v1#send-email"
       requestBody:
         content:
           application/json:
