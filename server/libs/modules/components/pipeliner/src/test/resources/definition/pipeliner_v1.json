@@ -1333,7 +1333,7 @@
         "type": "STRING"
       }, {
         "advancedOption": null,
-        "controlType": "TEXT",
+        "controlType": "PASSWORD",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
