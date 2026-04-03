@@ -981,6 +981,7 @@ public class ComponentInitOpenApiGenerator {
                             .required($L),
                         string(PASSWORD)
                             .label($S)
+                            .controlType($T.PASSWORD)
                             .required($L)
                     )
                 """,
@@ -988,6 +989,7 @@ public class ComponentInitOpenApiGenerator {
             "Username",
             true,
             "Password",
+            ClassName.get("com.bytechef.component.definition", "Property", "ControlType"),
             true);
 
         return builder.build();
