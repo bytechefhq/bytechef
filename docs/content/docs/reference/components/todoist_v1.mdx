@@ -66,8 +66,11 @@ Name: createProject
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Name | STRING | Name of the project. | true |
-| color | Color | STRING <details> <summary> Options </summary> <span>beryy_red</span>, <span>red</span>, <span>orange</span>, <span>yellow</span>, <span>olive_green</span>, <span>lime_green</span>, <span>green</span>, <span>mint_green</span>, <span>teal</span>, <span>sky_blue</span>, <span>light_blue</span>, <span>blue</span>, <span>grape</span>, <span>violet</span>, <span>lavender</span>, <span>magenta</span>, <span>salmon</span>, <span>charcoal</span>, <span>grey</span>, <span>taupe</span> </details> |  | false |
+| description | Description | STRING | Description of the project. | false |
+| parent_id | Parent Project ID | STRING | ID of the parent project. | false |
+| color | Color | STRING <details> <summary> Options </summary> <span>beryy_red</span>, <span>red</span>, <span>orange</span>, <span>yellow</span>, <span>olive_green</span>, <span>lime_green</span>, <span>green</span>, <span>mint_green</span>, <span>teal</span>, <span>sky_blue</span>, <span>light_blue</span>, <span>blue</span>, <span>grape</span>, <span>violet</span>, <span>lavender</span>, <span>magenta</span>, <span>salmon</span>, <span>charcoal</span>, <span>grey</span>, <span>taupe</span> </details> | Color of the project icon. | false |
 | is_favorite | Is Project a Favorite? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the project is a favorite. | false |
+| workspace_id | Workspace ID | INTEGER | ID of the workspace. If provided, creates a workspace project instead of a personal project. | false |
 
 #### Example JSON Structure
 ```json
@@ -76,8 +79,11 @@ Name: createProject
   "name" : "createProject",
   "parameters" : {
     "name" : "",
+    "description" : "",
+    "parent_id" : "",
     "color" : "",
-    "is_favorite" : false
+    "is_favorite" : false,
+    "workspace_id" : 1
   },
   "type" : "todoist/v1/createProject"
 }
@@ -96,9 +102,11 @@ Type: OBJECT
 |:------------:|:------------:|:-------------------:|
 | id | STRING | ID of the project. |
 | name | STRING | Name of the project. |
+| description | STRING | Description of the project. |
 | color | STRING | Color of the project icon. |
 | is_favorite | STRING | Whether the project is a favorite. |
 | url | STRING | URL of the project. |
+| parent_id | STRING | ID of the parent project. |
 
 
 
@@ -108,9 +116,11 @@ Type: OBJECT
 {
   "id" : "",
   "name" : "",
+  "description" : "",
   "color" : "",
   "is_favorite" : "",
-  "url" : ""
+  "url" : "",
+  "parent_id" : ""
 }
 ```
 
@@ -126,10 +136,13 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| content | Content | STRING | Task content. It may contain some markdown-formatted text and hyperlinks. | true |
-| description | Description | STRING | A description for the task. This value may contain some markdown-formatted text and hyperlinks. | false |
-| project_id | Project ID | STRING | Task project ID. If not set, task is put to user's Inbox. | false |
+| content | Content | STRING | Task content. | true |
+| description | Description | STRING | A description for the task. | false |
+| project_id | Project ID | STRING | ID of the project to add the task to. If not set, task is put to user's Inbox. | false |
 | priority | Priority | INTEGER <details> <summary> Options </summary> <span>1</span>, <span>2</span>, <span>3</span>, <span>4</span> </details> | Task priority from 1 (normal) to 4 (urgent). | false |
+| labels | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels to be applied to the task. | false |
+| section_id | Section ID | STRING <details> <summary> Depends On </summary> project_id </details> | ID of the section to add the task to. | false |
+| parent_id | Parent Task ID | STRING | ID of the parent task. | false |
 
 #### Example JSON Structure
 ```json
@@ -140,7 +153,10 @@ Name: createTask
     "content" : "",
     "description" : "",
     "project_id" : "",
-    "priority" : 1
+    "priority" : 1,
+    "labels" : [ "" ],
+    "section_id" : "",
+    "parent_id" : ""
   },
   "type" : "todoist/v1/createTask"
 }
@@ -157,8 +173,14 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| user_id | STRING | ID of the user. |
 | id | STRING | ID of the task. |
 | project_id | STRING | ID of the project. |
+| section_id | STRING | ID of the section. |
+| parent_id | STRING | ID of the parent task. |
+| labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of labels applied to the task. |
+| checked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the task is checked. |
+| is_deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the task is deleted. |
 | content | STRING | Task content. |
 | description | STRING | Task description. |
 | priority | INTEGER | Task priority. |
@@ -169,8 +191,14 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "user_id" : "",
   "id" : "",
   "project_id" : "",
+  "section_id" : "",
+  "parent_id" : "",
+  "labels" : [ "" ],
+  "checked" : false,
+  "is_deleted" : false,
   "content" : "",
   "description" : "",
   "priority" : 1
@@ -183,7 +211,7 @@ Type: OBJECT
 ### Mark Task as Completed
 Name: markTaskCompleted
 
-`Mark a tas as being completed.`
+`Marks a task as being completed.`
 
 #### Properties
 
