@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Property;
 
 /**
  * Provides the component connection definition.
@@ -41,6 +42,7 @@ public class FreshdeskConnection {
                     .required(true),
                 string(PASSWORD)
                     .label("Password")
+                    .controlType(Property.ControlType.PASSWORD)
                     .required(true)));
 
     private FreshdeskConnection() {
