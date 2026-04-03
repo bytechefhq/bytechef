@@ -42,6 +42,7 @@ public class StripeNewInvoiceTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newInvoice")
         .title("New Invoice")
         .description("Triggers on a new invoice.")
+        .help("", "https://docs.bytechef.io/reference/components/stripe_v1#new-invoice")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
             outputSchema(

@@ -42,6 +42,7 @@ public class StripeNewCustomerTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newCustomer")
         .title("New Customer")
         .description("Triggers when a new customer is created.")
+        .help("", "https://docs.bytechef.io/reference/components/stripe_v1#new-customer")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
             outputSchema(
