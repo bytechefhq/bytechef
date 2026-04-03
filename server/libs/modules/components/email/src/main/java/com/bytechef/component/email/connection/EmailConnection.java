@@ -27,7 +27,7 @@ import static com.bytechef.component.email.constant.EmailConstants.HOST;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.email.constant.EmailConstants;
 
 /**
@@ -42,7 +42,7 @@ public class EmailConnection {
                 .label("Host")
                 .required(true),
             string(CRYPTOGRAPHIC_PROTOCOL)
-                .controlType(Property.ControlType.SELECT)
+                .controlType(ControlType.SELECT)
                 .label("Connection Security")
                 .description(
                     "Connection security activates cryptographic protocol to secure communication over a network.")
@@ -62,5 +62,6 @@ public class EmailConnection {
                         .required(true),
                     string(PASSWORD)
                         .label("Password")
+                        .controlType(ControlType.PASSWORD)
                         .required(true)));
 }

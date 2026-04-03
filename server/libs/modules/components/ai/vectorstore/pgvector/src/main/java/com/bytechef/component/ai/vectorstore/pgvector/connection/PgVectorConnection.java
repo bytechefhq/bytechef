@@ -35,6 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Marko Krišković
@@ -59,6 +60,7 @@ public class PgVectorConnection {
                     string(PASSWORD)
                         .label("Password")
                         .description("The password for this connection.")
+                        .controlType(ControlType.PASSWORD)
                         .required(true),
                     string(SCHEMA_NAME)
                         .label("Schema Name")

@@ -33,6 +33,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property.ControlType;
 import org.springframework.ai.vectorstore.mariadb.MariaDBVectorStore;
 
 /**
@@ -56,6 +57,7 @@ public class MariaDBVectorStoreConnection {
                     string(PASSWORD)
                         .label("Password")
                         .description("MariaDB database password.")
+                        .controlType(ControlType.PASSWORD)
                         .required(true),
                     string(TABLE_NAME)
                         .label("Table Name")
