@@ -36,6 +36,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property.ControlType;
 import org.springframework.ai.vectorstore.couchbase.CouchbaseIndexOptimization;
 import org.springframework.ai.vectorstore.couchbase.CouchbaseSimilarityFunction;
 
@@ -60,6 +61,7 @@ public class CouchbaseConnection {
                     string(PASSWORD)
                         .label("Password")
                         .description("Password for authentication with Couchbase.")
+                        .controlType(ControlType.PASSWORD)
                         .required(true),
                     string(INDEX_NAME)
                         .label("Index Name")
