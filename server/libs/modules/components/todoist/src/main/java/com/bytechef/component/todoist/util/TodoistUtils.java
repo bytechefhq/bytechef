@@ -35,35 +35,88 @@ public class TodoistUtils extends AbstractTodoistUtils {
     private TodoistUtils() {
     }
 
+    public static List<Option<String>> getLabelsOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        return getOptions(context, "/labels", "name");
+    }
+
+    public static List<Option<String>> getProjectIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        return getOptions(context, "/projects", "name");
+    }
+
+    public static List<Option<String>> getSectionIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        return getOptions(context, "/sections", "name", "project_id", inputParameters.getString("project_id"));
+    }
+
     public static List<Option<String>> getTaskIdOptions(
-        Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         return getOptions(context, "/tasks", "content");
     }
 
-    public static List<Option<String>> getProjectIdOptions(
-        Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
-        Context context) {
+    public static List<Option<Long>> getWorkspaceIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        return getOptions(context, "/projects", "name");
-
-    }
-
-    private static List<Option<String>> getOptions(Context context, String path, String label) {
-        List<Map<String, Object>> body = context
-            .http(http -> http.get(path))
+        List<Map<String, ?>> body = context
+            .http(http -> http.get("/workspaces"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
+        List<Option<Long>> options = new ArrayList<>();
 
-        for (Map<String, Object> map : body) {
-            options.add(option((String) map.get(label), (String) map.get("id")));
+        for (Map<String, ?> workspace : body) {
+            options.add(option((String) workspace.get("name"), ((Integer) workspace.get("id")).intValue()));
         }
+
+        return options;
+    }
+
+    private static List<Option<String>> getOptions(
+        Context context, String path, String label, Object... additionalQueryParameters) {
+
+        List<Option<String>> options = new ArrayList<>();
+        String cursor = null;
+
+        do {
+            List<Object> queryParameters = new ArrayList<>();
+
+            queryParameters.add("cursor");
+            queryParameters.add(cursor);
+            queryParameters.add("limit");
+            queryParameters.add(200);
+
+            if (additionalQueryParameters.length > 0) {
+                queryParameters.addAll(List.of(additionalQueryParameters));
+            }
+
+            Map<String, ?> body = context
+                .http(http -> http.get(path))
+                .queryParameters(queryParameters.toArray())
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("results") instanceof List<?> results) {
+                for (Object result : results) {
+                    if (result instanceof Map<?, ?> map) {
+                        options.add(option((String) map.get(label), (String) map.get("id")));
+                    }
+                }
+            }
+
+            cursor = (String) body.get("next_cursor");
+        } while (cursor != null);
 
         return options;
     }
