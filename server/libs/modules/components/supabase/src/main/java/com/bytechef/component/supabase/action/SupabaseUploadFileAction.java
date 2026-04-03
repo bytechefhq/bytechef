@@ -65,7 +65,8 @@ public class SupabaseUploadFileAction {
                             .description("Key of the file that was uploaded."),
                         string("Id")
                             .description("Id of the file that was uploaded."))))
-        .perform(SupabaseUploadFileAction::perform);
+        .perform(SupabaseUploadFileAction::perform)
+        .help("", "https://docs.bytechef.io/reference/components/supabase_v1#upload-file");
 
     private SupabaseUploadFileAction() {
     }

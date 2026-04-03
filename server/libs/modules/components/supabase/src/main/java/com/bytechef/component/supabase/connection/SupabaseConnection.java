@@ -43,7 +43,9 @@ public class SupabaseConnection {
                         .label("Project API Key")
                         .description(
                             "Can be found in Project Settings -> Data API. Choose service_role/secret API key.")
-                        .required(true)));
+                        .required(true)))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/supabase_v1#connection-setup");
 
     private SupabaseConnection() {
     }
