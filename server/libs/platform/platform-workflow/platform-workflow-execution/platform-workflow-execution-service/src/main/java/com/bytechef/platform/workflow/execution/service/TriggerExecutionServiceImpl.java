@@ -67,6 +67,10 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
     @Override
     @Transactional(readOnly = true)
     public List<TriggerExecution> getJobTriggerExecutions(List<Long> jobIds) {
+        if (jobIds.isEmpty()) {
+            return List.of();
+        }
+
         return triggerExecutionRepository.findAllByJobIdIn(jobIds);
     }
 
