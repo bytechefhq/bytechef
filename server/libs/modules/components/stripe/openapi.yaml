@@ -12,6 +12,7 @@ paths:
       summary: "Create Customer"
       description: "Creates a new customer."
       operationId: "createCustomer"
+      x-help: "https://docs.bytechef.io/reference/components/stripe_v1#create-customer"
       x-ai-agent-tool: true
       requestBody:
         content:
@@ -22,34 +23,42 @@ paths:
               properties:
                 email:
                   type: "string"
-                  description: "Customer’s email address."
+                  description: "The customer’s email address."
                   maxLength: 512
                 name:
                   type: "string"
                   description: "The customer's full name."
                 description:
                   type: "string"
+                  description: "A description of the customer."
                 phone:
                   type: "string"
+                  description: "The customer’s phone number."
                 address:
                   type: "object"
+                  description: "The customer's address."
                   properties:
                     city:
                       type: "string"
+                      description: "City."
                     country:
                       type: "string"
+                      description: "Country."
                     line1:
                       type: "string"
                       title: "Address Line 1"
+                      description: "Address line 1."
                     line2:
                       type: "string"
                       title: "Address Line 2"
+                      description: "Address line 2."
                     postal_code:
                       type: "string"
                       title: "Postal Code"
+                      description: "Postal code."
                     state:
                       type: "string"
-                      description: "State, country, province, or region."
+                      description: "State, country, province or region."
       responses:
         200:
           description: "Successful operation."
@@ -100,6 +109,7 @@ paths:
       summary: "Create Invoice"
       description: "Creates a new invoice."
       operationId: "createInvoice"
+      x-help: "https://docs.bytechef.io/reference/components/stripe_v1#create-invoice"
       x-ai-agent-tool: true
       requestBody:
         content:

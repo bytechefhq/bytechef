@@ -49,6 +49,7 @@ public class StripeComponentHandler extends AbstractStripeComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://docs.stripe.com/api")
             .icon("path:assets/stripe.svg")
             .categories(ComponentCategory.PAYMENT_PROCESSING);
     }
@@ -71,6 +72,8 @@ public class StripeComponentHandler extends AbstractStripeComponentHandler {
                         AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(TOKEN)))));
         }
 
-        return modifiableConnectionDefinition;
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/stripe_v1#connection-setup")
+            .version(1);
     }
 }
