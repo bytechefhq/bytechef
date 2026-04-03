@@ -33,6 +33,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDe
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Property.ControlType;
 import com.google.auto.service.AutoService;
 import java.util.List;
 
@@ -88,6 +89,7 @@ public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler
                         string(PASSWORD)
                             .label("API Key")
                             .description("API key creation steps in documentation.")
+                            .controlType(ControlType.PASSWORD)
                             .required(true)));
     }
 }

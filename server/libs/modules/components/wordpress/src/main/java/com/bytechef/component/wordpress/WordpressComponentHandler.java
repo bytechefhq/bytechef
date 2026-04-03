@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.wordpress.trigger.WordPressNewPostTrigger;
 import com.google.auto.service.AutoService;
 import java.util.List;
@@ -68,6 +69,7 @@ public class WordpressComponentHandler extends AbstractWordpressComponentHandler
                         string(PASSWORD)
                             .label("Application Password")
                             .description("Application password, found in Users -> Profile.")
+                            .controlType(ControlType.PASSWORD)
                             .required(true),
                         string(WEBSITE)
                             .label("Wordpress Website")
