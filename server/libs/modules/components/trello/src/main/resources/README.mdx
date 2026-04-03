@@ -1,0 +1,44 @@
+### How to find Board ID
+
+- **Method 1: Via API**
+
+Use the `GET /members/AUTHORIZED_USER_ID/boards` endpoint to retrieve a list of all boards and their IDs.
+
+- **Method 2: Via UI**
+
+Open the Trello board on your browser and add .json to the end of URL so that you have something like `https://trello.com/b/123/my-trello-board.json`. The board ID is first value in that json listed under key `id`.
+
+The Board ID can also be found in the output of the following actions and triggers:
+* **Create Card**
+* **Get Card**
+* **New Card** trigger
+
+### How to find List ID
+
+- **Method 1: Via API**
+
+Use the `GET /boards/BOARD_ID/lists` endpoint to retrieve a list of all lists and their IDs.
+
+- **Method 2: Via UI**
+
+Open the Trello board on your browser and add .json to the end of URL so that you have something like `https://trello.com/b/123/my-trello-board.json`. Search for the name of your list and above the name should be a field with key `id` and value is your list ID.
+
+The List ID can also be found in the output of the following actions and triggers:
+* **Create Card**
+* **Get Card**
+* **New Card** trigger
+
+### How to find Card ID
+
+- **Method 1: Via API**
+
+Use the `GET /boards/BOARD_ID/cards` endpoint to retrieve a list of all cards and their IDs.
+
+- **Method 2: Via UI**
+
+Open the Trello board on your browser where your card is located. Open the card you want and you can find card ID in the URL. For example in `https://trello.com/c/123/my-trello-card`, card ID is 123.
+
+The Card ID can also be found in the output of the following actions and triggers:
+* **Create Card**
+* **Get Card**
+* **New Card** trigger
