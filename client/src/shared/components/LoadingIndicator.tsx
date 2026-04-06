@@ -2,11 +2,11 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CircleIcon, LoaderCircleIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
-const LoaderNotification = ({isFetching, isOnline}: {isFetching: number; isOnline: boolean}) => {
+const LoadingIndicator = ({isFetching, isOnline}: {isFetching: number; isOnline: boolean}) => {
     return (
         <Tooltip>
             <TooltipTrigger
-                aria-label="Loader notification indicator"
+                aria-label="Loading indicator"
                 className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover focus:outline focus:outline-ring"
             >
                 {isOnline && isFetching ? (
@@ -28,4 +28,4 @@ const LoaderNotification = ({isFetching, isOnline}: {isFetching: number; isOnlin
     );
 };
 
-export default LoaderNotification;
+export default LoadingIndicator;
