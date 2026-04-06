@@ -32,13 +32,16 @@ import com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunc
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
+import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -50,7 +53,9 @@ public class WorkflowCallWorkflowTool {
     private WorkflowCallWorkflowTool() {
     }
 
-    public static ClusterElementDefinition<ToolFunction> of(SubflowDataSource subflowDataSource) {
+    public static ClusterElementDefinition<ToolFunction> of(
+        SubflowDataSource subflowDataSource, SubflowSyncExecutor subflowSyncExecutor) {
+
         return ComponentDsl.<ToolFunction>clusterElement("callWorkflow")
             .title("Call Workflow")
             .description("Calls another workflow as an AI agent tool.")
@@ -76,7 +81,18 @@ public class WorkflowCallWorkflowTool {
                     .description("The input parameters for the sub-workflow.")
                     .propertiesLookupDependsOn(WORKFLOW_UUID)
                     .properties(getPropertiesFunction(subflowDataSource)))
+            .object(() -> getToolFunction(subflowSyncExecutor))
             .output(getOutputFunction(subflowDataSource));
+    }
+
+    private static ToolFunction getToolFunction(SubflowSyncExecutor subflowSyncExecutor) {
+        return (inputParameters, connectionParameters, context) -> {
+            String workflowUuid = inputParameters.getRequiredString(WORKFLOW_UUID);
+
+            Map<String, ?> inputs = inputParameters.getMap(INPUTS, Collections.emptyMap());
+
+            return subflowSyncExecutor.execute(workflowUuid, NEW_WORKFLOW_CALL, inputs, context.isEditorEnvironment());
+        };
     }
 
     private static ClusterElementDefinition.OptionsFunction<String> getWorkflowOptionsFunction(
