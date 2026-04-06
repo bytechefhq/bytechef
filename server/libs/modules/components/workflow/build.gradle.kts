@@ -1,6 +1,30 @@
 version="1.0"
 
 dependencies {
+    implementation("org.springframework:spring-context")
     implementation(project(":server:libs:ai:ai-tool-api"))
+    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
+    implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
+    implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:evaluator:evaluator-api"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-job-sync"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
+    implementation(project(":sdks:backend:java:component-api"))
+
+    implementation(project(":server:libs:modules:components:map"))
+    implementation(project(":server:libs:modules:task-dispatchers:approval"))
+    implementation(project(":server:libs:modules:task-dispatchers:branch"))
+    implementation(project(":server:libs:modules:task-dispatchers:condition"))
+    implementation(project(":server:libs:modules:task-dispatchers:each"))
+    implementation(project(":server:libs:modules:task-dispatchers:fork-join"))
+    implementation(project(":server:libs:modules:task-dispatchers:loop"))
+    implementation(project(":server:libs:modules:task-dispatchers:map"))
+    implementation(project(":server:libs:modules:task-dispatchers:parallel"))
+    implementation(project(":server:libs:modules:task-dispatchers:subflow"))
 }
