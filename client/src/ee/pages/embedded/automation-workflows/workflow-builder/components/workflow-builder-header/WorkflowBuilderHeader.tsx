@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import LoaderNotification from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/LoaderNotification';
+import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import OutputPanelButton from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/PublishPopover';
 import WorkflowActionsButton from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/WorkflowActionsButton';
@@ -72,7 +72,7 @@ const WorkflowBuilderHeader = ({
             </div>
 
             <div className="flex items-center space-x-2">
-                <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
+                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
                 <Button
                     className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
