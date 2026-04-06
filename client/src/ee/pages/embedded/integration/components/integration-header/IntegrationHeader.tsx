@@ -2,7 +2,7 @@ import {Separator} from '@/components/ui/separator';
 import IntegrationBreadcrumb from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationBreadcrumb';
 import IntegrationSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationSkeleton';
 import LeftSidebarButton from '@/ee/pages/embedded/integration/components/integration-header/components/LeftSidebarButton';
-import LoaderNotification from '@/ee/pages/embedded/integration/components/integration-header/components/LoaderNotification';
+import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import OutputPanelButton from '@/ee/pages/embedded/integration/components/integration-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/integration/components/integration-header/components/PublishPopover';
 import WorkflowActionsButton from '@/ee/pages/embedded/integration/components/integration-header/components/WorkflowActionsButton';
@@ -101,7 +101,7 @@ const IntegrationHeader = ({
             </div>
 
             <div className="flex items-center">
-                <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
+                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
                 <SettingsMenu
                     integration={integration}
