@@ -61,7 +61,7 @@
   "clusterElements": [ {
     "name": "callWorkflow",
     "description": "Calls another workflow as an AI agent tool.",
-    "element": null,
+    "element": { },
     "help": null,
     "outputDefinition": {
       "output": { },

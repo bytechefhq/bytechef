@@ -18,6 +18,7 @@ package com.bytechef.component.workflow;
 
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,8 @@ public class WorkflowComponentHandlerTest {
     @Test
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/workflow_v1.json", new WorkflowComponentHandler(mock(SubflowDataSource.class)).getDefinition());
+            "definition/workflow_v1.json",
+            new WorkflowComponentHandler(mock(SubflowDataSource.class), mock(SubflowSyncExecutor.class))
+                .getDefinition());
     }
 }
