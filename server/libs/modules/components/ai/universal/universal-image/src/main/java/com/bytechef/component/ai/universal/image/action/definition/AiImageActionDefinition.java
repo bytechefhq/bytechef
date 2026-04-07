@@ -33,6 +33,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
@@ -75,11 +76,15 @@ public class AiImageActionDefinition extends AbstractActionDefinitionWrapper {
 
         Map<String, String> modelConnectionParametersMap = new HashMap<>();
 
+        ActionContextAware actionContextAware = (ActionContextAware) context;
+
+        Long environmentId = actionContextAware.getEnvironmentId();
+
         List<String> activeProviderKeys = propertyService.getProperties(
             Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
-            Scope.PLATFORM, null)
+            Scope.PLATFORM, null, environmentId)
             .stream()
             .filter(property -> property.getValue() != null && property.isEnabled())
             .map(Property::getKey)
@@ -88,35 +93,38 @@ public class AiImageActionDefinition extends AbstractActionDefinitionWrapper {
         Parameters modelInputParameters = aiImageAction.createParameters(inputParameters);
         Parameters modelConnectionParameters = ParametersFactory.create(modelConnectionParametersMap);
 
-        ImageModel imageModel = getImageModel(inputParameters, activeProviderKeys, modelConnectionParametersMap);
+        ImageModel imageModel = getImageModel(
+            inputParameters, activeProviderKeys, modelConnectionParametersMap, environmentId);
 
         return imageModel.getResponse(modelInputParameters, modelConnectionParameters);
     }
 
-    private String getAiProviderToken(String key, List<String> activeProviderKeys) {
+    private String getAiProviderToken(String key, List<String> activeProviderKeys, Long environmentId) {
         return activeProviderKeys.stream()
             .filter(key::equals)
             .findFirst()
-            .map(curKey -> propertyService.getProperty(curKey, Scope.PLATFORM, null))
+            .map(curKey -> propertyService.getProperty(curKey, Scope.PLATFORM, null, environmentId))
             .map(property -> (String) property.get("apiKey"))
             .orElse(null);
     }
 
     private ImageModel getImageModel(
-        Parameters inputParameters, List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+        Parameters inputParameters, List<String> activeProviderKeys,
+        Map<String, String> modelConnectionParametersMap, Long environmentId) {
 
         return switch (Provider.valueOf(inputParameters.getRequiredString(PROVIDER))) {
-            case AZURE_OPEN_AI -> getAzureOpenAiImageModel(activeProviderKeys, modelConnectionParametersMap);
-            case OPEN_AI -> getOpenAiImageModel(activeProviderKeys, modelConnectionParametersMap);
-            case STABILITY -> getStabilityImageModel(activeProviderKeys, modelConnectionParametersMap);
+            case AZURE_OPEN_AI ->
+                getAzureOpenAiImageModel(activeProviderKeys, modelConnectionParametersMap, environmentId);
+            case OPEN_AI -> getOpenAiImageModel(activeProviderKeys, modelConnectionParametersMap, environmentId);
+            case STABILITY -> getStabilityImageModel(activeProviderKeys, modelConnectionParametersMap, environmentId);
             default -> throw new IllegalArgumentException("Invalid provider");
         };
     }
 
     private ImageModel getAzureOpenAiImageModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap, Long environmentId) {
 
-        String token = getAiProviderToken(AZURE_OPEN_AI.getKey(), activeProviderKeys);
+        String token = getAiProviderToken(AZURE_OPEN_AI.getKey(), activeProviderKeys, environmentId);
 
         if (token == null) {
             ApplicationProperties.Ai.Provider.AzureOpenAi azureOpenAi = aiProvider.getAzureOpenAi();
@@ -130,9 +138,9 @@ public class AiImageActionDefinition extends AbstractActionDefinitionWrapper {
     }
 
     private ImageModel getOpenAiImageModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap, Long environmentId) {
 
-        String token = getAiProviderToken(OPEN_AI.getKey(), activeProviderKeys);
+        String token = getAiProviderToken(OPEN_AI.getKey(), activeProviderKeys, environmentId);
 
         if (token == null) {
             ApplicationProperties.Ai.Provider.OpenAi openAi = aiProvider.getOpenAi();
@@ -146,9 +154,9 @@ public class AiImageActionDefinition extends AbstractActionDefinitionWrapper {
     }
 
     private ImageModel getStabilityImageModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap, Long environmentId) {
 
-        String token = getAiProviderToken(STABILITY.getKey(), activeProviderKeys);
+        String token = getAiProviderToken(STABILITY.getKey(), activeProviderKeys, environmentId);
 
         if (token == null) {
             ApplicationProperties.Ai.Provider.Stability stability = aiProvider.getStability();

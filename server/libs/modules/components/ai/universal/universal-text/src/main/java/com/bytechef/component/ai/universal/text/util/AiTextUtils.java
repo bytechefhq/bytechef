@@ -16,12 +16,6 @@
 
 package com.bytechef.component.ai.universal.text.util;
 
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_ANTHROPIC2;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_ANTHROPIC3;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_COHERE;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_JURASSIC2;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_LLAMA;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_TITAN;
 import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
 import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
 import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
@@ -43,12 +37,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties.Ai;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockAnthropic2;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockAnthropic3;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockCohere;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockJurassic2;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockLlama;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockTitan;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
 import com.bytechef.platform.configuration.domain.Property;
@@ -89,13 +77,13 @@ public class AiTextUtils {
     }
 
     public static List<? extends Option<String>> getProviderOptions(
-        Ai.Provider aiProvider, PropertyService propertyService) {
+        Ai.Provider aiProvider, PropertyService propertyService, Long environmentId) {
 
         List<String> activeProviderKeys = propertyService.getProperties(
             Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
-            Scope.PLATFORM, null)
+            Scope.PLATFORM, null, environmentId)
             .stream()
             .filter(property -> property.getValue() != null && property.isEnabled())
             .map(Property::getKey)
@@ -114,60 +102,6 @@ public class AiTextUtils {
 
     private static Predicate<Provider> filter(Ai.Provider aiProvider, List<String> activeProviderKeys) {
         return provider -> switch (provider) {
-            case AMAZON_BEDROCK_ANTHROPIC2 -> {
-                if (checkAiProvider(AMAZON_BEDROCK_ANTHROPIC2.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = aiProvider.getAmazonBedrockAnthropic2();
-
-                yield amazonBedrockAnthropic2.getApiKey() != null;
-            }
-            case AMAZON_BEDROCK_ANTHROPIC3 -> {
-                if (checkAiProvider(AMAZON_BEDROCK_ANTHROPIC3.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = aiProvider.getAmazonBedrockAnthropic3();
-
-                yield amazonBedrockAnthropic3.getApiKey() != null;
-            }
-            case AMAZON_BEDROCK_COHERE -> {
-                if (checkAiProvider(AMAZON_BEDROCK_COHERE.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                AmazonBedrockCohere amazonBedrockCohere = aiProvider.getAmazonBedrockCohere();
-
-                yield amazonBedrockCohere.getApiKey() != null;
-            }
-            case AMAZON_BEDROCK_JURASSIC2 -> {
-                if (checkAiProvider(AMAZON_BEDROCK_JURASSIC2.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                AmazonBedrockJurassic2 amazonBedrockJurassic2 = aiProvider.getAmazonBedrockJurassic2();
-
-                yield amazonBedrockJurassic2.getApiKey() != null;
-            }
-            case AMAZON_BEDROCK_LLAMA -> {
-                if (checkAiProvider(AMAZON_BEDROCK_LLAMA.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                AmazonBedrockLlama amazonBedrockLlama = aiProvider.getAmazonBedrockLlama();
-
-                yield amazonBedrockLlama.getApiKey() != null;
-            }
-            case AMAZON_BEDROCK_TITAN -> {
-                if (checkAiProvider(AMAZON_BEDROCK_TITAN.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                AmazonBedrockTitan amazonBedrockTitan = aiProvider.getAmazonBedrockTitan();
-
-                yield amazonBedrockTitan.getApiKey() != null;
-            }
             case ANTHROPIC -> {
                 if (checkAiProvider(ANTHROPIC.getKey(), activeProviderKeys)) {
                     yield true;
