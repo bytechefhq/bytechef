@@ -27,6 +27,6 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 @FunctionalInterface
 public interface ToolCallbackProviderFunction extends BaseToolFunction {
 
-    ToolCallbackProvider apply(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception;
+    ToolCallbackProvider apply(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws Exception;
 }

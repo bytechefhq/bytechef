@@ -89,12 +89,11 @@ public class WebhookConfiguration {
     WebhookWorkflowExecutor webhookExecutor(
         ChildJobPrincipalFactory childJobPrincipalFactory, ContextService contextService,
         CounterService counterService, Environment environment, Evaluator evaluator,
-        ApplicationEventPublisher eventPublisher,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
-        JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
+        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        PrincipalJobFacade principalJobFacade, JobService jobService,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         SseStreamBridgeRegistry sseStreamBridgeRegistry, SubflowResolver subflowResolver,
-        TaskExecutionService taskExecutionService,
-        TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
+        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
@@ -186,10 +185,6 @@ public class WebhookConfiguration {
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         return List.of(
-            (taskDispatcher) -> new SubflowTaskDispatcher(
-                childJobPrincipalFactory, jobService, subflowResolver),
-            (taskDispatcher) -> new WaitForApprovalTaskDispatcher(
-                eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(
@@ -208,6 +203,8 @@ public class WebhookConfiguration {
                 taskFileStorage),
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
-                taskFileStorage));
+                taskFileStorage),
+            (taskDispatcher) -> new SubflowTaskDispatcher(childJobPrincipalFactory, jobService, subflowResolver),
+            (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService));
     }
 }
