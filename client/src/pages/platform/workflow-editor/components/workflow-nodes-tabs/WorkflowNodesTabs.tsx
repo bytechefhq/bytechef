@@ -328,9 +328,9 @@ const WorkflowNodesTabs = ({
                                             {copiedNode?.label || copiedNode?.componentName}
                                         </span>
 
-                                        {copiedNode?.operationName && (
+                                        {copiedNode?.name && (
                                             <span className="font-normal text-content-neutral-secondary group-active/paste:text-content-brand-primary">
-                                                {` (${copiedNode.operationName})`}
+                                                {` (${copiedNode.name})`}
                                             </span>
                                         )}
                                     </span>
@@ -340,7 +340,7 @@ const WorkflowNodesTabs = ({
                             <TooltipContent side="top">
                                 {[
                                     copiedNode?.label || copiedNode?.componentName,
-                                    copiedNode?.operationName ? `(${copiedNode.operationName})` : null,
+                                    copiedNode?.name ? `(${copiedNode.name})` : null,
                                 ]
                                     .filter(Boolean)
                                     .join(' ')}
