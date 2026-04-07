@@ -45,6 +45,7 @@ public class NocoDbCreateRecords {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRecords")
         .title("Create Records")
         .description("Creates a new records in the specified table.")
+        .help("", "https://docs.bytechef.io/reference/components/nocodb_v1#create-records")
         .properties(
             WORKSPACE_ID_PROPERTY,
             BASE_ID_PROPERTY,

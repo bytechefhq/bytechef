@@ -48,7 +48,9 @@ public class NocoDbConnection {
                         .label("API Token")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
-                    Map.of("xc-token", List.of(connectionParameters.getRequiredString(API_TOKEN))))));
+                    Map.of("xc-token", List.of(connectionParameters.getRequiredString(API_TOKEN))))))
+        .help("", "https://docs.bytechef.io/reference/components/nocodb_v1#connection-setup")
+        .version(1);
 
     private NocoDbConnection() {
     }
