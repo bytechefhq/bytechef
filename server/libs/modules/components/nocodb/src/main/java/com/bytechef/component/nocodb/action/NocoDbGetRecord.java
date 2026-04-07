@@ -40,6 +40,7 @@ public class NocoDbGetRecord {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getRecord")
         .title("Get Record")
         .description("Gets a record from the specified table.")
+        .help("", "https://docs.bytechef.io/reference/components/nocodb_v1#get-records")
         .properties(
             WORKSPACE_ID_PROPERTY,
             BASE_ID_PROPERTY,

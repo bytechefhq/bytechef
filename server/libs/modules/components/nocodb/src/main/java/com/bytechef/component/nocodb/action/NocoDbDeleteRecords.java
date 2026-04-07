@@ -43,6 +43,7 @@ public class NocoDbDeleteRecords {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRecords")
         .title("Delete Records")
         .description("Deletes existing records in the specified table.")
+        .help("", "https://docs.bytechef.io/reference/components/nocodb_v1#delete-records")
         .properties(
             WORKSPACE_ID_PROPERTY,
             BASE_ID_PROPERTY,

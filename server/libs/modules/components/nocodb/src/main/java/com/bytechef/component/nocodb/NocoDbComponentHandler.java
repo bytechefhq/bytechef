@@ -44,6 +44,8 @@ public class NocoDbComponentHandler implements ComponentHandler {
         .icon("path:assets/nocodb.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(NocoDbConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("", "https://nocodb.com/apis/v2/data")
         .actions(
             NocoDbCreateRecords.ACTION_DEFINITION,
             NocoDbDeleteRecords.ACTION_DEFINITION,
@@ -55,7 +57,8 @@ public class NocoDbComponentHandler implements ComponentHandler {
             tool(NocoDbDeleteRecords.ACTION_DEFINITION),
             tool(NocoDbGetRecord.ACTION_DEFINITION),
             tool(NocoDbSearchRecords.ACTION_DEFINITION),
-            tool(NocoDbUpdateRecords.ACTION_DEFINITION));
+            tool(NocoDbUpdateRecords.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
