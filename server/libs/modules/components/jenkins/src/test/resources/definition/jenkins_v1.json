@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new job.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jenkins_v1#create-job"
+    },
     "metadata": null,
     "name": "createJob",
     "outputDefinition": null,
@@ -35,7 +38,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "Content of the config.xml file.",
       "displayCondition": null,
@@ -89,7 +92,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "Content of the config.xml file.",
       "displayCondition": null,
@@ -211,14 +214,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jenkins_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://www.jenkins.io/doc/book/using/remote-access-api/"
+  },
   "description": "Jenkins is leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.",
   "icon": "path:assets/jenkins.svg",
   "metadata": null,
@@ -232,7 +241,10 @@
     "deprecated": null,
     "description": "Triggers when job statuses are changed.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jenkins_v1#new-job-status-notification"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newJobStatusNotification",
