@@ -90,7 +90,7 @@ const AdminApiKeys = () => {
             }}
         >
             <ApiKeysContent
-                description="Use Admin keys for programmatic administration of your account. Do not share your API key with others or expose it in the browser or other client-side code."
+                description="Use Admin keys for programmatic administration of your account. Do not share your API key with others or expose it."
                 title="Admin API Keys"
             />
         </ApiKeysProvider>

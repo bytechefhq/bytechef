@@ -6,6 +6,7 @@ import ApiKeyDialog from '@/ee/shared/components/api-keys/components/ApiKeyDialo
 import ApiKeyTable from '@/ee/shared/components/api-keys/components/ApiKeyTable';
 import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
 import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {KeyIcon} from 'lucide-react';
@@ -31,7 +32,15 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
                         description={description}
                         position="main"
                         right={
-                            apiKeys && apiKeys.length > 0 && <ApiKeyDialog triggerNode={<Button>New API Key</Button>} />
+                            apiKeys && apiKeys.length > 0 ? (
+                                <div className="flex items-center gap-4">
+                                    <EnvironmentSelect />
+
+                                    <ApiKeyDialog triggerNode={<Button>New API Key</Button>} />
+                                </div>
+                            ) : (
+                                <EnvironmentSelect />
+                            )
                         }
                         title={title}
                     />
