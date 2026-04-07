@@ -13,6 +13,7 @@ paths:
       description: "Get Apify Actor last run."
       operationId: "getLastRun"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/apify_v1#get-last-run"
       parameters:
         - name: "actorId"
           in: "path"

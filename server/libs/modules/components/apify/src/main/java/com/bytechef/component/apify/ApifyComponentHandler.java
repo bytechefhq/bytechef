@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 import java.util.List;
 
@@ -48,6 +49,16 @@ public class ApifyComponentHandler extends AbstractApifyComponentHandler {
         return modifiableComponentDefinition
             .icon("path:assets/apify.svg")
             .categories(ComponentCategory.MARKETING_AUTOMATION)
-            .customAction(true);
+            .customAction(true)
+            .customActionHelp("", "https://docs.apify.com/api/v2");
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/apify_v1#connection-setup")
+            .version(1);
     }
 }

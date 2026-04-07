@@ -54,6 +54,7 @@ public class ApifyStartActorAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/apify_v1#start-actor")
         .perform(ApifyStartActorAction::perform);
 
     private ApifyStartActorAction() {
