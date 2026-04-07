@@ -1,5 +1,6 @@
 import {
     AiProviderApi,
+    DeleteAiProviderRequest,
     EnableAiProviderRequest,
     UpdateAiProviderOperationRequest,
 } from '@/ee/shared/middleware/platform/configuration';
@@ -20,16 +21,14 @@ export const useUpdateAiProviderMutation = (mutationProps?: UpdateAiProviderMuta
     });
 
 interface DeleteAiProviderMutationProps {
-    onError?: (error: Error, variables: number) => void;
-    onSuccess?: (result: void, variables: number) => void;
+    onError?: (error: Error, variables: DeleteAiProviderRequest) => void;
+    onSuccess?: (result: void, variables: DeleteAiProviderRequest) => void;
 }
 
 export const useDeleteAiProviderMutation = (mutationProps?: DeleteAiProviderMutationProps) =>
-    useMutation<void, Error, number>({
-        mutationFn: (id: number) => {
-            return new AiProviderApi().deleteAiProvider({
-                id,
-            });
+    useMutation<void, Error, DeleteAiProviderRequest>({
+        mutationFn: (requestParameters: DeleteAiProviderRequest) => {
+            return new AiProviderApi().deleteAiProvider(requestParameters);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

@@ -15,7 +15,17 @@ const formSchema = z.object({
     }),
 });
 
-const AiProviderForm = ({id, onClose, showCancel = false}: {id: number; showCancel: boolean; onClose: () => void}) => {
+const AiProviderForm = ({
+    environment,
+    id,
+    onClose,
+    showCancel = false,
+}: {
+    environment: number;
+    id: number;
+    onClose: () => void;
+    showCancel: boolean;
+}) => {
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             apiKey: '',
@@ -28,7 +38,7 @@ const AiProviderForm = ({id, onClose, showCancel = false}: {id: number; showCanc
     const updateAiProviderMutation = useUpdateAiProviderMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: AiProviderKeys.aiProviders,
+                queryKey: AiProviderKeys.aiProviders(environment),
             });
             queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
@@ -40,6 +50,7 @@ const AiProviderForm = ({id, onClose, showCancel = false}: {id: number; showCanc
 
     function handleSubmit(values: z.infer<typeof formSchema>) {
         updateAiProviderMutation.mutate({
+            environment,
             id,
             updateAiProviderRequest: {
                 apiKey: values.apiKey,
