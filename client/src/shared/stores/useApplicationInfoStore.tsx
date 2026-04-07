@@ -13,6 +13,9 @@ export interface ApplicationInfoI {
         copilot: {
             enabled: boolean;
         };
+        knowledgeBase: {
+            enabled: boolean;
+        };
     };
     analytics: {
         enabled: boolean;
@@ -29,9 +32,6 @@ export interface ApplicationInfoI {
         commandBar: {
             orgId: string | undefined;
         };
-        enabled: boolean;
-    };
-    knowledgeBase: {
         enabled: boolean;
     };
     loading: boolean;
@@ -100,6 +100,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 copilot: {
                                     enabled: json.ai.copilot.enabled === 'true',
                                 },
+                                knowledgeBase: {
+                                    enabled: json.ai.knowledgeBase?.enabled === 'true',
+                                },
                             },
                             analytics: {
                                 enabled: json.analytics.enabled === 'true',
@@ -110,9 +113,6 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             helpHub: {
                                 commandBar: json.helpHub.commandBar,
                                 enabled: json.helpHub.enabled === 'true',
-                            },
-                            knowledgeBase: {
-                                enabled: json.knowledgeBase?.enabled === 'true',
                             },
                             loading: false,
                             signUp: json.signUp,
