@@ -50,8 +50,7 @@ class TrelloGetCardActionTest {
 
     private final Object mockedObject = mock(Object.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(ID_BOARD, "abc", ID, "card"));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID_BOARD, "abc", ID, "card"));
 
     @Test
     void testPerform(
@@ -64,9 +63,7 @@ class TrelloGetCardActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        assertEquals(mockedObject,
-            TrelloGetCardAction.perform(mockedParameters, null, mockedContext));
-
+        assertEquals(mockedObject, TrelloGetCardAction.perform(mockedParameters, null, mockedContext));
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
@@ -74,6 +71,5 @@ class TrelloGetCardActionTest {
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/cards/card", stringArgumentCaptor.getValue());
-
     }
 }
