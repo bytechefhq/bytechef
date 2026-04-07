@@ -170,7 +170,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         setContext({
             ...currentContext,
             mode: MODE.ASK,
-            parameters: {componentName: rootClusterElementNodeData?.name},
+            parameters: {taskName: rootClusterElementNodeData?.name},
             source: Source.CLUSTER_ELEMENT,
         });
 

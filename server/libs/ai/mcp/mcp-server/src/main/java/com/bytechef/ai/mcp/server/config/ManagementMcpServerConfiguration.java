@@ -17,8 +17,10 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
+import com.bytechef.ai.mcp.tool.automation.impl.ClusterElementTools;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ScriptTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
@@ -65,17 +67,22 @@ public class ManagementMcpServerConfiguration {
     private final ProjectToolsImpl projectTools;
     private final ProjectWorkflowToolsImpl projectWorkflowTools;
     private final TaskTools taskTools;
+    private final ScriptTools scriptTools;
+    private final ClusterElementTools clusterElementTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
         ComponentTools componentTools, @Nullable FirecrawlTools firecrawlTools, ProjectToolsImpl projectTools,
-        ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools) {
+        ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        ClusterElementTools clusterElementTools) {
 
         this.componentTools = componentTools;
         this.firecrawlTools = firecrawlTools;
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.taskTools = taskTools;
+        this.scriptTools = scriptTools;
+        this.clusterElementTools = clusterElementTools;
     }
 
     @Bean
@@ -112,7 +119,8 @@ public class ManagementMcpServerConfiguration {
     @Bean
     @Primary
     ToolCallbackProvider toolCallbackProvider() {
-        List<Object> tools = new ArrayList<>(List.of(projectTools, projectWorkflowTools, componentTools, taskTools));
+        List<Object> tools = new ArrayList<>(
+            List.of(projectTools, projectWorkflowTools, componentTools, taskTools, scriptTools, clusterElementTools));
 
         if (firecrawlTools != null) {
             tools.add(firecrawlTools);
