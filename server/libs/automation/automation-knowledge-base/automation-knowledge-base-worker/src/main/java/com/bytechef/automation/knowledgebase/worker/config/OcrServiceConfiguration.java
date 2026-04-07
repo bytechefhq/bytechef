@@ -20,7 +20,7 @@ import com.bytechef.automation.knowledgebase.worker.document.ocr.MistralOcrServi
 import com.bytechef.automation.knowledgebase.worker.document.ocr.NoOpOcrService;
 import com.bytechef.automation.knowledgebase.worker.document.ocr.OcrService;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.KnowledgeBase.Ocr;
+import com.bytechef.config.ApplicationProperties.Ai.KnowledgeBase.Ocr;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +36,8 @@ class OcrServiceConfiguration {
 
     @Bean
     OcrService ocrService(ApplicationProperties applicationProperties) {
-        Ocr ocrProperties = applicationProperties.getKnowledgeBase()
+        Ocr ocrProperties = applicationProperties.getAi()
+            .getKnowledgeBase()
             .getOcr();
 
         Ocr.Provider provider = ocrProperties.getProvider();
