@@ -21,15 +21,15 @@ package com.bytechef.component.ai.llm;
  */
 public enum Provider {
 
-    AMAZON_BEDROCK_ANTHROPIC2(
-        1, "amazonBedrockAnthropic2", "ai.provider.amazonBedrockAnthropic2", "Amazon Bedrock: Anthropic 2"),
-    AMAZON_BEDROCK_ANTHROPIC3(
-        2, "amazonBedrockAnthropic3", "ai.provider.amazonBedrockAnthropic3", "Amazon Bedrock: Anthropic 3"),
-    AMAZON_BEDROCK_COHERE(3, "amazonBedrockCohere", "ai.provider.amazonBedrockCohere", "Amazon Bedrock: Cohere"),
-    AMAZON_BEDROCK_JURASSIC2(
-        4, "amazonBedrockJurassic2", "ai.provider.amazonBedrockJurassic2", "Amazon Bedrock: Jurassic 2"),
-    AMAZON_BEDROCK_LLAMA(5, "amazonBedrockLlama", "ai.provider.amazonBedrockLlama", "Amazon Bedrock: Llama"),
-    AMAZON_BEDROCK_TITAN(6, "amazonBedrockTitan", "ai.provider.amazonBedrockTitan", "Amazon Bedrock: Titan"),
+//    AMAZON_BEDROCK_ANTHROPIC2(
+//        1, "amazonBedrockAnthropic2", "ai.provider.amazonBedrockAnthropic2", "Amazon Bedrock: Anthropic 2"),
+//    AMAZON_BEDROCK_ANTHROPIC3(
+//        2, "amazonBedrockAnthropic3", "ai.provider.amazonBedrockAnthropic3", "Amazon Bedrock: Anthropic 3"),
+//    AMAZON_BEDROCK_COHERE(3, "amazonBedrockCohere", "ai.provider.amazonBedrockCohere", "Amazon Bedrock: Cohere"),
+//    AMAZON_BEDROCK_JURASSIC2(
+//        4, "amazonBedrockJurassic2", "ai.provider.amazonBedrockJurassic2", "Amazon Bedrock: Jurassic 2"),
+//    AMAZON_BEDROCK_LLAMA(5, "amazonBedrockLlama", "ai.provider.amazonBedrockLlama", "Amazon Bedrock: Llama"),
+//    AMAZON_BEDROCK_TITAN(6, "amazonBedrockTitan", "ai.provider.amazonBedrockTitan", "Amazon Bedrock: Titan"),
     ANTHROPIC(7, "anthropic", "ai.provider.anthropic", "Anthropic"),
     AZURE_OPEN_AI(8, "azureOpenAi", "ai.provider.azureOpenAi", "Azure Open AI"),
     GROQ(9, "groq", "ai.provider.groq", "Groq"),
