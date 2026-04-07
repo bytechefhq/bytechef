@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @Matija Petanjek
+ * @author Matija Petanjek
  */
 @Configuration(proxyBeanMethods = false)
 public class FilterConfiguration {

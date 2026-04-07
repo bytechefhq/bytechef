@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
 
 /**
- * @Matija Petanjek
+ * @author Matija Petanjek
  */
 @Configuration(proxyBeanMethods = false)
 public class ContextPropagationConfiguration {

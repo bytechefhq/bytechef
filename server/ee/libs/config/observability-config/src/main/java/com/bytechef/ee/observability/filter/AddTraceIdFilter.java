@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * @Matija Petanjek
+ * @author Matija Petanjek
  */
 class AddTraceIdFilter extends OncePerRequestFilter {
 
