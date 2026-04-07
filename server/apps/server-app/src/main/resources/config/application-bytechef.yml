@@ -102,12 +102,14 @@ bytechef:
 #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
   observability:
-    enabled: false
     logging:
+      enabled: false
       endpoint: http://localhost:4318/v1/logs
     metrics:
+      enabled: false
       endpoint: http://localhost:4318/v1/metrics
     tracing:
+      enabled: false
       endpoint: http://localhost:4318/v1/traces
   public-url:
   resources:

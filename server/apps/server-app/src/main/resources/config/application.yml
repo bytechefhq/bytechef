@@ -110,16 +110,16 @@ management:
           endpoint: ${bytechef.observability.logging.endpoint}
   logging:
     export:
-      enabled: ${bytechef.observability.enabled}
+      enabled: ${bytechef.observability.logging.enabled}
   tracing:
     export:
-      enabled: ${bytechef.observability.enabled}
+      enabled: ${bytechef.observability.tracing.enabled}
     sampling:
       probability: 1.0
   otlp:
     metrics:
       export:
-        enabled: ${bytechef.observability.enabled}
+        enabled: ${bytechef.observability.metrics.enabled}
         step: 10s
         url: ${bytechef.observability.metrics.endpoint}
 
