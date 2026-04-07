@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20250408000000-1" author="Ivica Cardic">
+        <addColumn tableName="property">
+            <column name="environment" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20250408000000-2" author="Ivica Cardic">
+        <dropUniqueConstraint constraintName="uk_property_key_scope_scope_id" tableName="property"/>
+    </changeSet>
+
+    <changeSet id="20250408000000-3" author="Ivica Cardic">
+        <addUniqueConstraint constraintName="uk_property_key_scope_scope_id_environment" tableName="property" columnNames="key,scope,scope_id,environment"/>
+    </changeSet>
+</databaseChangeLog>
