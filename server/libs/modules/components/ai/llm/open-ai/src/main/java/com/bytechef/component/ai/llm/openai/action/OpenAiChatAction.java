@@ -24,12 +24,15 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.STORE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY;
 import static com.bytechef.component.ai.llm.openai.constant.OpenAiConstants.ASK_PROPERTIES;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -92,6 +95,9 @@ public class OpenAiChatAction {
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))
                     .user(inputParameters.getString(USER))
+                    .reasoningEffort(inputParameters.getString(REASONING))
+                    .verbosity(inputParameters.getString(VERBOSITY))
+                    .store(inputParameters.getBoolean(STORE))
                     .build())
             .build();
     };

@@ -47,7 +47,9 @@ bytechef:
       chat:
         options:
           model: gpt-5.1
-          temperature: 0.5
+          temperature: 1
+          reasoning-effect: medium
+          verbosity: low
       embedding:
         options:
           model: text-embedding-3-small

@@ -83,6 +83,8 @@ public class CopilotConfiguration {
     private final String openAiApiKey;
     private final String openAiChatModel;
     private final Double openAiChatTemperature;
+    private final String openAiChatReasoningEffort;
+    private final String openAiChatVerbosity;
     private final String openAiEmbeddingModel;
     private final Resource promptWorkflowEditorAskResource;
     private final Resource promptWorkflowEditorBuildResource;
@@ -129,6 +131,12 @@ public class CopilotConfiguration {
 
         this.openAiChatModel = openAiChatOptions.getModel();
         this.openAiChatTemperature = openAiChatOptions.getTemperature();
+        this.openAiChatReasoningEffort = openAiChatOptions.getReasoningEffect()
+            .name()
+            .toLowerCase();
+        this.openAiChatVerbosity = openAiChatOptions.getVerbosity()
+            .name()
+            .toLowerCase();
 
         OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
             .getOptions();
@@ -281,6 +289,8 @@ public class CopilotConfiguration {
                 OpenAiChatOptions.builder()
                     .model(openAiChatModel)
                     .temperature(openAiChatTemperature)
+                    .reasoningEffort(openAiChatReasoningEffort)
+                    .verbosity(openAiChatVerbosity)
                     .build())
             .build();
     }

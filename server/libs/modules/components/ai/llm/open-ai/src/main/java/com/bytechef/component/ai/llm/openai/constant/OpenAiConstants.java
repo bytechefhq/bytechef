@@ -26,12 +26,15 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.STORE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -95,7 +98,10 @@ public final class OpenAiConstants {
         PRESENCE_PENALTY_PROPERTY,
         LOGIT_BIAS_PROPERTY,
         STOP_PROPERTY,
-        USER_PROPERTY);
+        USER_PROPERTY,
+        REASONING_PROPERTY,
+        VERBOSITY_PROPERTY,
+        STORE_PROPERTY);
 
     private OpenAiConstants() {
     }

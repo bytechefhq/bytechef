@@ -18,11 +18,13 @@ package com.bytechef.component.ai.llm.constant;
 
 import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
@@ -66,6 +68,7 @@ public class LLMConstants {
     public static final String PRESENCE_PENALTY = "presencePenalty";
     public static final String PROMPT = "prompt";
     public static final String PROVIDER = "provider";
+    public static final String REASONING = "reasoning";
     public static final String RESPONSE = "response";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String RESPONSE_SCHEMA = "responseSchema";
@@ -80,8 +83,10 @@ public class LLMConstants {
     public static final String USER_PROMPT = "userPrompt";
     public static final String URL = "url";
     public static final String SEED = "seed";
+    public static final String VERBOSITY = "verbosity";
     public static final String VOICE = "voice";
     public static final String SPEED = "speed";
+    public static final String STORE = "store";
     public static final String WEIGHT = "weight";
 
     public static final ModifiableArrayProperty ATTACHMENTS_PROPERTY = array(ATTACHMENTS)
@@ -292,6 +297,35 @@ public class LLMConstants {
         .defaultValue(1)
         .minValue(1)
         .maxValue(10)
+        .advancedOption(true);
+
+    public static final ModifiableStringProperty REASONING_PROPERTY = string(REASONING)
+        .label("Reasoning effort")
+        .description(
+            "Constrains effort on reasoning. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response. For reasoning models for gpt-5 and o-series models only.")
+        .options(
+            option("none", "none"),
+            option("minimal", "minimal"),
+            option("low", "low"),
+            option("medium", "medium"),
+            option("high", "high"),
+            option("maximal", "xhigh"))
+        .displayCondition("response.responseFormat == '%s'".formatted(ChatModel.ResponseFormat.TEXT.name()))
+        .advancedOption(true);
+
+    public static final ModifiableStringProperty VERBOSITY_PROPERTY = string(VERBOSITY)
+        .label("Verbosity")
+        .description("Adjusts response verbosity. Lower levels yield shorter answers.")
+        .options(
+            option("low", "low"),
+            option("medium", "medium"),
+            option("high", "high"))
+        .displayCondition("response.responseFormat == '%s'".formatted(ChatModel.ResponseFormat.TEXT.name()))
+        .advancedOption(true);
+
+    public static final ModifiableBooleanProperty STORE_PROPERTY = bool(STORE)
+        .label("Store logs")
+        .description("Whether to store the logs for later retrieval. Logs are visible to your organization.")
         .advancedOption(true);
 
     private LLMConstants() {
