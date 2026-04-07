@@ -4,11 +4,11 @@ import {AiProvider, AiProviderApi} from '@/ee/shared/middleware/platform/configu
 import {useQuery} from '@tanstack/react-query';
 
 export const AiProviderKeys = {
-    aiProviders: ['aiProviders'] as const,
+    aiProviders: (environment: number) => ['aiProviders', environment] as const,
 };
 
-export const useGetAiProvidersQuery = () =>
+export const useGetAiProvidersQuery = (environment: number) =>
     useQuery<AiProvider[], Error>({
-        queryKey: AiProviderKeys.aiProviders,
-        queryFn: () => new AiProviderApi().getAiProviders(),
+        queryKey: AiProviderKeys.aiProviders(environment),
+        queryFn: () => new AiProviderApi().getAiProviders({environment}),
     });

@@ -12,7 +12,7 @@ import InlineSVG from 'react-inlinesvg';
 
 import './AiProviderList.css';
 
-const AiProviderList = ({aiProviders}: {aiProviders: AiProvider[]}) => {
+const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; environment: number}) => {
     const [enabledItems, setEnabledItems] = useState<{[key: number]: boolean}>({});
     const [openItem, setOpenItem] = useState<string>();
     const [showForm, setShowForm] = useState<{[key: number]: boolean}>({});
@@ -22,7 +22,7 @@ const AiProviderList = ({aiProviders}: {aiProviders: AiProvider[]}) => {
     const enableAiProviderMutation = useEnableAiProviderMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: AiProviderKeys.aiProviders,
+                queryKey: AiProviderKeys.aiProviders(environment),
             });
             queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
@@ -45,6 +45,7 @@ const AiProviderList = ({aiProviders}: {aiProviders: AiProvider[]}) => {
         if (aiProvider.apiKey) {
             enableAiProviderMutation.mutate({
                 enable: value,
+                environment,
                 id: aiProvider.id!,
             });
         }
@@ -105,6 +106,7 @@ const AiProviderList = ({aiProviders}: {aiProviders: AiProvider[]}) => {
                         <AccordionContent className="my-2 w-6/12 pl-12">
                             {showForm[aiProvider.id!] ? (
                                 <AiProviderForm
+                                    environment={environment}
                                     id={aiProvider.id!}
                                     onClose={() =>
                                         setShowForm((prev) => ({
