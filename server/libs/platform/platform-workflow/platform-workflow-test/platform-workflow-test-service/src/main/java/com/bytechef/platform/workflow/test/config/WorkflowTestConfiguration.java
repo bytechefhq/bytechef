@@ -227,7 +227,6 @@ public class WorkflowTestConfiguration {
             (parentJobId, jobParametersDTO) -> jobFacade.createJob(jobParametersDTO);
 
         return List.of(
-            (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(
@@ -251,6 +250,7 @@ public class WorkflowTestConfiguration {
                 contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new SubflowTaskDispatcher(childJobPrincipalFactory, jobService, subflowResolver),
-            (taskDispatcher) -> new TerminateTaskDispatcher(eventPublisher, taskExecutionService));
+            (taskDispatcher) -> new TerminateTaskDispatcher(eventPublisher, taskExecutionService),
+            (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService));
     }
 }
