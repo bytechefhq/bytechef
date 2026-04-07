@@ -27,6 +27,7 @@ import com.bytechef.component.ai.universal.image.util.AiImageUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.config.ApplicationProperties.Ai;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.function.BiFunction;
 
@@ -43,7 +44,8 @@ public class AiImageConstants {
             .options(
                 (ActionDefinition.OptionsFunction<String>) (
                     inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> AiImageUtils
-                        .getProviderOptions(aiProvider, propertyService))
+                        .getProviderOptions(
+                            aiProvider, propertyService, ((ActionContextAware) context).getEnvironmentId()))
 
             .required(true);
 

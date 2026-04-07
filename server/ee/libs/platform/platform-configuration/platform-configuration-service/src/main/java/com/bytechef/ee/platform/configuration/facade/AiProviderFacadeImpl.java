@@ -48,7 +48,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     public void deleteAiProvider(int id, int environment) {
         Provider provider = getProvider(id);
 
-        propertyService.delete(provider.getKey(), Scope.PLATFORM, null, environment);
+        propertyService.delete(provider.getKey(), Scope.PLATFORM, null, (long) environment);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
-            Scope.PLATFORM, null, environment);
+            Scope.PLATFORM, null, (long) environment);
 
         return Arrays.stream(Provider.values())
             .map(provider -> {
@@ -102,14 +102,14 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     public void updateAiProvider(int id, boolean enabled, int environment) {
         Provider provider = getProvider(id);
 
-        propertyService.update(provider.getKey(), enabled, Scope.PLATFORM, null, environment);
+        propertyService.update(provider.getKey(), enabled, Scope.PLATFORM, null, (long) environment);
     }
 
     @Override
     public void updateAiProvider(int id, String apiKey, int environment) {
         Provider provider = getProvider(id);
 
-        propertyService.save(provider.getKey(), Map.of("apiKey", apiKey), Scope.PLATFORM, null, environment);
+        propertyService.save(provider.getKey(), Map.of("apiKey", apiKey), Scope.PLATFORM, null, (long) environment);
     }
 
     private static Provider getProvider(int id) {

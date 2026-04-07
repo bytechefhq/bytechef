@@ -16,12 +16,6 @@
 
 package com.bytechef.component.ai.universal.text.constant;
 
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_ANTHROPIC2;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_ANTHROPIC3;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_COHERE;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_JURASSIC2;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_LLAMA;
-import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_TITAN;
 import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
 import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
 import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
@@ -39,6 +33,7 @@ import static com.bytechef.config.ApplicationProperties.Ai;
 import com.bytechef.component.ai.universal.text.util.AiTextUtils;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.function.BiFunction;
 
@@ -73,7 +68,8 @@ public class AiTextConstants {
             .options(
                 (OptionsFunction<String>) (
                     inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> AiTextUtils
-                        .getProviderOptions(aiProvider, propertyService))
+                        .getProviderOptions(
+                            aiProvider, propertyService, ((ActionContextAware) context).getEnvironmentId()))
             .required(true);
 
     public static final ModifiableStringProperty MODEL_OPTIONS_PROPERTY = string(MODEL)
@@ -82,10 +78,8 @@ public class AiTextConstants {
         .options((OptionsFunction<String>) AiTextUtils::getModelOptions)
         .optionsLookupDependsOn(PROVIDER)
         .displayCondition(
-            "contains({'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'}, provider)".formatted(
-                AMAZON_BEDROCK_ANTHROPIC2, AMAZON_BEDROCK_ANTHROPIC3, AMAZON_BEDROCK_COHERE,
-                AMAZON_BEDROCK_JURASSIC2, AMAZON_BEDROCK_LLAMA, AMAZON_BEDROCK_TITAN, ANTHROPIC,
-                MISTRAL, OPEN_AI, VERTEX_GEMINI))
+            "contains({'%s','%s','%s','%s'}, provider)".formatted(
+                ANTHROPIC, MISTRAL, OPEN_AI, VERTEX_GEMINI))
         .required(true);
 
     public static final ModifiableStringProperty MODEL_NO_OPTIONS_PROPERTY = string(MODEL)
