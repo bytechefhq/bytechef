@@ -3,7 +3,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormattedName';
 import saveWorkflowDefinition from '@/pages/platform/workflow-editor/utils/saveWorkflowDefinition';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {TaskDispatcherContextType, UpdateWorkflowMutationType} from '@/shared/types';
+import {BranchCaseType, TaskDispatcherContextType, UpdateWorkflowMutationType} from '@/shared/types';
 
 type TaskParametersType = NonNullable<WorkflowTask['parameters']>;
 
@@ -27,6 +27,24 @@ const TASK_DISPATCHER_NAMES = new Set([
 
 const isTaskDispatcher = (componentName: string): boolean => TASK_DISPATCHER_NAMES.has(componentName);
 
+const getNextAvailableName = (copiedLabel: string, existingLabels: string[]): string => {
+    let counter = 1;
+    const escapedBase = copiedLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`^${escapedBase} \\((\\d+)\\)$`);
+
+    existingLabels.forEach((label) => {
+        const match = label.match(regex);
+        if (match) {
+            const num = parseInt(match[1], 10);
+            if (num >= counter) {
+                counter = num + 1;
+            }
+        }
+    });
+
+    return `${copiedLabel} (${counter})`;
+};
+
 function renameNestedTasks(
     parameters: TaskParametersType,
     componentName: string,
@@ -34,15 +52,14 @@ function renameNestedTasks(
 ): TaskParametersType {
     const renameTask = (task: WorkflowTask) => {
         const subtaskComponentName = task.type?.split('/')?.[0];
+        if (!subtaskComponentName) return;
 
-        if (!subtaskComponentName) {
-            return;
+        if (task.metadata?.ui) {
+            task.metadata.ui = {...task.metadata.ui, nodePosition: undefined};
         }
 
         const newName = getFormattedName(subtaskComponentName, reservedNames);
-
         reservedNames.add(newName);
-
         task.name = newName;
 
         if (isTaskDispatcher(subtaskComponentName) && task.parameters) {
@@ -51,102 +68,38 @@ function renameNestedTasks(
     };
 
     switch (componentName) {
-        case 'condition': {
-            if (Array.isArray(parameters.caseTrue)) {
-                for (const task of parameters.caseTrue) {
-                    renameTask(task);
-                }
-            }
-
-            if (Array.isArray(parameters.caseFalse)) {
-                for (const task of parameters.caseFalse) {
-                    renameTask(task);
-                }
-            }
-
+        case 'condition':
+            if (Array.isArray(parameters.caseTrue)) (parameters.caseTrue as WorkflowTask[]).forEach(renameTask);
+            if (Array.isArray(parameters.caseFalse)) (parameters.caseFalse as WorkflowTask[]).forEach(renameTask);
             break;
-        }
-
-        case 'branch': {
+        case 'branch':
             if (Array.isArray(parameters.cases)) {
-                for (const caseItem of parameters.cases) {
-                    if (Array.isArray(caseItem.tasks)) {
-                        for (const task of caseItem.tasks) {
-                            renameTask(task);
-                        }
-                    }
-                }
+                (parameters.cases as BranchCaseType[]).forEach((caseItem) => caseItem.tasks?.forEach(renameTask));
             }
-
-            if (Array.isArray(parameters.default)) {
-                for (const task of parameters.default) {
-                    renameTask(task);
-                }
-            }
-
+            if (Array.isArray(parameters.default)) (parameters.default as WorkflowTask[]).forEach(renameTask);
             break;
-        }
-
         case 'loop':
-        case 'map': {
-            if (Array.isArray(parameters.iteratee)) {
-                for (const task of parameters.iteratee) {
-                    renameTask(task);
-                }
-            }
-
+        case 'map':
+            if (Array.isArray(parameters.iteratee)) (parameters.iteratee as WorkflowTask[]).forEach(renameTask);
             break;
-        }
-
-        case 'each': {
+        case 'each':
             if (parameters.iteratee && typeof parameters.iteratee === 'object' && !Array.isArray(parameters.iteratee)) {
-                renameTask(parameters.iteratee);
+                renameTask(parameters.iteratee as WorkflowTask);
             }
-
             break;
-        }
-
-        case 'parallel': {
-            if (Array.isArray(parameters.tasks)) {
-                for (const task of parameters.tasks) {
-                    renameTask(task);
-                }
-            }
-
+        case 'parallel':
+            if (Array.isArray(parameters.tasks)) (parameters.tasks as WorkflowTask[]).forEach(renameTask);
             break;
-        }
-
-        case 'fork-join': {
+        case 'fork-join':
             if (Array.isArray(parameters.branches)) {
-                for (const branch of parameters.branches) {
-                    if (Array.isArray(branch)) {
-                        for (const task of branch) {
-                            renameTask(task);
-                        }
-                    }
-                }
+                (parameters.branches as WorkflowTask[][]).forEach((branch) => branch.forEach(renameTask));
             }
-
             break;
-        }
-
-        case 'on-error': {
-            if (Array.isArray(parameters['main-branch'])) {
-                for (const task of parameters['main-branch']) {
-                    renameTask(task);
-                }
-            }
-
-            if (Array.isArray(parameters['on-error-branch'])) {
-                for (const task of parameters['on-error-branch']) {
-                    renameTask(task);
-                }
-            }
-
-            break;
-        }
-
-        default:
+        case 'on-error':
+            if (Array.isArray(parameters['main-branch']))
+                (parameters['main-branch'] as WorkflowTask[]).forEach(renameTask);
+            if (Array.isArray(parameters['on-error-branch']))
+                (parameters['on-error-branch'] as WorkflowTask[]).forEach(renameTask);
             break;
     }
 
@@ -161,54 +114,42 @@ export default function pasteNode({
 }: PasteNodeI) {
     const {copiedNode, copiedWorkflowId} = useWorkflowEditorStore.getState();
 
-    if (!copiedNode) {
-        return;
-    }
+    if (!copiedNode) return;
 
-    const {workflow} = useWorkflowDataStore.getState();
+    const {nodes, workflow} = useWorkflowDataStore.getState();
 
-    if (copiedWorkflowId !== workflow.id) {
-        return;
-    }
+    if (copiedWorkflowId !== workflow.id) return;
 
     let definitionTasks: Array<{name: string}>;
-
     try {
         const workflowDefinition = JSON.parse(workflow.definition!);
-
         definitionTasks = workflowDefinition.tasks ?? [];
     } catch {
         return;
     }
 
-    let nodeIndex: number | undefined = directNodeIndex;
+    let resolvedNodeIndex: number | undefined = directNodeIndex;
 
-    if (nodeIndex === undefined && nodeSourceName) {
+    if (resolvedNodeIndex === undefined && nodeSourceName) {
         if (!taskDispatcherContext?.taskDispatcherId) {
             let sourceIndex = definitionTasks.findIndex((task) => task.name === nodeSourceName);
-
             if (sourceIndex === -1) {
-                const {nodes} = useWorkflowDataStore.getState();
                 const sourceNode = nodes.find((node) => node.id === nodeSourceName);
                 const resolvedName = sourceNode?.data?.taskDispatcherId as string | undefined;
-
                 if (resolvedName) {
                     sourceIndex = definitionTasks.findIndex((task) => task.name === resolvedName);
                 } else if (sourceNode?.data?.trigger) {
-                    nodeIndex = 0;
+                    resolvedNodeIndex = 0;
                 }
             }
-
-            if (nodeIndex === undefined) {
-                nodeIndex = sourceIndex !== -1 ? sourceIndex + 1 : undefined;
+            if (resolvedNodeIndex === undefined) {
+                resolvedNodeIndex = sourceIndex !== -1 ? sourceIndex + 1 : undefined;
             }
         }
     }
 
     const reservedNames = new Set<string>();
-
     const newName = getFormattedName(copiedNode.componentName, reservedNames);
-
     reservedNames.add(newName);
 
     const clonedParameters = structuredClone(copiedNode.parameters ?? {});
@@ -217,29 +158,38 @@ export default function pasteNode({
         renameNestedTasks(clonedParameters, copiedNode.componentName, reservedNames);
     }
 
+    const existingLabels = nodes.map((node) => node.data?.label).filter((label): label is string => !!label);
+    const finalLabel = getNextAvailableName(copiedNode.label ?? '', existingLabels);
+
+    let cleanedMetadata = undefined;
+    if (copiedNode.metadata) {
+        const {ui, ...restMetadata} = copiedNode.metadata;
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {nodePosition, ...restUi} = ui || {};
+
+        const cleanedUi = Object.keys(restUi).length > 0 ? restUi : undefined;
+
+        if (Object.keys(restMetadata).length > 0 || cleanedUi) {
+            cleanedMetadata = {
+                ...restMetadata,
+                ...(cleanedUi ? {ui: cleanedUi} : {}),
+            };
+        }
+    }
+
     const newNodeData = {
         ...copiedNode,
-        label: `copy of ${copiedNode.workflowNodeName}`,
-        metadata: copiedNode.metadata?.ui?.nodePosition
-            ? {
-                  ...copiedNode.metadata,
-                  ui: {
-                      ...copiedNode.metadata.ui,
-                      nodePosition: {
-                          x: copiedNode.metadata.ui.nodePosition.x + 50,
-                          y: copiedNode.metadata.ui.nodePosition.y + 50,
-                      },
-                  },
-              }
-            : copiedNode.metadata,
+        label: finalLabel,
+        metadata: cleanedMetadata,
         name: newName,
         parameters: clonedParameters,
-        workflowNodeName: newName,
+        workflowNodeName: finalLabel,
     };
 
     saveWorkflowDefinition({
         nodeData: newNodeData,
-        nodeIndex,
+        nodeIndex: resolvedNodeIndex,
         taskDispatcherContext,
         updateWorkflowMutation,
     });
