@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.observation.OpenTelemetryServerRequestObservationConvention;
 
 /**
- * @Matija Petanjek
+ * @author Matija Petanjek
  */
 @Configuration(proxyBeanMethods = false)
 public class OpenTelemetryConfiguration {

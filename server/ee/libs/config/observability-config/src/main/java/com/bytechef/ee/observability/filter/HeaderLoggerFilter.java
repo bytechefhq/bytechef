@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * @Matija Petanjek
+ * @author Matija Petanjek
  */
 class HeaderLoggerFilter extends OncePerRequestFilter {
 
