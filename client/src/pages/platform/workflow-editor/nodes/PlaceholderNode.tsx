@@ -1,8 +1,8 @@
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from '@/components/ui/context-menu';
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
-import {ClipboardPasteIcon} from 'lucide-react';
-import {memo, useState} from 'react';
+import {ClipboardPlusIcon} from 'lucide-react';
+import {memo, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -43,6 +43,16 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const effectiveDirection = isClusterElement ? 'TB' : layoutDirection;
 
     const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+
+    const copiedNodeLabel = copiedNode?.label || '';
+
+    const displayLabel = useMemo(() => {
+        if (!copiedNode) {
+            return '';
+        }
+
+        return `${copiedNodeLabel} (${copiedNode.name})`;
+    }, [copiedNode, copiedNodeLabel]);
 
     return (
         <ContextMenu>
@@ -91,8 +101,9 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             </ContextMenuTrigger>
 
-            <ContextMenuContent>
+            <ContextMenuContent className="w-[280px]">
                 <ContextMenuItem
+                    className="flex w-full flex-col gap-1"
                     onClick={() => {
                         const placeholderNode = nodes.find((node) => node.id === id);
 
@@ -107,8 +118,21 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         });
                     }}
                 >
-                    <ClipboardPasteIcon />
-                    Paste Here
+                    <div className="flex items-center gap-2">
+                        <ClipboardPlusIcon className="size-4 shrink-0" />
+
+                        <span>Paste Here</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-content-neutral-secondary">
+                        <span className="flex size-4 shrink-0 items-center justify-center">
+                            {copiedNode?.icon ?? null}
+                        </span>
+
+                        <span className="line-clamp-1 flex-1 text-xs font-normal" title={displayLabel}>
+                            {displayLabel}
+                        </span>
+                    </div>
                 </ContextMenuItem>
             </ContextMenuContent>
         </ContextMenu>

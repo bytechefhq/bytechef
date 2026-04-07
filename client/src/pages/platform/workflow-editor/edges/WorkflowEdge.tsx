@@ -1,7 +1,7 @@
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from '@/components/ui/context-menu';
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
-import {ClipboardPasteIcon, PlusIcon} from 'lucide-react';
+import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -41,7 +41,9 @@ export default function WorkflowEdge({
 
     const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);
+
     const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+
     const {updateWorkflowMutation} = useWorkflowEditor();
 
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
@@ -54,6 +56,16 @@ export default function WorkflowEdge({
 
     const isMiddleCaseEdge = !!(data as Record<string, unknown>)?.isMiddleCase;
     const isHorizontal = layoutDirection === 'LR';
+
+    const copiedNodeLabel = copiedNode?.label || '';
+
+    const displayLabel = useMemo(() => {
+        if (!copiedNode) {
+            return '';
+        }
+
+        return `${copiedNodeLabel} (${copiedNode.name})`;
+    }, [copiedNode, copiedNodeLabel]);
 
     const {
         correctedSourcePosition,
@@ -213,8 +225,9 @@ export default function WorkflowEdge({
                                 </div>
                             </ContextMenuTrigger>
 
-                            <ContextMenuContent>
+                            <ContextMenuContent className="w-[280px]">
                                 <ContextMenuItem
+                                    className="flex w-full cursor-pointer flex-col items-start gap-1 px-[var(--spacing-1,4px)] py-0"
                                     disabled={!canPaste}
                                     onClick={() => {
                                         const edge = edges.find((edge) => edge.id === id);
@@ -232,8 +245,21 @@ export default function WorkflowEdge({
                                         });
                                     }}
                                 >
-                                    <ClipboardPasteIcon />
-                                    Paste Here
+                                    <div className="flex items-center gap-2 text-content-neutral-primary">
+                                        <ClipboardPlusIcon className="size-4 shrink-0" />
+
+                                        <span>Paste Here</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 text-content-neutral-secondary">
+                                        <span className="flex size-4 shrink-0 items-center justify-center">
+                                            {copiedNode?.icon ?? null}
+                                        </span>
+
+                                        <span className="line-clamp-1 flex-1 text-xs font-normal" title={displayLabel}>
+                                            {displayLabel}
+                                        </span>
+                                    </div>
                                 </ContextMenuItem>
                             </ContextMenuContent>
                         </ContextMenu>
