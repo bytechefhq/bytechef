@@ -851,6 +851,108 @@
       "regex": null,
       "required": false,
       "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Constrains effort on reasoning. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response. For reasoning models for gpt-5 and o-series models only.",
+      "displayCondition": "response.responseFormat == 'TEXT'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Reasoning effort",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "reasoning",
+      "options": [ {
+        "description": null,
+        "label": "none",
+        "value": "none"
+      }, {
+        "description": null,
+        "label": "minimal",
+        "value": "minimal"
+      }, {
+        "description": null,
+        "label": "low",
+        "value": "low"
+      }, {
+        "description": null,
+        "label": "medium",
+        "value": "medium"
+      }, {
+        "description": null,
+        "label": "high",
+        "value": "high"
+      }, {
+        "description": null,
+        "label": "maximal",
+        "value": "xhigh"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": null,
+      "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Adjusts response verbosity. Lower levels yield shorter answers.",
+      "displayCondition": "response.responseFormat == 'TEXT'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Verbosity",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "verbosity",
+      "options": [ {
+        "description": null,
+        "label": "low",
+        "value": "low"
+      }, {
+        "description": null,
+        "label": "medium",
+        "value": "medium"
+      }, {
+        "description": null,
+        "label": "high",
+        "value": "high"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": null,
+      "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Whether to store the logs for later retrieval. Logs are visible to your organization.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Store logs",
+      "metadata": { },
+      "name": "store",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
     } ],
     "resumePerform": null,
     "title": "Ask",
@@ -1753,6 +1855,108 @@
       "regex": null,
       "required": false,
       "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Constrains effort on reasoning. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response. For reasoning models for gpt-5 and o-series models only.",
+      "displayCondition": "response.responseFormat == 'TEXT'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Reasoning effort",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "reasoning",
+      "options": [ {
+        "description": null,
+        "label": "none",
+        "value": "none"
+      }, {
+        "description": null,
+        "label": "minimal",
+        "value": "minimal"
+      }, {
+        "description": null,
+        "label": "low",
+        "value": "low"
+      }, {
+        "description": null,
+        "label": "medium",
+        "value": "medium"
+      }, {
+        "description": null,
+        "label": "high",
+        "value": "high"
+      }, {
+        "description": null,
+        "label": "maximal",
+        "value": "xhigh"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": null,
+      "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Adjusts response verbosity. Lower levels yield shorter answers.",
+      "displayCondition": "response.responseFormat == 'TEXT'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Verbosity",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "verbosity",
+      "options": [ {
+        "description": null,
+        "label": "low",
+        "value": "low"
+      }, {
+        "description": null,
+        "label": "medium",
+        "value": "medium"
+      }, {
+        "description": null,
+        "label": "high",
+        "value": "high"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": null,
+      "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Whether to store the logs for later retrieval. Logs are visible to your organization.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Store logs",
+      "metadata": { },
+      "name": "store",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
     } ],
     "resumePerform": null,
     "title": "Ask (stream)",
