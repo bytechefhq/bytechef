@@ -31,12 +31,264 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  id:
-                    type: "string"
-                    description: "The ID of the newly created opportunity."
-                  name:
-                    type: "string"
-                    description: "The name of the newly created opportunity."
+                  data:
+                    type: "object"
+                    description: "Main run object containing execution details"
+                    properties:
+                      id:
+                        type: "string"
+                        description: "Unique identifier of the run"
+                      actId:
+                        type: "string"
+                        description: "Identifier of the actor"
+                      userId:
+                        type: "string"
+                        description: "Identifier of the user who started the run"
+                      actorTaskId:
+                        type: "string"
+                        description: "Identifier of the actor task"
+                      startedAt:
+                        type: "string"
+                        format: "date-time"
+                        description: "Timestamp when the run started"
+                      finishedAt:
+                        type: "string"
+                        format: "date-time"
+                        description: "Timestamp when the run finished"
+                      status:
+                        type: "string"
+                        description: "Current status of the run"
+                      statusMessage:
+                        type: "string"
+                        description: "Human-readable status message"
+                      isStatusMessageTerminal:
+                        type: "boolean"
+                        description: "Indicates if the status message is terminal"
+                      meta:
+                        type: "object"
+                        description: "Metadata about the run origin and environment"
+                        properties:
+                          origin:
+                            type: "string"
+                            description: "Origin of the run"
+                          clientIp:
+                            type: "string"
+                            description: "IP address of the client"
+                          userAgent:
+                            type: "string"
+                            description: "User agent string of the client"
+                          scheduleId:
+                            type: "string"
+                            description: "Identifier of the schedule"
+                          scheduledAt:
+                            type: "string"
+                            format: "date-time"
+                            description: "Scheduled execution time"
+                      pricingInfo:
+                        type: "object"
+                        description: "Pricing details for the run"
+                        properties:
+                          apifyMarginPercentage:
+                            type: "number"
+                            description: "Margin percentage applied"
+                          createdAt:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when pricing info was created"
+                          startedAt:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when pricing started"
+                          notifiedAboutFutureChangeAt:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp of future pricing change notification"
+                          notifiedAboutChangeAt:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp of pricing change notification"
+                          reasonForChange:
+                            type: "string"
+                            description: "Reason for pricing change"
+                          pricingModel:
+                            type: "string"
+                            description: "Pricing model used"
+                          pricingPerEvent:
+                            type: "object"
+                            description: "Pricing details per event"
+                            properties:
+                              actorChargeEvents:
+                                type: "object"
+                                description: "Mapping of chargeable events"
+                          minimalMaxTotalChargeUsd:
+                            type: "number"
+                            description: "Minimum maximum total charge in USD"
+                      stats:
+                        type: "object"
+                        description: "Runtime statistics of the run"
+                        properties:
+                          inputBodyLen:
+                            type: "integer"
+                            description: "Length of the input body"
+                          migrationCount:
+                            type: "integer"
+                            description: "Number of migrations"
+                          rebootCount:
+                            type: "integer"
+                            description: "Number of reboots"
+                          restartCount:
+                            type: "integer"
+                            description: "Number of restarts"
+                          resurrectCount:
+                            type: "integer"
+                            description: "Number of resurrects"
+                          memAvgBytes:
+                            type: "number"
+                            description: "Average memory usage in bytes"
+                          memMaxBytes:
+                            type: "number"
+                            description: "Maximum memory usage in bytes"
+                          memCurrentBytes:
+                            type: "number"
+                            description: "Current memory usage in bytes"
+                          cpuAvgUsage:
+                            type: "number"
+                            description: "Average CPU usage"
+                          cpuMaxUsage:
+                            type: "number"
+                            description: "Maximum CPU usage"
+                          cpuCurrentUsage:
+                            type: "number"
+                            description: "Current CPU usage"
+                          netRxBytes:
+                            type: "number"
+                            description: "Network received bytes"
+                          netTxBytes:
+                            type: "number"
+                            description: "Network transmitted bytes"
+                          durationMillis:
+                            type: "integer"
+                            description: "Duration of the run in milliseconds"
+                          runTimeSecs:
+                            type: "number"
+                            description: "Runtime in seconds"
+                          metamorph:
+                            type: "integer"
+                            description: "Number of metamorph operations"
+                          computeUnits:
+                            type: "number"
+                            description: "Compute units consumed"
+                      chargedEventCounts:
+                        type: "object"
+                        additionalProperties:
+                          type: "integer"
+                        description: "Counts of charged events by event type"
+                      options:
+                        type: "object"
+                        description: "Run configuration options"
+                        properties:
+                          build:
+                            type: "string"
+                            description: "Build tag used"
+                          timeoutSecs:
+                            type: "integer"
+                            description: "Timeout in seconds"
+                          memoryMbytes:
+                            type: "integer"
+                            description: "Allocated memory in megabytes"
+                          diskMbytes:
+                            type: "integer"
+                            description: "Allocated disk space in megabytes"
+                          maxItems:
+                            type: "integer"
+                            description: "Maximum number of items to process"
+                          maxTotalChargeUsd:
+                            type: "number"
+                            description: "Maximum total charge in USD"
+                      buildId:
+                        type: "string"
+                        description: "Identifier of the build"
+                      exitCode:
+                        type: "integer"
+                        description: "Exit code of the run"
+                      generalAccess:
+                        type: "string"
+                        description: "Access level of the run"
+                      defaultKeyValueStoreId:
+                        type: "string"
+                        description: "Default key-value store ID"
+                      defaultDatasetId:
+                        type: "string"
+                        description: "Default dataset ID"
+                      defaultRequestQueueId:
+                        type: "string"
+                        description: "Default request queue ID"
+                      storageIds:
+                        type: "object"
+                        description: "Identifiers of associated storage resources"
+                        properties:
+                          datasets:
+                            type: "object"
+                            properties:
+                              default:
+                                type: "string"
+                                description: "Default dataset ID"
+                          keyValueStores:
+                            type: "object"
+                            properties:
+                              default:
+                                type: "string"
+                                description: "Default key-value store ID"
+                          requestQueues:
+                            type: "object"
+                            properties:
+                              default:
+                                type: "string"
+                                description: "Default request queue ID"
+                      buildNumber:
+                        type: "string"
+                        description: "Build version number"
+                      containerUrl:
+                        type: "string"
+                        description: "URL of the container"
+                      isContainerServerReady:
+                        type: "boolean"
+                        description: "Indicates if the container server is ready"
+                      gitBranchName:
+                        type: "string"
+                        description: "Git branch name used for the build"
+                      usage:
+                        type: "object"
+                        additionalProperties:
+                          type: "number"
+                        description: "Resource usage metrics"
+                      usageTotalUsd:
+                        type: "number"
+                        description: "Total usage cost in USD"
+                      usageUsd:
+                        type: "object"
+                        additionalProperties:
+                          type: "number"
+                        description: "Cost breakdown per resource type in USD"
+                      metamorphs:
+                        type: "array"
+                        description: "List of metamorph operations"
+                        items:
+                          type: "object"
+                          properties:
+                            createdAt:
+                              type: "string"
+                              format: "date-time"
+                              description: "Timestamp when metamorph was created"
+                            actorId:
+                              type: "string"
+                              description: "Identifier of the actor"
+                            buildId:
+                              type: "string"
+                              description: "Identifier of the build"
+                            inputKey:
+                              type: "string"
+                              description: "Input key used for metamorph"
 components:
   securitySchemes:
     bearerAuth:
