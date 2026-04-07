@@ -30,13 +30,26 @@ public interface PropertyService {
 
     void delete(String key, Scope scope, @Nullable Long scopeId);
 
+    void delete(String key, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);
+
     Optional<Property> fetchProperty(String key, Scope scope, @Nullable Long scopeId);
+
+    Optional<Property> fetchProperty(String key, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);
 
     Property getProperty(String key, Scope scope, @Nullable Long scopeId);
 
+    Property getProperty(String key, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);
+
     List<Property> getProperties(List<String> keys, Scope scope, @Nullable Long scopeId);
+
+    List<Property> getProperties(
+        List<String> keys, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);
 
     void save(String key, Map<String, ?> value, Scope scope, @Nullable Long scopeId);
 
+    void save(String key, Map<String, ?> value, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);
+
     void update(String key, boolean enabled, Scope scope, @Nullable Long scopeId);
+
+    void update(String key, boolean enabled, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);
 }

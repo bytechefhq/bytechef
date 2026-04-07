@@ -45,22 +45,22 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
-    public void deleteAiProvider(int id) {
+    public void deleteAiProvider(int id, int environment) {
         Provider provider = getProvider(id);
 
-        propertyService.delete(provider.getKey(), Scope.PLATFORM, null);
+        propertyService.delete(provider.getKey(), Scope.PLATFORM, null, environment);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<AiProviderDTO> getAiProviders() {
+    public List<AiProviderDTO> getAiProviders(int environment) {
         List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
         List<Property> properties = propertyService.getProperties(
             Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
-            Scope.PLATFORM, null);
+            Scope.PLATFORM, null, environment);
 
         return Arrays.stream(Provider.values())
             .map(provider -> {
@@ -99,17 +99,17 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
-    public void updateAiProvider(int id, boolean enabled) {
+    public void updateAiProvider(int id, boolean enabled, int environment) {
         Provider provider = getProvider(id);
 
-        propertyService.update(provider.getKey(), enabled, Scope.PLATFORM, null);
+        propertyService.update(provider.getKey(), enabled, Scope.PLATFORM, null, environment);
     }
 
     @Override
-    public void updateAiProvider(int id, String apiKey) {
+    public void updateAiProvider(int id, String apiKey, int environment) {
         Provider provider = getProvider(id);
 
-        propertyService.save(provider.getKey(), Map.of("apiKey", apiKey), Scope.PLATFORM, null);
+        propertyService.save(provider.getKey(), Map.of("apiKey", apiKey), Scope.PLATFORM, null, environment);
     }
 
     private static Provider getProvider(int id) {

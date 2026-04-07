@@ -18,6 +18,13 @@ paths:
       tags:
         - "ai-provider"
       operationId: "getAiProviders"
+      parameters:
+        - name: "environment"
+          description: "The environment of an AI provider."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
       responses:
         "200":
           description: "The list of AI providers."
@@ -41,6 +48,12 @@ paths:
           required: true
           schema:
             type: "integer"
+        - name: "environment"
+          description: "The environment of an AI provider."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
       responses:
         "204":
           description: "Successful operation."
@@ -54,6 +67,12 @@ paths:
         - name: "id"
           description: "The id of an AI provider."
           in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "environment"
+          description: "The environment of an AI provider."
+          in: "query"
           required: true
           schema:
             type: "integer"
@@ -90,6 +109,12 @@ paths:
           required: true
           schema:
             type: "boolean"
+        - name: "environment"
+          description: "The environment of an AI provider."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
       responses:
         "204":
           description: "Successful operation."

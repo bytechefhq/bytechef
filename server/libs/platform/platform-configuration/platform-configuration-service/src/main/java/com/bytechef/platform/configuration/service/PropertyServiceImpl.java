@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
 import java.util.List;
@@ -39,41 +38,82 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void delete(String key, Property.Scope scope, Long scopeId) {
-        if (scopeId == null) {
-            propertyRepository.findByKeyAndScope(key, scope.ordinal())
-                .ifPresent(propertyRepository::delete);
-        } else {
-            propertyRepository.findByKeyAndScopeAndScopeId(key, scope.ordinal(), scopeId)
-                .ifPresent(propertyRepository::delete);
-        }
+        delete(key, scope, scopeId, null);
+    }
+
+    @Override
+    public void delete(String key, Property.Scope scope, Long scopeId, @Nullable Long environmentId) {
+        fetchProperty(key, scope, scopeId, environmentId)
+            .ifPresent(propertyRepository::delete);
     }
 
     @Override
     public Optional<Property> fetchProperty(String key, Property.Scope scope, @Nullable Long scopeId) {
-        if (scopeId == null) {
+        return fetchProperty(key, scope, scopeId, null);
+    }
+
+    @Override
+    public Optional<Property> fetchProperty(
+        String key, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
+        if (scopeId == null && environmentId == null) {
             return propertyRepository.findByKeyAndScope(key, scope.ordinal());
-        } else {
+        } else if (scopeId == null) {
+            return propertyRepository.findByKeyAndScopeAndEnvironment(key, scope.ordinal(), environmentId.intValue());
+        } else if (environmentId == null) {
             return propertyRepository.findByKeyAndScopeAndScopeId(key, scope.ordinal(), scopeId);
+        } else {
+            return propertyRepository.findByKeyAndScopeAndScopeIdAndEnvironment(
+                key, scope.ordinal(), scopeId, environmentId.intValue());
         }
     }
 
     @Override
     public Property getProperty(String key, Property.Scope scope, @Nullable Long scopeId) {
-        return OptionalUtils.get(fetchProperty(key, scope, scopeId));
+        return fetchProperty(key, scope, scopeId)
+            .orElseThrow(() -> new IllegalArgumentException("Property not found: " + key));
+    }
+
+    @Override
+    public Property getProperty(
+        String key, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
+        return fetchProperty(key, scope, scopeId, environmentId)
+            .orElseThrow(() -> new IllegalArgumentException("Property not found: " + key));
     }
 
     @Override
     public List<Property> getProperties(List<String> keys, Property.Scope scope, @Nullable Long scopeId) {
-        if (scopeId == null) {
+        return getProperties(keys, scope, scopeId, null);
+    }
+
+    @Override
+    public List<Property> getProperties(
+        List<String> keys, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
+        if (scopeId == null && environmentId == null) {
             return propertyRepository.findAllByKeyInAndScope(keys, scope.ordinal());
-        } else {
+        } else if (scopeId == null) {
+            return propertyRepository.findAllByKeyInAndScopeAndEnvironment(
+                keys, scope.ordinal(), environmentId.intValue());
+        } else if (environmentId == null) {
             return propertyRepository.findAllByKeyInAndScopeAndScopeId(keys, scope.ordinal(), scopeId);
+        } else {
+            return propertyRepository.findAllByKeyInAndScopeAndScopeIdAndEnvironment(
+                keys, scope.ordinal(), scopeId, environmentId.intValue());
         }
     }
 
     @Override
     public void save(String key, Map<String, ?> value, Property.Scope scope, @Nullable Long scopeId) {
-        fetchProperty(key, scope, scopeId)
+        save(key, value, scope, scopeId, null);
+    }
+
+    @Override
+    public void save(
+        String key, Map<String, ?> value, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
+        fetchProperty(key, scope, scopeId, environmentId)
             .ifPresentOrElse(property -> {
                 property.setValue(value);
 
@@ -82,6 +122,11 @@ public class PropertyServiceImpl implements PropertyService {
                 Property property = new Property();
 
                 property.setEnabled(true);
+
+                if (environmentId != null) {
+                    property.setEnvironment(environmentId.intValue());
+                }
+
                 property.setKey(key);
                 property.setScope(scope);
                 property.setScopeId(scopeId);
@@ -93,11 +138,18 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void update(String key, boolean enabled, Property.Scope scope, @Nullable Long scopeId) {
-        fetchProperty(key, scope, scopeId)
-            .ifPresent(properties -> {
-                properties.setEnabled(enabled);
+        update(key, enabled, scope, scopeId, null);
+    }
 
-                propertyRepository.save(properties);
+    @Override
+    public void update(
+        String key, boolean enabled, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
+        fetchProperty(key, scope, scopeId, environmentId)
+            .ifPresent(property -> {
+                property.setEnabled(enabled);
+
+                propertyRepository.save(property);
             });
     }
 }
