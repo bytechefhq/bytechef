@@ -69,7 +69,8 @@ public class TaskTools {
     @Tool(
         description = "Get detailed information about a specific task (action, trigger, taskDispatcher, or clusterElement). Returns comprehensive task information based on the type parameter")
     public TaskInfo getTask(
-        @ToolParam(description = "The type of task: 'action', 'trigger', 'taskDispatcher', or 'clusterElement'") String type,
+        @ToolParam(
+            description = "The type of task: 'action', 'trigger', 'taskDispatcher', or 'clusterElement'") String type,
         @ToolParam(description = "The name of the task to retrieve") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
@@ -136,7 +137,8 @@ public class TaskTools {
     @Tool(
         description = "Get all properties of a specific task (action, trigger, or taskDispatcher). Returns a hierarchical list of properties including nested properties")
     public List<PropertyInfo> getTaskProperties(
-        @ToolParam(description = "The type of task: 'action', 'trigger', 'taskDispatcher', 'clusterElement'") String type,
+        @ToolParam(
+            description = "The type of task: 'action', 'trigger', 'taskDispatcher', 'clusterElement'") String type,
         @ToolParam(description = "The name of the task to retrieve properties for") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
@@ -408,7 +410,8 @@ public class TaskTools {
         description = "Validate a task configuration by checking both its structure and properties against the task definition. Returns validation results with any errors found")
     public TaskValidationResult validateTask(
         @ToolParam(description = "The JSON string of the task to validate") String task,
-        @ToolParam(description = "The type of task: 'action', 'trigger', 'taskDispatcher' or 'clusterElement'") String type,
+        @ToolParam(
+            description = "The type of task: 'action', 'trigger', 'taskDispatcher' or 'clusterElement'") String type,
         @ToolParam(description = "The name of the task for validation") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
@@ -458,7 +461,7 @@ public class TaskTools {
         @JsonProperty("type") @JsonPropertyDescription("The type of the task: action, trigger, or taskDispatcher") String type,
         @JsonProperty("componentName") @JsonPropertyDescription("The name of the component (null for taskDispatchers)") String componentName,
         @JsonProperty("properties") @JsonPropertyDescription("The properties of the task as JSON string") String properties,
-        @JsonProperty("clusterElements") @JsonPropertyDescription("The cluster elements defined in the action. Value contains information on containing multiple elements") Map<String, Boolean> clusterElements,
+        @JsonProperty("clusterElements") @JsonPropertyDescription("The cluster elements defined in the action. Value contains information on containing multiple elements") Map<String, String> clusterElements,
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the task as JSON string") String outputProperties) {
     }
 

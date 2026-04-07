@@ -8,7 +8,7 @@ Unless stated otherwise, assume all questions and suggestions are about the task
 
 2. **Discovery Phase** - Find the right tasks:
    - `getClusterElementsInstructions()` - Get the instructions for finding cluster elements
-   - `searchActions(query, type)` - Search actions by keywords
+   - `searchActions(query)` - Search actions by keywords
    - `getAction(componentName, actionName, version)` - Detailed actions that contains all cluster element types
    - `searchClusterElements(clusterElementType)` - Retrieve all possible options for the cluster element type
 

@@ -14,16 +14,15 @@ import com.agui.core.message.SystemMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
-import org.springframework.ai.chat.client.advisor.api.Advisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.tool.ToolCallback;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.tool.ToolCallback;
 
 /**
  * @version ee
@@ -52,7 +51,8 @@ public class ClusterElementSpringAIAgent extends SpringAIAgent {
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
         Map<?, ?> parameters = (Map<?, ?>) state.get("parameters");
 
-        String componentName = "Name of the task that is to be modified: " + parameters.get("componentName").toString();
+        String taskName = "Name of the task that is to be modified: " + parameters.get("taskName")
+            .toString();
 
         List<String> contextStrings = contexts.stream()
             .map(Context::toString)
@@ -62,7 +62,7 @@ public class ClusterElementSpringAIAgent extends SpringAIAgent {
             ? this.systemMessageProvider.apply(this) : this.systemMessage;
 
         String message = "%s%n%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
-            resolvedMessage, componentName, ADDITIONAL_RULES, state, String.join("\n", contextStrings));
+            resolvedMessage, taskName, ADDITIONAL_RULES, state, String.join("\n", contextStrings));
 
         SystemMessage systemMessage = new SystemMessage();
 

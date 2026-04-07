@@ -158,6 +158,7 @@ public class ComponentTools {
             return new ComponentInfo(
                 componentDefinition.getName(),
                 componentDefinition.getDescription(),
+                componentDefinition.getVersion(),
                 componentDefinition.getComponentCategories()
                     .stream()
                     .map(ComponentCategory::getName)
@@ -433,13 +434,10 @@ public class ComponentTools {
                         outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
                     }
 
-                    Map<String, Boolean> clusterElementTypeKeys = null;
-                    if (componentDefinition.isClusterElement()) {
-                        clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
-                            .stream()
-                            .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key,
-                                ClusterElementDefinition.ClusterElementType::multipleElements));
-                    }
+                    Map<String, String> clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
+                        .stream()
+                        .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key,
+                            (clusterElementType) -> clusterElementType.multipleElements() ? "array" : "object"));
 
                     return new ActionDetailedInfo(
                         action.getName(), action.getTitle(), action.getDescription(), componentDefinition.getName(),
@@ -460,22 +458,57 @@ public class ComponentTools {
 
     @Tool(
         description = "Search components that support a specific cluster element type. Returns a list of components that have cluster elements matching the given cluster element type key")
-    public List<ComponentMinimalInfo> searchClusterElements(
+    public List<ComponentInfo> searchClusterElements(
         @ToolParam(
-            description = "The cluster element type key to search for in snake_case") String clusterElementType) {
+            description = "The cluster element type key to search for in snake_case") String clusterElementType,
+        @ToolParam(
+            required = false,
+            description = "Filter results by the name of the component. Default is null") String componentName) {
 
         try {
             List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
-            List<ComponentMinimalInfo> matchingComponents = componentDefinitions.stream()
+            List<ComponentInfo> matchingComponents = componentDefinitions.stream()
                 .filter(component -> !component.getClusterElements()
                     .isEmpty())
                 .filter(component -> component.getClusterElements()
                     .stream()
-                    .anyMatch(clusterElement -> clusterElement.getName()
-                        .equals(clusterElementType)))
-                .map(component -> new ComponentMinimalInfo(
-                    component.getName(), component.getDescription(), component.getVersion()))
+                    .anyMatch(clusterElement -> {
+                        if (componentName == null || componentName.isEmpty()) {
+                            return clusterElement.getName()
+                                .equals(clusterElementType)
+                                || clusterElement.getType()
+                                    .key()
+                                    .equals(clusterElementType)
+                                || clusterElement.getType()
+                                    .name()
+                                    .toLowerCase()
+                                    .equals(clusterElementType);
+                        }
+
+                        return clusterElement.getName()
+                            .equals(clusterElementType)
+                            || ((clusterElement.getType()
+                                .key()
+                                .equals(clusterElementType)
+                                || clusterElement.getType()
+                                    .name()
+                                    .toLowerCase()
+                                    .equals(clusterElementType))
+                                && clusterElement.getComponentName()
+                                    .equals(componentName));
+                    }))
+                .map(component -> new ComponentInfo(
+                    component.getName(),
+                    component.getDescription(),
+                    component.getVersion(),
+                    null,
+                    null,
+                    component.getClusterElements()
+                        .stream()
+                        .map(com.bytechef.platform.component.domain.ClusterElementDefinition::getName)
+                        .toList(),
+                    null))
                 .toList();
 
             if (logger.isDebugEnabled()) {
@@ -515,12 +548,12 @@ public class ComponentTools {
                         outputPropertiesJson = ToolUtils.generateOutputPropertiesJson(outputResponse.outputSchema());
                     }
 
-                    Map<String, Boolean> clusterElementTypeKeys = null;
+                    Map<String, String> clusterElementTypeKeys = null;
                     if (componentDefinition.isClusterElement()) {
                         clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
                             .stream()
                             .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key,
-                                ClusterElementDefinition.ClusterElementType::multipleElements));
+                                (clusterElementType) -> clusterElementType.multipleElements() ? "array" : "object"));
                     }
 
                     return new ActionDetailedInfo(
@@ -838,7 +871,7 @@ public class ComponentTools {
         @JsonProperty("description") @JsonPropertyDescription("The description of the action") String description,
         @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this action") String componentName,
         @JsonProperty("properties") @JsonPropertyDescription("The properties defined in the action") String properties,
-        @JsonProperty("clusterElements") @JsonPropertyDescription("The cluster elements defined in the action. Value contains information on containing multiple elements") Map<String, Boolean> clusterElements,
+        @JsonProperty("clusterElements") @JsonPropertyDescription("The cluster elements defined in the action. Value contains information on containing multiple elements") Map<String, String> clusterElements,
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the action (if output is defined)") String outputProperties) {
     }
 
@@ -856,6 +889,7 @@ public class ComponentTools {
     public record ComponentInfo(
         @JsonProperty("name") @JsonPropertyDescription("The name of the component") String name,
         @JsonProperty("description") @JsonPropertyDescription("The description of the component") String description,
+        @JsonProperty("version") @JsonPropertyDescription("The version of the component") int version,
         @JsonProperty("categories") @JsonPropertyDescription("The categories that the component belongs to") List<String> category,
         @JsonProperty("triggers") @JsonPropertyDescription("Triggers that are defined in the component") List<String> triggers,
         @JsonProperty("actions") @JsonPropertyDescription("Actions that are defined in the component") List<String> actions,
