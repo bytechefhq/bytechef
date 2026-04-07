@@ -2648,6 +2648,7 @@ export type QueryComponentDefinitionVersionsArgs = {
 
 export type QueryComponentDefinitionsArgs = {
   actionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
+  clusterElementDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
   connectionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
   include?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   triggerDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
