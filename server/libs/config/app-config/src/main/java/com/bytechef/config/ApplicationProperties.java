@@ -1307,26 +1307,53 @@ public class ApplicationProperties {
                  */
                 public static class Options {
 
+                    public enum Setting {
+                        NONE,
+                        LOW,
+                        MEDIUM,
+                        HIGH
+                    }
+
                     /** Chat model name (e.g., gpt-4, gpt-3.5-turbo) */
                     private String model;
 
                     /** Temperature for response randomness (0.0-2.0) */
                     private Double temperature;
 
+                    private Setting reasoningEffect = Setting.NONE;
+
+                    private Setting verbosity = Setting.LOW;
+
                     public String getModel() {
                         return model;
-                    }
-
-                    public void setModel(String model) {
-                        this.model = model;
                     }
 
                     public Double getTemperature() {
                         return temperature;
                     }
 
+                    public Setting getReasoningEffect() {
+                        return reasoningEffect;
+                    }
+
+                    public Setting getVerbosity() {
+                        return verbosity;
+                    }
+
+                    public void setModel(String model) {
+                        this.model = model;
+                    }
+
                     public void setTemperature(Double temperature) {
                         this.temperature = temperature;
+                    }
+
+                    public void setReasoningEffect(Setting setting) {
+                        this.reasoningEffect = setting;
+                    }
+
+                    public void setVerbosity(Setting setting) {
+                        this.verbosity = setting;
                     }
                 }
             }
