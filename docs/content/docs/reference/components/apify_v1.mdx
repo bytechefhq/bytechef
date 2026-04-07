@@ -87,8 +87,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING | The ID of the newly created opportunity. |
-| name | STRING | The name of the newly created opportunity. |
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(actId), STRING\(userId), STRING\(actorTaskId), DATE_TIME\(startedAt), DATE_TIME\(finishedAt), STRING\(status), STRING\(statusMessage), BOOLEAN\(isStatusMessageTerminal), &#123;STRING\(origin), STRING\(clientIp), STRING\(userAgent), STRING\(scheduleId), DATE_TIME\(scheduledAt)&#125;\(meta), &#123;NUMBER\(apifyMarginPercentage), DATE_TIME\(createdAt), DATE_TIME\(startedAt), DATE_TIME\(notifiedAboutFutureChangeAt), DATE_TIME\(notifiedAboutChangeAt), STRING\(reasonForChange), STRING\(pricingModel), &#123;&#123;&#125;\(actorChargeEvents)&#125;\(pricingPerEvent), NUMBER\(minimalMaxTotalChargeUsd)&#125;\(pricingInfo), &#123;INTEGER\(inputBodyLen), INTEGER\(migrationCount), INTEGER\(rebootCount), INTEGER\(restartCount), INTEGER\(resurrectCount), NUMBER\(memAvgBytes), NUMBER\(memMaxBytes), NUMBER\(memCurrentBytes), NUMBER\(cpuAvgUsage), NUMBER\(cpuMaxUsage), NUMBER\(cpuCurrentUsage), NUMBER\(netRxBytes), NUMBER\(netTxBytes), INTEGER\(durationMillis), NUMBER\(runTimeSecs), INTEGER\(metamorph), NUMBER\(computeUnits)&#125;\(stats), &#123;&#125;\(chargedEventCounts), &#123;STRING\(build), INTEGER\(timeoutSecs), INTEGER\(memoryMbytes), INTEGER\(diskMbytes), INTEGER\(maxItems), NUMBER\(maxTotalChargeUsd)&#125;\(options), STRING\(buildId), INTEGER\(exitCode), STRING\(generalAccess), STRING\(defaultKeyValueStoreId), STRING\(defaultDatasetId), STRING\(defaultRequestQueueId), &#123;&#123;STRING\(default)&#125;\(datasets), &#123;STRING\(default)&#125;\(keyValueStores), &#123;STRING\(default)&#125;\(requestQueues)&#125;\(storageIds), STRING\(buildNumber), STRING\(containerUrl), BOOLEAN\(isContainerServerReady), STRING\(gitBranchName), &#123;&#125;\(usage), NUMBER\(usageTotalUsd), &#123;&#125;\(usageUsd), [&#123;DATE_TIME\(createdAt), STRING\(actorId), STRING\(buildId), STRING\(inputKey)&#125;]\(metamorphs)&#125; </details> | Main run object containing execution details |
 
 
 
@@ -96,8 +95,95 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "id" : "",
-  "name" : ""
+  "data" : {
+    "id" : "",
+    "actId" : "",
+    "userId" : "",
+    "actorTaskId" : "",
+    "startedAt" : "2021-01-01T00:00:00",
+    "finishedAt" : "2021-01-01T00:00:00",
+    "status" : "",
+    "statusMessage" : "",
+    "isStatusMessageTerminal" : false,
+    "meta" : {
+      "origin" : "",
+      "clientIp" : "",
+      "userAgent" : "",
+      "scheduleId" : "",
+      "scheduledAt" : "2021-01-01T00:00:00"
+    },
+    "pricingInfo" : {
+      "apifyMarginPercentage" : 0.0,
+      "createdAt" : "2021-01-01T00:00:00",
+      "startedAt" : "2021-01-01T00:00:00",
+      "notifiedAboutFutureChangeAt" : "2021-01-01T00:00:00",
+      "notifiedAboutChangeAt" : "2021-01-01T00:00:00",
+      "reasonForChange" : "",
+      "pricingModel" : "",
+      "pricingPerEvent" : {
+        "actorChargeEvents" : { }
+      },
+      "minimalMaxTotalChargeUsd" : 0.0
+    },
+    "stats" : {
+      "inputBodyLen" : 1,
+      "migrationCount" : 1,
+      "rebootCount" : 1,
+      "restartCount" : 1,
+      "resurrectCount" : 1,
+      "memAvgBytes" : 0.0,
+      "memMaxBytes" : 0.0,
+      "memCurrentBytes" : 0.0,
+      "cpuAvgUsage" : 0.0,
+      "cpuMaxUsage" : 0.0,
+      "cpuCurrentUsage" : 0.0,
+      "netRxBytes" : 0.0,
+      "netTxBytes" : 0.0,
+      "durationMillis" : 1,
+      "runTimeSecs" : 0.0,
+      "metamorph" : 1,
+      "computeUnits" : 0.0
+    },
+    "chargedEventCounts" : { },
+    "options" : {
+      "build" : "",
+      "timeoutSecs" : 1,
+      "memoryMbytes" : 1,
+      "diskMbytes" : 1,
+      "maxItems" : 1,
+      "maxTotalChargeUsd" : 0.0
+    },
+    "buildId" : "",
+    "exitCode" : 1,
+    "generalAccess" : "",
+    "defaultKeyValueStoreId" : "",
+    "defaultDatasetId" : "",
+    "defaultRequestQueueId" : "",
+    "storageIds" : {
+      "datasets" : {
+        "default" : ""
+      },
+      "keyValueStores" : {
+        "default" : ""
+      },
+      "requestQueues" : {
+        "default" : ""
+      }
+    },
+    "buildNumber" : "",
+    "containerUrl" : "",
+    "isContainerServerReady" : false,
+    "gitBranchName" : "",
+    "usage" : { },
+    "usageTotalUsd" : 0.0,
+    "usageUsd" : { },
+    "metamorphs" : [ {
+      "createdAt" : "2021-01-01T00:00:00",
+      "actorId" : "",
+      "buildId" : "",
+      "inputKey" : ""
+    } ]
+  }
 }
 ```
 
@@ -131,10 +217,158 @@ Name: startActor
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(actId), STRING\(userId), STRING\(actorTaskId), STRING\(startedAt), STRING\(finishedAt), STRING\(status), STRING\(statusMessage), BOOLEAN\(isStatusMessageTerminal), &#123;STRING\(origin), STRING\(clientIp), STRING\(userAgent), STRING\(scheduleId), STRING\(scheduledAt)&#125;\(meta), &#123;NUMBER\(apifyMarginPercentage), STRING\(createdAt), STRING\(startedAt), STRING\(notifiedAboutFutureChangeAt), STRING\(notifiedAboutChangeAt), STRING\(reasonForChange), STRING\(pricingModel), &#123;&#123;&#125;\(actorChargeEvents)&#125;\(pricingPerEvent), NUMBER\(minimalMaxTotalChargeUsd)&#125;\(pricingInfo), &#123;INTEGER\(inputBodyLen), INTEGER\(migrationCount), INTEGER\(rebootCount), INTEGER\(restartCount), INTEGER\(resurrectCount), NUMBER\(memAvgBytes), NUMBER\(memMaxBytes), NUMBER\(memCurrentBytes), NUMBER\(cpuAvgUsage), NUMBER\(cpuMaxUsage), NUMBER\(cpuCurrentUsage), NUMBER\(netRxBytes), NUMBER\(netTxBytes), INTEGER\(durationMillis), NUMBER\(runTimeSecs), INTEGER\(metamorph), NUMBER\(computeUnits)&#125;\(stats), &#123;INTEGER\(actor-start), INTEGER\(page-crawled), INTEGER\(data-extracted)&#125;\(chargedEventCounts), &#123;STRING\(build), INTEGER\(timeoutSecs), INTEGER\(memoryMbytes), INTEGER\(diskMbytes), INTEGER\(maxItems), NUMBER\(maxTotalChargeUsd)&#125;\(options), STRING\(buildId), INTEGER\(exitCode), STRING\(generalAccess), STRING\(defaultKeyValueStoreId), STRING\(defaultDatasetId), STRING\(defaultRequestQueueId), &#123;&#123;STRING\(default)&#125;\(datasets), &#123;STRING\(default)&#125;\(keyValueStores), &#123;STRING\(default)&#125;\(requestQueues)&#125;\(storageIds), STRING\(buildNumber), STRING\(containerUrl), BOOLEAN\(isContainerServerReady), STRING\(gitBranchName), &#123;INTEGER\(ACTOR_COMPUTE_UNITS), INTEGER\(DATASET_READS), INTEGER\(DATASET_WRITES), INTEGER\(KEY_VALUE_STORE_READS), INTEGER\(KEY_VALUE_STORE_WRITES), INTEGER\(KEY_VALUE_STORE_LISTS), INTEGER\(REQUEST_QUEUE_READS), INTEGER\(REQUEST_QUEUE_WRITES), INTEGER\(DATA_TRANSFER_INTERNAL_GBYTES), INTEGER\(DATA_TRANSFER_EXTERNAL_GBYTES), INTEGER\(PROXY_RESIDENTIAL_TRANSFER_GBYTES), INTEGER\(PROXY_SERPS)&#125;\(usage), NUMBER\(usageTotalUsd), &#123;INTEGER\(ACTOR_COMPUTE_UNITS), INTEGER\(DATASET_READS), INTEGER\(DATASET_WRITES), INTEGER\(KEY_VALUE_STORE_READS), INTEGER\(KEY_VALUE_STORE_WRITES), INTEGER\(KEY_VALUE_STORE_LISTS), INTEGER\(REQUEST_QUEUE_READS), INTEGER\(REQUEST_QUEUE_WRITES), INTEGER\(DATA_TRANSFER_INTERNAL_GBYTES), INTEGER\(DATA_TRANSFER_EXTERNAL_GBYTES), INTEGER\(PROXY_RESIDENTIAL_TRANSFER_GBYTES), INTEGER\(PROXY_SERPS)&#125;\(usageUsd), [&#123;STRING\(createdAt), STRING\(actorId), STRING\(buildId), STRING\(inputKey)&#125;]\(metamorphs)&#125; </details> | Main run object containing execution details |
 
 
 
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "actId" : "",
+    "userId" : "",
+    "actorTaskId" : "",
+    "startedAt" : "",
+    "finishedAt" : "",
+    "status" : "",
+    "statusMessage" : "",
+    "isStatusMessageTerminal" : false,
+    "meta" : {
+      "origin" : "",
+      "clientIp" : "",
+      "userAgent" : "",
+      "scheduleId" : "",
+      "scheduledAt" : ""
+    },
+    "pricingInfo" : {
+      "apifyMarginPercentage" : 0.0,
+      "createdAt" : "",
+      "startedAt" : "",
+      "notifiedAboutFutureChangeAt" : "",
+      "notifiedAboutChangeAt" : "",
+      "reasonForChange" : "",
+      "pricingModel" : "",
+      "pricingPerEvent" : {
+        "actorChargeEvents" : { }
+      },
+      "minimalMaxTotalChargeUsd" : 0.0
+    },
+    "stats" : {
+      "inputBodyLen" : 1,
+      "migrationCount" : 1,
+      "rebootCount" : 1,
+      "restartCount" : 1,
+      "resurrectCount" : 1,
+      "memAvgBytes" : 0.0,
+      "memMaxBytes" : 0.0,
+      "memCurrentBytes" : 0.0,
+      "cpuAvgUsage" : 0.0,
+      "cpuMaxUsage" : 0.0,
+      "cpuCurrentUsage" : 0.0,
+      "netRxBytes" : 0.0,
+      "netTxBytes" : 0.0,
+      "durationMillis" : 1,
+      "runTimeSecs" : 0.0,
+      "metamorph" : 1,
+      "computeUnits" : 0.0
+    },
+    "chargedEventCounts" : {
+      "actor-start" : 1,
+      "page-crawled" : 1,
+      "data-extracted" : 1
+    },
+    "options" : {
+      "build" : "",
+      "timeoutSecs" : 1,
+      "memoryMbytes" : 1,
+      "diskMbytes" : 1,
+      "maxItems" : 1,
+      "maxTotalChargeUsd" : 0.0
+    },
+    "buildId" : "",
+    "exitCode" : 1,
+    "generalAccess" : "",
+    "defaultKeyValueStoreId" : "",
+    "defaultDatasetId" : "",
+    "defaultRequestQueueId" : "",
+    "storageIds" : {
+      "datasets" : {
+        "default" : ""
+      },
+      "keyValueStores" : {
+        "default" : ""
+      },
+      "requestQueues" : {
+        "default" : ""
+      }
+    },
+    "buildNumber" : "",
+    "containerUrl" : "",
+    "isContainerServerReady" : false,
+    "gitBranchName" : "",
+    "usage" : {
+      "ACTOR_COMPUTE_UNITS" : 1,
+      "DATASET_READS" : 1,
+      "DATASET_WRITES" : 1,
+      "KEY_VALUE_STORE_READS" : 1,
+      "KEY_VALUE_STORE_WRITES" : 1,
+      "KEY_VALUE_STORE_LISTS" : 1,
+      "REQUEST_QUEUE_READS" : 1,
+      "REQUEST_QUEUE_WRITES" : 1,
+      "DATA_TRANSFER_INTERNAL_GBYTES" : 1,
+      "DATA_TRANSFER_EXTERNAL_GBYTES" : 1,
+      "PROXY_RESIDENTIAL_TRANSFER_GBYTES" : 1,
+      "PROXY_SERPS" : 1
+    },
+    "usageTotalUsd" : 0.0,
+    "usageUsd" : {
+      "ACTOR_COMPUTE_UNITS" : 1,
+      "DATASET_READS" : 1,
+      "DATASET_WRITES" : 1,
+      "KEY_VALUE_STORE_READS" : 1,
+      "KEY_VALUE_STORE_WRITES" : 1,
+      "KEY_VALUE_STORE_LISTS" : 1,
+      "REQUEST_QUEUE_READS" : 1,
+      "REQUEST_QUEUE_WRITES" : 1,
+      "DATA_TRANSFER_INTERNAL_GBYTES" : 1,
+      "DATA_TRANSFER_EXTERNAL_GBYTES" : 1,
+      "PROXY_RESIDENTIAL_TRANSFER_GBYTES" : 1,
+      "PROXY_SERPS" : 1
+    },
+    "metamorphs" : [ {
+      "createdAt" : "",
+      "actorId" : "",
+      "buildId" : "",
+      "inputKey" : ""
+    } ]
+  }
+}
+```
+
+#### Find Body of the Apify Actor
+
+1. Go to your [Apify console](https://console.apify.com/)
+2. Click on **Actors**
+3. Click on **Actor** you want to find Body JSON of
+4. In **Source** tab click on **Input**
+5. Fill out form with your desired inputs
+6. Click on **JSON**
+7. Copy JSON and paste it to the **ByteChef**
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/Opp6gpX3a1GE6QaKO23p?type=1&scrollType=0&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
 
 
 
