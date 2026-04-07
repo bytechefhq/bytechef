@@ -485,6 +485,7 @@ WorkflowNodeContent.displayName = 'WorkflowNodeContent';
 
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
+    const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
     const [renameValue, setRenameValue] = useState('');
     const [switchPopoverOpen, setSwitchPopoverOpen] = useState(false);
 
@@ -506,7 +507,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
     const {
         clusterElementsCanvasOpen,
-        contextMenuOpen,
         copiedNode,
         copiedWorkflowId,
         mainClusterRootComponentDefinition,
@@ -520,7 +520,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
-            contextMenuOpen: state.contextMenuOpen,
             copiedNode: state.copiedNode,
             copiedWorkflowId: state.copiedWorkflowId,
             mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
@@ -698,7 +697,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const handleCopyNode = () => {
         setTimeout(() => {
-            setCopiedNode(data);
+            setCopiedNode({...data, label: nodeLabel ?? data.label});
             setCopiedWorkflowId(workflow.id);
         }, 200);
     };
@@ -715,7 +714,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const isRenaming = renamingNodeName === data.name;
 
-    const suppressHover = contextMenuOpen || isRenaming || switchPopoverOpen;
+    const suppressHover = isContextMenuOpen || isRenaming || switchPopoverOpen;
 
     const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
 
@@ -764,6 +763,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 canPaste={canPaste}
                 data={data}
                 hasSavedPosition={!!hasSavedNodePosition}
+                onContextMenuOpenChange={setIsContextMenuOpen}
                 onCopy={handleCopyNode}
                 onDelete={() => handleDeleteNodeClick(data)}
                 onPaste={handlePasteNode}
