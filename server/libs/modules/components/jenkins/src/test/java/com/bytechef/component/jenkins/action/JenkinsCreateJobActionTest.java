@@ -19,6 +19,7 @@ package com.bytechef.component.jenkins.action;
 import static com.bytechef.component.jenkins.constant.JenkinsConstants.CONFIG_XML;
 import static com.bytechef.component.jenkins.constant.JenkinsConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
@@ -26,9 +27,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -51,9 +50,8 @@ class JenkinsCreateJobActionTest {
 
     @Test
     void testPerform(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -69,10 +67,7 @@ class JenkinsCreateJobActionTest {
         assertEquals(
             List.of("/createItem", "Content-Type", "application/xml", NAME, "name"),
             stringArgumentCaptor.getAllValues());
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals("application/xml", body.getMimeType());
-        assertEquals("configXml", body.getContent());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(Body.of("configXml", "application/xml"), bodyArgumentCaptor.getValue());
     }
 }
