@@ -84,7 +84,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 .filter(({actionsCount}) => actionsCount && actionsCount > 0)
                 .filter(
                     ({name}) =>
-                        ((!ff_732 && name !== 'hitl') || ff_732) &&
+                        ((!ff_732 && name !== 'approval') || ff_732) &&
                         ((!ff_797 && name !== 'dataStream') || ff_797) &&
                         ((!ff_1652 && name !== 'aiAgent') || ff_1652) &&
                         (((!ff_4000 || !knowledgeBaseEnabled) && name !== 'knowledgeBase') ||

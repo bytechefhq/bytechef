@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.hitl.constant;
+package com.bytechef.component.approval.constant;
 
 /**
  * @author Ivica Cardic
  */
-public class HitlConstants {
+public final class ApprovalConstants {
 
+    private ApprovalConstants() {
+    }
+
+    public static final String APPROVAL = "approval";
     public static final String DEFAULT_VALUE = "defaultValue";
     public static final String FIELD_DESCRIPTION = "fieldDescription";
     public static final String FIELD_LABEL = "fieldLabel";
@@ -29,7 +33,6 @@ public class HitlConstants {
     public static final String FIELD_TYPE = "fieldType";
     public static final String FORM_DESCRIPTION = "formDescription";
     public static final String FORM_TITLE = "formTitle";
-    public static final String HITL = "hitl";
     public static final String INPUTS = "inputs";
     public static final String MAX_SELECTION = "maxSelection";
     public static final String MIN_SELECTION = "minSelection";

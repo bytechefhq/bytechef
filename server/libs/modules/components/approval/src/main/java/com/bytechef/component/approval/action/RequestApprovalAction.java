@@ -14,8 +14,35 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.hitl.action;
+package com.bytechef.component.approval.action;
 
+import static com.bytechef.component.approval.constant.ApprovalConstants.DEFAULT_VALUE;
+import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_DESCRIPTION;
+import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_LABEL;
+import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_NAME;
+import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_OPTIONS;
+import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_TYPE;
+import static com.bytechef.component.approval.constant.ApprovalConstants.FORM_DESCRIPTION;
+import static com.bytechef.component.approval.constant.ApprovalConstants.FORM_TITLE;
+import static com.bytechef.component.approval.constant.ApprovalConstants.INPUTS;
+import static com.bytechef.component.approval.constant.ApprovalConstants.MAX_SELECTION;
+import static com.bytechef.component.approval.constant.ApprovalConstants.MIN_SELECTION;
+import static com.bytechef.component.approval.constant.ApprovalConstants.MULTIPLE_CHOICE;
+import static com.bytechef.component.approval.constant.ApprovalConstants.PLACEHOLDER;
+import static com.bytechef.component.approval.constant.ApprovalConstants.REQUIRED;
+import static com.bytechef.component.approval.util.FieldType.CHECKBOX;
+import static com.bytechef.component.approval.util.FieldType.CUSTOM_HTML;
+import static com.bytechef.component.approval.util.FieldType.DATETIME_PICKER;
+import static com.bytechef.component.approval.util.FieldType.DATE_PICKER;
+import static com.bytechef.component.approval.util.FieldType.EMAIL_INPUT;
+import static com.bytechef.component.approval.util.FieldType.FILE_INPUT;
+import static com.bytechef.component.approval.util.FieldType.HIDDEN_FIELD;
+import static com.bytechef.component.approval.util.FieldType.INPUT;
+import static com.bytechef.component.approval.util.FieldType.NUMBER_INPUT;
+import static com.bytechef.component.approval.util.FieldType.PASSWORD_INPUT;
+import static com.bytechef.component.approval.util.FieldType.RADIO;
+import static com.bytechef.component.approval.util.FieldType.SELECT;
+import static com.bytechef.component.approval.util.FieldType.TEXTAREA;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -24,44 +51,29 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
-import static com.bytechef.component.hitl.constant.HitlConstants.DEFAULT_VALUE;
-import static com.bytechef.component.hitl.constant.HitlConstants.FIELD_DESCRIPTION;
-import static com.bytechef.component.hitl.constant.HitlConstants.FIELD_LABEL;
-import static com.bytechef.component.hitl.constant.HitlConstants.FIELD_NAME;
-import static com.bytechef.component.hitl.constant.HitlConstants.FIELD_OPTIONS;
-import static com.bytechef.component.hitl.constant.HitlConstants.FIELD_TYPE;
-import static com.bytechef.component.hitl.constant.HitlConstants.FORM_DESCRIPTION;
-import static com.bytechef.component.hitl.constant.HitlConstants.FORM_TITLE;
-import static com.bytechef.component.hitl.constant.HitlConstants.INPUTS;
-import static com.bytechef.component.hitl.constant.HitlConstants.MAX_SELECTION;
-import static com.bytechef.component.hitl.constant.HitlConstants.MIN_SELECTION;
-import static com.bytechef.component.hitl.constant.HitlConstants.MULTIPLE_CHOICE;
-import static com.bytechef.component.hitl.constant.HitlConstants.PLACEHOLDER;
-import static com.bytechef.component.hitl.constant.HitlConstants.REQUIRED;
-import static com.bytechef.component.hitl.util.FieldType.CHECKBOX;
-import static com.bytechef.component.hitl.util.FieldType.CUSTOM_HTML;
-import static com.bytechef.component.hitl.util.FieldType.DATETIME_PICKER;
-import static com.bytechef.component.hitl.util.FieldType.DATE_PICKER;
-import static com.bytechef.component.hitl.util.FieldType.EMAIL_INPUT;
-import static com.bytechef.component.hitl.util.FieldType.FILE_INPUT;
-import static com.bytechef.component.hitl.util.FieldType.HIDDEN_FIELD;
-import static com.bytechef.component.hitl.util.FieldType.INPUT;
-import static com.bytechef.component.hitl.util.FieldType.NUMBER_INPUT;
-import static com.bytechef.component.hitl.util.FieldType.PASSWORD_INPUT;
-import static com.bytechef.component.hitl.util.FieldType.RADIO;
-import static com.bytechef.component.hitl.util.FieldType.SELECT;
-import static com.bytechef.component.hitl.util.FieldType.TEXTAREA;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Suspend;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class ApproveAction {
+public class RequestApprovalAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("approve")
-        .title("Approve")
+    private static final String FORM_URL = "formUrl";
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("requestApproval")
+        .title("Request Approval")
         .description("Sends an approval request and waits for a human to approve or reject.")
+        .perform(RequestApprovalAction::perform)
+        .resumePerform(RequestApprovalAction::resumePerform)
         .properties(
             string(FORM_TITLE)
                 .label("Form Title")
@@ -172,4 +184,32 @@ public class ApproveAction {
                                 .defaultValue(false)
                                 .required(false)))
                 .required(false));
+
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    private static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        String formUrl = ((ActionContextAware) context).generateResumeUrl();
+
+        if (formUrl == null) {
+            throw new IllegalStateException(
+                "Cannot generate approval form URL. Ensure the server's public URL is configured " +
+                    "and the workflow is running in a proper execution context.");
+        }
+
+        Instant expiresAt = Instant.now()
+            .plus(30, ChronoUnit.DAYS);
+
+        context.suspend(new Suspend(Map.of(FORM_URL, formUrl), expiresAt));
+
+        return null;
+    }
+
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    private static ResumeResponse resumePerform(
+        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
+        ActionContext context) {
+
+        return ResumeResponse.of(Map.copyOf(data.toMap()));
+    }
 }

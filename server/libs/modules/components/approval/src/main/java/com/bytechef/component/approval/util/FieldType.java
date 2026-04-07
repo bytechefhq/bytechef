@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.hitl.util;
+package com.bytechef.component.approval.util;
 
 /**
  * @author Ivica Cardic

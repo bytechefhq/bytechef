@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition.hitl;
+package com.bytechef.component.definition.approval;
 
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;

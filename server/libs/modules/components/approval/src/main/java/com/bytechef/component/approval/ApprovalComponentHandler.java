@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.hitl;
+package com.bytechef.component.approval;
 
+import static com.bytechef.component.approval.constant.ApprovalConstants.APPROVAL;
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.hitl.constant.HitlConstants.HITL;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.approval.action.RequestApprovalAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.hitl.action.ApproveAction;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.HitlComponentDefinition;
+import com.bytechef.platform.component.definition.ApprovalComponentDefinition;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(HITL + "_v1_ComponentHandler")
-public class HitlComponentHandler implements ComponentHandler {
+@Component(APPROVAL + "_v1_ComponentHandler")
+public class ApprovalComponentHandler implements ComponentHandler {
 
-    private final HitlComponentDefinition componentDefinition;
+    private final ApprovalComponentDefinition componentDefinition;
 
-    public HitlComponentHandler() {
-        this.componentDefinition = new HitlComponentDefinitionImpl(
-            component(HITL)
-                .title("Human in the Loop")
-                .description("Human-in-the-Loop component for manual intervention in workflows.")
-                .icon("path:assets/hitl.svg")
+    public ApprovalComponentHandler() {
+        this.componentDefinition = new ApprovalComponentDefinitionImpl(
+            component(APPROVAL)
+                .title("Approval")
+                .description("Approval component for manual intervention in workflows.")
+                .icon("path:assets/approval.svg")
                 .categories(ComponentCategory.HELPERS)
-                .actions(ApproveAction.ACTION_DEFINITION));
+                .actions(RequestApprovalAction.ACTION_DEFINITION));
     }
 
     @Override
@@ -50,10 +50,10 @@ public class HitlComponentHandler implements ComponentHandler {
         return componentDefinition;
     }
 
-    private static class HitlComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
-        implements HitlComponentDefinition {
+    private static class ApprovalComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
+        implements ApprovalComponentDefinition {
 
-        public HitlComponentDefinitionImpl(ComponentDefinition componentDefinition) {
+        public ApprovalComponentDefinitionImpl(ComponentDefinition componentDefinition) {
             super(componentDefinition);
         }
     }
