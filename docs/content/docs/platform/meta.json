@@ -6,6 +6,7 @@
   "pages": [
     "overview",
     "copilot",
-    "mcp-server"
+    "mcp-server",
+    "agent"
   ]
 }
