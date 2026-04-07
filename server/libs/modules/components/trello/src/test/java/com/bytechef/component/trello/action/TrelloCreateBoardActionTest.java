@@ -18,6 +18,7 @@ package com.bytechef.component.trello.action;
 
 import static com.bytechef.component.trello.constant.TrelloConstants.DESC;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -34,8 +35,6 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +63,6 @@ class TrelloCreateBoardActionTest {
             .thenReturn(mockedExecutor);
 
         assertNull(TrelloCreateBoardAction.perform(mockedParameters, null, mockedContext));
-
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
@@ -73,8 +71,10 @@ class TrelloCreateBoardActionTest {
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/boards", stringArgumentCaptor.getValue());
 
-        Object[] query = queryArgumentCaptor.getValue();
+        Object[] expectedQueryParameters = {
+            NAME, "new board", DESC, "new board description"
+        };
 
-        assertEquals(List.of(NAME, "new board", DESC, "new board description"), Arrays.asList(query));
+        assertArrayEquals(expectedQueryParameters, queryArgumentCaptor.getValue());
     }
 }

@@ -19,6 +19,7 @@ package com.bytechef.component.trello.action;
 import static com.bytechef.component.trello.constant.TrelloConstants.DESC;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -38,8 +39,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,7 +70,6 @@ class TrelloCreateCardActionTest {
             .thenReturn(mockedObject);
 
         assertEquals(mockedObject, TrelloCreateCardAction.perform(mockedParameters, null, mockedContext));
-
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
@@ -80,8 +78,10 @@ class TrelloCreateCardActionTest {
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/cards", stringArgumentCaptor.getValue());
 
-        Object[] query = queryArgumentCaptor.getValue();
+        Object[] expectedQueryParameters = {
+            ID_LIST, "abc", NAME, "new card", DESC, "new card description"
+        };
 
-        assertEquals(List.of(ID_LIST, "abc", NAME, "new card", DESC, "new card description"), Arrays.asList(query));
+        assertArrayEquals(expectedQueryParameters, queryArgumentCaptor.getValue());
     }
 }
