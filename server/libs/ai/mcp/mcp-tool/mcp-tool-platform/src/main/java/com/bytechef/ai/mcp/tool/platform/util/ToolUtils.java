@@ -342,7 +342,7 @@ public final class ToolUtils {
         }
 
         return options.stream()
-            .map(option -> option.getLabel() + " (" + option.getValue() + ")")
+            .map(option -> "label:'" + option.getLabel() + "', value:'" + option.getValue() + "'")
             .toList();
     }
 
