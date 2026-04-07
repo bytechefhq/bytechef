@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Nikolina Spehar
@@ -42,6 +43,7 @@ public class JenkinsCreateJobAction {
             string(CONFIG_XML)
                 .label("Config XML")
                 .description("Content of the config.xml file.")
+                .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .perform(JenkinsCreateJobAction::perform)
         .help("", "https://docs.bytechef.io/reference/components/jenkins_v1#create-job");
