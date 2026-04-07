@@ -73,7 +73,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_3839 = getFeatureFlag('ff-3839');
         const ff_4000 = getFeatureFlag('ff-4000');
 
-        const knowledgeBaseEnabled = useApplicationInfoStore((state) => state.knowledgeBase.enabled);
+        const knowledgeBaseEnabled = useApplicationInfoStore((state) => state.ai.knowledgeBase.enabled);
 
         const filteredActionComponentDefinitions = useMemo(() => {
             if (!componentsWithActions) {

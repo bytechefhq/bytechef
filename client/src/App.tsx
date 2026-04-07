@@ -130,11 +130,10 @@ function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
 
-    const {ai, edition, knowledgeBaseEnabled} = useApplicationInfoStore(
+    const {ai, edition} = useApplicationInfoStore(
         useShallow((state) => ({
             ai: state.ai,
             edition: state.application?.edition,
-            knowledgeBaseEnabled: state.knowledgeBase.enabled,
         }))
     );
     const {
@@ -202,7 +201,7 @@ function App() {
         }
 
         if (navItem.href === '/automation/knowledge-bases') {
-            return ff_4000 && knowledgeBaseEnabled;
+            return ff_4000 && ai.knowledgeBase.enabled;
         }
 
         if (navItem.href === '/automation/approval-tasks') {
