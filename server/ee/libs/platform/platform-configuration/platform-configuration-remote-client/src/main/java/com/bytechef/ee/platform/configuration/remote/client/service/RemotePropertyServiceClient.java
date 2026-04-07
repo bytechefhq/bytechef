@@ -29,7 +29,19 @@ public class RemotePropertyServiceClient implements PropertyService {
     }
 
     @Override
+    public void delete(String key, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<Property> fetchProperty(String key, Property.Scope scope, @Nullable Long scopeId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Property> fetchProperty(
+        String key, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 
@@ -39,7 +51,21 @@ public class RemotePropertyServiceClient implements PropertyService {
     }
 
     @Override
+    public Property getProperty(
+        String key, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Property> getProperties(List<String> keys, Property.Scope scope, @Nullable Long scopeId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Property> getProperties(
+        List<String> keys, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 
@@ -49,7 +75,20 @@ public class RemotePropertyServiceClient implements PropertyService {
     }
 
     @Override
+    public void save(
+        String key, Map<String, ?> value, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void update(String key, boolean enabled, Property.Scope scope, @Nullable Long scopeID) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void update(
+        String key, boolean enabled, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
         throw new UnsupportedOperationException();
     }
 }

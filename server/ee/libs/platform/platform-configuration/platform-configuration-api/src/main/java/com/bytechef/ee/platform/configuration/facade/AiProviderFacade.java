@@ -17,11 +17,11 @@ import java.util.List;
  */
 public interface AiProviderFacade {
 
-    void deleteAiProvider(int id);
+    void deleteAiProvider(int id, int environment);
 
-    List<AiProviderDTO> getAiProviders();
+    List<AiProviderDTO> getAiProviders(int environment);
 
-    void updateAiProvider(int id, boolean enabled);
+    void updateAiProvider(int id, boolean enabled, int environment);
 
-    void updateAiProvider(int id, String apiKey);
+    void updateAiProvider(int id, String apiKey, int environment);
 }
