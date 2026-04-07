@@ -65,7 +65,8 @@ public interface AiProviderApi {
         value = AiProviderApi.PATH_DELETE_AI_PROVIDER
     )
     default ResponseEntity<Void> deleteAiProvider(
-        @NotNull @Parameter(name = "id", description = "The id of an AI provider.", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id
+        @NotNull @Parameter(name = "id", description = "The id of an AI provider.", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id,
+        @NotNull @Parameter(name = "environment", description = "The environment of an AI provider.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = true) Integer environment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -96,7 +97,8 @@ public interface AiProviderApi {
     )
     default ResponseEntity<Void> enableAiProvider(
         @NotNull @Parameter(name = "id", description = "The id of an AI provider.", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id,
-        @NotNull @Parameter(name = "enable", description = "The enable status of an AI provider.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable
+        @NotNull @Parameter(name = "enable", description = "The enable status of an AI provider.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable,
+        @NotNull @Parameter(name = "environment", description = "The environment of an AI provider.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = true) Integer environment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -127,7 +129,7 @@ public interface AiProviderApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<AiProviderModel>> getAiProviders(
-        
+        @NotNull @Parameter(name = "environment", description = "The environment of an AI provider.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = true) Integer environment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -168,7 +170,8 @@ public interface AiProviderApi {
     )
     default ResponseEntity<Void> updateAiProvider(
         @NotNull @Parameter(name = "id", description = "The id of an AI provider.", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id,
-        @Parameter(name = "UpdateAiProviderRequestModel", description = "", required = true) @Valid @RequestBody UpdateAiProviderRequestModel updateAiProviderRequestModel
+        @Parameter(name = "UpdateAiProviderRequestModel", description = "", required = true) @Valid @RequestBody UpdateAiProviderRequestModel updateAiProviderRequestModel,
+        @NotNull @Parameter(name = "environment", description = "The environment of an AI provider.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = true) Integer environment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
