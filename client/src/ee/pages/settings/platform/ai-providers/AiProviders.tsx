@@ -4,6 +4,9 @@ import {useGetAiProvidersQuery} from '@/ee/shared/queries/platform/aiProviders.q
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import * as React from 'react';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import CreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/CreateKnowledgeBaseDialog';
+import Button from '@/components/Button/Button';
 
 const AiProviders = () => {
     const {data: aiProviders, error: aiProvidersError, isLoading: aiProvidersLoading} = useGetAiProvidersQuery();
@@ -16,6 +19,7 @@ const AiProviders = () => {
                         centerTitle
                         description="Enable providers used by Univerzal AI Connectors"
                         position="main"
+                        right={<EnvironmentSelect />}
                         title="AI Providers"
                     />
                 }
