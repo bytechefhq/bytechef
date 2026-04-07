@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.component.approval;
 
-import static com.bytechef.component.definition.hitl.ApprovalChannelFunction.APPROVAL_CHANNELS;
-
-import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import java.util.List;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * @author Ivica Cardic
+ * @author Marija Horvat
  */
-public interface HitlComponentDefinition extends ClusterRootComponentDefinition {
+class ApprovalComponentHandlerTest {
 
-    @Override
-    default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(APPROVAL_CHANNELS);
+    @Test
+    void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals("definition/approval.json", new ApprovalComponentHandler().getDefinition());
     }
 }
