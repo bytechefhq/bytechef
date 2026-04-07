@@ -59,13 +59,13 @@ public class AiImageUtils {
     }
 
     public static List<? extends Option<String>> getProviderOptions(
-        Ai.Provider aiProvider, PropertyService propertyService) {
+        Ai.Provider aiProvider, PropertyService propertyService, Long environmentId) {
 
         List<String> activeProviderKeys = propertyService.getProperties(
             Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
-            Scope.PLATFORM, null)
+            Scope.PLATFORM, null, environmentId)
             .stream()
             .filter(property -> property.getValue() != null && property.isEnabled())
             .map(Property::getKey)
