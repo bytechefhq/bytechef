@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new records in the specified table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nocodb_v1#create-records"
+    },
     "metadata": null,
     "name": "createRecords",
     "outputDefinition": {
@@ -239,7 +242,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes existing records in the specified table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nocodb_v1#delete-records"
+    },
     "metadata": null,
     "name": "deleteRecords",
     "outputDefinition": {
@@ -497,7 +503,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets a record from the specified table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nocodb_v1#get-records"
+    },
     "metadata": null,
     "name": "getRecord",
     "outputDefinition": {
@@ -654,7 +663,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Searches for records in the specified table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nocodb_v1#search-records"
+    },
     "metadata": null,
     "name": "searchRecords",
     "outputDefinition": {
@@ -908,7 +920,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates existing records in the specified table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nocodb_v1#update-records"
+    },
     "metadata": null,
     "name": "updateRecords",
     "outputDefinition": {
@@ -2342,14 +2357,20 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nocodb_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://nocodb.com/apis/v2/data"
+  },
   "description": "NocoDB is an open-source platform that transforms databases into smart spreadsheets, enabling users to manage and collaborate on data with a no-code interface.",
   "icon": "path:assets/nocodb.svg",
   "metadata": null,
