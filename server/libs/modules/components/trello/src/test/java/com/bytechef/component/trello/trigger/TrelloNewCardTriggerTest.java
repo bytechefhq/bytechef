@@ -18,6 +18,7 @@ package com.bytechef.component.trello.trigger;
 
 import static com.bytechef.component.trello.constant.TrelloConstants.ID;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -38,10 +39,9 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +54,8 @@ import org.mockito.ArgumentCaptor;
 class TrelloNewCardTriggerTest {
 
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(ID_LIST, "abc"));
+    private final Parameters mockedOutputParameters = MockParametersFactory.create(Map.of(ID, "abc"));
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
@@ -66,8 +67,6 @@ class TrelloNewCardTriggerTest {
 
         String webhookUrl = "testWebhookUrl";
 
-        when(mockedParameters.getString(ID_LIST))
-            .thenReturn("listId");
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
@@ -76,7 +75,7 @@ class TrelloNewCardTriggerTest {
             .thenReturn(Map.of(ID, "abc"));
 
         WebhookEnableOutput webhookEnableOutput = TrelloNewCardTrigger.dynamicWebhookEnable(
-            mockedParameters, null, webhookUrl, null, mockedTriggerContext);
+            mockedInputParameters, null, webhookUrl, null, mockedTriggerContext);
 
         Map<String, ?> parameters = webhookEnableOutput.parameters();
         Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
@@ -92,9 +91,11 @@ class TrelloNewCardTriggerTest {
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/webhooks", stringArgumentCaptor.getValue());
 
-        Object[] query = queryArgumentCaptor.getValue();
+        Object[] expectedQueryParameters = {
+            "callbackURL", webhookUrl, "idModel", "abc"
+        };
 
-        assertEquals(List.of("callbackURL", webhookUrl, "idModel", "listId"), Arrays.asList(query));
+        assertArrayEquals(expectedQueryParameters, queryArgumentCaptor.getValue());
     }
 
     @Test
@@ -103,13 +104,11 @@ class TrelloNewCardTriggerTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedParameters.getString(ID))
-            .thenReturn("abc");
         when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
         TrelloNewCardTrigger.dynamicWebhookDisable(
-            null, null, mockedParameters, null, mockedTriggerContext);
+            null, null, mockedOutputParameters, null, mockedTriggerContext);
 
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
@@ -141,7 +140,6 @@ class TrelloNewCardTriggerTest {
             null, null, mockedTriggerContext);
 
         assertEquals(map, result);
-
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
