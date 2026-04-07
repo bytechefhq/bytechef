@@ -25,38 +25,50 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
+import static com.bytechef.component.nocodb.constant.NocoDbConstants.BASE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.FIELDS;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.RECORDS;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_COLUMNS;
+import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TITLE;
+import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class NocoDbUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FIELDS, List.of("firstName", "lastName")));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+        Map.of(WORKSPACE_ID, "w", BASE_ID, "p", TABLE_ID, "m", FIELDS, List.of("firstName", "lastName")));
     private final Map<String, Object> tableColumns = Map.of("columns", List.of(
         Map.of("uidt", "Checkbox", TITLE, "name"),
         Map.of("uidt", "SingleLineText", TITLE, "name"),
@@ -77,11 +89,16 @@ class NocoDbUtilsTest {
         Map.of("uidt", "Date", TITLE, "name"),
         Map.of("uidt", "Time", TITLE, "name"),
         Map.of("uidt", "DateTime", TITLE, "name")));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testCreatePropertiesForRecordWhenAddingNewRecord() throws Exception {
-        mockHttpParemeters();
+    void testCreatePropertiesForRecordWhenAddingNewRecord(
+        ActionContext mockedActionContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) throws Exception {
 
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(tableColumns);
 
@@ -154,42 +171,85 @@ class NocoDbUtilsTest {
                     .minItems(1)
                     .required(true)),
             properties);
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/api/v2/meta/tables/m", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetBaseIdOptions() {
-        mockHttpParemeters();
+    void testGetBaseIdOptions(
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("list", List.of(Map.of(TITLE, "abc", "id", "123"))));
 
         assertEquals(
             expectedOptions,
-            NocoDbUtils.getBaseIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            NocoDbUtils.getBaseIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/api/v2/meta/workspaces/w/bases", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetTableIdOptions() {
-        mockHttpParemeters();
+    void testGetTableIdOptions(
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("list", List.of(Map.of(TITLE, "abc", "id", "123"))));
 
         assertEquals(
             expectedOptions,
-            NocoDbUtils.getTableIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            NocoDbUtils.getTableIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/api/v2/meta/bases/p/tables", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetWorkspaceIdOptions() {
-        mockHttpParemeters();
+    void testGetWorkspaceIdOptions(
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("list", List.of(Map.of(TITLE, "abc", "id", "123"))));
 
         assertEquals(
             expectedOptions,
-            NocoDbUtils.getWorkspaceIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            NocoDbUtils.getWorkspaceIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/api/v1/workspaces", stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -201,14 +261,5 @@ class NocoDbUtilsTest {
 
         assertEquals(List.of(Map.of("firstName", "John", "lastName", "Doe", "options", "option1,option2")),
             transformRecords);
-    }
-
-    private void mockHttpParemeters() {
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
     }
 }
