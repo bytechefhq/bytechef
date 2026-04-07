@@ -44,8 +44,8 @@ public class AiProviderApiController implements AiProviderApi {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public ResponseEntity<Void> deleteAiProvider(Integer id) {
-        aiProviderFacade.deleteAiProvider(id);
+    public ResponseEntity<Void> deleteAiProvider(Integer id, Integer environment) {
+        aiProviderFacade.deleteAiProvider(id, environment);
 
         return ResponseEntity.noContent()
             .build();
@@ -53,9 +53,9 @@ public class AiProviderApiController implements AiProviderApi {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public ResponseEntity<List<AiProviderModel>> getAiProviders() {
+    public ResponseEntity<List<AiProviderModel>> getAiProviders(Integer environment) {
         return ResponseEntity.ok(
-            aiProviderFacade.getAiProviders()
+            aiProviderFacade.getAiProviders(environment)
                 .stream()
                 .map(aiProviderDTO -> conversionService.convert(aiProviderDTO, AiProviderModel.class))
                 .peek(aiProviderModel -> {
@@ -68,8 +68,8 @@ public class AiProviderApiController implements AiProviderApi {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public ResponseEntity<Void> enableAiProvider(Integer id, Boolean enable) {
-        aiProviderFacade.updateAiProvider(id, enable);
+    public ResponseEntity<Void> enableAiProvider(Integer id, Boolean enable, Integer environment) {
+        aiProviderFacade.updateAiProvider(id, enable, environment);
 
         return ResponseEntity.noContent()
             .build();
@@ -78,9 +78,9 @@ public class AiProviderApiController implements AiProviderApi {
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<Void> updateAiProvider(
-        Integer id, UpdateAiProviderRequestModel updateAiProviderRequestModel) {
+        Integer id, UpdateAiProviderRequestModel updateAiProviderRequestModel, Integer environment) {
 
-        aiProviderFacade.updateAiProvider(id, updateAiProviderRequestModel.getApiKey());
+        aiProviderFacade.updateAiProvider(id, updateAiProviderRequestModel.getApiKey(), environment);
 
         return ResponseEntity.noContent()
             .build();

@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -55,6 +56,9 @@ public class Property {
 
     @Column
     private EncryptedMapWrapper value;
+
+    @Column
+    private @Nullable Integer environment;
 
     @Column
     private boolean enabled;
@@ -123,6 +127,10 @@ public class Property {
         return Collections.unmodifiableMap(value.getMap());
     }
 
+    public @Nullable Integer getEnvironment() {
+        return environment;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -169,6 +177,10 @@ public class Property {
         }
     }
 
+    public void setEnvironment(@Nullable Integer environment) {
+        this.environment = environment;
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -200,6 +212,7 @@ public class Property {
             ", key='" + key + '\'' +
             ", scope=" + scope +
             ", scopeId=" + scopeId +
+            ", environment=" + environment +
             ", value=" + value +
             ", enabled=" + enabled +
             ", createdBy='" + createdBy + '\'' +
