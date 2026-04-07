@@ -204,13 +204,17 @@ export const WorkflowExecutions = () => {
     };
 
     const handleEndDateChange = (date?: Date) => {
-        setFilterEndDate(date);
+        const normalizedDate = date
+            ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999))
+            : undefined;
+
+        setFilterEndDate(normalizedDate);
 
         filter(
             filterAutomations,
             filterStatus,
             filterStartDate,
-            date,
+            normalizedDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
@@ -280,12 +284,16 @@ export const WorkflowExecutions = () => {
     };
 
     const handleStartDateChange = (date?: Date) => {
-        setFilterStartDate(date);
+        const normalizedDate = date
+            ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0))
+            : undefined;
+
+        setFilterStartDate(normalizedDate);
 
         filter(
             filterAutomations,
             filterStatus,
-            date,
+            normalizedDate,
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
