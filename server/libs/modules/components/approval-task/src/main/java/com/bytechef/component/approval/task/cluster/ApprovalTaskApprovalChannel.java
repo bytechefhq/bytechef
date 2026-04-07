@@ -16,14 +16,14 @@
 
 package com.bytechef.component.approval.task.cluster;
 
-import static com.bytechef.component.definition.hitl.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.hitl.ApprovalChannelFunction;
+import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 
 /**
  * @author Ivica Cardic

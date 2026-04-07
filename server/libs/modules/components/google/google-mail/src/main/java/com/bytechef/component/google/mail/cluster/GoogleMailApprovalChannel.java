@@ -18,7 +18,7 @@ package com.bytechef.component.google.mail.cluster;
 
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.hitl.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
@@ -28,7 +28,7 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.hitl.ApprovalChannelFunction;
+import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
