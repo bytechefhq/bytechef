@@ -45,6 +45,7 @@ public class NocoDbUpdateRecords {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRecords")
         .title("Update Records")
         .description("Updates existing records in the specified table.")
+        .help("", "https://docs.bytechef.io/reference/components/nocodb_v1#update-records")
         .properties(
             WORKSPACE_ID_PROPERTY,
             BASE_ID_PROPERTY,
