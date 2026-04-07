@@ -23,7 +23,7 @@ import com.bytechef.automation.knowledgebase.event.KnowledgeBaseDocumentEvent;
 import com.bytechef.automation.knowledgebase.message.route.KnowledgeBaseMessageRoute;
 import com.bytechef.automation.knowledgebase.worker.KnowledgeBaseDocumentProcessWorker;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.KnowledgeBase.Subscriptions;
+import com.bytechef.config.ApplicationProperties.Ai.KnowledgeBase.Subscriptions;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
@@ -50,7 +50,8 @@ class KnowledgeBaseMessageBrokerConfigurerConfiguration {
         List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors) {
 
         this.messageEventPostReceiveProcessors = messageEventPostReceiveProcessors;
-        this.subscriptions = applicationProperties.getKnowledgeBase()
+        this.subscriptions = applicationProperties.getAi()
+            .getKnowledgeBase()
             .getSubscriptions();
     }
 

@@ -88,9 +88,6 @@ public class ApplicationProperties {
     /** Help hub configuration */
     private HelpHub helpHub = new HelpHub();
 
-    /** Knowledge base configuration */
-    private KnowledgeBase knowledgeBase = new KnowledgeBase();
-
     /** Observability and logging configuration */
     private Observability observability = new Observability();
 
@@ -186,10 +183,6 @@ public class ApplicationProperties {
 
     public HelpHub getHelpHub() {
         return helpHub;
-    }
-
-    public KnowledgeBase getKnowledgeBase() {
-        return knowledgeBase;
     }
 
     public Observability getObservability() {
@@ -302,10 +295,6 @@ public class ApplicationProperties {
 
     public void setHelpHub(HelpHub helpHub) {
         this.helpHub = helpHub;
-    }
-
-    public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
-        this.knowledgeBase = knowledgeBase;
     }
 
     public void setObservability(Observability observability) {
@@ -1004,6 +993,12 @@ public class ApplicationProperties {
             /** Embedding model configuration for knowledge base */
             private Embedding embedding = new Embedding();
 
+            /** OCR configuration */
+            private Ocr ocr = new Ocr();
+
+            /** Event subscription configuration */
+            private Subscriptions subscriptions = new Subscriptions();
+
             /** Vector store configuration for knowledge base */
             private Vectorstore vectorstore = new Vectorstore();
 
@@ -1021,6 +1016,22 @@ public class ApplicationProperties {
 
             public void setEmbedding(Embedding embedding) {
                 this.embedding = embedding;
+            }
+
+            public Ocr getOcr() {
+                return ocr;
+            }
+
+            public void setOcr(Ocr ocr) {
+                this.ocr = ocr;
+            }
+
+            public Subscriptions getSubscriptions() {
+                return subscriptions;
+            }
+
+            public void setSubscriptions(Subscriptions subscriptions) {
+                this.subscriptions = subscriptions;
             }
 
             public Vectorstore getVectorstore() {
@@ -1098,6 +1109,91 @@ public class ApplicationProperties {
                             this.model = model;
                         }
                     }
+                }
+            }
+
+            /**
+             * OCR configuration for knowledge base document processing.
+             */
+            public static class Ocr {
+
+                /**
+                 * OCR provider type.
+                 */
+                public enum Provider {
+                    /** No OCR provider */
+                    NONE,
+                    /** Azure OCR provider */
+                    AZURE,
+                    /** Mistral OCR provider */
+                    MISTRAL
+                }
+
+                /** OCR provider */
+                private Provider provider = Provider.NONE;
+
+                /** Mistral OCR configuration */
+                private Mistral mistral = new Mistral();
+
+                public Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
+
+                public Mistral getMistral() {
+                    return mistral;
+                }
+
+                public void setMistral(Mistral mistral) {
+                    this.mistral = mistral;
+                }
+
+                /**
+                 * Mistral OCR configuration.
+                 */
+                public static class Mistral {
+
+                    /** Mistral API key */
+                    private String apiKey;
+
+                    public String getApiKey() {
+                        return apiKey;
+                    }
+
+                    public void setApiKey(String apiKey) {
+                        this.apiKey = apiKey;
+                    }
+                }
+            }
+
+            /**
+             * Event subscription configuration for knowledge base events.
+             */
+            public static class Subscriptions {
+
+                /** Number of subscribers for document process events */
+                private int documentProcessEvents = 1;
+
+                /** Number of subscribers for document chunk update events */
+                private int documentChunkUpdateEvents = 1;
+
+                public int getDocumentProcessEvents() {
+                    return documentProcessEvents;
+                }
+
+                public void setDocumentProcessEvents(int documentProcessEvents) {
+                    this.documentProcessEvents = documentProcessEvents;
+                }
+
+                public int getDocumentChunkUpdateEvents() {
+                    return documentChunkUpdateEvents;
+                }
+
+                public void setDocumentChunkUpdateEvents(int documentChunkUpdateEvents) {
+                    this.documentChunkUpdateEvents = documentChunkUpdateEvents;
                 }
             }
 
@@ -2437,170 +2533,6 @@ public class ApplicationProperties {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
-        }
-    }
-
-    /**
-     * Knowledge base configuration for document storage and retrieval.
-     */
-    public static class KnowledgeBase {
-
-        /** Whether knowledge base is enabled */
-        private boolean enabled;
-
-        /** OCR configuration */
-        private Ocr ocr = new Ocr();
-
-        /** Event subscription configuration */
-        private Subscriptions subscriptions = new Subscriptions();
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public Ocr getOcr() {
-            return ocr;
-        }
-
-        public void setOcr(Ocr ocr) {
-            this.ocr = ocr;
-        }
-
-        public Subscriptions getSubscriptions() {
-            return subscriptions;
-        }
-
-        public void setSubscriptions(Subscriptions subscriptions) {
-            this.subscriptions = subscriptions;
-        }
-
-        /**
-         * Embedding configuration for knowledge base document processing.
-         */
-        public static class Embedding {
-
-            /**
-             * Embedding provider type.
-             */
-            public enum Provider {
-                /** OpenAI embedding provider */
-                OPENAI,
-                /** Ollama embedding provider */
-                OLLAMA,
-                /** Azure embedding provider */
-                AZURE
-            }
-
-            /** Embedding model name */
-            private String model = "text-embedding-3-small";
-
-            /** Embedding provider */
-            private Provider provider = Provider.OPENAI;
-
-            public String getModel() {
-                return model;
-            }
-
-            public void setModel(String model) {
-                this.model = model;
-            }
-
-            public Provider getProvider() {
-                return provider;
-            }
-
-            public void setProvider(Provider provider) {
-                this.provider = provider;
-            }
-        }
-
-        /**
-         * OCR configuration for knowledge base document processing.
-         */
-        public static class Ocr {
-
-            /**
-             * OCR provider type.
-             */
-            public enum Provider {
-                /** No OCR provider */
-                NONE,
-                /** Azure OCR provider */
-                AZURE,
-                /** Mistral OCR provider */
-                MISTRAL
-            }
-
-            /** OCR provider */
-            private Provider provider = Provider.NONE;
-
-            /** Mistral OCR configuration */
-            private Mistral mistral = new Mistral();
-
-            public Provider getProvider() {
-                return provider;
-            }
-
-            public void setProvider(Provider provider) {
-                this.provider = provider;
-            }
-
-            public Mistral getMistral() {
-                return mistral;
-            }
-
-            public void setMistral(Mistral mistral) {
-                this.mistral = mistral;
-            }
-
-            /**
-             * Mistral OCR configuration.
-             */
-            public static class Mistral {
-
-                /** Mistral API key */
-                private String apiKey;
-
-                public String getApiKey() {
-                    return apiKey;
-                }
-
-                public void setApiKey(String apiKey) {
-                    this.apiKey = apiKey;
-                }
-            }
-        }
-
-        /**
-         * Event subscription configuration for knowledge base events.
-         */
-        public static class Subscriptions {
-
-            /** Number of subscribers for document process events */
-            private int documentProcessEvents = 1;
-
-            /** Number of subscribers for document chunk update events */
-            private int documentChunkUpdateEvents = 1;
-
-            public int getDocumentProcessEvents() {
-                return documentProcessEvents;
-            }
-
-            public void setDocumentProcessEvents(int documentProcessEvents) {
-                this.documentProcessEvents = documentProcessEvents;
-            }
-
-            public int getDocumentChunkUpdateEvents() {
-                return documentChunkUpdateEvents;
-            }
-
-            public void setDocumentChunkUpdateEvents(int documentChunkUpdateEvents) {
-                this.documentChunkUpdateEvents = documentChunkUpdateEvents;
-            }
         }
     }
 
