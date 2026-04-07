@@ -233,7 +233,7 @@ public class CopilotConfiguration {
     @Bean
     ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
-        ComponentTools componentTools) throws AGUIException {
+        ComponentTools componentTools, TaskTools taskTools) throws AGUIException {
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.ASK.name();
 
         return ClusterElementSpringAIAgent.builder()
@@ -241,7 +241,7 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementAskResource))
-            .tools(List.of(readProjectWorkflowToolsImpl, componentTools))
+            .tools(List.of(readProjectWorkflowToolsImpl, componentTools, taskTools))
             .state(state)
             .build();
     }
@@ -250,7 +250,7 @@ public class CopilotConfiguration {
     ClusterElementSpringAIAgent clusterElementBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ClusterElementTools clusterElementTools,
         ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
-        ComponentTools componentTools)
+        ComponentTools componentTools, TaskTools taskTools)
         throws AGUIException {
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.BUILD.name();
 
@@ -259,7 +259,7 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
-            .tools(List.of(readProjectWorkflowToolsImpl, clusterElementTools, componentTools))
+            .tools(List.of(readProjectWorkflowToolsImpl, clusterElementTools, componentTools, taskTools))
             .state(state)
             .build();
     }

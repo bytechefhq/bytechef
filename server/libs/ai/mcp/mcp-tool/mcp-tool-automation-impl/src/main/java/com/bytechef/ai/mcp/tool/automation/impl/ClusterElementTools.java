@@ -72,7 +72,8 @@ public class ClusterElementTools {
             JsonNode clusterElementsNode = JsonUtils.readTree(clusterElementsDefinition);
 
             for (JsonNode taskNode : tasksNode) {
-                if (taskName.equals(taskNode.get("name").stringValue())) {
+                if (taskName.equals(taskNode.get("name")
+                    .stringValue())) {
                     ((ObjectNode) taskNode).set("clusterElements", clusterElementsNode);
 
                     break;

@@ -1,24 +1,24 @@
 Some actions contain cluster elements — sub-components nested within a task.
 Rules:
-- Before building any action that has cluster elements, call getAction(componentName, actionName, version) to get cluster element types. If the cluster element value is true, this indicates that it's a list of actions, otherwise it's a single action.
+- Before building any action that has cluster elements, call getAction(componentName, actionName, version) to get cluster element types.
 - Then use searchClusterElements(clusterElementType) for each cluster element type to retrieve all possible options for that type. Not all types need to be implemented.
 - Then call getClusterElement(componentName, clusterElementName, version) to retrieve the definition for the task you need.
 - Once retrieved, nest the retrieved cluster elements task or tasks inside the action, under clusterElements property, keyed by their type.
 Example of tasks with cluster elements:
 "tasks": [
   {
-    "label": "action with cluster elements",
-    "name": "action_1",
+    "label": "task with cluster elements",
+    "name": "taskName_1",
     "type": "<action type>",
     "parameters": { ... }
     "clusterElements": {
-      "clusterElementTypeFalseValue": {
+      "clusterElementTypeObject": {
         "label": "<custom label>",
         "name": "<clusterElementTypeName>_1",
         "type": "<type from searchActions()>",
         "parameters": { ... }
       },
-      "clusterElementTypeTrueValue": [
+      "clusterElementTypeArray": [
         {
           "label": "<custom label>",
           "name": "<clusterElementTypeName>_1",
