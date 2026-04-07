@@ -26,15 +26,22 @@ import {
 } from '../models/index';
 
 export interface DeleteAiProviderRequest {
+    environment: number;
     id: number;
 }
 
 export interface EnableAiProviderRequest {
-    id: number;
     enable: boolean;
+    environment: number;
+    id: number;
+}
+
+export interface GetAiProvidersRequest {
+    environment: number;
 }
 
 export interface UpdateAiProviderOperationRequest {
+    environment: number;
     id: number;
     updateAiProviderRequest: UpdateAiProviderRequest;
 }
@@ -56,7 +63,18 @@ export class AiProviderApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environment'] == null) {
+            throw new runtime.RequiredError(
+                'environment',
+                'Required parameter "environment" was null or undefined when calling deleteAiProvider().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environment'] != null) {
+            queryParameters['environment'] = requestParameters['environment'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -101,7 +119,18 @@ export class AiProviderApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environment'] == null) {
+            throw new runtime.RequiredError(
+                'environment',
+                'Required parameter "environment" was null or undefined when calling enableAiProvider().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environment'] != null) {
+            queryParameters['environment'] = requestParameters['environment'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -132,8 +161,19 @@ export class AiProviderApi extends runtime.BaseAPI {
      * Get AI providers.
      * Get AI providers
      */
-    async getAiProvidersRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AiProvider>>> {
+    async getAiProvidersRaw(requestParameters: GetAiProvidersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AiProvider>>> {
+        if (requestParameters['environment'] == null) {
+            throw new runtime.RequiredError(
+                'environment',
+                'Required parameter "environment" was null or undefined when calling getAiProviders().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environment'] != null) {
+            queryParameters['environment'] = requestParameters['environment'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -154,8 +194,8 @@ export class AiProviderApi extends runtime.BaseAPI {
      * Get AI providers.
      * Get AI providers
      */
-    async getAiProviders(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AiProvider>> {
-        const response = await this.getAiProvidersRaw(initOverrides);
+    async getAiProviders(requestParameters: GetAiProvidersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AiProvider>> {
+        const response = await this.getAiProvidersRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -178,7 +218,18 @@ export class AiProviderApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['environment'] == null) {
+            throw new runtime.RequiredError(
+                'environment',
+                'Required parameter "environment" was null or undefined when calling updateAiProvider().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environment'] != null) {
+            queryParameters['environment'] = requestParameters['environment'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
