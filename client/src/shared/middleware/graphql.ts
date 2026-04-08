@@ -375,6 +375,15 @@ export type Category = {
   name?: Maybe<Scalars['String']['output']>;
 };
 
+export type ChatWorkflow = {
+  __typename?: 'ChatWorkflow';
+  projectDeploymentId: Scalars['ID']['output'];
+  projectId: Scalars['ID']['output'];
+  projectName: Scalars['String']['output'];
+  workflowExecutionId: Scalars['String']['output'];
+  workflowLabel: Scalars['String']['output'];
+};
+
 export type ClusterElementDefinition = {
   __typename?: 'ClusterElementDefinition';
   componentName?: Maybe<Scalars['String']['output']>;
@@ -2239,9 +2248,7 @@ export type ProjectDeploymentWorkflow = {
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   projectDeploymentId: Scalars['ID']['output'];
   projectWorkflow: ProjectWorkflow;
-  staticWebhookUrl?: Maybe<Scalars['String']['output']>;
   version: Scalars['Int']['output'];
-  workflowExecutionId?: Maybe<Scalars['String']['output']>;
   workflowId: Scalars['String']['output'];
 };
 
@@ -2458,6 +2465,7 @@ export type Query = {
   workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
+  workspaceChatWorkflows: Array<ChatWorkflow>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
 };
@@ -3039,6 +3047,12 @@ export type QueryWorkflowTemplateArgs = {
 
 
 export type QueryWorkspaceApiKeysArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceChatWorkflowsArgs = {
   environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
 };
@@ -3903,16 +3917,6 @@ export type WorkflowChatProjectDeploymentWorkflowQueryVariables = Exact<{
 
 export type WorkflowChatProjectDeploymentWorkflowQuery = { __typename?: 'Query', projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', projectWorkflow: { __typename?: 'ProjectWorkflow', sseStreamResponse: boolean, workflow: { __typename?: 'Workflow', label: string } } } | null };
 
-export type WorkflowChatWorkspaceProjectDeploymentsQueryVariables = Exact<{
-  workspaceId: Scalars['ID']['input'];
-  environmentId: Scalars['ID']['input'];
-  projectId?: InputMaybe<Scalars['ID']['input']>;
-  tagId?: InputMaybe<Scalars['ID']['input']>;
-}>;
-
-
-export type WorkflowChatWorkspaceProjectDeploymentsQuery = { __typename?: 'Query', workspaceProjectDeployments: Array<{ __typename?: 'ProjectDeployment', id: string, enabled: boolean, project: { __typename?: 'Project', id: string, name: string }, projectDeploymentWorkflows: Array<{ __typename?: 'ProjectDeploymentWorkflow', id: string, enabled: boolean, staticWebhookUrl?: string | null, workflowExecutionId?: string | null, projectWorkflow: { __typename?: 'ProjectWorkflow', workflow: { __typename?: 'Workflow', id: string, label: string, triggers: Array<{ __typename?: 'WorkflowTrigger', parameters?: any | null, type: string }> } } }> }> };
-
 export type WorkflowTemplateQueryVariables = Exact<{
   id: Scalars['String']['input'];
   sharedWorkflow: Scalars['Boolean']['input'];
@@ -3928,6 +3932,14 @@ export type WorkspaceApiKeysQueryVariables = Exact<{
 
 
 export type WorkspaceApiKeysQuery = { __typename?: 'Query', workspaceApiKeys: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null }> };
+
+export type WorkspaceChatWorkflowsQueryVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+  environmentId: Scalars['ID']['input'];
+}>;
+
+
+export type WorkspaceChatWorkflowsQuery = { __typename?: 'Query', workspaceChatWorkflows: Array<{ __typename?: 'ChatWorkflow', projectDeploymentId: string, projectId: string, projectName: string, workflowExecutionId: string, workflowLabel: string }> };
 
 export type WorkspaceMcpServersQueryVariables = Exact<{
   workspaceId: Scalars['ID']['input'];
@@ -6896,56 +6908,6 @@ export const useWorkflowChatProjectDeploymentWorkflowQuery = <
   }
     )};
 
-export const WorkflowChatWorkspaceProjectDeploymentsDocument = new TypedDocumentString(`
-    query workflowChatWorkspaceProjectDeployments($workspaceId: ID!, $environmentId: ID!, $projectId: ID, $tagId: ID) {
-  workspaceProjectDeployments(
-    workspaceId: $workspaceId
-    environmentId: $environmentId
-    projectId: $projectId
-    tagId: $tagId
-  ) {
-    id
-    enabled
-    project {
-      id
-      name
-    }
-    projectDeploymentWorkflows {
-      id
-      enabled
-      staticWebhookUrl
-      workflowExecutionId
-      projectWorkflow {
-        workflow {
-          id
-          label
-          triggers {
-            parameters
-            type
-          }
-        }
-      }
-    }
-  }
-}
-    `);
-
-export const useWorkflowChatWorkspaceProjectDeploymentsQuery = <
-      TData = WorkflowChatWorkspaceProjectDeploymentsQuery,
-      TError = unknown
-    >(
-      variables: WorkflowChatWorkspaceProjectDeploymentsQueryVariables,
-      options?: Omit<UseQueryOptions<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<WorkflowChatWorkspaceProjectDeploymentsQuery, TError, TData>(
-      {
-    queryKey: ['workflowChatWorkspaceProjectDeployments', variables],
-    queryFn: fetcher<WorkflowChatWorkspaceProjectDeploymentsQuery, WorkflowChatWorkspaceProjectDeploymentsQueryVariables>(WorkflowChatWorkspaceProjectDeploymentsDocument, variables),
-    ...options
-  }
-    )};
-
 export const WorkflowTemplateDocument = new TypedDocumentString(`
     query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
   workflowTemplate(id: $id, sharedWorkflow: $sharedWorkflow) {
@@ -7012,6 +6974,34 @@ export const useWorkspaceApiKeysQuery = <
       {
     queryKey: ['workspaceApiKeys', variables],
     queryFn: fetcher<WorkspaceApiKeysQuery, WorkspaceApiKeysQueryVariables>(WorkspaceApiKeysDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceChatWorkflowsDocument = new TypedDocumentString(`
+    query workspaceChatWorkflows($workspaceId: ID!, $environmentId: ID!) {
+  workspaceChatWorkflows(workspaceId: $workspaceId, environmentId: $environmentId) {
+    projectDeploymentId
+    projectId
+    projectName
+    workflowExecutionId
+    workflowLabel
+  }
+}
+    `);
+
+export const useWorkspaceChatWorkflowsQuery = <
+      TData = WorkspaceChatWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceChatWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceChatWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceChatWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceChatWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['workspaceChatWorkflows', variables],
+    queryFn: fetcher<WorkspaceChatWorkflowsQuery, WorkspaceChatWorkflowsQueryVariables>(WorkspaceChatWorkflowsDocument, variables),
     ...options
   }
     )};
