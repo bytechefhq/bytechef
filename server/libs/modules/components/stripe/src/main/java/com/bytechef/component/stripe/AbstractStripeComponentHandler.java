@@ -23,6 +23,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.stripe.action.StripeCreateCustomerAction;
 import com.bytechef.component.stripe.action.StripeCreateInvoiceAction;
+import com.bytechef.component.stripe.action.StripeCreatePayoutAction;
 import com.bytechef.component.stripe.connection.StripeConnection;
 
 /**
@@ -38,10 +39,11 @@ public abstract class AbstractStripeComponentHandler implements OpenApiComponent
                 "Stripe is a payment processing platform that allows businesses to accept online payments and manage transactions securely.")
             .version(1))
                 .actions(modifyActions(StripeCreateCustomerAction.ACTION_DEFINITION,
-                    StripeCreateInvoiceAction.ACTION_DEFINITION))
+                    StripeCreateInvoiceAction.ACTION_DEFINITION, StripeCreatePayoutAction.ACTION_DEFINITION))
                 .connection(modifyConnection(StripeConnection.CONNECTION_DEFINITION))
                 .clusterElements(modifyClusterElements(tool(StripeCreateCustomerAction.ACTION_DEFINITION),
-                    tool(StripeCreateInvoiceAction.ACTION_DEFINITION)))
+                    tool(StripeCreateInvoiceAction.ACTION_DEFINITION),
+                    tool(StripeCreatePayoutAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override
