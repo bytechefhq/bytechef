@@ -77,7 +77,7 @@ public class TaskDispatcherTools {
                 taskDispatcherDefinitionService.getTaskDispatcherDefinitions();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Found {} task dispatchers", taskDispatcherDefinitions.size());
+                logger.debug("listTaskDispatchers(): Found {} task dispatchers", taskDispatcherDefinitions.size());
             }
 
             return taskDispatcherDefinitions.stream()
@@ -88,7 +88,7 @@ public class TaskDispatcherTools {
                     taskDispatcherDefinition.getVersion()))
                 .toList();
         } catch (Exception e) {
-            logger.error(FAILED_TO_LIST_TASK_DISPATCHERS, e);
+            logger.error("listTaskDispatchers(): " + FAILED_TO_LIST_TASK_DISPATCHERS, e);
 
             throw new ExecutionException(FAILED_TO_LIST_TASK_DISPATCHERS, e,
                 TaskDispatcherToolErrorType.LIST_TASK_DISPATCHERS);
@@ -106,7 +106,7 @@ public class TaskDispatcherTools {
                 taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Retrieved task dispatcher {}", name);
+                logger.debug("getTaskDispatcher({}, {}): Retrieved task dispatcher {}", name, version, name);
             }
 
             List<Property> properties = new ArrayList<>(taskDispatcherDefinition.getProperties());
@@ -128,7 +128,7 @@ public class TaskDispatcherTools {
                 taskDispatcherDefinition.getName(), taskDispatcherDefinition.getDescription(),
                 taskDispatcherDefinition.getTitle(), type, propertiesJSON, outputPropertiesJson);
         } catch (Exception e) {
-            logger.error("Failed to get task dispatcher {}", name, e);
+            logger.error("getTaskDispatcher({}, {}): Failed to get task dispatcher {}", name, version, name, e);
 
             throw new ExecutionException(FAILED_TO_GET_TASK_DISPATCHER, e,
                 TaskDispatcherToolErrorType.GET_TASK_DISPATCHER);
@@ -162,12 +162,14 @@ public class TaskDispatcherTools {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Retrieved output properties for task dispatcher '{}'", name);
+                logger.debug("getTaskDispatcherOutput({}, {}): Retrieved output properties for task dispatcher '{}'",
+                    name, version, name);
             }
 
             return ToolUtils.convertToPropertyInfo(outputResponse.outputSchema());
         } catch (Exception e) {
-            logger.error("Failed to get output properties for task dispatcher '{}'", name, e);
+            logger.error("getTaskDispatcherOutput({}, {}): Failed to get output properties for task dispatcher '{}'",
+                name, version, name, e);
 
             throw new ExecutionException("Failed to get output properties", e,
                 TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_OUTPUT);
@@ -188,8 +190,8 @@ public class TaskDispatcherTools {
             List<? extends BaseProperty> taskProperties = taskDispatcherDefinition.getTaskProperties();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Retrieved {} properties for task dispatcher '{}'", properties.size(), name);
-                logger.debug("Retrieved {} task properties for task dispatcher '{}'", taskProperties.size(), name);
+                logger.debug("getTaskDispatcherProperties({}, {}): Retrieved {} properties for task dispatcher '{}'",
+                    name, version, properties.size(), name);
             }
 
             List<PropertyInfo> propertyInfos =
@@ -198,7 +200,8 @@ public class TaskDispatcherTools {
 
             return propertyInfos;
         } catch (Exception e) {
-            logger.error("Failed to get properties for task dispatcher '{}'", name, e);
+            logger.error("getTaskDispatcherProperties({}, {}): Failed to get properties for task dispatcher '{}'", name,
+                version, name, e);
 
             throw new ExecutionException("Failed to get properties", e,
                 TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_PROPERTIES);
@@ -231,12 +234,14 @@ public class TaskDispatcherTools {
                 .toList();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Found {} task dispatchers matching query '{}'", matchingTaskDispatchers.size(), query);
+                logger.debug("searchTaskDispatchers({}): Found {} task dispatchers matching query '{}'", query,
+                    matchingTaskDispatchers.size(), query);
             }
 
             return matchingTaskDispatchers;
         } catch (Exception e) {
-            logger.error("Failed to search task dispatchers with query '{}'", query, e);
+            logger.error("searchTaskDispatchers({}): Failed to search task dispatchers with query '{}'", query, query,
+                e);
 
             throw new ExecutionException(FAILED_TO_SEARCH_TASK_DISPATCHERS, e,
                 TaskDispatcherToolErrorType.SEARCH_TASK_DISPATCHERS);
@@ -267,12 +272,14 @@ public class TaskDispatcherTools {
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Generated task dispatcher definition for {}", name);
+                logger.debug("getTaskDispatcherDefinition({}, {}): Generated task dispatcher definition for {}", name,
+                    version, name);
             }
 
             return taskDispatcherDefinitionString;
         } catch (Exception e) {
-            logger.error("Failed to generate task dispatcher definition for '{}'", name, e);
+            logger.error("getTaskDispatcherDefinition({}, {}): Failed to generate task dispatcher definition for '{}'",
+                name, version, name, e);
 
             throw new ExecutionException("Failed to generate task dispatcher definition", e,
                 TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_DEFINITION);
