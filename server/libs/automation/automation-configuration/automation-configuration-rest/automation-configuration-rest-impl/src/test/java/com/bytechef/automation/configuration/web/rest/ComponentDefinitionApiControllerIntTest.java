@@ -61,7 +61,8 @@ public class ComponentDefinitionApiControllerIntTest {
     @Test
     public void testGetComponentDefinitions() {
         Mockito
-            .when(componentDefinitionService.getComponentDefinitions(null, null, null, null, PlatformType.AUTOMATION))
+            .when(componentDefinitionService.getComponentDefinitions(null, null, null, null, null,
+                PlatformType.AUTOMATION))
             .thenReturn(List.of(new ComponentDefinition("component1"), new ComponentDefinition("component2")));
 
         try {

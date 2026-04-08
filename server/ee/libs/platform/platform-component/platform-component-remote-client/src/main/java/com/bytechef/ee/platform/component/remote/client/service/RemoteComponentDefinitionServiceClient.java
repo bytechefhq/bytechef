@@ -71,7 +71,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions,
+        Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
         Boolean triggerDefinitions, List<String> include, PlatformType platformType) {
 
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
@@ -79,7 +79,9 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
             serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
                 uriBuilder -> toUri(
                     uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions",
-                    Map.of(), getQueryParams(actionDefinitions, connectionDefinitions, triggerDefinitions)),
+                    Map.of(),
+                    getQueryParams(actionDefinitions, clusterElementDefinitions, connectionDefinitions,
+                        triggerDefinitions)),
                 new ParameterizedTypeReference<>() {})));
 
         return getComponentDefinitions(completableFutures);
@@ -137,12 +139,17 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     private static LinkedMultiValueMap<String, String> getQueryParams(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions) {
+        Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
+        Boolean triggerDefinitions) {
 
         LinkedMultiValueMap<String, String> queryParamsMap = new LinkedMultiValueMap<>();
 
         if (actionDefinitions != null) {
             queryParamsMap.put("actionDefinitions", List.of(actionDefinitions.toString()));
+        }
+
+        if (clusterElementDefinitions != null) {
+            queryParamsMap.put("clusterElementDefinitions", List.of(clusterElementDefinitions.toString()));
         }
 
         if (connectionDefinitions != null) {

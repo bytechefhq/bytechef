@@ -10,7 +10,7 @@ import {useQuery} from '@tanstack/react-query';
 
 export interface GetComponentDefinitionsRequestI {
     actionDefinitions?: boolean;
-    //TODO clusterElementDefinitions?: boolean;
+    clusterElementDefinitions?: boolean;
     connectionDefinitions?: boolean;
     triggerDefinitions?: boolean;
     include?: Array<string>;

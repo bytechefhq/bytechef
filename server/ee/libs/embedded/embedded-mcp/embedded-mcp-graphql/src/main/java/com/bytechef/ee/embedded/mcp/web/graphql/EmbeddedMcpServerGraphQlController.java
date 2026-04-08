@@ -79,7 +79,7 @@ class EmbeddedMcpServerGraphQlController {
         }
 
         return componentDefinitionService.getComponentDefinitions(
-            true, null, null, componentNames, PlatformType.EMBEDDED);
+            true, null, null, null, componentNames, PlatformType.EMBEDDED);
     }
 
     @MutationMapping

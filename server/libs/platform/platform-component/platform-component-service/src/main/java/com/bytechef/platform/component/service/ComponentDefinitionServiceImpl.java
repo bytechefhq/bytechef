@@ -103,8 +103,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
-        @Nullable List<String> include, PlatformType platformType) {
+        Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
+        Boolean triggerDefinitions, @Nullable List<String> include, PlatformType platformType) {
 
         ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
             .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
@@ -114,7 +114,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         List<ComponentDefinition> components = getComponentDefinitions()
             .stream()
             .filter(componentDefinitionFilter::filter)
-            .filter(filter(actionDefinitions, connectionDefinitions, triggerDefinitions, include))
+            .filter(filter(actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions,
+                include))
             .distinct()
             .toList();
 
@@ -185,12 +186,19 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     private static Predicate<ComponentDefinition> filter(
-        @Nullable Boolean actionDefinitions, @Nullable Boolean connectionDefinitions,
-        @Nullable Boolean triggerDefinitions, @Nullable List<String> include) {
+        @Nullable Boolean actionDefinitions, @Nullable Boolean clusterElementDefinitions,
+        @Nullable Boolean connectionDefinitions, @Nullable Boolean triggerDefinitions,
+        @Nullable List<String> include) {
 
         return componentDefinition -> {
             if (include == null || include.contains(componentDefinition.getName())) {
                 if (actionDefinitions != null && !CollectionUtils.isEmpty(componentDefinition.getActions())) {
+                    return true;
+                }
+
+                if (clusterElementDefinitions != null &&
+                    !CollectionUtils.isEmpty(componentDefinition.getClusterElements())) {
+
                     return true;
                 }
 
@@ -203,8 +211,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 }
             }
 
-            return include == null && actionDefinitions == null && connectionDefinitions == null &&
-                triggerDefinitions == null;
+            return include == null && actionDefinitions == null && clusterElementDefinitions == null &&
+                connectionDefinitions == null && triggerDefinitions == null;
         };
     }
 

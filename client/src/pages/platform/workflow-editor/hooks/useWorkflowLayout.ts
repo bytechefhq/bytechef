@@ -81,6 +81,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
 
     const componentDefinitionsQueryParameters: object = {
         actionDefinitions: true,
+        clusterElementDefinitions: true,
         include: includeComponents,
         triggerDefinitions: true,
     };
