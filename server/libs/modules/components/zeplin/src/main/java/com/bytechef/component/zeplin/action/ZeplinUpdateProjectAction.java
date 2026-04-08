@@ -60,7 +60,8 @@ public class ZeplinUpdateProjectAction {
                     "type", PropertyType.BODY))
                 .label("Description")
                 .description("New description for the project.")
-                .required(false));
+                .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/zeplin_v1#update-project");
 
     private ZeplinUpdateProjectAction() {
     }
