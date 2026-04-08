@@ -9,9 +9,9 @@ package com.bytechef.ee.automation.apiplatform.handler.security.web.configurer;
 
 import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
-import com.bytechef.ee.automation.apiplatform.configuration.service.ApiClientService;
 import com.bytechef.ee.automation.apiplatform.handler.security.web.authentication.ApiPlatformApiKeyAuthenticationProvider;
 import com.bytechef.ee.automation.apiplatform.handler.security.web.authentication.ApiPlatformApiKeyAuthenticationToken;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
 import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -26,11 +26,11 @@ public class ApiPlatformApiKeySecurityConfigurer extends AbstractApiKeyHttpConfi
 
     protected static final String PATH_PATTERN = "^/api/o/.+";
 
-    public ApiPlatformApiKeySecurityConfigurer(ApiClientService apiClientService) {
+    public ApiPlatformApiKeySecurityConfigurer(ApiKeyService apiKeyService) {
 
         super(
             PATH_PATTERN, new ApiPlatformApiKeyAuthenticationConverter(),
-            new ApiPlatformApiKeyAuthenticationProvider(apiClientService));
+            new ApiPlatformApiKeyAuthenticationProvider(apiKeyService));
     }
 
     @Override
