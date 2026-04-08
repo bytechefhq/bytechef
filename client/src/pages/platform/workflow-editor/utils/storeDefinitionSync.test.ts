@@ -291,6 +291,45 @@ describe('store definition sync', () => {
         });
     });
 
+    describe('clearPositionNodeIds during save', () => {
+        it('should clear positions for specified nodes while saving dragged node position', () => {
+            const tasks = [
+                makeTask('task_1', {x: 100, y: 200}),
+                makeTask('task_2', {x: 300, y: 400}),
+                makeTask('task_3', {x: 500, y: 600}),
+            ];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            saveWorkflowNodesPosition({
+                clearPositionNodeIds: new Set(['task_2']),
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 150, y: 250}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            const storeDefinition = useWorkflowDataStore.getState().workflow.definition!;
+            const parsed = JSON.parse(storeDefinition);
+
+            // task_1 should have new position
+            expect(parsed.tasks[0].metadata.ui.nodePosition).toEqual({x: 150, y: 250});
+            // task_2 should have position cleared
+            expect(parsed.tasks[1].metadata?.ui?.nodePosition).toBeUndefined();
+            // task_3 should retain original position
+            expect(parsed.tasks[2].metadata.ui.nodePosition).toEqual({x: 500, y: 600});
+        });
+    });
+
     describe('each single-object iteratee handling', () => {
         it('should update positions for each dispatcher single-object iteratee child', () => {
             const eachTask: WorkflowTask = {
@@ -567,6 +606,171 @@ describe('store definition sync', () => {
             expect(finalWorkflow.version).toBe(3);
             expect(parsed.tasks[0].metadata.ui.nodePosition).toEqual({x: 100, y: 200});
             expect(parsed.tasks[1].metadata.ui.nodePosition).toEqual({x: 300, y: 400});
+        });
+    });
+
+    describe('onError rollback', () => {
+        it('should restore both nodes and definition on mutation error', () => {
+            const tasks = [makeTask('task_1')];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                nodes: [
+                    {
+                        data: {name: 'task_1', type: 'test/task_1'},
+                        id: 'task_1',
+                        position: {x: 0, y: 0},
+                        type: 'workflow',
+                    },
+                ],
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 200, y: 300}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Verify optimistic update applied
+            const optimisticDefinition = useWorkflowDataStore.getState().workflow.definition!;
+            const optimisticParsed = JSON.parse(optimisticDefinition);
+
+            expect(optimisticParsed.tasks[0].metadata.ui.nodePosition).toEqual({x: 200, y: 300});
+
+            // Simulate mutation error
+            const mutateCall = mockMutation.mutate.mock.calls[0];
+            const callbacks = mutateCall[1];
+
+            callbacks.onError();
+
+            // Nodes should be restored to pre-drag state
+            const restoredNodes = useWorkflowDataStore.getState().nodes;
+
+            expect((restoredNodes[0].data as NodeDataType).metadata?.ui?.nodePosition).toBeUndefined();
+
+            // Definition should be restored to original (no positions)
+            const restoredDefinition = useWorkflowDataStore.getState().workflow.definition!;
+            const restoredParsed = JSON.parse(restoredDefinition);
+
+            expect(restoredParsed.tasks[0].metadata?.ui?.nodePosition).toBeUndefined();
+        });
+
+        it('should restore definition on error for a queued mutation fired from onSettled', () => {
+            const tasks = [makeTask('task_1'), makeTask('task_2')];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                nodes: [
+                    {
+                        data: {name: 'task_1', type: 'test/task_1'},
+                        id: 'task_1',
+                        position: {x: 0, y: 0},
+                        type: 'workflow',
+                    },
+                    {
+                        data: {name: 'task_2', type: 'test/task_2'},
+                        id: 'task_2',
+                        position: {x: 0, y: 100},
+                        type: 'workflow',
+                    },
+                ],
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            // First save succeeds
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 100, y: 200}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Second save queued
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_2',
+                nodePositions: {task_2: {x: 300, y: 400}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Complete first mutation successfully
+            const firstCallbacks = mockMutation.mutate.mock.calls[0][1];
+
+            firstCallbacks.onSuccess({version: 2});
+            firstCallbacks.onSettled();
+
+            // Second mutation was drained from onSettled
+            expect(mockMutation.mutate).toHaveBeenCalledTimes(2);
+
+            // Capture definition state before second mutation error
+            const definitionBeforeError = useWorkflowDataStore.getState().workflow.definition!;
+            const parsedBeforeError = JSON.parse(definitionBeforeError);
+
+            // task_1 position should be present (from first successful save)
+            expect(parsedBeforeError.tasks[0].metadata.ui.nodePosition).toEqual({x: 100, y: 200});
+
+            // Simulate second mutation error
+            const secondCallbacks = mockMutation.mutate.mock.calls[1][1];
+
+            secondCallbacks.onError();
+
+            // Definition should be restored to state before second mutation
+            const restoredDefinition = useWorkflowDataStore.getState().workflow.definition!;
+            const restoredParsed = JSON.parse(restoredDefinition);
+
+            // task_1 position should survive (it was saved by first mutation)
+            expect(restoredParsed.tasks[0].metadata.ui.nodePosition).toEqual({x: 100, y: 200});
+        });
+
+        it('should clear mutation guard on error so subsequent saves can fire', () => {
+            const tasks = [makeTask('task_1')];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            // First save
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 100, y: 200}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Simulate error followed by settled
+            const firstCallbacks = mockMutation.mutate.mock.calls[0][1];
+
+            firstCallbacks.onError();
+            firstCallbacks.onSettled();
+
+            // Second save should fire immediately (guard should be cleared)
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 500, y: 600}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            expect(mockMutation.mutate).toHaveBeenCalledTimes(2);
         });
     });
 
