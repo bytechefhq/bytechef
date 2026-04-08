@@ -237,6 +237,8 @@ export default function saveWorkflowNodesPosition({
     const {nodes, setNodes} = useWorkflowDataStore.getState();
     const previousNodes = nodes;
 
+    const previousDefinition = workflow.definition;
+
     const updatedNodes = nodes.map((node) => {
         const position = nodePositions[node.id];
 
@@ -272,6 +274,7 @@ export default function saveWorkflowNodesPosition({
 
     firePositionMutation({
         definition: updatedDefinitionStr,
+        previousDefinition,
         previousNodes,
         setNodes,
         updateWorkflowMutation,
@@ -282,6 +285,7 @@ export default function saveWorkflowNodesPosition({
 
 interface FirePositionMutationProps {
     definition: string;
+    previousDefinition: string;
     previousNodes: Node[];
     setNodes: (nodes: Node[]) => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -291,6 +295,7 @@ interface FirePositionMutationProps {
 
 function firePositionMutation({
     definition,
+    previousDefinition,
     previousNodes,
     setNodes,
     updateWorkflowMutation,
@@ -310,6 +315,13 @@ function firePositionMutation({
         {
             onError: () => {
                 setNodes(previousNodes);
+
+                useWorkflowDataStore.setState((state) => ({
+                    workflow: {
+                        ...state.workflow,
+                        definition: previousDefinition,
+                    },
+                }));
             },
             onSettled: () => {
                 setWorkflowMutating(workflowId, false);
@@ -323,6 +335,7 @@ function firePositionMutation({
 
                     firePositionMutation({
                         definition: pendingDefinition,
+                        previousDefinition: currentWorkflow.definition!,
                         previousNodes: useWorkflowDataStore.getState().nodes,
                         setNodes: useWorkflowDataStore.getState().setNodes,
                         updateWorkflowMutation,
