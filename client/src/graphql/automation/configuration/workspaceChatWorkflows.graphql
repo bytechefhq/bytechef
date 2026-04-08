@@ -1,0 +1,9 @@
+query workspaceChatWorkflows($workspaceId: ID!, $environmentId: ID!) {
+    workspaceChatWorkflows(workspaceId: $workspaceId, environmentId: $environmentId) {
+        projectDeploymentId
+        projectId
+        projectName
+        workflowExecutionId
+        workflowLabel
+    }
+}
