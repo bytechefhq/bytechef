@@ -2,80 +2,56 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {useWorkflowChatWorkspaceProjectDeploymentsQuery} from '@/shared/middleware/graphql';
+import {useWorkspaceChatWorkflowsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
 import {useParams} from 'react-router-dom';
 
-interface WorkflowWithDeploymentProps {
-    workflowId: string;
-    workflowLabel: string;
-    projectDeploymentId: number;
-    enabled: boolean;
-    workflowExecutionId?: string | null;
+interface ProjectChatGroupI {
+    projectName: string;
+    workflows: Array<{
+        projectDeploymentId: string;
+        workflowExecutionId: string;
+        workflowLabel: string;
+    }>;
 }
-
-const hasHostedChatTrigger = (
-    triggers?: Array<{type: string; parameters?: {mode?: number} | Record<string, unknown>}>
-): boolean => {
-    return (
-        !!triggers &&
-        triggers.findIndex((trigger) => trigger.type?.includes('chat/')) !== -1 &&
-        ((triggers?.[0]?.parameters as {mode?: number})?.mode ?? 1) === 1
-    );
-};
 
 const WorkflowChatSidebar = () => {
     const {workflowExecutionId} = useParams();
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const isRunning = useWorkflowChatStore((state) => state.isRunning);
-    const {data, isLoading} = useWorkflowChatWorkspaceProjectDeploymentsQuery({
+
+    const {data, isLoading} = useWorkspaceChatWorkflowsQuery({
         environmentId: String(currentEnvironmentId),
         workspaceId: String(currentWorkspaceId),
     });
 
-    const workflowsByProject: Map<string, {projectName: string; workflows: WorkflowWithDeploymentProps[]}> =
-        useMemo(() => {
-            if (isLoading || !data?.workspaceProjectDeployments) {
-                return new Map();
-            }
+    const workflowsByProject: Map<string, ProjectChatGroupI> = useMemo(() => {
+        const result = new Map<string, ProjectChatGroupI>();
 
-            const result = new Map<string, {projectName: string; workflows: WorkflowWithDeploymentProps[]}>();
+        if (isLoading || !data?.workspaceChatWorkflows) {
+            return result;
+        }
 
-            data.workspaceProjectDeployments.forEach((projectDeployment) => {
-                const projectId = projectDeployment.project.id;
-                const projectName = projectDeployment.project?.name || 'Untitled Project';
+        data.workspaceChatWorkflows.forEach((chatWorkflow) => {
+            const group = result.get(chatWorkflow.projectId) ?? {
+                projectName: chatWorkflow.projectName,
+                workflows: [],
+            };
 
-                projectDeployment.projectDeploymentWorkflows.forEach((projectDeploymentWorkflow) => {
-                    const workflowId = projectDeploymentWorkflow.projectWorkflow.workflow.id;
-                    const projectWorkflow = projectDeploymentWorkflow.projectWorkflow;
-                    const triggers = projectWorkflow?.workflow?.triggers;
-
-                    if (
-                        workflowId &&
-                        projectWorkflow &&
-                        projectDeploymentWorkflow.enabled &&
-                        projectDeploymentWorkflow.staticWebhookUrl &&
-                        hasHostedChatTrigger(triggers)
-                    ) {
-                        if (!result.has(projectId)) {
-                            result.set(projectId, {projectName, workflows: []});
-                        }
-
-                        result.get(projectId)!.workflows.push({
-                            enabled: projectDeploymentWorkflow.enabled,
-                            projectDeploymentId: Number(projectDeployment.id),
-                            workflowExecutionId: projectDeploymentWorkflow.workflowExecutionId,
-                            workflowId,
-                            workflowLabel: projectWorkflow.workflow.label || 'Untitled Workflow',
-                        });
-                    }
-                });
+            group.workflows.push({
+                projectDeploymentId: chatWorkflow.projectDeploymentId,
+                workflowExecutionId: chatWorkflow.workflowExecutionId,
+                workflowLabel: chatWorkflow.workflowLabel,
             });
 
-            return result;
-        }, [isLoading, data]);
+            result.set(chatWorkflow.projectId, group);
+        });
+
+        return result;
+    }, [isLoading, data]);
 
     if (isLoading) {
         return (
@@ -109,10 +85,10 @@ const WorkflowChatSidebar = () => {
                                             disabled={isRunning && !isActive}
                                             item={{
                                                 current: isActive,
-                                                id: `${workflowData.projectDeploymentId}-${workflowData.workflowId}`,
+                                                id: `${workflowData.projectDeploymentId}-${workflowData.workflowExecutionId}`,
                                                 name: workflowData.workflowLabel,
                                             }}
-                                            key={`${workflowData.projectDeploymentId}-${workflowData.workflowId}`}
+                                            key={`${workflowData.projectDeploymentId}-${workflowData.workflowExecutionId}`}
                                             toLink={chatUrl}
                                         />
                                     );
