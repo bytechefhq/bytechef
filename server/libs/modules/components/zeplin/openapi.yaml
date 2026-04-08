@@ -12,6 +12,7 @@ paths:
       summary: "Update Project"
       description: "Updates an existing project."
       operationId: "updateProject"
+      x-help: "https://docs.bytechef.io/reference/components/zeplin_v1#update-project"
       parameters:
         - name: "project_id"
           in: "path"
