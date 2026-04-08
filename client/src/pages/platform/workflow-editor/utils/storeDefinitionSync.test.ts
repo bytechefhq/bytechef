@@ -449,7 +449,7 @@ describe('store definition sync', () => {
     });
 
     describe('position mutation does not invalidate queries', () => {
-        it('should not call invalidateWorkflowQueries on successful position save', () => {
+        it('should fire mutation exactly once when no pending definitions exist', () => {
             const tasks = [makeTask('task_1')];
             const definition = makeDefinition(tasks);
 
