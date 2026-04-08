@@ -18,6 +18,7 @@ package com.bytechef.component.zeplin.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -63,8 +64,14 @@ public class ZeplinProjectNoteTrigger {
                     .properties(
                         object("context")
                             .properties(
-                                string(ID),
-                                string("type"),
+                                object("project")
+                                    .properties(
+                                        string(ID)
+                                            .description("The ID of the project that triggered the webhook."),
+                                        string("name")
+                                            .description("The name of the project."))),
+                        object("resource")
+                            .properties(
                                 object("data")
                                     .properties(
                                         string(ID),
@@ -73,15 +80,24 @@ public class ZeplinProjectNoteTrigger {
                                             .items(
                                                 object()
                                                     .properties(
-                                                        string(ID),
+                                                        string(ID)
+                                                            .description("The ID of the comment."),
                                                         object("author")
                                                             .properties(
-                                                                string(ID),
-                                                                string("email"),
-                                                                string("username")),
-                                                        string("content"))))),
-                        string("action"),
-                        string("event"))))
+                                                                string(ID)
+                                                                    .description("The ID of the author."),
+                                                                string("email")
+                                                                    .description("The email of the author."),
+                                                                string("username")
+                                                                    .description("The username of the author.")),
+                                                        string("content")
+                                                            .description("The content of the comment."))))),
+                        string("action")
+                            .description("The action that triggered the webhook."),
+                        string("event")
+                            .description("The event that triggered the webhook."),
+                        integer("timestamp")
+                            .description("The timestamp of the event."))))
         .webhookEnable(ZeplinProjectNoteTrigger::webhookEnable)
         .webhookDisable(ZeplinProjectNoteTrigger::webhookDisable)
         .webhookRequest(ZeplinProjectNoteTrigger::webhookRequest)
@@ -119,9 +135,8 @@ public class ZeplinProjectNoteTrigger {
         String workflowExecutionId, TriggerContext triggerContext) {
 
         triggerContext.http(http -> http
-            .delete("/projects/" + inputParameters.getRequiredString(PROJECT_ID) + "/webhooks/"
-                + outputParameters.getRequiredString(ID)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .delete("/projects/%s/webhooks/%s".formatted(
+                inputParameters.getRequiredString(PROJECT_ID), outputParameters.getRequiredString(ID))))
             .execute();
     }
 
