@@ -19,15 +19,18 @@ package com.bytechef.component.apify.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -44,11 +47,12 @@ import org.mockito.ArgumentCaptor;
  */
 @ExtendWith(MockContextSetupExtension.class)
 class ApifyUtilsTest {
+
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
     private final Map<String, Object> responseMap = Map.of("data", Map.of("items", List.of(
         Map.of("name", "name1", "id", "1"),
         Map.of("name", "name2", "id", "2"))));
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testGetActorIdOptions(
@@ -64,21 +68,13 @@ class ApifyUtilsTest {
         List<Option<String>> result = ApifyUtils.getActorIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        List<Option<String>> expected = List.of(
-            option("name1", "1"),
-            option("name2", "2"));
-
-        assertEquals(expected, result);
+        assertEquals(List.of(option("name1", "1"), option("name2", "2")), result);
         assertEquals("/acts", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
