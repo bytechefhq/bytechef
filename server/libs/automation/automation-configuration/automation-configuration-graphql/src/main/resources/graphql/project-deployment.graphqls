@@ -5,6 +5,15 @@ extend type Query {
         projectId: ID
         tagId: ID
     ): [ProjectDeployment!]!
+    workspaceChatWorkflows(workspaceId: ID!, environmentId: ID!): [ChatWorkflow!]!
+}
+
+type ChatWorkflow {
+    projectDeploymentId: ID!
+    projectId: ID!
+    projectName: String!
+    workflowExecutionId: String!
+    workflowLabel: String!
 }
 
 type ProjectDeployment {

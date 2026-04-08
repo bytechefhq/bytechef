@@ -167,6 +167,15 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public List<ProjectWorkflow> getWorkflowProjectWorkflows(List<String> workflowIds) {
+        if (workflowIds.isEmpty()) {
+            return List.of();
+        }
+
+        return projectWorkflowRepository.findAllByWorkflowIdIn(workflowIds);
+    }
+
+    @Override
     public void delete(long projectId, int projectVersion, String workflowId) {
         projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowId(projectId, projectVersion, workflowId)
             .ifPresent(projectWorkflow -> projectWorkflowRepository.deleteById(projectWorkflow.getId()));
