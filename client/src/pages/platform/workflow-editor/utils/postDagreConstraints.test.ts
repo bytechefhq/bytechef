@@ -1809,7 +1809,8 @@ describe('applySavedPositions', () => {
 });
 
 describe('alignChainNodesCrossAxis', () => {
-    it('should align cross-axis and main-axis when predecessor has saved position', () => {
+    it('should leave linear-chain successor at dagre position when predecessor is manually saved', () => {
+        // User drag of one node should not pull successors.
         const savedNode: Node = {
             data: {
                 componentName: 'httpClient',
@@ -1831,9 +1832,9 @@ describe('alignChainNodesCrossAxis', () => {
 
         alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
 
-        // Both axes adjusted: x = 800 + 170, y = 200
-        expect(allNodes[1].position).toEqual({x: 970, y: 200});
-        expect((allNodes[1].data as NodeDataType).metadata?.ui?.chainAlignedPosition).toEqual({x: 970, y: 200});
+        // Successor stays at dagre position, no alignment cascade
+        expect(allNodes[1].position).toEqual({x: 1000, y: 500});
+        expect((allNodes[1].data as NodeDataType).metadata?.ui?.chainAlignedPosition).toBeUndefined();
         expect((allNodes[1].data as NodeDataType).metadata?.ui?.nodePosition).toBeUndefined();
     });
 
@@ -1892,7 +1893,8 @@ describe('alignChainNodesCrossAxis', () => {
         expect(allNodes[2].position).toEqual({x: 800, y: 600});
     });
 
-    it('should cascade both axes when predecessor has saved position', () => {
+    it('should NOT cascade both axes through chain when first node is manually saved', () => {
+        // User drag of one node should not pull the entire downstream chain.
         const savedNode: Node = {
             data: {
                 componentName: 'httpClient',
@@ -1923,9 +1925,9 @@ describe('alignChainNodesCrossAxis', () => {
 
         alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
 
-        // Each node is predecessor.x + 170
-        expect(allNodes[1].position).toEqual({x: 570, y: 150});
-        expect(allNodes[2].position).toEqual({x: 740, y: 150});
+        // Successors stay at dagre positions — no cascade from user-saved predecessor
+        expect(allNodes[1].position).toEqual({x: 600, y: 500});
+        expect(allNodes[2].position).toEqual({x: 800, y: 600});
     });
 
     it('should skip alignment when predecessor is a top-ghost node', () => {
@@ -2258,301 +2260,6 @@ describe('alignChainNodesCrossAxis', () => {
         expect(allNodes[3].position).toEqual({x: 900, y: 400});
     });
 
-    it('should delta-shift loop child when dispatcher is chain-aligned in LR mode', () => {
-        // saved accelo_1 → loop_1 (chain-aligned) → top-ghost → accelo_3 (loop child)
-        // accelo_3 should be delta-shifted by loop_1's alignment delta, NOT cross-axis-aligned
-        const savedNode: Node = {
-            data: {
-                componentName: 'accelo',
-                metadata: {ui: {nodePosition: {x: 400, y: 300}}},
-                workflowNodeName: 'accelo_1',
-            },
-            id: 'accelo_1',
-            position: {x: 400, y: 300},
-            type: 'workflow',
-        };
-        const loopNode: Node = {
-            data: {
-                componentName: 'loop',
-                taskDispatcher: true,
-                taskDispatcherId: 'loop_1',
-                workflowNodeName: 'loop_1',
-            },
-            id: 'loop_1',
-            position: {x: 700, y: 500},
-            type: 'workflow',
-        };
-        const topGhost: Node = {
-            data: {taskDispatcherId: 'loop_1'},
-            id: 'loop_1-loop-top-ghost',
-            position: {x: 650, y: 480},
-            type: 'taskDispatcherTopGhostNode',
-        };
-        const bodyNode: Node = {
-            data: {componentName: 'accelo', loopData: {loopId: 'loop_1'}},
-            id: 'accelo_3',
-            position: {x: 800, y: 600},
-            type: 'workflow',
-        };
-        const edges: Edge[] = [
-            {id: 'accelo_1=>loop_1', source: 'accelo_1', target: 'loop_1'},
-            {id: 'ghost=>accelo_3', source: 'loop_1-loop-top-ghost', target: 'accelo_3'},
-        ];
-        const allNodes = [savedNode, loopNode, topGhost, bodyNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
-
-        // loop_1 chain-aligned: x = 400 + 170 = 570, y = 300
-        // loop delta: x = 570 - 700 = -130, y = 300 - 500 = -200
-        expect(allNodes[1].position).toEqual({x: 570, y: 300});
-
-        // accelo_3 delta-shifted: x = 800 + (-130) = 670, y = 600 + (-200) = 400
-        // Preserves dagre offset from loop (was +100 x / +100 y, still +100 / +100)
-        expect(allNodes[3].position).toEqual({x: 670, y: 400});
-    });
-
-    it('should delta-shift loop child when dispatcher is chain-aligned in TB mode', () => {
-        // saved accelo_1 → loop_1 (chain-aligned) → top-ghost → accelo_3 (loop child)
-        const savedNode: Node = {
-            data: {
-                componentName: 'accelo',
-                metadata: {ui: {nodePosition: {x: 300, y: 400}}},
-                workflowNodeName: 'accelo_1',
-            },
-            id: 'accelo_1',
-            position: {x: 300, y: 400},
-            type: 'workflow',
-        };
-        const loopNode: Node = {
-            data: {
-                componentName: 'loop',
-                taskDispatcher: true,
-                taskDispatcherId: 'loop_1',
-                workflowNodeName: 'loop_1',
-            },
-            id: 'loop_1',
-            position: {x: 500, y: 700},
-            type: 'workflow',
-        };
-        const topGhost: Node = {
-            data: {taskDispatcherId: 'loop_1'},
-            id: 'loop_1-loop-top-ghost',
-            position: {x: 480, y: 850},
-            type: 'taskDispatcherTopGhostNode',
-        };
-        const bodyNode: Node = {
-            data: {componentName: 'accelo', loopData: {loopId: 'loop_1'}},
-            id: 'accelo_3',
-            position: {x: 645, y: 900},
-            type: 'workflow',
-        };
-        const edges: Edge[] = [
-            {id: 'accelo_1=>loop_1', source: 'accelo_1', target: 'loop_1'},
-            {id: 'ghost=>accelo_3', source: 'loop_1-loop-top-ghost', target: 'accelo_3'},
-        ];
-        const allNodes = [savedNode, loopNode, topGhost, bodyNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // loop_1 chain-aligned: x = 300, y = 400 + 150 = 550
-        // loop delta: x = 300 - 500 = -200, y = 550 - 700 = -150
-        expect(allNodes[1].position).toEqual({x: 300, y: 550});
-
-        // accelo_3 delta-shifted: x = 645 + (-200) = 445, y = 900 + (-150) = 750
-        // Preserves dagre offset from loop (was +145 x / +200 y, still +145 / +200)
-        expect(allNodes[3].position).toEqual({x: 445, y: 750});
-    });
-
-    it('should delta-shift ghosts and children together when dispatcher is chain-aligned', () => {
-        // Verifies ghosts and workflow children both get delta-shifted consistently
-        const savedNode: Node = {
-            data: {
-                componentName: 'accelo',
-                metadata: {ui: {nodePosition: {x: 400, y: 300}}},
-                workflowNodeName: 'accelo_1',
-            },
-            id: 'accelo_1',
-            position: {x: 400, y: 300},
-            type: 'workflow',
-        };
-        const loopNode: Node = {
-            data: {
-                componentName: 'loop',
-                taskDispatcher: true,
-                taskDispatcherId: 'loop_1',
-                workflowNodeName: 'loop_1',
-            },
-            id: 'loop_1',
-            position: {x: 700, y: 500},
-            type: 'workflow',
-        };
-        const topGhost: Node = {
-            data: {taskDispatcherId: 'loop_1'},
-            id: 'loop_1-loop-top-ghost',
-            position: {x: 650, y: 480},
-            type: 'taskDispatcherTopGhostNode',
-        };
-        const leftGhost: Node = {
-            data: {taskDispatcherId: 'loop_1'},
-            id: 'loop_1-taskDispatcher-left-ghost',
-            position: {x: 750, y: 380},
-            type: 'taskDispatcherLeftGhostNode',
-        };
-        const bottomGhost: Node = {
-            data: {taskDispatcherId: 'loop_1'},
-            id: 'loop_1-loop-bottom-ghost',
-            position: {x: 900, y: 480},
-            type: 'taskDispatcherBottomGhostNode',
-        };
-        const bodyNode: Node = {
-            data: {componentName: 'accelo', loopData: {loopId: 'loop_1'}},
-            id: 'accelo_3',
-            position: {x: 800, y: 600},
-            type: 'workflow',
-        };
-        const edges: Edge[] = [
-            {id: 'accelo_1=>loop_1', source: 'accelo_1', target: 'loop_1'},
-            {id: 'ghost=>accelo_3', source: 'loop_1-loop-top-ghost', target: 'accelo_3'},
-        ];
-        const allNodes = [savedNode, loopNode, topGhost, leftGhost, bottomGhost, bodyNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
-
-        // loop delta: x = 570 - 700 = -130, y = 300 - 500 = -200
-        const deltaX = -130;
-        const deltaY = -200;
-
-        // All descendants shifted by the same delta
-        expect(allNodes[2].position).toEqual({x: 650 + deltaX, y: 480 + deltaY}); // top-ghost
-        expect(allNodes[3].position).toEqual({x: 750 + deltaX, y: 380 + deltaY}); // left-ghost
-        expect(allNodes[4].position).toEqual({x: 900 + deltaX, y: 480 + deltaY}); // bottom-ghost
-        expect(allNodes[5].position).toEqual({x: 800 + deltaX, y: 600 + deltaY}); // accelo_3 (child)
-    });
-
-    it('should align task dispatcher when predecessor has saved position', () => {
-        const savedNode: Node = {
-            data: {
-                componentName: 'accelo',
-                metadata: {ui: {nodePosition: {x: 400, y: 300}}},
-                workflowNodeName: 'accelo_1',
-            },
-            id: 'accelo_1',
-            position: {x: 400, y: 300},
-            type: 'workflow',
-        };
-        const loopNode: Node = {
-            data: {
-                componentName: 'loop',
-                taskDispatcher: true,
-                taskDispatcherId: 'loop_1',
-                workflowNodeName: 'loop_1',
-            },
-            id: 'loop_1',
-            position: {x: 700, y: 500},
-            type: 'workflow',
-        };
-        const topGhost: Node = {
-            data: {taskDispatcherId: 'loop_1'},
-            id: 'loop_1-loop-top-ghost',
-            position: {x: 650, y: 480},
-            type: 'taskDispatcherTopGhostNode',
-        };
-        const edges: Edge[] = [{id: 'accelo_1=>loop_1', source: 'accelo_1', target: 'loop_1'}];
-        const allNodes = [savedNode, loopNode, topGhost];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
-
-        // Loop aligned: x = 400 + 170 = 570, y = 300
-        expect(allNodes[1].position).toEqual({x: 570, y: 300});
-        // Ghost shifted by delta: x = 650 + (570-700) = 520, y = 480 + (300-500) = 280
-        expect(allNodes[2].position).toEqual({x: 520, y: 280});
-    });
-
-    it('should work with x cross-axis for TB mode', () => {
-        const savedNode: Node = {
-            data: {
-                componentName: 'httpClient',
-                metadata: {ui: {nodePosition: {x: 250, y: 400}}},
-                workflowNodeName: 'httpClient_1',
-            },
-            id: 'httpClient_1',
-            position: {x: 250, y: 400},
-            type: 'workflow',
-        };
-        const unsavedNode: Node = {
-            data: {componentName: 'accelo', workflowNodeName: 'accelo_1'},
-            id: 'accelo_1',
-            position: {x: 500, y: 600},
-            type: 'workflow',
-        };
-        const edges: Edge[] = [{id: 'httpClient_1=>accelo_1', source: 'httpClient_1', target: 'accelo_1'}];
-        const allNodes = [savedNode, unsavedNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // y adjusted to predecessor.y + 150 (standard TB gap: NODE_HEIGHT/2 + 50 + NODE_HEIGHT/2)
-        expect(allNodes[1].position).toEqual({x: 250, y: 550});
-    });
-
-    it('should use same main-axis gap when predecessor is AI Agent in TB mode', () => {
-        const savedAiAgent: Node = {
-            data: {
-                clusterElements: {tool_1: {label: 'Tool 1'}},
-                clusterRoot: true,
-                componentName: 'aiAgent',
-                metadata: {ui: {nodePosition: {x: 500, y: 400}}},
-                workflowNodeName: 'aiAgent_1',
-            },
-            id: 'aiAgent_1',
-            position: {x: 500, y: 400},
-            type: 'clusterRoot',
-        };
-        const regularNode: Node = {
-            data: {componentName: 'httpClient', workflowNodeName: 'httpClient_1'},
-            id: 'httpClient_1',
-            position: {x: 800, y: 700},
-            type: 'workflow',
-        };
-        const edges: Edge[] = [{id: 'aiAgent_1=>httpClient_1', source: 'aiAgent_1', target: 'httpClient_1'}];
-        const allNodes = [savedAiAgent, regularNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // Gap = NODE_HEIGHT/2 + RANKSEP + NODE_HEIGHT/2 = 50 + 50 + 50 = 150
-        expect(allNodes[1].position.y).toBe(400 + 150);
-    });
-
-    it('should use same main-axis gap when successor is AI Agent in TB mode', () => {
-        const savedNode: Node = {
-            data: {
-                componentName: 'httpClient',
-                metadata: {ui: {nodePosition: {x: 500, y: 400}}},
-                workflowNodeName: 'httpClient_1',
-            },
-            id: 'httpClient_1',
-            position: {x: 500, y: 400},
-            type: 'workflow',
-        };
-        const clusterRootNode: Node = {
-            data: {
-                clusterElements: {tool_1: {label: 'Tool 1'}},
-                clusterRoot: true,
-                componentName: 'aiAgent',
-                workflowNodeName: 'aiAgent_1',
-            },
-            id: 'aiAgent_1',
-            position: {x: 800, y: 700},
-            type: 'clusterRoot',
-        };
-        const edges: Edge[] = [{id: 'httpClient_1=>aiAgent_1', source: 'httpClient_1', target: 'aiAgent_1'}];
-        const allNodes = [savedNode, clusterRootNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // Gap = NODE_HEIGHT/2 + RANKSEP + NODE_HEIGHT/2 = 50 + 50 + 50 = 150
-        expect(allNodes[1].position.y).toBe(400 + 150);
-    });
-
     it('should NOT align in TB mode when no saved positions exist', () => {
         const nodeA: Node = {
             data: {componentName: 'httpClient'},
@@ -2646,289 +2353,105 @@ describe('alignChainNodesCrossAxis', () => {
         expect(accelo5Data.metadata?.ui?.nodePosition).toBeUndefined();
     });
 
-    it('should delta-shift nested task dispatcher using forkJoinData, not taskDispatcherId', () => {
-        // Scenario: saved accelo_1 → fork-join_1 (chain-aligned).
-        // condition_4 is a child of fork-join_1 with forkJoinData.forkJoinId='fork-join_1'
-        // AND taskDispatcherId='condition_4' (its own ID).
-        // getParentDispatcherId must resolve via forkJoinData so condition_4
-        // is delta-shifted by fork-join_1's alignment delta.
-        const savedNode: Node = {
-            data: {
-                componentName: 'accelo',
-                metadata: {ui: {nodePosition: {x: 400, y: 300}}},
-                workflowNodeName: 'accelo_1',
-            },
-            id: 'accelo_1',
-            position: {x: 400, y: 300},
-            type: 'workflow',
-        };
-        const forkJoinNode: Node = {
-            data: {
-                componentName: 'forkJoin',
-                taskDispatcher: true,
-                taskDispatcherId: 'fork-join_1',
-                workflowNodeName: 'fork-join_1',
-            },
-            id: 'fork-join_1',
-            position: {x: 700, y: 500},
-            type: 'workflow',
-        };
-        const topGhost: Node = {
-            data: {taskDispatcherId: 'fork-join_1'},
-            id: 'fork-join_1-forkJoin-top-ghost',
-            position: {x: 650, y: 480},
-            type: 'taskDispatcherTopGhostNode',
-        };
-        const condition4: Node = {
+    it('should cascade cross-axis from chain-aligned predecessor to linear-chain successors', () => {
+        // Scenario reproducing the "insert node between chain-aligned nodes" bug:
+        // - condition_1 has a saved position, so its chain (script_1 onwards) gets
+        //   chain-aligned to the condition's column via the bottom-ghost delta.
+        // - A new accelo_2 is inserted between script_1 and googleMail_3. Since
+        //   accelo_2 has no saved position, it defaults to dagre's center, and
+        //   downstream nodes (googleMail_3, logger_1) follow accelo_2's column,
+        //   drifting out of the main chain column.
+        // Fix: cascade cross-axis alignment from chain-aligned predecessors to
+        // unanchored linear-chain successors so the whole tail inherits the
+        // predecessor's column.
+        const condition: Node = {
             data: {
                 componentName: 'condition',
-                forkJoinData: {forkJoinId: 'fork-join_1'},
+                metadata: {ui: {nodePosition: {x: 600, y: 100}}},
                 taskDispatcher: true,
-                taskDispatcherId: 'condition_4',
-                workflowNodeName: 'condition_4',
+                taskDispatcherId: 'condition_1',
             },
-            id: 'condition_4',
-            position: {x: 800, y: 600},
+            id: 'condition_1',
+            position: {x: 600, y: 100},
             type: 'workflow',
         };
-        const condition4TopGhost: Node = {
-            data: {conditionId: 'condition_4', taskDispatcherId: 'condition_4'},
-            id: 'condition_4-condition-top-ghost',
-            position: {x: 750, y: 580},
-            type: 'taskDispatcherTopGhostNode',
+        const bottomGhost: Node = {
+            data: {taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 600, y: 300},
+            type: 'taskDispatcherBottomGhostNode',
         };
-        const edges: Edge[] = [
-            {id: 'accelo_1=>fork-join_1', source: 'accelo_1', target: 'fork-join_1'},
-            {id: 'ghost=>condition_4', source: 'fork-join_1-forkJoin-top-ghost', target: 'condition_4'},
-        ];
-        const allNodes = [savedNode, forkJoinNode, topGhost, condition4, condition4TopGhost];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
-
-        // fork-join_1 aligned: x = 400 + 170 = 570, y = 300
-        // delta: x = 570 - 700 = -130, y = 300 - 500 = -200
-        const deltaX = -130;
-        const deltaY = -200;
-
-        // condition_4 shifted via forkJoinData.forkJoinId='fork-join_1'
-        expect(allNodes[3].position).toEqual({x: 800 + deltaX, y: 600 + deltaY});
-        // condition_4's ghost shifted via taskDispatcherId='condition_4' (cascaded delta)
-        expect(allNodes[4].position).toEqual({x: 750 + deltaX, y: 580 + deltaY});
-    });
-
-    it('should apply cluster centering offset when aligning AI Agent after regular node in TB mode', () => {
-        // In TB mode, AI Agent nodes with cluster elements get a -85 cross-axis
-        // centering offset during dagre conversion. alignChainNodesCrossAxis must
-        // preserve this differential when copying predecessor's cross-axis position.
-        const savedNode: Node = {
-            data: {
-                componentName: 'httpClient',
-                metadata: {ui: {nodePosition: {x: 500, y: 400}}},
-                workflowNodeName: 'httpClient_1',
-            },
-            id: 'httpClient_1',
+        const script: Node = {
+            data: {componentName: 'script', workflowNodeName: 'script_1'},
+            id: 'script_1',
             position: {x: 500, y: 400},
             type: 'workflow',
         };
-        const clusterRootNode: Node = {
-            data: {
-                clusterElements: {tool_1: {label: 'Tool 1'}, tool_2: {label: 'Tool 2'}},
-                clusterRoot: true,
-                componentName: 'aiAgent',
-                workflowNodeName: 'aiAgent_1',
-            },
-            id: 'aiAgent_1',
-            position: {x: 1000, y: 600},
-            type: 'clusterRoot',
-        };
-        const edges: Edge[] = [{id: 'httpClient_1=>aiAgent_1', source: 'httpClient_1', target: 'aiAgent_1'}];
-        const allNodes = [savedNode, clusterRootNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // AI Agent gets predecessor's x shifted by cluster offset: 500 + (-85) = 415
-        expect(allNodes[1].position.x).toBe(500 - 85);
-    });
-
-    it('should apply reverse cluster offset when aligning regular node after AI Agent in TB mode', () => {
-        const savedAiAgent: Node = {
-            data: {
-                clusterElements: {tool_1: {label: 'Tool 1'}, tool_2: {label: 'Tool 2'}},
-                clusterRoot: true,
-                componentName: 'aiAgent',
-                metadata: {ui: {nodePosition: {x: 415, y: 400}}},
-                workflowNodeName: 'aiAgent_1',
-            },
-            id: 'aiAgent_1',
-            position: {x: 415, y: 400},
-            type: 'clusterRoot',
-        };
-        const regularNode: Node = {
-            data: {componentName: 'httpClient', workflowNodeName: 'httpClient_1'},
-            id: 'httpClient_1',
-            position: {x: 1000, y: 600},
+        const accelo2: Node = {
+            data: {componentName: 'accelo', workflowNodeName: 'accelo_2'},
+            id: 'accelo_2',
+            position: {x: 500, y: 500},
             type: 'workflow',
         };
-        const edges: Edge[] = [{id: 'aiAgent_1=>httpClient_1', source: 'aiAgent_1', target: 'httpClient_1'}];
-        const allNodes = [savedAiAgent, regularNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // Regular node gets AI Agent's x shifted by reverse cluster offset: 415 + 85 = 500
-        expect(allNodes[1].position.x).toBe(415 + 85);
-    });
-
-    it('should apply cluster centering offset in LR mode (y-axis)', () => {
-        const savedNode: Node = {
-            data: {
-                componentName: 'httpClient',
-                metadata: {ui: {nodePosition: {x: 400, y: 300}}},
-                workflowNodeName: 'httpClient_1',
-            },
-            id: 'httpClient_1',
-            position: {x: 400, y: 300},
-            type: 'workflow',
-        };
-        const clusterRootNode: Node = {
-            data: {
-                clusterElements: {tool_1: {label: 'Tool 1'}},
-                clusterRoot: true,
-                componentName: 'aiAgent',
-                workflowNodeName: 'aiAgent_1',
-            },
-            id: 'aiAgent_1',
-            position: {x: 600, y: 500},
-            type: 'clusterRoot',
-        };
-        const edges: Edge[] = [{id: 'httpClient_1=>aiAgent_1', source: 'httpClient_1', target: 'aiAgent_1'}];
-        const allNodes = [savedNode, clusterRootNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
-
-        // LR mode uses -23 cluster offset on cross-axis (y)
-        expect(allNodes[1].position.y).toBe(300 - 23);
-    });
-
-    it('should not apply cluster offset when both nodes have cluster elements', () => {
-        const savedAiAgent: Node = {
-            data: {
-                clusterElements: {tool_1: {label: 'Tool 1'}},
-                clusterRoot: true,
-                componentName: 'aiAgent',
-                metadata: {ui: {nodePosition: {x: 500, y: 400}}},
-                workflowNodeName: 'aiAgent_1',
-            },
-            id: 'aiAgent_1',
-            position: {x: 500, y: 400},
-            type: 'clusterRoot',
-        };
-        const secondAiAgent: Node = {
-            data: {
-                clusterElements: {tool_1: {label: 'Tool 1'}, tool_2: {label: 'Tool 2'}},
-                clusterRoot: true,
-                componentName: 'aiAgent',
-                workflowNodeName: 'aiAgent_2',
-            },
-            id: 'aiAgent_2',
-            position: {x: 1000, y: 600},
-            type: 'clusterRoot',
-        };
-        const edges: Edge[] = [{id: 'aiAgent_1=>aiAgent_2', source: 'aiAgent_1', target: 'aiAgent_2'}];
-        const allNodes = [savedAiAgent, secondAiAgent];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // Both have cluster offset → differential is 0, same x as predecessor
-        expect(allNodes[1].position.x).toBe(500);
-    });
-
-    it('should not apply cluster offset when node has empty cluster elements', () => {
-        const savedNode: Node = {
-            data: {
-                componentName: 'httpClient',
-                metadata: {ui: {nodePosition: {x: 500, y: 400}}},
-                workflowNodeName: 'httpClient_1',
-            },
-            id: 'httpClient_1',
-            position: {x: 500, y: 400},
-            type: 'workflow',
-        };
-        const aiAgentNoCluster: Node = {
-            data: {
-                clusterElements: {tool_1: null, tool_2: []},
-                clusterRoot: true,
-                componentName: 'aiAgent',
-                workflowNodeName: 'aiAgent_1',
-            },
-            id: 'aiAgent_1',
-            position: {x: 1000, y: 600},
-            type: 'clusterRoot',
-        };
-        const edges: Edge[] = [{id: 'httpClient_1=>aiAgent_1', source: 'httpClient_1', target: 'aiAgent_1'}];
-        const allNodes = [savedNode, aiAgentNoCluster];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // Empty/null cluster elements → no offset, same x as predecessor
-        expect(allNodes[1].position.x).toBe(500);
-    });
-
-    it('should backward-propagate position when successor has saved position in TB mode', () => {
-        const newNode: Node = {
-            data: {componentName: 'accelo', workflowNodeName: 'accelo_1'},
-            id: 'accelo_1',
-            position: {x: 500, y: 300},
-            type: 'workflow',
-        };
-        const savedNode: Node = {
-            data: {
-                componentName: 'httpClient',
-                metadata: {ui: {nodePosition: {x: 500, y: 600}}},
-                workflowNodeName: 'httpClient_1',
-            },
-            id: 'httpClient_1',
+        const gmail: Node = {
+            data: {componentName: 'googleMail', workflowNodeName: 'googleMail_3'},
+            id: 'googleMail_3',
             position: {x: 500, y: 600},
             type: 'workflow',
         };
-        const edges: Edge[] = [{id: 'accelo_1=>httpClient_1', source: 'accelo_1', target: 'httpClient_1'}];
-        const allNodes = [newNode, savedNode];
+        const logger: Node = {
+            data: {componentName: 'logger', workflowNodeName: 'logger_1'},
+            id: 'logger_1',
+            position: {x: 500, y: 700},
+            type: 'workflow',
+        };
+        const edges: Edge[] = [
+            {id: 'ghost=>script', source: 'condition_1-condition-bottom-ghost', target: 'script_1'},
+            {id: 'script=>accelo2', source: 'script_1', target: 'accelo_2'},
+            {id: 'accelo2=>gmail', source: 'accelo_2', target: 'googleMail_3'},
+            {id: 'gmail=>logger', source: 'googleMail_3', target: 'logger_1'},
+        ];
+        const allNodes = [condition, bottomGhost, script, accelo2, gmail, logger];
+        const savedDispatcherDeltas = new Map([['condition_1', {x: 100, y: 0}]]);
+
+        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB', savedDispatcherDeltas);
+
+        // script_1 aligned to condition column via bottom-ghost delta
+        expect(allNodes[2].position.x).toBe(600);
+        // accelo_2 (new, unanchored) cascades from script_1's chain-aligned column
+        expect(allNodes[3].position.x).toBe(600);
+        // googleMail_3 and logger_1 cascade from accelo_2's chain-aligned column
+        expect(allNodes[4].position.x).toBe(600);
+        expect(allNodes[5].position.x).toBe(600);
+    });
+
+    it('should NOT cascade from manually-saved predecessor to its linear-chain successors', () => {
+        // Regression guard: if a user manually drags a single node (raw nodePosition
+        // metadata on the predecessor), only that node should be offset. Successors
+        // stay at dagre's default position so the drag doesn't pull them along.
+        const draggedScript: Node = {
+            data: {
+                componentName: 'script',
+                metadata: {ui: {nodePosition: {x: 700, y: 400}}},
+                workflowNodeName: 'script_1',
+            },
+            id: 'script_1',
+            position: {x: 700, y: 400},
+            type: 'workflow',
+        };
+        const gmail: Node = {
+            data: {componentName: 'googleMail', workflowNodeName: 'googleMail_3'},
+            id: 'googleMail_3',
+            position: {x: 500, y: 600},
+            type: 'workflow',
+        };
+        const edges: Edge[] = [{id: 'script=>gmail', source: 'script_1', target: 'googleMail_3'}];
+        const allNodes = [draggedScript, gmail];
 
         alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
 
-        // New node should be positioned above the saved node: savedY - gap
-        // TB gap = NODE_HEIGHT/2 + RANKSEP + NODE_HEIGHT/2 = 100/2 + 50 + 100/2 = 150
-        expect(allNodes[0].position.x).toBe(500);
-        expect(allNodes[0].position.y).toBe(600 - 150);
-        expect((allNodes[0].data as NodeDataType).metadata?.ui?.chainAlignedPosition).toEqual({x: 500, y: 600 - 150});
-        expect((allNodes[0].data as NodeDataType).metadata?.ui?.nodePosition).toBeUndefined();
-    });
-
-    it('should backward-propagate position when successor has saved position in LR mode', () => {
-        const newNode: Node = {
-            data: {componentName: 'accelo', workflowNodeName: 'accelo_1'},
-            id: 'accelo_1',
-            position: {x: 300, y: 500},
-            type: 'workflow',
-        };
-        const savedNode: Node = {
-            data: {
-                componentName: 'httpClient',
-                metadata: {ui: {nodePosition: {x: 800, y: 500}}},
-                workflowNodeName: 'httpClient_1',
-            },
-            id: 'httpClient_1',
-            position: {x: 800, y: 500},
-            type: 'workflow',
-        };
-        const edges: Edge[] = [{id: 'accelo_1=>httpClient_1', source: 'accelo_1', target: 'httpClient_1'}];
-        const allNodes = [newNode, savedNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'y', 'LR');
-
-        // LR gap = renderedHalf + dagreHalf + RANKSEP + dagreHalf - renderedHalf
-        // = 60 + 60 + 50 + 60 - 60 = 170
-        expect(allNodes[0].position.x).toBe(800 - 170);
-        expect(allNodes[0].position.y).toBe(500);
+        // googleMail_3 stays at dagre's default (500), not pulled to script's 700
+        expect(allNodes[1].position.x).toBe(500);
     });
 
     it('should NOT backward-propagate when no saved positions exist', () => {
@@ -2952,44 +2475,6 @@ describe('alignChainNodesCrossAxis', () => {
         // No saved positions → no backward propagation
         expect(allNodes[0].position).toEqual({x: 400, y: 300});
         expect(allNodes[1].position).toEqual({x: 600, y: 500});
-    });
-
-    it('should backward-cascade through chain to saved successor in TB mode', () => {
-        const nodeA: Node = {
-            data: {componentName: 'accelo', workflowNodeName: 'accelo_1'},
-            id: 'accelo_1',
-            position: {x: 500, y: 100},
-            type: 'workflow',
-        };
-        const nodeB: Node = {
-            data: {componentName: 'slack', workflowNodeName: 'slack_1'},
-            id: 'slack_1',
-            position: {x: 500, y: 400},
-            type: 'workflow',
-        };
-        const savedNode: Node = {
-            data: {
-                componentName: 'httpClient',
-                metadata: {ui: {nodePosition: {x: 500, y: 900}}},
-                workflowNodeName: 'httpClient_1',
-            },
-            id: 'httpClient_1',
-            position: {x: 500, y: 900},
-            type: 'workflow',
-        };
-        const edges: Edge[] = [
-            {id: 'accelo_1=>slack_1', source: 'accelo_1', target: 'slack_1'},
-            {id: 'slack_1=>httpClient_1', source: 'slack_1', target: 'httpClient_1'},
-        ];
-        const allNodes = [nodeA, nodeB, savedNode];
-
-        alignChainNodesCrossAxis(allNodes, edges, 'x', 'TB');
-
-        // TB gap = 150
-        // slack_1 should be at 900 - 150 = 750
-        expect(allNodes[1].position.y).toBe(900 - 150);
-        // accelo_1 should be at 750 - 150 = 600
-        expect(allNodes[0].position.y).toBe(900 - 150 - 150);
     });
 
     it('should NOT backward-propagate task dispatcher nodes', () => {
