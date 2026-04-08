@@ -51,6 +51,7 @@ public class ZeplinProjectNoteTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("projectNote")
         .title("Project Note")
         .description("Triggers when new note is created, deleted or updated in specified project.")
+        .help("", "https://docs.bytechef.io/reference/components/zeplin_v1#project-note")
         .properties(
             string(PROJECT_ID)
                 .label("Project ID")
