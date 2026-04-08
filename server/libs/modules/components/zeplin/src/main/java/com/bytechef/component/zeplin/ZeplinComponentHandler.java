@@ -19,6 +19,7 @@ package com.bytechef.component.zeplin;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.zeplin.trigger.ZeplinProjectNoteTrigger;
 import com.google.auto.service.AutoService;
@@ -39,7 +40,17 @@ public class ZeplinComponentHandler extends AbstractZeplinComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://docs.zeplin.dev/reference/introduction")
             .icon("path:assets/zeplin.svg")
             .categories(ComponentCategory.COMMUNICATION);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/zeplin_v1#connection-setup")
+            .version(1);
     }
 }
