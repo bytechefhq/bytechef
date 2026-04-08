@@ -67,6 +67,8 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow getWorkflowProjectWorkflow(String workflowId);
 
+    List<ProjectWorkflow> getWorkflowProjectWorkflows(List<String> workflowIds);
+
     void publishWorkflow(long projectId, int oldProjectVersion, String oldWorkflowId, ProjectWorkflow projectWorkflow);
 
     ProjectWorkflow update(ProjectWorkflow projectWorkflow);

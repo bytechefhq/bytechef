@@ -41,6 +41,8 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
 
     List<ProjectWorkflow> findAllByProjectIdIn(List<Long> projectIds);
 
+    List<ProjectWorkflow> findAllByWorkflowIdIn(List<String> workflowIds);
+
     @Query("""
         SELECT pw.* FROM project_workflow pw
         INNER JOIN (
