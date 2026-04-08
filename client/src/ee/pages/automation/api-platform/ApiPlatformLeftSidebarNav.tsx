@@ -3,7 +3,6 @@ import {ProjectBasic} from '@/ee/shared/middleware/automation/api-platform';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {Tag} from '@/shared/middleware/automation/configuration';
 import {TagIcon} from 'lucide-react';
-import {useLocation} from 'react-router-dom';
 
 interface ApiPlatformLeftSidebarNavProps {
     environment?: number;
@@ -13,8 +12,6 @@ interface ApiPlatformLeftSidebarNavProps {
 }
 
 const ApiPlatformLeftSidebarNav = ({environment, filterData, projects, tags}: ApiPlatformLeftSidebarNavProps) => {
-    const location = useLocation();
-
     return (
         <>
             <LeftSidebarNav
@@ -67,19 +64,6 @@ const ApiPlatformLeftSidebarNav = ({environment, filterData, projects, tags}: Ap
                     </>
                 }
                 title="Tags"
-            />
-
-            <LeftSidebarNav
-                body={
-                    <LeftSidebarNavItem
-                        item={{
-                            current: location.pathname.includes('api-clients'),
-                            id: 'api-clients',
-                            name: 'API Clients',
-                        }}
-                        toLink="../api-clients"
-                    />
-                }
             />
         </>
     );
