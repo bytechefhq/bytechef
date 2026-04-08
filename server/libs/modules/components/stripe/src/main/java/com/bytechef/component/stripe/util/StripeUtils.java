@@ -18,6 +18,7 @@ package com.bytechef.component.stripe.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.stripe.constant.StripeConstants.CUSTOMER_ID;
 import static com.bytechef.component.stripe.constant.StripeConstants.ID;
 
 import com.bytechef.component.definition.Context;
@@ -41,12 +42,49 @@ public class StripeUtils extends AbstractStripeUtils {
     private StripeUtils() {
     }
 
+    public static List<Option<String>> getCouponOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> body = context.http(http -> http.get("/coupons"))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body, "name");
+    }
+
+    public static List<Option<String>> getSubscriptionIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> body = context.http(http -> http.get("/subscriptions"))
+            .queryParameter(CUSTOMER_ID, inputParameters.getRequiredString(CUSTOMER_ID))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body, ID);
+    }
+
     public static List<Option<String>> getCustomerOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(
-            http -> http.get("/customers"))
+        Map<String, Object> body = context.http(http -> http.get("/customers"))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body, "name");
+
+    }
+
+    public static List<Option<String>> getPriceOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> body = context.http(http -> http.get("/prices"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -56,12 +94,41 @@ public class StripeUtils extends AbstractStripeUtils {
         if (body.get("data") instanceof List<?> list) {
             for (Object object : list) {
                 if (object instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get(ID)));
+
+                    Integer unitAmount = (Integer) map.get("unit_amount");
+                    String currency = ((String) map.get("currency")).toUpperCase();
+
+                    double amount = unitAmount / 100.0;
+
+                    String interval = null;
+                    if (map.get("recurring") instanceof Map<?, ?> recurring) {
+                        interval = (String) recurring.get("interval");
+                    }
+
+                    String label = String.format("%.2f %s", amount, currency);
+
+                    if (interval != null) {
+                        label += " / " + interval;
+                    }
+
+                    options.add(option(label, (String) map.get(ID)));
                 }
             }
         }
         return options;
+    }
 
+    public static List<Option<String>> getDefaultPaymentMethodOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> body = context.http(
+            http -> http.get("/customers/" + inputParameters.getRequiredString(CUSTOMER_ID) + "/payment_methods"))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body, ID);
     }
 
     public static Object getNewObject(WebhookBody webhookBody) {
@@ -93,5 +160,19 @@ public class StripeUtils extends AbstractStripeUtils {
         context.http(http -> http.delete("/webhook_endpoints/" + webhookId))
             .configuration(responseType(ResponseType.JSON))
             .execute();
+    }
+
+    private static List<Option<String>> getOptions(Map<String, Object> body, String label) {
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("data") instanceof List<?> list) {
+            for (Object object : list) {
+                if (object instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(label), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
     }
 }
