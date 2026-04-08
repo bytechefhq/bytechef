@@ -6,7 +6,6 @@ import {Node} from '@xyflow/react';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {
     consumePendingDefinition,
-    hasPendingDefinition,
     isWorkflowMutating,
     setPendingDefinition,
     setWorkflowMutating,
@@ -15,7 +14,6 @@ import {
 interface SaveWorkflowNodesPositionProps {
     clearPositionNodeIds?: Set<string>;
     draggedNodeId: string;
-    invalidateWorkflowQueries: () => void;
     nodePositions: Record<string, {x: number; y: number}>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
@@ -179,7 +177,6 @@ export function updateTaskPositions(
 export default function saveWorkflowNodesPosition({
     clearPositionNodeIds,
     draggedNodeId,
-    invalidateWorkflowQueries,
     nodePositions,
     updateWorkflowMutation,
 }: SaveWorkflowNodesPositionProps) {
@@ -275,7 +272,6 @@ export default function saveWorkflowNodesPosition({
 
     firePositionMutation({
         definition: updatedDefinitionStr,
-        invalidateWorkflowQueries,
         previousNodes,
         setNodes,
         updateWorkflowMutation,
@@ -286,7 +282,6 @@ export default function saveWorkflowNodesPosition({
 
 interface FirePositionMutationProps {
     definition: string;
-    invalidateWorkflowQueries: () => void;
     previousNodes: Node[];
     setNodes: (nodes: Node[]) => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -296,7 +291,6 @@ interface FirePositionMutationProps {
 
 function firePositionMutation({
     definition,
-    invalidateWorkflowQueries,
     previousNodes,
     setNodes,
     updateWorkflowMutation,
@@ -327,18 +321,8 @@ function firePositionMutation({
                 if (pendingDefinition) {
                     const currentWorkflow = useWorkflowDataStore.getState().workflow;
 
-                    // Re-sync the store definition in case the refetch from
-                    // onSuccess already overwrote it with stale server data.
-                    useWorkflowDataStore.setState((state) => ({
-                        workflow: {
-                            ...state.workflow,
-                            definition: pendingDefinition,
-                        },
-                    }));
-
                     firePositionMutation({
                         definition: pendingDefinition,
-                        invalidateWorkflowQueries,
                         previousNodes: useWorkflowDataStore.getState().nodes,
                         setNodes: useWorkflowDataStore.getState().setNodes,
                         updateWorkflowMutation,
@@ -354,15 +338,6 @@ function firePositionMutation({
                     ...currentWorkflow,
                     version: updatedWorkflow.version,
                 });
-
-                // Only invalidate queries if there are no pending position saves.
-                // A pending save means another mutation will fire from onSettled,
-                // and its own onSuccess will invalidate queries with up-to-date
-                // server data. Invalidating here would trigger a refetch that
-                // overwrites the locally synced definition with stale server data.
-                if (!hasPendingDefinition(workflowId)) {
-                    invalidateWorkflowQueries();
-                }
             },
         }
     );
