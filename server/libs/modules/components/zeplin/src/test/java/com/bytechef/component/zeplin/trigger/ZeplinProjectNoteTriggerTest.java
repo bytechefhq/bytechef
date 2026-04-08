@@ -17,101 +17,107 @@
 package com.bytechef.component.zeplin.trigger;
 
 import static com.bytechef.component.zeplin.constant.ZeplinConstants.ID;
+import static com.bytechef.component.zeplin.constant.ZeplinConstants.PROJECT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class ZeplinProjectNoteTriggerTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(PROJECT_ID, "xy"));
     private final Object mockedObject = mock(Object.class);
-    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Parameters mockedOutputParameters = MockParametersFactory.create(Map.of(ID, "123"));
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
-    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private static final String TEST_WORKFLOW_EXECUTION_ID = "testWorkflowExecutionId";
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testWebhookEnable() {
+    void testWebhookEnable(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         UUID uuid = UUID.randomUUID();
 
-        when(mockedTriggerContext.http(any()))
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "abc"));
 
         try (MockedStatic<UUID> uuidMockedStatic = mockStatic(UUID.class)) {
-
             uuidMockedStatic.when(UUID::randomUUID)
                 .thenReturn(uuid);
 
             WebhookEnableOutput result = ZeplinProjectNoteTrigger.webhookEnable(
-                mockedParameters, mockedParameters, "testWebhookUrl", TEST_WORKFLOW_EXECUTION_ID, mockedTriggerContext);
+                mockedInputParameters, mockedInputParameters, "testWebhookUrl", "testWorkflowExecutionId",
+                mockedContext);
 
             WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(
                 Map.of(ID, "abc"), null);
 
             assertEquals(expectedWebhookEnableOutput, result);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-            Http.Body body = bodyArgumentCaptor.getValue();
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
 
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
+            assertEquals("/projects/xy/webhooks", stringArgumentCaptor.getValue());
             assertEquals(
-                Map.of("url", "testWebhookUrl",
-                    "secret", uuid,
-                    "events", List.of("project.note")),
-                body.getContent());
+                Body.of(
+                    Map.of("url", "testWebhookUrl", "secret", uuid, "events", List.of("project.note")),
+                    BodyContentType.JSON),
+                bodyArgumentCaptor.getValue());
         }
     }
 
     @Test
-    void testWebhookDisable() {
-        when(mockedTriggerContext.http(any()))
+    void testWebhookDisable(
+        TriggerContext mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
+
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         ZeplinProjectNoteTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, TEST_WORKFLOW_EXECUTION_ID, mockedTriggerContext);
+            mockedInputParameters, null, mockedOutputParameters, "testWorkflowExecutionId", mockedContext);
 
-        verify(mockedTriggerContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).configuration(any());
-        verify(mockedExecutor, times(1)).execute();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/projects/xy/webhooks/123", stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -120,8 +126,8 @@ class ZeplinProjectNoteTriggerTest {
             .thenReturn(mockedObject);
 
         Object result = ZeplinProjectNoteTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedInputParameters, null, null, null, mockedWebhookBody,
+            null, null, null);
 
         assertEquals(mockedObject, result);
     }
