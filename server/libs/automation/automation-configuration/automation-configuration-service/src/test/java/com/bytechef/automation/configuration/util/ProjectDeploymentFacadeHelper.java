@@ -108,6 +108,7 @@ public class ProjectDeploymentFacadeHelper {
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
             new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
+                null,
                 0,
                 publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
@@ -143,6 +144,7 @@ public class ProjectDeploymentFacadeHelper {
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
             new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
+                null,
                 0, projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
@@ -198,6 +200,7 @@ public class ProjectDeploymentFacadeHelper {
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
             new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
+                null,
                 0,
                 publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 

@@ -1393,6 +1393,15 @@ components:
           description: "The last execution date of a project deployment."
           type: "string"
           format: "date-time"
+        lastExecutionStatus:
+          description: "The last execution status of a project deployment."
+          type: "string"
+          enum:
+            - "CREATED"
+            - "STARTED"
+            - "COMPLETED"
+            - "FAILED"
+            - "STOPPED"
         lastModifiedBy:
           description: "The last modified by."
           type: "string"

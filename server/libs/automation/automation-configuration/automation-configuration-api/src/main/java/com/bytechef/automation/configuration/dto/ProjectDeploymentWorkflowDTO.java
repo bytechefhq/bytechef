@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.dto;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,20 +30,20 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ProjectDeploymentWorkflowDTO(
     List<ProjectDeploymentWorkflowConnection> connections, String createdBy, Instant createdDate,
-    Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, String lastModifiedBy,
-    Instant lastModifiedDate, Long projectDeploymentId, String staticWebhookUrl, int version, String workflowId,
-    String workflowUuid)
+    Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, Job.Status lastExecutionStatus,
+    String lastModifiedBy, Instant lastModifiedDate, Long projectDeploymentId, String staticWebhookUrl, int version,
+    String workflowId, String workflowUuid)
     implements Comparable<ProjectDeploymentWorkflowDTO> {
 
     public ProjectDeploymentWorkflowDTO(
-        ProjectDeploymentWorkflow projectDeploymentWorkflow, Instant lastExecutionDate, String staticWebhookUrl,
-        String workflowUuid) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, Instant lastExecutionDate, Job.Status lastExecutionStatus,
+        String staticWebhookUrl, String workflowUuid) {
 
         this(
             projectDeploymentWorkflow.getConnections(), projectDeploymentWorkflow.getCreatedBy(),
             projectDeploymentWorkflow.getCreatedDate(), projectDeploymentWorkflow.getInputs(),
-            projectDeploymentWorkflow.isEnabled(), projectDeploymentWorkflow.getId(),
-            lastExecutionDate, projectDeploymentWorkflow.getLastModifiedBy(),
+            projectDeploymentWorkflow.isEnabled(), projectDeploymentWorkflow.getId(), lastExecutionDate,
+            lastExecutionStatus, projectDeploymentWorkflow.getLastModifiedBy(),
             projectDeploymentWorkflow.getLastModifiedDate(), projectDeploymentWorkflow.getProjectDeploymentId(),
             staticWebhookUrl, projectDeploymentWorkflow.getVersion(), projectDeploymentWorkflow.getWorkflowId(),
             workflowUuid);
