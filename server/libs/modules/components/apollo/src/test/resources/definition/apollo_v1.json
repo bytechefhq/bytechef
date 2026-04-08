@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new deal for an Apollo account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/apollo_v1#create-deal"
+    },
     "metadata": {
       "method": "POST",
       "path": "/opportunities"
@@ -760,7 +763,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Enriches data for company.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/apollo_v1#enrich-company"
+    },
     "metadata": {
       "method": "GET",
       "path": "/organizations/enrich"
@@ -1473,7 +1479,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Enriches data for a person.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/apollo_v1#enrich-person"
+    },
     "metadata": {
       "method": "POST",
       "path": "/people/match"
@@ -2376,7 +2385,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates the details of existing deals within your team's Apollo account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/apollo_v1#update-deal"
+    },
     "metadata": {
       "method": "PATCH",
       "path": "/opportunities"
@@ -6375,14 +6387,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/apollo_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://docs.apollo.io/"
+  },
   "description": "Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts.",
   "icon": "path:assets/apollo.svg",
   "metadata": null,
