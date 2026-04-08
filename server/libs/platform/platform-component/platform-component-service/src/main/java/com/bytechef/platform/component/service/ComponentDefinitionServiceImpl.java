@@ -114,8 +114,9 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         List<ComponentDefinition> components = getComponentDefinitions()
             .stream()
             .filter(componentDefinitionFilter::filter)
-            .filter(filter(actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions,
-                include))
+            .filter(
+                filter(
+                    actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions, include))
             .distinct()
             .toList();
 
@@ -187,8 +188,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     private static Predicate<ComponentDefinition> filter(
         @Nullable Boolean actionDefinitions, @Nullable Boolean clusterElementDefinitions,
-        @Nullable Boolean connectionDefinitions, @Nullable Boolean triggerDefinitions,
-        @Nullable List<String> include) {
+        @Nullable Boolean connectionDefinitions, @Nullable Boolean triggerDefinitions, @Nullable List<String> include) {
 
         return componentDefinition -> {
             if (include == null || include.contains(componentDefinition.getName())) {
