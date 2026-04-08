@@ -1,5 +1,6 @@
 import {SPACE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {NodeDataType} from '@/shared/types';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -69,7 +70,6 @@ describe('store definition sync', () => {
 
             saveWorkflowNodesPosition({
                 draggedNodeId: 'task_1',
-                invalidateWorkflowQueries: vi.fn(),
                 nodePositions: {task_1: {x: 200, y: 300}},
                 updateWorkflowMutation: mockMutation as never,
             });
@@ -103,7 +103,6 @@ describe('store definition sync', () => {
 
             saveWorkflowNodesPosition({
                 draggedNodeId: 'condition_1',
-                invalidateWorkflowQueries: vi.fn(),
                 nodePositions: {
                     child_1: {x: 350, y: 450},
                     condition_1: {x: 100, y: 200},
@@ -135,7 +134,6 @@ describe('store definition sync', () => {
 
             saveWorkflowNodesPosition({
                 draggedNodeId: 'task_1',
-                invalidateWorkflowQueries: vi.fn(),
                 nodePositions: {task_1: {x: 200, y: 300}},
                 updateWorkflowMutation: mockMutation as never,
             });
@@ -316,7 +314,6 @@ describe('store definition sync', () => {
 
             saveWorkflowNodesPosition({
                 draggedNodeId: 'each_1',
-                invalidateWorkflowQueries: vi.fn(),
                 nodePositions: {
                     child_1: {x: 300, y: 400},
                     each_1: {x: 100, y: 200},
@@ -386,7 +383,6 @@ describe('store definition sync', () => {
 
             saveWorkflowNodesPosition({
                 draggedNodeId: 'task_1',
-                invalidateWorkflowQueries: vi.fn(),
                 nodePositions: {task_1: {x: 200, y: 300}},
                 updateWorkflowMutation: mockMutation as never,
             });
@@ -400,7 +396,7 @@ describe('store definition sync', () => {
             expect(mockMutation.mutate).not.toHaveBeenCalled();
         });
 
-        it('should not invalidate queries when there is a pending definition', () => {
+        it('should drain pending definitions when first mutation settles', () => {
             const tasks = [makeTask('task_1'), makeTask('task_2')];
             const definition = makeDefinition(tasks);
 
@@ -414,12 +410,10 @@ describe('store definition sync', () => {
             });
 
             const mockMutation = createMockMutation();
-            const invalidateWorkflowQueries = vi.fn();
 
             // First save: fires the mutation
             saveWorkflowNodesPosition({
                 draggedNodeId: 'task_1',
-                invalidateWorkflowQueries,
                 nodePositions: {task_1: {x: 100, y: 200}},
                 updateWorkflowMutation: mockMutation as never,
             });
@@ -429,21 +423,17 @@ describe('store definition sync', () => {
             // Second save: mutation is in flight so it gets queued
             saveWorkflowNodesPosition({
                 draggedNodeId: 'task_2',
-                invalidateWorkflowQueries,
                 nodePositions: {task_2: {x: 300, y: 400}},
                 updateWorkflowMutation: mockMutation as never,
             });
 
             expect(mockMutation.mutate).toHaveBeenCalledTimes(1);
 
-            // Simulate first mutation's onSuccess
+            // Simulate first mutation's onSuccess — only updates version, no query invalidation
             const firstMutateCall = mockMutation.mutate.mock.calls[0];
             const firstCallbacks = firstMutateCall[1];
 
             firstCallbacks.onSuccess({version: 2});
-
-            // invalidateWorkflowQueries should NOT be called because there's a pending definition
-            expect(invalidateWorkflowQueries).not.toHaveBeenCalled();
 
             // Simulate first mutation's onSettled — this should fire the queued mutation
             firstCallbacks.onSettled();
@@ -455,6 +445,264 @@ describe('store definition sync', () => {
             const secondDefinition = JSON.parse(secondMutateCall[0].workflow.definition);
 
             expect(secondDefinition.tasks[1].metadata.ui.nodePosition).toEqual({x: 300, y: 400});
+        });
+    });
+
+    describe('position mutation does not invalidate queries', () => {
+        it('should not call invalidateWorkflowQueries on successful position save', () => {
+            const tasks = [makeTask('task_1')];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 200, y: 300}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Simulate mutation success
+            const mutateCall = mockMutation.mutate.mock.calls[0];
+            const callbacks = mutateCall[1];
+
+            callbacks.onSuccess({version: 2});
+            callbacks.onSettled();
+
+            // The mutation should have been called exactly once (no refetch-triggered re-saves)
+            expect(mockMutation.mutate).toHaveBeenCalledTimes(1);
+        });
+
+        it('should update workflow version on success while preserving definition positions', () => {
+            const tasks = [makeTask('task_1')];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 200, y: 300}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Simulate mutation success with new version
+            const mutateCall = mockMutation.mutate.mock.calls[0];
+            const callbacks = mutateCall[1];
+
+            callbacks.onSuccess({version: 5});
+
+            // Version should be updated
+            const workflow = useWorkflowDataStore.getState().workflow;
+
+            expect(workflow.version).toBe(5);
+
+            // Definition should still contain the saved position
+            const parsed = JSON.parse(workflow.definition!);
+
+            expect(parsed.tasks[0].metadata.ui.nodePosition).toEqual({x: 200, y: 300});
+        });
+
+        it('should preserve definition through full mutation lifecycle with pending drain', () => {
+            const tasks = [makeTask('task_1'), makeTask('task_2')];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            // First save
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 100, y: 200}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Second save (queued)
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_2',
+                nodePositions: {task_2: {x: 300, y: 400}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Complete first mutation
+            const firstCallbacks = mockMutation.mutate.mock.calls[0][1];
+
+            firstCallbacks.onSuccess({version: 2});
+            firstCallbacks.onSettled();
+
+            // Complete second (drained) mutation
+            const secondCallbacks = mockMutation.mutate.mock.calls[1][1];
+
+            secondCallbacks.onSuccess({version: 3});
+            secondCallbacks.onSettled();
+
+            // Both positions should survive through the entire lifecycle
+            const finalWorkflow = useWorkflowDataStore.getState().workflow;
+            const parsed = JSON.parse(finalWorkflow.definition!);
+
+            expect(finalWorkflow.version).toBe(3);
+            expect(parsed.tasks[0].metadata.ui.nodePosition).toEqual({x: 100, y: 200});
+            expect(parsed.tasks[1].metadata.ui.nodePosition).toEqual({x: 300, y: 400});
+        });
+    });
+
+    describe('ReactFlow node position resilience after stale refetch', () => {
+        it('should preserve ReactFlow node positions when definition is overwritten by stale refetch', () => {
+            const tasks = [makeTask('task_1'), makeTask('task_2')];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                nodes: [
+                    {
+                        data: {name: 'task_1', type: 'test/task_1'},
+                        id: 'task_1',
+                        position: {x: 0, y: 0},
+                        type: 'workflow',
+                    },
+                    {
+                        data: {name: 'task_2', type: 'test/task_2'},
+                        id: 'task_2',
+                        position: {x: 0, y: 100},
+                        type: 'workflow',
+                    },
+                ],
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            // Save position for task_1 — this updates both the definition and ReactFlow node data
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 200, y: 300}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Verify ReactFlow node data has the optimistic position
+            const nodesAfterSave = useWorkflowDataStore.getState().nodes;
+            const task1Node = nodesAfterSave.find((node) => node.id === 'task_1')!;
+
+            expect((task1Node.data as NodeDataType).metadata!.ui!.nodePosition).toEqual({x: 200, y: 300});
+
+            // Simulate a stale refetch overwriting the workflow definition
+            // (this is what useProject.ts does: setWorkflow({...currentWorkflow}))
+            // The stale server data does NOT have task_1's new position
+            const staleServerDefinition = makeDefinition(tasks); // no positions
+
+            useWorkflowDataStore.setState((state) => ({
+                workflow: {
+                    ...state.workflow,
+                    definition: staleServerDefinition,
+                },
+            }));
+
+            // The definition no longer has the position
+            const staleDefinition = useWorkflowDataStore.getState().workflow.definition!;
+            const staleParsed = JSON.parse(staleDefinition);
+
+            expect(staleParsed.tasks[0].metadata?.ui?.nodePosition).toBeUndefined();
+
+            // But ReactFlow nodes are NOT affected by setWorkflow — they retain
+            // the optimistic position. This is the invariant the layout effect
+            // relies on as a fallback when the definition is stale.
+            const nodesAfterOverwrite = useWorkflowDataStore.getState().nodes;
+            const task1NodeAfterOverwrite = nodesAfterOverwrite.find((node) => node.id === 'task_1')!;
+
+            expect((task1NodeAfterOverwrite.data as NodeDataType).metadata!.ui!.nodePosition).toEqual({
+                x: 200,
+                y: 300,
+            });
+        });
+
+        it('should preserve multiple node positions when definition is overwritten', () => {
+            const tasks = [makeTask('task_1'), makeTask('task_2')];
+            const definition = makeDefinition(tasks);
+
+            useWorkflowDataStore.setState({
+                nodes: [
+                    {
+                        data: {name: 'task_1', type: 'test/task_1'},
+                        id: 'task_1',
+                        position: {x: 0, y: 0},
+                        type: 'workflow',
+                    },
+                    {
+                        data: {name: 'task_2', type: 'test/task_2'},
+                        id: 'task_2',
+                        position: {x: 0, y: 100},
+                        type: 'workflow',
+                    },
+                ],
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            // Save position for task_1
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_1',
+                nodePositions: {task_1: {x: 200, y: 300}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Save position for task_2 (queued because task_1 mutation is in flight)
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'task_2',
+                nodePositions: {task_2: {x: 400, y: 500}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            // Simulate stale refetch that only has task_1's position (from first mutation)
+            const partialServerDefinition = makeDefinition([makeTask('task_1', {x: 200, y: 300}), makeTask('task_2')]);
+
+            useWorkflowDataStore.setState((state) => ({
+                workflow: {
+                    ...state.workflow,
+                    definition: partialServerDefinition,
+                },
+            }));
+
+            // ReactFlow nodes still have both positions
+            const nodesAfterOverwrite = useWorkflowDataStore.getState().nodes;
+            const task1Node = nodesAfterOverwrite.find((node) => node.id === 'task_1')!;
+            const task2Node = nodesAfterOverwrite.find((node) => node.id === 'task_2')!;
+
+            expect((task1Node.data as NodeDataType).metadata!.ui!.nodePosition).toEqual({x: 200, y: 300});
+            expect((task2Node.data as NodeDataType).metadata!.ui!.nodePosition).toEqual({x: 400, y: 500});
         });
     });
 });
