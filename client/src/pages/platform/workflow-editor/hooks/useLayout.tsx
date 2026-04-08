@@ -165,16 +165,14 @@ export default function useLayout({
     const tasks = storeTasks || readOnlyWorkflow?.tasks;
     const triggers = storeTriggers || readOnlyWorkflow?.triggers;
 
-    const {incrementLayoutResetCounter, initializeWithCanvasWidth, setEdges, setNodes, setSavedPositionCrossAxisShift} =
-        useWorkflowDataStore(
-            useShallow((state) => ({
-                incrementLayoutResetCounter: state.incrementLayoutResetCounter,
-                initializeWithCanvasWidth: state.initializeWithCanvasWidth,
-                setEdges: state.setEdges,
-                setNodes: state.setNodes,
-                setSavedPositionCrossAxisShift: state.setSavedPositionCrossAxisShift,
-            }))
-        );
+    const {initializeWithCanvasWidth, setEdges, setNodes, setSavedPositionCrossAxisShift} = useWorkflowDataStore(
+        useShallow((state) => ({
+            initializeWithCanvasWidth: state.initializeWithCanvasWidth,
+            setEdges: state.setEdges,
+            setNodes: state.setNodes,
+            setSavedPositionCrossAxisShift: state.setSavedPositionCrossAxisShift,
+        }))
+    );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
@@ -701,19 +699,27 @@ export default function useLayout({
             cancelAnimationRef.current = null;
         }
 
-        // Trigger a full layout recomputation rather than shifting nodes directly.
-        // The dagre worker already accounts for canvas dimensions via savedPositionCrossAxisShift.
-        // Direct shifting caused visible jumps in LR mode when the panel open coincided
-        // with a structural graph change (e.g. adding a node).
-        incrementLayoutResetCounter();
-    }, [
-        copilotPanelOpen,
-        dataPillPanelOpen,
-        incrementLayoutResetCounter,
-        layoutDirection,
-        leftSidebarOpen,
-        workflowNodeDetailsPanelOpen,
-    ]);
+        // Shift all existing nodes by half the width delta rather than triggering
+        // a full dagre recalculation. A full layout recomputation would re-run
+        // alignChainNodesCrossAxis which aligns non-saved nodes to saved
+        // predecessors — an alignment that may not have existed before the panel
+        // toggle, causing mixed (saved + dagre) layouts to visibly rearrange
+        // instead of uniformly shifting.
+        const crossAxis = layoutDirection === 'LR' ? 'y' : 'x';
+        const shift = -widthDelta / 2;
+        const {nodes: currentNodes, setNodes: updateNodes} = useWorkflowDataStore.getState();
+
+        const shiftedNodes = currentNodes.map((node) => ({
+            ...node,
+            position: {
+                ...node.position,
+                [crossAxis]: node.position[crossAxis] + shift,
+            } as {x: number; y: number},
+        }));
+
+        cancelAnimationRef.current = animateNodePositions(currentNodes, shiftedNodes, updateNodes);
+         
+    }, [copilotPanelOpen, dataPillPanelOpen, layoutDirection, leftSidebarOpen, workflowNodeDetailsPanelOpen]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
