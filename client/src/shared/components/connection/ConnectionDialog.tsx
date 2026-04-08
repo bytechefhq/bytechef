@@ -404,10 +404,15 @@ const ConnectionDialog = ({
     }, [oAuth2AuthorizationParameters?.scopes, wizardStep, getValues, setValue]);
 
     useEffect(() => {
-        setAuthorizationType(
-            authorizationOptions && authorizationOptions.length > 0 ? authorizationOptions[0].value : undefined
-        );
-    }, [authorizationsExists, authorizationOptions, selectedComponentDefinition]);
+        const initialAuthorizationType =
+            authorizationOptions && authorizationOptions.length > 0 ? authorizationOptions[0].value : undefined;
+
+        setAuthorizationType(initialAuthorizationType);
+
+        if (initialAuthorizationType) {
+            setValue('authorizationType', initialAuthorizationType);
+        }
+    }, [authorizationsExists, authorizationOptions, selectedComponentDefinition, setValue]);
 
     return (
         <Dialog
