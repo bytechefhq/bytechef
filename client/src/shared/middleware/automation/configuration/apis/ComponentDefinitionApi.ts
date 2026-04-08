@@ -24,6 +24,7 @@ import {
 
 export interface GetComponentDefinitionsRequest {
     actionDefinitions?: boolean;
+    clusterElementDefinitions?: boolean;
     connectionDefinitions?: boolean;
     triggerDefinitions?: boolean;
     include?: Array<string>;
@@ -42,6 +43,10 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
         if (requestParameters['actionDefinitions'] != null) {
             queryParameters['actionDefinitions'] = requestParameters['actionDefinitions'];
+        }
+
+        if (requestParameters['clusterElementDefinitions'] != null) {
+            queryParameters['clusterElementDefinitions'] = requestParameters['clusterElementDefinitions'];
         }
 
         if (requestParameters['connectionDefinitions'] != null) {

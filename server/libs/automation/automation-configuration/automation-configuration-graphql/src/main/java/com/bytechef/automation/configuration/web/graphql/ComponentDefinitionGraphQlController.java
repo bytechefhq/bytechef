@@ -40,11 +40,13 @@ public class ComponentDefinitionGraphQlController {
 
     @QueryMapping
     public List<ComponentDefinition> componentDefinitions(
-        @Argument Boolean actionDefinitions, @Argument Boolean connectionDefinitions,
-        @Argument Boolean triggerDefinitions, @Argument List<String> include) {
+        @Argument Boolean actionDefinitions, @Argument Boolean clusterElementDefinitions,
+        @Argument Boolean connectionDefinitions, @Argument Boolean triggerDefinitions,
+        @Argument List<String> include) {
 
         return componentDefinitionService.getComponentDefinitions(
-            actionDefinitions, connectionDefinitions, triggerDefinitions, include, PlatformType.AUTOMATION);
+            actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions, include,
+            PlatformType.AUTOMATION);
     }
 
     @QueryMapping

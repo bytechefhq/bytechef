@@ -43,6 +43,12 @@ paths:
           required: false
           schema:
             type: "boolean"
+        - name: "clusterElementDefinitions"
+          description: "Use for filtering components which define cluster element definitions."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
         - name: "connectionDefinitions"
           description: "Use for filtering components which define connection definitions."
           in: "query"
