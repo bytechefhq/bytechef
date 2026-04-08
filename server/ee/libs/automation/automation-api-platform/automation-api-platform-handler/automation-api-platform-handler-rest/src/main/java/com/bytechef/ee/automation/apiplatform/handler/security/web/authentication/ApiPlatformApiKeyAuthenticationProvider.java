@@ -7,11 +7,10 @@
 
 package com.bytechef.ee.automation.apiplatform.handler.security.web.authentication;
 
-import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
-import com.bytechef.ee.automation.apiplatform.configuration.service.ApiClientService;
+import com.bytechef.platform.security.domain.ApiKey;
+import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -24,11 +23,11 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class ApiPlatformApiKeyAuthenticationProvider implements AuthenticationProvider {
 
-    private final ApiClientService apiClientService;
+    private final ApiKeyService apiKeyService;
 
     @SuppressFBWarnings("EI")
-    public ApiPlatformApiKeyAuthenticationProvider(ApiClientService apiClientService) {
-        this.apiClientService = apiClientService;
+    public ApiPlatformApiKeyAuthenticationProvider(ApiKeyService apiKeyService) {
+        this.apiKeyService = apiKeyService;
     }
 
     @Override
@@ -36,17 +35,17 @@ public class ApiPlatformApiKeyAuthenticationProvider implements AuthenticationPr
         ApiPlatformApiKeyAuthenticationToken apiPlatformApiKeyAuthenticationToken =
             (ApiPlatformApiKeyAuthenticationToken) authentication;
 
-        Optional<ApiClient> apiClientOptional = apiClientService.fetchApiClient(
-            apiPlatformApiKeyAuthenticationToken.getSecretKey(),
-            apiPlatformApiKeyAuthenticationToken.getEnvironmentId());
+        ApiKey apiKey;
 
-        if (apiClientOptional.isEmpty()) {
-            throw new BadCredentialsException("Unknown API secret key");
+        try {
+            apiKey = apiKeyService.getApiKey(
+                apiPlatformApiKeyAuthenticationToken.getSecretKey(),
+                apiPlatformApiKeyAuthenticationToken.getEnvironmentId());
+        } catch (IllegalArgumentException e) {
+            throw new BadCredentialsException("Unknown API secret key", e);
         }
 
-        ApiClient apiClient = apiClientOptional.get();
-
-        return new ApiPlatformApiKeyAuthenticationToken(createSpringSecurityUser(apiClient.getName()));
+        return new ApiPlatformApiKeyAuthenticationToken(createSpringSecurityUser(apiKey.getName()));
     }
 
     @Override

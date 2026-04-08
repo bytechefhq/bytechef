@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.automation.apiplatform.handler.security.web.config;
 
-import com.bytechef.ee.automation.apiplatform.configuration.service.ApiClientService;
 import com.bytechef.ee.automation.apiplatform.handler.security.web.configurer.ApiPlatformApiKeySecurityConfigurer;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Configuration;
@@ -25,16 +25,16 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @ConditionalOnEEVersion
 public class ApiPlatformApiKeySecurityConfigurerContributor implements SecurityConfigurerContributor {
 
-    private final ApiClientService apiClientService;
+    private final ApiKeyService apiKeyService;
 
     @SuppressFBWarnings("EI")
-    public ApiPlatformApiKeySecurityConfigurerContributor(ApiClientService apiClientService) {
-        this.apiClientService = apiClientService;
+    public ApiPlatformApiKeySecurityConfigurerContributor(ApiKeyService apiKeyService) {
+        this.apiKeyService = apiKeyService;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
-        return (T) new ApiPlatformApiKeySecurityConfigurer(apiClientService);
+        return (T) new ApiPlatformApiKeySecurityConfigurer(apiKeyService);
     }
 }
