@@ -17,6 +17,7 @@
 package com.bytechef.component.stripe.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.stripe.constant.StripeConstants.CUSTOMER_ID;
 import static com.bytechef.component.stripe.constant.StripeConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,9 +35,11 @@ import com.bytechef.component.definition.Context.Http.Configuration.Configuratio
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +59,60 @@ class StripeUtilsTest {
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
 
     @Test
+    void testGetCouponOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("data", List.of(Map.of("name", "some name", ID, "abc"))));
+
+        assertEquals(List.of(option("some name", "abc")), StripeUtils.getCouponOptions(
+            null, null, null, null, mockedContext));
+
+        assertEquals("/coupons", stringArgumentCaptor.getValue());
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+    }
+
+    @Test
+    void testGetSubscriptionIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(CUSTOMER_ID, "xy"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("data", List.of(Map.of("name", "some name", ID, "abc"))));
+
+        assertEquals(List.of(option("abc", "abc")), StripeUtils.getSubscriptionIdOptions(
+            mockedParameters, null, null, null, mockedContext));
+
+        assertEquals(List.of("/subscriptions", CUSTOMER_ID, "xy"), stringArgumentCaptor.getAllValues());
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+    }
+
+    @Test
     void testGetCustomerOptions(
         Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
@@ -70,6 +127,60 @@ class StripeUtilsTest {
             null, null, null, null, mockedContext));
 
         assertEquals("/customers", stringArgumentCaptor.getValue());
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+    }
+
+    @Test
+    void testGetPriceOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of("data", List.of(Map.of(ID, "abc", "unit_amount", 1000, "currency", "usd",
+                    "recurring", Map.of("interval", "month")))));
+
+        assertEquals(List.of(option("10.00 USD / month", "abc")), StripeUtils.getPriceOptions(
+            null, null, null, null, mockedContext));
+
+        assertEquals("/prices", stringArgumentCaptor.getValue());
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+    }
+
+    @Test
+    void testGetDefaultPaymentMethodOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(CUSTOMER_ID, "xy"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("data", List.of(Map.of("name", "some name", ID, "abc"))));
+
+        assertEquals(List.of(option("abc", "abc")), StripeUtils.getDefaultPaymentMethodOptions(
+            mockedParameters, null, null, null, mockedContext));
+
+        assertEquals("/customers/xy/payment_methods", stringArgumentCaptor.getValue());
 
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 

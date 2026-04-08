@@ -18,15 +18,20 @@ package com.bytechef.component.stripe;
 
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.Authorization.TOKEN;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.stripe.action.StripeCreateSubscriptionAction;
+import com.bytechef.component.stripe.action.StripeUpdateSubscriptionAction;
 import com.bytechef.component.stripe.trigger.StripeNewCustomerTrigger;
 import com.bytechef.component.stripe.trigger.StripeNewInvoiceTrigger;
 import com.google.auto.service.AutoService;
@@ -39,6 +44,19 @@ import java.util.Optional;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class StripeComponentHandler extends AbstractStripeComponentHandler {
+
+    @Override
+    public List<ModifiableActionDefinition> getCustomActions() {
+        return List.of(
+            StripeCreateSubscriptionAction.ACTION_DEFINITION, StripeUpdateSubscriptionAction.ACTION_DEFINITION);
+    }
+
+    @Override
+    public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
+        return List.of(
+            tool(StripeCreateSubscriptionAction.ACTION_DEFINITION),
+            tool(StripeUpdateSubscriptionAction.ACTION_DEFINITION));
+    }
 
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
