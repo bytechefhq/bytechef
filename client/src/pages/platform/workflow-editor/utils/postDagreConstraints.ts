@@ -2077,7 +2077,7 @@ export function adjustBottomGhostForMovedChildren(
  * Computes the minimum main-axis gap from a source node to a bottom ghost,
  * accounting for the minlen=2 that dagre uses for edges targeting bottom ghosts.
  *
- * Formula mirrors computeMainAxisGap but uses 2 × RANKSEP (for minlen=2)
+ * Formula mirrors computeMainAxisGapToPlaceholder but uses 2 × RANKSEP (for minlen=2)
  * and the bottom ghost's dagre size of 0 with rendered size of 2.
  */
 function computeMinGapToBottomGhost(sourceNode: Node, direction: LayoutDirectionType): number {
@@ -2111,33 +2111,6 @@ function computeMinGapToBottomGhost(sourceNode: Node, direction: LayoutDirection
 
     // TB mode: positions are dagre centers (getRenderedMainAxisSize returns 0).
     return NODE_HEIGHT / 2 + RANKSEP * BOTTOM_GHOST_MINLEN;
-}
-
-/**
- * Computes the React Flow main-axis position gap between two consecutive
- * workflow nodes, matching what dagre would produce for adjacent ranks.
- *
- * In LR mode the main axis is x; in TB mode the main axis is y.
- * The gap accounts for dagre-allocated sizes (which differ from rendered sizes)
- * and the default ranksep of 50.
- */
-function computeMainAxisGap(predecessorNode: Node, currentNode: Node, direction: LayoutDirectionType): number {
-    const RANKSEP = 50;
-
-    if (direction === 'LR') {
-        const predecessorDagreWidth = getLRDagreWidth(predecessorNode);
-        const predecessorRendered = getLRRenderedWidth(predecessorNode);
-        const currentDagreWidth = getLRDagreWidth(currentNode);
-        const currentRendered = getLRRenderedWidth(currentNode);
-
-        return (
-            predecessorRendered / 2 + predecessorDagreWidth / 2 + RANKSEP + currentDagreWidth / 2 - currentRendered / 2
-        );
-    }
-
-    // TB mode: getRenderedMainAxisSize returns 0, so RF position = dagre center.
-    // Gap = half dagre heights + ranksep.
-    return NODE_HEIGHT / 2 + RANKSEP + NODE_HEIGHT / 2;
 }
 
 function getLRDagreWidth(node: Node): number {
@@ -2341,22 +2314,32 @@ export function alignChainNodesCrossAxis(
                 } as {x: number; y: number};
 
                 adjustedMainAxis = true;
-            } else if (predecessorHasPosition && !crossAxisOnlyNodes.has(node.id)) {
-                // Predecessor has saved/adjusted position: adjust both axes
-                const mainAxisGap = computeMainAxisGap(predecessorNode, node, direction);
-
-                newPosition = {
-                    [crossAxis]: predecessorNode.position[crossAxis] + clusterCrossOffset,
-                    [mainAxis]: predecessorNode.position[mainAxis] + mainAxisGap,
-                } as {x: number; y: number};
-
-                adjustedMainAxis = true;
-            } else {
-                // Predecessor at dagre position or top-ghost resolved: only align cross-axis
+            } else if (crossAxisOnlyNodes.has(node.id)) {
+                // Bottom-ghost resolved without dispatcher delta: only align cross-axis
+                // (main-axis is already handled through the ghost by dagre)
                 newPosition = {
                     ...oldPosition,
                     [crossAxis]: predecessorNode.position[crossAxis] + clusterCrossOffset,
                 };
+            } else if (!containsNodePosition(predecessorData.metadata)) {
+                // Predecessor was chain-aligned (anchored but no raw nodePosition),
+                // meaning the whole chain moved collectively with a dispatcher upstream.
+                // Cascade cross-axis so newly inserted nodes and unanchored successors
+                // inherit the same column instead of drifting back to dagre's center.
+                newPosition = {
+                    ...oldPosition,
+                    [crossAxis]: predecessorNode.position[crossAxis] + clusterCrossOffset,
+                };
+
+                adjustedMainAxis = true;
+            } else {
+                // Regular linear-chain node with a manually saved predecessor: do
+                // NOT cascade. A user-dragged predecessor must not pull its
+                // successors — leave the node at dagre's default position so only
+                // the manually moved node itself is offset from center.
+                skipped.add(node.id);
+
+                continue;
             }
 
             if (adjustedMainAxis) {
@@ -2395,94 +2378,9 @@ export function alignChainNodesCrossAxis(
         }
     }
 
-    // Backward propagation: if a node's successor is anchored but the node
-    // itself is not (e.g. newly inserted node before a saved-position node),
-    // position the node relative to its successor's position minus the gap.
-    // Track all successors per source since a node can have multiple outgoing edges.
-    const successorMap = new Map<string, string[]>();
-
-    for (const [targetId, sourceId] of predecessorMap.entries()) {
-        const existing = successorMap.get(sourceId);
-
-        if (existing) {
-            existing.push(targetId);
-        } else {
-            successorMap.set(sourceId, [targetId]);
-        }
-    }
-
-    let backwardChanged = true;
-
-    while (backwardChanged) {
-        backwardChanged = false;
-
-        for (let nodeIndex = 0; nodeIndex < allNodes.length; nodeIndex++) {
-            const node = allNodes[nodeIndex];
-            const nodeData = node.data as NodeDataType;
-
-            if (anchored.has(node.id) || skipped.has(node.id) || AUXILIARY_TYPES.has(node.type!)) {
-                continue;
-            }
-
-            // Task dispatchers should not be repositioned by backward propagation —
-            // their position governs branch layout and must only be set by forward
-            // propagation or their own saved position.
-            if (nodeData.taskDispatcher) {
-                continue;
-            }
-
-            const successorIds = successorMap.get(node.id);
-
-            if (!successorIds) {
-                continue;
-            }
-
-            // Only backward-propagate when exactly one successor is anchored,
-            // to avoid ambiguous positioning when multiple branches diverge.
-            const anchoredSuccessorIds = successorIds.filter((successorId) => anchored.has(successorId));
-
-            if (anchoredSuccessorIds.length !== 1) {
-                continue;
-            }
-
-            const successorId = anchoredSuccessorIds[0];
-            const successorIndex = nodeIndexById.get(successorId);
-
-            if (successorIndex === undefined) {
-                continue;
-            }
-
-            const successorNode = allNodes[successorIndex];
-
-            const clusterCrossOffset =
-                getClusterRootCrossOffset(node, direction) - getClusterRootCrossOffset(successorNode, direction);
-
-            const mainAxisGap = computeMainAxisGap(node, successorNode, direction);
-
-            const newPosition = {
-                [crossAxis]: successorNode.position[crossAxis] + clusterCrossOffset,
-                [mainAxis]: successorNode.position[mainAxis] - mainAxisGap,
-            } as {x: number; y: number};
-
-            allNodes[nodeIndex] = {
-                ...node,
-                data: {
-                    ...nodeData,
-                    metadata: {
-                        ...nodeData.metadata,
-                        ui: {
-                            ...nodeData.metadata?.ui,
-                            chainAlignedPosition: newPosition,
-                        },
-                    },
-                },
-                position: newPosition,
-            };
-
-            anchored.add(node.id);
-            backwardChanged = true;
-        }
-    }
+    // Backward propagation was removed: manually positioned successors must NOT
+    // pull their predecessors. Upstream nodes (including the trigger) stay at
+    // dagre's default position so only the manually moved node itself is offset.
 
     // Shift dispatcher descendants when a dispatcher was aligned
     if (dispatcherDeltas.size > 0) {
