@@ -34,8 +34,8 @@ public interface ComponentDefinitionService {
     List<ComponentDefinition> getComponentDefinitions();
 
     List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
-        @Nullable List<String> include, PlatformType platformType);
+        Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
+        Boolean triggerDefinitions, @Nullable List<String> include, PlatformType platformType);
 
     List<ComponentDefinition> getComponentDefinitions(String query, PlatformType platformType);
 

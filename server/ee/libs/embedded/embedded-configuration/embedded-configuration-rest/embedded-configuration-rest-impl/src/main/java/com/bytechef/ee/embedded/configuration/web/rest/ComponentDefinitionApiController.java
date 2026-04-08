@@ -41,12 +41,14 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
 
     @Override
     public ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
+        Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
+        Boolean triggerDefinitions, List<String> include) {
 
         return ResponseEntity.ok(
             componentDefinitionService
                 .getComponentDefinitions(
-                    actionDefinitions, connectionDefinitions, triggerDefinitions, include, PlatformType.EMBEDDED)
+                    actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions, include,
+                    PlatformType.EMBEDDED)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))

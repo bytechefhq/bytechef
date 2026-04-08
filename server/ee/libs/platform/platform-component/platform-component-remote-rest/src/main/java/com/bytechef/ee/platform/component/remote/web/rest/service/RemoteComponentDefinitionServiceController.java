@@ -55,17 +55,19 @@ public class RemoteComponentDefinitionServiceController {
         })
     public ResponseEntity<List<ComponentDefinition>> getComponentDefinitions(
         @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
+        @RequestParam(value = "clusterElementDefinitions", required = false) Boolean clusterElementDefinitions,
         @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
         @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,
         @RequestParam(value = "include", required = false) List<String> include,
         @RequestParam(value = "platformType", required = false) PlatformType platformType) {
 
         return ResponseEntity.ok(
-            actionDefinitions == null && connectionDefinitions == null && triggerDefinitions == null
-                && include == null
+            actionDefinitions == null && clusterElementDefinitions == null && connectionDefinitions == null
+                && triggerDefinitions == null && include == null
                     ? componentDefinitionService.getComponentDefinitions()
                     : componentDefinitionService.getComponentDefinitions(
-                        actionDefinitions, connectionDefinitions, triggerDefinitions, include, platformType));
+                        actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions,
+                        include, platformType));
     }
 
     @RequestMapping(

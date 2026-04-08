@@ -49,6 +49,7 @@ public interface ComponentDefinitionApi {
      * Get all component definitions.
      *
      * @param actionDefinitions Use for filtering components which define action definitions. (optional)
+     * @param clusterElementDefinitions Use for filtering components which define cluster element definitions. (optional)
      * @param connectionDefinitions Use for filtering components which define connection definitions. (optional)
      * @param triggerDefinitions Use for filtering components which define trigger definitions. (optional)
      * @param include The list of component names to include in the result. (optional)
@@ -72,6 +73,7 @@ public interface ComponentDefinitionApi {
     )
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
         @Parameter(name = "actionDefinitions", description = "Use for filtering components which define action definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actionDefinitions", required = false) @Nullable Boolean actionDefinitions,
+        @Parameter(name = "clusterElementDefinitions", description = "Use for filtering components which define cluster element definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "clusterElementDefinitions", required = false) @Nullable Boolean clusterElementDefinitions,
         @Parameter(name = "connectionDefinitions", description = "Use for filtering components which define connection definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionDefinitions", required = false) @Nullable Boolean connectionDefinitions,
         @Parameter(name = "triggerDefinitions", description = "Use for filtering components which define trigger definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerDefinitions", required = false) @Nullable Boolean triggerDefinitions,
         @Parameter(name = "include", description = "The list of component names to include in the result.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include", required = false) @Nullable List<String> include
