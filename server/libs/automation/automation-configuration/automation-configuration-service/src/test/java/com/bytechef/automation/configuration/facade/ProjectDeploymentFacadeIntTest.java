@@ -543,7 +543,8 @@ public class ProjectDeploymentFacadeIntTest {
         reset(triggerLifecycleFacade);
 
         ProjectDeploymentWorkflowDTO disabledWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), false, null, null, null, null, null, null, 0, v2WorkflowId, workflowUuid);
+            List.of(), null, null, Map.of(), false, null, null, null, null, null, null, null, 0, v2WorkflowId,
+            workflowUuid);
 
         ProjectDeploymentDTO currentDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
@@ -606,7 +607,8 @@ public class ProjectDeploymentFacadeIntTest {
         reset(triggerLifecycleFacade);
 
         ProjectDeploymentWorkflowDTO enabledWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, 0, v2WorkflowId, workflowUuid);
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0, v2WorkflowId,
+            workflowUuid);
 
         ProjectDeploymentDTO currentDeployment = projectDeploymentFacade.getProjectDeployment(
             projectDeploymentDTO.id());
