@@ -699,13 +699,14 @@ export default function useLayout({
             cancelAnimationRef.current = null;
         }
 
-        // Shift all existing nodes by half the width delta rather than triggering
-        // a full dagre recalculation. A full layout recomputation would re-run
-        // alignChainNodesCrossAxis which aligns non-saved nodes to saved
-        // predecessors — an alignment that may not have existed before the panel
-        // toggle, causing mixed (saved + dagre) layouts to visibly rearrange
-        // instead of uniformly shifting.
-        const crossAxis = layoutDirection === 'LR' ? 'y' : 'x';
+        // Shift all existing nodes horizontally by half the width delta rather
+        // than triggering a full dagre recalculation. A full layout recomputation
+        // would re-run alignChainNodesCrossAxis which aligns non-saved nodes to
+        // saved predecessors — an alignment that may not have existed before the
+        // panel toggle, causing mixed (saved + dagre) layouts to visibly
+        // rearrange instead of uniformly shifting.
+        // Side panels always change horizontal width, so the shift is always on x
+        // regardless of layout direction.
         const shift = -widthDelta / 2;
         const {nodes: currentNodes, setNodes: updateNodes} = useWorkflowDataStore.getState();
 
@@ -713,13 +714,12 @@ export default function useLayout({
             ...node,
             position: {
                 ...node.position,
-                [crossAxis]: node.position[crossAxis] + shift,
-            } as {x: number; y: number},
+                x: node.position.x + shift,
+            },
         }));
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, shiftedNodes, updateNodes);
-         
-    }, [copilotPanelOpen, dataPillPanelOpen, layoutDirection, leftSidebarOpen, workflowNodeDetailsPanelOpen]);
+    }, [copilotPanelOpen, dataPillPanelOpen, leftSidebarOpen, workflowNodeDetailsPanelOpen]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
