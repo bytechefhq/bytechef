@@ -61,7 +61,8 @@ public class ClusterElementTools {
 
             if (!workflowDefinition.contains(taskName)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Task '{}' not found in workflow '{}'", taskName, projectWorkflowDTO.getId());
+                    logger.debug("updateClusterElementTask({}, {}): Task '{}' not found in workflow '{}'", workflowId,
+                        taskName, taskName, projectWorkflowDTO.getId());
                 }
 
                 return null;
@@ -86,7 +87,8 @@ public class ClusterElementTools {
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Updated clusterElements for task '{}'", taskName);
+                logger.debug("updateClusterElementTask({}, {}): Updated clusterElements for task '{}'", workflowId,
+                    taskName, taskName);
             }
 
             return new WorkflowInfo(
@@ -97,7 +99,9 @@ public class ClusterElementTools {
                 projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
                 projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
         } catch (Exception e) {
-            logger.error("Failed to update clusterElements for task '{}' in workflow {}", taskName, workflowId, e);
+            logger.error(
+                "updateClusterElementTask({}, {}): Failed to update clusterElements for task '{}' in workflow {}",
+                workflowId, taskName, taskName, workflowId, e);
 
             throw new ExecutionException("Failed to update workflow: " + e.getMessage(), e,
                 ScriptToolErrorType.UPDATE_SCRIPT);
