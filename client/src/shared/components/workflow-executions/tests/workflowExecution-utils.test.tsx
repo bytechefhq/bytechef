@@ -143,10 +143,10 @@ describe('workflowExecution-utils', () => {
                 expect(getWorkflowStatusType(job)).toBe('failed');
             });
 
-            it('should return failed when job is STOPPED and no trigger execution', () => {
+            it('should return stopped when job is STOPPED and no trigger execution', () => {
                 const job = createJob({status: 'STOPPED'});
 
-                expect(getWorkflowStatusType(job)).toBe('failed');
+                expect(getWorkflowStatusType(job)).toBe('stopped');
             });
 
             it('should return failed when job is COMPLETED but trigger is FAILED', () => {

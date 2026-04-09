@@ -1,7 +1,7 @@
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {AlertTriangleIcon, CheckIcon, LoaderCircleIcon} from 'lucide-react';
 
-export type WorkflowStatusType = 'completed' | 'running' | 'failed';
+export type WorkflowStatusType = 'completed' | 'running' | 'failed' | 'stopped';
 
 export type ExecutionStatusType = TaskExecution['status'] | TriggerExecution['status'];
 
@@ -35,6 +35,10 @@ export function getWorkflowStatusType(job: Job, triggerExecution?: TriggerExecut
 
     if (isJobRunning && isTriggerRunning) {
         return 'running';
+    }
+
+    if (jobStatus === 'STOPPED') {
+        return 'stopped';
     }
 
     return 'failed';

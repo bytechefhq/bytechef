@@ -39,6 +39,10 @@ const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExe
                         />
                     )}
 
+                    {workflowStatus === 'stopped' && (
+                        <Badge label="Workflow stopped" styleType="secondary-outline" weight="semibold" />
+                    )}
+
                     {workflowStatus === 'failed' && (
                         <Badge label="Workflow failed" styleType="destructive-filled" weight="semibold" />
                     )}
