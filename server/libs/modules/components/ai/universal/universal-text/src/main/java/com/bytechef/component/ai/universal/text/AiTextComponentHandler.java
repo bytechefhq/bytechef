@@ -21,6 +21,7 @@ import static com.bytechef.platform.component.definition.AiUniversalComponentDef
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.universal.text.action.ClassifyTextAction;
+import com.bytechef.component.ai.universal.text.action.ExtractDataAction;
 import com.bytechef.component.ai.universal.text.action.GenerateTextAction;
 import com.bytechef.component.ai.universal.text.action.ScoreAction;
 import com.bytechef.component.ai.universal.text.action.SentimentAction;
@@ -66,6 +67,7 @@ public class AiTextComponentHandler implements ComponentHandler {
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
                         ClassifyTextAction.of(provider, propertyService),
+                        ExtractDataAction.of(provider, propertyService),
                         SentimentAction.of(provider, propertyService),
                         ScoreAction.of(provider, propertyService),
                         SummarizeTextAction.of(provider, propertyService),
