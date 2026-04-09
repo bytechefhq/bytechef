@@ -1,0 +1,61 @@
+### How to find Customer ID
+
+- **Method 1: Via API**
+
+Use the `GET /customers` endpoint to retrieve a list of all customers and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Customers. Open the customer you want and you can find Customer ID under Details on the right. If you see Account ID instead of Customer ID, you can click three dots next to the ID and there you have Copy customer ID button.
+
+The Customer ID can also be found in the output of the following actions and triggers:
+* **Create Customer**
+* **Create Invoice**
+* **Create Subscription**
+* **Update Subscription**
+* **New Customer** trigger
+* **New Invoice** trigger
+
+### How to find Price ID
+
+- **Method 1: Via API**
+
+Use the `GET /prices` endpoint to retrieve a list of all prices and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Product catalog. There is an Export prices button that downloads a file with all prices.
+
+### How to find Coupon ID
+
+- **Method 1: Via API**
+
+Use the `GET /coupons` endpoint to retrieve a list of all coupons and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Product catalog. Below the title you will find a Coupons tab. Enter the coupon you want and you will ID under Details.
+
+### How to find Default Payment Method
+
+- **Method 1: Via API**
+
+Use the `GET /customers/CUSTOMER_ID/payment_methods` endpoint to retrieve a list of all payment methods and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Customers. Open the customer you want and under Payment methods you will find list of payment methods. Find the one you want to use, click on three dots on the right and there you will find a button Copy ID.
+
+### How to find Subscription ID
+
+- **Method 1: Via API**
+
+Use the `GET /subscriptions` endpoint to retrieve a list of all subscriptions and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Subscriptions. Open the subscription you want and you can find ID under Details on the right.
+
+The Subscription ID can also be found in the output of the following actions:
+* **Create Subscription**
+* **Update Subscription**
