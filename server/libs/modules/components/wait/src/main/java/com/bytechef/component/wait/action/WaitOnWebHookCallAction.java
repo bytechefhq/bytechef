@@ -49,51 +49,61 @@ import java.util.Objects;
  */
 public class WaitOnWebHookCallAction {
 
-    public static ModifiableActionDefinition of() {
-        WaitOnWebHookCallAction waitOnWebHookCallAction = new WaitOnWebHookCallAction();
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("onWebhookCall")
+        .title("On Webhook Call")
+        .description(
+            "Suspends the workflow execution until a webhook call is received. An external service can " +
+                "resume the workflow by calling the webhook URL.")
+        .properties(
+            string(SERVICE_URL)
+                .label("Service URL")
+                .description(
+                    "The URL of the external service to notify with the webhook resume URL when the " +
+                        "workflow is suspended.")
+                .required(true),
+            string(DATA)
+                .label("Data Schema")
+                .description(
+                    "JSON schema defining the structure of the body submitted by the external service when " +
+                        "resuming the workflow via the webhook URL.")
+                .controlType(JSON_SCHEMA_BUILDER)
+                .required(false),
+            integer(AMOUNT)
+                .label("Expires After Amount")
+                .description("The amount of time to wait for the webhook call before the workflow times out.")
+                .required(true)
+                .defaultValue(30),
+            string(UNIT)
+                .label("Expires After Unit")
+                .description("The unit of time for the expiration.")
+                .required(true)
+                .defaultValue("DAYS")
+                .options(
+                    option("Seconds", "SECONDS"),
+                    option("Minutes", "MINUTES"),
+                    option("Hours", "HOURS"),
+                    option("Days", "DAYS")))
+        .output(WaitOnWebHookCallAction::output)
+        .perform(WaitOnWebHookCallAction::perform)
+        .beforeSuspend(WaitOnWebHookCallAction::beforeSuspend)
+        .resumePerform(WaitOnWebHookCallAction::resumePerform)
+        .help("", "https://docs.bytechef.io/reference/components/wait_v1#on-web-hook-call");
 
-        return action("onWebhookCall")
-            .title("On Webhook Call")
-            .description(
-                "Suspends the workflow execution until a webhook call is received. An external service can " +
-                    "resume the workflow by calling the webhook URL.")
-            .properties(
-                string(SERVICE_URL)
-                    .label("Service URL")
-                    .description(
-                        "The URL of the external service to notify with the webhook resume URL when the " +
-                            "workflow is suspended.")
-                    .required(true),
-                string(DATA)
-                    .label("Data Schema")
-                    .description(
-                        "JSON schema defining the structure of the body submitted by the external service when " +
-                            "resuming the workflow via the webhook URL.")
-                    .controlType(JSON_SCHEMA_BUILDER)
-                    .required(false),
-                integer(AMOUNT)
-                    .label("Expires After Amount")
-                    .description("The amount of time to wait for the webhook call before the workflow times out.")
-                    .required(true)
-                    .defaultValue(30),
-                string(UNIT)
-                    .label("Expires After Unit")
-                    .description("The unit of time for the expiration.")
-                    .required(true)
-                    .defaultValue("DAYS")
-                    .options(
-                        option("Seconds", "SECONDS"),
-                        option("Minutes", "MINUTES"),
-                        option("Hours", "HOURS"),
-                        option("Days", "DAYS")))
-            .output(waitOnWebHookCallAction::output)
-            .perform(waitOnWebHookCallAction::perform)
-            .beforeSuspend(waitOnWebHookCallAction::beforeSuspend)
-            .resumePerform(waitOnWebHookCallAction::resumePerform)
-            .help("", "https://docs.bytechef.io/reference/components/wait_v1#on-web-hook-call");
+    protected static void beforeSuspend(
+        String resumeUrl, Instant expiresAt, Parameters continueParameters, ActionContext context) {
+
+        String serviceUrl = continueParameters.getString(SERVICE_URL);
+
+        if (serviceUrl != null && resumeUrl != null) {
+            context.http(
+                http -> http.post(serviceUrl)
+                    .body(Body.of(Map.of("resumeUrl", resumeUrl)))
+                    .configuration(Http.disableAuthorization(true))
+                    .execute());
+        }
     }
 
-    protected OutputResponse output(
+    protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         ValueProperty<?> outputSchema = object()
@@ -110,7 +120,7 @@ public class WaitOnWebHookCallAction {
             context.outputSchema(curOutputSchema -> curOutputSchema.getSampleOutput(outputSchema)));
     }
 
-    protected Object perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String serviceUrl = inputParameters.getString(SERVICE_URL);
@@ -138,22 +148,8 @@ public class WaitOnWebHookCallAction {
         return null;
     }
 
-    protected void beforeSuspend(
-        String resumeUrl, Instant expiresAt, Parameters continueParameters, ActionContext context) {
-
-        String serviceUrl = continueParameters.getString(SERVICE_URL);
-
-        if (serviceUrl != null && resumeUrl != null) {
-            context.http(
-                http -> http.post(serviceUrl)
-                    .body(Body.of(Map.of("resumeUrl", resumeUrl)))
-                    .configuration(Http.disableAuthorization(true))
-                    .execute());
-        }
-    }
-
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    protected ResumeResponse resumePerform(
+    protected static ResumeResponse resumePerform(
         Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
         ActionContext context) {
 
