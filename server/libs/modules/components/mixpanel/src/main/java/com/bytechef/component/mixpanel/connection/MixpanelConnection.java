@@ -36,7 +36,9 @@ public class MixpanelConnection {
                 .properties(
                     string(USERNAME)
                         .label("Username")
-                        .required(true)));
+                        .required(true)))
+        .help("", "https://docs.bytechef.io/reference/components/mixpanel_v1#connection-setup")
+        .version(1);
 
     private MixpanelConnection() {
     }
