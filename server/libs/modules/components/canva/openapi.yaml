@@ -1,0 +1,273 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Canva"
+  description: "Canva is a web and mobile application designed to help users create, design, and collaborate on visual content such as graphics, presentations, and marketing materials easily and efficiently."
+  version: "v1"
+servers:
+  - url: "https://api.canva.com/rest/v1/"
+paths:
+  /designs:
+    post:
+      summary: "Create Design"
+      description: "Create a Canva design."
+      operationId: "createDesign"
+      x-help: "https://docs.bytechef.io/reference/components/canva_v1#create-design"
+      security:
+        - oauth2:
+            - "design:content:write"
+            - "design:content:read"
+      x-ai-agent-tool: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Project"
+              required:
+                - "type"
+              properties:
+                type:
+                  type: "string"
+                  description: "."
+                design_type:
+                  type: "object"
+                  description: "The desired design type."
+                  properties:
+                    type:
+                      type: "string"
+                      description: "The type of design."
+                      enum:
+                        - "preset"
+                        - "custom"
+                    name:
+                      type: "string"
+                      description: "The name of the design type."
+                      enum:
+                        - "doc"
+                        - "email"
+                        - "presentation"
+                        - "whiteboard"
+                    width:
+                      type: "integer"
+                      description: "The width of the design, in pixels."
+                      minimum: 40
+                      maximum: 8000
+                    height:
+                      type: "integer"
+                      description: "The height of the design, in pixels."
+                      minimum: 40
+                      maximum: 8000
+                title:
+                  type: "string"
+                  description: "The name of the design."
+                  minLength: 1
+                  maxLength: 255
+                asset_id:
+                  type: "string"
+                  description: "The ID of an asset to insert into the created design."
+      responses:
+        "200":
+          description: "Successfully created design"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    description: "The design ID."
+                  owner:
+                    type: "object"
+                    properties:
+                      user_id:
+                        type: "string"
+                        description: "The ID of the user."
+                      team_id:
+                        type: "string"
+                        description: "The ID of the user's Canva Team."
+                  URLs:
+                    type: "object"
+                    properties:
+                      edit_url:
+                        type: "string"
+                        description: "A temporary editing URL for the design."
+                      view_url:
+                        type: "string"
+                        description: "A temporary viewing URL for the design."
+                  created_at:
+                    type: "string"
+                    format: "date-time"
+                    description: "When the design was created in Canva."
+                  updated_at:
+                    type: "string"
+                    format: "date-time"
+                    description: "When the design was last updated in Canva."
+                  title:
+                    type: "string"
+                    description: "The design title."
+                  thumbnail:
+                    type: "object"
+                    description: "A thumbnail image representing the object."
+                    properties:
+                      width:
+                        type: "integer"
+                        description: "The width of the thumbnail image in pixels."
+                      height:
+                        type: "integer"
+                        description: "The height of the thumbnail image in pixels."
+                      url:
+                        type: "string"
+                        description: "A URL for retrieving the thumbnail image."
+                  page_count:
+                    type: "integer"
+                    description: "The total number of pages in the design."
+  /exports/{exportId}:
+    get:
+      summary: "Export Design"
+      description: "Get the status and results of an export job, including link(s) to the downloadable file(s)."
+      operationId: "exportDesign"
+      x-help: "https://docs.bytechef.io/reference/components/canva_v1#export-design"
+      security:
+        - oauth2:
+            - "design:content:read"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "exportId"
+          in: "path"
+          required: true
+          description: "The export job ID."
+          schema:
+            title: "export ID"
+            type: "string"
+      responses:
+        "200":
+          description: "Successfully created design"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    description: "The export job ID."
+                  status:
+                    type: "string"
+                    description: "The export status of the job."
+                  URLs:
+                    type: "array"
+                    items:
+                      type: "string"
+                      description: "URL(s) for the completed export job."
+  /asset-uploads/{jobId}:
+    get:
+      summary: "Get asset upload job"
+      description: "Get the status and results of an upload asset job."
+      operationId: "uploadAsset"
+      x-help: "https://docs.bytechef.io/reference/components/canva_v1#upload-asset"
+      security:
+        - oauth2:
+            - "asset:read"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "jobId"
+          in: "path"
+          required: true
+          description: "The asset upload job ID."
+          schema:
+            title: "job ID"
+            type: "string"
+      responses:
+        "200":
+          description: "Successfully created design"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    description: "The ID of the asset upload job."
+                  status:
+                    type: "string"
+                    description: "Status of the asset upload job."
+                  asset:
+                    type: "object"
+                    description: "The asset object, which contains metadata about the asset."
+                    properties:
+                      type:
+                        type: "string"
+                        description: "Type of an asset."
+                      id:
+                        type: "string"
+                        description: "The ID of the asset."
+                      name:
+                        type: "string"
+                        description: "The name of the asset."
+                      tags:
+                        type: "array"
+                        description: "The user-facing tags attached to the asset."
+                        items:
+                          type: "string"
+                      created_at:
+                        type: "string"
+                        format: "date-time"
+                        description: "When the asset was added to Canva."
+                      updated_at:
+                        type: "string"
+                        format: "date-time"
+                        description: "When the asset was last updated in Canva."
+                      owner:
+                        type: "object"
+                        description: "Metadata for the user."
+                        properties:
+                          user_id:
+                            type: "string"
+                            description: "The ID of the user."
+                          team_id:
+                            type: "string"
+                            description: "The ID of the user's Canva Team."
+                      thumbnail:
+                        type: "object"
+                        description: "A thumbnail image representing the object."
+                        properties:
+                          width:
+                            type: "integer"
+                            description: "The width of the thumbnail image in pixels."
+                          height:
+                            type: "integer"
+                            description: "The height of the thumbnail image in pixels."
+                          url:
+                            type: "string"
+                            description: "A URL for retrieving the thumbnail image."
+                      metadata:
+                        type: "object"
+                        description: "Type-specific metadata for the asset."
+                        properties:
+                          type:
+                            type: "string"
+                            description: "Type of an asset."
+                          width:
+                            type: "integer"
+                            description: "The width of the image in pixels."
+                          height:
+                            type: "integer"
+                            description: "The height of the image in pixels."
+                          smart_tags:
+                            type: "array"
+                            description: "AI-generated tags for the image."
+                            items:
+                              type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://www.canva.com/api/oauth/authorize"
+          tokenUrl: "https://api.canva.com/rest/v1/oauth/token"
+          refreshUrl: "https://api.canva.com/rest/v1/oauth/token"
+          scopes:
+            design:content:write: ""
+            design:content:read: ""
+            asset:read: ""
