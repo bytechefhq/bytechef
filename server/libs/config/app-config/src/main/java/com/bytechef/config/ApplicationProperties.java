@@ -354,9 +354,6 @@ public class ApplicationProperties {
      */
     public static class Observability {
 
-        /** Whether observability features are enabled */
-        private boolean enabled;
-
         /** Logging observability configuration */
         private Logging logging = new Logging();
 
@@ -365,10 +362,6 @@ public class ApplicationProperties {
 
         /** Tracing observability configuration */
         private Tracing tracing = new Tracing();
-
-        public boolean isEnabled() {
-            return enabled;
-        }
 
         public Logging getLogging() {
             return logging;
@@ -380,10 +373,6 @@ public class ApplicationProperties {
 
         public Tracing getTracing() {
             return tracing;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
         }
 
         public void setLogging(Logging logging) {
@@ -400,6 +389,9 @@ public class ApplicationProperties {
 
         public static class Logging {
 
+            /** Whether observability logging features are enabled */
+            private boolean enabled;
+
             /** OTLP endpoint for logging export */
             private String endpoint;
 
@@ -410,9 +402,20 @@ public class ApplicationProperties {
             public void setEndpoint(String endpoint) {
                 this.endpoint = endpoint;
             }
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
         }
 
         public static class Metrics {
+
+            /** Whether observability features are enabled */
+            private boolean enabled;
 
             /** OTLP endpoint for metrics export */
             private String endpoint;
@@ -424,10 +427,19 @@ public class ApplicationProperties {
             public void setEndpoint(String endpoint) {
                 this.endpoint = endpoint;
             }
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
         }
 
         public static class Tracing {
-
+            /** Whether observability features are enabled */
+            private boolean enabled;
             /** OTLP endpoint for tracing export */
             private String endpoint;
 
@@ -437,6 +449,14 @@ public class ApplicationProperties {
 
             public void setEndpoint(String endpoint) {
                 this.endpoint = endpoint;
+            }
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
         }
     }
