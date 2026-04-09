@@ -175,7 +175,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         });
 
         setCopilotPanelOpen(true);
-    }, [setContext, setCopilotPanelOpen]);
+    }, [rootClusterElementNodeData?.name, setCopilotPanelOpen, setContext]);
 
     const handleCopilotClose = useCallback(() => {
         useCopilotStore.getState().restoreConversationState();
