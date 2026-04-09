@@ -55,11 +55,18 @@ public class AiTextConstants {
     public static final String IS_DECIMAL = "isDecimal";
     public static final String NUM_RESULTS = "numResults";
     public static final String CHUNK_SIZE = "chunkSize";
+    public static final String DATA_FIELDS = "dataFields";
+    public static final String FIELD_NAME = "fieldName";
+    public static final String FIELD_TYPE = "fieldType";
+    public static final String FIELD_DESCRIPTION = "fieldDescription";
+    public static final String EXTRACT_LIST = "extractList";
+    public static final String ADDITIONAL_CONTEXT = "additionalContext";
     public static final String SUMMARIZE_TEXT = "summarizeText";
     public static final String TEXT_GENERATION = "textGeneration";
     public static final String SIMILARITY_SEARCH = "similaritySearch";
     public static final String CLASSIFY_TEXT = "classifyText";
     public static final String SENTIMENT_ANALYSIS = "sentimentAnalysis";
+    public static final String EXTRACT_DATA = "extractData";
     public static final String SCORE = "score";
 
     public static final BiFunction<Ai.Provider, PropertyService, ModifiableStringProperty> PROVIDER_PROPERTY =
