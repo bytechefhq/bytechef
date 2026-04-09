@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.universal.text.action.ClassifyTextAction;
 import com.bytechef.component.ai.universal.text.action.ExtractDataAction;
 import com.bytechef.component.ai.universal.text.action.GenerateTextAction;
+import com.bytechef.component.ai.universal.text.action.MaskAction;
 import com.bytechef.component.ai.universal.text.action.ScoreAction;
 import com.bytechef.component.ai.universal.text.action.SentimentAction;
 import com.bytechef.component.ai.universal.text.action.SimilaritySearchAction;
@@ -68,6 +69,7 @@ public class AiTextComponentHandler implements ComponentHandler {
                     .actions(
                         ClassifyTextAction.of(provider, propertyService),
                         ExtractDataAction.of(provider, propertyService),
+                        MaskAction.of(provider, propertyService),
                         SentimentAction.of(provider, propertyService),
                         ScoreAction.of(provider, propertyService),
                         SummarizeTextAction.of(provider, propertyService),

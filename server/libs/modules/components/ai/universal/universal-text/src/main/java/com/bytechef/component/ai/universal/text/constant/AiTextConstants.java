@@ -61,6 +61,14 @@ public class AiTextConstants {
     public static final String FIELD_DESCRIPTION = "fieldDescription";
     public static final String EXTRACT_LIST = "extractList";
     public static final String ADDITIONAL_CONTEXT = "additionalContext";
+    public static final String SENSITIVE_KEYWORDS = "sensitiveKeywords";
+    public static final String PII_DETECTION = "piiDetection";
+    public static final String CUSTOM_PATTERNS = "customRegexPatterns";
+    public static final String MODE = "mode";
+    public static final String MODE_CLASSIFY = "classify";
+    public static final String MODE_SANITIZE = "sanitize";
+    public static final String BLOCKED_MESSAGE = "blockedMessage";
+    public static final String MASK = "mask";
     public static final String SUMMARIZE_TEXT = "summarizeText";
     public static final String TEXT_GENERATION = "textGeneration";
     public static final String SIMILARITY_SEARCH = "similaritySearch";

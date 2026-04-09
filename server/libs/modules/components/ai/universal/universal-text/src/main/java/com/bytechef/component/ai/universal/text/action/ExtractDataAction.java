@@ -104,7 +104,8 @@ public class ExtractDataAction implements AiTextAction {
             .append(inputParameters.getString(TEXT));
 
         if (additionalContext != null && !additionalContext.isEmpty()) {
-            userBuilder.append("\n\nAdditional context: ").append(additionalContext);
+            userBuilder.append("\n\nAdditional context: ")
+                .append(additionalContext);
         }
 
         String responseSchema = inputParameters.getRequiredString(RESPONSE_SCHEMA);
