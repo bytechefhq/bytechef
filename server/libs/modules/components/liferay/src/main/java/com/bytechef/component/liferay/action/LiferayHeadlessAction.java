@@ -183,6 +183,10 @@ public class LiferayHeadlessAction {
             return Body.of((List<?>) properties.get(BODY));
         }
 
+        if (parameterNames == null) {
+            return Body.of();
+        }
+
         return Body.of(parameterNames
             .stream()
             .filter(
