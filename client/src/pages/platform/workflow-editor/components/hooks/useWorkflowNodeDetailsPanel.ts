@@ -182,7 +182,10 @@ export default function useWorkflowNodeDetailsPanel({
                 ? (rootClusterElementNodeData?.workflowNodeName as string)
                 : (currentNode?.workflowNodeName as string),
         },
-        !!workflow.id && !!currentNode && !!currentComponentDefinition?.connectionRequired
+        !!workflow.id &&
+            !!currentNode &&
+            (!!currentComponentDefinition?.connectionRequired ||
+                (!!currentNode.clusterRoot && !currentNode.isNestedClusterRoot))
     );
 
     const {data: currentClusterElementDefinition} = useGetClusterElementDefinitionQuery(
