@@ -42,32 +42,28 @@ import java.util.Map;
  */
 public class WaitAtSpecifiedTimeAction {
 
-    public static ModifiableActionDefinition of() {
-        WaitAtSpecifiedTimeAction waitAtSpecifiedTimeAction = new WaitAtSpecifiedTimeAction();
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("atSpecifiedTime")
+        .title("At Specified Time")
+        .description("Pauses the workflow execution until a specified date and time.")
+        .properties(
+            object(ResumeResponse.DATA)
+                .properties(
+                    dateTime(DATE_TIME)
+                        .label("Date and Time")
+                        .description("The date and time to wait until before resuming workflow execution.")
+                        .required(true),
+                    string(TIMEZONE)
+                        .label("Timezone")
+                        .description("The timezone in which the specified date and time should be interpreted.")
+                        .options(WaitUtils.getTimeZoneOptions())
+                        .required(true)),
+            bool(ResumeResponse.RESUMED)
+                .description("Whether the workflow was resumed by a webhook call."))
+        .output(WaitAtSpecifiedTimeAction::output)
+        .perform(WaitAtSpecifiedTimeAction::perform)
+        .resumePerform(WaitAtSpecifiedTimeAction::resumePerform);
 
-        return action("atSpecifiedTime")
-            .title("At Specified Time")
-            .description("Pauses the workflow execution until a specified date and time.")
-            .properties(
-                object(ResumeResponse.DATA)
-                    .properties(
-                        dateTime(DATE_TIME)
-                            .label("Date and Time")
-                            .description("The date and time to wait until before resuming workflow execution.")
-                            .required(true),
-                        string(TIMEZONE)
-                            .label("Timezone")
-                            .description("The timezone in which the specified date and time should be interpreted.")
-                            .options(WaitUtils.getTimeZoneOptions())
-                            .required(true)),
-                bool(ResumeResponse.RESUMED)
-                    .description("Whether the workflow was resumed by a webhook call."))
-            .output(waitAtSpecifiedTimeAction::output)
-            .perform(waitAtSpecifiedTimeAction::perform)
-            .resumePerform(waitAtSpecifiedTimeAction::resumePerform);
-    }
-
-    protected OutputResponse output(
+    protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         long expiresAtMillis = inputParameters.getLong("expiresAt", System.currentTimeMillis());
@@ -78,7 +74,7 @@ public class WaitAtSpecifiedTimeAction {
         return OutputResponse.of(ResumeResponse.of(Map.of("scheduledAt", scheduledAt)));
     }
 
-    protected Object perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         LocalDateTime localDateTime = inputParameters.getRequiredLocalDateTime(DATE_TIME);
@@ -93,7 +89,7 @@ public class WaitAtSpecifiedTimeAction {
         return null;
     }
 
-    protected ResumeResponse resumePerform(
+    protected static ResumeResponse resumePerform(
         Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
         ActionContext context) {
 

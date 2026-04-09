@@ -40,9 +40,9 @@ public class WaitComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .icon("path:assets/wait.svg")
         .actions(
-            WaitAfterTimeIntervalAction.of(),
-            WaitAtSpecifiedTimeAction.of(),
-            WaitOnWebHookCallAction.of());
+            WaitAfterTimeIntervalAction.ACTION_DEFINITION,
+            WaitAtSpecifiedTimeAction.ACTION_DEFINITION,
+            WaitOnWebHookCallAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

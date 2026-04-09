@@ -48,49 +48,45 @@ public class WaitAfterTimeIntervalAction {
     private static final String MINUTES = "MINUTES";
     private static final String SCHEDULED_AT = "scheduledAt";
 
-    public static ModifiableActionDefinition of() {
-        WaitAfterTimeIntervalAction waitAfterTimeIntervalAction = new WaitAfterTimeIntervalAction();
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("afterTimeInterval")
+        .title("After Time Interval")
+        .description("Pauses the workflow execution for a specified amount of time.")
+        .properties(
+            integer(AMOUNT)
+                .label("Amount")
+                .description("The amount of time to wait.")
+                .required(true)
+                .defaultValue(1),
+            string(UNIT)
+                .label("Unit")
+                .description("The unit of time.")
+                .required(true)
+                .defaultValue(MINUTES)
+                .options(
+                    option("Seconds", "SECONDS"),
+                    option("Minutes", MINUTES),
+                    option("Hours", "HOURS"),
+                    option("Days", "DAYS")))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object(ResumeResponse.DATA)
+                            .properties(
+                                dateTime(SCHEDULED_AT)
+                                    .description(
+                                        "The date and time at which the workflow was scheduled to resume."),
+                                integer(AMOUNT)
+                                    .description("The amount of time that was waited."),
+                                string(UNIT)
+                                    .description("The unit of time that was waited.")),
+                        bool(ResumeResponse.RESUMED)
+                            .description("Whether the workflow was resumed by a webhook call."))))
+        .output(WaitAfterTimeIntervalAction::output)
+        .perform(WaitAfterTimeIntervalAction::perform)
+        .resumePerform(WaitAfterTimeIntervalAction::resumePerform);
 
-        return action("afterTimeInterval")
-            .title("After Time Interval")
-            .description("Pauses the workflow execution for a specified amount of time.")
-            .properties(
-                integer(AMOUNT)
-                    .label("Amount")
-                    .description("The amount of time to wait.")
-                    .required(true)
-                    .defaultValue(1),
-                string(UNIT)
-                    .label("Unit")
-                    .description("The unit of time.")
-                    .required(true)
-                    .defaultValue(MINUTES)
-                    .options(
-                        option("Seconds", "SECONDS"),
-                        option("Minutes", MINUTES),
-                        option("Hours", "HOURS"),
-                        option("Days", "DAYS")))
-            .output(
-                outputSchema(
-                    object()
-                        .properties(
-                            object(ResumeResponse.DATA)
-                                .properties(
-                                    dateTime(SCHEDULED_AT)
-                                        .description(
-                                            "The date and time at which the workflow was scheduled to resume."),
-                                    integer(AMOUNT)
-                                        .description("The amount of time that was waited."),
-                                    string(UNIT)
-                                        .description("The unit of time that was waited.")),
-                            bool(ResumeResponse.RESUMED)
-                                .description("Whether the workflow was resumed by a webhook call."))))
-            .output(waitAfterTimeIntervalAction::output)
-            .perform(waitAfterTimeIntervalAction::perform)
-            .resumePerform(waitAfterTimeIntervalAction::resumePerform);
-    }
-
-    protected OutputResponse output(
+    protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return OutputResponse.of(
@@ -101,7 +97,7 @@ public class WaitAfterTimeIntervalAction {
                     UNIT, inputParameters.getString(UNIT, MINUTES))));
     }
 
-    protected Object perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         int amount = inputParameters.getRequiredInteger(AMOUNT);
@@ -116,7 +112,7 @@ public class WaitAfterTimeIntervalAction {
         return null;
     }
 
-    protected ResumeResponse resumePerform(
+    protected static ResumeResponse resumePerform(
         Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
         ActionContext context) {
 
