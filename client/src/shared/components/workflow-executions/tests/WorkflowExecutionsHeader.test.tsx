@@ -63,6 +63,19 @@ describe('WorkflowExecutionsHeader', () => {
             expect(screen.getByText('Workflow failed')).toBeInTheDocument();
         });
 
+        it('should display Workflow stopped badge when workflow is stopped', () => {
+            const job = createJob({
+                endDate: new Date('2024-01-01T10:00:05'),
+                startDate: new Date('2024-01-01T10:00:00'),
+                status: 'STOPPED',
+                taskExecutions: [{} as never],
+            });
+
+            render(<WorkflowExecutionsHeader job={job} />);
+
+            expect(screen.getByText('Workflow stopped')).toBeInTheDocument();
+        });
+
         it('should display Running badge when job is CREATED (not yet started)', () => {
             const job = createJob({
                 endDate: undefined,

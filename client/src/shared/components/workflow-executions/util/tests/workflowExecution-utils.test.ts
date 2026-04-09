@@ -83,15 +83,17 @@ describe('getWorkflowStatusType', () => {
         });
     });
 
+    describe('stopped status', () => {
+        it('should return stopped when job is STOPPED and no trigger execution', () => {
+            const job = createJob({status: 'STOPPED'});
+
+            expect(getWorkflowStatusType(job)).toBe('stopped');
+        });
+    });
+
     describe('failed status', () => {
         it('should return failed when job is FAILED and no trigger execution', () => {
             const job = createJob({status: 'FAILED'});
-
-            expect(getWorkflowStatusType(job)).toBe('failed');
-        });
-
-        it('should return failed when job is STOPPED and no trigger execution', () => {
-            const job = createJob({status: 'STOPPED'});
 
             expect(getWorkflowStatusType(job)).toBe('failed');
         });
