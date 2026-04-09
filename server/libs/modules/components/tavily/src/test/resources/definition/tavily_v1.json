@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extract web page content from one or more specified URLs.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/tavily_v1#extract"
+    },
     "metadata": {
       "path": "/extract",
       "mimeType": "application/json",
@@ -650,7 +653,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Execute a search query.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/tavily_v1#search"
+    },
     "metadata": {
       "path": "/search",
       "mimeType": "application/json",
@@ -2809,15 +2815,21 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/tavily_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
-  "description": "Tavily is an AI-powered search tool designed to help users quickly find accurate, relevant, and up-to-date information from the web.",
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://docs.tavily.com/documentation/api-reference/introduction"
+  },
+  "description": "Tavily is an AI-powered search tool designed to help users quickly find accurate, relevant and up-to-date information from the web.",
   "icon": "path:assets/tavily.svg",
   "metadata": null,
   "name": "tavily",
