@@ -184,7 +184,7 @@ export default function useWorkflowNodeDetailsPanel({
         },
         !!workflow.id &&
             !!currentNode &&
-            (!!currentComponentDefinition?.connectionRequired ||
+            (!!currentComponentDefinition?.connection ||
                 (!!currentNode.clusterRoot && !currentNode.isNestedClusterRoot))
     );
 
