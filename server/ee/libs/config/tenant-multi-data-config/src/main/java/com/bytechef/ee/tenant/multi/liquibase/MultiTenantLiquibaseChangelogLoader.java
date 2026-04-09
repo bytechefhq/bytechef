@@ -41,5 +41,7 @@ public class MultiTenantLiquibaseChangelogLoader implements InitializingBean {
         }
 
         tenantService.loadChangelog(tenantIds, "multitenant");
+
+        log.info("Loading changelog completed");
     }
 }
