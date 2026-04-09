@@ -449,9 +449,20 @@ export const getClusterElementsLayoutElements = ({
         }
     }
 
-    // Center the entire graph when there are children beyond the root.
-    // When only the root exists, keep its current centered position.
-    if (positionedNodes.length > 1) {
+    // Center the graph on the canvas.
+    if (positionedNodes.length === 1) {
+        const viewportWidth = canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM;
+        const viewportHeight = canvasHeight / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM;
+        const rootPadding = NODE_HEIGHT;
+
+        const centeredX = currentRootPosition ? currentRootPosition.x : viewportWidth / 2 - mainRootWidth / 2;
+        const centeredY = viewportHeight / 2 - NODE_HEIGHT / 2 - placeholderY / 2;
+
+        positionedNodes[0].position = {
+            x: Math.max(rootPadding, Math.min(centeredX, viewportWidth - mainRootWidth - rootPadding)),
+            y: Math.max(rootPadding, Math.min(centeredY, viewportHeight - NODE_HEIGHT - rootPadding)),
+        };
+    } else if (positionedNodes.length > 1) {
         const absolutePositionMap = new Map<string, {x: number; y: number}>();
 
         const getAbsolutePosition = (nodeId: string): {x: number; y: number} => {
