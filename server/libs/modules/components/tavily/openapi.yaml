@@ -2,7 +2,7 @@
 openapi: "3.0.1"
 info:
   title: "Tavily"
-  description: "Tavily is an AI-powered search tool designed to help users quickly find accurate, relevant, and up-to-date information from the web."
+  description: "Tavily is an AI-powered search tool designed to help users quickly find accurate, relevant and up-to-date information from the web."
   version: "v1"
 servers:
   - url: "https://api.tavily.com"
@@ -12,6 +12,7 @@ paths:
       summary: "Search"
       description: "Execute a search query."
       operationId: "search"
+      x-help: "https://docs.bytechef.io/reference/components/tavily_v1#search"
       x-ai-agent-tool: true
       requestBody:
         content:
@@ -92,6 +93,7 @@ paths:
       summary: "Extract"
       description: "Extract web page content from one or more specified URLs."
       operationId: "extract"
+      x-help: "https://docs.bytechef.io/reference/components/tavily_v1#extract"
       x-ai-agent-tool: true
       requestBody:
         content:

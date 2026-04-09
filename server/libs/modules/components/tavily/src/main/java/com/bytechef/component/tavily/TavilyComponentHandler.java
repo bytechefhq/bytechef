@@ -22,6 +22,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.google.auto.service.AutoService;
@@ -38,7 +39,8 @@ public class TavilyComponentHandler extends AbstractTavilyComponentHandler {
         return modifiableComponentDefinition
             .icon("path:assets/tavily.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-            .customAction(true);
+            .customAction(true)
+            .customActionHelp("", "https://docs.tavily.com/documentation/api-reference/introduction");
     }
 
     @Override
@@ -70,5 +72,14 @@ public class TavilyComponentHandler extends AbstractTavilyComponentHandler {
         }
 
         return modifiableProperty;
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/tavily_v1#connection-setup")
+            .version(1);
     }
 }
