@@ -39,6 +39,7 @@ public class KlaviyoGetListsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getLists")
         .title("Get Lists")
         .description("Get all lists in an account.")
+        .help("", "https://docs.bytechef.io/reference/components/klaviyo_v1#get-lists")
         .properties(
             array(LIST_FIELDS)
                 .label("List Fields")

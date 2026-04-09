@@ -63,6 +63,7 @@ public class KlaviyoUpdateProfileAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateProfile")
         .title("Update Profile")
         .description("Update the profile with the given profile ID.")
+        .help("", "https://docs.bytechef.io/reference/components/klaviyo_v1#update-profile")
         .properties(
             string(PROFILE_ID)
                 .label("Profile ID")

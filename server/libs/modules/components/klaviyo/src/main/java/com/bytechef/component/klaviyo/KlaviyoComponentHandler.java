@@ -42,6 +42,7 @@ public class KlaviyoComponentHandler implements ComponentHandler {
         .icon("path:assets/klaviyo.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .customAction(true)
+        .customActionHelp("", "https://developers.klaviyo.com/en/reference/api_overview")
         .connection(KlaviyoConnection.CONNECTION_DEFINITION)
         .actions(
             KlaviyoGetListsAction.ACTION_DEFINITION,
@@ -50,7 +51,8 @@ public class KlaviyoComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(KlaviyoGetListsAction.ACTION_DEFINITION),
             tool(KlaviyoSubscribeProfilesAction.ACTION_DEFINITION),
-            tool(KlaviyoUpdateProfileAction.ACTION_DEFINITION));
+            tool(KlaviyoUpdateProfileAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
