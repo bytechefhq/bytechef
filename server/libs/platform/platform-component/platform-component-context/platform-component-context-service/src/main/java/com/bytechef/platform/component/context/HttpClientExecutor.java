@@ -524,11 +524,11 @@ class HttpClientExecutor {
 
                 mediaType = mediaType.toLowerCase(Locale.ROOT);
 
-                if (mediaType.equals("text/json")) {
-                    mediaType = "application/json";
-                } else if (mediaType.equals("text/xml")) {
-                    mediaType = "application/xml";
-                }
+                mediaType = switch (mediaType) {
+                    case "text/json", "application/vnd.api+json" -> "application/json";
+                    case "text/xml" -> "application/xml";
+                    default -> mediaType;
+                };
 
                 if (responseType.getType() == ResponseType.Type.TEXT && mediaType.startsWith("text/")) {
                     return true;
