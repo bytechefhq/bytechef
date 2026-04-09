@@ -2,12 +2,16 @@ import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
-import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/middleware/graphql';
+import {
+    useSaveClusterElementTestConfigurationConnectionMutation,
+    useSaveWorkflowTestConfigurationConnectionMutation,
+} from '@/shared/middleware/graphql';
 import {
     ComponentConnection,
     ComponentDefinition,
@@ -104,6 +108,15 @@ const ConnectionTabConnectionSelect = ({
         },
     });
 
+    const saveClusterElementTestConfigurationConnectionMutation =
+        useSaveClusterElementTestConfigurationConnectionMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
+                });
+            },
+        });
+
     const deleteWorkflowTestConfigurationConnectionMutation = useDeleteWorkflowTestConfigurationConnectionMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -124,62 +137,80 @@ const ConnectionTabConnectionSelect = ({
 
             connectionIdRef.current = connectionId;
 
-            saveWorkflowTestConfigurationConnectionMutation.mutate(
-                {
-                    connectionId,
-                    environmentId: currentEnvironmentId,
-                    workflowConnectionKey,
-                    workflowId,
-                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
-                },
-                {
-                    onError: () => {
-                        if (connectionIdRef.current !== connectionId) {
-                            return;
-                        }
-
-                        setConnectionId(previousConnectionId);
-
-                        connectionIdRef.current = previousConnectionId;
-
-                        toast.error('Failed to save connection');
-                    },
-                    onSuccess: () => {
-                        if (connectionIdRef.current !== connectionId) {
-                            return;
-                        }
-
-                        const latestState = useWorkflowNodeDetailsPanelStore.getState();
-                        const latestNode = latestState.currentNode;
-                        const latestComponent = latestState.currentComponent;
-
-                        if (latestNode) {
-                            latestState.setCurrentNode({...latestNode, connectionId});
-                        }
-
-                        if (latestComponent) {
-                            latestState.setCurrentComponent({...latestComponent, connectionId});
-                        }
-
-                        queryClient.removeQueries({
-                            queryKey: [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
-                        });
-
-                        queryClient.removeQueries({
-                            queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
-                        });
-
-                        queryClient.removeQueries({
-                            queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions, workflowId],
-                        });
-                    },
+            const onError = () => {
+                if (connectionIdRef.current !== connectionId) {
+                    return;
                 }
-            );
+
+                setConnectionId(previousConnectionId);
+
+                connectionIdRef.current = previousConnectionId;
+
+                toast.error('Failed to save connection');
+            };
+
+            const onSuccess = () => {
+                if (connectionIdRef.current !== connectionId) {
+                    return;
+                }
+
+                const latestState = useWorkflowNodeDetailsPanelStore.getState();
+                const latestNode = latestState.currentNode;
+                const latestComponent = latestState.currentComponent;
+
+                if (latestNode) {
+                    latestState.setCurrentNode({...latestNode, connectionId});
+                }
+
+                if (latestComponent) {
+                    latestState.setCurrentComponent({...latestComponent, connectionId});
+                }
+
+                queryClient.removeQueries({
+                    queryKey: [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
+                });
+
+                queryClient.removeQueries({
+                    queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
+                });
+
+                queryClient.removeQueries({
+                    queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions, workflowId],
+                });
+            };
+
+            if (currentNode?.clusterElementType && rootClusterElementNodeData?.workflowNodeName) {
+                saveClusterElementTestConfigurationConnectionMutation.mutate(
+                    {
+                        clusterElementType: convertNameToSnakeCase(currentNode.clusterElementType),
+                        clusterElementWorkflowNodeName: workflowNodeName,
+                        connectionId,
+                        environmentId: currentEnvironmentId,
+                        workflowConnectionKey,
+                        workflowId,
+                        workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                    },
+                    {onError, onSuccess}
+                );
+            } else {
+                saveWorkflowTestConfigurationConnectionMutation.mutate(
+                    {
+                        connectionId,
+                        environmentId: currentEnvironmentId,
+                        workflowConnectionKey,
+                        workflowId,
+                        workflowNodeName,
+                    },
+                    {onError, onSuccess}
+                );
+            }
         },
         [
             currentEnvironmentId,
+            currentNode?.clusterElementType,
             queryClient,
             rootClusterElementNodeData?.workflowNodeName,
+            saveClusterElementTestConfigurationConnectionMutation,
             saveWorkflowTestConfigurationConnectionMutation,
             workflowId,
             workflowNodeName,
