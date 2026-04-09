@@ -2144,13 +2144,26 @@ function getLRRenderedWidth(node: Node): number {
 }
 
 /**
- * Aligns consecutive workflow nodes in a chain to the same cross-axis level,
- * matching the inline "add node" behavior in both LR and TB modes.
+ * Aligns chain nodes to inherit the cross-axis column of an anchored
+ * predecessor, matching the inline "add node" behavior in both LR and TB modes.
  *
- * Cross-axis alignment (y in LR, x in TB) always happens for chain nodes.
- * Main-axis adjustment only happens when the predecessor has a saved or
- * previously-adjusted position, to compensate for the offset between
- * dagre's rank position and the saved position.
+ * Propagation is strictly forward (a successor never pulls its predecessor),
+ * and the cascade rules depend on *how* the predecessor became anchored:
+ *
+ * - Bottom-ghost resolved successor with a dispatcher delta (either a saved
+ *   dispatcher or a chain-aligned one): both cross-axis and main-axis are
+ *   shifted — cross-axis to the dispatcher's column, main-axis by the delta
+ *   so the dagre gap through the dispatcher subtree is preserved.
+ * - Bottom-ghost resolved successor without a delta: only cross-axis is
+ *   aligned; dagre already handles main-axis spacing through the ghost.
+ * - Successor of a chain-aligned predecessor (anchored by a prior collective
+ *   move but with no raw `nodePosition`): only cross-axis is aligned, so newly
+ *   inserted and unanchored successors stay in the moved column instead of
+ *   drifting back to dagre's center.
+ * - Successor of a manually saved predecessor (raw `nodePosition` set by a
+ *   user drag): NOT cascaded. A user drag of a single node must not pull its
+ *   successors — they stay at dagre's default position, and only the dragged
+ *   node itself is offset from center.
  *
  * Task dispatcher nodes (condition, loop, branch) are skipped when the
  * predecessor has no saved position, since dagre positions them to
@@ -2377,10 +2390,6 @@ export function alignChainNodesCrossAxis(
             changed = true;
         }
     }
-
-    // Backward propagation was removed: manually positioned successors must NOT
-    // pull their predecessors. Upstream nodes (including the trigger) stay at
-    // dagre's default position so only the manually moved node itself is offset.
 
     // Shift dispatcher descendants when a dispatcher was aligned
     if (dispatcherDeltas.size > 0) {
