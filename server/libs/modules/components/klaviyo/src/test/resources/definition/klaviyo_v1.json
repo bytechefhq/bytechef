@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get all lists in an account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/klaviyo_v1#get-lists"
+    },
     "metadata": null,
     "name": "getLists",
     "outputDefinition": {
@@ -1699,8 +1702,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Subscribe one or more profiles to email marketing, SMS marketing, or both.",
-    "help": null,
+    "description": "Subscribe one or more profiles to email marketing, SMS marketing or both.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/klaviyo_v1#subscribe-profiles"
+    },
     "metadata": null,
     "name": "subscribeProfiles",
     "outputDefinition": null,
@@ -1812,7 +1818,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update the profile with the given profile ID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/klaviyo_v1#update-profile"
+    },
     "metadata": null,
     "name": "updateProfile",
     "outputDefinition": {
@@ -8166,7 +8175,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "subscribeProfiles",
-    "description": "Subscribe one or more profiles to email marketing, SMS marketing, or both.",
+    "description": "Subscribe one or more profiles to email marketing, SMS marketing or both.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -12991,14 +13000,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/klaviyo_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.klaviyo.com/en/reference/api_overview"
+  },
   "description": "Klaviyo is a marketing automation platform primarily used for email and SMS marketing, especially by e-commerce businesses.",
   "icon": "path:assets/klaviyo.svg",
   "metadata": null,
