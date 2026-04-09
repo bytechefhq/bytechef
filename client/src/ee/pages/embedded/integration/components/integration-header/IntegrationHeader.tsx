@@ -2,7 +2,6 @@ import {Separator} from '@/components/ui/separator';
 import IntegrationBreadcrumb from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationBreadcrumb';
 import IntegrationSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationSkeleton';
 import LeftSidebarButton from '@/ee/pages/embedded/integration/components/integration-header/components/LeftSidebarButton';
-import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import OutputPanelButton from '@/ee/pages/embedded/integration/components/integration-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/integration/components/integration-header/components/PublishPopover';
 import WorkflowActionsButton from '@/ee/pages/embedded/integration/components/integration-header/components/WorkflowActionsButton';
@@ -12,6 +11,7 @@ import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/sto
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';

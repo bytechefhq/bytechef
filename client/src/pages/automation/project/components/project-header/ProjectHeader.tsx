@@ -1,6 +1,5 @@
 import {Separator} from '@/components/ui/separator';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
-import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
 import ProjectBreadcrumb from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumb';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
@@ -11,6 +10,7 @@ import {useProjectHeader} from '@/pages/automation/project/components/project-he
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';
