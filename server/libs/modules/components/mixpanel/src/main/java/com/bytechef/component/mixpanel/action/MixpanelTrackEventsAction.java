@@ -50,6 +50,7 @@ public class MixpanelTrackEventsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("trackEvents")
         .title("Track Events")
         .description("Send batches of events from your servers to Mixpanel.")
+        .help("", "https://docs.bytechef.io/reference/components/mixpanel_v1#track-events")
         .properties(
             array(EVENTS)
                 .label("Events")

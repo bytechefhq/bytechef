@@ -37,11 +37,14 @@ public class MixpanelComponentHandler implements ComponentHandler {
         .description(
             "Mixpanel is a product analytics tool that helps you track user interactions and behaviors in your app " +
                 "or website to make data-driven decisions.")
+        .customAction(true)
+        .customActionHelp("", "https://developer.mixpanel.com/reference/overview")
         .icon("path:assets/mixpanel.svg")
         .categories(ComponentCategory.ANALYTICS)
         .connection(MixpanelConnection.CONNECTION_DEFINITION)
         .actions(MixpanelTrackEventsAction.ACTION_DEFINITION)
-        .clusterElements(tool(MixpanelTrackEventsAction.ACTION_DEFINITION));
+        .clusterElements(tool(MixpanelTrackEventsAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
