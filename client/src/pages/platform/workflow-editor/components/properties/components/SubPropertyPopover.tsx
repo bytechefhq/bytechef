@@ -18,6 +18,7 @@ interface SubPropertyPopoverProps {
     handleClick: () => void;
     newPropertyName?: string;
     newPropertyType: keyof typeof VALUE_PROPERTY_CONTROL_TYPES | string;
+    propertyName?: string;
     setNewPropertyName?: (value: string) => void;
     setNewPropertyType: (value: keyof typeof VALUE_PROPERTY_CONTROL_TYPES) => void;
 }
@@ -32,6 +33,7 @@ const SubPropertyPopover = ({
     handleClick,
     newPropertyName,
     newPropertyType,
+    propertyName,
     setNewPropertyName,
     setNewPropertyType,
 }: SubPropertyPopoverProps) => {
@@ -72,6 +74,7 @@ const SubPropertyPopover = ({
         <Popover>
             <PopoverTrigger asChild>
                 <Button
+                    aria-label={`Add ${propertyName ? `${propertyName} ` : ''}${array ? 'array item' : 'object property'}`}
                     className="mt-3 rounded-sm"
                     icon={<PlusIcon />}
                     label={buttonLabel || `Add ${array ? 'array item' : 'object property'}`}
@@ -81,7 +84,7 @@ const SubPropertyPopover = ({
             </PopoverTrigger>
 
             <PopoverContent
-                aria-label={`${array ? 'Array' : 'Object'} property popover`}
+                aria-label={`${propertyName ? `${propertyName} ` : ''}${array ? 'array' : 'object'} property popover`}
                 className="min-w-sub-property-popover-width space-y-4 p-4"
             >
                 <header className="flex items-center justify-between">
