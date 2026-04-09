@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {BlocksIcon, CableIcon, Code2Icon, SlidersIcon, SparklesIcon} from 'lucide-react';
 import {useMemo} from 'react';
@@ -27,8 +28,12 @@ const WorkflowRightSidebar = ({
     showCopilot = true,
     showWorkflowInputs = true,
 }: WorkflowRightSidebarProps) => {
+    const ai = useApplicationInfoStore((state) => state.ai);
+
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
     const ff_1840 = useFeatureFlagsStore()('ff-1840');
+
+    const copilotEnabled = ai.copilot.enabled && ff_1570;
 
     const rightSidebarNavigation = useMemo(
         () =>
@@ -68,7 +73,7 @@ const WorkflowRightSidebar = ({
                 ],
             ].filter((item) => {
                 if (item.name === 'Copilot') {
-                    return showCopilot && ff_1570;
+                    return showCopilot && copilotEnabled;
                 }
 
                 if (item.name === 'Workflow Outputs') {
@@ -78,7 +83,7 @@ const WorkflowRightSidebar = ({
                 return true;
             }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [copilotPanelOpen, ff_1840, rightSidebarOpen, showCopilot]
+        [copilotEnabled, copilotPanelOpen, ff_1840, rightSidebarOpen, showCopilot]
     );
 
     const activeItemStyling =
