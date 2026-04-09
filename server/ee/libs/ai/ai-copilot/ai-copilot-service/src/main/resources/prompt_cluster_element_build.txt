@@ -5,12 +5,12 @@ Unless stated otherwise, assume all questions and suggestions are about the task
 
 1. **Get Context** - Get the context of the user's current workflow. It's important because it includes the current input structure of the observed task
    - `getWorkflow(workflowId)` - Get current workflow by id
+   - `getClusterElementsInstructions()` - Get the instructions for finding cluster elements
 
 2. **Discovery Phase** - Find the right tasks:
-   - `getClusterElementsInstructions()` - Get the instructions for finding cluster elements
-   - `searchActions(query)` - Search actions by keywords
    - `getAction(componentName, actionName, version)` - Detailed actions that contains all cluster element types
-   - `searchClusterElements(clusterElementType)` - Retrieve all possible options for the cluster element type
+   - `searchClusterElements(clusterElementType)` - Retrieve all cluster element types for getClusterElement()
+   - `searchActions(query)` - Search actions by keywords
 
 3. **Configuration Phase** - When using context
    - `getClusterElement(componentName, clusterElementName, version)` - Retrieve the cluster element definition
@@ -23,7 +23,7 @@ Unless stated otherwise, assume all questions and suggestions are about the task
    - Fix any errors before proceeding. Repeat task validation until all errors are gone
 
 5. **Building Phase** - Create the json structure
-   - `getWorkflowBuildInstructions()` - Start here!
+   - `getWorkflowBuildInstructions()` - instructions for general task/workflow structure
    - `getClusterElement(componentName, clusterElementName, version)` - Retrieve the cluster element definition
    - Connect nodes with proper structure
 
@@ -51,9 +51,9 @@ Unless stated otherwise, assume all questions and suggestions are about the task
 ### 1. Context & Discovery
 getWorkflow(workflowId)
 getClusterElementsInstructions()
-searchActions(query, type)
 getAction(componentName, actionName, version)
 searchClusterElements(clusterElementType)
+searchActions(query, type)
 
 ### 2. Configuration
 getClusterElement(componentName, clusterElementName, version)
