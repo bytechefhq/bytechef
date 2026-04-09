@@ -50,7 +50,9 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
         await test.step('Switch to the Properties tab and expand value', async () => {
             await openPropertiesTab(workflowPage.firstTaskComponentConfigurationPanel);
 
-            const valuePropertyList = workflowPage.valueProperty.getByRole('list', {name: 'value object properties'});
+            const valuePropertyList = workflowPage.parentObjectProperty.getByRole('list', {
+                name: 'value object properties',
+            });
 
             await expect(valuePropertyList).toBeVisible();
         });
@@ -90,15 +92,13 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
 
     test.describe('Add array item', () => {
         test('should show Add array item button when array has single item type', async () => {
-            await test.step('Verify Add array item button is present', async () => {
-                const addButton = workflowPage.arrayProperty.getByRole('button', {name: /Add array item/i});
+            const addButton = workflowPage.arrayProperty.getByRole('button', {name: /Add array item/i});
 
-                await expect(addButton).toBeVisible();
-            });
+            await expect(addButton).toBeVisible();
         });
 
         test('should add new item when clicking Add array item', async () => {
-            const initialCount = SAMPLE_VAR_ARRAY?.length;
+            const initialCount = SAMPLE_VAR_ARRAY?.length ?? 0;
 
             await test.step('Add an array item', async () => {
                 await addArrayItemViaPopover({
@@ -161,7 +161,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
 
                 const arrayItems = workflowPage.arrayPropertyItems;
 
-                const expectedInitialCount = SAMPLE_VAR_ARRAY?.length;
+                const expectedInitialCount = SAMPLE_VAR_ARRAY?.length ?? 0;
 
                 await expect(arrayItems).toHaveCount(expectedInitialCount + 1);
             });
