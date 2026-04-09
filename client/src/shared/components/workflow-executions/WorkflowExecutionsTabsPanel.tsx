@@ -184,7 +184,9 @@ const WorkflowExecutionsTabsPanel = ({
                         {selectedItem?.input ? (
                             <WorkflowExecutionContent input={selectedItem?.input} />
                         ) : (
-                            <span className="p-1 text-sm">No input data.</span>
+                            <div className="flex items-center justify-center p-4">
+                                <span className="text-sm text-muted-foreground">No input data</span>
+                            </div>
                         )}
                     </TabsContent>
 
@@ -198,7 +200,9 @@ const WorkflowExecutionsTabsPanel = ({
                                 }
                             />
                         ) : (
-                            <span className="p-1 text-sm">No output data.</span>
+                            <div className="flex items-center justify-center p-4">
+                                <span className="text-sm text-muted-foreground">No output data</span>
+                            </div>
                         )}
                     </TabsContent>
 
