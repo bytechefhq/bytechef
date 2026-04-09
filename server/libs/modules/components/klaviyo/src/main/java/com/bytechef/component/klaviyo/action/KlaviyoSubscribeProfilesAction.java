@@ -68,7 +68,8 @@ public class KlaviyoSubscribeProfilesAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("subscribeProfiles")
         .title("Subscribe Profiles")
-        .description("Subscribe one or more profiles to email marketing, SMS marketing, or both.")
+        .description("Subscribe one or more profiles to email marketing, SMS marketing or both.")
+        .help("", "https://docs.bytechef.io/reference/components/klaviyo_v1#subscribe-profiles")
         .properties(
             array(PROFILE_ID)
                 .label("Profile ID")

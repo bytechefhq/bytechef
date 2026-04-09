@@ -46,7 +46,9 @@ public class KlaviyoConnection {
                     Map.of(
                         AUTHORIZATION, List.of("Klaviyo-API-Key " + connectionParameters.getRequiredString(KEY)),
                         "accept", List.of("application/vnd.api+json"),
-                        "revision", List.of("2025-04-15")))));
+                        "revision", List.of("2025-04-15")))))
+        .help("", "https://docs.bytechef.io/reference/components/klaviyo_v1#connection-setup")
+        .version(1);
 
     private KlaviyoConnection() {
     }
