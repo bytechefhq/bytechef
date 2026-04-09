@@ -27,42 +27,50 @@ import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.PROFILE_I
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.SUBSCRIPTION;
 import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.klaviyo.constant.KlaviyoConstants;
 import com.bytechef.component.klaviyo.util.KlaviyoUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class KlaviyoSubscribeProfilesActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
-    private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(PROFILE_ID, List.of("1", "2", "3"), SUBSCRIPTION, List.of(EMAIL.getValue(), SMS.getValue())));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform(
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         try (MockedStatic<KlaviyoUtils> klaviyoUtilsMockedStatic = mockStatic(KlaviyoUtils.class)) {
             klaviyoUtilsMockedStatic
                 .when(
@@ -74,18 +82,19 @@ class KlaviyoSubscribeProfilesActionTest {
                     stringArgumentCaptor.capture()))
                 .thenReturn("+1111111", "+2222222", "+3333333");
 
-            when(mockedContext.http(any()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(any()))
+            when(mockedHttp.post(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.body(bodyArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
 
-            Object result = KlaviyoSubscribeProfilesAction.perform(mockedParameters, mockedParameters, mockedContext);
+            assertNull(KlaviyoSubscribeProfilesAction.perform(mockedParameters, null, mockedContext));
 
-            assertNull(result);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
 
             Body capturedBody = bodyArgumentCaptor.getValue();
 
@@ -104,7 +113,9 @@ class KlaviyoSubscribeProfilesActionTest {
             assertEquals(
                 List.of(mockedContext, mockedContext, mockedContext, mockedContext, mockedContext, mockedContext),
                 contextArgumentCaptor.getAllValues());
-            assertEquals(List.of("1", "1", "2", "2", "3", "3"), stringArgumentCaptor.getAllValues());
+            assertEquals(
+                List.of("1", "1", "2", "2", "3", "3", "/api/profile-subscription-bulk-create-jobs"),
+                stringArgumentCaptor.getAllValues());
         }
     }
 
