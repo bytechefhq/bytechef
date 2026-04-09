@@ -367,7 +367,7 @@ class ComponentToolsTest {
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
 
         assertNotNull(result);
-        assertEquals(List.of("Active (active)", "Inactive (inactive)"), result.options());
+        assertEquals(List.of("label:'Active', value:'active'", "label:'Inactive', value:'inactive'"), result.options());
     }
 
     @Test
