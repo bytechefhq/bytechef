@@ -61,11 +61,11 @@ Name: createCustomer
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | Customer’s email address. | false |
+| email | Email | STRING | The customer’s email address. | false |
 | name | Name | STRING | The customer's full name. | false |
-| description | Description | STRING |  | false |
-| phone | Phone | STRING |  | false |
-| address | Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)&#125; </details> |  | false |
+| description | Description | STRING | A description of the customer. | false |
+| phone | Phone | STRING | The customer’s phone number. | false |
+| address | Address | OBJECT <details> <summary> Properties </summary> &#123;STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)&#125; </details> | The customer's address. | false |
 
 #### Example JSON Structure
 ```json
@@ -189,6 +189,324 @@ Type: OBJECT
 }
 ```
 
+#### Find Customer ID
+
+To find the Customer ID, click [here](/reference/components/stripe_v1#how-to-find-customer-id).
+
+
+
+### Create Payout
+Name: createPayout
+
+`Create a payout.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| amount | Amount | INTEGER | A positive integer in cents representing how much to payout. | true |
+| currency | Currency | STRING | Three-letter ISO currency code in lowercase. Must be a currency supported by Stripe. | true |
+| method | Method | STRING <details> <summary> Options </summary> <span>instant</span>, <span>standard</span> </details> | The method used to send this payout, which is `standard` or `instant`. | false |
+| metadata | Metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Payout",
+  "name" : "createPayout",
+  "parameters" : {
+    "amount" : 1,
+    "currency" : "",
+    "method" : "",
+    "metadata" : { }
+  },
+  "type" : "stripe/v1/createPayout"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| amount | INTEGER | The amount (in cents (or local equivalent)) that transfers to your bank account or debit card. |
+| arrival_date | INTEGER | Date that you can expect the payout to arrive in the bank. This factors in delays to account for weekends or bank holidays. |
+| automatic | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Returns `true` if the payout is created by an automated payout schedule and `false` if it's requested manually. |
+| created | INTEGER | Time at which the object was created. |
+| currency | STRING | Three-letter ISO currency code in lowercase. |
+| id | STRING | Unique identifier for the object. |
+| livemode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`. |
+| method | STRING | The method used to send this payout, which can be `standard` or `instant`. |
+| object | STRING | String representing the object's type. Objects of the same type share the same value. |
+| reconciliation_status | STRING | If `completed`, you can use the Balance Transactions API to list all balance transactions that are paid out in this payout. |
+| source_type | STRING | The source balance this payout came from, which can be one of the following: `card`, `fpx` or `bank_account`. |
+| status | STRING | Current status of the payout. |
+| type | STRING | Can be `bank_account` or `card`. |
+
+
+
+
+#### Output Example
+```json
+{
+  "amount" : 1,
+  "arrival_date" : 1,
+  "automatic" : false,
+  "created" : 1,
+  "currency" : "",
+  "id" : "",
+  "livemode" : false,
+  "method" : "",
+  "object" : "",
+  "reconciliation_status" : "",
+  "source_type" : "",
+  "status" : "",
+  "type" : ""
+}
+```
+
+
+
+
+### Create Subscription
+Name: createSubscription
+
+`Creates a new subscription.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| customer | Customer ID | STRING | ID of the customer to subscribe. | true |
+| items | Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(price), STRING\(coupon), INTEGER\(quantity)&#125;] </details> | A list of up to 20 subscription items. | true |
+| collection_method | Collection Method | STRING <details> <summary> Options </summary> <span>charge_automatically</span>, <span>send_invoice</span> </details> | When charging automatically, Stripe will attempt to pay this subscription at the end of the cycle using the default source attached to the customer. When sending an invoice, Stripe will email your customer an invoice with payment instructions and mark the subscription as `active`. | false |
+| days_until_due | Days Until Due | INTEGER | Number of days a customer has to pay invoices generated by this subscription. | true |
+| default_payment_method | Default Payment Method | STRING <details> <summary> Depends On </summary> customer </details> | ID of the default payment method for the subscription. It must belong to the customer associated with the subscription. | false |
+| metadata | null | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Set of key-value pairs that you can attach to an object. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Subscription",
+  "name" : "createSubscription",
+  "parameters" : {
+    "customer" : "",
+    "items" : [ {
+      "price" : "",
+      "coupon" : "",
+      "quantity" : 1
+    } ],
+    "collection_method" : "",
+    "days_until_due" : 1,
+    "default_payment_method" : "",
+    "metadata" : { }
+  },
+  "type" : "stripe/v1/createSubscription"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| automatic_tax | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Tax rates that apply to automatic tax calculations. |
+| billing_cycle_anchor | INTEGER | The reference point that aligns future billing cycle dates. |
+| billing_mode | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Billing mode of the subscription. |
+| cancel_at_period_end | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this subscription is cancel at the end of the current billing period. |
+| collection_method | STRING | When charging automatically, Stripe will attempt to pay this subscription at the end of the cycle using the default source attached to the customer. When sending an invoice, Stripe will email your customer an invoice with payment instructions and mark the subscription as `active`. |
+| created | INTEGER | Time at which the object was created. |
+| currency | STRING | Three-letter ISO currency code in lowercase. |
+| customer | STRING | ID of the customer who owns the subscription. |
+| discounts | ARRAY <details> <summary> Items </summary> [STRING] </details> | The discounts applied to the subscription. |
+| id | STRING | Unique identifier for the object. |
+| invoice_settings | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Invoice settings for the subscription. |
+| items | OBJECT <details> <summary> Properties </summary> &#123;[&#123;&#125;]\(data), BOOLEAN\(has_more), STRING\(object), STRING\(url)&#125; </details> | List of subscription items, each with an attached price. |
+| livemode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Set of key-value pairs that you can attach to an object. |
+| object | STRING | String representing the object's type. Objects of the same type share the same value. |
+| start_date | INTEGER | Date when the subscription was first created. |
+| status | STRING | Status of the subscription. |
+
+
+
+
+#### Output Example
+```json
+{
+  "automatic_tax" : { },
+  "billing_cycle_anchor" : 1,
+  "billing_mode" : { },
+  "cancel_at_period_end" : false,
+  "collection_method" : "",
+  "created" : 1,
+  "currency" : "",
+  "customer" : "",
+  "discounts" : [ "" ],
+  "id" : "",
+  "invoice_settings" : { },
+  "items" : {
+    "data" : [ { } ],
+    "has_more" : false,
+    "object" : "",
+    "url" : ""
+  },
+  "livemode" : false,
+  "metadata" : { },
+  "object" : "",
+  "start_date" : 1,
+  "status" : ""
+}
+```
+
+#### Find Customer ID
+
+To find the Customer ID, click [here](/reference/components/stripe_v1#how-to-find-customer-id).
+
+#### Find Price ID
+
+To find the Price ID, click [here](/reference/components/stripe_v1#how-to-find-price-id).
+
+#### Find Coupon ID
+
+To find the Coupon ID, click [here](/reference/components/stripe_v1#how-to-find-coupon-id).
+
+#### Find Default Payment Method
+
+To find the Default Payment Method, click [here](/reference/components/stripe_v1#how-to-find-default-payment-method).
+
+
+
+### Update Subscription
+Name: updateSubscription
+
+`Updates an existing subscription.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| customer | Customer ID | STRING | ID of the customer to subscribe. | true |
+| subscription | Subscription ID | STRING <details> <summary> Depends On </summary> customer </details> | Unique identifier of the subscription to update. | true |
+| items | Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(price), STRING\(coupon), INTEGER\(quantity)&#125;] </details> | A list of up to 20 subscription items. | false |
+| collection_method | Collection Method | STRING <details> <summary> Options </summary> <span>charge_automatically</span>, <span>send_invoice</span> </details> | When charging automatically, Stripe will attempt to pay this subscription at the end of the cycle using the default source attached to the customer. When sending an invoice, Stripe will email your customer an invoice with payment instructions and mark the subscription as `active`. | false |
+| days_until_due | Days Until Due | INTEGER | Number of days a customer has to pay invoices generated by this subscription. | true |
+| default_payment_method | Default Payment Method | STRING <details> <summary> Depends On </summary> customer </details> | ID of the default payment method for the subscription. It must belong to the customer associated with the subscription. | false |
+| metadata | null | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Set of key-value pairs that you can attach to an object. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Subscription",
+  "name" : "updateSubscription",
+  "parameters" : {
+    "customer" : "",
+    "subscription" : "",
+    "items" : [ {
+      "price" : "",
+      "coupon" : "",
+      "quantity" : 1
+    } ],
+    "collection_method" : "",
+    "days_until_due" : 1,
+    "default_payment_method" : "",
+    "metadata" : { }
+  },
+  "type" : "stripe/v1/updateSubscription"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| automatic_tax | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Tax rates that apply to automatic tax calculations. |
+| billing_cycle_anchor | INTEGER | The reference point that aligns future billing cycle dates. |
+| billing_mode | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Billing mode of the subscription. |
+| cancel_at_period_end | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this subscription is cancel at the end of the current billing period. |
+| collection_method | STRING | When charging automatically, Stripe will attempt to pay this subscription at the end of the cycle using the default source attached to the customer. When sending an invoice, Stripe will email your customer an invoice with payment instructions and mark the subscription as `active`. |
+| created | INTEGER | Time at which the object was created. |
+| currency | STRING | Three-letter ISO currency code in lowercase. |
+| customer | STRING | ID of the customer who owns the subscription. |
+| discounts | ARRAY <details> <summary> Items </summary> [STRING] </details> | The discounts applied to the subscription. |
+| id | STRING | Unique identifier for the object. |
+| invoice_settings | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Invoice settings for the subscription. |
+| items | OBJECT <details> <summary> Properties </summary> &#123;[&#123;&#125;]\(data), BOOLEAN\(has_more), STRING\(object), STRING\(url)&#125; </details> | List of subscription items, each with an attached price. |
+| livemode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Set of key-value pairs that you can attach to an object. |
+| object | STRING | String representing the object's type. Objects of the same type share the same value. |
+| start_date | INTEGER | Date when the subscription was first created. |
+| status | STRING | Status of the subscription. |
+
+
+
+
+#### Output Example
+```json
+{
+  "automatic_tax" : { },
+  "billing_cycle_anchor" : 1,
+  "billing_mode" : { },
+  "cancel_at_period_end" : false,
+  "collection_method" : "",
+  "created" : 1,
+  "currency" : "",
+  "customer" : "",
+  "discounts" : [ "" ],
+  "id" : "",
+  "invoice_settings" : { },
+  "items" : {
+    "data" : [ { } ],
+    "has_more" : false,
+    "object" : "",
+    "url" : ""
+  },
+  "livemode" : false,
+  "metadata" : { },
+  "object" : "",
+  "start_date" : 1,
+  "status" : ""
+}
+```
+
+#### Find Customer ID
+
+To find the Customer ID, click [here](/reference/components/stripe_v1#how-to-find-customer-id).
+
+#### Find Subscription ID
+
+To find the Subscription ID, click [here](/reference/components/stripe_v1#how-to-find-subscription-id).
+
+#### Find Price ID
+
+To find the Price ID, click [here](/reference/components/stripe_v1#how-to-find-price-id).
+
+#### Find Coupon ID
+
+To find the Coupon ID, click [here](/reference/components/stripe_v1#how-to-find-coupon-id).
+
+#### Find Default Payment Method
+
+To find the Default Payment Method, click [here](/reference/components/stripe_v1#how-to-find-default-payment-method).
 
 
 
@@ -285,3 +603,68 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find Customer ID
+
+- **Method 1: Via API**
+
+Use the `GET /customers` endpoint to retrieve a list of all customers and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Customers. Open the customer you want and you can find Customer ID under Details on the right. If you see Account ID instead of Customer ID, you can click three dots next to the ID and there you have Copy customer ID button.
+
+The Customer ID can also be found in the output of the following actions and triggers:
+* **Create Customer**
+* **Create Invoice**
+* **Create Subscription**
+* **Update Subscription**
+* **New Customer** trigger
+* **New Invoice** trigger
+
+### How to find Price ID
+
+- **Method 1: Via API**
+
+Use the `GET /prices` endpoint to retrieve a list of all prices and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Product catalog. There is an Export prices button that downloads a file with all prices.
+
+### How to find Coupon ID
+
+- **Method 1: Via API**
+
+Use the `GET /coupons` endpoint to retrieve a list of all coupons and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Product catalog. Below the title you will find a Coupons tab. Enter the coupon you want and you will ID under Details.
+
+### How to find Default Payment Method
+
+- **Method 1: Via API**
+
+Use the `GET /customers/CUSTOMER_ID/payment_methods` endpoint to retrieve a list of all payment methods and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Customers. Open the customer you want and under Payment methods you will find list of payment methods. Find the one you want to use, click on three dots on the right and there you will find a button Copy ID.
+
+### How to find Subscription ID
+
+- **Method 1: Via API**
+
+Use the `GET /subscriptions` endpoint to retrieve a list of all subscriptions and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar your will find Subscriptions. Open the subscription you want and you can find ID under Details on the right.
+
+The Subscription ID can also be found in the output of the following actions:
+* **Create Subscription**
+* **Update Subscription**
