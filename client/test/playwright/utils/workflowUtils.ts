@@ -8,6 +8,11 @@ export interface WorkflowDefinitionI {
         parameters?: {
             value?: Record<string, unknown>;
         };
+        metadata?: {
+            ui?: {
+                dynamicPropertyTypes?: Record<string, string>;
+            };
+        };
     }>;
 }
 
@@ -130,6 +135,48 @@ export async function addArrayItemViaPopover({
             trigger: arrayPopoverTrigger,
         });
     }
+}
+
+interface AddObjectPropertyViaPopoverProps {
+    page: Page;
+    objectProperty: Locator;
+    propertyName: string;
+    itemType?: string;
+}
+
+export async function addObjectSubPropertyViaPopover({
+    itemType = 'STRING',
+    objectProperty,
+    page,
+    propertyName,
+}: AddObjectPropertyViaPopoverProps): Promise<void> {
+    const objectPopoverTrigger = objectProperty.getByRole('button', {name: /Add object property/i});
+    const objectPropertyPopover = page.getByRole('dialog', {name: /property popover/i});
+
+    const propertyNameInput = objectPropertyPopover.getByRole('textbox', {name: /name/i});
+    const addObjectSubpropertyButton = objectPropertyPopover.getByRole('button', {name: /Add/i});
+
+    await expect(async () => {
+        if (!(await objectPropertyPopover.isVisible()) && (await objectPopoverTrigger.isVisible())) {
+            await objectPopoverTrigger.click();
+        }
+
+        await expect(objectPropertyPopover).toBeVisible({timeout: 100});
+
+        await propertyNameInput.fill(propertyName);
+
+        if (itemType != null) {
+            const typeCombobox = objectPropertyPopover.getByRole('combobox');
+
+            if (await typeCombobox.isVisible()) {
+                await typeCombobox.click();
+
+                await page.getByRole('option', {name: itemType}).click();
+            }
+        }
+
+        await addObjectSubpropertyButton.click();
+    }).toPass();
 }
 
 export async function openPropertiesTab(componentConfigurationPanel: Locator): Promise<void> {

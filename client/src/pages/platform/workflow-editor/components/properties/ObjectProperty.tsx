@@ -89,6 +89,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                     handleClick={handleAddItemClick}
                     newPropertyName={newPropertyName}
                     newPropertyType={newPropertyType}
+                    propertyName={name}
                     setNewPropertyName={setNewPropertyName}
                     setNewPropertyType={setNewPropertyType}
                 />

@@ -1,5 +1,6 @@
 import {type Locator, type Page, expect} from '@playwright/test';
 
+import sampleWorkflow from '../sampleWorkflow.json';
 import {
     type WorkflowDefinitionI,
     addArrayItemViaPopover,
@@ -26,11 +27,19 @@ export class WorkflowPage {
     static readonly LONG_DEBOUNCE_MS = 700;
     static readonly SHORT_DEBOUNCE_MS = 300;
 
+    static readonly varTask = sampleWorkflow.tasks.find((task) => task.name === 'var_1');
+
     readonly arrayProperty: Locator;
     readonly arrayPropertyItems: Locator;
-    readonly valueProperty: Locator;
+    readonly dynamicPropertyTypes?: Record<string, unknown>;
     readonly firstTaskComponentConfigurationPanel: Locator;
     readonly firstNode: Locator;
+    readonly objectPropertyParameters?: Record<string, unknown>;
+    readonly objectPropertyParameterKeys: string[];
+    readonly parentObjectProperty: Locator;
+    readonly parentObjectSubPropertyList: Locator;
+    readonly workflowDefinition: WorkflowDefinitionI;
+    readonly subPropertyListItems: Locator;
 
     static assertVar1ArrayParameterIsDefined(arrayValue: unknown): void {
         expect(Array.isArray(arrayValue)).toBe(true);
@@ -65,9 +74,28 @@ export class WorkflowPage {
         this.page = page;
         this.firstNode = page.getByLabel('var_1 node');
         this.firstTaskComponentConfigurationPanel = page.getByLabel('var_1 component configuration panel');
-        this.valueProperty = this.firstTaskComponentConfigurationPanel.getByLabel('value property');
         this.arrayProperty = this.firstTaskComponentConfigurationPanel.getByLabel('Array property', {exact: true});
+
         this.arrayPropertyItems = this.arrayProperty.getByLabel(WorkflowPage.arrayPropertyItemLabelRegex);
+
+        this.parentObjectProperty = this.firstTaskComponentConfigurationPanel.getByLabel('value property');
+        this.parentObjectSubPropertyList = this.parentObjectProperty.getByRole('list', {
+            name: 'value object properties',
+        });
+
+        this.objectPropertyParameters = WorkflowPage.varTask?.parameters?.value as Record<string, unknown> | undefined;
+
+        this.objectPropertyParameterKeys = this.objectPropertyParameters
+            ? Object.keys(this.objectPropertyParameters)
+            : [];
+
+        this.dynamicPropertyTypes = WorkflowPage.varTask?.metadata?.ui?.dynamicPropertyTypes as
+            | Record<string, unknown>
+            | undefined;
+
+        this.subPropertyListItems = this.parentObjectSubPropertyList.locator(':scope > li');
+
+        this.workflowDefinition = sampleWorkflow as WorkflowDefinitionI;
     }
 
     arrayPropertyItemAt(index: number): Locator {

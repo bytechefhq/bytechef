@@ -11,7 +11,13 @@ interface DeletePropertyButtonProps {
 const DeletePropertyButton = ({onClick, propertyName}: DeletePropertyButtonProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <Button icon={<XIcon />} onClick={() => onClick()} size="iconXs" variant="destructiveGhost" />
+            <Button
+                aria-label={`Delete ${propertyName}`}
+                icon={<XIcon />}
+                onClick={() => onClick()}
+                size="iconXs"
+                variant="destructiveGhost"
+            />
         </TooltipTrigger>
 
         <TooltipPortal>
