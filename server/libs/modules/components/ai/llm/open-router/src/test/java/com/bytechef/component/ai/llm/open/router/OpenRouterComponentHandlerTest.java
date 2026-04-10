@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.llm.hugging.face;
+package com.bytechef.component.ai.llm.open.router;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -22,11 +22,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-class HuggingFaceComponentHandlerTest {
+class OpenRouterComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/hugging-face_v1.json", new HuggingFaceComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/oper-router_v1.json", new OpenRouterComponentHandler().getDefinition());
     }
 }
