@@ -32,9 +32,16 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 
 // Mock mutations
 const mockSaveWorkflowTestConfigurationConnectionMutation = vi.fn();
+const mockSaveClusterElementTestConfigurationConnectionMutation = vi.fn();
 const mockDeleteWorkflowTestConfigurationConnectionMutation = vi.fn();
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useSaveClusterElementTestConfigurationConnectionMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
+        mutate: (...args: unknown[]) => {
+            mockSaveClusterElementTestConfigurationConnectionMutation(...args);
+        },
+        onSuccess,
+    }),
     useSaveWorkflowTestConfigurationConnectionMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
         mutate: (...args: unknown[]) => {
             mockSaveWorkflowTestConfigurationConnectionMutation(...args);
@@ -140,6 +147,14 @@ describe('ConnectionTabConnectionSelect', () => {
         vi.clearAllMocks();
 
         mockSaveWorkflowTestConfigurationConnectionMutation.mockImplementation(
+            (mutationData: unknown, options?: {onSuccess?: () => void}) => {
+                if (options?.onSuccess) {
+                    options.onSuccess();
+                }
+            }
+        );
+
+        mockSaveClusterElementTestConfigurationConnectionMutation.mockImplementation(
             (mutationData: unknown, options?: {onSuccess?: () => void}) => {
                 if (options?.onSuccess) {
                     options.onSuccess();
