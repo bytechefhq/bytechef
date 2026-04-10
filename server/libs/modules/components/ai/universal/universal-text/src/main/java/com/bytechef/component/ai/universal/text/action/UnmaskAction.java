@@ -49,6 +49,10 @@ import java.util.Map;
  */
 public class UnmaskAction implements AiTextAction {
 
+    private static final String SYSTEM_PROMPT =
+        "Replace the redacted content with values in the map. Return only the unredacted text with no additional " +
+            "commentary.";
+
     public static AiTextActionDefinition of(
         ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
@@ -84,21 +88,19 @@ public class UnmaskAction implements AiTextAction {
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
-        String systemPrompt =
-            "Replace the redacted content with values in the map. Return only the unredacted text with no additional commentary.";
+        StringBuilder userPrompt = new StringBuilder();
 
-        StringBuilder userBuilder = new StringBuilder();
-
-        userBuilder.append("Text: ")
+        userPrompt.append("Text: ")
             .append(inputParameters.getString(TEXT))
             .append("\n\nInstructions:\n");
 
         Map<String, String> maskMap = inputParameters.getMap(MASK_MAP, String.class, Map.of());
 
         if (!maskMap.isEmpty()) {
-            userBuilder.append("Mask Map: ")
+            userPrompt.append("Mask Map: ")
                 .append("\n");
-            maskMap.forEach((key, value) -> userBuilder.append("- ")
+
+            maskMap.forEach((key, value) -> userPrompt.append("- ")
                 .append(key)
                 .append(": ")
                 .append(value)
@@ -108,8 +110,8 @@ public class UnmaskAction implements AiTextAction {
         modelInputParametersMap.put(
             "messages",
             List.of(
-                Map.of("content", systemPrompt, ROLE, SYSTEM.name()),
-                Map.of("content", userBuilder.toString(), ROLE, USER.name())));
+                Map.of("content", SYSTEM_PROMPT, ROLE, SYSTEM.name()),
+                Map.of("content", userPrompt.toString(), ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
         return ParametersFactory.create(modelInputParametersMap);

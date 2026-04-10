@@ -56,6 +56,29 @@ import java.util.Map;
  */
 public class MaskAction implements AiTextAction {
 
+    private static final String RESPONSE_SCHEMA = """
+        {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "maskMap": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "required": ["text", "maskMap"]
+        }
+        """;
+    private static final String SYSTEM_PROMPT =
+        "You are a content redaction specialist. Detect and replace sensitive information in the given text with " +
+            "mask tokens. Increment the number suffix (_1, _2, ...) for each unique occurrence of the same type " +
+            "so every masking is unique. Respond with a JSON object with two fields: \"text\" (the redacted " +
+            "text) and \"maskMap\" (an object mapping each mask token to the original value it replaced).";
+
     public static AiTextActionDefinition of(
         ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
 
@@ -120,29 +143,24 @@ public class MaskAction implements AiTextAction {
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
-        String systemPrompt =
-            "You are a content redaction specialist. Detect and replace sensitive information in the given text with mask tokens. "
-                + "Increment the number suffix (_1, _2, ...) for each unique occurrence of the same type so every masking is unique. "
-                + "Respond with a JSON object with two fields: \"text\" (the redacted text) and \"maskMap\" (an object mapping each mask token to the original value it replaced).";
+        StringBuilder userPrompt = new StringBuilder();
 
-        StringBuilder userBuilder = new StringBuilder();
-
-        userBuilder.append("Text: ")
+        userPrompt.append("Text: ")
             .append(inputParameters.getString(TEXT))
             .append("\n\nInstructions:\n");
 
-        List<String> keywords = inputParameters.getList(SENSITIVE_KEYWORDS, String.class, List.of());
+        List<String> sensitiveKeywords = inputParameters.getList(SENSITIVE_KEYWORDS, String.class, List.of());
 
-        if (!keywords.isEmpty()) {
-            userBuilder.append("- Replace each of the following sensitive keywords with [REDACTED_N]: ")
-                .append(String.join(", ", keywords))
+        if (!sensitiveKeywords.isEmpty()) {
+            userPrompt.append("- Replace each of the following sensitive keywords with [REDACTED_N]: ")
+                .append(String.join(", ", sensitiveKeywords))
                 .append("\n");
         }
 
         List<String> selectedPiiTypes = inputParameters.getList(PII_DETECTION, String.class, List.of());
 
         for (String piiType : selectedPiiTypes) {
-            userBuilder.append("- Replace all ")
+            userPrompt.append("- Replace all ")
                 .append(piiType.toLowerCase()
                     .replace("_", " "))
                 .append(" values with [")
@@ -153,40 +171,22 @@ public class MaskAction implements AiTextAction {
         List<String> customPatterns = inputParameters.getList(CUSTOM_PATTERNS, String.class, List.of());
 
         if (!customPatterns.isEmpty()) {
-            userBuilder.append("- Replace all matches of the following patterns with [CUSTOM_N]: ")
+            userPrompt.append("- Replace all matches of the following patterns with [CUSTOM_N]: ")
                 .append(String.join(", ", customPatterns))
                 .append("\n");
         }
 
-        String responseSchema = """
-            {
-              "type": "object",
-              "properties": {
-                "text": {
-                  "type": "string"
-                },
-                "maskMap": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
-                }
-              },
-              "required": ["text", "maskMap"]
-            }
-            """;
-
         modelInputParametersMap.put(
             "messages",
             List.of(
-                Map.of("content", systemPrompt, ROLE, SYSTEM.name()),
-                Map.of("content", userBuilder.toString(), ROLE, USER.name())));
+                Map.of("content", SYSTEM_PROMPT, ROLE, SYSTEM.name()),
+                Map.of("content", userPrompt.toString(), ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
         modelInputParametersMap.put(
             "response",
             Map.of(
                 "responseFormat", ChatModel.ResponseFormat.JSON,
-                "responseSchema", responseSchema));
+                "responseSchema", RESPONSE_SCHEMA));
 
         return ParametersFactory.create(modelInputParametersMap);
     }
