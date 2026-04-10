@@ -25,10 +25,9 @@ export interface StopWorkflowTestRequest {
 export class WorkflowTestApi extends runtime.BaseAPI {
 
     /**
-     * Abort an in-progress workflow test run identified by jobId. Sends an \'error\' event with \'Aborted\' and closes the SSE stream.
-     * Stop workflow test run
+     * Creates request options for stopWorkflowTest without sending the request
      */
-    async stopWorkflowTestRaw(requestParameters: StopWorkflowTestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async stopWorkflowTestRequestOpts(requestParameters: StopWorkflowTestRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['jobId'] == null) {
             throw new runtime.RequiredError(
                 'jobId',
@@ -44,12 +43,21 @@ export class WorkflowTestApi extends runtime.BaseAPI {
         let urlPath = `/workflow-tests/{jobId}/stop`;
         urlPath = urlPath.replace(`{${"jobId"}}`, encodeURIComponent(String(requestParameters['jobId'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Abort an in-progress workflow test run identified by jobId. Sends an \'error\' event with \'Aborted\' and closes the SSE stream.
+     * Stop workflow test run
+     */
+    async stopWorkflowTestRaw(requestParameters: StopWorkflowTestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.stopWorkflowTestRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
