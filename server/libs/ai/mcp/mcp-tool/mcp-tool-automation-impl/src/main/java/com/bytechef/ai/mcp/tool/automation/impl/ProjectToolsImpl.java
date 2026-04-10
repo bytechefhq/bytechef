@@ -158,15 +158,16 @@ public class ProjectToolsImpl implements ProjectTools {
                 .collect(Collectors.toList());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("searchProjects({}): Found {} projects matching query '{}'", query,
-                    matchingProjects.size(), query);
+                logger.debug(
+                    "searchProjects({}): Found {} projects matching query '{}'", query, matchingProjects.size(), query);
             }
 
             return matchingProjects;
         } catch (Exception e) {
             logger.error("searchProjects({}): Failed to search projects with query '{}'", query, query, e);
-            throw new ExecutionException("Failed to search projects: " + e.getMessage(), e,
-                ProjectToolErrorType.SEARCH_PROJECTS);
+
+            throw new ExecutionException(
+                "Failed to search projects: " + e.getMessage(), e, ProjectToolErrorType.SEARCH_PROJECTS);
         }
     }
 
@@ -193,8 +194,9 @@ public class ProjectToolsImpl implements ProjectTools {
                 .collect(Collectors.toList());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("getProjectStatus({}): Retrieved status for project {} with {} deployments", projectId,
-                    projectId, deploymentStatuses.size());
+                logger.debug(
+                    "getProjectStatus({}): Retrieved status for project {} with {} deployments", projectId, projectId,
+                    deploymentStatuses.size());
             }
 
             ProjectVersion.Status lastStatus = project.getLastStatus();
@@ -205,8 +207,9 @@ public class ProjectToolsImpl implements ProjectTools {
                 project.getLastPublishedDate() != null ? project.getLastPublishedDate() : null, deploymentStatuses);
         } catch (Exception e) {
             logger.error("getProjectStatus({}): Failed to get status for project {}", projectId, projectId, e);
-            throw new ExecutionException("Failed to get project status: " + e.getMessage(), e,
-                ProjectToolErrorType.GET_PROJECT_STATUS);
+
+            throw new ExecutionException(
+                "Failed to get project status: " + e.getMessage(), e, ProjectToolErrorType.GET_PROJECT_STATUS);
         }
     }
 
@@ -249,7 +252,8 @@ public class ProjectToolsImpl implements ProjectTools {
             Project project = projectService.create(projectBuilder.build());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("createProject({}, {}, {}, {}, {}): Created project {} with name '{}'", name, description,
+                logger.debug(
+                    "createProject({}, {}, {}, {}, {}): Created project {} with name '{}'", name, description,
                     categoryId, workspaceId, tagIds, project.getId(), project.getName());
             }
 
@@ -259,11 +263,12 @@ public class ProjectToolsImpl implements ProjectTools {
                 project.getId(), project.getName(), project.getDescription(), lastStatus.name(),
                 project.getCreatedDate(), project.getLastModifiedDate());
         } catch (Exception e) {
-            logger.error("createProject({}, {}, {}, {}, {}): Failed to create project with name '{}'", name,
-                description, categoryId, workspaceId, tagIds, name, e);
+            logger.error(
+                "createProject({}, {}, {}, {}, {}): Failed to create project with name '{}'", name, description,
+                categoryId, workspaceId, tagIds, name, e);
 
-            throw new ExecutionException("Failed to create project: " + e.getMessage(), e,
-                ProjectToolErrorType.CREATE_PROJECT);
+            throw new ExecutionException(
+                "Failed to create project: " + e.getMessage(), e, ProjectToolErrorType.CREATE_PROJECT);
         }
     }
 
@@ -295,7 +300,8 @@ public class ProjectToolsImpl implements ProjectTools {
             Project updatedProject = projectService.update(existingProject);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("updateProject({}, {}, {}, {}, {}): Updated project {} with name '{}'", projectId, name,
+                logger.debug(
+                    "updateProject({}, {}, {}, {}, {}): Updated project {} with name '{}'", projectId, name,
                     description, categoryId, tagIds, updatedProject.getId(), updatedProject.getName());
             }
 
@@ -305,11 +311,12 @@ public class ProjectToolsImpl implements ProjectTools {
                 updatedProject.getId(), updatedProject.getName(), updatedProject.getDescription(), lastStatus.name(),
                 updatedProject.getCreatedDate(), updatedProject.getLastModifiedDate());
         } catch (Exception e) {
-            logger.error("updateProject({}, {}, {}, {}, {}): Failed to update project {}", projectId, name,
-                description, categoryId, tagIds, projectId, e);
+            logger.error(
+                "updateProject({}, {}, {}, {}, {}): Failed to update project {}", projectId, name, description,
+                categoryId, tagIds, projectId, e);
 
-            throw new ExecutionException("Failed to update project: " + e.getMessage(), e,
-                ProjectToolErrorType.UPDATE_PROJECT);
+            throw new ExecutionException(
+                "Failed to update project: " + e.getMessage(), e, ProjectToolErrorType.UPDATE_PROJECT);
         }
     }
 
@@ -334,8 +341,8 @@ public class ProjectToolsImpl implements ProjectTools {
         } catch (Exception e) {
             logger.error("deleteProject({}): Failed to delete project {}", projectId, projectId, e);
 
-            throw new ExecutionException("Failed to delete project: " + e.getMessage(), e,
-                ProjectToolErrorType.DELETE_PROJECT);
+            throw new ExecutionException(
+                "Failed to delete project: " + e.getMessage(), e, ProjectToolErrorType.DELETE_PROJECT);
         }
     }
 
@@ -352,7 +359,8 @@ public class ProjectToolsImpl implements ProjectTools {
             Project updatedProject = projectService.getProject(projectId);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("publishProject({}, {}): Published project {} version {} with description '{}'", projectId,
+                logger.debug(
+                    "publishProject({}, {}): Published project {} version {} with description '{}'", projectId,
                     description, projectId, publishedVersion, description);
             }
 
@@ -361,8 +369,9 @@ public class ProjectToolsImpl implements ProjectTools {
                 updatedProject.getLastPublishedDate() != null ? updatedProject.getLastPublishedDate() : null);
         } catch (Exception e) {
             logger.error("publishProject({}, {}): Failed to publish project {}", projectId, description, projectId, e);
-            throw new ExecutionException("Failed to publish project: " + e.getMessage(), e,
-                ProjectToolErrorType.PUBLISH_PROJECT);
+
+            throw new ExecutionException(
+                "Failed to publish project: " + e.getMessage(), e, ProjectToolErrorType.PUBLISH_PROJECT);
         }
     }
 

@@ -157,8 +157,9 @@ public class TaskTools {
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
             };
         } catch (Exception e) {
-            logger.error("getTaskProperties({}, {}, {}, {}): Failed to get properties for task '{}' of type '{}'",
-                type, name, componentName, version, name, type, e);
+            logger.error(
+                "getTaskProperties({}, {}, {}, {}): Failed to get properties for task '{}' of type '{}'", type, name,
+                componentName, version, name, type, e);
 
             throw new ExecutionException("Failed to get properties", e, TaskToolErrorType.GET_TASK_PROPERTIES);
         }
@@ -221,8 +222,9 @@ public class TaskTools {
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
             };
         } catch (Exception e) {
-            logger.error("getTaskDefinition({}, {}, {}, {}): Failed to get definition for task '{}' of type '{}'",
-                type, name, componentName, version, name, type, e);
+            logger.error(
+                "getTaskDefinition({}, {}, {}, {}): Failed to get definition for task '{}' of type '{}'", type, name,
+                componentName, version, name, type, e);
 
             throw new ExecutionException("Failed to get task definition", e, TaskToolErrorType.GET_TASK_DEFINITION);
         }
@@ -405,8 +407,8 @@ public class TaskTools {
 
             return matchingTasks;
         } catch (Exception e) {
-            logger.error("searchTasks({}, {}, {}): Failed to search tasks with query '{}'", query, type, limit, query,
-                e);
+            logger.error(
+                "searchTasks({}, {}, {}): Failed to search tasks with query '{}'", query, type, limit, query, e);
 
             throw new ExecutionException(FAILED_TO_SEARCH_TASKS, e, TaskToolErrorType.SEARCH_TASKS);
         }
@@ -451,8 +453,9 @@ public class TaskTools {
             return new TaskValidationResult(isValid, errorMessages, warningMessages);
 
         } catch (Exception e) {
-            logger.error("validateTask({}, {}, {}, {}): Failed to validate task '{}' of type '{}'", type, name,
-                componentName, version, name, type, e);
+            logger.error(
+                "validateTask({}, {}, {}, {}): Failed to validate task '{}' of type '{}'", type, name, componentName,
+                version, name, type, e);
 
             throw new ExecutionException("Failed to validate task", e, TaskToolErrorType.VALIDATE_TASK);
         }

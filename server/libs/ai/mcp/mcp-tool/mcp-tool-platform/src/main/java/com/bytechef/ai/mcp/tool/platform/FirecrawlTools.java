@@ -71,8 +71,8 @@ public class FirecrawlTools {
 
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("webSearch({}, {}, {}): Performing Firecrawl search for query: {}", query, limit, country,
-                    query);
+                logger.debug(
+                    "webSearch({}, {}, {}): Performing Firecrawl search for query: {}", query, limit, country, query);
             }
 
             Map<String, Object> requestBody = new HashMap<>();
@@ -114,18 +114,20 @@ public class FirecrawlTools {
                 .toList();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("webSearch({}, {}, {}): Found {} search results for query: {}", query, limit, country,
+                logger.debug(
+                    "webSearch({}, {}, {}): Found {} search results for query: {}", query, limit, country,
                     results.size(), query);
             }
 
             return new FirecrawlSearchResult(query, results);
 
         } catch (Exception e) {
-            logger.error("webSearch({}, {}, {}): Failed to perform Firecrawl search for query: {}", query, limit,
-                country, query, e);
+            logger.error(
+                "webSearch({}, {}, {}): Failed to perform Firecrawl search for query: {}", query, limit, country, query,
+                e);
 
-            throw new ExecutionException("Failed to perform Firecrawl search: " + e.getMessage(), e,
-                FirecrawlToolErrorType.WEB_SEARCH);
+            throw new ExecutionException(
+                "Failed to perform Firecrawl search: " + e.getMessage(), e, FirecrawlToolErrorType.WEB_SEARCH);
         }
     }
 
@@ -172,17 +174,18 @@ public class FirecrawlTools {
             String description = metadata != null && metadata.description() != null ? metadata.description() : null;
 
             if (logger.isDebugEnabled()) {
-                logger.debug("webpageScrape({}, {}): Successfully scraped URL: {}, content length: {}", url,
-                    onlyMainContent, url, markdown.length());
+                logger.debug(
+                    "webpageScrape({}, {}): Successfully scraped URL: {}, content length: {}", url, onlyMainContent,
+                    url, markdown.length());
             }
 
             return new FirecrawlScrapeResult(url, markdown, title, description);
         } catch (Exception e) {
-            logger.error("webpageScrape({}, {}): Failed to scrape URL with Firecrawl: {}", url, onlyMainContent, url,
-                e);
+            logger.error(
+                "webpageScrape({}, {}): Failed to scrape URL with Firecrawl: {}", url, onlyMainContent, url, e);
 
-            throw new ExecutionException("Failed to scrape URL: " + e.getMessage(), e,
-                FirecrawlToolErrorType.WEBPAGE_SCRAPE);
+            throw new ExecutionException(
+                "Failed to scrape URL: " + e.getMessage(), e, FirecrawlToolErrorType.WEBPAGE_SCRAPE);
         }
     }
 
@@ -205,7 +208,8 @@ public class FirecrawlTools {
 
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("websiteMap({}, {}, {}, {}, {}): Mapping website URLs for: {}", url, search, limit,
+                logger.debug(
+                    "websiteMap({}, {}, {}, {}, {}): Mapping website URLs for: {}", url, search, limit,
                     includeSubdomains, ignoreQueryParameters, url);
             }
 
@@ -249,18 +253,20 @@ public class FirecrawlTools {
                 .toList();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("websiteMap({}, {}, {}, {}, {}): Found {} URLs for website: {}", url, search, limit,
+                logger.debug(
+                    "websiteMap({}, {}, {}, {}, {}): Found {} URLs for website: {}", url, search, limit,
                     includeSubdomains, ignoreQueryParameters, results.size(), url);
             }
 
             return new FirecrawlMapResult(url, results);
 
         } catch (Exception e) {
-            logger.error("websiteMap({}, {}, {}, {}, {}): Failed to map website URLs for: {}", url, search, limit,
+            logger.error(
+                "websiteMap({}, {}, {}, {}, {}): Failed to map website URLs for: {}", url, search, limit,
                 includeSubdomains, ignoreQueryParameters, url, e);
 
-            throw new ExecutionException("Failed to map website: " + e.getMessage(), e,
-                FirecrawlToolErrorType.WEBSITE_MAP);
+            throw new ExecutionException(
+                "Failed to map website: " + e.getMessage(), e, FirecrawlToolErrorType.WEBSITE_MAP);
         }
     }
 
@@ -299,8 +305,8 @@ public class FirecrawlTools {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record FirecrawlSearchResponse(boolean success, SearchData data, String warning, String id,
-        Integer creditsUsed) {
+    record FirecrawlSearchResponse(
+        boolean success, SearchData data, String warning, String id, Integer creditsUsed) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -316,13 +322,14 @@ public class FirecrawlTools {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record ScrapeData(String markdown, String summary, String html, List<String> links,
-        ScrapeMetadata metadata) {
+    record ScrapeData(
+        String markdown, String summary, String html, List<String> links, ScrapeMetadata metadata) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record ScrapeMetadata(String title, String description, String language, String sourceURL, String keywords,
-        Integer statusCode, String error) {
+    record ScrapeMetadata(
+        String title, String description, String language, String sourceURL, String keywords, Integer statusCode,
+        String error) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

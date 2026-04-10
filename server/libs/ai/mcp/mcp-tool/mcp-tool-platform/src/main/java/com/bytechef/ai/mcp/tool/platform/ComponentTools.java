@@ -19,7 +19,7 @@ package com.bytechef.ai.mcp.tool.platform;
 import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import com.bytechef.ai.mcp.tool.platform.exception.ComponentToolErrorType;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
-import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -215,8 +215,9 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getTrigger({}, {}, {}): Failed to get trigger '{}' from component '{}'", componentName,
-                triggerName, version, triggerName, componentName, e);
+            logger.error(
+                "getTrigger({}, {}, {}): Failed to get trigger '{}' from component '{}'", componentName, triggerName,
+                version, triggerName, componentName, e);
 
             throw new ExecutionException(FAILED_TO_GET_TRIGGER, e, ComponentToolErrorType.GET_TRIGGER);
         }
@@ -255,7 +256,8 @@ public class ComponentTools {
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("getTriggerDefinition({}, {}, {}): Generated trigger definition for {}:{}", componentName,
+                logger.debug(
+                    "getTriggerDefinition({}, {}, {}): Generated trigger definition for {}:{}", componentName,
                     triggerName, version, componentName, triggerName);
             }
 
@@ -263,7 +265,8 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getTriggerDefinition({}, {}, {}): Failed to generate trigger definition for '{}:{}'",
+            logger.error(
+                "getTriggerDefinition({}, {}, {}): Failed to generate trigger definition for '{}:{}'",
                 componentName, triggerName, version, componentName, triggerName, e);
 
             throw new ExecutionException(
@@ -363,8 +366,9 @@ public class ComponentTools {
                 .toList();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("searchComponents({}): Found {} components matching query '{}'", query,
-                    matchingComponents.size(), query);
+                logger.debug(
+                    "searchComponents({}): Found {} components matching query '{}'", query, matchingComponents.size(),
+                    query);
             }
 
             return matchingComponents;
@@ -400,8 +404,8 @@ public class ComponentTools {
                 .toList();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("searchTriggers({}): Found {} triggers matching query '{}'", query,
-                    matchingTriggers.size(), query);
+                logger.debug(
+                    "searchTriggers({}): Found {} triggers matching query '{}'", query, matchingTriggers.size(), query);
             }
 
             return matchingTriggers;
@@ -441,7 +445,7 @@ public class ComponentTools {
 
                     Map<String, String> clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
                         .stream()
-                        .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key,
+                        .collect(Collectors.toMap(ClusterElementType::key,
                             (clusterElementType) -> clusterElementType.multipleElements() ? "array" : "object"));
 
                     return new ActionDetailedInfo(
@@ -453,16 +457,18 @@ public class ComponentTools {
                     String.format(ACTION_NOT_FOUND, actionName, componentName), ComponentToolErrorType.GET_ACTION));
 
             if (logger.isDebugEnabled()) {
-                logger.debug("getAction({}, {}, {}): Found action '{}' from component '{}'", componentName,
-                    actionName, version, actionName, componentName);
+                logger.debug(
+                    "getAction({}, {}, {}): Found action '{}' from component '{}'", componentName, actionName, version,
+                    actionName, componentName);
             }
 
             return actionDetailedInfo;
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getAction({}, {}, {}): Failed to get action '{}' from component '{}'", componentName,
-                actionName, version, actionName, componentName, e);
+            logger.error(
+                "getAction({}, {}, {}): Failed to get action '{}' from component '{}'", componentName, actionName,
+                version, actionName, componentName, e);
 
             throw new ExecutionException(FAILED_TO_GET_ACTION, e, ComponentToolErrorType.GET_ACTION);
         }
@@ -486,29 +492,21 @@ public class ComponentTools {
                 .filter(component -> component.getClusterElements()
                     .stream()
                     .anyMatch(clusterElement -> {
+                        String curClusterElementName = clusterElement.getName();
+                        ClusterElementType curClusterElementType = clusterElement.getType();
+
+                        String curClusterElementTypeName = curClusterElementType.name();
+
                         if (componentName == null || componentName.isEmpty()) {
-                            return clusterElement.getName()
-                                .equals(clusterElementType)
-                                || clusterElement.getType()
-                                    .key()
-                                    .equals(clusterElementType)
-                                || clusterElement.getType()
-                                    .name()
-                                    .toLowerCase()
-                                    .equals(clusterElementType);
+                            return Objects.equals(curClusterElementName, clusterElementType) ||
+                                Objects.equals(curClusterElementType.key(), clusterElementType) ||
+                                Objects.equals(curClusterElementTypeName.toLowerCase(), clusterElementType);
                         }
 
-                        return clusterElement.getName()
-                            .equals(clusterElementType)
-                            || ((clusterElement.getType()
-                                .key()
-                                .equals(clusterElementType)
-                                || clusterElement.getType()
-                                    .name()
-                                    .toLowerCase()
-                                    .equals(clusterElementType))
-                                && clusterElement.getComponentName()
-                                    .equals(componentName));
+                        return Objects.equals(curClusterElementName, clusterElementType)
+                            || ((Objects.equals(curClusterElementType.key(), clusterElementType) ||
+                                Objects.equals(curClusterElementTypeName.toLowerCase(), clusterElementType)) &&
+                                Objects.equals(clusterElement.getComponentName(), componentName));
                     }))
                 .map(component -> new ComponentInfo(
                     component.getName(),
@@ -565,7 +563,7 @@ public class ComponentTools {
                     if (componentDefinition.isClusterElement()) {
                         clusterElementTypeKeys = componentDefinition.getClusterElementTypes()
                             .stream()
-                            .collect(Collectors.toMap(ClusterElementDefinition.ClusterElementType::key,
+                            .collect(Collectors.toMap(ClusterElementType::key,
                                 (clusterElementType) -> clusterElementType.multipleElements() ? "array" : "object"));
                     }
 
@@ -589,8 +587,9 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getClusterElement({}, {}, {}): Failed to get cluster element '{}' from component '{}'",
-                componentName, clusterElementName, version, clusterElementName, componentName, e);
+            logger.error(
+                "getClusterElement({}, {}, {}): Failed to get cluster element '{}' from component '{}'", componentName,
+                clusterElementName, version, clusterElementName, componentName, e);
 
             throw new ExecutionException(FAILED_TO_GET_ACTION, e, ComponentToolErrorType.GET_ACTION);
         }
@@ -620,8 +619,8 @@ public class ComponentTools {
                 .toList();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("searchActions({}): Found {} actions matching query '{}'", query, matchingActions.size(),
-                    query);
+                logger.debug(
+                    "searchActions({}): Found {} actions matching query '{}'", query, matchingActions.size(), query);
             }
 
             return matchingActions;
@@ -661,16 +660,18 @@ public class ComponentTools {
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("getActionDefinition({}, {}, {}): Generated action definition for {}:{}", componentName,
-                    actionName, version, componentName, actionName);
+                logger.debug(
+                    "getActionDefinition({}, {}, {}): Generated action definition for {}:{}", componentName, actionName,
+                    version, componentName, actionName);
             }
 
             return actionDefinition;
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getActionDefinition({}, {}, {}): Failed to generate action definition for '{}:{}'",
-                componentName, actionName, version, componentName, actionName, e);
+            logger.error(
+                "getActionDefinition({}, {}, {}): Failed to generate action definition for '{}:{}'", componentName,
+                actionName, version, componentName, actionName, e);
 
             throw new ExecutionException(
                 FAILED_TO_GENERATE_ACTION_DEFINITION, e, ComponentToolErrorType.GENERATE_ACTION_DEFINITION);
@@ -717,8 +718,7 @@ public class ComponentTools {
                 // If not found in triggers, try actions
                 var actionOptional = componentDefinition.getActions()
                     .stream()
-                    .filter(action -> action.getName()
-                        .equals(operationName))
+                    .filter(action -> Objects.equals(action.getName(), operationName))
                     .findFirst();
 
                 if (actionOptional.isPresent()) {
@@ -745,6 +745,7 @@ public class ComponentTools {
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
                                         null, null, Map.of(), connectionIds, null, null, null, true, null, null, null);
+
                                     if (output != null) {
                                         outputResponse = SchemaUtils.toOutput(
                                             output, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
@@ -761,8 +762,7 @@ public class ComponentTools {
                     // If not found in actions, try cluster elements
                     var clusterElementOptional = componentDefinition.getClusterElements()
                         .stream()
-                        .filter(clusterElement -> clusterElement.getName()
-                            .equals(operationName))
+                        .filter(clusterElement -> Objects.equals(clusterElement.getName(), operationName))
                         .findFirst();
 
                     if (clusterElementOptional.isPresent()) {
@@ -784,7 +784,8 @@ public class ComponentTools {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("getOutputProperty({}, {}, {}): Retrieved output properties for {}:{}", componentName,
+                logger.debug(
+                    "getOutputProperty({}, {}, {}): Retrieved output properties for {}:{}", componentName,
                     operationName, version, componentName, operationName);
             }
 
@@ -792,7 +793,8 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getOutputProperty({}, {}, {}): Failed to get output properties for '{}:{}'", componentName,
+            logger.error(
+                "getOutputProperty({}, {}, {}): Failed to get output properties for '{}:{}'", componentName,
                 operationName, version, componentName, operationName, e);
 
             throw new ExecutionException(
@@ -848,8 +850,7 @@ public class ComponentTools {
                     // If not found in actions, try cluster elements
                     var clusterElementOptional = componentDefinition.getClusterElements()
                         .stream()
-                        .filter(clusterElement -> clusterElement.getName()
-                            .equals(operationName))
+                        .filter(clusterElement -> Objects.equals(clusterElement.getName(), operationName))
                         .findFirst();
 
                     if (clusterElementOptional.isPresent()) {
@@ -872,8 +873,8 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("getProperties({}, {}, {}): Failed to get properties for '{}:{}'", componentName,
-                operationName,
+            logger.error(
+                "getProperties({}, {}, {}): Failed to get properties for '{}:{}'", componentName, operationName,
                 version, componentName, operationName, e);
 
             throw new ExecutionException(FAILED_TO_GET_PROPERTIES, e, ComponentToolErrorType.GET_PROPERTIES);
