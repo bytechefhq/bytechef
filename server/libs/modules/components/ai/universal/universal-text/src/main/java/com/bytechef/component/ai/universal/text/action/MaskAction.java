@@ -23,6 +23,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ROLE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.CUSTOM_PATTERNS;
+import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MASK_MAP;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.MODEL_URL_PROPERTY;
@@ -32,10 +33,12 @@ import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.universal.text.constant.AiTextConstants;
 import com.bytechef.component.definition.ComponentDsl;
@@ -86,8 +89,18 @@ public class MaskAction implements AiTextAction {
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(
-                    outputSchema(string().description("The text with sensitive content redacted.")),
-                    sampleOutput("Hello, my name is [REDACTED] and my email is [EMAIL].")),
+                    outputSchema(
+                        object()
+                            .properties(
+                                string(TEXT)
+                                    .description("The text with sensitive content redacted."),
+                                object(MASK_MAP)
+                                    .description("Mapping of mask tokens to their original values.")
+                                    .additionalProperties(string()))),
+                    sampleOutput(
+                        Map.of(
+                            TEXT, "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
+                            MASK_MAP, Map.of("[REDACTED_1]", "John Doe", "[EMAIL_1]", "john@example.com")))),
             provider, new MaskAction(), propertyService);
     }
 
@@ -108,7 +121,9 @@ public class MaskAction implements AiTextAction {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
         String systemPrompt =
-            "You are a content redaction specialist. Detect and replace sensitive information in the given text with mask tokens. Return only the redacted text with no additional commentary.";
+            "You are a content redaction specialist. Detect and replace sensitive information in the given text with mask tokens. "
+                + "Increment the number suffix (_1, _2, ...) for each unique occurrence of the same type so every masking is unique. "
+                + "Respond with a JSON object with two fields: \"text\" (the redacted text) and \"maskMap\" (an object mapping each mask token to the original value it replaced).";
 
         StringBuilder userBuilder = new StringBuilder();
 
@@ -119,7 +134,7 @@ public class MaskAction implements AiTextAction {
         List<String> keywords = inputParameters.getList(SENSITIVE_KEYWORDS, String.class, List.of());
 
         if (!keywords.isEmpty()) {
-            userBuilder.append("- Replace each of the following sensitive keywords with [REDACTED]: ")
+            userBuilder.append("- Replace each of the following sensitive keywords with [REDACTED_N]: ")
                 .append(String.join(", ", keywords))
                 .append("\n");
         }
@@ -132,16 +147,34 @@ public class MaskAction implements AiTextAction {
                     .replace("_", " "))
                 .append(" values with [")
                 .append(piiType)
-                .append("]\n");
+                .append("_N]\n");
         }
 
         List<String> customPatterns = inputParameters.getList(CUSTOM_PATTERNS, String.class, List.of());
 
         if (!customPatterns.isEmpty()) {
-            userBuilder.append("- Replace all matches of the following patterns with [REDACTED]: ")
+            userBuilder.append("- Replace all matches of the following patterns with [CUSTOM_N]: ")
                 .append(String.join(", ", customPatterns))
                 .append("\n");
         }
+
+        String responseSchema = """
+            {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "maskMap": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": ["text", "maskMap"]
+            }
+            """;
 
         modelInputParametersMap.put(
             "messages",
@@ -149,6 +182,11 @@ public class MaskAction implements AiTextAction {
                 Map.of("content", systemPrompt, ROLE, SYSTEM.name()),
                 Map.of("content", userBuilder.toString(), ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
+        modelInputParametersMap.put(
+            "response",
+            Map.of(
+                "responseFormat", ChatModel.ResponseFormat.JSON,
+                "responseSchema", responseSchema));
 
         return ParametersFactory.create(modelInputParametersMap);
     }
