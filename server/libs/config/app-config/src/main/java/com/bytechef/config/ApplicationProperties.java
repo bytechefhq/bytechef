@@ -1418,23 +1418,23 @@ public class ApplicationProperties {
          */
         public static class Provider {
 
-            /** Amazon Bedrock Anthropic Claude 2 configuration */
-            private AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = new AmazonBedrockAnthropic2();
-
-            /** Amazon Bedrock Anthropic Claude 3 configuration */
-            private AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = new AmazonBedrockAnthropic3();
-
-            /** Amazon Bedrock Cohere configuration */
-            private AmazonBedrockCohere amazonBedrockCohere = new AmazonBedrockCohere();
-
-            /** Amazon Bedrock Jurassic-2 configuration */
-            private AmazonBedrockJurassic2 amazonBedrockJurassic2 = new AmazonBedrockJurassic2();
-
-            /** Amazon Bedrock Llama configuration */
-            private AmazonBedrockLlama amazonBedrockLlama = new AmazonBedrockLlama();
-
-            /** Amazon Bedrock Titan configuration */
-            private AmazonBedrockTitan amazonBedrockTitan = new AmazonBedrockTitan();
+//            /** Amazon Bedrock Anthropic Claude 2 configuration */
+//            private AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = new AmazonBedrockAnthropic2();
+//
+//            /** Amazon Bedrock Anthropic Claude 3 configuration */
+//            private AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = new AmazonBedrockAnthropic3();
+//
+//            /** Amazon Bedrock Cohere configuration */
+//            private AmazonBedrockCohere amazonBedrockCohere = new AmazonBedrockCohere();
+//
+//            /** Amazon Bedrock Jurassic-2 configuration */
+//            private AmazonBedrockJurassic2 amazonBedrockJurassic2 = new AmazonBedrockJurassic2();
+//
+//            /** Amazon Bedrock Llama configuration */
+//            private AmazonBedrockLlama amazonBedrockLlama = new AmazonBedrockLlama();
+//
+//            /** Amazon Bedrock Titan configuration */
+//            private AmazonBedrockTitan amazonBedrockTitan = new AmazonBedrockTitan();
 
             /** Anthropic Claude configuration */
             private Anthropic anthropic = new Anthropic();
@@ -1466,29 +1466,29 @@ public class ApplicationProperties {
             /** Google Vertex AI Gemini configuration */
             private VertexGemini vertexGemini = new VertexGemini();
 
-            public AmazonBedrockAnthropic2 getAmazonBedrockAnthropic2() {
-                return amazonBedrockAnthropic2;
-            }
-
-            public AmazonBedrockAnthropic3 getAmazonBedrockAnthropic3() {
-                return amazonBedrockAnthropic3;
-            }
-
-            public AmazonBedrockCohere getAmazonBedrockCohere() {
-                return amazonBedrockCohere;
-            }
-
-            public AmazonBedrockJurassic2 getAmazonBedrockJurassic2() {
-                return amazonBedrockJurassic2;
-            }
-
-            public AmazonBedrockLlama getAmazonBedrockLlama() {
-                return amazonBedrockLlama;
-            }
-
-            public AmazonBedrockTitan getAmazonBedrockTitan() {
-                return amazonBedrockTitan;
-            }
+//            public AmazonBedrockAnthropic2 getAmazonBedrockAnthropic2() {
+//                return amazonBedrockAnthropic2;
+//            }
+//
+//            public AmazonBedrockAnthropic3 getAmazonBedrockAnthropic3() {
+//                return amazonBedrockAnthropic3;
+//            }
+//
+//            public AmazonBedrockCohere getAmazonBedrockCohere() {
+//                return amazonBedrockCohere;
+//            }
+//
+//            public AmazonBedrockJurassic2 getAmazonBedrockJurassic2() {
+//                return amazonBedrockJurassic2;
+//            }
+//
+//            public AmazonBedrockLlama getAmazonBedrockLlama() {
+//                return amazonBedrockLlama;
+//            }
+//
+//            public AmazonBedrockTitan getAmazonBedrockTitan() {
+//                return amazonBedrockTitan;
+//            }
 
             public Anthropic getAnthropic() {
                 return anthropic;
@@ -1530,29 +1530,29 @@ public class ApplicationProperties {
                 return vertexGemini;
             }
 
-            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
-                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
-            }
-
-            public void setAmazonBedrockAnthropic3(AmazonBedrockAnthropic3 amazonBedrockAnthropic3) {
-                this.amazonBedrockAnthropic3 = amazonBedrockAnthropic3;
-            }
-
-            public void setAmazonBedrockCohere(AmazonBedrockCohere amazonBedrockCohere) {
-                this.amazonBedrockCohere = amazonBedrockCohere;
-            }
-
-            public void setAmazonBedrockJurassic2(AmazonBedrockJurassic2 amazonBedrockJurassic2) {
-                this.amazonBedrockJurassic2 = amazonBedrockJurassic2;
-            }
-
-            public void setAmazonBedrockLlama(AmazonBedrockLlama amazonBedrockLlama) {
-                this.amazonBedrockLlama = amazonBedrockLlama;
-            }
-
-            public void setAmazonBedrockTitan(AmazonBedrockTitan amazonBedrockTitan) {
-                this.amazonBedrockTitan = amazonBedrockTitan;
-            }
+//            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
+//                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
+//            }
+//
+//            public void setAmazonBedrockAnthropic3(AmazonBedrockAnthropic3 amazonBedrockAnthropic3) {
+//                this.amazonBedrockAnthropic3 = amazonBedrockAnthropic3;
+//            }
+//
+//            public void setAmazonBedrockCohere(AmazonBedrockCohere amazonBedrockCohere) {
+//                this.amazonBedrockCohere = amazonBedrockCohere;
+//            }
+//
+//            public void setAmazonBedrockJurassic2(AmazonBedrockJurassic2 amazonBedrockJurassic2) {
+//                this.amazonBedrockJurassic2 = amazonBedrockJurassic2;
+//            }
+//
+//            public void setAmazonBedrockLlama(AmazonBedrockLlama amazonBedrockLlama) {
+//                this.amazonBedrockLlama = amazonBedrockLlama;
+//            }
+//
+//            public void setAmazonBedrockTitan(AmazonBedrockTitan amazonBedrockTitan) {
+//                this.amazonBedrockTitan = amazonBedrockTitan;
+//            }
 
             public void setAnthropic(Anthropic anthropic) {
                 this.anthropic = anthropic;
