@@ -339,8 +339,8 @@ public class WorkflowValidator {
                 String type = typeJsonNode.asString();
 
                 taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, "clusterElement"));
-                taskOutputMap.putIfAbsent(type,
-                    taskOutputProvider.getTaskOutputProperty(type, "clusterElement", warnings));
+                taskOutputMap.putIfAbsent(
+                    type, taskOutputProvider.getTaskOutputProperty(type, "clusterElement", warnings));
 
                 List<String> clusterElementTypes = clusterTypesProvider.getClusterElementTypes(type);
 

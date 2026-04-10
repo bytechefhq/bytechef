@@ -61,20 +61,23 @@ public class ClusterElementTools {
 
             if (!workflowDefinition.contains(taskName)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("updateClusterElementTask({}, {}): Task '{}' not found in workflow '{}'", workflowId,
-                        taskName, taskName, projectWorkflowDTO.getId());
+                    logger.debug(
+                        "updateClusterElementTask({}, {}): Task '{}' not found in workflow '{}'", workflowId, taskName,
+                        taskName, projectWorkflowDTO.getId());
                 }
 
                 return null;
             }
 
-            JsonNode rootNode = JsonUtils.readTree(workflowDefinition);
-            JsonNode tasksNode = rootNode.get("tasks");
             JsonNode clusterElementsNode = JsonUtils.readTree(clusterElementsDefinition);
+            JsonNode rootNode = JsonUtils.readTree(workflowDefinition);
+
+            JsonNode tasksNode = rootNode.get("tasks");
 
             for (JsonNode taskNode : tasksNode) {
-                if (taskName.equals(taskNode.get("name")
-                    .stringValue())) {
+                JsonNode name = taskNode.get("name");
+
+                if (taskName.equals(name.stringValue())) {
                     ((ObjectNode) taskNode).set("clusterElements", clusterElementsNode);
 
                     break;
@@ -87,8 +90,9 @@ public class ClusterElementTools {
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("updateClusterElementTask({}, {}): Updated clusterElements for task '{}'", workflowId,
-                    taskName, taskName);
+                logger.debug(
+                    "updateClusterElementTask({}, {}): Updated clusterElements for task '{}'", workflowId, taskName,
+                    taskName);
             }
 
             return new WorkflowInfo(
