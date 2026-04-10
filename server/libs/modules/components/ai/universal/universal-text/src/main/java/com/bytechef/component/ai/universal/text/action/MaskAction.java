@@ -130,15 +130,6 @@ public class MaskAction implements AiTextAction {
     private MaskAction() {
     }
 
-    public static List<Option<String>> getPiiDetectionOptions() {
-        return List.of(
-            ComponentDsl.option("Email address", "EMAIL"),
-            ComponentDsl.option("Phone number", "PHONE"),
-            ComponentDsl.option("Credit card number", "CREDIT_CARD"),
-            ComponentDsl.option("IP address", "IP_ADDRESS"),
-            ComponentDsl.option("US Social Security Number", "SSN"));
-    }
-
     @Override
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
@@ -189,5 +180,14 @@ public class MaskAction implements AiTextAction {
                 "responseSchema", RESPONSE_SCHEMA));
 
         return ParametersFactory.create(modelInputParametersMap);
+    }
+
+    public static List<Option<String>> getPiiDetectionOptions() {
+        return List.of(
+            ComponentDsl.option("Email address", "EMAIL"),
+            ComponentDsl.option("Phone number", "PHONE"),
+            ComponentDsl.option("Credit card number", "CREDIT_CARD"),
+            ComponentDsl.option("IP address", "IP_ADDRESS"),
+            ComponentDsl.option("US Social Security Number", "SSN"));
     }
 }
