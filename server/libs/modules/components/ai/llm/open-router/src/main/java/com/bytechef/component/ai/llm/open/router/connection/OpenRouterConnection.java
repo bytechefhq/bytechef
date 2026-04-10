@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.llm.hugging.face.connection;
+package com.bytechef.component.ai.llm.open.router.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -25,13 +25,12 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
- * @author Monika Domiter
  * @author Marko Kriskovic
  */
-public final class HuggingFaceConnection {
+public final class OpenRouterConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api-inference.huggingface.co")
+        .baseUri((connectionParameters, context) -> "https://openrouter.ai/api/v1")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
@@ -40,6 +39,6 @@ public final class HuggingFaceConnection {
                         .label("Token")
                         .required(true)));
 
-    private HuggingFaceConnection() {
+    private OpenRouterConnection() {
     }
 }
