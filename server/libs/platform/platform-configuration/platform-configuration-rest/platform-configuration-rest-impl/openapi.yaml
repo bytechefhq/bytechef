@@ -3218,6 +3218,10 @@ components:
         label:
           description: "The human-readable description of the task."
           type: "string"
+        maxRetries:
+          description: "The maximum number of times a task may retry."
+          type: "integer"
+          format: "int32"
         metadata:
           description: "Key-value map of metadata."
           type: "object"
