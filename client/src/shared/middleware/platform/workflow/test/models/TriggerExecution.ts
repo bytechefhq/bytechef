@@ -150,7 +150,7 @@ export interface TriggerExecution {
     readonly startDate: Date;
     /**
      * The current status of a task.
-     * @type {string}
+     * @type {TriggerExecutionStatusEnum}
      * @memberof TriggerExecution
      */
     readonly status: TriggerExecutionStatusEnum;

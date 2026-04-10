@@ -10,7 +10,7 @@ All URIs are relative to */api/automation/internal*
 
 ## getComponentDefinitions
 
-> Array&lt;ComponentDefinitionBasic&gt; getComponentDefinitions(actionDefinitions, connectionDefinitions, triggerDefinitions, include)
+> Array&lt;ComponentDefinitionBasic&gt; getComponentDefinitions(actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions, include)
 
 Get all component definitions
 
@@ -32,6 +32,8 @@ async function example() {
   const body = {
     // boolean | Use for filtering components which define action definitions. (optional)
     actionDefinitions: true,
+    // boolean | Use for filtering components which define cluster element definitions. (optional)
+    clusterElementDefinitions: true,
     // boolean | Use for filtering components which define connection definitions. (optional)
     connectionDefinitions: true,
     // boolean | Use for filtering components which define trigger definitions. (optional)
@@ -58,6 +60,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **actionDefinitions** | `boolean` | Use for filtering components which define action definitions. | [Optional] [Defaults to `undefined`] |
+| **clusterElementDefinitions** | `boolean` | Use for filtering components which define cluster element definitions. | [Optional] [Defaults to `undefined`] |
 | **connectionDefinitions** | `boolean` | Use for filtering components which define connection definitions. | [Optional] [Defaults to `undefined`] |
 | **triggerDefinitions** | `boolean` | Use for filtering components which define trigger definitions. | [Optional] [Defaults to `undefined`] |
 | **include** | `Array<string>` | The list of component names to include in the result. | [Optional] |

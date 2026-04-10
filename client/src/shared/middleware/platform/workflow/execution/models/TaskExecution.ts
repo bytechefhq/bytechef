@@ -156,7 +156,7 @@ export interface TaskExecution {
     readonly startDate: Date;
     /**
      * The current status of a task.
-     * @type {string}
+     * @type {TaskExecutionStatusEnum}
      * @memberof TaskExecution
      */
     readonly status: TaskExecutionStatusEnum;
