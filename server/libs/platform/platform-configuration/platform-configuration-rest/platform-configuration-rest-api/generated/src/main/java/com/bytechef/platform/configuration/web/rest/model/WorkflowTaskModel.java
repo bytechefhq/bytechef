@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-30T08:41:23.947667+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 public class WorkflowTaskModel {
 
   private Boolean clusterRoot = false;
@@ -45,6 +45,8 @@ public class WorkflowTaskModel {
   private List<@Valid WorkflowTaskModel> finalize = new ArrayList<>();
 
   private @Nullable String label;
+
+  private @Nullable Integer maxRetries;
 
   @Valid
   private Map<String, Object> metadata = new HashMap<>();
@@ -220,6 +222,26 @@ public class WorkflowTaskModel {
 
   public void setLabel(@Nullable String label) {
     this.label = label;
+  }
+
+  public WorkflowTaskModel maxRetries(@Nullable Integer maxRetries) {
+    this.maxRetries = maxRetries;
+    return this;
+  }
+
+  /**
+   * The maximum number of times a task may retry.
+   * @return maxRetries
+   */
+  
+  @Schema(name = "maxRetries", description = "The maximum number of times a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxRetries")
+  public @Nullable Integer getMaxRetries() {
+    return maxRetries;
+  }
+
+  public void setMaxRetries(@Nullable Integer maxRetries) {
+    this.maxRetries = maxRetries;
   }
 
   public WorkflowTaskModel metadata(Map<String, Object> metadata) {
@@ -429,6 +451,7 @@ public class WorkflowTaskModel {
         Objects.equals(this.description, workflowTask.description) &&
         Objects.equals(this.finalize, workflowTask.finalize) &&
         Objects.equals(this.label, workflowTask.label) &&
+        Objects.equals(this.maxRetries, workflowTask.maxRetries) &&
         Objects.equals(this.metadata, workflowTask.metadata) &&
         Objects.equals(this.name, workflowTask.name) &&
         Objects.equals(this.node, workflowTask.node) &&
@@ -441,7 +464,7 @@ public class WorkflowTaskModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(clusterRoot, clusterElements, connections, description, finalize, label, metadata, name, node, parameters, post, pre, timeout, type);
+    return Objects.hash(clusterRoot, clusterElements, connections, description, finalize, label, maxRetries, metadata, name, node, parameters, post, pre, timeout, type);
   }
 
   @Override
@@ -454,6 +477,7 @@ public class WorkflowTaskModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    finalize: ").append(toIndentedString(finalize)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    maxRetries: ").append(toIndentedString(maxRetries)).append("\n");
     sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    node: ").append(toIndentedString(node)).append("\n");
