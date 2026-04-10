@@ -186,10 +186,4 @@ public class AiTextUtils {
             default -> false;
         };
     }
-
-    public record Criteria(String criterion, double lowestScore, double highestScore, boolean isDecimal) {
-    }
-
-    public record DataField(String fieldName, String fieldType, String fieldDescription) {
-    }
 }
