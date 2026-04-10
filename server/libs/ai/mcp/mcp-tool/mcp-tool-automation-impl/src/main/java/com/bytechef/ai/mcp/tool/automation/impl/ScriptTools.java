@@ -61,7 +61,8 @@ public class ScriptTools {
 
             if (!workflowDefinition.contains(scriptName)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("updateScriptComponentCode({}, {}): Script component '{}' not found in workflow '{}'",
+                    logger.debug(
+                        "updateScriptComponentCode({}, {}): Script component '{}' not found in workflow '{}'",
                         workflowId, scriptName, scriptName, projectWorkflowDTO.getId());
                 }
 
@@ -88,7 +89,8 @@ public class ScriptTools {
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("updateScriptComponentCode({}, {}): Updated script component '{}'", workflowId, scriptName,
+                logger.debug(
+                    "updateScriptComponentCode({}, {}): Updated script component '{}'", workflowId, scriptName,
                     scriptName);
             }
 
@@ -100,11 +102,12 @@ public class ScriptTools {
                 projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
                 projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
         } catch (Exception e) {
-            logger.error("updateScriptComponentCode({}, {}): Failed to update Script component in workflow {}",
-                workflowId, scriptName, workflowId, e);
+            logger.error(
+                "updateScriptComponentCode({}, {}): Failed to update Script component in workflow {}", workflowId,
+                scriptName, workflowId, e);
 
-            throw new ExecutionException("Failed to update workflow: " + e.getMessage(), e,
-                ScriptToolErrorType.UPDATE_SCRIPT);
+            throw new ExecutionException(
+                "Failed to update workflow: " + e.getMessage(), e, ScriptToolErrorType.UPDATE_SCRIPT);
         }
     }
 }

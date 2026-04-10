@@ -117,8 +117,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("getWorkflow({}): Retrieved workflow {}", workflowId,
-                    projectWorkflowDTO.getProjectWorkflowId());
+                logger.debug(
+                    "getWorkflow({}): Retrieved workflow {}", workflowId, projectWorkflowDTO.getProjectWorkflowId());
             }
 
             return new WorkflowInfo(
@@ -167,8 +167,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("listWorkflows({}): Failed to list project workflows", projectId, e);
 
-            throw new ExecutionException("Failed to list project workflows: " + e.getMessage(), e,
-                ProjectWorkflowToolErrorType.LIST_WORKFLOWS);
+            throw new ExecutionException(
+                "Failed to list project workflows: " + e.getMessage(), e, ProjectWorkflowToolErrorType.LIST_WORKFLOWS);
         }
     }
 
@@ -206,7 +206,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                 .toList();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("searchWorkflows({}, {}): Found {} workflows matching query '{}'", query, projectId,
+                logger.debug(
+                    "searchWorkflows({}, {}): Found {} workflows matching query '{}'", query, projectId,
                     matchingWorkflow.size(), query);
             }
 
@@ -214,8 +215,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("searchWorkflows({}, {}): Failed to search workflows with query '{}'", query, projectId, query,
                 e);
-            throw new ExecutionException("Failed to search workflows: " + e.getMessage(), e,
-                ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
+            throw new ExecutionException(
+                "Failed to search workflows: " + e.getMessage(), e, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
         }
     }
 
@@ -229,15 +230,19 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
                 workflowValidatorFacade.validateWorkflow(workflow);
 
-            String errorMessages = workflowValidationResult.errors()
-                .toString();
-            String warningMessages = workflowValidationResult.warnings()
-                .toString();
+            List<String> errors = workflowValidationResult.errors();
+
+            String errorMessages = errors.toString();
+
+            List<String> warnings = workflowValidationResult.warnings();
+
+            String warningMessages = warnings.toString();
 
             boolean isValid = errorMessages.equals("[]");
 
             if (logger.isDebugEnabled()) {
-                logger.debug("validateWorkflow(): Validated workflow. Valid: {}, Errors: {}, Warnings: {}", isValid,
+                logger.debug(
+                    "validateWorkflow(): Validated workflow. Valid: {}, Errors: {}, Warnings: {}", isValid,
                     errorMessages, warningMessages);
             }
 
@@ -245,8 +250,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("validateWorkflow(): Failed to validate workflow", e);
 
-            throw new ExecutionException("Failed to validate workflow", e,
-                ProjectWorkflowToolErrorType.VALIDATE_WORKFLOW);
+            throw new ExecutionException(
+                "Failed to validate workflow", e, ProjectWorkflowToolErrorType.VALIDATE_WORKFLOW);
         }
     }
 
@@ -256,8 +261,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     public ProjectWorkflowInfo createProjectWorkflow(
         @ToolParam(description = "The ID of the project to add the workflow to") long projectId,
         @ToolParam(
-            description = "The definition for the workflow. Needs to be in JSON format similar to "
-                + DEFAULT_DEFINITION) String definition) {
+            description = "The definition for the workflow. Needs to be in JSON format similar to " +
+                DEFAULT_DEFINITION) String definition) {
 
         try {
             ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(projectId, definition);
@@ -272,10 +277,11 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                 projectWorkflow.getCreatedDate() != null ? projectWorkflow.getCreatedDate() : null,
                 projectWorkflow.getLastModifiedDate() != null ? projectWorkflow.getLastModifiedDate() : null);
         } catch (Exception e) {
-            logger.error("createProjectWorkflow({}): Failed to create workflow for project {}", projectId, projectId,
-                e);
+            logger.error(
+                "createProjectWorkflow({}): Failed to create workflow for project {}", projectId, projectId, e);
 
-            throw new ExecutionException("Failed to create project workflow: " + e.getMessage(), e,
+            throw new ExecutionException(
+                "Failed to create project workflow: " + e.getMessage(), e,
                 ProjectWorkflowToolErrorType.CREATE_WORKFLOW);
         }
     }
@@ -284,6 +290,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
     @Tool(description = "Delete a workflow. Returns a confirmation message.")
     public String deleteWorkflow(
         @ToolParam(description = "The ID of the workflow to delete") String workflowId) {
+
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
 
@@ -292,16 +299,16 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             projectWorkflowFacade.deleteWorkflow(projectWorkflowDTO.getId());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("deleteWorkflow({}): Deleted workflow {} with name '{}'", workflowId, workflowId,
-                    workflowName);
+                logger.debug(
+                    "deleteWorkflow({}): Deleted workflow {} with name '{}'", workflowId, workflowId, workflowName);
             }
 
             return "Workflow '" + workflowName + "' (ID: " + workflowId + ") has been successfully deleted.";
         } catch (Exception e) {
             logger.error("deleteWorkflow({}): Failed to delete workflow {}", workflowId, workflowId, e);
 
-            throw new ExecutionException("Failed to delete workflow: " + e.getMessage(), e,
-                ProjectWorkflowToolErrorType.DELETE_WORKFLOW);
+            throw new ExecutionException(
+                "Failed to delete workflow: " + e.getMessage(), e, ProjectWorkflowToolErrorType.DELETE_WORKFLOW);
         }
     }
 
@@ -321,8 +328,9 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
                 projectWorkflowDTO.getId(), definition, projectWorkflowDTO.getVersion());
 
             if (logger.isDebugEnabled()) {
-                logger.debug("updateWorkflow({}): Updated workflow {} with name '{}'", workflowId,
-                    projectWorkflowDTO.getId(), projectWorkflowDTO.getLabel());
+                logger.debug(
+                    "updateWorkflow({}): Updated workflow {} with name '{}'", workflowId, projectWorkflowDTO.getId(),
+                    projectWorkflowDTO.getLabel());
             }
 
             return new WorkflowInfo(
@@ -333,8 +341,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         } catch (Exception e) {
             logger.error("updateWorkflow({}): Failed to update workflow {}", workflowId, workflowId, e);
 
-            throw new ExecutionException("Failed to update workflow: " + e.getMessage(), e,
-                ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
+            throw new ExecutionException(
+                "Failed to update workflow: " + e.getMessage(), e, ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
         }
     }
 
@@ -342,8 +350,7 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
         try (InputStream inputStream = resource.getInputStream()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException ioException) {
-            throw new IllegalStateException(
-                "Failed to read resource: " + resource.getDescription(), ioException);
+            throw new IllegalStateException("Failed to read resource: " + resource.getDescription(), ioException);
         }
     }
 }
