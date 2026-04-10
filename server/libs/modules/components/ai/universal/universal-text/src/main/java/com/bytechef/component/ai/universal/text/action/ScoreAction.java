@@ -42,7 +42,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.universal.text.constant.AiTextConstants;
-import com.bytechef.component.ai.universal.text.util.AiTextUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
@@ -151,8 +150,7 @@ public class ScoreAction implements AiTextAction {
             .append(inputParameters.getString(TEXT))
             .append("\n");
 
-        List<AiTextUtils.Criteria> criteria = inputParameters.getList(
-            CRITERIA, AiTextUtils.Criteria.class, List.of());
+        List<Criteria> criteria = inputParameters.getList(CRITERIA, Criteria.class, List.of());
 
         userBuilder.append("Criteria: {")
             .append("\n");
@@ -189,5 +187,8 @@ public class ScoreAction implements AiTextAction {
                 "responseSchema", RESPONSE_SCHEMA));
 
         return ParametersFactory.create(modelInputParametersMap);
+    }
+
+    private record Criteria(String criterion, double lowestScore, double highestScore, boolean isDecimal) {
     }
 }
