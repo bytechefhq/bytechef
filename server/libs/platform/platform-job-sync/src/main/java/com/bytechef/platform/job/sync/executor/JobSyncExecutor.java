@@ -680,6 +680,22 @@ public class JobSyncExecutor {
 
             throw new ExecutionException(message, TaskExecutionErrorType.TASK_EXECUTION_FAILED);
         }
+
+        if (job.getStatus() == Job.Status.FAILED) {
+            ExecutionError error = job.getError();
+
+            if (error != null && error.getMessage() != null) {
+                throw new ExecutionException(error.getMessage(), TaskExecutionErrorType.TASK_EXECUTION_FAILED);
+            }
+
+            String message = "Job " + job.getId() + " failed but no error details are available.";
+
+            if (logger.isWarnEnabled()) {
+                logger.warn("Detected FAILED job without error details for jobId={}", job.getId());
+            }
+
+            throw new ExecutionException(message, TaskExecutionErrorType.TASK_EXECUTION_FAILED);
+        }
     }
 
     private static <T> Cache<String, CopyOnWriteArrayList<T>> createCache() {

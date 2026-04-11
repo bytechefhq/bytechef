@@ -250,8 +250,11 @@ public class TaskCoordinator {
 
             eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
         } else {
-            job.setStatus(Job.Status.FAILED);
             job.setEndDate(Instant.now());
+            job.setError(
+                new ExecutionError(
+                    exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+            job.setStatus(Job.Status.FAILED);
 
             jobService.update(job);
 
