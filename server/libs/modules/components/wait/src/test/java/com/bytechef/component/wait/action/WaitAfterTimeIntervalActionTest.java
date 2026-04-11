@@ -52,7 +52,7 @@ public class WaitAfterTimeIntervalActionTest {
         Mockito.when(inputParameters.getRequiredString(eq(UNIT)))
             .thenReturn("MINUTES");
 
-        ModifiableActionDefinition actionDefinition = WaitAfterTimeIntervalAction.of();
+        ModifiableActionDefinition actionDefinition = WaitAfterTimeIntervalAction.ACTION_DEFINITION;
 
         PerformFunction performFunction = (PerformFunction) actionDefinition.getPerform()
             .orElseThrow();
@@ -92,7 +92,7 @@ public class WaitAfterTimeIntervalActionTest {
         Mockito.when(continueParameters.getString(eq("unit")))
             .thenReturn("MINUTES");
 
-        ModifiableActionDefinition actionDefinition = WaitAfterTimeIntervalAction.of();
+        ModifiableActionDefinition actionDefinition = WaitAfterTimeIntervalAction.ACTION_DEFINITION;
 
         ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
             .orElseThrow();
