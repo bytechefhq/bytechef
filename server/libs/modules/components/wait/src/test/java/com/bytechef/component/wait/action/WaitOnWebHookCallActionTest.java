@@ -50,7 +50,7 @@ public class WaitOnWebHookCallActionTest {
         Mockito.when(inputParameters.getRequiredString(eq(UNIT)))
             .thenReturn("DAYS");
 
-        ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.of();
+        ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.ACTION_DEFINITION;
 
         PerformFunction performFunction = (PerformFunction) actionDefinition.getPerform()
             .orElseThrow();
@@ -71,13 +71,13 @@ public class WaitOnWebHookCallActionTest {
 
     @Test
     public void testBeforeSuspendIsPresent() {
-        ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.of();
+        ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.ACTION_DEFINITION;
 
-        Assertions.assertTrue(actionDefinition.getBeforeSuspend()
-            .isPresent());
+        Assertions.assertTrue(
+            actionDefinition.getBeforeSuspend()
+                .isPresent());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testResumePerformReturnsResumeData() throws Exception {
         Parameters inputParameters = Mockito.mock(Parameters.class);
@@ -92,20 +92,18 @@ public class WaitOnWebHookCallActionTest {
             .when(data)
             .toMap();
 
-        ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.of();
+        ModifiableActionDefinition actionDefinition = WaitOnWebHookCallAction.ACTION_DEFINITION;
 
         ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
             .orElseThrow();
 
-        Object result = resumePerformFunction.apply(
+        Map<String, Object> result = resumePerformFunction.apply(
             inputParameters, connectionParameters, continueParameters, data, context);
 
         Assertions.assertNotNull(result);
         Assertions.assertInstanceOf(Map.class, result);
 
-        Map<String, Object> resultMap = (Map<String, Object>) result;
-
-        Assertions.assertEquals(true, resultMap.get("resumed"));
-        Assertions.assertEquals(dataMap, resultMap.get(ResumePerformFunction.ResumeResponse.DATA));
+        Assertions.assertEquals(true, result.get("resumed"));
+        Assertions.assertEquals(dataMap, result.get(ResumePerformFunction.ResumeResponse.DATA));
     }
 }
