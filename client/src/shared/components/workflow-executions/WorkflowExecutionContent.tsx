@@ -1,5 +1,7 @@
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
-import {Suspense, lazy, useMemo} from 'react';
+import {ChevronRightIcon} from 'lucide-react';
+import {Suspense, lazy, useMemo, useState} from 'react';
 
 import {getFilteredOutput, hasValue} from './WorkflowExecutionsUtils';
 
@@ -30,6 +32,8 @@ const WorkflowExecutionContent = ({
         [output, jobInputs, workflowTriggerName]
     );
 
+    const [stackTraceOpen, setStackTraceOpen] = useState(false);
+
     if (error !== undefined) {
         return (
             <div className="flex flex-col gap-4 overflow-hidden">
@@ -37,15 +41,27 @@ const WorkflowExecutionContent = ({
                     {error.message || 'No message.'}
                 </span>
 
-                <div className="flex flex-col space-y-1">
-                    <span className="text-sm font-semibold">Stack Trace</span>
+                {error?.stackTrace && error.stackTrace.length > 0 && (
+                    <Collapsible onOpenChange={setStackTraceOpen} open={stackTraceOpen}>
+                        <CollapsibleTrigger className="flex cursor-pointer items-center gap-1">
+                            <ChevronRightIcon
+                                className={`size-4 transition-transform ${stackTraceOpen ? 'rotate-90' : ''}`}
+                            />
 
-                    {error?.stackTrace?.map((line, index) => (
-                        <div className="text-sm" key={index}>
-                            {line}
-                        </div>
-                    ))}
-                </div>
+                            <span className="text-sm font-semibold">Stack Trace</span>
+                        </CollapsibleTrigger>
+
+                        <CollapsibleContent>
+                            <div className="mt-2 flex flex-col space-y-1 pl-5 text-sm">
+                                {error.stackTrace.map((line, index) => (
+                                    <div className="text-sm" key={index}>
+                                        {line}
+                                    </div>
+                                ))}
+                            </div>
+                        </CollapsibleContent>
+                    </Collapsible>
+                )}
             </div>
         );
     }
