@@ -2,13 +2,14 @@ import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
 import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
 import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/WorkflowExecutionsHeader';
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import {getErrorItem, getInitialSelectedItem} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
-import {TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
+import {JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {TabValueType} from '@/shared/types';
 import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
@@ -42,6 +43,9 @@ const WorkflowExecutionsTestOutput = ({
         setActiveTab('input');
     }, [workflowTestExecution]);
 
+    const hasNoExecutions = !triggerExecution && (!job?.taskExecutions || job.taskExecutions.length === 0);
+    const jobFailedWithNoExecutions = hasNoExecutions && job?.status === JobStatusEnum.Failed;
+
     useEffect(() => {
         const errorItem = getErrorItem(workflowTestExecution);
 
@@ -52,10 +56,17 @@ const WorkflowExecutionsTestOutput = ({
                 title: errorItem.title,
                 workflowId: currentWorkflowId,
             });
+        } else if (jobFailedWithNoExecutions && job?.error && currentWorkflowId) {
+            useCopilotStore.getState().setWorkflowExecutionError({
+                errorMessage: job.error.message,
+                stackTrace: job.error.stackTrace,
+                title: 'Workflow',
+                workflowId: currentWorkflowId,
+            });
         } else if (!errorItem?.error) {
             useCopilotStore.getState().setWorkflowExecutionError(undefined);
         }
-    }, [workflowTestExecution, currentWorkflowId]);
+    }, [workflowTestExecution, currentWorkflowId, jobFailedWithNoExecutions, job?.error]);
 
     const taskExecutions = job?.taskExecutions || [];
 
@@ -96,7 +107,13 @@ const WorkflowExecutionsTestOutput = ({
 
                     {!workflowIsRunning && (
                         <>
-                            {workflowTestExecution?.job && (
+                            {workflowTestExecution?.job && jobFailedWithNoExecutions && (
+                                <div className="flex-1 p-4">
+                                    <WorkflowExecutionContent error={job?.error} />
+                                </div>
+                            )}
+
+                            {workflowTestExecution?.job && !jobFailedWithNoExecutions && (
                                 <ResizablePanelGroup orientation="horizontal">
                                     <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
                                         <ScrollArea className="h-full pl-1 pr-4">
