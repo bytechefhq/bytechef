@@ -17,6 +17,7 @@
 package com.bytechef.platform.job.sync.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +38,9 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.SyncMessageBroker;
 import com.bytechef.tenant.TenantContext;
@@ -270,6 +273,41 @@ class JobSyncExecutorTest {
 
         // This should not throw an exception because it's caught in handleCoordinatorJobStopEvent
         memoryMessageBroker.send(TaskCoordinatorMessageRoute.JOB_STOP_EVENTS, stopJobEvent);
+    }
+
+    @Test
+    void testCheckForErrorThrowsWhenJobFailedWithNoTaskExecutions() {
+        long jobId = 606L;
+
+        Job failedJob = new Job();
+
+        failedJob.setId(jobId);
+        failedJob.setStatus(Job.Status.FAILED);
+        failedJob.setError(new ExecutionError("Invalid expression: function perform(input) {}", List.of()));
+
+        when(jobService.getJob(jobId)).thenReturn(failedJob);
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("Invalid expression");
+    }
+
+    @Test
+    void testCheckForErrorThrowsWhenJobFailedWithNoErrorDetails() {
+        long jobId = 707L;
+
+        Job failedJob = new Job();
+
+        failedJob.setId(jobId);
+        failedJob.setStatus(Job.Status.FAILED);
+
+        when(jobService.getJob(jobId)).thenReturn(failedJob);
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("Job 707 failed");
     }
 
     private static void waitForLatchRegistration(JobSyncExecutor jobSyncExecutor, String key, Duration timeout)
