@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import WorkflowChatSidebar from '@/pages/automation/workflow-chat/components/WorkflowChatSidebar';
-import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
+import ChatsSidebar from '@/pages/automation/chats/components/ChatsSidebar';
+import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -9,13 +9,13 @@ import {MessageSquareIcon, MessageSquareXIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {Outlet, useParams} from 'react-router-dom';
 
-const WorkflowChatContainer = () => {
+const Chats = () => {
     const {workflowExecutionId} = useParams();
 
-    const currentChatName = useWorkflowChatStore((state) => state.currentChatName);
-    const isRunning = useWorkflowChatStore((state) => state.isRunning);
-    const resetAll = useWorkflowChatStore((state) => state.resetAll);
-    const resetCurrentChat = useWorkflowChatStore((state) => state.resetCurrentChat);
+    const currentChatName = useChatsStore((state) => state.currentChatName);
+    const isRunning = useChatsStore((state) => state.isRunning);
+    const resetAll = useChatsStore((state) => state.resetAll);
+    const resetCurrentChat = useChatsStore((state) => state.resetCurrentChat);
 
     useEffect(() => {
         return () => {
@@ -55,8 +55,8 @@ const WorkflowChatContainer = () => {
                     title={currentChatName}
                 />
             }
-            leftSidebarBody={<WorkflowChatSidebar />}
-            leftSidebarHeader={<Header position="sidebar" title="Chat" />}
+            leftSidebarBody={<ChatsSidebar />}
+            leftSidebarHeader={<Header position="sidebar" title="Chats" />}
             leftSidebarWidth="64"
         >
             {workflowExecutionId ? (
@@ -74,4 +74,4 @@ const WorkflowChatContainer = () => {
     );
 };
 
-export default WorkflowChatContainer;
+export default Chats;

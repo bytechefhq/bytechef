@@ -2,10 +2,10 @@ import {renderHook, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
-import {WorkflowChatRuntimeProvider} from '../WorkflowChatRuntimeProvider';
+import {ChatRuntimeProvider} from '../ChatRuntimeProvider';
 
 // Mock dependencies
-vi.mock('@/pages/automation/workflow-chat/stores/useWorkflowChatStore', () => ({
+vi.mock('@/pages/automation/chats/stores/useWorkflowChatStore', () => ({
     useWorkflowChatStore: vi.fn((selector) =>
         selector({
             appendToLastAssistantMessage: vi.fn(),
@@ -35,13 +35,13 @@ vi.mock('@assistant-ui/react', () => ({
     useExternalStoreRuntime: vi.fn(() => ({})),
 }));
 
-describe('WorkflowChatRuntimeProvider', () => {
+describe('ChatRuntimeProvider', () => {
     it('renders children', () => {
         const {result} = renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
+                <ChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
                     {children}
-                </WorkflowChatRuntimeProvider>
+                </ChatRuntimeProvider>
             ),
         });
 
@@ -51,13 +51,9 @@ describe('WorkflowChatRuntimeProvider', () => {
     it('accepts sseStream prop', () => {
         const {result} = renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider
-                    environmentName="test"
-                    sseStreamResponse={true}
-                    workflowExecutionId="workflow-123"
-                >
+                <ChatRuntimeProvider environmentName="test" sseStreamResponse={true} workflowExecutionId="workflow-123">
                     {children}
-                </WorkflowChatRuntimeProvider>
+                </ChatRuntimeProvider>
             ),
         });
 
@@ -67,9 +63,9 @@ describe('WorkflowChatRuntimeProvider', () => {
     it('initializes with correct environment', () => {
         const {result} = renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environmentName="production" workflowExecutionId="workflow-123">
+                <ChatRuntimeProvider environmentName="production" workflowExecutionId="workflow-123">
                     {children}
-                </WorkflowChatRuntimeProvider>
+                </ChatRuntimeProvider>
             ),
         });
 
@@ -79,9 +75,9 @@ describe('WorkflowChatRuntimeProvider', () => {
     it('handles different workflow execution IDs', () => {
         const {result} = renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environmentName="test" workflowExecutionId="different-workflow-456">
+                <ChatRuntimeProvider environmentName="test" workflowExecutionId="different-workflow-456">
                     {children}
-                </WorkflowChatRuntimeProvider>
+                </ChatRuntimeProvider>
             ),
         });
 
@@ -100,9 +96,9 @@ describe('WorkflowChatRuntimeProvider', () => {
 
         renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
+                <ChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
                     {children}
-                </WorkflowChatRuntimeProvider>
+                </ChatRuntimeProvider>
             ),
         });
 
@@ -123,9 +119,9 @@ describe('WorkflowChatRuntimeProvider', () => {
 
         renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
+                <ChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
                     {children}
-                </WorkflowChatRuntimeProvider>
+                </ChatRuntimeProvider>
             ),
         });
 
