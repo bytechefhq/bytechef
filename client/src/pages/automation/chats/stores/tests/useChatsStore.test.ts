@@ -1,11 +1,11 @@
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it} from 'vitest';
 
-import {useWorkflowChatStore} from '../useWorkflowChatStore';
+import {useChatsStore} from '../useChatsStore';
 
 describe('useWorkflowChatStore', () => {
     beforeEach(() => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.resetAll();
@@ -13,7 +13,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('initializes with empty messages and a conversation ID', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         expect(result.current.messages).toEqual([]);
         expect(result.current.conversationId).toBeDefined();
@@ -22,7 +22,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('generates unique conversation IDs', () => {
-        const {result: result1} = renderHook(() => useWorkflowChatStore());
+        const {result: result1} = renderHook(() => useChatsStore());
         const id1 = result1.current.conversationId;
 
         act(() => {
@@ -35,7 +35,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('adds a message to the messages array', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'Hello', role: 'user'});
@@ -46,7 +46,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('adds multiple messages in order', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'First', role: 'user'});
@@ -61,7 +61,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('appends content to the last assistant message', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'User message', role: 'user'});
@@ -74,7 +74,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('creates a new assistant message if none exists when appending', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'User message', role: 'user'});
@@ -86,7 +86,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('appends to the last assistant message when multiple exist', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'First assistant', role: 'assistant'});
@@ -101,7 +101,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('sets content on the last assistant message', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'User message', role: 'user'});
@@ -114,7 +114,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('creates a new assistant message if none exists when setting content', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'User message', role: 'user'});
@@ -126,7 +126,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('resets messages to empty array', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'Message 1', role: 'user'});
@@ -143,7 +143,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('resets all state including conversation cache', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         const originalId = result.current.conversationId;
 
@@ -166,7 +166,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('preserves message attachments when setting message', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         const attachments = [
             {
@@ -191,7 +191,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('handles appending empty string', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'Assistant message', role: 'assistant'});
@@ -202,7 +202,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('handles setting empty string content', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: 'Old content', role: 'assistant'});
@@ -213,7 +213,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('maintains store state across multiple operations', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         const conversationId = result.current.conversationId;
 
@@ -231,7 +231,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('handles rapid consecutive appends', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.setMessage({content: '', role: 'assistant'});
@@ -246,7 +246,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('preserves messages when switching between chats', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.switchChat('chat-1');
@@ -272,7 +272,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('preserves conversationId when switching back to a cached chat', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.switchChat('chat-1');
@@ -296,7 +296,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('creates a fresh conversation for a new chat', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.switchChat('new-chat');
@@ -309,7 +309,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('sets activeWorkflowExecutionId on switch', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.switchChat('chat-abc');
@@ -325,7 +325,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('blocks switchChat when isRunning is true', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.switchChat('chat-1');
@@ -350,7 +350,7 @@ describe('useWorkflowChatStore', () => {
     });
 
     it('allows switchChat after isRunning becomes false', () => {
-        const {result} = renderHook(() => useWorkflowChatStore());
+        const {result} = renderHook(() => useChatsStore());
 
         act(() => {
             result.current.switchChat('chat-1');

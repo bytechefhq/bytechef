@@ -83,7 +83,7 @@ const automationNavigation: NavigationType[] = [
         icon: VectorSquareIcon,
         name: 'Knowledge Base',
     },
-    {href: '/automation/chat', icon: MessagesSquareIcon, name: 'Chat'},
+    {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
     {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
 ];
 

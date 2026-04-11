@@ -55,8 +55,8 @@ const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 const ApprovalTasks = lazy(() => import('@/pages/automation/approval-tasks/ApprovalTasks'));
-const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
-const WorkflowChatContainer = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChatContainer'));
+const Chat = lazy(() => import('@/pages/automation/chats/Chat'));
+const Chats = lazy(() => import('@/pages/automation/chats/Chats'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 
@@ -719,7 +719,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <LazyLoadWrapper hasLeftSidebar>
-                                                        <WorkflowChat />
+                                                        <Chat />
                                                     </LazyLoadWrapper>
                                                 </PrivateRoute>
                                             ),
@@ -728,10 +728,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                     ],
                                     element: (
                                         <LazyLoadWrapper hasLeftSidebar>
-                                            <WorkflowChatContainer />
+                                            <Chats />
                                         </LazyLoadWrapper>
                                     ),
-                                    path: 'chat',
+                                    path: 'chats',
                                 },
                                 {
                                     element: (

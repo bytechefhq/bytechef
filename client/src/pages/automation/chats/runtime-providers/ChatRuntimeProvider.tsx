@@ -1,4 +1,4 @@
-import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
+import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
 import {useSSE} from '@/shared/hooks/useSSE';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
 import {
@@ -22,7 +22,7 @@ const attachmentAdapter = new CompositeAttachmentAdapter([
     new SimpleTextAttachmentAdapter(),
 ]);
 
-export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProvider({
+export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
     children,
     environmentName,
     sseStreamResponse,
@@ -45,7 +45,7 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
         setIsRunning,
         setLastAssistantMessageContent,
         setMessage,
-    } = useWorkflowChatStore(
+    } = useChatsStore(
         useShallow((state) => ({
             appendToLastAssistantMessage: state.appendToLastAssistantMessage,
             isRunning: state.isRunning,
@@ -115,7 +115,7 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
 
             const formData = new FormData();
 
-            const conversationId = useWorkflowChatStore.getState().conversationId;
+            const conversationId = useChatsStore.getState().conversationId;
 
             formData.append('conversationId', conversationId ?? '');
             formData.append('message', input ?? '');
