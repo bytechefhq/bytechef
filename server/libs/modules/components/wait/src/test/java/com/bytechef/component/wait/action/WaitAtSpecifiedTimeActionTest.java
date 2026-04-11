@@ -54,7 +54,7 @@ public class WaitAtSpecifiedTimeActionTest {
         Mockito.when(inputParameters.getRequiredLocalDateTime(eq(DATE_TIME)))
             .thenReturn(futureTime);
 
-        ModifiableActionDefinition actionDefinition = WaitAtSpecifiedTimeAction.of();
+        ModifiableActionDefinition actionDefinition = WaitAtSpecifiedTimeAction.ACTION_DEFINITION;
 
         PerformFunction performFunction = (PerformFunction) actionDefinition.getPerform()
             .orElseThrow();
@@ -70,15 +70,16 @@ public class WaitAtSpecifiedTimeActionTest {
 
         Assertions.assertNotNull(suspend);
         Assertions.assertNotNull(suspend.expiresAt());
-        Assertions.assertNotNull(suspend.continueParameters());
-        Assertions.assertTrue(suspend.continueParameters()
-            .containsKey("expiresAt"));
+
+        Map<String, ?> continueParameters = suspend.continueParameters();
+
+        Assertions.assertNotNull(continueParameters);
+        Assertions.assertTrue(continueParameters.containsKey("expiresAt"));
 
         Instant expectedInstant = futureTime.atZone(ZoneId.systemDefault())
             .toInstant();
 
-        Assertions.assertEquals(expectedInstant.toEpochMilli(), suspend.continueParameters()
-            .get("expiresAt"));
+        Assertions.assertEquals(expectedInstant.toEpochMilli(), continueParameters.get("expiresAt"));
     }
 
     @Test
@@ -94,7 +95,7 @@ public class WaitAtSpecifiedTimeActionTest {
         Mockito.when(continueParameters.getLong(eq("expiresAt")))
             .thenReturn(expiresAtMillis);
 
-        ModifiableActionDefinition actionDefinition = WaitAtSpecifiedTimeAction.of();
+        ModifiableActionDefinition actionDefinition = WaitAtSpecifiedTimeAction.ACTION_DEFINITION;
 
         ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
             .orElseThrow();
