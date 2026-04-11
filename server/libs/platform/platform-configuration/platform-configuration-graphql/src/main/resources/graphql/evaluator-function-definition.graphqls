@@ -1,0 +1,46 @@
+extend type Query {
+    evaluatorFunctionDefinition(name: String!): EvaluatorFunctionDefinition!
+    evaluatorFunctionDefinitions(name: String): [EvaluatorFunctionDefinition!]!
+}
+
+enum EvaluatorFunctionCategory {
+    COLLECTION
+    DATE_TIME
+    MAP
+    STRING
+    TYPE
+    UTILITY
+}
+
+enum EvaluatorFunctionType {
+    BOOLEAN
+    BYTE
+    CHARACTER
+    DATETIME
+    DOUBLE
+    FLOAT
+    INTEGER
+    LIST
+    LONG
+    MAP
+    NUMBER
+    SHORT
+    STRING
+}
+
+type EvaluatorFunctionDefinition {
+    name: String!
+    title: String!
+    description: String!
+    category: EvaluatorFunctionCategory!
+    parameters: [EvaluatorFunctionParameter!]!
+    returnType: EvaluatorFunctionType!
+    example: String!
+}
+
+type EvaluatorFunctionParameter {
+    name: String!
+    description: String!
+    type: EvaluatorFunctionType!
+    required: Boolean!
+}
