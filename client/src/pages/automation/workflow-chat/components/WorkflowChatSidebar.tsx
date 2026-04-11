@@ -1,4 +1,3 @@
-import {Skeleton} from '@/components/ui/skeleton';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -52,18 +51,6 @@ const WorkflowChatSidebar = () => {
 
         return result;
     }, [isLoading, data]);
-
-    if (isLoading) {
-        return (
-            <div className="space-y-2 p-4">
-                <Skeleton className="h-4 w-1/2" />
-
-                {[1, 2, 3].map((value) => (
-                    <Skeleton className="h-6" key={value} />
-                ))}
-            </div>
-        );
-    }
 
     return (
         <>
