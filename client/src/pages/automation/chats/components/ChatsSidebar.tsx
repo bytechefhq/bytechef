@@ -1,5 +1,5 @@
+import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useWorkspaceChatWorkflowsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -15,12 +15,12 @@ interface ProjectChatGroupI {
     }>;
 }
 
-const WorkflowChatSidebar = () => {
+const ChatsSidebar = () => {
     const {workflowExecutionId} = useParams();
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    const isRunning = useWorkflowChatStore((state) => state.isRunning);
+    const isRunning = useChatsStore((state) => state.isRunning);
 
     const {data, isLoading} = useWorkspaceChatWorkflowsQuery({
         environmentId: String(currentEnvironmentId),
@@ -64,7 +64,7 @@ const WorkflowChatSidebar = () => {
                         body={
                             <>
                                 {workflows.map((workflowData) => {
-                                    const chatUrl = `/automation/chat/${workflowData.workflowExecutionId}`;
+                                    const chatUrl = `/automation/chats/${workflowData.workflowExecutionId}`;
                                     const isActive = workflowExecutionId === workflowData.workflowExecutionId;
 
                                     return (
@@ -91,4 +91,4 @@ const WorkflowChatSidebar = () => {
     );
 };
 
-export default WorkflowChatSidebar;
+export default ChatsSidebar;

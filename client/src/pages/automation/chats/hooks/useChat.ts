@@ -1,13 +1,11 @@
-import {Thread} from '@/components/assistant-ui/thread';
-import {WorkflowChatRuntimeProvider} from '@/pages/automation/workflow-chat/runtime-providers/WorkflowChatRuntimeProvider';
-import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
+import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
 import {toEnvironmentName} from '@/shared/constants';
 import {useWorkflowChatProjectDeploymentWorkflowQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
-const WorkflowChat = () => {
+const useChat = () => {
     const {workflowExecutionId} = useParams();
     const navigate = useNavigate();
 
@@ -15,10 +13,10 @@ const WorkflowChat = () => {
 
     const environmentName = useMemo(() => toEnvironmentName(currentEnvironmentId), [currentEnvironmentId]);
 
-    const activeWorkflowExecutionId = useWorkflowChatStore((state) => state.activeWorkflowExecutionId);
-    const isRunning = useWorkflowChatStore((state) => state.isRunning);
-    const setCurrentChatName = useWorkflowChatStore((state) => state.setCurrentChatName);
-    const switchChat = useWorkflowChatStore((state) => state.switchChat);
+    const activeWorkflowExecutionId = useChatsStore((state) => state.activeWorkflowExecutionId);
+    const isRunning = useChatsStore((state) => state.isRunning);
+    const setCurrentChatName = useChatsStore((state) => state.setCurrentChatName);
+    const switchChat = useChatsStore((state) => state.switchChat);
 
     useEffect(() => {
         if (workflowExecutionId) {
@@ -63,19 +61,11 @@ const WorkflowChat = () => {
         setCurrentChatName(chatName);
     }, [chatName, setCurrentChatName]);
 
-    return (
-        <div className="flex flex-1">
-            <WorkflowChatRuntimeProvider
-                environmentName={environmentName}
-                sseStreamResponse={data?.projectDeploymentWorkflow?.projectWorkflow?.sseStreamResponse}
-                workflowExecutionId={effectiveWorkflowExecutionId!}
-            >
-                <div className="relative flex size-full flex-col">
-                    <Thread />
-                </div>
-            </WorkflowChatRuntimeProvider>
-        </div>
-    );
+    return {
+        effectiveWorkflowExecutionId: effectiveWorkflowExecutionId!,
+        environmentName,
+        sseStreamResponse: data?.projectDeploymentWorkflow?.projectWorkflow?.sseStreamResponse,
+    };
 };
 
-export default WorkflowChat;
+export default useChat;

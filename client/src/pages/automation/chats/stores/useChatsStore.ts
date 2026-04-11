@@ -11,7 +11,7 @@ interface ConversationCacheEntryI {
     messages: ThreadMessageLike[];
 }
 
-interface WorkflowChatStateI {
+interface ChatStateI {
     activeWorkflowExecutionId: string | null;
     conversationCache: Record<string, ConversationCacheEntryI>;
     conversationId: string;
@@ -44,7 +44,7 @@ const initialState = {
     messages: [] as ThreadMessageLike[],
 };
 
-export const useWorkflowChatStore = create<WorkflowChatStateI>()(
+export const useChatsStore = create<ChatStateI>()(
     devtools((set) => ({
         ...initialState,
         appendToLastAssistantMessage: (delta: string) =>
