@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component(KNOWLEDGE_BASE + "_v1_ComponentHandler")
-@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseComponentHandler implements ComponentHandler {
 
     private final VectorStoreComponentDefinition componentDefinition;

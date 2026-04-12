@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 class KnowledgeBaseDocumentChunkFacadeImpl implements KnowledgeBaseDocumentChunkFacade {
 
     private final ApplicationEventPublisher eventPublisher;

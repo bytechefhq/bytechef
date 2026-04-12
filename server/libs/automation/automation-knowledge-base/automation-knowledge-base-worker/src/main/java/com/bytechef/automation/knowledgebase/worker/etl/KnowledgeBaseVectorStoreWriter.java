@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseVectorStoreWriter {
 
     private final VectorStore vectorStore;
