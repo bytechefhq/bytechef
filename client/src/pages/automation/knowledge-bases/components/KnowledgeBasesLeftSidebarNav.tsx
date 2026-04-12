@@ -3,11 +3,7 @@ import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav
 import {TagIcon} from 'lucide-react';
 
 const KnowledgeBasesLeftSidebarNav = () => {
-    const {hasData, isLoading, tagId, tags} = useKnowledgeBasesLeftSidebarNav();
-
-    if (!hasData) {
-        return <></>;
-    }
+    const {isLoading, tagId, tags} = useKnowledgeBasesLeftSidebarNav();
 
     return (
         <LeftSidebarNav

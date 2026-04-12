@@ -51,7 +51,7 @@ const KnowledgeBases = () => {
                 />
             }
             leftSidebarBody={<KnowledgeBasesLeftSidebarNav />}
-            leftSidebarHeader={<Header position="sidebar" title="Knowledge Base" />}
+            leftSidebarHeader={<Header position="sidebar" title="Knowledge Bases" />}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading}>
