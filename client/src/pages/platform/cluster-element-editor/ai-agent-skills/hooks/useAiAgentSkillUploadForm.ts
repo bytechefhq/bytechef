@@ -1,12 +1,15 @@
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
-import {useCreateAgentSkillFromInstructionsMutation, useCreateAgentSkillMutation} from '@/shared/middleware/graphql';
+import {
+    useCreateAiAgentSkillFromInstructionsMutation,
+    useCreateAiAgentSkillMutation,
+} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {type ChangeEvent, type DragEvent, useCallback, useRef, useState} from 'react';
 import {toast} from 'sonner';
 
 const ACCEPTED_EXTENSIONS = ['.zip', '.skill', '.md'];
 
-export default function useAgentSkillUploadForm() {
+export default function useAiAgentSkillUploadForm() {
     const [dragActive, setDragActive] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
@@ -19,11 +22,11 @@ export default function useAgentSkillUploadForm() {
 
     const queryClient = useQueryClient();
 
-    const createSkillMutation = useCreateAgentSkillMutation();
-    const createSkillFromInstructionsMutation = useCreateAgentSkillFromInstructionsMutation();
+    const createSkillMutation = useCreateAiAgentSkillMutation();
+    const createSkillFromInstructionsMutation = useCreateAiAgentSkillFromInstructionsMutation();
 
     const handleUploadBatchComplete = useCallback(() => {
-        queryClient.invalidateQueries({queryKey: ['agentSkills']});
+        queryClient.invalidateQueries({queryKey: ['aiAgentSkills']});
 
         const totalCount = totalToUploadRef.current;
         const successCount = successCountRef.current;

@@ -1,3 +1,0 @@
-query agentSkillFileContent($id: ID!, $path: String!) {
-    agentSkillFileContent(id: $id, path: $path)
-}

@@ -1,17 +1,17 @@
 import {Input} from '@/components/ui/input';
 import AiAgentSkillListItem from '@/pages/platform/cluster-element-editor/ai-agent-skills/components/AiAgentSkillListItem';
 import AiAgentSkillsCreateDropdown from '@/pages/platform/cluster-element-editor/ai-agent-skills/components/AiAgentSkillsCreateDropdown';
-import useAgentSkillsList from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkillsList';
-import {AgentSkill} from '@/shared/middleware/graphql';
+import useAiAgentSkillsList from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkillsList';
+import {AiAgentSkill} from '@/shared/middleware/graphql';
 import {SearchIcon} from 'lucide-react';
 
 interface AiAgentSkillsListProps {
-    skills: AgentSkill[];
+    skills: AiAgentSkill[];
 }
 
 const AiAgentSkillsList = ({skills}: AiAgentSkillsListProps) => {
     const {deleteSkill, filteredSkills, handleDownloadSkill, renameSkill, searchQuery, setSearchQuery} =
-        useAgentSkillsList(skills);
+        useAiAgentSkillsList(skills);
 
     return (
         <div className="flex flex-1 flex-col py-4">
