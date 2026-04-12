@@ -25,41 +25,44 @@ import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFu
 import java.nio.file.Path;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.BraveWebSearchTool;
+import org.springaicommunity.agent.tools.task.TaskTool;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentType;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides web search with domain filtering using the Brave Search API.
+ * Provides a task tool that delegates complex tasks to specialized sub-agents.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsBraveWebSearchTool {
-
-    public static final String BRAVE_API_KEY = "braveApiKey";
+public class AiAgentUtilsTaskTool {
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("braveWebSearchTool")
-            .title("Brave Web Search Tool")
-            .description("Web search with domain filtering using the Brave Search API.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("taskTool")
+            .title("Task Tool")
+            .description("Delegate complex tasks to specialized sub-agents for parallel execution.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsBraveWebSearchTool::apply);
+            .object(() -> AiAgentUtilsTaskTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        String apiKey = connectionParameters.getString(BRAVE_API_KEY);
-
-        if (apiKey == null || apiKey.isBlank()) {
+        if (chatModel == null) {
             return ToolCallbackProvider.from(List.of());
         }
 
-        BraveWebSearchTool braveWebSearchTool = BraveWebSearchTool.builder(apiKey)
+        ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel);
+
+        ToolCallback taskToolCallback = TaskTool.builder()
+            .subagentTypes(ClaudeSubagentType.builder()
+                .chatClientBuilder("default", chatClientBuilder)
+                .build())
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(braveWebSearchTool));
+        return ToolCallbackProvider.from(taskToolCallback);
     }
 }

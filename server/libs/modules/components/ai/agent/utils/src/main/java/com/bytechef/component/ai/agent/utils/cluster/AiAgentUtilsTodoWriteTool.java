@@ -24,34 +24,33 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.ShellTools;
+import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides shell tools (Bash, BashOutput, KillShell) for the AI agent.
+ * Provides structured task management with state tracking for the AI agent.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsShellTools {
+public class AiAgentUtilsTodoWriteTool {
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("shellTools")
-            .title("Shell Tools")
-            .description("Execute shell commands with timeout control, background process management, "
-                + "and regex output filtering.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("todoWriteTool")
+            .title("Todo Write Tool")
+            .description("Structured task management with state tracking.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsShellTools::apply);
+            .object(() -> AiAgentUtilsTodoWriteTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        ShellTools shellTools = ShellTools.builder()
+        TodoWriteTool todoWriteTool = TodoWriteTool.builder()
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(shellTools));
+        return ToolCallbackProvider.from(ToolCallbacks.from(todoWriteTool));
     }
 }

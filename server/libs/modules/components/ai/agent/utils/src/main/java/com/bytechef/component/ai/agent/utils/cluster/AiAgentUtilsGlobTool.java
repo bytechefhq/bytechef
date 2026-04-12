@@ -23,46 +23,35 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
-import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.task.TaskTool;
-import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentType;
-import org.springframework.ai.chat.client.ChatClient;
+import org.springaicommunity.agent.tools.GlobTool;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides a task tool that delegates complex tasks to specialized sub-agents.
+ * Provides fast file pattern matching for finding files by name patterns with glob syntax.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsTaskTool {
+public class AiAgentUtilsGlobTool {
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("taskTool")
-            .title("Task Tool")
-            .description("Delegate complex tasks to specialized sub-agents for parallel execution.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("globTool")
+            .title("Glob Tool")
+            .description("Fast file pattern matching tool for finding files by name patterns with glob syntax.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsTaskTool::apply);
+            .object(() -> AiAgentUtilsGlobTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        if (chatModel == null) {
-            return ToolCallbackProvider.from(List.of());
-        }
-
-        ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel);
-
-        ToolCallback taskToolCallback = TaskTool.builder()
-            .subagentTypes(ClaudeSubagentType.builder()
-                .chatClientBuilder("default", chatClientBuilder)
-                .build())
+        GlobTool globTool = GlobTool.builder()
+            .workingDirectory(workingDirectory)
             .build();
 
-        return ToolCallbackProvider.from(taskToolCallback);
+        return ToolCallbackProvider.from(ToolCallbacks.from(globTool));
     }
 }
