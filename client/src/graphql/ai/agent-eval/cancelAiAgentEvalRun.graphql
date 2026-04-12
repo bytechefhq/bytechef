@@ -1,0 +1,6 @@
+mutation cancelAiAgentEvalRun($id: ID!) {
+    cancelAiAgentEvalRun(id: $id) {
+        id
+        status
+    }
+}

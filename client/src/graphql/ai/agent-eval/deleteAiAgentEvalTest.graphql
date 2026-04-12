@@ -1,0 +1,3 @@
+mutation deleteAiAgentEvalTest($id: ID!) {
+    deleteAiAgentEvalTest(id: $id)
+}

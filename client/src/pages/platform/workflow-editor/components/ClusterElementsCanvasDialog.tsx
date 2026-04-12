@@ -3,10 +3,10 @@ import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Dia
 import AiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/AiAgentEditor';
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
 import AiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals';
-import useAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvals';
+import useAiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAiAgentEvals';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import AiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/AiAgentSkills';
-import useAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkills';
+import useAiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkills';
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
 import ClusterElementsWorkflowEditor from '@/pages/platform/cluster-element-editor/components/ClusterElementsWorkflowEditor';
 import ClusterElementsWorkflowEditorHeader from '@/pages/platform/cluster-element-editor/components/ClusterElementsWorkflowEditorHeader';
@@ -64,8 +64,8 @@ const ClusterElementsCanvasDialog = ({
     const ff_4070 = useFeatureFlagsStore()('ff-4070');
     const ff_4553 = useFeatureFlagsStore()('ff-4553');
 
-    const {handleClose: handleEvalsClose} = useAgentEvals();
-    const {handleClose: handleSkillsClose} = useAgentSkills({enabled: skillsPanelOpen});
+    const {handleClose: handleEvalsClose} = useAiAgentEvals();
+    const {handleClose: handleSkillsClose} = useAiAgentSkills({enabled: skillsPanelOpen});
     const {
         copilotEnabled,
         handleClose,

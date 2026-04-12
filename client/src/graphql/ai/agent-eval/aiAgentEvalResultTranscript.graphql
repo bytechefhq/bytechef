@@ -1,0 +1,3 @@
+query aiAgentEvalResultTranscript($id: ID!) {
+    aiAgentEvalResultTranscript(id: $id)
+}

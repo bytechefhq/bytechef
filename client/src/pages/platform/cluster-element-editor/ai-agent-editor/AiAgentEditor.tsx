@@ -3,10 +3,10 @@ import {AiAgentConfigurationPanel} from '@/pages/platform/cluster-element-editor
 import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
 import useAiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/hooks/useAiAgentEditor';
 import AiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals';
-import useAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAgentEvals';
+import useAiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAiAgentEvals';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import AiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/AiAgentSkills';
-import useAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkills';
+import useAiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkills';
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
 import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
@@ -51,8 +51,8 @@ export default function AiAgentEditor({
         previousComponentDefinitions,
         workflowNodeOutputs,
     });
-    const {handleClose: handleEvalsClose} = useAgentEvals();
-    const {handleClose: handleSkillsClose} = useAgentSkills({enabled: skillsPanelOpen});
+    const {handleClose: handleEvalsClose} = useAiAgentEvals();
+    const {handleClose: handleSkillsClose} = useAiAgentSkills({enabled: skillsPanelOpen});
 
     if (evalsPanelOpen) {
         return (

@@ -1,3 +1,0 @@
-query agentEvalResultTranscript($id: ID!) {
-    agentEvalResultTranscript(id: $id)
-}

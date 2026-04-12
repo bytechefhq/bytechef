@@ -1,5 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {AgentJudgeType} from '@/shared/middleware/graphql';
+import {AiAgentJudgeType} from '@/shared/middleware/graphql';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {
     useGetClusterElementDefinitionQuery,
@@ -13,13 +13,13 @@ interface JudgeEditDataI {
     configuration: Record<string, unknown>;
     id: string;
     name: string;
-    type: AgentJudgeType;
+    type: AiAgentJudgeType;
 }
 
 interface UseCreateJudgeFormProps {
     editData?: JudgeEditDataI;
     onClose: () => void;
-    onCreate: (name: string, type: AgentJudgeType, configuration: Record<string, unknown>) => void;
+    onCreate: (name: string, type: AiAgentJudgeType, configuration: Record<string, unknown>) => void;
     onUpdate?: (id: string, name?: string, configuration?: Record<string, unknown>) => void;
 }
 
@@ -33,7 +33,7 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
     const [expectedValue, setExpectedValue] = useState(String(editConfig.expectedValue ?? ''));
     const [jsonSchema, setJsonSchema] = useState(String(editConfig.schema ?? ''));
     const [jsonSchemaError, setJsonSchemaError] = useState('');
-    const [judgeType, setJudgeType] = useState<AgentJudgeType>(editData?.type ?? AgentJudgeType.LlmRule);
+    const [judgeType, setJudgeType] = useState<AiAgentJudgeType>(editData?.type ?? AiAgentJudgeType.LlmRule);
     const [maxLength, setMaxLength] = useState(String(editConfig.maxLength ?? ''));
     const [minLength, setMinLength] = useState(String(editConfig.minLength ?? ''));
     const [model, setModel] = useState(String(editConfig.model ?? ''));
@@ -54,12 +54,12 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
 
     const {data: modelProviders = []} = useGetRootComponentClusterElementDefinitions(
         {clusterElementType: 'model', rootComponentName: 'aiAgent', rootComponentVersion: 1},
-        judgeType === AgentJudgeType.LlmRule
+        judgeType === AiAgentJudgeType.LlmRule
     );
 
     const {data: allConnections = []} = useGetWorkspaceConnectionsQuery(
         {componentName: provider || undefined, id: currentWorkspaceId!},
-        judgeType === AgentJudgeType.LlmRule && currentWorkspaceId != null && !!provider
+        judgeType === AiAgentJudgeType.LlmRule && currentWorkspaceId != null && !!provider
     );
 
     const selectedProviderVersion = useMemo(
@@ -69,10 +69,10 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
 
     const {data: clusterElementDefinition} = useGetClusterElementDefinitionQuery(
         {clusterElementName: 'model', componentName: provider, componentVersion: selectedProviderVersion ?? 1},
-        judgeType === AgentJudgeType.LlmRule && !!provider && selectedProviderVersion != null
+        judgeType === AiAgentJudgeType.LlmRule && !!provider && selectedProviderVersion != null
     );
 
-    const isLlmRule = judgeType === AgentJudgeType.LlmRule;
+    const isLlmRule = judgeType === AiAgentJudgeType.LlmRule;
     const isEditing = !!editData;
 
     const modelOptions = useMemo(() => {
@@ -91,7 +91,7 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
 
     const buildConfiguration = (): Record<string, unknown> | null => {
         switch (judgeType) {
-            case AgentJudgeType.LlmRule: {
+            case AiAgentJudgeType.LlmRule: {
                 const llmConfig: Record<string, unknown> = {rule: rule.trim()};
 
                 if (provider) {
@@ -113,13 +113,13 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
                 return llmConfig;
             }
 
-            case AgentJudgeType.ContainsText:
+            case AiAgentJudgeType.ContainsText:
                 return {mustNotContain, text: searchText.trim()};
 
-            case AgentJudgeType.RegexMatch:
+            case AiAgentJudgeType.RegexMatch:
                 return {mustNotMatch, pattern: regexPattern.trim()};
 
-            case AgentJudgeType.ResponseLength: {
+            case AiAgentJudgeType.ResponseLength: {
                 const config: Record<string, unknown> = {};
 
                 if (minLength.trim()) {
@@ -133,7 +133,7 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
                 return config;
             }
 
-            case AgentJudgeType.JsonSchema: {
+            case AiAgentJudgeType.JsonSchema: {
                 const trimmedSchema = jsonSchema.trim();
 
                 if (trimmedSchema) {
@@ -151,17 +151,17 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
                 return {schema: trimmedSchema};
             }
 
-            case AgentJudgeType.Similarity:
+            case AiAgentJudgeType.Similarity:
                 return {
                     algorithm,
                     expectedOutput: expectedOutput.trim(),
                     threshold: Number(threshold),
                 };
 
-            case AgentJudgeType.StringEquals:
+            case AiAgentJudgeType.StringEquals:
                 return {caseSensitive, expectedValue: expectedValue.trim()};
 
-            case AgentJudgeType.ToolUsage:
+            case AiAgentJudgeType.ToolUsage:
                 return {
                     comparison: toolComparison,
                     count: toolCount,

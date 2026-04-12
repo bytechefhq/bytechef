@@ -1,0 +1,10 @@
+mutation createAiAgentJudge($workflowId: String!, $workflowNodeName: String!, $name: String!, $type: AiAgentJudgeType!, $configuration: Map!) {
+    createAiAgentJudge(workflowId: $workflowId, workflowNodeName: $workflowNodeName, name: $name, type: $type, configuration: $configuration) {
+        id
+        name
+        type
+        configuration
+        createdDate
+        lastModifiedDate
+    }
+}

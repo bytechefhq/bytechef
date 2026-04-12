@@ -1,13 +1,13 @@
 import Button from '@/components/Button/Button';
-import AgentJudgeCard from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/AgentJudgeCard';
+import AiAgentJudgeCard from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/AiAgentJudgeCard';
 import CreateJudgeDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/CreateJudgeDialog';
-import useAgentEvalsJudgesTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/hooks/useAgentEvalsJudgesTab';
+import useAiAgentEvalsJudgesTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/hooks/useAiAgentEvalsJudgesTab';
 import {GavelIcon, Loader2Icon, PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 
-import type {AgentJudgesQuery} from '@/shared/middleware/graphql';
+import type {AiAgentJudgesQuery} from '@/shared/middleware/graphql';
 
-type AgentJudgeListItemType = AgentJudgesQuery['agentJudges'][number];
+type AiAgentJudgeListItemType = AiAgentJudgesQuery['aiAgentJudges'][number];
 
 interface EvalsJudgesTabProps {
     workflowId: string;
@@ -15,10 +15,10 @@ interface EvalsJudgesTabProps {
 }
 
 const EvalsJudgesTab = ({workflowId, workflowNodeName}: EvalsJudgesTabProps) => {
-    const [editingJudge, setEditingJudge] = useState<AgentJudgeListItemType | null>(null);
+    const [editingJudge, setEditingJudge] = useState<AiAgentJudgeListItemType | null>(null);
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-    const {handleCreateJudge, handleDeleteJudge, handleUpdateJudge, isLoading, judges} = useAgentEvalsJudgesTab(
+    const {handleCreateJudge, handleDeleteJudge, handleUpdateJudge, isLoading, judges} = useAiAgentEvalsJudgesTab(
         workflowId,
         workflowNodeName
     );
@@ -45,7 +45,7 @@ const EvalsJudgesTab = ({workflowId, workflowNodeName}: EvalsJudgesTabProps) => 
                     </div>
 
                     {judges.map((judge) => (
-                        <AgentJudgeCard
+                        <AiAgentJudgeCard
                             judge={judge}
                             key={judge.id}
                             onDelete={handleDeleteJudge}

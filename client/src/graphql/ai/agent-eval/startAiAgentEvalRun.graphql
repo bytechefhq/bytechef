@@ -1,0 +1,11 @@
+mutation startAiAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!, $scenarioIds: [ID!], $aiAgentJudgeIds: [ID!]) {
+    startAiAgentEvalRun(agentEvalTestId: $agentEvalTestId, name: $name, environmentId: $environmentId, scenarioIds: $scenarioIds, aiAgentJudgeIds: $aiAgentJudgeIds) {
+        id
+        name
+        status
+        totalScenarios
+        completedScenarios
+        agentVersion
+        createdDate
+    }
+}

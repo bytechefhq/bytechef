@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
-import AgentEvalTestCard from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/AgentEvalTestCard';
+import AiAgentEvalTestCard from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/AiAgentEvalTestCard';
 import CreateTestDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/CreateTestDialog';
-import useAgentEvalsTestsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useAgentEvalsTestsTab';
+import useAiAgentEvalsTestsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useAiAgentEvalsTestsTab';
 import {FlaskConicalIcon, Loader2Icon, PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -21,7 +21,7 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
         handleDeleteTest,
         handleUpdateScenario,
         isLoading,
-    } = useAgentEvalsTestsTab(workflowId, workflowNodeName);
+    } = useAiAgentEvalsTestsTab(workflowId, workflowNodeName);
 
     if (isLoading) {
         return (
@@ -45,7 +45,7 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
                     </div>
 
                     {evalTests.map((test) => (
-                        <AgentEvalTestCard
+                        <AiAgentEvalTestCard
                             key={test.id}
                             onCreateScenario={handleCreateScenario}
                             onDeleteScenario={handleDeleteScenario}

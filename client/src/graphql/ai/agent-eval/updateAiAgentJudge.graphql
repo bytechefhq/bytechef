@@ -1,0 +1,10 @@
+mutation updateAiAgentJudge($id: ID!, $name: String, $configuration: Map) {
+    updateAiAgentJudge(id: $id, name: $name, configuration: $configuration) {
+        id
+        name
+        type
+        configuration
+        createdDate
+        lastModifiedDate
+    }
+}

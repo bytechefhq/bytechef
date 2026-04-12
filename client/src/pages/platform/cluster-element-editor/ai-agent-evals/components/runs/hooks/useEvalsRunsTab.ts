@@ -1,14 +1,14 @@
-import useAgentEvalsRunsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/hooks/useAgentEvalsRunsTab';
+import useAiAgentEvalsRunsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/hooks/useAiAgentEvalsRunsTab';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
-import {useAgentEvalTestsQuery} from '@/shared/middleware/graphql';
+import {useAiAgentEvalTestsQuery} from '@/shared/middleware/graphql';
 import {useEffect, useMemo} from 'react';
 
 export default function useEvalsRunsTab(workflowId: string, workflowNodeName: string) {
     const {selectedTestId, setSelectedTestId} = useAiAgentEvalsStore();
 
-    const {data: evalTestsData} = useAgentEvalTestsQuery({workflowId, workflowNodeName});
+    const {data: evalTestsData} = useAiAgentEvalTestsQuery({workflowId, workflowNodeName});
 
-    const evalTests = useMemo(() => evalTestsData?.agentEvalTests ?? [], [evalTestsData]);
+    const evalTests = useMemo(() => evalTestsData?.aiAgentEvalTests ?? [], [evalTestsData]);
 
     useEffect(() => {
         if (selectedTestId == null && evalTests.length > 0) {
@@ -17,7 +17,7 @@ export default function useEvalsRunsTab(workflowId: string, workflowNodeName: st
     }, [evalTests, selectedTestId, setSelectedTestId]);
 
     const {handleCancelRun, handleSelectRun, runSummary, runs, runsLoading, selectedRun, selectedRunId} =
-        useAgentEvalsRunsTab(selectedTestId);
+        useAiAgentEvalsRunsTab(selectedTestId);
 
     return {
         handleCancelRun,
