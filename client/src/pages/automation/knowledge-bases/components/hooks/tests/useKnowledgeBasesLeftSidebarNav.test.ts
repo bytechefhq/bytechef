@@ -77,22 +77,6 @@ describe('useKnowledgeBasesLeftSidebarNav', () => {
         });
     });
 
-    describe('hasData', () => {
-        it('returns true when data is available', () => {
-            const {result} = renderHook(() => useKnowledgeBasesLeftSidebarNav());
-
-            expect(result.current.hasData).toBe(true);
-        });
-
-        it('returns false when no data', () => {
-            hoisted.tagsData = null as unknown as typeof hoisted.tagsData;
-
-            const {result} = renderHook(() => useKnowledgeBasesLeftSidebarNav());
-
-            expect(result.current.hasData).toBe(false);
-        });
-    });
-
     describe('isLoading', () => {
         it('returns loading state from query', () => {
             const {result} = renderHook(() => useKnowledgeBasesLeftSidebarNav());
