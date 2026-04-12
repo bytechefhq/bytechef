@@ -139,7 +139,7 @@ class AiAgentSkillServiceTest {
         existingAiAgentSkill.setId(1L);
         existingAiAgentSkill.setName("Original Name");
         existingAiAgentSkill.setDescription("Original Description");
-        existingAiAgentSkill.setSkillFileEntry(originalFileEntry);
+        existingAiAgentSkill.setSkillFile(originalFileEntry);
 
         when(aiAgentSkillRepository.findById(1L)).thenReturn(Optional.of(existingAiAgentSkill));
         when(aiAgentSkillRepository.save(any(AiAgentSkill.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -148,7 +148,7 @@ class AiAgentSkillServiceTest {
 
         assertEquals("Updated Name", result.getName());
         assertEquals("Updated Description", result.getDescription());
-        assertEquals(originalFileEntry, result.getSkillFileEntry());
+        assertEquals(originalFileEntry, result.getSkillFile());
 
         ArgumentCaptor<AiAgentSkill> captor = ArgumentCaptor.forClass(AiAgentSkill.class);
 
@@ -156,6 +156,6 @@ class AiAgentSkillServiceTest {
 
         AiAgentSkill savedAiAgentSkill = captor.getValue();
 
-        assertEquals(originalFileEntry, savedAiAgentSkill.getSkillFileEntry());
+        assertEquals(originalFileEntry, savedAiAgentSkill.getSkillFile());
     }
 }

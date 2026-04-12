@@ -123,7 +123,7 @@ class AiAgentSkillFacadeImpl implements AiAgentSkillFacade {
 
         aiAgentSkill.setName(skillName);
         aiAgentSkill.setDescription(skillDescription);
-        aiAgentSkill.setSkillFileEntry(fileEntry);
+        aiAgentSkill.setSkillFile(fileEntry);
 
         try {
             return aiAgentSkillService.createAiAgentSkill(aiAgentSkill);
@@ -158,7 +158,7 @@ class AiAgentSkillFacadeImpl implements AiAgentSkillFacade {
     public void deleteAiAgentSkill(long id) {
         AiAgentSkill aiAgentSkill = aiAgentSkillService.getAiAgentSkill(id);
 
-        FileEntry fileEntry = aiAgentSkill.getSkillFileEntry();
+        FileEntry fileEntry = aiAgentSkill.getSkillFile();
 
         logger.debug("Deleting agent skill id={}, name='{}', fileEntry={}", id, aiAgentSkill.getName(), fileEntry);
 
@@ -194,7 +194,7 @@ class AiAgentSkillFacadeImpl implements AiAgentSkillFacade {
     public AiAgentSkillDownload getAiAgentSkillWithDownload(long id) {
         AiAgentSkill aiAgentSkill = aiAgentSkillService.getAiAgentSkill(id);
 
-        byte[] bytes = aiAgentSkillFileStorage.readAiAgentSkillFileBytes(aiAgentSkill.getSkillFileEntry());
+        byte[] bytes = aiAgentSkillFileStorage.readAiAgentSkillFileBytes(aiAgentSkill.getSkillFile());
 
         return new AiAgentSkillDownload(aiAgentSkill, bytes);
     }
@@ -433,7 +433,7 @@ class AiAgentSkillFacadeImpl implements AiAgentSkillFacade {
     private byte[] getSkillZipBytes(long id) {
         AiAgentSkill aiAgentSkill = aiAgentSkillService.getAiAgentSkill(id);
 
-        return aiAgentSkillFileStorage.readAiAgentSkillFileBytes(aiAgentSkill.getSkillFileEntry());
+        return aiAgentSkillFileStorage.readAiAgentSkillFileBytes(aiAgentSkill.getSkillFile());
     }
 
     private String escapeYamlValue(String value) {
