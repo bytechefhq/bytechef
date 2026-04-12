@@ -1,0 +1,160 @@
+extend type Query {
+    aiAgentJudges(workflowId: String!, workflowNodeName: String!): [AiAgentJudge!]!
+    aiAgentEvalTests(workflowId: String!, workflowNodeName: String!): [AiAgentEvalTest!]!
+    aiAgentEvalTest(id: ID!): AiAgentEvalTest
+    aiAgentEvalRuns(agentEvalTestId: ID!, limit: Int, offset: Int): [AiAgentEvalRun!]!
+    aiAgentEvalRun(id: ID!): AiAgentEvalRun
+    aiAgentEvalResult(id: ID!): AiAgentEvalResult
+    aiAgentEvalResultTranscript(id: ID!): String
+}
+
+extend type Mutation {
+    createAiAgentJudge(workflowId: String!, workflowNodeName: String!, name: String!, type: AiAgentJudgeType!, configuration: Map!): AiAgentJudge!
+    updateAiAgentJudge(id: ID!, name: String, configuration: Map): AiAgentJudge!
+    deleteAiAgentJudge(id: ID!): Boolean!
+
+    createAiAgentEvalTest(workflowId: String!, workflowNodeName: String!, name: String!, description: String): AiAgentEvalTest!
+    updateAiAgentEvalTest(id: ID!, name: String, description: String): AiAgentEvalTest!
+    deleteAiAgentEvalTest(id: ID!): Boolean!
+
+    createAiAgentEvalScenario(agentEvalTestId: ID!, name: String!, type: AiAgentScenarioType!, userMessage: String, expectedOutput: String, personaPrompt: String, maxTurns: Int, numberOfRuns: Int): AiAgentEvalScenario!
+    updateAiAgentEvalScenario(id: ID!, name: String, userMessage: String, expectedOutput: String, personaPrompt: String, maxTurns: Int, numberOfRuns: Int): AiAgentEvalScenario!
+    deleteAiAgentEvalScenario(id: ID!): Boolean!
+
+    createAiAgentScenarioJudge(agentEvalScenarioId: ID!, name: String!, type: AiAgentJudgeType!, configuration: Map!): AiAgentScenarioJudge!
+    updateAiAgentScenarioJudge(id: ID!, name: String, configuration: Map): AiAgentScenarioJudge!
+    deleteAiAgentScenarioJudge(id: ID!): Boolean!
+
+    createAiAgentScenarioToolSimulation(agentEvalScenarioId: ID!, toolName: String!, responsePrompt: String!, simulationModel: String): AiAgentScenarioToolSimulation!
+    updateAiAgentScenarioToolSimulation(id: ID!, toolName: String, responsePrompt: String, simulationModel: String): AiAgentScenarioToolSimulation!
+    deleteAiAgentScenarioToolSimulation(id: ID!): Boolean!
+
+    startAiAgentEvalRun(agentEvalTestId: ID!, name: String!, environmentId: ID!, scenarioIds: [ID!], aiAgentJudgeIds: [ID!]): AiAgentEvalRun!
+    cancelAiAgentEvalRun(id: ID!): AiAgentEvalRun!
+}
+
+type AiAgentJudge {
+    id: ID!
+    name: String!
+    type: AiAgentJudgeType!
+    configuration: Map!
+    createdDate: Long
+    lastModifiedDate: Long
+}
+
+type AiAgentEvalTest {
+    id: ID!
+    name: String!
+    description: String
+    scenarios: [AiAgentEvalScenario!]!
+    createdDate: Long
+    lastModifiedDate: Long
+}
+
+type AiAgentEvalScenario {
+    id: ID!
+    name: String!
+    type: AiAgentScenarioType!
+    userMessage: String
+    expectedOutput: String
+    personaPrompt: String
+    maxTurns: Int
+    numberOfRuns: Int
+    judges: [AiAgentScenarioJudge!]!
+    toolSimulations: [AiAgentScenarioToolSimulation!]!
+    createdDate: Long
+    lastModifiedDate: Long
+}
+
+type AiAgentScenarioJudge {
+    id: ID!
+    name: String!
+    type: AiAgentJudgeType!
+    configuration: Map!
+    createdDate: Long
+    lastModifiedDate: Long
+}
+
+type AiAgentScenarioToolSimulation {
+    id: ID!
+    toolName: String!
+    responsePrompt: String!
+    simulationModel: String
+    createdDate: Long
+    lastModifiedDate: Long
+}
+
+type AiAgentEvalRun {
+    id: ID!
+    name: String!
+    status: AiAgentEvalRunStatus!
+    averageScore: Float
+    totalScenarios: Int!
+    completedScenarios: Int!
+    agentVersion: String
+    totalInputTokens: Int
+    totalOutputTokens: Int
+    startedDate: Long
+    completedDate: Long
+    results: [AiAgentEvalResult!]!
+    createdDate: Long
+}
+
+type AiAgentEvalResult {
+    id: ID!
+    scenario: AiAgentEvalScenario!
+    status: AiAgentEvalResultStatus!
+    score: Float
+    errorMessage: String
+    transcriptFile: String
+    inputTokens: Int
+    outputTokens: Int
+    runIndex: Int
+    verdicts: [AiAgentJudgeVerdict!]!
+    createdDate: Long
+}
+
+type AiAgentJudgeVerdict {
+    id: ID!
+    judgeName: String!
+    judgeType: AiAgentJudgeType!
+    judgeScope: AiAgentJudgeScope!
+    passed: Boolean!
+    score: Float!
+    explanation: String!
+}
+
+enum AiAgentJudgeType {
+    LLM_RULE
+    CONTAINS_TEXT
+    REGEX_MATCH
+    RESPONSE_LENGTH
+    JSON_SCHEMA
+    SIMILARITY
+    STRING_EQUALS
+    TOOL_USAGE
+}
+
+enum AiAgentJudgeScope {
+    AGENT
+    SCENARIO
+}
+
+enum AiAgentScenarioType {
+    SINGLE_TURN
+    MULTI_TURN
+}
+
+enum AiAgentEvalRunStatus {
+    PENDING
+    RUNNING
+    COMPLETED
+    FAILED
+}
+
+enum AiAgentEvalResultStatus {
+    PENDING
+    RUNNING
+    COMPLETED
+    FAILED
+}
