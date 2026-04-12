@@ -1,9 +1,9 @@
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
-import downloadAgentSkill from '@/pages/platform/cluster-element-editor/ai-agent-skills/utils/downloadAgentSkill';
+import downloadAiAgentSkill from '@/pages/platform/cluster-element-editor/ai-agent-skills/utils/downloadAiAgentSkill';
 import {
-    useAgentSkillFileContentQuery,
-    useAgentSkillFilePathsQuery,
-    useAgentSkillQuery,
+    useAiAgentSkillFileContentQuery,
+    useAiAgentSkillFilePathsQuery,
+    useAiAgentSkillQuery,
 } from '@/shared/middleware/graphql';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {toast} from 'sonner';
@@ -72,17 +72,17 @@ function getFileLanguage(filename: string): string {
 
 export type {FileTreeNodeI};
 
-export default function useAgentSkillDetail() {
+export default function useAiAgentSkillDetail() {
     const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
 
     const {closeSkillDetail, selectedSkillId} = useAiAgentSkillsStore();
 
-    const {data: skillData, isError: isSkillError} = useAgentSkillQuery(
+    const {data: skillData, isError: isSkillError} = useAiAgentSkillQuery(
         {id: selectedSkillId ?? ''},
         {enabled: !!selectedSkillId}
     );
 
-    const {data: filePathsData, isError: isFilePathsError} = useAgentSkillFilePathsQuery(
+    const {data: filePathsData, isError: isFilePathsError} = useAiAgentSkillFilePathsQuery(
         {id: selectedSkillId ?? ''},
         {enabled: !!selectedSkillId}
     );
@@ -91,14 +91,14 @@ export default function useAgentSkillDetail() {
         data: fileContentData,
         isError: isFileContentError,
         isLoading: isFileContentLoading,
-    } = useAgentSkillFileContentQuery(
+    } = useAiAgentSkillFileContentQuery(
         {id: selectedSkillId ?? '', path: selectedFilePath ?? ''},
         {enabled: !!selectedSkillId && !!selectedFilePath}
     );
 
-    const filePaths = useMemo(() => filePathsData?.agentSkillFilePaths ?? [], [filePathsData]);
-    const fileContent = useMemo(() => fileContentData?.agentSkillFileContent ?? '', [fileContentData]);
-    const skill = skillData?.agentSkill;
+    const filePaths = useMemo(() => filePathsData?.aiAgentSkillFilePaths ?? [], [filePathsData]);
+    const fileContent = useMemo(() => fileContentData?.aiAgentSkillFileContent ?? '', [fileContentData]);
+    const skill = skillData?.aiAgentSkill;
 
     const fileTree = useMemo(() => buildFileTree(filePaths), [filePaths]);
 
@@ -120,7 +120,7 @@ export default function useAgentSkillDetail() {
         }
 
         try {
-            await downloadAgentSkill(selectedSkillId, skill.name);
+            await downloadAiAgentSkill(selectedSkillId, skill.name);
         } catch (error) {
             toast.error('Failed to download skill', {
                 description: error instanceof Error ? error.message : 'An unexpected error occurred',

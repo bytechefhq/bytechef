@@ -1,5 +1,5 @@
-query agentSkills {
-    agentSkills {
+query aiAgentSkill($id: ID!) {
+    aiAgentSkill(id: $id) {
         id
         name
         description

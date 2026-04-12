@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import useAgentSkillDetail, {
+import useAiAgentSkillDetail, {
     type FileTreeNodeI,
-} from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkillDetail';
+} from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkillDetail';
 import {EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {DownloadIcon, FileIcon, FileTextIcon, FolderIcon} from 'lucide-react';
@@ -137,7 +137,7 @@ const AiAgentSkillDetail = () => {
         isMarkdown,
         selectedFilePath,
         skill,
-    } = useAgentSkillDetail();
+    } = useAiAgentSkillDetail();
 
     if (!skill) {
         return (

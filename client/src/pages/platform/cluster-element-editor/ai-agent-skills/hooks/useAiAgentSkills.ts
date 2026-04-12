@@ -1,20 +1,20 @@
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
-import {useAgentSkillsQuery} from '@/shared/middleware/graphql';
+import {useAiAgentSkillsQuery} from '@/shared/middleware/graphql';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {toast} from 'sonner';
 
-interface UseAgentSkillsOptionsI {
+interface UseAiAgentSkillsOptionsI {
     enabled?: boolean;
 }
 
-export default function useAgentSkills(options?: UseAgentSkillsOptionsI) {
+export default function useAiAgentSkills(options?: UseAiAgentSkillsOptionsI) {
     const enabled = options?.enabled ?? true;
 
     const {setSkillsPanelOpen, setSkillsView, skillsView} = useAiAgentSkillsStore();
 
-    const {data: agentSkillsData, isError, isLoading} = useAgentSkillsQuery(undefined, {enabled});
+    const {data: aiAgentSkillsData, isError, isLoading} = useAiAgentSkillsQuery(undefined, {enabled});
 
-    const skills = useMemo(() => agentSkillsData?.agentSkills ?? [], [agentSkillsData]);
+    const skills = useMemo(() => aiAgentSkillsData?.aiAgentSkills ?? [], [aiAgentSkillsData]);
 
     const previousSkillsLengthRef = useRef(skills.length);
 

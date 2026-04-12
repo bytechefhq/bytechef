@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import useAgentSkillUploadForm from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkillUploadForm';
+import useAiAgentSkillUploadForm from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkillUploadForm';
 import {FileIcon, UploadIcon, XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
@@ -16,7 +16,7 @@ const AiAgentSkillUploadForm = () => {
         handleUpload,
         isUploadPending,
         selectedFiles,
-    } = useAgentSkillUploadForm();
+    } = useAiAgentSkillUploadForm();
 
     return (
         <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col py-6">

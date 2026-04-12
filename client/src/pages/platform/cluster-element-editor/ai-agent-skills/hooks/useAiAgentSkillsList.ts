@@ -1,10 +1,10 @@
-import downloadAgentSkill from '@/pages/platform/cluster-element-editor/ai-agent-skills/utils/downloadAgentSkill';
-import {AgentSkill, useDeleteAgentSkillMutation, useUpdateAgentSkillMutation} from '@/shared/middleware/graphql';
+import downloadAiAgentSkill from '@/pages/platform/cluster-element-editor/ai-agent-skills/utils/downloadAiAgentSkill';
+import {AiAgentSkill, useDeleteAiAgentSkillMutation, useUpdateAiAgentSkillMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
-export default function useAgentSkillsList(skills: AgentSkill[]) {
+export default function useAiAgentSkillsList(skills: AiAgentSkill[]) {
     const [searchQuery, setSearchQuery] = useState('');
 
     const queryClient = useQueryClient();
@@ -14,38 +14,38 @@ export default function useAgentSkillsList(skills: AgentSkill[]) {
         [searchQuery, skills]
     );
 
-    const deleteAgentSkillMutation = useDeleteAgentSkillMutation({
+    const deleteAiAgentSkillMutation = useDeleteAiAgentSkillMutation({
         onError: (error: Error) => {
             toast.error('Failed to delete skill', {
                 description: error.message,
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['agentSkills']});
+            queryClient.invalidateQueries({queryKey: ['aiAgentSkills']});
         },
     });
 
-    const updateAgentSkillMutation = useUpdateAgentSkillMutation({
+    const updateAiAgentSkillMutation = useUpdateAiAgentSkillMutation({
         onError: (error: Error) => {
             toast.error('Failed to rename skill', {
                 description: error.message,
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['agentSkills']});
+            queryClient.invalidateQueries({queryKey: ['aiAgentSkills']});
         },
     });
 
     const deleteSkill = useCallback(
         async (id: string) => {
-            await deleteAgentSkillMutation.mutateAsync({id});
+            await deleteAiAgentSkillMutation.mutateAsync({id});
         },
-        [deleteAgentSkillMutation]
+        [deleteAiAgentSkillMutation]
     );
 
     const handleDownloadSkill = useCallback(async (id: string, skillName: string) => {
         try {
-            await downloadAgentSkill(id, skillName);
+            await downloadAiAgentSkill(id, skillName);
         } catch (error) {
             toast.error('Failed to download skill', {
                 description: error instanceof Error ? error.message : 'An unexpected error occurred',
@@ -55,9 +55,9 @@ export default function useAgentSkillsList(skills: AgentSkill[]) {
 
     const renameSkill = useCallback(
         (id: string, newName: string, description?: string | null) => {
-            updateAgentSkillMutation.mutate({description: description || undefined, id, name: newName});
+            updateAiAgentSkillMutation.mutate({description: description || undefined, id, name: newName});
         },
-        [updateAgentSkillMutation]
+        [updateAiAgentSkillMutation]
     );
 
     return {

@@ -1,3 +1,0 @@
-query agentSkillFilePaths($id: ID!) {
-    agentSkillFilePaths(id: $id)
-}

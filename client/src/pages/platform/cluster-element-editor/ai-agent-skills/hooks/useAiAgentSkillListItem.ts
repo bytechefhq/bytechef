@@ -1,5 +1,5 @@
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
-import {AgentSkill} from '@/shared/middleware/graphql';
+import {AiAgentSkill} from '@/shared/middleware/graphql';
 import {useCallback, useState} from 'react';
 
 const SKILL_COLORS = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500'];
@@ -14,14 +14,19 @@ function getSkillColor(skillId: string): string {
     return SKILL_COLORS[Math.abs(hash) % SKILL_COLORS.length];
 }
 
-interface UseAgentSkillListItemPropsI {
+interface UseAiAgentSkillListItemPropsI {
     deleteSkill: (id: string) => Promise<void>;
     onDownload: (id: string, name: string) => void;
     onRename: (id: string, newName: string, description?: string | null) => void;
-    skill: AgentSkill;
+    skill: AiAgentSkill;
 }
 
-export default function useAgentSkillListItem({deleteSkill, onDownload, onRename, skill}: UseAgentSkillListItemPropsI) {
+export default function useAiAgentSkillListItem({
+    deleteSkill,
+    onDownload,
+    onRename,
+    skill,
+}: UseAiAgentSkillListItemPropsI) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showRenameDialog, setShowRenameDialog] = useState(false);
 

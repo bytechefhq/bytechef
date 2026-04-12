@@ -1,0 +1,9 @@
+mutation createAiAgentSkill($name: String!, $description: String, $filename: String!, $fileBytes: String!) {
+    createAiAgentSkill(name: $name, description: $description, filename: $filename, fileBytes: $fileBytes) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}

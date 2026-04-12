@@ -2,7 +2,7 @@
  * Downloads an agent skill archive as a .skill file via REST endpoint.
  * Uses a native browser download instead of GraphQL to avoid Base64 encoding overhead.
  */
-export default async function downloadAgentSkill(id: string, skillName: string): Promise<void> {
+export default async function downloadAiAgentSkill(id: string, skillName: string): Promise<void> {
     let response: Response;
 
     try {

@@ -4,11 +4,11 @@ import AiAgentSkillUploadForm from '@/pages/platform/cluster-element-editor/ai-a
 import AiAgentSkillWriteForm from '@/pages/platform/cluster-element-editor/ai-agent-skills/components/AiAgentSkillWriteForm';
 import AiAgentSkillsEmptyState from '@/pages/platform/cluster-element-editor/ai-agent-skills/components/AiAgentSkillsEmptyState';
 import AiAgentSkillsList from '@/pages/platform/cluster-element-editor/ai-agent-skills/components/AiAgentSkillsList';
-import useAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkills';
+import useAiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkills';
 import {AlertTriangleIcon, Loader2Icon} from 'lucide-react';
 
 const AiAgentSkills = () => {
-    const {isError, isLoading, skills, skillsView: currentView} = useAgentSkills();
+    const {isError, isLoading, skills, skillsView: currentView} = useAiAgentSkills();
 
     if (isLoading) {
         return (

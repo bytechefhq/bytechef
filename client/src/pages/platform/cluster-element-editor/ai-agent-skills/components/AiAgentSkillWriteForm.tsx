@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import useAgentSkillWriteForm from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkillWriteForm';
+import useAiAgentSkillWriteForm from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkillWriteForm';
 
 const AiAgentSkillWriteForm = () => {
     const {
@@ -14,7 +14,7 @@ const AiAgentSkillWriteForm = () => {
         setDescription,
         setInstructions,
         setName,
-    } = useAgentSkillWriteForm();
+    } = useAiAgentSkillWriteForm();
 
     return (
         <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col py-6">
