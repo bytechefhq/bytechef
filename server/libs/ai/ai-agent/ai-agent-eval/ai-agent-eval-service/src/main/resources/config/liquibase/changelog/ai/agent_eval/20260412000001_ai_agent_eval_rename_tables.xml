@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260412000001" author="Ivica Cardic">
+        <renameTable oldTableName="agent_judge" newTableName="ai_agent_judge"/>
+        <renameTable oldTableName="agent_eval_test" newTableName="ai_agent_eval_test"/>
+        <renameTable oldTableName="agent_eval_scenario" newTableName="ai_agent_eval_scenario"/>
+        <renameTable oldTableName="agent_scenario_judge" newTableName="ai_agent_scenario_judge"/>
+        <renameTable oldTableName="agent_eval_run" newTableName="ai_agent_eval_run"/>
+        <renameTable oldTableName="agent_eval_result" newTableName="ai_agent_eval_result"/>
+        <renameTable oldTableName="agent_judge_verdict" newTableName="ai_agent_judge_verdict"/>
+        <renameTable oldTableName="agent_scenario_tool_simulation" newTableName="ai_agent_scenario_tool_simulation"/>
+    </changeSet>
+</databaseChangeLog>
