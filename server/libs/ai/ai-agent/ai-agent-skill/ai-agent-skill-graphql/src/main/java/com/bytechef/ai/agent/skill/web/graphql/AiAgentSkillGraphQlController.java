@@ -16,8 +16,8 @@
 
 package com.bytechef.ai.agent.skill.web.graphql;
 
-import com.bytechef.ai.agent.skill.domain.AgentSkill;
-import com.bytechef.ai.agent.skill.facade.AgentSkillFacade;
+import com.bytechef.ai.agent.skill.domain.AiAgentSkill;
+import com.bytechef.ai.agent.skill.facade.AiAgentSkillFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Base64;
 import java.util.List;
@@ -32,36 +32,36 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @SuppressFBWarnings("EI") // Spring GraphQL controllers intentionally return domain objects for serialization
-class AgentSkillGraphQlController {
+class AiAgentSkillGraphQlController {
 
-    private final AgentSkillFacade agentSkillFacade;
+    private final AiAgentSkillFacade aiAgentSkillFacade;
 
-    AgentSkillGraphQlController(AgentSkillFacade agentSkillFacade) {
-        this.agentSkillFacade = agentSkillFacade;
+    AiAgentSkillGraphQlController(AiAgentSkillFacade aiAgentSkillFacade) {
+        this.aiAgentSkillFacade = aiAgentSkillFacade;
     }
 
     @QueryMapping
-    List<AgentSkill> agentSkills() {
-        return agentSkillFacade.getAgentSkills();
+    List<AiAgentSkill> aiAgentSkills() {
+        return aiAgentSkillFacade.getAiAgentSkills();
     }
 
     @QueryMapping
-    AgentSkill agentSkill(@Argument long id) {
-        return agentSkillFacade.getAgentSkill(id);
+    AiAgentSkill aiAgentSkill(@Argument long id) {
+        return aiAgentSkillFacade.getAiAgentSkill(id);
     }
 
     @QueryMapping
-    List<String> agentSkillFilePaths(@Argument long id) {
-        return agentSkillFacade.getAgentSkillFilePaths(id);
+    List<String> aiAgentSkillFilePaths(@Argument long id) {
+        return aiAgentSkillFacade.getAiAgentSkillFilePaths(id);
     }
 
     @QueryMapping
-    String agentSkillFileContent(@Argument long id, @Argument String path) {
-        return agentSkillFacade.getAgentSkillFileContent(id, path);
+    String aiAgentSkillFileContent(@Argument long id, @Argument String path) {
+        return aiAgentSkillFacade.getAiAgentSkillFileContent(id, path);
     }
 
     @MutationMapping
-    AgentSkill createAgentSkill(
+    AiAgentSkill createAiAgentSkill(
         @Argument String name, @Argument @Nullable String description,
         @Argument String filename, @Argument String fileBytes) {
 
@@ -76,26 +76,26 @@ class AgentSkillGraphQlController {
                 illegalArgumentException);
         }
 
-        return agentSkillFacade.createAgentSkill(name, description, filename, bytes);
+        return aiAgentSkillFacade.createAiAgentSkill(name, description, filename, bytes);
     }
 
     @MutationMapping
-    AgentSkill createAgentSkillFromInstructions(
+    AiAgentSkill createAiAgentSkillFromInstructions(
         @Argument String name, @Argument @Nullable String description, @Argument String instructions) {
 
-        return agentSkillFacade.createAgentSkillFromInstructions(name, description, instructions);
+        return aiAgentSkillFacade.createAiAgentSkillFromInstructions(name, description, instructions);
     }
 
     @MutationMapping
-    AgentSkill updateAgentSkill(
+    AiAgentSkill updateAiAgentSkill(
         @Argument long id, @Argument String name, @Argument @Nullable String description) {
 
-        return agentSkillFacade.updateAgentSkill(id, name, description);
+        return aiAgentSkillFacade.updateAiAgentSkill(id, name, description);
     }
 
     @MutationMapping
-    boolean deleteAgentSkill(@Argument long id) {
-        agentSkillFacade.deleteAgentSkill(id);
+    boolean deleteAiAgentSkill(@Argument long id) {
+        aiAgentSkillFacade.deleteAiAgentSkill(id);
 
         return true;
     }

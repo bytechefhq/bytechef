@@ -16,7 +16,7 @@
 
 package com.bytechef.ai.agent.skill.repository;
 
-import com.bytechef.ai.agent.skill.domain.AgentSkill;
+import com.bytechef.ai.agent.skill.domain.AiAgentSkill;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface AgentSkillRepository extends ListCrudRepository<AgentSkill, Long> {
+public interface AiAgentSkillRepository extends ListCrudRepository<AiAgentSkill, Long> {
 
     boolean existsByName(String name);
 }

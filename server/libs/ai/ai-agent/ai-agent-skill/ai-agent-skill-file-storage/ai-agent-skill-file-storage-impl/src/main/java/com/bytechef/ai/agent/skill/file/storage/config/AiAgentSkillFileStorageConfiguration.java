@@ -16,8 +16,8 @@
 
 package com.bytechef.ai.agent.skill.file.storage.config;
 
-import com.bytechef.ai.agent.skill.file.storage.AgentSkillFileStorage;
-import com.bytechef.ai.agent.skill.file.storage.AgentSkillFileStorageImpl;
+import com.bytechef.ai.agent.skill.file.storage.AiAgentSkillFileStorage;
+import com.bytechef.ai.agent.skill.file.storage.AiAgentSkillFileStorageImpl;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
@@ -28,15 +28,15 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-class AgentSkillFileStorageConfiguration {
+class AiAgentSkillFileStorageConfiguration {
 
     @Bean
-    AgentSkillFileStorage agentSkillFileStorage(
+    AiAgentSkillFileStorage aiAgentSkillFileStorage(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
         Provider provider = applicationProperties.getFileStorage()
             .getProvider();
 
-        return new AgentSkillFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
+        return new AiAgentSkillFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
 }

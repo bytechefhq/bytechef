@@ -16,7 +16,7 @@
 
 package com.bytechef.ai.agent.skill.facade;
 
-import com.bytechef.ai.agent.skill.domain.AgentSkill;
+import com.bytechef.ai.agent.skill.domain.AiAgentSkill;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
@@ -24,24 +24,24 @@ import org.jspecify.annotations.Nullable;
 /**
  * @author Ivica Cardic
  */
-public interface AgentSkillFacade {
+public interface AiAgentSkillFacade {
 
-    AgentSkill createAgentSkill(String name, @Nullable String description, String filename, byte[] bytes);
+    AiAgentSkill createAiAgentSkill(String name, @Nullable String description, String filename, byte[] bytes);
 
-    AgentSkill createAgentSkillFromInstructions(
+    AiAgentSkill createAiAgentSkillFromInstructions(
         String name, @Nullable String description, String instructions);
 
-    void deleteAgentSkill(long id);
+    void deleteAiAgentSkill(long id);
 
-    AgentSkill getAgentSkill(long id);
+    AiAgentSkill getAiAgentSkill(long id);
 
     /** Returns the raw bytes of the skill zip archive. */
-    byte[] getAgentSkillDownload(long id);
+    byte[] getAiAgentSkillDownload(long id);
 
     /**
      * Returns the skill metadata and raw zip bytes together, avoiding separate lookups.
      */
-    AgentSkillDownload getAgentSkillWithDownload(long id);
+    AiAgentSkillDownload getAiAgentSkillWithDownload(long id);
 
     /**
      * Reads a single file from within the skill zip archive. Path must not contain traversal sequences (..) or be
@@ -50,19 +50,19 @@ public interface AgentSkillFacade {
      * @throws IllegalArgumentException     if path contains traversal sequences, is absolute, or file is not found
      * @throws java.io.UncheckedIOException if the skill archive is corrupt or unreadable
      */
-    String getAgentSkillFileContent(long id, String path);
+    String getAiAgentSkillFileContent(long id, String path);
 
     /**
      * Returns all non-directory entry paths within the skill zip archive, excluding entries with path traversal
      * sequences or absolute paths.
      */
-    List<String> getAgentSkillFilePaths(long id);
+    List<String> getAiAgentSkillFilePaths(long id);
 
     @SuppressFBWarnings("EI")
-    record AgentSkillDownload(AgentSkill agentSkill, byte[] bytes) {
+    record AiAgentSkillDownload(AiAgentSkill aiAgentSkill, byte[] bytes) {
     }
 
-    List<AgentSkill> getAgentSkills();
+    List<AiAgentSkill> getAiAgentSkills();
 
-    AgentSkill updateAgentSkill(long id, String name, @Nullable String description);
+    AiAgentSkill updateAiAgentSkill(long id, String name, @Nullable String description);
 }
