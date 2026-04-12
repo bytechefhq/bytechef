@@ -1,3 +1,0 @@
-mutation deleteAgentScenarioToolSimulation($id: ID!) {
-    deleteAgentScenarioToolSimulation(id: $id)
-}

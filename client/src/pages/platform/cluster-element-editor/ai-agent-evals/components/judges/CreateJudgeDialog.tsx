@@ -15,25 +15,25 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useCreateJudgeDialog, {
     type JudgeEditDataI,
 } from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/hooks/useCreateJudgeDialog';
-import {AgentJudgeType} from '@/shared/middleware/graphql';
+import {AiAgentJudgeType} from '@/shared/middleware/graphql';
 import {InfoIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
-const JUDGE_TYPE_OPTIONS: Array<{label: string; value: AgentJudgeType}> = [
-    {label: 'LLM Rule', value: AgentJudgeType.LlmRule},
-    {label: 'Contains Text', value: AgentJudgeType.ContainsText},
-    {label: 'Regex Match', value: AgentJudgeType.RegexMatch},
-    {label: 'Response Length', value: AgentJudgeType.ResponseLength},
-    {label: 'JSON Schema', value: AgentJudgeType.JsonSchema},
-    {label: 'Similarity', value: AgentJudgeType.Similarity},
-    {label: 'String Equals', value: AgentJudgeType.StringEquals},
-    {label: 'Tool Usage', value: AgentJudgeType.ToolUsage},
+const JUDGE_TYPE_OPTIONS: Array<{label: string; value: AiAgentJudgeType}> = [
+    {label: 'LLM Rule', value: AiAgentJudgeType.LlmRule},
+    {label: 'Contains Text', value: AiAgentJudgeType.ContainsText},
+    {label: 'Regex Match', value: AiAgentJudgeType.RegexMatch},
+    {label: 'Response Length', value: AiAgentJudgeType.ResponseLength},
+    {label: 'JSON Schema', value: AiAgentJudgeType.JsonSchema},
+    {label: 'Similarity', value: AiAgentJudgeType.Similarity},
+    {label: 'String Equals', value: AiAgentJudgeType.StringEquals},
+    {label: 'Tool Usage', value: AiAgentJudgeType.ToolUsage},
 ];
 
 interface CreateJudgeDialogProps {
     editData?: JudgeEditDataI;
     onClose: () => void;
-    onCreate: (name: string, type: AgentJudgeType, configuration: Record<string, unknown>) => void;
+    onCreate: (name: string, type: AiAgentJudgeType, configuration: Record<string, unknown>) => void;
     onUpdate?: (id: string, name?: string, configuration?: Record<string, unknown>) => void;
 }
 
@@ -307,7 +307,7 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                         </>
                     )}
 
-                    {judgeType === AgentJudgeType.ContainsText && (
+                    {judgeType === AiAgentJudgeType.ContainsText && (
                         <>
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1">
@@ -381,7 +381,7 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                         </>
                     )}
 
-                    {judgeType === AgentJudgeType.RegexMatch && (
+                    {judgeType === AiAgentJudgeType.RegexMatch && (
                         <>
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1">
@@ -456,7 +456,7 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                         </>
                     )}
 
-                    {judgeType === AgentJudgeType.ResponseLength && (
+                    {judgeType === AiAgentJudgeType.ResponseLength && (
                         <div className="flex gap-4">
                             <div className="flex flex-1 flex-col gap-2">
                                 <div className="flex items-center gap-1">
@@ -513,7 +513,7 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                         </div>
                     )}
 
-                    {judgeType === AgentJudgeType.JsonSchema && (
+                    {judgeType === AiAgentJudgeType.JsonSchema && (
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-1">
                                 <Label htmlFor="judge-schema">JSON Schema</Label>
@@ -546,7 +546,7 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                         </div>
                     )}
 
-                    {judgeType === AgentJudgeType.Similarity && (
+                    {judgeType === AiAgentJudgeType.Similarity && (
                         <>
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1">
@@ -650,7 +650,7 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                         </>
                     )}
 
-                    {judgeType === AgentJudgeType.StringEquals && (
+                    {judgeType === AiAgentJudgeType.StringEquals && (
                         <>
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1">
@@ -721,7 +721,7 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                         </>
                     )}
 
-                    {judgeType === AgentJudgeType.ToolUsage && (
+                    {judgeType === AiAgentJudgeType.ToolUsage && (
                         <>
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1">

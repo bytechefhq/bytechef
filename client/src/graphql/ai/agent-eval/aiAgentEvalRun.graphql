@@ -1,0 +1,55 @@
+query aiAgentEvalRun($id: ID!) {
+    aiAgentEvalRun(id: $id) {
+        id
+        name
+        status
+        averageScore
+        totalScenarios
+        completedScenarios
+        agentVersion
+        totalInputTokens
+        totalOutputTokens
+        startedDate
+        completedDate
+        results {
+            id
+            scenario {
+                id
+                name
+                type
+                userMessage
+                expectedOutput
+                personaPrompt
+                maxTurns
+                judges {
+                    id
+                    name
+                    type
+                    configuration
+                    createdDate
+                    lastModifiedDate
+                }
+                createdDate
+                lastModifiedDate
+            }
+            status
+            score
+            errorMessage
+            transcriptFile
+            inputTokens
+            outputTokens
+            runIndex
+            verdicts {
+                id
+                judgeName
+                judgeType
+                judgeScope
+                passed
+                score
+                explanation
+            }
+            createdDate
+        }
+        createdDate
+    }
+}

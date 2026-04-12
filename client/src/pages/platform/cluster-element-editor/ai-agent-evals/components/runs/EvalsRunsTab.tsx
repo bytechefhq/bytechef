@@ -1,5 +1,5 @@
-import AgentEvalRunDetail from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AgentEvalRunDetail';
-import AgentEvalRunList from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AgentEvalRunList';
+import AiAgentEvalRunDetail from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AiAgentEvalRunDetail';
+import AiAgentEvalRunList from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AiAgentEvalRunList';
 import useEvalsRunsTab from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/hooks/useEvalsRunsTab';
 import {Loader2Icon, PlayCircleIcon} from 'lucide-react';
 
@@ -21,7 +21,7 @@ const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
     } = useEvalsRunsTab(workflowId, workflowNodeName);
 
     if (selectedRunId && selectedRun) {
-        return <AgentEvalRunDetail onBack={() => handleSelectRun(null)} run={selectedRun} summary={runSummary} />;
+        return <AiAgentEvalRunDetail onBack={() => handleSelectRun(null)} run={selectedRun} summary={runSummary} />;
     }
 
     if (selectedTestId == null) {
@@ -54,7 +54,7 @@ const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
                 {runs.length} {runs.length === 1 ? 'run' : 'runs'}
             </div>
 
-            <AgentEvalRunList onCancelRun={handleCancelRun} onSelectRun={handleSelectRun} runs={runs} />
+            <AiAgentEvalRunList onCancelRun={handleCancelRun} onSelectRun={handleSelectRun} runs={runs} />
         </div>
     );
 };

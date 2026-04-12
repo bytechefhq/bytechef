@@ -1,3 +1,0 @@
-mutation deleteAgentJudge($id: ID!) {
-    deleteAgentJudge(id: $id)
-}

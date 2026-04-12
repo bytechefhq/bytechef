@@ -1,6 +1,0 @@
-mutation cancelAgentEvalRun($id: ID!) {
-    cancelAgentEvalRun(id: $id) {
-        id
-        status
-    }
-}

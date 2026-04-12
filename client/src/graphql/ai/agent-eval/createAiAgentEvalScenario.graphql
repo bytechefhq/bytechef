@@ -1,0 +1,22 @@
+mutation createAiAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: AiAgentScenarioType!, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
+    createAiAgentEvalScenario(agentEvalTestId: $agentEvalTestId, name: $name, type: $type, userMessage: $userMessage, expectedOutput: $expectedOutput, personaPrompt: $personaPrompt, maxTurns: $maxTurns, numberOfRuns: $numberOfRuns) {
+        id
+        name
+        type
+        userMessage
+        expectedOutput
+        personaPrompt
+        maxTurns
+        numberOfRuns
+        judges {
+            id
+            name
+            type
+            configuration
+            createdDate
+            lastModifiedDate
+        }
+        createdDate
+        lastModifiedDate
+    }
+}

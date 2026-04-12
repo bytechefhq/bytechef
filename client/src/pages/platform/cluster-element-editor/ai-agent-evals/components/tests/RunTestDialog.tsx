@@ -8,31 +8,31 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import useRunTestDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useRunTestDialog';
-import {type AgentEvalTestsQuery, AgentJudgeType, AgentScenarioType} from '@/shared/middleware/graphql';
+import {type AiAgentEvalTestsQuery, AiAgentJudgeType, AiAgentScenarioType} from '@/shared/middleware/graphql';
 import {Loader2Icon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
-type AgentEvalTestListItemType = AgentEvalTestsQuery['agentEvalTests'][number];
+type AiAgentEvalTestListItemType = AiAgentEvalTestsQuery['aiAgentEvalTests'][number];
 
-const SCENARIO_TYPE_COLORS: Record<AgentScenarioType, string> = {
-    [AgentScenarioType.MultiTurn]: 'border-purple-200 bg-purple-50 text-purple-700',
-    [AgentScenarioType.SingleTurn]: 'border-blue-200 bg-blue-50 text-blue-700',
+const SCENARIO_TYPE_COLORS: Record<AiAgentScenarioType, string> = {
+    [AiAgentScenarioType.MultiTurn]: 'border-purple-200 bg-purple-50 text-purple-700',
+    [AiAgentScenarioType.SingleTurn]: 'border-blue-200 bg-blue-50 text-blue-700',
 };
 
-const JUDGE_TYPE_COLORS: Record<AgentJudgeType, string> = {
-    [AgentJudgeType.ContainsText]: 'border-amber-200 bg-amber-50 text-amber-700',
-    [AgentJudgeType.JsonSchema]: 'border-indigo-200 bg-indigo-50 text-indigo-700',
-    [AgentJudgeType.LlmRule]: 'border-blue-200 bg-blue-50 text-blue-700',
-    [AgentJudgeType.RegexMatch]: 'border-purple-200 bg-purple-50 text-purple-700',
-    [AgentJudgeType.ResponseLength]: 'border-green-200 bg-green-50 text-green-700',
-    [AgentJudgeType.Similarity]: 'border-teal-200 bg-teal-50 text-teal-700',
-    [AgentJudgeType.StringEquals]: 'border-cyan-200 bg-cyan-50 text-cyan-700',
-    [AgentJudgeType.ToolUsage]: 'border-orange-200 bg-orange-50 text-orange-700',
+const JUDGE_TYPE_COLORS: Record<AiAgentJudgeType, string> = {
+    [AiAgentJudgeType.ContainsText]: 'border-amber-200 bg-amber-50 text-amber-700',
+    [AiAgentJudgeType.JsonSchema]: 'border-indigo-200 bg-indigo-50 text-indigo-700',
+    [AiAgentJudgeType.LlmRule]: 'border-blue-200 bg-blue-50 text-blue-700',
+    [AiAgentJudgeType.RegexMatch]: 'border-purple-200 bg-purple-50 text-purple-700',
+    [AiAgentJudgeType.ResponseLength]: 'border-green-200 bg-green-50 text-green-700',
+    [AiAgentJudgeType.Similarity]: 'border-teal-200 bg-teal-50 text-teal-700',
+    [AiAgentJudgeType.StringEquals]: 'border-cyan-200 bg-cyan-50 text-cyan-700',
+    [AiAgentJudgeType.ToolUsage]: 'border-orange-200 bg-orange-50 text-orange-700',
 };
 
 interface RunTestDialogProps {
     onClose: () => void;
-    test: AgentEvalTestListItemType;
+    test: AiAgentEvalTestListItemType;
     workflowId: string;
     workflowNodeName: string;
 }
@@ -80,7 +80,7 @@ const RunTestDialog = ({onClose, test, workflowId, workflowNodeName}: RunTestDia
                                                 SCENARIO_TYPE_COLORS[scenario.type]
                                             )}
                                         >
-                                            {scenario.type === AgentScenarioType.SingleTurn
+                                            {scenario.type === AiAgentScenarioType.SingleTurn
                                                 ? 'Single-turn'
                                                 : 'Multi-turn'}
                                         </span>

@@ -1,16 +1,16 @@
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import {
-    type AgentEvalTestsQuery,
-    useAgentEvalTestQuery,
-    useAgentJudgesQuery,
-    useStartAgentEvalRunMutation,
+    type AiAgentEvalTestsQuery,
+    useAiAgentEvalTestQuery,
+    useAiAgentJudgesQuery,
+    useStartAiAgentEvalRunMutation,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {toast} from 'sonner';
 
-type AgentEvalTestListItemType = AgentEvalTestsQuery['agentEvalTests'][number];
+type AiAgentEvalTestListItemType = AiAgentEvalTestsQuery['aiAgentEvalTests'][number];
 
 function generateRunName(): string {
     const now = new Date();
@@ -22,7 +22,7 @@ function generateRunName(): string {
 
 interface UseRunTestDialogProps {
     onClose: () => void;
-    test: AgentEvalTestListItemType;
+    test: AiAgentEvalTestListItemType;
     workflowId: string;
     workflowNodeName: string;
 }
@@ -36,14 +36,14 @@ export default function useRunTestDialog({onClose, test, workflowId, workflowNod
 
     const queryClient = useQueryClient();
 
-    const {data: testDetailData} = useAgentEvalTestQuery({id: test.id});
-    const {data: judgesData} = useAgentJudgesQuery({workflowId, workflowNodeName});
+    const {data: testDetailData} = useAiAgentEvalTestQuery({id: test.id});
+    const {data: judgesData} = useAiAgentJudgesQuery({workflowId, workflowNodeName});
 
     const scenariosInitializedRef = useRef(false);
     const judgesInitializedRef = useRef(false);
 
-    const scenarios = useMemo(() => testDetailData?.agentEvalTest?.scenarios ?? [], [testDetailData]);
-    const judges = useMemo(() => judgesData?.agentJudges ?? [], [judgesData]);
+    const scenarios = useMemo(() => testDetailData?.aiAgentEvalTest?.scenarios ?? [], [testDetailData]);
+    const judges = useMemo(() => judgesData?.aiAgentJudges ?? [], [judgesData]);
 
     useEffect(() => {
         if (scenarios.length > 0 && !scenariosInitializedRef.current) {
@@ -61,18 +61,18 @@ export default function useRunTestDialog({onClose, test, workflowId, workflowNod
         }
     }, [judges]);
 
-    const startRunMutation = useStartAgentEvalRunMutation({
+    const startRunMutation = useStartAiAgentEvalRunMutation({
         onError: (error: Error) => {
             toast.error('Failed to start eval run: ' + error.message);
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({queryKey: ['agentEvalRuns']});
+            queryClient.invalidateQueries({queryKey: ['aiAgentEvalRuns']});
 
             setSelectedTestId(test.id);
             setEvalsTab('runs');
 
-            if (data.startAgentEvalRun?.id) {
-                setSelectedRunId(data.startAgentEvalRun.id);
+            if (data.startAiAgentEvalRun?.id) {
+                setSelectedRunId(data.startAiAgentEvalRun.id);
             } else {
                 toast.warning('Run started but the run ID was not returned. Check the Runs tab for status.');
             }
@@ -112,7 +112,7 @@ export default function useRunTestDialog({onClose, test, workflowId, workflowNod
     const handleRunTest = () => {
         startRunMutation.mutate({
             agentEvalTestId: test.id,
-            agentJudgeIds: Array.from(selectedJudgeIds),
+            aiAgentJudgeIds: Array.from(selectedJudgeIds),
             environmentId: String(currentEnvironmentId),
             name: generateRunName(),
             scenarioIds: Array.from(selectedScenarioIds),

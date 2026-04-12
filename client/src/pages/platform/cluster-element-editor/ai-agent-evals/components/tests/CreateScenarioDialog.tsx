@@ -11,7 +11,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {AgentScenarioType} from '@/shared/middleware/graphql';
+import {AiAgentScenarioType} from '@/shared/middleware/graphql';
 import {InfoIcon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -25,14 +25,14 @@ interface CreateScenarioDialogProps {
         name: string;
         numberOfRuns?: number | null;
         personaPrompt?: string | null;
-        type: AgentScenarioType;
+        type: AiAgentScenarioType;
         userMessage?: string | null;
     };
     onClose: () => void;
     onCreate: (
         agentEvalTestId: string,
         name: string,
-        type: AgentScenarioType,
+        type: AiAgentScenarioType,
         fields: {
             expectedOutput?: string;
             maxTurns?: number;
@@ -59,7 +59,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
     const [name, setName] = useState(editData?.name ?? '');
     const [numberOfRuns, setNumberOfRuns] = useState(editData?.numberOfRuns ?? 1);
     const [personaPrompt, setPersonaPrompt] = useState(editData?.personaPrompt ?? '');
-    const [scenarioType, setScenarioType] = useState<AgentScenarioType>(editData?.type ?? AgentScenarioType.SingleTurn);
+    const [scenarioType, setScenarioType] = useState<AiAgentScenarioType>(
+        editData?.type ?? AiAgentScenarioType.SingleTurn
+    );
     const [userMessage, setUserMessage] = useState(editData?.userMessage ?? '');
 
     const isEditing = !!editData;
@@ -70,7 +72,7 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
         }
 
         const fields =
-            scenarioType === AgentScenarioType.SingleTurn
+            scenarioType === AiAgentScenarioType.SingleTurn
                 ? {
                       expectedOutput: expectedOutput.trim() || undefined,
                       numberOfRuns: numberOfRuns > 1 ? numberOfRuns : undefined,
@@ -147,11 +149,11 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                             <button
                                 className={twMerge(
                                     'rounded-md border px-3 py-1.5 text-sm',
-                                    scenarioType === AgentScenarioType.SingleTurn
+                                    scenarioType === AiAgentScenarioType.SingleTurn
                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                                         : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                                 )}
-                                onClick={() => setScenarioType(AgentScenarioType.SingleTurn)}
+                                onClick={() => setScenarioType(AiAgentScenarioType.SingleTurn)}
                                 type="button"
                             >
                                 Single-turn
@@ -160,11 +162,11 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                             <button
                                 className={twMerge(
                                     'rounded-md border px-3 py-1.5 text-sm',
-                                    scenarioType === AgentScenarioType.MultiTurn
+                                    scenarioType === AiAgentScenarioType.MultiTurn
                                         ? 'border-purple-500 bg-purple-50 text-purple-700'
                                         : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                                 )}
-                                onClick={() => setScenarioType(AgentScenarioType.MultiTurn)}
+                                onClick={() => setScenarioType(AiAgentScenarioType.MultiTurn)}
                                 type="button"
                             >
                                 Multi-turn
@@ -172,7 +174,7 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                         </div>
                     </div>
 
-                    {scenarioType === AgentScenarioType.SingleTurn ? (
+                    {scenarioType === AiAgentScenarioType.SingleTurn ? (
                         <>
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-1">

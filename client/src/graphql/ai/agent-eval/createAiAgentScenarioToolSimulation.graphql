@@ -1,0 +1,8 @@
+mutation createAiAgentScenarioToolSimulation($agentEvalScenarioId: ID!, $toolName: String!, $responsePrompt: String!, $simulationModel: String) {
+    createAiAgentScenarioToolSimulation(agentEvalScenarioId: $agentEvalScenarioId, toolName: $toolName, responsePrompt: $responsePrompt, simulationModel: $simulationModel) {
+        id
+        toolName
+        responsePrompt
+        simulationModel
+    }
+}
