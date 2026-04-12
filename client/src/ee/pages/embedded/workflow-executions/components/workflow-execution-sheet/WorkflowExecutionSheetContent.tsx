@@ -12,8 +12,12 @@ import {TabValueType} from '@/shared/types';
 import {useCallback, useState} from 'react';
 
 const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
-    const hasNoExecutions = !triggerExecution && (!job.taskExecutions || job.taskExecutions.length === 0);
-    const jobFailedWithNoExecutions = hasNoExecutions && job.status === JobStatusEnum.Failed;
+    const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
+    const jobFailedWithNoExecutions = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
+    const jobFailureError = job.error ?? {
+        message: 'Workflow execution failed before any executions were created.',
+        stackTrace: [],
+    };
 
     const [activeTab, setActiveTab] = useState<TabValueType>(jobFailedWithNoExecutions ? 'error' : 'input');
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -36,7 +40,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
 
             {jobFailedWithNoExecutions ? (
                 <div className="flex-1 p-4">
-                    <WorkflowExecutionContent error={job.error} />
+                    <WorkflowExecutionContent error={jobFailureError} />
                 </div>
             ) : (
                 <ResizablePanelGroup className="px-2" orientation="horizontal">
