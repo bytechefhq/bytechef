@@ -24,34 +24,35 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.GlobTool;
+import org.springaicommunity.agent.tools.GrepTool;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides fast file pattern matching for finding files by name patterns with glob syntax.
+ * Provides a pure Java grep implementation for code search with regex, glob filtering, and multiple output modes.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsGlobTool {
+public class AiAgentUtilsGrepTool {
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("globTool")
-            .title("Glob Tool")
-            .description("Fast file pattern matching tool for finding files by name patterns with glob syntax.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("grepTool")
+            .title("Grep Tool")
+            .description("Pure Java grep implementation for code search with regex, glob filtering, "
+                + "and multiple output modes.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsGlobTool::apply);
+            .object(() -> AiAgentUtilsGrepTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        GlobTool globTool = GlobTool.builder()
+        GrepTool grepTool = GrepTool.builder()
             .workingDirectory(workingDirectory)
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(globTool));
+        return ToolCallbackProvider.from(ToolCallbacks.from(grepTool));
     }
 }

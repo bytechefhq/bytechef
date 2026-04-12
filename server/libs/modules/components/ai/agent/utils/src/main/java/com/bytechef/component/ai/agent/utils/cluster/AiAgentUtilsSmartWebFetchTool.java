@@ -23,34 +23,43 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.TodoWriteTool;
+import org.springaicommunity.agent.tools.SmartWebFetchTool;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides structured task management with state tracking for the AI agent.
+ * Provides AI-powered web content fetching and summarization with caching.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsTodoWriteTool {
+public class AiAgentUtilsSmartWebFetchTool {
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("todoWriteTool")
-            .title("Todo Write Tool")
-            .description("Structured task management with state tracking.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("smartWebFetchTool")
+            .title("Smart Web Fetch Tool")
+            .description("AI-powered web content summarization with caching.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsTodoWriteTool::apply);
+            .object(() -> AiAgentUtilsSmartWebFetchTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        TodoWriteTool todoWriteTool = TodoWriteTool.builder()
+        if (chatModel == null) {
+            return ToolCallbackProvider.from(List.of());
+        }
+
+        ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(todoWriteTool));
+        SmartWebFetchTool smartWebFetchTool = SmartWebFetchTool.builder(chatClient)
+            .build();
+
+        return ToolCallbackProvider.from(ToolCallbacks.from(smartWebFetchTool));
     }
 }

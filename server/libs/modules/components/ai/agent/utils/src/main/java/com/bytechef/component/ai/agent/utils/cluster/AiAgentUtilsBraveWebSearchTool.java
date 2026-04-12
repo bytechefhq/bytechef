@@ -23,34 +23,43 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.FileSystemTools;
+import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides file system tools (Read, Write, Edit) for the AI agent.
+ * Provides web search with domain filtering using the Brave Search API.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsFileSystemTools {
+public class AiAgentUtilsBraveWebSearchTool {
+
+    public static final String BRAVE_API_KEY = "braveApiKey";
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("fileSystemTools")
-            .title("File System Tools")
-            .description("Read, write, and edit files with precise control.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("braveWebSearchTool")
+            .title("Brave Web Search Tool")
+            .description("Web search with domain filtering using the Brave Search API.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsFileSystemTools::apply);
+            .object(() -> AiAgentUtilsBraveWebSearchTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        FileSystemTools fileSystemTools = FileSystemTools.builder()
+        String apiKey = connectionParameters.getString(BRAVE_API_KEY);
+
+        if (apiKey == null || apiKey.isBlank()) {
+            return ToolCallbackProvider.from(List.of());
+        }
+
+        BraveWebSearchTool braveWebSearchTool = BraveWebSearchTool.builder(apiKey)
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(fileSystemTools));
+        return ToolCallbackProvider.from(ToolCallbacks.from(braveWebSearchTool));
     }
 }

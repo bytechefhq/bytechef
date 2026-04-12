@@ -23,43 +23,34 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
 import java.nio.file.Path;
-import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springaicommunity.agent.tools.SmartWebFetchTool;
-import org.springframework.ai.chat.client.ChatClient;
+import org.springaicommunity.agent.tools.FileSystemTools;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides AI-powered web content fetching and summarization with caching.
+ * Provides file system tools (Read, Write, Edit) for the AI agent.
  *
  * @author Ivica Cardic
  */
-public class AgentUtilsSmartWebFetchTool {
+public class AiAgentUtilsFileSystemTools {
 
     public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("smartWebFetchTool")
-            .title("Smart Web Fetch Tool")
-            .description("AI-powered web content summarization with caching.")
+        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("fileSystemTools")
+            .title("File System Tools")
+            .description("Read, write, and edit files with precise control.")
             .type(CLAUDE_CODE_TOOLS)
-            .object(() -> AgentUtilsSmartWebFetchTool::apply);
+            .object(() -> AiAgentUtilsFileSystemTools::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
         @Nullable ChatModel chatModel) {
 
-        if (chatModel == null) {
-            return ToolCallbackProvider.from(List.of());
-        }
-
-        ChatClient chatClient = ChatClient.builder(chatModel)
+        FileSystemTools fileSystemTools = FileSystemTools.builder()
             .build();
 
-        SmartWebFetchTool smartWebFetchTool = SmartWebFetchTool.builder(chatClient)
-            .build();
-
-        return ToolCallbackProvider.from(ToolCallbacks.from(smartWebFetchTool));
+        return ToolCallbackProvider.from(ToolCallbacks.from(fileSystemTools));
     }
 }
