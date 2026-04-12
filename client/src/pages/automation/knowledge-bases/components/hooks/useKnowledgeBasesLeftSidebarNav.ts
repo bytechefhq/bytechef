@@ -9,10 +9,8 @@ export default function useKnowledgeBasesLeftSidebarNav() {
     const {data, isLoading} = useKnowledgeBaseTagsQuery();
 
     const tags = data?.knowledgeBaseTags ?? [];
-    const hasData = !!data?.knowledgeBaseTags;
 
     return {
-        hasData,
         isLoading,
         tagId,
         tags,

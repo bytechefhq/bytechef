@@ -174,7 +174,7 @@ describe('KnowledgeBases', () => {
     it('renders sidebar header', () => {
         render(<KnowledgeBases />);
 
-        expect(screen.getByText('Knowledge Base')).toBeInTheDocument();
+        expect(screen.getByText('Knowledge Bases')).toBeInTheDocument();
     });
 
     it('shows loading state', () => {

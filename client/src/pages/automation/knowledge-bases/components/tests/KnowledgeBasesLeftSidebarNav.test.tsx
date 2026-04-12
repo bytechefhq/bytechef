@@ -62,15 +62,17 @@ describe('KnowledgeBasesLeftSidebarNav', () => {
         expect(screen.getByTestId('left-sidebar-nav')).toBeInTheDocument();
     });
 
-    it('renders nothing when no data', () => {
+    it('renders empty state when no tags', () => {
         hoisted.mockUseKnowledgeBasesLeftSidebarNav.mockReturnValue({
             ...defaultMockReturn,
             hasData: false,
+            tags: [],
         });
 
         render(<KnowledgeBasesLeftSidebarNav />);
 
-        expect(screen.queryByTestId('left-sidebar-nav')).not.toBeInTheDocument();
+        expect(screen.getByTestId('left-sidebar-nav')).toBeInTheDocument();
+        expect(screen.getByText('No defined tags.')).toBeInTheDocument();
     });
 
     it('renders title', () => {
