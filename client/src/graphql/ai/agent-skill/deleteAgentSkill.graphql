@@ -1,3 +1,0 @@
-mutation deleteAgentSkill($id: ID!) {
-    deleteAgentSkill(id: $id)
-}

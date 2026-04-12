@@ -1,0 +1,3 @@
+query aiAgentSkillFileContent($id: ID!, $path: String!) {
+    aiAgentSkillFileContent(id: $id, path: $path)
+}

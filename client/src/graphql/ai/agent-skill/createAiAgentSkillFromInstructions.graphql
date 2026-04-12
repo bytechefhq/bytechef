@@ -1,0 +1,9 @@
+mutation createAiAgentSkillFromInstructions($name: String!, $description: String, $instructions: String!) {
+    createAiAgentSkillFromInstructions(name: $name, description: $description, instructions: $instructions) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}

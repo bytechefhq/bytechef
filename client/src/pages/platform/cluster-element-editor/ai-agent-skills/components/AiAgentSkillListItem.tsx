@@ -9,15 +9,15 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiAgentSkillDeleteAlertDialog from '@/pages/platform/cluster-element-editor/ai-agent-skills/components/AiAgentSkillDeleteAlertDialog';
 import AiAgentSkillRenameDialog from '@/pages/platform/cluster-element-editor/ai-agent-skills/components/AiAgentSkillRenameDialog';
-import useAgentSkillListItem from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAgentSkillListItem';
-import {AgentSkill} from '@/shared/middleware/graphql';
+import useAiAgentSkillListItem from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkillListItem';
+import {AiAgentSkill} from '@/shared/middleware/graphql';
 import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, ZapIcon} from 'lucide-react';
 
 interface AiAgentSkillListItemProps {
     deleteSkill: (id: string) => Promise<void>;
     onDownload: (id: string, name: string) => void;
     onRename: (id: string, newName: string, description?: string | null) => void;
-    skill: AgentSkill;
+    skill: AiAgentSkill;
 }
 
 const AiAgentSkillListItem = ({deleteSkill, onDownload, onRename, skill}: AiAgentSkillListItemProps) => {
@@ -31,7 +31,7 @@ const AiAgentSkillListItem = ({deleteSkill, onDownload, onRename, skill}: AiAgen
         showDeleteDialog,
         showRenameDialog,
         skillColor,
-    } = useAgentSkillListItem({deleteSkill, onDownload, onRename, skill});
+    } = useAiAgentSkillListItem({deleteSkill, onDownload, onRename, skill});
 
     return (
         <>

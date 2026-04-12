@@ -1,9 +1,0 @@
-mutation createAgentSkill($name: String!, $description: String, $filename: String!, $fileBytes: String!) {
-    createAgentSkill(name: $name, description: $description, filename: $filename, fileBytes: $fileBytes) {
-        id
-        name
-        description
-        createdDate
-        lastModifiedDate
-    }
-}

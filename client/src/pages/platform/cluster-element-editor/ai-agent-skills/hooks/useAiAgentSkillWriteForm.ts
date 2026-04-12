@@ -1,10 +1,10 @@
 import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
-import {useCreateAgentSkillFromInstructionsMutation} from '@/shared/middleware/graphql';
+import {useCreateAiAgentSkillFromInstructionsMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useState} from 'react';
 import {toast} from 'sonner';
 
-export default function useAgentSkillWriteForm() {
+export default function useAiAgentSkillWriteForm() {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [instructions, setInstructions] = useState('');
@@ -13,14 +13,14 @@ export default function useAgentSkillWriteForm() {
 
     const queryClient = useQueryClient();
 
-    const createSkillFromInstructionsMutation = useCreateAgentSkillFromInstructionsMutation({
+    const createSkillFromInstructionsMutation = useCreateAiAgentSkillFromInstructionsMutation({
         onError: (error: Error) => {
             toast.error('Failed to create skill', {
                 description: error.message,
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['agentSkills']});
+            queryClient.invalidateQueries({queryKey: ['aiAgentSkills']});
 
             setName('');
             setDescription('');
