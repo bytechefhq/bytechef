@@ -240,25 +240,37 @@ public class TaskCoordinator {
     private void handleJobExecutionException(Job job, Exception exception) {
         long jobId = Validate.notNull(job.getId(), "id");
 
+        String errorMessage = resolveErrorMessage(exception);
+
         Optional<TaskExecution> taskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);
 
         if (taskExecutionOptional.isPresent()) {
             TaskExecution taskExecution = taskExecutionOptional.get();
 
             taskExecution.setError(
-                new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+                new ExecutionError(errorMessage, Arrays.asList(ExceptionUtils.getStackFrames(exception))));
 
             eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
         } else {
             job.setEndDate(Instant.now());
             job.setError(
                 new ExecutionError(
-                    exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+                    errorMessage, Arrays.asList(ExceptionUtils.getStackFrames(exception))));
             job.setStatus(Job.Status.FAILED);
 
             jobService.update(job);
 
             eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, Job.Status.FAILED));
         }
+    }
+
+    private static String resolveErrorMessage(Exception exception) {
+        String message = exception.getMessage();
+
+        if (message == null || message.isBlank()) {
+            return exception.toString();
+        }
+
+        return message;
     }
 }

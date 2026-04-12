@@ -43,8 +43,12 @@ const WorkflowExecutionsTestOutput = ({
         setActiveTab('input');
     }, [workflowTestExecution]);
 
-    const hasNoExecutions = !triggerExecution && (!job?.taskExecutions || job.taskExecutions.length === 0);
-    const jobFailedWithNoExecutions = hasNoExecutions && job?.status === JobStatusEnum.Failed;
+    const hasNoTaskExecutions = !job?.taskExecutions || job.taskExecutions.length === 0;
+    const jobFailedWithNoExecutions = hasNoTaskExecutions && job?.status === JobStatusEnum.Failed;
+    const jobFailureError = job?.error ?? {
+        message: 'Workflow execution failed before any executions were created.',
+        stackTrace: [],
+    };
 
     useEffect(() => {
         const errorItem = getErrorItem(workflowTestExecution);
@@ -109,7 +113,7 @@ const WorkflowExecutionsTestOutput = ({
                         <>
                             {workflowTestExecution?.job && jobFailedWithNoExecutions && (
                                 <div className="flex-1 p-4">
-                                    <WorkflowExecutionContent error={job?.error} />
+                                    <WorkflowExecutionContent error={jobFailureError} />
                                 </div>
                             )}
 
