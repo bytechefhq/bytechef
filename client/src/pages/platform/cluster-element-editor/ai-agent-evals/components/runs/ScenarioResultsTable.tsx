@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
-import AgentJudgeVerdictList from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AgentJudgeVerdictList';
+import AiAgentJudgeVerdictList from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AiAgentJudgeVerdictList';
 import TranscriptDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/TranscriptDialog';
-import {AgentEvalResultStatus, type AgentEvalRunQuery, AgentScenarioType} from '@/shared/middleware/graphql';
+import {AiAgentEvalResultStatus, type AiAgentEvalRunQuery, AiAgentScenarioType} from '@/shared/middleware/graphql';
 import {
     CheckCircle2Icon,
     ChevronDownIcon,
@@ -13,13 +13,13 @@ import {
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-type ResultType = NonNullable<AgentEvalRunQuery['agentEvalRun']>['results'][number];
+type ResultType = NonNullable<AiAgentEvalRunQuery['aiAgentEvalRun']>['results'][number];
 
-const STATUS_ICONS: Record<AgentEvalResultStatus, React.ReactNode> = {
-    [AgentEvalResultStatus.Completed]: <CheckCircle2Icon className="size-4 text-green-500" />,
-    [AgentEvalResultStatus.Failed]: <XCircleIcon className="size-4 text-red-500" />,
-    [AgentEvalResultStatus.Pending]: <div className="size-4 rounded-full border-2 border-gray-300" />,
-    [AgentEvalResultStatus.Running]: <Loader2Icon className="size-4 animate-spin text-blue-500" />,
+const STATUS_ICONS: Record<AiAgentEvalResultStatus, React.ReactNode> = {
+    [AiAgentEvalResultStatus.Completed]: <CheckCircle2Icon className="size-4 text-green-500" />,
+    [AiAgentEvalResultStatus.Failed]: <XCircleIcon className="size-4 text-red-500" />,
+    [AiAgentEvalResultStatus.Pending]: <div className="size-4 rounded-full border-2 border-gray-300" />,
+    [AiAgentEvalResultStatus.Running]: <Loader2Icon className="size-4 animate-spin text-blue-500" />,
 };
 
 interface ScenarioResultsTableProps {
@@ -57,7 +57,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
 
                 {results.map((result) => {
                     const isExpanded = expandedResultId === result.id;
-                    const isSingleTurn = result.scenario.type === AgentScenarioType.SingleTurn;
+                    const isSingleTurn = result.scenario.type === AiAgentScenarioType.SingleTurn;
                     const scorePercent = result.score != null ? Math.round(result.score * 100) : null;
                     const inputTokens = result.inputTokens ?? 0;
                     const outputTokens = result.outputTokens ?? 0;
@@ -156,7 +156,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                         </div>
                                     )}
 
-                                    <AgentJudgeVerdictList verdicts={result.verdicts} />
+                                    <AiAgentJudgeVerdictList verdicts={result.verdicts} />
                                 </div>
                             )}
                         </div>

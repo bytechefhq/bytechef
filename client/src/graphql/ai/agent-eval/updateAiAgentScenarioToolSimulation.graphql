@@ -1,0 +1,8 @@
+mutation updateAiAgentScenarioToolSimulation($id: ID!, $toolName: String, $responsePrompt: String, $simulationModel: String) {
+    updateAiAgentScenarioToolSimulation(id: $id, toolName: $toolName, responsePrompt: $responsePrompt, simulationModel: $simulationModel) {
+        id
+        toolName
+        responsePrompt
+        simulationModel
+    }
+}

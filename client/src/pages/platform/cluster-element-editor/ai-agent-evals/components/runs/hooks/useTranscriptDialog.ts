@@ -1,4 +1,4 @@
-import {useAgentEvalResultTranscriptQuery} from '@/shared/middleware/graphql';
+import {useAiAgentEvalResultTranscriptQuery} from '@/shared/middleware/graphql';
 import {useMemo} from 'react';
 
 interface TranscriptMessageI {
@@ -26,10 +26,10 @@ interface GroupedTurnI {
 }
 
 export default function useTranscriptDialog(resultId: string) {
-    const {data, error, isLoading} = useAgentEvalResultTranscriptQuery({id: resultId});
+    const {data, error, isLoading} = useAiAgentEvalResultTranscriptQuery({id: resultId});
 
     const transcriptData = useMemo<TranscriptDataI | null>(() => {
-        const transcriptString = data?.agentEvalResultTranscript;
+        const transcriptString = data?.aiAgentEvalResultTranscript;
 
         if (!transcriptString) {
             return null;

@@ -1,0 +1,10 @@
+query aiAgentJudges($workflowId: String!, $workflowNodeName: String!) {
+    aiAgentJudges(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
+        id
+        name
+        type
+        configuration
+        createdDate
+        lastModifiedDate
+    }
+}

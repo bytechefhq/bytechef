@@ -1,0 +1,37 @@
+query aiAgentEvalTest($id: ID!) {
+    aiAgentEvalTest(id: $id) {
+        id
+        name
+        description
+        scenarios {
+            id
+            name
+            type
+            userMessage
+            expectedOutput
+            personaPrompt
+            maxTurns
+            numberOfRuns
+            judges {
+                id
+                name
+                type
+                configuration
+                createdDate
+                lastModifiedDate
+            }
+            toolSimulations {
+                id
+                responsePrompt
+                simulationModel
+                toolName
+                createdDate
+                lastModifiedDate
+            }
+            createdDate
+            lastModifiedDate
+        }
+        createdDate
+        lastModifiedDate
+    }
+}

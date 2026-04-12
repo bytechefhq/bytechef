@@ -1,0 +1,10 @@
+mutation createAiAgentScenarioJudge($agentEvalScenarioId: ID!, $name: String!, $type: AiAgentJudgeType!, $configuration: Map!) {
+    createAiAgentScenarioJudge(agentEvalScenarioId: $agentEvalScenarioId, name: $name, type: $type, configuration: $configuration) {
+        id
+        name
+        type
+        configuration
+        createdDate
+        lastModifiedDate
+    }
+}
