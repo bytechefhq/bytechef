@@ -1,0 +1,34 @@
+logging:
+  level:
+    ROOT: WARN
+    liquibase: INFO
+    com.bytechef.liquibase: INFO
+
+spring:
+  autoconfigure:
+    exclude:
+      org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,
+      org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration,
+      org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,
+      org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration,
+      org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration,
+      org.springframework.boot.autoconfigure.graphql.GraphQlAutoConfiguration,
+      org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration,
+      org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration,
+      org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration,
+      org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration,
+      org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration,
+      org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration,
+      org.springframework.ai.autoconfigure.chat.client.ChatClientAutoConfiguration,
+      org.springframework.ai.model.anthropic.autoconfigure.AnthropicAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiImageAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiModerationAutoConfiguration,
+      org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration
+  main:
+    web-application-type: none
+  quartz:
+    auto-startup: false
