@@ -23,29 +23,29 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public class AgentSkillFileStorageImpl implements AgentSkillFileStorage {
+public class AiAgentSkillFileStorageImpl implements AiAgentSkillFileStorage {
 
-    private static final String AGENT_SKILLS_FILES_DIR = "agent_skills";
+    private static final String AI_AGENT_SKILLS_FILES_DIR = "ai_agent_skills";
 
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI")
-    public AgentSkillFileStorageImpl(FileStorageService fileStorageService) {
+    public AiAgentSkillFileStorageImpl(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    public void deleteAgentSkillFile(FileEntry skillFile) {
-        fileStorageService.deleteFile(AGENT_SKILLS_FILES_DIR, skillFile);
+    public void deleteAiAgentSkillFile(FileEntry skillFile) {
+        fileStorageService.deleteFile(AI_AGENT_SKILLS_FILES_DIR, skillFile);
     }
 
     @Override
-    public byte[] readAgentSkillFileBytes(FileEntry skillFile) {
-        return fileStorageService.readFileToBytes(AGENT_SKILLS_FILES_DIR, skillFile);
+    public byte[] readAiAgentSkillFileBytes(FileEntry skillFile) {
+        return fileStorageService.readFileToBytes(AI_AGENT_SKILLS_FILES_DIR, skillFile);
     }
 
     @Override
-    public FileEntry storeAgentSkillFile(String filename, byte[] bytes) {
-        return fileStorageService.storeFileContent(AGENT_SKILLS_FILES_DIR, filename, bytes);
+    public FileEntry storeAiAgentSkillFile(String filename, byte[] bytes) {
+        return fileStorageService.storeFileContent(AI_AGENT_SKILLS_FILES_DIR, filename, bytes);
     }
 }

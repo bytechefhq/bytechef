@@ -19,9 +19,9 @@ package com.bytechef.ai.agent.skill.facade;
 import static com.bytechef.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
 import static com.bytechef.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 
-import com.bytechef.ai.agent.skill.domain.AgentSkill;
-import com.bytechef.ai.agent.skill.file.storage.AgentSkillFileStorage;
-import com.bytechef.ai.agent.skill.service.AgentSkillService;
+import com.bytechef.ai.agent.skill.domain.AiAgentSkill;
+import com.bytechef.ai.agent.skill.file.storage.AiAgentSkillFileStorage;
+import com.bytechef.ai.agent.skill.service.AiAgentSkillService;
 import com.bytechef.file.storage.domain.FileEntry;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,25 +50,25 @@ import org.springframework.util.Assert;
  */
 @Service
 @Transactional
-class AgentSkillFacadeImpl implements AgentSkillFacade {
+class AiAgentSkillFacadeImpl implements AiAgentSkillFacade {
 
     // Reject uploaded skill archives larger than 10 MB
     private static final int MAX_SKILL_FILE_SIZE = 10 * 1024 * 1024;
 
-    private static final Logger logger = LoggerFactory.getLogger(AgentSkillFacadeImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AiAgentSkillFacadeImpl.class);
 
-    private final AgentSkillFileStorage agentSkillFileStorage;
-    private final AgentSkillService agentSkillService;
+    private final AiAgentSkillFileStorage aiAgentSkillFileStorage;
+    private final AiAgentSkillService aiAgentSkillService;
 
-    AgentSkillFacadeImpl(
-        AgentSkillFileStorage agentSkillFileStorage, AgentSkillService agentSkillService) {
+    AiAgentSkillFacadeImpl(
+        AiAgentSkillFileStorage aiAgentSkillFileStorage, AiAgentSkillService aiAgentSkillService) {
 
-        this.agentSkillFileStorage = agentSkillFileStorage;
-        this.agentSkillService = agentSkillService;
+        this.aiAgentSkillFileStorage = aiAgentSkillFileStorage;
+        this.aiAgentSkillService = aiAgentSkillService;
     }
 
     @Override
-    public AgentSkill createAgentSkill(String name, @Nullable String description, String filename, byte[] bytes) {
+    public AiAgentSkill createAiAgentSkill(String name, @Nullable String description, String filename, byte[] bytes) {
         Assert.hasText(name, "Skill name must not be blank");
         Assert.hasText(filename, "Filename must not be blank");
 
@@ -102,7 +102,7 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
 
         String storageFilename = toSkillFilename(filename);
 
-        FileEntry fileEntry = agentSkillFileStorage.storeAgentSkillFile(storageFilename, bytes);
+        FileEntry fileEntry = aiAgentSkillFileStorage.storeAiAgentSkillFile(storageFilename, bytes);
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
@@ -110,7 +110,7 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
             public void afterCompletion(int status) {
                 if (status == STATUS_ROLLED_BACK) {
                     try {
-                        agentSkillFileStorage.deleteAgentSkillFile(fileEntry);
+                        aiAgentSkillFileStorage.deleteAiAgentSkillFile(fileEntry);
                     } catch (RuntimeException exception) {
                         logger.error(
                             "Failed to clean up skill file after rollback, fileEntry={}", fileEntry, exception);
@@ -119,14 +119,14 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
             }
         });
 
-        AgentSkill agentSkill = new AgentSkill();
+        AiAgentSkill aiAgentSkill = new AiAgentSkill();
 
-        agentSkill.setName(skillName);
-        agentSkill.setDescription(skillDescription);
-        agentSkill.setSkillFileEntry(fileEntry);
+        aiAgentSkill.setName(skillName);
+        aiAgentSkill.setDescription(skillDescription);
+        aiAgentSkill.setSkillFileEntry(fileEntry);
 
         try {
-            return agentSkillService.createAgentSkill(agentSkill);
+            return aiAgentSkillService.createAiAgentSkill(aiAgentSkill);
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             if (!isUniqueNameViolation(dataIntegrityViolationException)) {
                 throw dataIntegrityViolationException;
@@ -134,16 +134,16 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
 
             logger.debug(
                 "Unique name conflict during save for '{}', retrying with new suffix",
-                agentSkill.getName());
+                aiAgentSkill.getName());
 
-            agentSkill.setName(generateUniqueName(agentSkill.getName()));
+            aiAgentSkill.setName(generateUniqueName(aiAgentSkill.getName()));
 
-            return agentSkillService.createAgentSkill(agentSkill);
+            return aiAgentSkillService.createAiAgentSkill(aiAgentSkill);
         }
     }
 
     @Override
-    public AgentSkill createAgentSkillFromInstructions(
+    public AiAgentSkill createAiAgentSkillFromInstructions(
         String name, @Nullable String description, String instructions) {
 
         Assert.hasText(name, "Skill name must not be blank");
@@ -151,25 +151,25 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
 
         byte[] zipBytes = createSkillZip(name, description, instructions);
 
-        return createAgentSkill(name, description, name + ".skill", zipBytes);
+        return createAiAgentSkill(name, description, name + ".skill", zipBytes);
     }
 
     @Override
-    public void deleteAgentSkill(long id) {
-        AgentSkill agentSkill = agentSkillService.getAgentSkill(id);
+    public void deleteAiAgentSkill(long id) {
+        AiAgentSkill aiAgentSkill = aiAgentSkillService.getAiAgentSkill(id);
 
-        FileEntry fileEntry = agentSkill.getSkillFileEntry();
+        FileEntry fileEntry = aiAgentSkill.getSkillFileEntry();
 
-        logger.debug("Deleting agent skill id={}, name='{}', fileEntry={}", id, agentSkill.getName(), fileEntry);
+        logger.debug("Deleting agent skill id={}, name='{}', fileEntry={}", id, aiAgentSkill.getName(), fileEntry);
 
-        agentSkillService.deleteAgentSkill(id);
+        aiAgentSkillService.deleteAiAgentSkill(id);
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
             @Override
             public void afterCommit() {
                 try {
-                    agentSkillFileStorage.deleteAgentSkillFile(fileEntry);
+                    aiAgentSkillFileStorage.deleteAiAgentSkillFile(fileEntry);
                 } catch (RuntimeException exception) {
                     logger.error("Failed to delete skill file after DB commit, fileEntry={}", fileEntry, exception);
                 }
@@ -179,29 +179,29 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public byte[] getAgentSkillDownload(long id) {
+    public byte[] getAiAgentSkillDownload(long id) {
         return getSkillZipBytes(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AgentSkill getAgentSkill(long id) {
-        return agentSkillService.getAgentSkill(id);
+    public AiAgentSkill getAiAgentSkill(long id) {
+        return aiAgentSkillService.getAiAgentSkill(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AgentSkillDownload getAgentSkillWithDownload(long id) {
-        AgentSkill agentSkill = agentSkillService.getAgentSkill(id);
+    public AiAgentSkillDownload getAiAgentSkillWithDownload(long id) {
+        AiAgentSkill aiAgentSkill = aiAgentSkillService.getAiAgentSkill(id);
 
-        byte[] bytes = agentSkillFileStorage.readAgentSkillFileBytes(agentSkill.getSkillFileEntry());
+        byte[] bytes = aiAgentSkillFileStorage.readAiAgentSkillFileBytes(aiAgentSkill.getSkillFileEntry());
 
-        return new AgentSkillDownload(agentSkill, bytes);
+        return new AiAgentSkillDownload(aiAgentSkill, bytes);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public String getAgentSkillFileContent(long id, String path) {
+    public String getAiAgentSkillFileContent(long id, String path) {
         Assert.hasText(path, "File path must not be blank");
 
         if (path.contains("..") || path.startsWith("/")) {
@@ -243,7 +243,7 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<String> getAgentSkillFilePaths(long id) {
+    public List<String> getAiAgentSkillFilePaths(long id) {
         byte[] zipBytes = getSkillZipBytes(id);
 
         List<String> paths = new ArrayList<>();
@@ -273,16 +273,16 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AgentSkill> getAgentSkills() {
-        return agentSkillService.getAgentSkills();
+    public List<AiAgentSkill> getAiAgentSkills() {
+        return aiAgentSkillService.getAiAgentSkills();
     }
 
     @Override
-    public AgentSkill updateAgentSkill(long id, String name, @Nullable String description) {
+    public AiAgentSkill updateAiAgentSkill(long id, String name, @Nullable String description) {
         Assert.hasText(name, "Skill name must not be blank");
 
         try {
-            return agentSkillService.updateAgentSkill(id, name, description);
+            return aiAgentSkillService.updateAiAgentSkill(id, name, description);
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             if (!isUniqueNameViolation(dataIntegrityViolationException)) {
                 throw dataIntegrityViolationException;
@@ -308,14 +308,14 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
 
     /** Appends a numeric suffix (2)-(100) to avoid name collisions; falls back to a timestamp suffix if all taken. */
     private String generateUniqueName(String name) {
-        if (!agentSkillService.existsByName(name)) {
+        if (!aiAgentSkillService.existsByName(name)) {
             return name;
         }
 
         for (int suffix = 2; suffix <= 100; suffix++) {
             String candidateName = name + " (" + suffix + ")";
 
-            if (!agentSkillService.existsByName(candidateName)) {
+            if (!aiAgentSkillService.existsByName(candidateName)) {
                 return candidateName;
             }
         }
@@ -431,9 +431,9 @@ class AgentSkillFacadeImpl implements AgentSkillFacade {
     }
 
     private byte[] getSkillZipBytes(long id) {
-        AgentSkill agentSkill = agentSkillService.getAgentSkill(id);
+        AiAgentSkill aiAgentSkill = aiAgentSkillService.getAiAgentSkill(id);
 
-        return agentSkillFileStorage.readAgentSkillFileBytes(agentSkill.getSkillFileEntry());
+        return aiAgentSkillFileStorage.readAiAgentSkillFileBytes(aiAgentSkill.getSkillFileEntry());
     }
 
     private String escapeYamlValue(String value) {
