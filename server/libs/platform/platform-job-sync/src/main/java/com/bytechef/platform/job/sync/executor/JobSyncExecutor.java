@@ -70,6 +70,7 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
+import com.bytechef.platform.job.sync.exception.JobErrorType;
 import com.bytechef.platform.job.sync.exception.TaskExecutionErrorType;
 import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
@@ -685,7 +686,7 @@ public class JobSyncExecutor {
             ExecutionError error = job.getError();
 
             if (error != null && error.getMessage() != null) {
-                throw new ExecutionException(error.getMessage(), TaskExecutionErrorType.TASK_EXECUTION_FAILED);
+                throw new ExecutionException(error.getMessage(), JobErrorType.JOB_FAILED);
             }
 
             String message = "Job " + job.getId() + " failed but no error details are available.";
@@ -694,7 +695,7 @@ public class JobSyncExecutor {
                 logger.warn("Detected FAILED job without error details for jobId={}", job.getId());
             }
 
-            throw new ExecutionException(message, TaskExecutionErrorType.TASK_EXECUTION_FAILED);
+            throw new ExecutionException(message, JobErrorType.JOB_FAILED);
         }
     }
 
