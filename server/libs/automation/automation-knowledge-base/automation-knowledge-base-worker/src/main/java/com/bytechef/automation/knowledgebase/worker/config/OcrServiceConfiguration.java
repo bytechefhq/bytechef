@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 class OcrServiceConfiguration {
 
     @Bean
@@ -49,7 +49,7 @@ class OcrServiceConfiguration {
             if (apiKey == null || apiKey.isBlank()) {
                 throw new IllegalStateException(
                     "Mistral OCR is enabled but API key is not configured. " +
-                        "Set bytechef.knowledge-base.ocr.mistral.api-key");
+                        "Set bytechef.ai.knowledge-base.ocr.mistral.api-key");
             }
 
             return new MistralOcrService(apiKey);

@@ -31,7 +31,7 @@ import org.springframework.stereotype.Controller;
  * @author Ivica Cardic
  */
 @Controller
-@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 @SuppressFBWarnings("EI")
 public class KnowledgeBaseDocumentTagGraphQlController {
 

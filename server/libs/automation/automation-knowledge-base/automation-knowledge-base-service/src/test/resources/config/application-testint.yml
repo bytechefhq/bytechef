@@ -1,6 +1,7 @@
 bytechef:
-  knowledgebase:
-    enabled: true
+  ai:
+    knowledge-base:
+      enabled: true
 
 spring:
   liquibase:

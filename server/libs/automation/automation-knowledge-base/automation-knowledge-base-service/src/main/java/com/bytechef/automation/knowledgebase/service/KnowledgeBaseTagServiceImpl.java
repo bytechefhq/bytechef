@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseTagServiceImpl implements KnowledgeBaseTagService {
 
     private final KnowledgeBaseRepository knowledgeBaseRepository;
