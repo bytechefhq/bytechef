@@ -79,30 +79,30 @@ export type AdminUserPage = {
   totalPages: Scalars['Int']['output'];
 };
 
-export type AgentEvalResult = {
-  __typename?: 'AgentEvalResult';
+export type AiAgentEvalResult = {
+  __typename?: 'AiAgentEvalResult';
   createdDate?: Maybe<Scalars['Long']['output']>;
   errorMessage?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   inputTokens?: Maybe<Scalars['Int']['output']>;
   outputTokens?: Maybe<Scalars['Int']['output']>;
   runIndex?: Maybe<Scalars['Int']['output']>;
-  scenario: AgentEvalScenario;
+  scenario: AiAgentEvalScenario;
   score?: Maybe<Scalars['Float']['output']>;
-  status: AgentEvalResultStatus;
+  status: AiAgentEvalResultStatus;
   transcriptFile?: Maybe<Scalars['String']['output']>;
-  verdicts: Array<AgentJudgeVerdict>;
+  verdicts: Array<AiAgentJudgeVerdict>;
 };
 
-export enum AgentEvalResultStatus {
+export enum AiAgentEvalResultStatus {
   Completed = 'COMPLETED',
   Failed = 'FAILED',
   Pending = 'PENDING',
   Running = 'RUNNING'
 }
 
-export type AgentEvalRun = {
-  __typename?: 'AgentEvalRun';
+export type AiAgentEvalRun = {
+  __typename?: 'AiAgentEvalRun';
   agentVersion?: Maybe<Scalars['String']['output']>;
   averageScore?: Maybe<Scalars['Float']['output']>;
   completedDate?: Maybe<Scalars['Long']['output']>;
@@ -110,63 +110,63 @@ export type AgentEvalRun = {
   createdDate?: Maybe<Scalars['Long']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  results: Array<AgentEvalResult>;
+  results: Array<AiAgentEvalResult>;
   startedDate?: Maybe<Scalars['Long']['output']>;
-  status: AgentEvalRunStatus;
+  status: AiAgentEvalRunStatus;
   totalInputTokens?: Maybe<Scalars['Int']['output']>;
   totalOutputTokens?: Maybe<Scalars['Int']['output']>;
   totalScenarios: Scalars['Int']['output'];
 };
 
-export enum AgentEvalRunStatus {
+export enum AiAgentEvalRunStatus {
   Completed = 'COMPLETED',
   Failed = 'FAILED',
   Pending = 'PENDING',
   Running = 'RUNNING'
 }
 
-export type AgentEvalScenario = {
-  __typename?: 'AgentEvalScenario';
+export type AiAgentEvalScenario = {
+  __typename?: 'AiAgentEvalScenario';
   createdDate?: Maybe<Scalars['Long']['output']>;
   expectedOutput?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
-  judges: Array<AgentScenarioJudge>;
+  judges: Array<AiAgentScenarioJudge>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   maxTurns?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   numberOfRuns?: Maybe<Scalars['Int']['output']>;
   personaPrompt?: Maybe<Scalars['String']['output']>;
-  toolSimulations: Array<AgentScenarioToolSimulation>;
-  type: AgentScenarioType;
+  toolSimulations: Array<AiAgentScenarioToolSimulation>;
+  type: AiAgentScenarioType;
   userMessage?: Maybe<Scalars['String']['output']>;
 };
 
-export type AgentEvalTest = {
-  __typename?: 'AgentEvalTest';
+export type AiAgentEvalTest = {
+  __typename?: 'AiAgentEvalTest';
   createdDate?: Maybe<Scalars['Long']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
-  scenarios: Array<AgentEvalScenario>;
+  scenarios: Array<AiAgentEvalScenario>;
 };
 
-export type AgentJudge = {
-  __typename?: 'AgentJudge';
+export type AiAgentJudge = {
+  __typename?: 'AiAgentJudge';
   configuration: Scalars['Map']['output'];
   createdDate?: Maybe<Scalars['Long']['output']>;
   id: Scalars['ID']['output'];
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
-  type: AgentJudgeType;
+  type: AiAgentJudgeType;
 };
 
-export enum AgentJudgeScope {
+export enum AiAgentJudgeScope {
   Agent = 'AGENT',
   Scenario = 'SCENARIO'
 }
 
-export enum AgentJudgeType {
+export enum AiAgentJudgeType {
   ContainsText = 'CONTAINS_TEXT',
   JsonSchema = 'JSON_SCHEMA',
   LlmRule = 'LLM_RULE',
@@ -177,29 +177,29 @@ export enum AgentJudgeType {
   ToolUsage = 'TOOL_USAGE'
 }
 
-export type AgentJudgeVerdict = {
-  __typename?: 'AgentJudgeVerdict';
+export type AiAgentJudgeVerdict = {
+  __typename?: 'AiAgentJudgeVerdict';
   explanation: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   judgeName: Scalars['String']['output'];
-  judgeScope: AgentJudgeScope;
-  judgeType: AgentJudgeType;
+  judgeScope: AiAgentJudgeScope;
+  judgeType: AiAgentJudgeType;
   passed: Scalars['Boolean']['output'];
   score: Scalars['Float']['output'];
 };
 
-export type AgentScenarioJudge = {
-  __typename?: 'AgentScenarioJudge';
+export type AiAgentScenarioJudge = {
+  __typename?: 'AiAgentScenarioJudge';
   configuration: Scalars['Map']['output'];
   createdDate?: Maybe<Scalars['Long']['output']>;
   id: Scalars['ID']['output'];
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
-  type: AgentJudgeType;
+  type: AiAgentJudgeType;
 };
 
-export type AgentScenarioToolSimulation = {
-  __typename?: 'AgentScenarioToolSimulation';
+export type AiAgentScenarioToolSimulation = {
+  __typename?: 'AiAgentScenarioToolSimulation';
   createdDate?: Maybe<Scalars['Long']['output']>;
   id: Scalars['ID']['output'];
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
@@ -208,13 +208,13 @@ export type AgentScenarioToolSimulation = {
   toolName: Scalars['String']['output'];
 };
 
-export enum AgentScenarioType {
+export enum AiAgentScenarioType {
   MultiTurn = 'MULTI_TURN',
   SingleTurn = 'SINGLE_TURN'
 }
 
-export type AgentSkill = {
-  __typename?: 'AgentSkill';
+export type AiAgentSkill = {
+  __typename?: 'AiAgentSkill';
   /** Epoch milliseconds (UTC) */
   createdDate?: Maybe<Scalars['Long']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -825,6 +825,50 @@ export enum EnvironmentEnum {
   Staging = 'STAGING'
 }
 
+export enum EvaluatorFunctionCategory {
+  Collection = 'COLLECTION',
+  DateTime = 'DATE_TIME',
+  Map = 'MAP',
+  String = 'STRING',
+  Type = 'TYPE',
+  Utility = 'UTILITY'
+}
+
+export type EvaluatorFunctionDefinition = {
+  __typename?: 'EvaluatorFunctionDefinition';
+  category: EvaluatorFunctionCategory;
+  description: Scalars['String']['output'];
+  example: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  parameters: Array<EvaluatorFunctionParameter>;
+  returnType: EvaluatorFunctionType;
+  title: Scalars['String']['output'];
+};
+
+export type EvaluatorFunctionParameter = {
+  __typename?: 'EvaluatorFunctionParameter';
+  description: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  required: Scalars['Boolean']['output'];
+  type: EvaluatorFunctionType;
+};
+
+export enum EvaluatorFunctionType {
+  Boolean = 'BOOLEAN',
+  Byte = 'BYTE',
+  Character = 'CHARACTER',
+  Datetime = 'DATETIME',
+  Double = 'DOUBLE',
+  Float = 'FLOAT',
+  Integer = 'INTEGER',
+  List = 'LIST',
+  Long = 'LONG',
+  Map = 'MAP',
+  Number = 'NUMBER',
+  Short = 'SHORT',
+  String = 'STRING'
+}
+
 export type ExecutionError = {
   __typename?: 'ExecutionError';
   message?: Maybe<Scalars['String']['output']>;
@@ -1332,15 +1376,15 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
-  cancelAgentEvalRun: AgentEvalRun;
+  cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
-  createAgentEvalScenario: AgentEvalScenario;
-  createAgentEvalTest: AgentEvalTest;
-  createAgentJudge: AgentJudge;
-  createAgentScenarioJudge: AgentScenarioJudge;
-  createAgentScenarioToolSimulation: AgentScenarioToolSimulation;
-  createAgentSkill: AgentSkill;
-  createAgentSkillFromInstructions: AgentSkill;
+  createAiAgentEvalScenario: AiAgentEvalScenario;
+  createAiAgentEvalTest: AiAgentEvalTest;
+  createAiAgentJudge: AiAgentJudge;
+  createAiAgentScenarioJudge: AiAgentScenarioJudge;
+  createAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
+  createAiAgentSkill: AiAgentSkill;
+  createAiAgentSkillFromInstructions: AiAgentSkill;
   createApiConnector: ApiConnector;
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
@@ -1358,12 +1402,12 @@ export type Mutation = {
   createMcpTool?: Maybe<McpTool>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
-  deleteAgentEvalScenario: Scalars['Boolean']['output'];
-  deleteAgentEvalTest: Scalars['Boolean']['output'];
-  deleteAgentJudge: Scalars['Boolean']['output'];
-  deleteAgentScenarioJudge: Scalars['Boolean']['output'];
-  deleteAgentScenarioToolSimulation: Scalars['Boolean']['output'];
-  deleteAgentSkill: Scalars['Boolean']['output'];
+  deleteAiAgentEvalScenario: Scalars['Boolean']['output'];
+  deleteAiAgentEvalTest: Scalars['Boolean']['output'];
+  deleteAiAgentJudge: Scalars['Boolean']['output'];
+  deleteAiAgentScenarioJudge: Scalars['Boolean']['output'];
+  deleteAiAgentScenarioToolSimulation: Scalars['Boolean']['output'];
+  deleteAiAgentSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
@@ -1408,18 +1452,18 @@ export type Mutation = {
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
-  startAgentEvalRun: AgentEvalRun;
+  startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
-  updateAgentEvalScenario: AgentEvalScenario;
-  updateAgentEvalTest: AgentEvalTest;
-  updateAgentJudge: AgentJudge;
-  updateAgentScenarioJudge: AgentScenarioJudge;
-  updateAgentScenarioToolSimulation: AgentScenarioToolSimulation;
-  updateAgentSkill: AgentSkill;
+  updateAiAgentEvalScenario: AiAgentEvalScenario;
+  updateAiAgentEvalTest: AiAgentEvalTest;
+  updateAiAgentJudge: AiAgentJudge;
+  updateAiAgentScenarioJudge: AiAgentScenarioJudge;
+  updateAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
+  updateAiAgentSkill: AiAgentSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
@@ -1451,7 +1495,7 @@ export type MutationAddDataTableColumnArgs = {
 };
 
 
-export type MutationCancelAgentEvalRunArgs = {
+export type MutationCancelAiAgentEvalRunArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -1461,19 +1505,19 @@ export type MutationCancelGenerationJobArgs = {
 };
 
 
-export type MutationCreateAgentEvalScenarioArgs = {
+export type MutationCreateAiAgentEvalScenarioArgs = {
   agentEvalTestId: Scalars['ID']['input'];
   expectedOutput?: InputMaybe<Scalars['String']['input']>;
   maxTurns?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
   numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
   personaPrompt?: InputMaybe<Scalars['String']['input']>;
-  type: AgentScenarioType;
+  type: AiAgentScenarioType;
   userMessage?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type MutationCreateAgentEvalTestArgs = {
+export type MutationCreateAiAgentEvalTestArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
@@ -1481,24 +1525,24 @@ export type MutationCreateAgentEvalTestArgs = {
 };
 
 
-export type MutationCreateAgentJudgeArgs = {
+export type MutationCreateAiAgentJudgeArgs = {
   configuration: Scalars['Map']['input'];
   name: Scalars['String']['input'];
-  type: AgentJudgeType;
+  type: AiAgentJudgeType;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
 };
 
 
-export type MutationCreateAgentScenarioJudgeArgs = {
+export type MutationCreateAiAgentScenarioJudgeArgs = {
   agentEvalScenarioId: Scalars['ID']['input'];
   configuration: Scalars['Map']['input'];
   name: Scalars['String']['input'];
-  type: AgentJudgeType;
+  type: AiAgentJudgeType;
 };
 
 
-export type MutationCreateAgentScenarioToolSimulationArgs = {
+export type MutationCreateAiAgentScenarioToolSimulationArgs = {
   agentEvalScenarioId: Scalars['ID']['input'];
   responsePrompt: Scalars['String']['input'];
   simulationModel?: InputMaybe<Scalars['String']['input']>;
@@ -1506,7 +1550,7 @@ export type MutationCreateAgentScenarioToolSimulationArgs = {
 };
 
 
-export type MutationCreateAgentSkillArgs = {
+export type MutationCreateAiAgentSkillArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   fileBytes: Scalars['String']['input'];
   filename: Scalars['String']['input'];
@@ -1514,7 +1558,7 @@ export type MutationCreateAgentSkillArgs = {
 };
 
 
-export type MutationCreateAgentSkillFromInstructionsArgs = {
+export type MutationCreateAiAgentSkillFromInstructionsArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   instructions: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -1612,32 +1656,32 @@ export type MutationCreateWorkspaceMcpServerArgs = {
 };
 
 
-export type MutationDeleteAgentEvalScenarioArgs = {
+export type MutationDeleteAiAgentEvalScenarioArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type MutationDeleteAgentEvalTestArgs = {
+export type MutationDeleteAiAgentEvalTestArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type MutationDeleteAgentJudgeArgs = {
+export type MutationDeleteAiAgentJudgeArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type MutationDeleteAgentScenarioJudgeArgs = {
+export type MutationDeleteAiAgentScenarioJudgeArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type MutationDeleteAgentScenarioToolSimulationArgs = {
+export type MutationDeleteAiAgentScenarioToolSimulationArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type MutationDeleteAgentSkillArgs = {
+export type MutationDeleteAiAgentSkillArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -1887,9 +1931,9 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
 };
 
 
-export type MutationStartAgentEvalRunArgs = {
+export type MutationStartAiAgentEvalRunArgs = {
   agentEvalTestId: Scalars['ID']['input'];
-  agentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  aiAgentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']>>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   scenarioIds?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -1929,7 +1973,7 @@ export type MutationTestWorkflowNodeScriptArgs = {
 };
 
 
-export type MutationUpdateAgentEvalScenarioArgs = {
+export type MutationUpdateAiAgentEvalScenarioArgs = {
   expectedOutput?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   maxTurns?: InputMaybe<Scalars['Int']['input']>;
@@ -1940,28 +1984,28 @@ export type MutationUpdateAgentEvalScenarioArgs = {
 };
 
 
-export type MutationUpdateAgentEvalTestArgs = {
+export type MutationUpdateAiAgentEvalTestArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type MutationUpdateAgentJudgeArgs = {
+export type MutationUpdateAiAgentJudgeArgs = {
   configuration?: InputMaybe<Scalars['Map']['input']>;
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type MutationUpdateAgentScenarioJudgeArgs = {
+export type MutationUpdateAiAgentScenarioJudgeArgs = {
   configuration?: InputMaybe<Scalars['Map']['input']>;
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type MutationUpdateAgentScenarioToolSimulationArgs = {
+export type MutationUpdateAiAgentScenarioToolSimulationArgs = {
   id: Scalars['ID']['input'];
   responsePrompt?: InputMaybe<Scalars['String']['input']>;
   simulationModel?: InputMaybe<Scalars['String']['input']>;
@@ -1969,7 +2013,7 @@ export type MutationUpdateAgentScenarioToolSimulationArgs = {
 };
 
 
-export type MutationUpdateAgentSkillArgs = {
+export type MutationUpdateAiAgentSkillArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -2248,7 +2292,9 @@ export type ProjectDeploymentWorkflow = {
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   projectDeploymentId: Scalars['ID']['output'];
   projectWorkflow: ProjectWorkflow;
+  staticWebhookUrl?: Maybe<Scalars['String']['output']>;
   version: Scalars['Int']['output'];
+  workflowExecutionId?: Maybe<Scalars['String']['output']>;
   workflowId: Scalars['String']['output'];
 };
 
@@ -2344,17 +2390,17 @@ export type Query = {
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
-  agentEvalResult?: Maybe<AgentEvalResult>;
-  agentEvalResultTranscript?: Maybe<Scalars['String']['output']>;
-  agentEvalRun?: Maybe<AgentEvalRun>;
-  agentEvalRuns: Array<AgentEvalRun>;
-  agentEvalTest?: Maybe<AgentEvalTest>;
-  agentEvalTests: Array<AgentEvalTest>;
-  agentJudges: Array<AgentJudge>;
-  agentSkill: AgentSkill;
-  agentSkillFileContent: Scalars['String']['output'];
-  agentSkillFilePaths: Array<Scalars['String']['output']>;
-  agentSkills: Array<AgentSkill>;
+  aiAgentEvalResult?: Maybe<AiAgentEvalResult>;
+  aiAgentEvalResultTranscript?: Maybe<Scalars['String']['output']>;
+  aiAgentEvalRun?: Maybe<AiAgentEvalRun>;
+  aiAgentEvalRuns: Array<AiAgentEvalRun>;
+  aiAgentEvalTest?: Maybe<AiAgentEvalTest>;
+  aiAgentEvalTests: Array<AiAgentEvalTest>;
+  aiAgentJudges: Array<AiAgentJudge>;
+  aiAgentSkill: AiAgentSkill;
+  aiAgentSkillFileContent: Scalars['String']['output'];
+  aiAgentSkillFilePaths: Array<Scalars['String']['output']>;
+  aiAgentSkills: Array<AiAgentSkill>;
   apiConnector?: Maybe<ApiConnector>;
   apiConnectors: Array<ApiConnector>;
   apiKey?: Maybe<ApiKey>;
@@ -2396,6 +2442,8 @@ export type Query = {
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
+  evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
+  evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
   exportDataTableCsv: Scalars['String']['output'];
   generationJobStatus?: Maybe<GenerationJobStatus>;
   identityProvider?: Maybe<IdentityProviderType>;
@@ -2489,57 +2537,57 @@ export type QueryAdminApiKeysArgs = {
 };
 
 
-export type QueryAgentEvalResultArgs = {
+export type QueryAiAgentEvalResultArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryAgentEvalResultTranscriptArgs = {
+export type QueryAiAgentEvalResultTranscriptArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryAgentEvalRunArgs = {
+export type QueryAiAgentEvalRunArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryAgentEvalRunsArgs = {
+export type QueryAiAgentEvalRunsArgs = {
   agentEvalTestId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-export type QueryAgentEvalTestArgs = {
+export type QueryAiAgentEvalTestArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryAgentEvalTestsArgs = {
+export type QueryAiAgentEvalTestsArgs = {
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
 };
 
 
-export type QueryAgentJudgesArgs = {
+export type QueryAiAgentJudgesArgs = {
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
 };
 
 
-export type QueryAgentSkillArgs = {
+export type QueryAiAgentSkillArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryAgentSkillFileContentArgs = {
+export type QueryAiAgentSkillFileContentArgs = {
   id: Scalars['ID']['input'];
   path: Scalars['String']['input'];
 };
 
 
-export type QueryAgentSkillFilePathsArgs = {
+export type QueryAiAgentSkillFilePathsArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2759,6 +2807,16 @@ export type QueryEditorTaskExecutionFileLogsArgs = {
 
 export type QueryEndpointDiscoveryStatusArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type QueryEvaluatorFunctionDefinitionArgs = {
+  name: Scalars['String']['input'];
+};
+
+
+export type QueryEvaluatorFunctionDefinitionsArgs = {
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -3373,70 +3431,70 @@ export type WorkflowTrigger = {
   type: Scalars['String']['output'];
 };
 
-export type AgentEvalResultQueryVariables = Exact<{
+export type AiAgentEvalResultQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AgentEvalResultQuery = { __typename?: 'Query', agentEvalResult?: { __typename?: 'AgentEvalResult', id: string, status: AgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, createdDate?: any | null, scenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AgentJudgeVerdict', id: string, judgeName: string, judgeType: AgentJudgeType, judgeScope: AgentJudgeScope, passed: boolean, score: number, explanation: string }> } | null };
+export type AiAgentEvalResultQuery = { __typename?: 'Query', aiAgentEvalResult?: { __typename?: 'AiAgentEvalResult', id: string, status: AiAgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, createdDate?: any | null, scenario: { __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AiAgentJudgeVerdict', id: string, judgeName: string, judgeType: AiAgentJudgeType, judgeScope: AiAgentJudgeScope, passed: boolean, score: number, explanation: string }> } | null };
 
-export type AgentEvalResultTranscriptQueryVariables = Exact<{
+export type AiAgentEvalResultTranscriptQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AgentEvalResultTranscriptQuery = { __typename?: 'Query', agentEvalResultTranscript?: string | null };
+export type AiAgentEvalResultTranscriptQuery = { __typename?: 'Query', aiAgentEvalResultTranscript?: string | null };
 
-export type AgentEvalRunQueryVariables = Exact<{
+export type AiAgentEvalRunQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AgentEvalRunQuery = { __typename?: 'Query', agentEvalRun?: { __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, agentVersion?: string | null, totalInputTokens?: number | null, totalOutputTokens?: number | null, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null, results: Array<{ __typename?: 'AgentEvalResult', id: string, status: AgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, inputTokens?: number | null, outputTokens?: number | null, runIndex?: number | null, createdDate?: any | null, scenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AgentJudgeVerdict', id: string, judgeName: string, judgeType: AgentJudgeType, judgeScope: AgentJudgeScope, passed: boolean, score: number, explanation: string }> }> } | null };
+export type AiAgentEvalRunQuery = { __typename?: 'Query', aiAgentEvalRun?: { __typename?: 'AiAgentEvalRun', id: string, name: string, status: AiAgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, agentVersion?: string | null, totalInputTokens?: number | null, totalOutputTokens?: number | null, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null, results: Array<{ __typename?: 'AiAgentEvalResult', id: string, status: AiAgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, inputTokens?: number | null, outputTokens?: number | null, runIndex?: number | null, createdDate?: any | null, scenario: { __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AiAgentJudgeVerdict', id: string, judgeName: string, judgeType: AiAgentJudgeType, judgeScope: AiAgentJudgeScope, passed: boolean, score: number, explanation: string }> }> } | null };
 
-export type AgentEvalRunsQueryVariables = Exact<{
+export type AiAgentEvalRunsQueryVariables = Exact<{
   agentEvalTestId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type AgentEvalRunsQuery = { __typename?: 'Query', agentEvalRuns: Array<{ __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null }> };
+export type AiAgentEvalRunsQuery = { __typename?: 'Query', aiAgentEvalRuns: Array<{ __typename?: 'AiAgentEvalRun', id: string, name: string, status: AiAgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null }> };
 
-export type AgentEvalTestQueryVariables = Exact<{
+export type AiAgentEvalTestQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AgentEvalTestQuery = { __typename?: 'Query', agentEvalTest?: { __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }>, toolSimulations: Array<{ __typename?: 'AgentScenarioToolSimulation', id: string, responsePrompt: string, simulationModel?: string | null, toolName: string, createdDate?: any | null, lastModifiedDate?: any | null }> }> } | null };
+export type AiAgentEvalTestQuery = { __typename?: 'Query', aiAgentEvalTest?: { __typename?: 'AiAgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }>, toolSimulations: Array<{ __typename?: 'AiAgentScenarioToolSimulation', id: string, responsePrompt: string, simulationModel?: string | null, toolName: string, createdDate?: any | null, lastModifiedDate?: any | null }> }> } | null };
 
-export type AgentEvalTestsQueryVariables = Exact<{
+export type AiAgentEvalTestsQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
 }>;
 
 
-export type AgentEvalTestsQuery = { __typename?: 'Query', agentEvalTests: Array<{ __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, toolSimulations: Array<{ __typename?: 'AgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null }>, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }> }> };
+export type AiAgentEvalTestsQuery = { __typename?: 'Query', aiAgentEvalTests: Array<{ __typename?: 'AiAgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, toolSimulations: Array<{ __typename?: 'AiAgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null }>, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }> }> };
 
-export type AgentJudgesQueryVariables = Exact<{
+export type AiAgentJudgesQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
 }>;
 
 
-export type AgentJudgesQuery = { __typename?: 'Query', agentJudges: Array<{ __typename?: 'AgentJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> };
+export type AiAgentJudgesQuery = { __typename?: 'Query', aiAgentJudges: Array<{ __typename?: 'AiAgentJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> };
 
-export type CancelAgentEvalRunMutationVariables = Exact<{
+export type CancelAiAgentEvalRunMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type CancelAgentEvalRunMutation = { __typename?: 'Mutation', cancelAgentEvalRun: { __typename?: 'AgentEvalRun', id: string, status: AgentEvalRunStatus } };
+export type CancelAiAgentEvalRunMutation = { __typename?: 'Mutation', cancelAiAgentEvalRun: { __typename?: 'AiAgentEvalRun', id: string, status: AiAgentEvalRunStatus } };
 
-export type CreateAgentEvalScenarioMutationVariables = Exact<{
+export type CreateAiAgentEvalScenarioMutationVariables = Exact<{
   agentEvalTestId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type: AgentScenarioType;
+  type: AiAgentScenarioType;
   userMessage?: InputMaybe<Scalars['String']['input']>;
   expectedOutput?: InputMaybe<Scalars['String']['input']>;
   personaPrompt?: InputMaybe<Scalars['String']['input']>;
@@ -3445,9 +3503,9 @@ export type CreateAgentEvalScenarioMutationVariables = Exact<{
 }>;
 
 
-export type CreateAgentEvalScenarioMutation = { __typename?: 'Mutation', createAgentEvalScenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
+export type CreateAiAgentEvalScenarioMutation = { __typename?: 'Mutation', createAiAgentEvalScenario: { __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
 
-export type CreateAgentEvalTestMutationVariables = Exact<{
+export type CreateAiAgentEvalTestMutationVariables = Exact<{
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -3455,30 +3513,30 @@ export type CreateAgentEvalTestMutationVariables = Exact<{
 }>;
 
 
-export type CreateAgentEvalTestMutation = { __typename?: 'Mutation', createAgentEvalTest: { __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiAgentEvalTestMutation = { __typename?: 'Mutation', createAiAgentEvalTest: { __typename?: 'AiAgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type CreateAgentJudgeMutationVariables = Exact<{
+export type CreateAiAgentJudgeMutationVariables = Exact<{
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
   name: Scalars['String']['input'];
-  type: AgentJudgeType;
+  type: AiAgentJudgeType;
   configuration: Scalars['Map']['input'];
 }>;
 
 
-export type CreateAgentJudgeMutation = { __typename?: 'Mutation', createAgentJudge: { __typename?: 'AgentJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiAgentJudgeMutation = { __typename?: 'Mutation', createAiAgentJudge: { __typename?: 'AiAgentJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type CreateAgentScenarioJudgeMutationVariables = Exact<{
+export type CreateAiAgentScenarioJudgeMutationVariables = Exact<{
   agentEvalScenarioId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type: AgentJudgeType;
+  type: AiAgentJudgeType;
   configuration: Scalars['Map']['input'];
 }>;
 
 
-export type CreateAgentScenarioJudgeMutation = { __typename?: 'Mutation', createAgentScenarioJudge: { __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiAgentScenarioJudgeMutation = { __typename?: 'Mutation', createAiAgentScenarioJudge: { __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type CreateAgentScenarioToolSimulationMutationVariables = Exact<{
+export type CreateAiAgentScenarioToolSimulationMutationVariables = Exact<{
   agentEvalScenarioId: Scalars['ID']['input'];
   toolName: Scalars['String']['input'];
   responsePrompt: Scalars['String']['input'];
@@ -3486,55 +3544,55 @@ export type CreateAgentScenarioToolSimulationMutationVariables = Exact<{
 }>;
 
 
-export type CreateAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', createAgentScenarioToolSimulation: { __typename?: 'AgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
+export type CreateAiAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', createAiAgentScenarioToolSimulation: { __typename?: 'AiAgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
 
-export type DeleteAgentEvalScenarioMutationVariables = Exact<{
+export type DeleteAiAgentEvalScenarioMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteAgentEvalScenarioMutation = { __typename?: 'Mutation', deleteAgentEvalScenario: boolean };
+export type DeleteAiAgentEvalScenarioMutation = { __typename?: 'Mutation', deleteAiAgentEvalScenario: boolean };
 
-export type DeleteAgentEvalTestMutationVariables = Exact<{
+export type DeleteAiAgentEvalTestMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteAgentEvalTestMutation = { __typename?: 'Mutation', deleteAgentEvalTest: boolean };
+export type DeleteAiAgentEvalTestMutation = { __typename?: 'Mutation', deleteAiAgentEvalTest: boolean };
 
-export type DeleteAgentJudgeMutationVariables = Exact<{
+export type DeleteAiAgentJudgeMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteAgentJudgeMutation = { __typename?: 'Mutation', deleteAgentJudge: boolean };
+export type DeleteAiAgentJudgeMutation = { __typename?: 'Mutation', deleteAiAgentJudge: boolean };
 
-export type DeleteAgentScenarioJudgeMutationVariables = Exact<{
+export type DeleteAiAgentScenarioJudgeMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteAgentScenarioJudgeMutation = { __typename?: 'Mutation', deleteAgentScenarioJudge: boolean };
+export type DeleteAiAgentScenarioJudgeMutation = { __typename?: 'Mutation', deleteAiAgentScenarioJudge: boolean };
 
-export type DeleteAgentScenarioToolSimulationMutationVariables = Exact<{
+export type DeleteAiAgentScenarioToolSimulationMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', deleteAgentScenarioToolSimulation: boolean };
+export type DeleteAiAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', deleteAiAgentScenarioToolSimulation: boolean };
 
-export type StartAgentEvalRunMutationVariables = Exact<{
+export type StartAiAgentEvalRunMutationVariables = Exact<{
   agentEvalTestId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   environmentId: Scalars['ID']['input'];
   scenarioIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
-  agentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
+  aiAgentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
 }>;
 
 
-export type StartAgentEvalRunMutation = { __typename?: 'Mutation', startAgentEvalRun: { __typename?: 'AgentEvalRun', id: string, name: string, status: AgentEvalRunStatus, totalScenarios: number, completedScenarios: number, agentVersion?: string | null, createdDate?: any | null } };
+export type StartAiAgentEvalRunMutation = { __typename?: 'Mutation', startAiAgentEvalRun: { __typename?: 'AiAgentEvalRun', id: string, name: string, status: AiAgentEvalRunStatus, totalScenarios: number, completedScenarios: number, agentVersion?: string | null, createdDate?: any | null } };
 
-export type UpdateAgentEvalScenarioMutationVariables = Exact<{
+export type UpdateAiAgentEvalScenarioMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   userMessage?: InputMaybe<Scalars['String']['input']>;
@@ -3545,36 +3603,36 @@ export type UpdateAgentEvalScenarioMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAgentEvalScenarioMutation = { __typename?: 'Mutation', updateAgentEvalScenario: { __typename?: 'AgentEvalScenario', id: string, name: string, type: AgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
+export type UpdateAiAgentEvalScenarioMutation = { __typename?: 'Mutation', updateAiAgentEvalScenario: { __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
 
-export type UpdateAgentEvalTestMutationVariables = Exact<{
+export type UpdateAiAgentEvalTestMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type UpdateAgentEvalTestMutation = { __typename?: 'Mutation', updateAgentEvalTest: { __typename?: 'AgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiAgentEvalTestMutation = { __typename?: 'Mutation', updateAiAgentEvalTest: { __typename?: 'AiAgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type UpdateAgentJudgeMutationVariables = Exact<{
+export type UpdateAiAgentJudgeMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   configuration?: InputMaybe<Scalars['Map']['input']>;
 }>;
 
 
-export type UpdateAgentJudgeMutation = { __typename?: 'Mutation', updateAgentJudge: { __typename?: 'AgentJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiAgentJudgeMutation = { __typename?: 'Mutation', updateAiAgentJudge: { __typename?: 'AiAgentJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type UpdateAgentScenarioJudgeMutationVariables = Exact<{
+export type UpdateAiAgentScenarioJudgeMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   configuration?: InputMaybe<Scalars['Map']['input']>;
 }>;
 
 
-export type UpdateAgentScenarioJudgeMutation = { __typename?: 'Mutation', updateAgentScenarioJudge: { __typename?: 'AgentScenarioJudge', id: string, name: string, type: AgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiAgentScenarioJudgeMutation = { __typename?: 'Mutation', updateAiAgentScenarioJudge: { __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type UpdateAgentScenarioToolSimulationMutationVariables = Exact<{
+export type UpdateAiAgentScenarioToolSimulationMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   toolName?: InputMaybe<Scalars['String']['input']>;
   responsePrompt?: InputMaybe<Scalars['String']['input']>;
@@ -3582,36 +3640,36 @@ export type UpdateAgentScenarioToolSimulationMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', updateAgentScenarioToolSimulation: { __typename?: 'AgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
+export type UpdateAiAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', updateAiAgentScenarioToolSimulation: { __typename?: 'AiAgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
 
-export type AgentSkillQueryVariables = Exact<{
+export type AiAgentSkillQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AgentSkillQuery = { __typename?: 'Query', agentSkill: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type AiAgentSkillQuery = { __typename?: 'Query', aiAgentSkill: { __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type AgentSkillFileContentQueryVariables = Exact<{
+export type AiAgentSkillFileContentQueryVariables = Exact<{
   id: Scalars['ID']['input'];
   path: Scalars['String']['input'];
 }>;
 
 
-export type AgentSkillFileContentQuery = { __typename?: 'Query', agentSkillFileContent: string };
+export type AiAgentSkillFileContentQuery = { __typename?: 'Query', aiAgentSkillFileContent: string };
 
-export type AgentSkillFilePathsQueryVariables = Exact<{
+export type AiAgentSkillFilePathsQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AgentSkillFilePathsQuery = { __typename?: 'Query', agentSkillFilePaths: Array<string> };
+export type AiAgentSkillFilePathsQuery = { __typename?: 'Query', aiAgentSkillFilePaths: Array<string> };
 
-export type AgentSkillsQueryVariables = Exact<{ [key: string]: never; }>;
+export type AiAgentSkillsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AgentSkillsQuery = { __typename?: 'Query', agentSkills: Array<{ __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null }> };
+export type AiAgentSkillsQuery = { __typename?: 'Query', aiAgentSkills: Array<{ __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null }> };
 
-export type CreateAgentSkillMutationVariables = Exact<{
+export type CreateAiAgentSkillMutationVariables = Exact<{
   name: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   filename: Scalars['String']['input'];
@@ -3619,32 +3677,32 @@ export type CreateAgentSkillMutationVariables = Exact<{
 }>;
 
 
-export type CreateAgentSkillMutation = { __typename?: 'Mutation', createAgentSkill: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiAgentSkillMutation = { __typename?: 'Mutation', createAiAgentSkill: { __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type CreateAgentSkillFromInstructionsMutationVariables = Exact<{
+export type CreateAiAgentSkillFromInstructionsMutationVariables = Exact<{
   name: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   instructions: Scalars['String']['input'];
 }>;
 
 
-export type CreateAgentSkillFromInstructionsMutation = { __typename?: 'Mutation', createAgentSkillFromInstructions: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiAgentSkillFromInstructionsMutation = { __typename?: 'Mutation', createAiAgentSkillFromInstructions: { __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type DeleteAgentSkillMutationVariables = Exact<{
+export type DeleteAiAgentSkillMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteAgentSkillMutation = { __typename?: 'Mutation', deleteAgentSkill: boolean };
+export type DeleteAiAgentSkillMutation = { __typename?: 'Mutation', deleteAiAgentSkill: boolean };
 
-export type UpdateAgentSkillMutationVariables = Exact<{
+export type UpdateAiAgentSkillMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type UpdateAgentSkillMutation = { __typename?: 'Mutation', updateAgentSkill: { __typename?: 'AgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiAgentSkillMutation = { __typename?: 'Mutation', updateAiAgentSkill: { __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
 export type ApprovalTaskQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -4938,9 +4996,9 @@ export type UsersQuery = { __typename?: 'Query', users?: { __typename?: 'AdminUs
 
 
 
-export const AgentEvalResultDocument = new TypedDocumentString(`
-    query agentEvalResult($id: ID!) {
-  agentEvalResult(id: $id) {
+export const AiAgentEvalResultDocument = new TypedDocumentString(`
+    query aiAgentEvalResult($id: ID!) {
+  aiAgentEvalResult(id: $id) {
     id
     scenario {
       id
@@ -4979,47 +5037,47 @@ export const AgentEvalResultDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAgentEvalResultQuery = <
-      TData = AgentEvalResultQuery,
+export const useAiAgentEvalResultQuery = <
+      TData = AiAgentEvalResultQuery,
       TError = unknown
     >(
-      variables: AgentEvalResultQueryVariables,
-      options?: Omit<UseQueryOptions<AgentEvalResultQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalResultQuery, TError, TData>['queryKey'] }
+      variables: AiAgentEvalResultQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentEvalResultQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalResultQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentEvalResultQuery, TError, TData>(
+    return useQuery<AiAgentEvalResultQuery, TError, TData>(
       {
-    queryKey: ['agentEvalResult', variables],
-    queryFn: fetcher<AgentEvalResultQuery, AgentEvalResultQueryVariables>(AgentEvalResultDocument, variables),
+    queryKey: ['aiAgentEvalResult', variables],
+    queryFn: fetcher<AiAgentEvalResultQuery, AiAgentEvalResultQueryVariables>(AiAgentEvalResultDocument, variables),
     ...options
   }
     )};
 
-export const AgentEvalResultTranscriptDocument = new TypedDocumentString(`
-    query agentEvalResultTranscript($id: ID!) {
-  agentEvalResultTranscript(id: $id)
+export const AiAgentEvalResultTranscriptDocument = new TypedDocumentString(`
+    query aiAgentEvalResultTranscript($id: ID!) {
+  aiAgentEvalResultTranscript(id: $id)
 }
     `);
 
-export const useAgentEvalResultTranscriptQuery = <
-      TData = AgentEvalResultTranscriptQuery,
+export const useAiAgentEvalResultTranscriptQuery = <
+      TData = AiAgentEvalResultTranscriptQuery,
       TError = unknown
     >(
-      variables: AgentEvalResultTranscriptQueryVariables,
-      options?: Omit<UseQueryOptions<AgentEvalResultTranscriptQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalResultTranscriptQuery, TError, TData>['queryKey'] }
+      variables: AiAgentEvalResultTranscriptQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentEvalResultTranscriptQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalResultTranscriptQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentEvalResultTranscriptQuery, TError, TData>(
+    return useQuery<AiAgentEvalResultTranscriptQuery, TError, TData>(
       {
-    queryKey: ['agentEvalResultTranscript', variables],
-    queryFn: fetcher<AgentEvalResultTranscriptQuery, AgentEvalResultTranscriptQueryVariables>(AgentEvalResultTranscriptDocument, variables),
+    queryKey: ['aiAgentEvalResultTranscript', variables],
+    queryFn: fetcher<AiAgentEvalResultTranscriptQuery, AiAgentEvalResultTranscriptQueryVariables>(AiAgentEvalResultTranscriptDocument, variables),
     ...options
   }
     )};
 
-export const AgentEvalRunDocument = new TypedDocumentString(`
-    query agentEvalRun($id: ID!) {
-  agentEvalRun(id: $id) {
+export const AiAgentEvalRunDocument = new TypedDocumentString(`
+    query aiAgentEvalRun($id: ID!) {
+  aiAgentEvalRun(id: $id) {
     id
     name
     status
@@ -5075,25 +5133,29 @@ export const AgentEvalRunDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAgentEvalRunQuery = <
-      TData = AgentEvalRunQuery,
+export const useAiAgentEvalRunQuery = <
+      TData = AiAgentEvalRunQuery,
       TError = unknown
     >(
-      variables: AgentEvalRunQueryVariables,
-      options?: Omit<UseQueryOptions<AgentEvalRunQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalRunQuery, TError, TData>['queryKey'] }
+      variables: AiAgentEvalRunQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentEvalRunQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalRunQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentEvalRunQuery, TError, TData>(
+    return useQuery<AiAgentEvalRunQuery, TError, TData>(
       {
-    queryKey: ['agentEvalRun', variables],
-    queryFn: fetcher<AgentEvalRunQuery, AgentEvalRunQueryVariables>(AgentEvalRunDocument, variables),
+    queryKey: ['aiAgentEvalRun', variables],
+    queryFn: fetcher<AiAgentEvalRunQuery, AiAgentEvalRunQueryVariables>(AiAgentEvalRunDocument, variables),
     ...options
   }
     )};
 
-export const AgentEvalRunsDocument = new TypedDocumentString(`
-    query agentEvalRuns($agentEvalTestId: ID!, $limit: Int, $offset: Int) {
-  agentEvalRuns(agentEvalTestId: $agentEvalTestId, limit: $limit, offset: $offset) {
+export const AiAgentEvalRunsDocument = new TypedDocumentString(`
+    query aiAgentEvalRuns($agentEvalTestId: ID!, $limit: Int, $offset: Int) {
+  aiAgentEvalRuns(
+    agentEvalTestId: $agentEvalTestId
+    limit: $limit
+    offset: $offset
+  ) {
     id
     name
     status
@@ -5107,25 +5169,25 @@ export const AgentEvalRunsDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAgentEvalRunsQuery = <
-      TData = AgentEvalRunsQuery,
+export const useAiAgentEvalRunsQuery = <
+      TData = AiAgentEvalRunsQuery,
       TError = unknown
     >(
-      variables: AgentEvalRunsQueryVariables,
-      options?: Omit<UseQueryOptions<AgentEvalRunsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalRunsQuery, TError, TData>['queryKey'] }
+      variables: AiAgentEvalRunsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentEvalRunsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalRunsQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentEvalRunsQuery, TError, TData>(
+    return useQuery<AiAgentEvalRunsQuery, TError, TData>(
       {
-    queryKey: ['agentEvalRuns', variables],
-    queryFn: fetcher<AgentEvalRunsQuery, AgentEvalRunsQueryVariables>(AgentEvalRunsDocument, variables),
+    queryKey: ['aiAgentEvalRuns', variables],
+    queryFn: fetcher<AiAgentEvalRunsQuery, AiAgentEvalRunsQueryVariables>(AiAgentEvalRunsDocument, variables),
     ...options
   }
     )};
 
-export const AgentEvalTestDocument = new TypedDocumentString(`
-    query agentEvalTest($id: ID!) {
-  agentEvalTest(id: $id) {
+export const AiAgentEvalTestDocument = new TypedDocumentString(`
+    query aiAgentEvalTest($id: ID!) {
+  aiAgentEvalTest(id: $id) {
     id
     name
     description
@@ -5163,25 +5225,25 @@ export const AgentEvalTestDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAgentEvalTestQuery = <
-      TData = AgentEvalTestQuery,
+export const useAiAgentEvalTestQuery = <
+      TData = AiAgentEvalTestQuery,
       TError = unknown
     >(
-      variables: AgentEvalTestQueryVariables,
-      options?: Omit<UseQueryOptions<AgentEvalTestQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalTestQuery, TError, TData>['queryKey'] }
+      variables: AiAgentEvalTestQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentEvalTestQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalTestQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentEvalTestQuery, TError, TData>(
+    return useQuery<AiAgentEvalTestQuery, TError, TData>(
       {
-    queryKey: ['agentEvalTest', variables],
-    queryFn: fetcher<AgentEvalTestQuery, AgentEvalTestQueryVariables>(AgentEvalTestDocument, variables),
+    queryKey: ['aiAgentEvalTest', variables],
+    queryFn: fetcher<AiAgentEvalTestQuery, AiAgentEvalTestQueryVariables>(AiAgentEvalTestDocument, variables),
     ...options
   }
     )};
 
-export const AgentEvalTestsDocument = new TypedDocumentString(`
-    query agentEvalTests($workflowId: String!, $workflowNodeName: String!) {
-  agentEvalTests(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
+export const AiAgentEvalTestsDocument = new TypedDocumentString(`
+    query aiAgentEvalTests($workflowId: String!, $workflowNodeName: String!) {
+  aiAgentEvalTests(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
     id
     name
     description
@@ -5217,25 +5279,25 @@ export const AgentEvalTestsDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAgentEvalTestsQuery = <
-      TData = AgentEvalTestsQuery,
+export const useAiAgentEvalTestsQuery = <
+      TData = AiAgentEvalTestsQuery,
       TError = unknown
     >(
-      variables: AgentEvalTestsQueryVariables,
-      options?: Omit<UseQueryOptions<AgentEvalTestsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentEvalTestsQuery, TError, TData>['queryKey'] }
+      variables: AiAgentEvalTestsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentEvalTestsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalTestsQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentEvalTestsQuery, TError, TData>(
+    return useQuery<AiAgentEvalTestsQuery, TError, TData>(
       {
-    queryKey: ['agentEvalTests', variables],
-    queryFn: fetcher<AgentEvalTestsQuery, AgentEvalTestsQueryVariables>(AgentEvalTestsDocument, variables),
+    queryKey: ['aiAgentEvalTests', variables],
+    queryFn: fetcher<AiAgentEvalTestsQuery, AiAgentEvalTestsQueryVariables>(AiAgentEvalTestsDocument, variables),
     ...options
   }
     )};
 
-export const AgentJudgesDocument = new TypedDocumentString(`
-    query agentJudges($workflowId: String!, $workflowNodeName: String!) {
-  agentJudges(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
+export const AiAgentJudgesDocument = new TypedDocumentString(`
+    query aiAgentJudges($workflowId: String!, $workflowNodeName: String!) {
+  aiAgentJudges(workflowId: $workflowId, workflowNodeName: $workflowNodeName) {
     id
     name
     type
@@ -5246,47 +5308,47 @@ export const AgentJudgesDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAgentJudgesQuery = <
-      TData = AgentJudgesQuery,
+export const useAiAgentJudgesQuery = <
+      TData = AiAgentJudgesQuery,
       TError = unknown
     >(
-      variables: AgentJudgesQueryVariables,
-      options?: Omit<UseQueryOptions<AgentJudgesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentJudgesQuery, TError, TData>['queryKey'] }
+      variables: AiAgentJudgesQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentJudgesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentJudgesQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentJudgesQuery, TError, TData>(
+    return useQuery<AiAgentJudgesQuery, TError, TData>(
       {
-    queryKey: ['agentJudges', variables],
-    queryFn: fetcher<AgentJudgesQuery, AgentJudgesQueryVariables>(AgentJudgesDocument, variables),
+    queryKey: ['aiAgentJudges', variables],
+    queryFn: fetcher<AiAgentJudgesQuery, AiAgentJudgesQueryVariables>(AiAgentJudgesDocument, variables),
     ...options
   }
     )};
 
-export const CancelAgentEvalRunDocument = new TypedDocumentString(`
-    mutation cancelAgentEvalRun($id: ID!) {
-  cancelAgentEvalRun(id: $id) {
+export const CancelAiAgentEvalRunDocument = new TypedDocumentString(`
+    mutation cancelAiAgentEvalRun($id: ID!) {
+  cancelAiAgentEvalRun(id: $id) {
     id
     status
   }
 }
     `);
 
-export const useCancelAgentEvalRunMutation = <
+export const useCancelAiAgentEvalRunMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CancelAgentEvalRunMutation, TError, CancelAgentEvalRunMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CancelAiAgentEvalRunMutation, TError, CancelAiAgentEvalRunMutationVariables, TContext>) => {
     
-    return useMutation<CancelAgentEvalRunMutation, TError, CancelAgentEvalRunMutationVariables, TContext>(
+    return useMutation<CancelAiAgentEvalRunMutation, TError, CancelAiAgentEvalRunMutationVariables, TContext>(
       {
-    mutationKey: ['cancelAgentEvalRun'],
-    mutationFn: (variables?: CancelAgentEvalRunMutationVariables) => fetcher<CancelAgentEvalRunMutation, CancelAgentEvalRunMutationVariables>(CancelAgentEvalRunDocument, variables)(),
+    mutationKey: ['cancelAiAgentEvalRun'],
+    mutationFn: (variables?: CancelAiAgentEvalRunMutationVariables) => fetcher<CancelAiAgentEvalRunMutation, CancelAiAgentEvalRunMutationVariables>(CancelAiAgentEvalRunDocument, variables)(),
     ...options
   }
     )};
 
-export const CreateAgentEvalScenarioDocument = new TypedDocumentString(`
-    mutation createAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: AgentScenarioType!, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
-  createAgentEvalScenario(
+export const CreateAiAgentEvalScenarioDocument = new TypedDocumentString(`
+    mutation createAiAgentEvalScenario($agentEvalTestId: ID!, $name: String!, $type: AiAgentScenarioType!, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
+  createAiAgentEvalScenario(
     agentEvalTestId: $agentEvalTestId
     name: $name
     type: $type
@@ -5318,22 +5380,22 @@ export const CreateAgentEvalScenarioDocument = new TypedDocumentString(`
 }
     `);
 
-export const useCreateAgentEvalScenarioMutation = <
+export const useCreateAiAgentEvalScenarioMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAgentEvalScenarioMutation, TError, CreateAgentEvalScenarioMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiAgentEvalScenarioMutation, TError, CreateAiAgentEvalScenarioMutationVariables, TContext>) => {
     
-    return useMutation<CreateAgentEvalScenarioMutation, TError, CreateAgentEvalScenarioMutationVariables, TContext>(
+    return useMutation<CreateAiAgentEvalScenarioMutation, TError, CreateAiAgentEvalScenarioMutationVariables, TContext>(
       {
-    mutationKey: ['createAgentEvalScenario'],
-    mutationFn: (variables?: CreateAgentEvalScenarioMutationVariables) => fetcher<CreateAgentEvalScenarioMutation, CreateAgentEvalScenarioMutationVariables>(CreateAgentEvalScenarioDocument, variables)(),
+    mutationKey: ['createAiAgentEvalScenario'],
+    mutationFn: (variables?: CreateAiAgentEvalScenarioMutationVariables) => fetcher<CreateAiAgentEvalScenarioMutation, CreateAiAgentEvalScenarioMutationVariables>(CreateAiAgentEvalScenarioDocument, variables)(),
     ...options
   }
     )};
 
-export const CreateAgentEvalTestDocument = new TypedDocumentString(`
-    mutation createAgentEvalTest($workflowId: String!, $workflowNodeName: String!, $name: String!, $description: String) {
-  createAgentEvalTest(
+export const CreateAiAgentEvalTestDocument = new TypedDocumentString(`
+    mutation createAiAgentEvalTest($workflowId: String!, $workflowNodeName: String!, $name: String!, $description: String) {
+  createAiAgentEvalTest(
     workflowId: $workflowId
     workflowNodeName: $workflowNodeName
     name: $name
@@ -5348,22 +5410,22 @@ export const CreateAgentEvalTestDocument = new TypedDocumentString(`
 }
     `);
 
-export const useCreateAgentEvalTestMutation = <
+export const useCreateAiAgentEvalTestMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAgentEvalTestMutation, TError, CreateAgentEvalTestMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiAgentEvalTestMutation, TError, CreateAiAgentEvalTestMutationVariables, TContext>) => {
     
-    return useMutation<CreateAgentEvalTestMutation, TError, CreateAgentEvalTestMutationVariables, TContext>(
+    return useMutation<CreateAiAgentEvalTestMutation, TError, CreateAiAgentEvalTestMutationVariables, TContext>(
       {
-    mutationKey: ['createAgentEvalTest'],
-    mutationFn: (variables?: CreateAgentEvalTestMutationVariables) => fetcher<CreateAgentEvalTestMutation, CreateAgentEvalTestMutationVariables>(CreateAgentEvalTestDocument, variables)(),
+    mutationKey: ['createAiAgentEvalTest'],
+    mutationFn: (variables?: CreateAiAgentEvalTestMutationVariables) => fetcher<CreateAiAgentEvalTestMutation, CreateAiAgentEvalTestMutationVariables>(CreateAiAgentEvalTestDocument, variables)(),
     ...options
   }
     )};
 
-export const CreateAgentJudgeDocument = new TypedDocumentString(`
-    mutation createAgentJudge($workflowId: String!, $workflowNodeName: String!, $name: String!, $type: AgentJudgeType!, $configuration: Map!) {
-  createAgentJudge(
+export const CreateAiAgentJudgeDocument = new TypedDocumentString(`
+    mutation createAiAgentJudge($workflowId: String!, $workflowNodeName: String!, $name: String!, $type: AiAgentJudgeType!, $configuration: Map!) {
+  createAiAgentJudge(
     workflowId: $workflowId
     workflowNodeName: $workflowNodeName
     name: $name
@@ -5380,22 +5442,22 @@ export const CreateAgentJudgeDocument = new TypedDocumentString(`
 }
     `);
 
-export const useCreateAgentJudgeMutation = <
+export const useCreateAiAgentJudgeMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAgentJudgeMutation, TError, CreateAgentJudgeMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiAgentJudgeMutation, TError, CreateAiAgentJudgeMutationVariables, TContext>) => {
     
-    return useMutation<CreateAgentJudgeMutation, TError, CreateAgentJudgeMutationVariables, TContext>(
+    return useMutation<CreateAiAgentJudgeMutation, TError, CreateAiAgentJudgeMutationVariables, TContext>(
       {
-    mutationKey: ['createAgentJudge'],
-    mutationFn: (variables?: CreateAgentJudgeMutationVariables) => fetcher<CreateAgentJudgeMutation, CreateAgentJudgeMutationVariables>(CreateAgentJudgeDocument, variables)(),
+    mutationKey: ['createAiAgentJudge'],
+    mutationFn: (variables?: CreateAiAgentJudgeMutationVariables) => fetcher<CreateAiAgentJudgeMutation, CreateAiAgentJudgeMutationVariables>(CreateAiAgentJudgeDocument, variables)(),
     ...options
   }
     )};
 
-export const CreateAgentScenarioJudgeDocument = new TypedDocumentString(`
-    mutation createAgentScenarioJudge($agentEvalScenarioId: ID!, $name: String!, $type: AgentJudgeType!, $configuration: Map!) {
-  createAgentScenarioJudge(
+export const CreateAiAgentScenarioJudgeDocument = new TypedDocumentString(`
+    mutation createAiAgentScenarioJudge($agentEvalScenarioId: ID!, $name: String!, $type: AiAgentJudgeType!, $configuration: Map!) {
+  createAiAgentScenarioJudge(
     agentEvalScenarioId: $agentEvalScenarioId
     name: $name
     type: $type
@@ -5411,22 +5473,22 @@ export const CreateAgentScenarioJudgeDocument = new TypedDocumentString(`
 }
     `);
 
-export const useCreateAgentScenarioJudgeMutation = <
+export const useCreateAiAgentScenarioJudgeMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAgentScenarioJudgeMutation, TError, CreateAgentScenarioJudgeMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiAgentScenarioJudgeMutation, TError, CreateAiAgentScenarioJudgeMutationVariables, TContext>) => {
     
-    return useMutation<CreateAgentScenarioJudgeMutation, TError, CreateAgentScenarioJudgeMutationVariables, TContext>(
+    return useMutation<CreateAiAgentScenarioJudgeMutation, TError, CreateAiAgentScenarioJudgeMutationVariables, TContext>(
       {
-    mutationKey: ['createAgentScenarioJudge'],
-    mutationFn: (variables?: CreateAgentScenarioJudgeMutationVariables) => fetcher<CreateAgentScenarioJudgeMutation, CreateAgentScenarioJudgeMutationVariables>(CreateAgentScenarioJudgeDocument, variables)(),
+    mutationKey: ['createAiAgentScenarioJudge'],
+    mutationFn: (variables?: CreateAiAgentScenarioJudgeMutationVariables) => fetcher<CreateAiAgentScenarioJudgeMutation, CreateAiAgentScenarioJudgeMutationVariables>(CreateAiAgentScenarioJudgeDocument, variables)(),
     ...options
   }
     )};
 
-export const CreateAgentScenarioToolSimulationDocument = new TypedDocumentString(`
-    mutation createAgentScenarioToolSimulation($agentEvalScenarioId: ID!, $toolName: String!, $responsePrompt: String!, $simulationModel: String) {
-  createAgentScenarioToolSimulation(
+export const CreateAiAgentScenarioToolSimulationDocument = new TypedDocumentString(`
+    mutation createAiAgentScenarioToolSimulation($agentEvalScenarioId: ID!, $toolName: String!, $responsePrompt: String!, $simulationModel: String) {
+  createAiAgentScenarioToolSimulation(
     agentEvalScenarioId: $agentEvalScenarioId
     toolName: $toolName
     responsePrompt: $responsePrompt
@@ -5440,122 +5502,122 @@ export const CreateAgentScenarioToolSimulationDocument = new TypedDocumentString
 }
     `);
 
-export const useCreateAgentScenarioToolSimulationMutation = <
+export const useCreateAiAgentScenarioToolSimulationMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAgentScenarioToolSimulationMutation, TError, CreateAgentScenarioToolSimulationMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiAgentScenarioToolSimulationMutation, TError, CreateAiAgentScenarioToolSimulationMutationVariables, TContext>) => {
     
-    return useMutation<CreateAgentScenarioToolSimulationMutation, TError, CreateAgentScenarioToolSimulationMutationVariables, TContext>(
+    return useMutation<CreateAiAgentScenarioToolSimulationMutation, TError, CreateAiAgentScenarioToolSimulationMutationVariables, TContext>(
       {
-    mutationKey: ['createAgentScenarioToolSimulation'],
-    mutationFn: (variables?: CreateAgentScenarioToolSimulationMutationVariables) => fetcher<CreateAgentScenarioToolSimulationMutation, CreateAgentScenarioToolSimulationMutationVariables>(CreateAgentScenarioToolSimulationDocument, variables)(),
+    mutationKey: ['createAiAgentScenarioToolSimulation'],
+    mutationFn: (variables?: CreateAiAgentScenarioToolSimulationMutationVariables) => fetcher<CreateAiAgentScenarioToolSimulationMutation, CreateAiAgentScenarioToolSimulationMutationVariables>(CreateAiAgentScenarioToolSimulationDocument, variables)(),
     ...options
   }
     )};
 
-export const DeleteAgentEvalScenarioDocument = new TypedDocumentString(`
-    mutation deleteAgentEvalScenario($id: ID!) {
-  deleteAgentEvalScenario(id: $id)
+export const DeleteAiAgentEvalScenarioDocument = new TypedDocumentString(`
+    mutation deleteAiAgentEvalScenario($id: ID!) {
+  deleteAiAgentEvalScenario(id: $id)
 }
     `);
 
-export const useDeleteAgentEvalScenarioMutation = <
+export const useDeleteAiAgentEvalScenarioMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteAgentEvalScenarioMutation, TError, DeleteAgentEvalScenarioMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteAiAgentEvalScenarioMutation, TError, DeleteAiAgentEvalScenarioMutationVariables, TContext>) => {
     
-    return useMutation<DeleteAgentEvalScenarioMutation, TError, DeleteAgentEvalScenarioMutationVariables, TContext>(
+    return useMutation<DeleteAiAgentEvalScenarioMutation, TError, DeleteAiAgentEvalScenarioMutationVariables, TContext>(
       {
-    mutationKey: ['deleteAgentEvalScenario'],
-    mutationFn: (variables?: DeleteAgentEvalScenarioMutationVariables) => fetcher<DeleteAgentEvalScenarioMutation, DeleteAgentEvalScenarioMutationVariables>(DeleteAgentEvalScenarioDocument, variables)(),
+    mutationKey: ['deleteAiAgentEvalScenario'],
+    mutationFn: (variables?: DeleteAiAgentEvalScenarioMutationVariables) => fetcher<DeleteAiAgentEvalScenarioMutation, DeleteAiAgentEvalScenarioMutationVariables>(DeleteAiAgentEvalScenarioDocument, variables)(),
     ...options
   }
     )};
 
-export const DeleteAgentEvalTestDocument = new TypedDocumentString(`
-    mutation deleteAgentEvalTest($id: ID!) {
-  deleteAgentEvalTest(id: $id)
+export const DeleteAiAgentEvalTestDocument = new TypedDocumentString(`
+    mutation deleteAiAgentEvalTest($id: ID!) {
+  deleteAiAgentEvalTest(id: $id)
 }
     `);
 
-export const useDeleteAgentEvalTestMutation = <
+export const useDeleteAiAgentEvalTestMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteAgentEvalTestMutation, TError, DeleteAgentEvalTestMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteAiAgentEvalTestMutation, TError, DeleteAiAgentEvalTestMutationVariables, TContext>) => {
     
-    return useMutation<DeleteAgentEvalTestMutation, TError, DeleteAgentEvalTestMutationVariables, TContext>(
+    return useMutation<DeleteAiAgentEvalTestMutation, TError, DeleteAiAgentEvalTestMutationVariables, TContext>(
       {
-    mutationKey: ['deleteAgentEvalTest'],
-    mutationFn: (variables?: DeleteAgentEvalTestMutationVariables) => fetcher<DeleteAgentEvalTestMutation, DeleteAgentEvalTestMutationVariables>(DeleteAgentEvalTestDocument, variables)(),
+    mutationKey: ['deleteAiAgentEvalTest'],
+    mutationFn: (variables?: DeleteAiAgentEvalTestMutationVariables) => fetcher<DeleteAiAgentEvalTestMutation, DeleteAiAgentEvalTestMutationVariables>(DeleteAiAgentEvalTestDocument, variables)(),
     ...options
   }
     )};
 
-export const DeleteAgentJudgeDocument = new TypedDocumentString(`
-    mutation deleteAgentJudge($id: ID!) {
-  deleteAgentJudge(id: $id)
+export const DeleteAiAgentJudgeDocument = new TypedDocumentString(`
+    mutation deleteAiAgentJudge($id: ID!) {
+  deleteAiAgentJudge(id: $id)
 }
     `);
 
-export const useDeleteAgentJudgeMutation = <
+export const useDeleteAiAgentJudgeMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteAgentJudgeMutation, TError, DeleteAgentJudgeMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteAiAgentJudgeMutation, TError, DeleteAiAgentJudgeMutationVariables, TContext>) => {
     
-    return useMutation<DeleteAgentJudgeMutation, TError, DeleteAgentJudgeMutationVariables, TContext>(
+    return useMutation<DeleteAiAgentJudgeMutation, TError, DeleteAiAgentJudgeMutationVariables, TContext>(
       {
-    mutationKey: ['deleteAgentJudge'],
-    mutationFn: (variables?: DeleteAgentJudgeMutationVariables) => fetcher<DeleteAgentJudgeMutation, DeleteAgentJudgeMutationVariables>(DeleteAgentJudgeDocument, variables)(),
+    mutationKey: ['deleteAiAgentJudge'],
+    mutationFn: (variables?: DeleteAiAgentJudgeMutationVariables) => fetcher<DeleteAiAgentJudgeMutation, DeleteAiAgentJudgeMutationVariables>(DeleteAiAgentJudgeDocument, variables)(),
     ...options
   }
     )};
 
-export const DeleteAgentScenarioJudgeDocument = new TypedDocumentString(`
-    mutation deleteAgentScenarioJudge($id: ID!) {
-  deleteAgentScenarioJudge(id: $id)
+export const DeleteAiAgentScenarioJudgeDocument = new TypedDocumentString(`
+    mutation deleteAiAgentScenarioJudge($id: ID!) {
+  deleteAiAgentScenarioJudge(id: $id)
 }
     `);
 
-export const useDeleteAgentScenarioJudgeMutation = <
+export const useDeleteAiAgentScenarioJudgeMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteAgentScenarioJudgeMutation, TError, DeleteAgentScenarioJudgeMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteAiAgentScenarioJudgeMutation, TError, DeleteAiAgentScenarioJudgeMutationVariables, TContext>) => {
     
-    return useMutation<DeleteAgentScenarioJudgeMutation, TError, DeleteAgentScenarioJudgeMutationVariables, TContext>(
+    return useMutation<DeleteAiAgentScenarioJudgeMutation, TError, DeleteAiAgentScenarioJudgeMutationVariables, TContext>(
       {
-    mutationKey: ['deleteAgentScenarioJudge'],
-    mutationFn: (variables?: DeleteAgentScenarioJudgeMutationVariables) => fetcher<DeleteAgentScenarioJudgeMutation, DeleteAgentScenarioJudgeMutationVariables>(DeleteAgentScenarioJudgeDocument, variables)(),
+    mutationKey: ['deleteAiAgentScenarioJudge'],
+    mutationFn: (variables?: DeleteAiAgentScenarioJudgeMutationVariables) => fetcher<DeleteAiAgentScenarioJudgeMutation, DeleteAiAgentScenarioJudgeMutationVariables>(DeleteAiAgentScenarioJudgeDocument, variables)(),
     ...options
   }
     )};
 
-export const DeleteAgentScenarioToolSimulationDocument = new TypedDocumentString(`
-    mutation deleteAgentScenarioToolSimulation($id: ID!) {
-  deleteAgentScenarioToolSimulation(id: $id)
+export const DeleteAiAgentScenarioToolSimulationDocument = new TypedDocumentString(`
+    mutation deleteAiAgentScenarioToolSimulation($id: ID!) {
+  deleteAiAgentScenarioToolSimulation(id: $id)
 }
     `);
 
-export const useDeleteAgentScenarioToolSimulationMutation = <
+export const useDeleteAiAgentScenarioToolSimulationMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteAgentScenarioToolSimulationMutation, TError, DeleteAgentScenarioToolSimulationMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteAiAgentScenarioToolSimulationMutation, TError, DeleteAiAgentScenarioToolSimulationMutationVariables, TContext>) => {
     
-    return useMutation<DeleteAgentScenarioToolSimulationMutation, TError, DeleteAgentScenarioToolSimulationMutationVariables, TContext>(
+    return useMutation<DeleteAiAgentScenarioToolSimulationMutation, TError, DeleteAiAgentScenarioToolSimulationMutationVariables, TContext>(
       {
-    mutationKey: ['deleteAgentScenarioToolSimulation'],
-    mutationFn: (variables?: DeleteAgentScenarioToolSimulationMutationVariables) => fetcher<DeleteAgentScenarioToolSimulationMutation, DeleteAgentScenarioToolSimulationMutationVariables>(DeleteAgentScenarioToolSimulationDocument, variables)(),
+    mutationKey: ['deleteAiAgentScenarioToolSimulation'],
+    mutationFn: (variables?: DeleteAiAgentScenarioToolSimulationMutationVariables) => fetcher<DeleteAiAgentScenarioToolSimulationMutation, DeleteAiAgentScenarioToolSimulationMutationVariables>(DeleteAiAgentScenarioToolSimulationDocument, variables)(),
     ...options
   }
     )};
 
-export const StartAgentEvalRunDocument = new TypedDocumentString(`
-    mutation startAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!, $scenarioIds: [ID!], $agentJudgeIds: [ID!]) {
-  startAgentEvalRun(
+export const StartAiAgentEvalRunDocument = new TypedDocumentString(`
+    mutation startAiAgentEvalRun($agentEvalTestId: ID!, $name: String!, $environmentId: ID!, $scenarioIds: [ID!], $aiAgentJudgeIds: [ID!]) {
+  startAiAgentEvalRun(
     agentEvalTestId: $agentEvalTestId
     name: $name
     environmentId: $environmentId
     scenarioIds: $scenarioIds
-    agentJudgeIds: $agentJudgeIds
+    aiAgentJudgeIds: $aiAgentJudgeIds
   ) {
     id
     name
@@ -5568,22 +5630,22 @@ export const StartAgentEvalRunDocument = new TypedDocumentString(`
 }
     `);
 
-export const useStartAgentEvalRunMutation = <
+export const useStartAiAgentEvalRunMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<StartAgentEvalRunMutation, TError, StartAgentEvalRunMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<StartAiAgentEvalRunMutation, TError, StartAiAgentEvalRunMutationVariables, TContext>) => {
     
-    return useMutation<StartAgentEvalRunMutation, TError, StartAgentEvalRunMutationVariables, TContext>(
+    return useMutation<StartAiAgentEvalRunMutation, TError, StartAiAgentEvalRunMutationVariables, TContext>(
       {
-    mutationKey: ['startAgentEvalRun'],
-    mutationFn: (variables?: StartAgentEvalRunMutationVariables) => fetcher<StartAgentEvalRunMutation, StartAgentEvalRunMutationVariables>(StartAgentEvalRunDocument, variables)(),
+    mutationKey: ['startAiAgentEvalRun'],
+    mutationFn: (variables?: StartAiAgentEvalRunMutationVariables) => fetcher<StartAiAgentEvalRunMutation, StartAiAgentEvalRunMutationVariables>(StartAiAgentEvalRunDocument, variables)(),
     ...options
   }
     )};
 
-export const UpdateAgentEvalScenarioDocument = new TypedDocumentString(`
-    mutation updateAgentEvalScenario($id: ID!, $name: String, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
-  updateAgentEvalScenario(
+export const UpdateAiAgentEvalScenarioDocument = new TypedDocumentString(`
+    mutation updateAiAgentEvalScenario($id: ID!, $name: String, $userMessage: String, $expectedOutput: String, $personaPrompt: String, $maxTurns: Int, $numberOfRuns: Int) {
+  updateAiAgentEvalScenario(
     id: $id
     name: $name
     userMessage: $userMessage
@@ -5614,22 +5676,22 @@ export const UpdateAgentEvalScenarioDocument = new TypedDocumentString(`
 }
     `);
 
-export const useUpdateAgentEvalScenarioMutation = <
+export const useUpdateAiAgentEvalScenarioMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateAgentEvalScenarioMutation, TError, UpdateAgentEvalScenarioMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateAiAgentEvalScenarioMutation, TError, UpdateAiAgentEvalScenarioMutationVariables, TContext>) => {
     
-    return useMutation<UpdateAgentEvalScenarioMutation, TError, UpdateAgentEvalScenarioMutationVariables, TContext>(
+    return useMutation<UpdateAiAgentEvalScenarioMutation, TError, UpdateAiAgentEvalScenarioMutationVariables, TContext>(
       {
-    mutationKey: ['updateAgentEvalScenario'],
-    mutationFn: (variables?: UpdateAgentEvalScenarioMutationVariables) => fetcher<UpdateAgentEvalScenarioMutation, UpdateAgentEvalScenarioMutationVariables>(UpdateAgentEvalScenarioDocument, variables)(),
+    mutationKey: ['updateAiAgentEvalScenario'],
+    mutationFn: (variables?: UpdateAiAgentEvalScenarioMutationVariables) => fetcher<UpdateAiAgentEvalScenarioMutation, UpdateAiAgentEvalScenarioMutationVariables>(UpdateAiAgentEvalScenarioDocument, variables)(),
     ...options
   }
     )};
 
-export const UpdateAgentEvalTestDocument = new TypedDocumentString(`
-    mutation updateAgentEvalTest($id: ID!, $name: String, $description: String) {
-  updateAgentEvalTest(id: $id, name: $name, description: $description) {
+export const UpdateAiAgentEvalTestDocument = new TypedDocumentString(`
+    mutation updateAiAgentEvalTest($id: ID!, $name: String, $description: String) {
+  updateAiAgentEvalTest(id: $id, name: $name, description: $description) {
     id
     name
     description
@@ -5639,22 +5701,22 @@ export const UpdateAgentEvalTestDocument = new TypedDocumentString(`
 }
     `);
 
-export const useUpdateAgentEvalTestMutation = <
+export const useUpdateAiAgentEvalTestMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateAgentEvalTestMutation, TError, UpdateAgentEvalTestMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateAiAgentEvalTestMutation, TError, UpdateAiAgentEvalTestMutationVariables, TContext>) => {
     
-    return useMutation<UpdateAgentEvalTestMutation, TError, UpdateAgentEvalTestMutationVariables, TContext>(
+    return useMutation<UpdateAiAgentEvalTestMutation, TError, UpdateAiAgentEvalTestMutationVariables, TContext>(
       {
-    mutationKey: ['updateAgentEvalTest'],
-    mutationFn: (variables?: UpdateAgentEvalTestMutationVariables) => fetcher<UpdateAgentEvalTestMutation, UpdateAgentEvalTestMutationVariables>(UpdateAgentEvalTestDocument, variables)(),
+    mutationKey: ['updateAiAgentEvalTest'],
+    mutationFn: (variables?: UpdateAiAgentEvalTestMutationVariables) => fetcher<UpdateAiAgentEvalTestMutation, UpdateAiAgentEvalTestMutationVariables>(UpdateAiAgentEvalTestDocument, variables)(),
     ...options
   }
     )};
 
-export const UpdateAgentJudgeDocument = new TypedDocumentString(`
-    mutation updateAgentJudge($id: ID!, $name: String, $configuration: Map) {
-  updateAgentJudge(id: $id, name: $name, configuration: $configuration) {
+export const UpdateAiAgentJudgeDocument = new TypedDocumentString(`
+    mutation updateAiAgentJudge($id: ID!, $name: String, $configuration: Map) {
+  updateAiAgentJudge(id: $id, name: $name, configuration: $configuration) {
     id
     name
     type
@@ -5665,22 +5727,22 @@ export const UpdateAgentJudgeDocument = new TypedDocumentString(`
 }
     `);
 
-export const useUpdateAgentJudgeMutation = <
+export const useUpdateAiAgentJudgeMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateAgentJudgeMutation, TError, UpdateAgentJudgeMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateAiAgentJudgeMutation, TError, UpdateAiAgentJudgeMutationVariables, TContext>) => {
     
-    return useMutation<UpdateAgentJudgeMutation, TError, UpdateAgentJudgeMutationVariables, TContext>(
+    return useMutation<UpdateAiAgentJudgeMutation, TError, UpdateAiAgentJudgeMutationVariables, TContext>(
       {
-    mutationKey: ['updateAgentJudge'],
-    mutationFn: (variables?: UpdateAgentJudgeMutationVariables) => fetcher<UpdateAgentJudgeMutation, UpdateAgentJudgeMutationVariables>(UpdateAgentJudgeDocument, variables)(),
+    mutationKey: ['updateAiAgentJudge'],
+    mutationFn: (variables?: UpdateAiAgentJudgeMutationVariables) => fetcher<UpdateAiAgentJudgeMutation, UpdateAiAgentJudgeMutationVariables>(UpdateAiAgentJudgeDocument, variables)(),
     ...options
   }
     )};
 
-export const UpdateAgentScenarioJudgeDocument = new TypedDocumentString(`
-    mutation updateAgentScenarioJudge($id: ID!, $name: String, $configuration: Map) {
-  updateAgentScenarioJudge(id: $id, name: $name, configuration: $configuration) {
+export const UpdateAiAgentScenarioJudgeDocument = new TypedDocumentString(`
+    mutation updateAiAgentScenarioJudge($id: ID!, $name: String, $configuration: Map) {
+  updateAiAgentScenarioJudge(id: $id, name: $name, configuration: $configuration) {
     id
     name
     type
@@ -5691,22 +5753,22 @@ export const UpdateAgentScenarioJudgeDocument = new TypedDocumentString(`
 }
     `);
 
-export const useUpdateAgentScenarioJudgeMutation = <
+export const useUpdateAiAgentScenarioJudgeMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateAgentScenarioJudgeMutation, TError, UpdateAgentScenarioJudgeMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateAiAgentScenarioJudgeMutation, TError, UpdateAiAgentScenarioJudgeMutationVariables, TContext>) => {
     
-    return useMutation<UpdateAgentScenarioJudgeMutation, TError, UpdateAgentScenarioJudgeMutationVariables, TContext>(
+    return useMutation<UpdateAiAgentScenarioJudgeMutation, TError, UpdateAiAgentScenarioJudgeMutationVariables, TContext>(
       {
-    mutationKey: ['updateAgentScenarioJudge'],
-    mutationFn: (variables?: UpdateAgentScenarioJudgeMutationVariables) => fetcher<UpdateAgentScenarioJudgeMutation, UpdateAgentScenarioJudgeMutationVariables>(UpdateAgentScenarioJudgeDocument, variables)(),
+    mutationKey: ['updateAiAgentScenarioJudge'],
+    mutationFn: (variables?: UpdateAiAgentScenarioJudgeMutationVariables) => fetcher<UpdateAiAgentScenarioJudgeMutation, UpdateAiAgentScenarioJudgeMutationVariables>(UpdateAiAgentScenarioJudgeDocument, variables)(),
     ...options
   }
     )};
 
-export const UpdateAgentScenarioToolSimulationDocument = new TypedDocumentString(`
-    mutation updateAgentScenarioToolSimulation($id: ID!, $toolName: String, $responsePrompt: String, $simulationModel: String) {
-  updateAgentScenarioToolSimulation(
+export const UpdateAiAgentScenarioToolSimulationDocument = new TypedDocumentString(`
+    mutation updateAiAgentScenarioToolSimulation($id: ID!, $toolName: String, $responsePrompt: String, $simulationModel: String) {
+  updateAiAgentScenarioToolSimulation(
     id: $id
     toolName: $toolName
     responsePrompt: $responsePrompt
@@ -5720,22 +5782,22 @@ export const UpdateAgentScenarioToolSimulationDocument = new TypedDocumentString
 }
     `);
 
-export const useUpdateAgentScenarioToolSimulationMutation = <
+export const useUpdateAiAgentScenarioToolSimulationMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateAgentScenarioToolSimulationMutation, TError, UpdateAgentScenarioToolSimulationMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateAiAgentScenarioToolSimulationMutation, TError, UpdateAiAgentScenarioToolSimulationMutationVariables, TContext>) => {
     
-    return useMutation<UpdateAgentScenarioToolSimulationMutation, TError, UpdateAgentScenarioToolSimulationMutationVariables, TContext>(
+    return useMutation<UpdateAiAgentScenarioToolSimulationMutation, TError, UpdateAiAgentScenarioToolSimulationMutationVariables, TContext>(
       {
-    mutationKey: ['updateAgentScenarioToolSimulation'],
-    mutationFn: (variables?: UpdateAgentScenarioToolSimulationMutationVariables) => fetcher<UpdateAgentScenarioToolSimulationMutation, UpdateAgentScenarioToolSimulationMutationVariables>(UpdateAgentScenarioToolSimulationDocument, variables)(),
+    mutationKey: ['updateAiAgentScenarioToolSimulation'],
+    mutationFn: (variables?: UpdateAiAgentScenarioToolSimulationMutationVariables) => fetcher<UpdateAiAgentScenarioToolSimulationMutation, UpdateAiAgentScenarioToolSimulationMutationVariables>(UpdateAiAgentScenarioToolSimulationDocument, variables)(),
     ...options
   }
     )};
 
-export const AgentSkillDocument = new TypedDocumentString(`
-    query agentSkill($id: ID!) {
-  agentSkill(id: $id) {
+export const AiAgentSkillDocument = new TypedDocumentString(`
+    query aiAgentSkill($id: ID!) {
+  aiAgentSkill(id: $id) {
     id
     name
     description
@@ -5745,69 +5807,69 @@ export const AgentSkillDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAgentSkillQuery = <
-      TData = AgentSkillQuery,
+export const useAiAgentSkillQuery = <
+      TData = AiAgentSkillQuery,
       TError = unknown
     >(
-      variables: AgentSkillQueryVariables,
-      options?: Omit<UseQueryOptions<AgentSkillQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillQuery, TError, TData>['queryKey'] }
+      variables: AiAgentSkillQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentSkillQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentSkillQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentSkillQuery, TError, TData>(
+    return useQuery<AiAgentSkillQuery, TError, TData>(
       {
-    queryKey: ['agentSkill', variables],
-    queryFn: fetcher<AgentSkillQuery, AgentSkillQueryVariables>(AgentSkillDocument, variables),
+    queryKey: ['aiAgentSkill', variables],
+    queryFn: fetcher<AiAgentSkillQuery, AiAgentSkillQueryVariables>(AiAgentSkillDocument, variables),
     ...options
   }
     )};
 
-export const AgentSkillFileContentDocument = new TypedDocumentString(`
-    query agentSkillFileContent($id: ID!, $path: String!) {
-  agentSkillFileContent(id: $id, path: $path)
+export const AiAgentSkillFileContentDocument = new TypedDocumentString(`
+    query aiAgentSkillFileContent($id: ID!, $path: String!) {
+  aiAgentSkillFileContent(id: $id, path: $path)
 }
     `);
 
-export const useAgentSkillFileContentQuery = <
-      TData = AgentSkillFileContentQuery,
+export const useAiAgentSkillFileContentQuery = <
+      TData = AiAgentSkillFileContentQuery,
       TError = unknown
     >(
-      variables: AgentSkillFileContentQueryVariables,
-      options?: Omit<UseQueryOptions<AgentSkillFileContentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillFileContentQuery, TError, TData>['queryKey'] }
+      variables: AiAgentSkillFileContentQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentSkillFileContentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentSkillFileContentQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentSkillFileContentQuery, TError, TData>(
+    return useQuery<AiAgentSkillFileContentQuery, TError, TData>(
       {
-    queryKey: ['agentSkillFileContent', variables],
-    queryFn: fetcher<AgentSkillFileContentQuery, AgentSkillFileContentQueryVariables>(AgentSkillFileContentDocument, variables),
+    queryKey: ['aiAgentSkillFileContent', variables],
+    queryFn: fetcher<AiAgentSkillFileContentQuery, AiAgentSkillFileContentQueryVariables>(AiAgentSkillFileContentDocument, variables),
     ...options
   }
     )};
 
-export const AgentSkillFilePathsDocument = new TypedDocumentString(`
-    query agentSkillFilePaths($id: ID!) {
-  agentSkillFilePaths(id: $id)
+export const AiAgentSkillFilePathsDocument = new TypedDocumentString(`
+    query aiAgentSkillFilePaths($id: ID!) {
+  aiAgentSkillFilePaths(id: $id)
 }
     `);
 
-export const useAgentSkillFilePathsQuery = <
-      TData = AgentSkillFilePathsQuery,
+export const useAiAgentSkillFilePathsQuery = <
+      TData = AiAgentSkillFilePathsQuery,
       TError = unknown
     >(
-      variables: AgentSkillFilePathsQueryVariables,
-      options?: Omit<UseQueryOptions<AgentSkillFilePathsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillFilePathsQuery, TError, TData>['queryKey'] }
+      variables: AiAgentSkillFilePathsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentSkillFilePathsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentSkillFilePathsQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentSkillFilePathsQuery, TError, TData>(
+    return useQuery<AiAgentSkillFilePathsQuery, TError, TData>(
       {
-    queryKey: ['agentSkillFilePaths', variables],
-    queryFn: fetcher<AgentSkillFilePathsQuery, AgentSkillFilePathsQueryVariables>(AgentSkillFilePathsDocument, variables),
+    queryKey: ['aiAgentSkillFilePaths', variables],
+    queryFn: fetcher<AiAgentSkillFilePathsQuery, AiAgentSkillFilePathsQueryVariables>(AiAgentSkillFilePathsDocument, variables),
     ...options
   }
     )};
 
-export const AgentSkillsDocument = new TypedDocumentString(`
-    query agentSkills {
-  agentSkills {
+export const AiAgentSkillsDocument = new TypedDocumentString(`
+    query aiAgentSkills {
+  aiAgentSkills {
     id
     name
     description
@@ -5817,25 +5879,25 @@ export const AgentSkillsDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAgentSkillsQuery = <
-      TData = AgentSkillsQuery,
+export const useAiAgentSkillsQuery = <
+      TData = AiAgentSkillsQuery,
       TError = unknown
     >(
-      variables?: AgentSkillsQueryVariables,
-      options?: Omit<UseQueryOptions<AgentSkillsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentSkillsQuery, TError, TData>['queryKey'] }
+      variables?: AiAgentSkillsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentSkillsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentSkillsQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AgentSkillsQuery, TError, TData>(
+    return useQuery<AiAgentSkillsQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['agentSkills'] : ['agentSkills', variables],
-    queryFn: fetcher<AgentSkillsQuery, AgentSkillsQueryVariables>(AgentSkillsDocument, variables),
+    queryKey: variables === undefined ? ['aiAgentSkills'] : ['aiAgentSkills', variables],
+    queryFn: fetcher<AiAgentSkillsQuery, AiAgentSkillsQueryVariables>(AiAgentSkillsDocument, variables),
     ...options
   }
     )};
 
-export const CreateAgentSkillDocument = new TypedDocumentString(`
-    mutation createAgentSkill($name: String!, $description: String, $filename: String!, $fileBytes: String!) {
-  createAgentSkill(
+export const CreateAiAgentSkillDocument = new TypedDocumentString(`
+    mutation createAiAgentSkill($name: String!, $description: String, $filename: String!, $fileBytes: String!) {
+  createAiAgentSkill(
     name: $name
     description: $description
     filename: $filename
@@ -5850,22 +5912,22 @@ export const CreateAgentSkillDocument = new TypedDocumentString(`
 }
     `);
 
-export const useCreateAgentSkillMutation = <
+export const useCreateAiAgentSkillMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAgentSkillMutation, TError, CreateAgentSkillMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiAgentSkillMutation, TError, CreateAiAgentSkillMutationVariables, TContext>) => {
     
-    return useMutation<CreateAgentSkillMutation, TError, CreateAgentSkillMutationVariables, TContext>(
+    return useMutation<CreateAiAgentSkillMutation, TError, CreateAiAgentSkillMutationVariables, TContext>(
       {
-    mutationKey: ['createAgentSkill'],
-    mutationFn: (variables?: CreateAgentSkillMutationVariables) => fetcher<CreateAgentSkillMutation, CreateAgentSkillMutationVariables>(CreateAgentSkillDocument, variables)(),
+    mutationKey: ['createAiAgentSkill'],
+    mutationFn: (variables?: CreateAiAgentSkillMutationVariables) => fetcher<CreateAiAgentSkillMutation, CreateAiAgentSkillMutationVariables>(CreateAiAgentSkillDocument, variables)(),
     ...options
   }
     )};
 
-export const CreateAgentSkillFromInstructionsDocument = new TypedDocumentString(`
-    mutation createAgentSkillFromInstructions($name: String!, $description: String, $instructions: String!) {
-  createAgentSkillFromInstructions(
+export const CreateAiAgentSkillFromInstructionsDocument = new TypedDocumentString(`
+    mutation createAiAgentSkillFromInstructions($name: String!, $description: String, $instructions: String!) {
+  createAiAgentSkillFromInstructions(
     name: $name
     description: $description
     instructions: $instructions
@@ -5879,41 +5941,41 @@ export const CreateAgentSkillFromInstructionsDocument = new TypedDocumentString(
 }
     `);
 
-export const useCreateAgentSkillFromInstructionsMutation = <
+export const useCreateAiAgentSkillFromInstructionsMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAgentSkillFromInstructionsMutation, TError, CreateAgentSkillFromInstructionsMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiAgentSkillFromInstructionsMutation, TError, CreateAiAgentSkillFromInstructionsMutationVariables, TContext>) => {
     
-    return useMutation<CreateAgentSkillFromInstructionsMutation, TError, CreateAgentSkillFromInstructionsMutationVariables, TContext>(
+    return useMutation<CreateAiAgentSkillFromInstructionsMutation, TError, CreateAiAgentSkillFromInstructionsMutationVariables, TContext>(
       {
-    mutationKey: ['createAgentSkillFromInstructions'],
-    mutationFn: (variables?: CreateAgentSkillFromInstructionsMutationVariables) => fetcher<CreateAgentSkillFromInstructionsMutation, CreateAgentSkillFromInstructionsMutationVariables>(CreateAgentSkillFromInstructionsDocument, variables)(),
+    mutationKey: ['createAiAgentSkillFromInstructions'],
+    mutationFn: (variables?: CreateAiAgentSkillFromInstructionsMutationVariables) => fetcher<CreateAiAgentSkillFromInstructionsMutation, CreateAiAgentSkillFromInstructionsMutationVariables>(CreateAiAgentSkillFromInstructionsDocument, variables)(),
     ...options
   }
     )};
 
-export const DeleteAgentSkillDocument = new TypedDocumentString(`
-    mutation deleteAgentSkill($id: ID!) {
-  deleteAgentSkill(id: $id)
+export const DeleteAiAgentSkillDocument = new TypedDocumentString(`
+    mutation deleteAiAgentSkill($id: ID!) {
+  deleteAiAgentSkill(id: $id)
 }
     `);
 
-export const useDeleteAgentSkillMutation = <
+export const useDeleteAiAgentSkillMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteAgentSkillMutation, TError, DeleteAgentSkillMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteAiAgentSkillMutation, TError, DeleteAiAgentSkillMutationVariables, TContext>) => {
     
-    return useMutation<DeleteAgentSkillMutation, TError, DeleteAgentSkillMutationVariables, TContext>(
+    return useMutation<DeleteAiAgentSkillMutation, TError, DeleteAiAgentSkillMutationVariables, TContext>(
       {
-    mutationKey: ['deleteAgentSkill'],
-    mutationFn: (variables?: DeleteAgentSkillMutationVariables) => fetcher<DeleteAgentSkillMutation, DeleteAgentSkillMutationVariables>(DeleteAgentSkillDocument, variables)(),
+    mutationKey: ['deleteAiAgentSkill'],
+    mutationFn: (variables?: DeleteAiAgentSkillMutationVariables) => fetcher<DeleteAiAgentSkillMutation, DeleteAiAgentSkillMutationVariables>(DeleteAiAgentSkillDocument, variables)(),
     ...options
   }
     )};
 
-export const UpdateAgentSkillDocument = new TypedDocumentString(`
-    mutation updateAgentSkill($id: ID!, $name: String!, $description: String) {
-  updateAgentSkill(id: $id, name: $name, description: $description) {
+export const UpdateAiAgentSkillDocument = new TypedDocumentString(`
+    mutation updateAiAgentSkill($id: ID!, $name: String!, $description: String) {
+  updateAiAgentSkill(id: $id, name: $name, description: $description) {
     id
     name
     description
@@ -5923,15 +5985,15 @@ export const UpdateAgentSkillDocument = new TypedDocumentString(`
 }
     `);
 
-export const useUpdateAgentSkillMutation = <
+export const useUpdateAiAgentSkillMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateAgentSkillMutation, TError, UpdateAgentSkillMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateAiAgentSkillMutation, TError, UpdateAiAgentSkillMutationVariables, TContext>) => {
     
-    return useMutation<UpdateAgentSkillMutation, TError, UpdateAgentSkillMutationVariables, TContext>(
+    return useMutation<UpdateAiAgentSkillMutation, TError, UpdateAiAgentSkillMutationVariables, TContext>(
       {
-    mutationKey: ['updateAgentSkill'],
-    mutationFn: (variables?: UpdateAgentSkillMutationVariables) => fetcher<UpdateAgentSkillMutation, UpdateAgentSkillMutationVariables>(UpdateAgentSkillDocument, variables)(),
+    mutationKey: ['updateAiAgentSkill'],
+    mutationFn: (variables?: UpdateAiAgentSkillMutationVariables) => fetcher<UpdateAiAgentSkillMutation, UpdateAiAgentSkillMutationVariables>(UpdateAiAgentSkillDocument, variables)(),
     ...options
   }
     )};
