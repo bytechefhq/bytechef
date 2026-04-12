@@ -43,10 +43,8 @@ public final class AiAgentSkill {
     @Nullable
     private String description;
 
-    // Stores a serialized FileEntry identifier (the result of FileEntry.toId());
-    // use getSkillFileEntry()/setSkillFileEntry() for domain-level access
     @Column("skill_file")
-    private String skillFile;
+    private FileEntry skillFile;
 
     @CreatedDate
     private Instant createdDate;
@@ -91,12 +89,12 @@ public final class AiAgentSkill {
         this.description = description;
     }
 
-    public FileEntry getSkillFileEntry() {
-        return FileEntry.parse(skillFile);
+    public FileEntry getSkillFile() {
+        return skillFile;
     }
 
-    public void setSkillFileEntry(FileEntry fileEntry) {
-        this.skillFile = fileEntry.toId();
+    public void setSkillFile(FileEntry skillFile) {
+        this.skillFile = skillFile;
     }
 
     public Instant getCreatedDate() {

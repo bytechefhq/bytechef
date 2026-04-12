@@ -85,7 +85,7 @@ class AiAgentSkillFacadeTest {
         expectedAiAgentSkill.setId(1L);
         expectedAiAgentSkill.setName("Test Skill");
         expectedAiAgentSkill.setDescription("A test skill");
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
@@ -112,7 +112,7 @@ class AiAgentSkillFacadeTest {
         expectedAiAgentSkill.setId(1L);
         expectedAiAgentSkill.setName("Frontmatter Name");
         expectedAiAgentSkill.setDescription("Frontmatter Description");
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         String skillMdContent =
             "---\nname: Frontmatter Name\ndescription: Frontmatter Description\n---\n\nInstructions";
@@ -137,7 +137,7 @@ class AiAgentSkillFacadeTest {
 
         expectedAiAgentSkill.setId(1L);
         expectedAiAgentSkill.setName("mySkill");
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         when(aiAgentSkillFileStorage.storeAiAgentSkillFile(eq("mySkill.skill"), any(byte[].class)))
             .thenReturn(fileEntry);
@@ -198,7 +198,7 @@ class AiAgentSkillFacadeTest {
         AiAgentSkill expectedAiAgentSkill = new AiAgentSkill();
 
         expectedAiAgentSkill.setId(1L);
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
@@ -223,7 +223,7 @@ class AiAgentSkillFacadeTest {
 
         aiAgentSkill.setId(skillId);
         aiAgentSkill.setName("Test Skill");
-        aiAgentSkill.setSkillFileEntry(fileEntry);
+        aiAgentSkill.setSkillFile(fileEntry);
 
         when(aiAgentSkillService.getAiAgentSkill(skillId)).thenReturn(aiAgentSkill);
 
@@ -258,7 +258,7 @@ class AiAgentSkillFacadeTest {
 
         aiAgentSkill.setId(skillId);
         aiAgentSkill.setName("Test Skill");
-        aiAgentSkill.setSkillFileEntry(fileEntry);
+        aiAgentSkill.setSkillFile(fileEntry);
 
         when(aiAgentSkillService.getAiAgentSkill(skillId)).thenReturn(aiAgentSkill);
         when(aiAgentSkillFileStorage.readAiAgentSkillFileBytes(fileEntry)).thenReturn(zipBytes);
@@ -293,7 +293,7 @@ class AiAgentSkillFacadeTest {
 
         aiAgentSkill.setId(skillId);
         aiAgentSkill.setName("Test Skill");
-        aiAgentSkill.setSkillFileEntry(fileEntry);
+        aiAgentSkill.setSkillFile(fileEntry);
 
         when(aiAgentSkillService.getAiAgentSkill(skillId)).thenReturn(aiAgentSkill);
         when(aiAgentSkillFileStorage.readAiAgentSkillFileBytes(fileEntry)).thenReturn(zipBytes);
@@ -338,7 +338,7 @@ class AiAgentSkillFacadeTest {
 
         expectedAiAgentSkill.setId(1L);
         expectedAiAgentSkill.setName("Test Skill");
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
@@ -381,7 +381,7 @@ class AiAgentSkillFacadeTest {
         AiAgentSkill expectedAiAgentSkill = new AiAgentSkill();
 
         expectedAiAgentSkill.setId(1L);
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         when(aiAgentSkillFileStorage.storeAiAgentSkillFile(any(), any(byte[].class))).thenReturn(fileEntry);
         when(aiAgentSkillService.createAiAgentSkill(any(AiAgentSkill.class))).thenReturn(expectedAiAgentSkill);
@@ -434,7 +434,7 @@ class AiAgentSkillFacadeTest {
 
         expectedAiAgentSkill.setId(1L);
         expectedAiAgentSkill.setName("Test Skill");
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
@@ -462,7 +462,7 @@ class AiAgentSkillFacadeTest {
 
         expectedAiAgentSkill.setId(1L);
         expectedAiAgentSkill.setName("Test Skill (2)");
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
@@ -504,7 +504,7 @@ class AiAgentSkillFacadeTest {
 
         expectedAiAgentSkill.setId(1L);
         expectedAiAgentSkill.setName("Provided Name");
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "Just some instructions without frontmatter");
 
@@ -526,7 +526,7 @@ class AiAgentSkillFacadeTest {
 
         expectedAiAgentSkill.setId(1L);
         expectedAiAgentSkill.setName("Provided Name");
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "---\nname: Unclosed\nInstructions without closing delimiter");
 
@@ -547,7 +547,7 @@ class AiAgentSkillFacadeTest {
         AiAgentSkill expectedAiAgentSkill = new AiAgentSkill();
 
         expectedAiAgentSkill.setId(1L);
-        expectedAiAgentSkill.setSkillFileEntry(fileEntry);
+        expectedAiAgentSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
@@ -589,7 +589,7 @@ class AiAgentSkillFacadeTest {
 
         aiAgentSkill.setId(skillId);
         aiAgentSkill.setName("Test Skill");
-        aiAgentSkill.setSkillFileEntry(fileEntry);
+        aiAgentSkill.setSkillFile(fileEntry);
 
         when(aiAgentSkillService.getAiAgentSkill(skillId)).thenReturn(aiAgentSkill);
         when(aiAgentSkillFileStorage.readAiAgentSkillFileBytes(fileEntry)).thenReturn(zipBytes);
