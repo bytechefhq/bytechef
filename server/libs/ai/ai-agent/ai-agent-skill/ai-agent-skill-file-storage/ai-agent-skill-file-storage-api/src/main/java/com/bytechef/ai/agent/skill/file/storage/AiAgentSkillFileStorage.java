@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.agent.skill.service;
+package com.bytechef.ai.agent.skill.file.storage;
 
-import com.bytechef.ai.agent.skill.domain.AgentSkill;
-import java.util.List;
-import org.jspecify.annotations.Nullable;
+import com.bytechef.file.storage.domain.FileEntry;
 
 /**
  * @author Ivica Cardic
  */
-public interface AgentSkillService {
+public interface AiAgentSkillFileStorage {
 
-    AgentSkill createAgentSkill(AgentSkill agentSkill);
+    void deleteAiAgentSkillFile(FileEntry skillFile);
 
-    void deleteAgentSkill(long id);
+    byte[] readAiAgentSkillFileBytes(FileEntry skillFile);
 
-    boolean existsByName(String name);
-
-    AgentSkill getAgentSkill(long id);
-
-    List<AgentSkill> getAgentSkills();
-
-    AgentSkill updateAgentSkill(long id, String name, @Nullable String description);
+    FileEntry storeAiAgentSkillFile(String filename, byte[] bytes);
 }

@@ -32,8 +32,8 @@ import org.springframework.data.relational.core.mapping.Table;
 /**
  * @author Ivica Cardic
  */
-@Table("agent_skill")
-public final class AgentSkill {
+@Table("ai_agent_skill")
+public final class AiAgentSkill {
 
     @Id
     private Long id;
@@ -63,7 +63,7 @@ public final class AgentSkill {
     @Version
     private int version;
 
-    public AgentSkill() {
+    public AiAgentSkill() {
     }
 
     public Long getId() {
@@ -145,11 +145,11 @@ public final class AgentSkill {
             return true;
         }
 
-        if (!(object instanceof AgentSkill agentSkill)) {
+        if (!(object instanceof AiAgentSkill aiAgentSkill)) {
             return false;
         }
 
-        return Objects.equals(id, agentSkill.id);
+        return Objects.equals(id, aiAgentSkill.id);
     }
 
     @Override
@@ -159,7 +159,7 @@ public final class AgentSkill {
 
     @Override
     public String toString() {
-        return "AgentSkill{" +
+        return "AiAgentSkill{" +
             "id=" + id +
             ", name='" + name + '\'' +
             ", description='" + description + '\'' +

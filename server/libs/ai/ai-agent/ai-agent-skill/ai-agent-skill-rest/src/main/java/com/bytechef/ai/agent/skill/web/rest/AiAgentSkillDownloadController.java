@@ -16,8 +16,8 @@
 
 package com.bytechef.ai.agent.skill.web.rest;
 
-import com.bytechef.ai.agent.skill.facade.AgentSkillFacade;
-import com.bytechef.ai.agent.skill.facade.AgentSkillFacade.AgentSkillDownload;
+import com.bytechef.ai.agent.skill.facade.AiAgentSkillFacade;
+import com.bytechef.ai.agent.skill.facade.AiAgentSkillFacade.AiAgentSkillDownload;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -34,19 +34,19 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/ai/agent-skills")
-class AgentSkillDownloadController {
+class AiAgentSkillDownloadController {
 
-    private final AgentSkillFacade agentSkillFacade;
+    private final AiAgentSkillFacade aiAgentSkillFacade;
 
-    AgentSkillDownloadController(AgentSkillFacade agentSkillFacade) {
-        this.agentSkillFacade = agentSkillFacade;
+    AiAgentSkillDownloadController(AiAgentSkillFacade aiAgentSkillFacade) {
+        this.aiAgentSkillFacade = aiAgentSkillFacade;
     }
 
     @GetMapping("/{id}/download")
-    ResponseEntity<Resource> downloadAgentSkill(@PathVariable long id) {
-        AgentSkillDownload download = agentSkillFacade.getAgentSkillWithDownload(id);
+    ResponseEntity<Resource> downloadAiAgentSkill(@PathVariable long id) {
+        AiAgentSkillDownload download = aiAgentSkillFacade.getAiAgentSkillWithDownload(id);
 
-        String safeName = download.agentSkill()
+        String safeName = download.aiAgentSkill()
             .getName()
             .replaceAll("[^a-zA-Z0-9._\\- ]", "_");
 
