@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@ConditionalOnProperty(prefix = "bytechef.knowledge-base", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal/knowledge-bases")
 @SuppressFBWarnings("EI")
 class KnowledgeBaseDocumentApiController {
