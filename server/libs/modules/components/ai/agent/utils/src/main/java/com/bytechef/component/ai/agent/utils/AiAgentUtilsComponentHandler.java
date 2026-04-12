@@ -18,17 +18,17 @@ package com.bytechef.component.ai.agent.utils;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 
-import com.bytechef.ai.agent.skill.facade.AgentSkillFacade;
+import com.bytechef.ai.agent.skill.facade.AiAgentSkillFacade;
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsBraveWebSearchTool;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsFileSystemTools;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsGlobTool;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsGrepTool;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsShellTools;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsSkillsTool;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsSmartWebFetchTool;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsTaskTool;
-import com.bytechef.component.ai.agent.utils.cluster.AgentUtilsTodoWriteTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGlobTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGrepTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsShellTools;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSkillsTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSmartWebFetchTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTodoWriteTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import org.springframework.stereotype.Component;
@@ -37,12 +37,12 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component("aiAgentUtils_v1_ComponentHandler")
-public class AgentUtilsComponentHandler implements ComponentHandler {
+public class AiAgentUtilsComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
 
-    public AgentUtilsComponentHandler(AgentSkillFacade agentSkillFacade) {
-        AgentUtilsSkillsTool agentUtilsSkillsTool = new AgentUtilsSkillsTool(agentSkillFacade);
+    public AiAgentUtilsComponentHandler(AiAgentSkillFacade aiAgentSkillFacade) {
+        AiAgentUtilsSkillsTool agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiAgentSkillFacade);
 
         this.componentDefinition = component("aiAgentUtils")
             .title("AI Agent Utils")
@@ -50,15 +50,15 @@ public class AgentUtilsComponentHandler implements ComponentHandler {
             .icon("path:assets/agent-utils.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .clusterElements(
-                AgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
-                AgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
-                AgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
-                AgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
-                AgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
-                AgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
+                AiAgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
+                AiAgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
+                AiAgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
+                AiAgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
+                AiAgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
+                AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
                 agentUtilsSkillsTool.clusterElementDefinition,
-                AgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
-                AgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION);
+                AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
+                AiAgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION);
     }
 
     @Override

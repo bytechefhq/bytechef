@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class AgentUtilsComponentHandlerTest {
+public class AiAgentUtilsComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/agent-utils_v1.json", new AgentUtilsComponentHandler(null).getDefinition());
+            "definition/ai_agent-utils_v1.json", new AiAgentUtilsComponentHandler(null).getDefinition());
     }
 }
