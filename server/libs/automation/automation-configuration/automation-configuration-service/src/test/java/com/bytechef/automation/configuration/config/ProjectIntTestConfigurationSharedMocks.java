@@ -33,6 +33,7 @@ import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -50,11 +51,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class, ComponentConnectionFacade.class,
-    ComponentDefinitionService.class, ConnectionFacade.class, EnvironmentService.class, GitHubProxyClient.class,
-    JobFacade.class, JobService.class, ConnectionService.class, PrincipalJobFacade.class, PrincipalJobService.class,
-    TaskExecutionService.class, TriggerDefinitionService.class, TriggerExecutionService.class,
-    TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class, WorkflowNodeParameterFacade.class,
-    WorkflowNodeTestOutputService.class
+    ComponentDefinitionService.class, ConnectionFacade.class, ConnectionLifecycleFacade.class,
+    EnvironmentService.class, GitHubProxyClient.class, JobFacade.class, JobService.class, ConnectionService.class,
+    PrincipalJobFacade.class, PrincipalJobService.class, TaskExecutionService.class, TriggerDefinitionService.class,
+    TriggerExecutionService.class, TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class,
+    WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class
 })
 public @interface ProjectIntTestConfigurationSharedMocks {
 }
