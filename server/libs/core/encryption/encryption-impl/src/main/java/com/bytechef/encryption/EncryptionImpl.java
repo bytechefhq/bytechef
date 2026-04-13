@@ -151,7 +151,7 @@ public class EncryptionImpl implements Encryption {
     }
 
     private Key getSecretKey() {
-        byte[] decodedKey = EncodingUtils.base64Decode(encryptionKey.getKey());
+        byte[] decodedKey = EncodingUtils.base64Decode(encryptionKey.getKey().trim());
 
         return new SecretKeySpec(Arrays.copyOf(decodedKey, 16), "AES");
     }
