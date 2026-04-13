@@ -1,13 +1,28 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ConnectionTab from './ConnectionTab';
 
+function renderWithTooltip(ui: React.ReactElement) {
+    return render(<TooltipProvider>{ui}</TooltipProvider>);
+}
+
 const mockSetShowConnectionNote = vi.fn();
 const mockUseConnectionNoteStore = vi.fn();
+const mockUseWorkflowNodeDetailsPanelStore = vi.fn();
+const mockUseWorkflowDataStore = vi.fn();
 
 vi.mock('../../../stores/useConnectionNoteStore', () => ({
     useConnectionNoteStore: (selector: unknown) => mockUseConnectionNoteStore(selector),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore', () => ({
+    default: (selector: unknown) => mockUseWorkflowNodeDetailsPanelStore(selector),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
+    default: (selector: unknown) => mockUseWorkflowDataStore(selector),
 }));
 
 vi.mock('zustand/react/shallow', () => ({
@@ -60,10 +75,26 @@ describe('ConnectionTab', () => {
                 showConnectionNote: true,
             })
         );
+
+        mockUseWorkflowNodeDetailsPanelStore.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({
+                currentComponent: undefined,
+                currentNode: undefined,
+                setCurrentComponent: vi.fn(),
+                setCurrentNode: vi.fn(),
+            })
+        );
+
+        mockUseWorkflowDataStore.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({
+                nodes: [],
+                workflow: {tasks: []},
+            })
+        );
     });
 
     it('renders with default p-4 class when no className prop is provided', () => {
-        const {container} = render(<ConnectionTab {...defaultProps} />);
+        const {container} = renderWithTooltip(<ConnectionTab {...defaultProps} />);
 
         const wrapper = container.firstElementChild as HTMLElement;
 
@@ -71,7 +102,7 @@ describe('ConnectionTab', () => {
     });
 
     it('merges custom className with default classes via twMerge', () => {
-        const {container} = render(<ConnectionTab {...defaultProps} className="p-0" />);
+        const {container} = renderWithTooltip(<ConnectionTab {...defaultProps} className="p-0" />);
 
         const wrapper = container.firstElementChild as HTMLElement;
 
@@ -97,7 +128,7 @@ describe('ConnectionTab', () => {
             },
         ];
 
-        render(<ConnectionTab {...defaultProps} componentConnections={multipleConnections} />);
+        renderWithTooltip(<ConnectionTab {...defaultProps} componentConnections={multipleConnections} />);
 
         expect(screen.getByTestId('fieldset-conn_1')).toBeInTheDocument();
         expect(screen.getByTestId('fieldset-conn_2')).toBeInTheDocument();
@@ -112,7 +143,7 @@ describe('ConnectionTab', () => {
             },
         ];
 
-        render(
+        renderWithTooltip(
             <ConnectionTab
                 {...defaultProps}
                 workflowTestConfigurationConnections={workflowTestConfigurationConnections}
@@ -125,7 +156,7 @@ describe('ConnectionTab', () => {
     });
 
     it('shows connection note when showConnectionNote is true', () => {
-        render(<ConnectionTab {...defaultProps} />);
+        renderWithTooltip(<ConnectionTab {...defaultProps} />);
 
         expect(screen.getByText('Note')).toBeInTheDocument();
         expect(screen.getByText('The selected connections are used for testing purposes only.')).toBeInTheDocument();
@@ -139,13 +170,13 @@ describe('ConnectionTab', () => {
             })
         );
 
-        render(<ConnectionTab {...defaultProps} />);
+        renderWithTooltip(<ConnectionTab {...defaultProps} />);
 
         expect(screen.queryByText('Note')).not.toBeInTheDocument();
     });
 
     it('calls setShowConnectionNote(false) when close button is clicked', () => {
-        render(<ConnectionTab {...defaultProps} />);
+        renderWithTooltip(<ConnectionTab {...defaultProps} />);
 
         const closeButton = screen.getByTitle('Close the note');
 
