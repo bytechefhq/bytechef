@@ -47,10 +47,15 @@ public abstract class AbstractToolFacade {
 
                 if (value instanceof FromAiResult fromAiResult) {
                     fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
-                } else if (value instanceof Map<?, ?> map && ConvertUtils.canConvert(map, FromAiResult.class)) {
-                    FromAiResult fromAiResult = ConvertUtils.convertValue(value, FromAiResult.class);
+                } else if (value instanceof Map<?, ?> map) {
+                    if (ConvertUtils.canConvert(map, FromAiResult.class)) {
+                        FromAiResult fromAiResult = ConvertUtils.convertValue(value, FromAiResult.class);
 
-                    fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
+                        fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
+                    } else {
+                        extractFromAiResults((Map<String, ?>) map).forEach(
+                            fromAiResult -> fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult));
+                    }
                 } else if (value instanceof String expression && expression.contains("fromAi(")) {
                     for (String fromAiCall : extractFromAiCallStrings(expression)) {
                         FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCall);
@@ -73,12 +78,22 @@ public abstract class AbstractToolFacade {
             return requestValue != null ? requestValue : fromAiResult.defaultValue();
         }
 
-        if (value instanceof Map<?, ?> map && ConvertUtils.canConvert(map, FromAiResult.class)) {
-            FromAiResult fromAiResult = ConvertUtils.convertValue(value, FromAiResult.class);
+        if (value instanceof Map<?, ?> map) {
+            if (ConvertUtils.canConvert(map, FromAiResult.class)) {
+                FromAiResult fromAiResult = ConvertUtils.convertValue(value, FromAiResult.class);
 
-            Object requestValue = request.get(fromAiResult.name());
+                Object requestValue = request.get(fromAiResult.name());
 
-            return requestValue != null ? requestValue : fromAiResult.defaultValue();
+                return requestValue != null ? requestValue : fromAiResult.defaultValue();
+            }
+
+            Map<String, Object> resolvedMap = new LinkedHashMap<>();
+
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                resolvedMap.put((String) entry.getKey(), resolveParameterValue(entry.getValue(), request));
+            }
+
+            return resolvedMap;
         }
 
         if (!(value instanceof String expression) || !expression.contains("fromAi(")) {

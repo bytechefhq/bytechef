@@ -54,6 +54,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -70,6 +72,8 @@ import tools.jackson.core.type.TypeReference;
  * @author Ivica Cardic
  */
 public abstract class AbstractAiAgentChatAction {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAiAgentChatAction.class);
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final AiAgentToolFacade aiAgentToolFacade;
@@ -384,6 +388,8 @@ public abstract class AbstractAiAgentChatAction {
             }
 
             private String observeAndCall(String toolInput, Supplier<String> execution) {
+                logger.debug("Tool '{}' request: {}", toolDefinition.name(), toolInput);
+
                 Map<String, Object> inputs;
 
                 try {
