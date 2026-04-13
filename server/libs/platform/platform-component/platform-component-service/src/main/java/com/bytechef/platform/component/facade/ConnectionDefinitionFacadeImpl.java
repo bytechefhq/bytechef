@@ -22,6 +22,7 @@ import com.bytechef.platform.component.aspect.TokenRefreshHandler;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
     private final ConnectionDefinitionService connectionDefinitionService;
     private final TokenRefreshHandler tokenRefreshHandler;
 
-    @SuppressWarnings("E1")
+    @SuppressFBWarnings("EI2")
     public ConnectionDefinitionFacadeImpl(
         ConnectionService connectionService, ConnectionDefinitionService connectionDefinitionService,
         TokenRefreshHandler tokenRefreshHandler) {
