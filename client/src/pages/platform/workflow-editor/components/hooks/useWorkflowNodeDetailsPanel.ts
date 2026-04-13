@@ -1225,19 +1225,15 @@ export default function useWorkflowNodeDetailsPanel({
 
     // Set currentOperationName depending on the currentWorkflowNode.operationName
     useEffect(() => {
-        if (!workflowNodes?.length) {
-            return;
-        }
-
         let currentWorkflowNode;
 
-        if (workflowNodes.length && !clusterElementsCanvasOpen && !isClusterElement) {
+        if (workflowNodes?.length && !clusterElementsCanvasOpen && !isClusterElement) {
             currentWorkflowNode = workflowNodes.find(
                 (workflowNode) => workflowNode.workflowNodeName === currentNode?.workflowNodeName
             );
         } else if (clusterElementsCanvasOpen) {
             if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
-                currentWorkflowNode = workflowNodes.find(
+                currentWorkflowNode = workflowNodes?.find(
                     (workflowNodeType) => workflowNodeType.workflowNodeName === currentNode?.workflowNodeName
                 );
             } else if (clusterElementComponentOperations) {
@@ -1247,12 +1243,23 @@ export default function useWorkflowNodeDetailsPanel({
             }
         }
 
-        if (currentWorkflowNode?.operationName && currentWorkflowNode.operationName !== currentOperationName) {
-            setCurrentOperationName(currentWorkflowNode.operationName);
+        // Prefer the server-synced operationName once available; otherwise fall back to the
+        // optimistically-set currentNode.operationName so a newly added node can resolve its
+        // operation before the workflow mutation settles.
+        const resolvedOperationName = currentWorkflowNode?.operationName ?? currentNode?.operationName;
+
+        if (resolvedOperationName && resolvedOperationName !== currentOperationName) {
+            setCurrentOperationName(resolvedOperationName);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [clusterElementComponentOperations, currentNode?.workflowNodeName, currentOperationName, workflowNodes]);
+    }, [
+        clusterElementComponentOperations,
+        currentNode?.workflowNodeName,
+        currentNode?.operationName,
+        currentOperationName,
+        workflowNodes,
+    ]);
 
     // Update display conditions when currentNode changes
     useEffect(() => {
