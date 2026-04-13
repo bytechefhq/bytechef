@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates comment on a Reddit post or replies to a comment.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/reddit_v1#create-comment"
+    },
     "metadata": null,
     "name": "createComment",
     "outputDefinition": {
@@ -204,7 +207,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new reddit post.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/reddit_v1#create-post"
+    },
     "metadata": null,
     "name": "createPost",
     "outputDefinition": {
@@ -1006,14 +1012,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/reddit_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://www.reddit.com/dev/api/"
+  },
   "description": "Reddit is a social news aggregation, discussion, and content-sharing platform where users post and vote on content organized into communities called subreddits.",
   "icon": "path:assets/reddit.svg",
   "metadata": null,
