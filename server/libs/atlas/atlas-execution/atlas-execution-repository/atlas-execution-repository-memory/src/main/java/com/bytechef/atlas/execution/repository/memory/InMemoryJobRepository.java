@@ -91,6 +91,26 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
+    public List<Long> findAllIdsByParentJobId(Long parentJobId) {
+        List<Long> parentTaskExecutionIds = inMemoryTaskExecutionRepository.findAllByJobIdOrderByIdDesc(parentJobId)
+            .stream()
+            .map(TaskExecution::getId)
+            .filter(Objects::nonNull)
+            .toList();
+
+        return cache.values()
+            .stream()
+            .filter(job -> {
+                Long parentTaskExecutionId = job.getParentTaskExecutionId();
+
+                return parentTaskExecutionId != null && parentTaskExecutionIds.contains(parentTaskExecutionId);
+            })
+            .map(Job::getId)
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    @Override
     public Optional<Job> findById(Long id) {
         return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id)));
     }

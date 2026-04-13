@@ -27,6 +27,11 @@ import org.springframework.data.domain.Page;
 public record JobServiceWrapper(JobSyncExecutor.JobFactoryFunction jobFactoryFunction) implements JobService {
 
     @Override
+    public List<Long> getChildJobIds(long parentJobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job getJob(long id) {
         throw new UnsupportedOperationException();
     }

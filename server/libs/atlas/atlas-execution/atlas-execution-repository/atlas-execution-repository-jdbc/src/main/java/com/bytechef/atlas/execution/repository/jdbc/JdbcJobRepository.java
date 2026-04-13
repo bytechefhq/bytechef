@@ -65,5 +65,10 @@ public interface JdbcJobRepository
     @Query("SELECT * FROM job j WHERE j.id = (SELECT job_id FROM task_execution te WHERE te.id=:taskExecutionId)")
     Optional<Job> findByTaskExecutionId(@Param("taskExecutionId") Long taskExecutionId);
 
+    @Override
+    @Query("SELECT j.id FROM job j WHERE j.parent_task_execution_id IN "
+        + "(SELECT te.id FROM task_execution te WHERE te.job_id=:parentJobId)")
+    List<Long> findAllIdsByParentJobId(@Param("parentJobId") Long parentJobId);
+
     Job save(Job job);
 }

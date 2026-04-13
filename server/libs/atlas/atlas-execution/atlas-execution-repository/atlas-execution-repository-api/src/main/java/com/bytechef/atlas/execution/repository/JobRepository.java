@@ -46,6 +46,8 @@ public interface JobRepository {
 
     List<Job> findAllByIdIn(List<Long> ids);
 
+    List<Long> findAllIdsByParentJobId(Long parentJobId);
+
     List<Job> findAllByWorkflowId(String workflowId);
 
     Optional<Job> findById(Long id);
