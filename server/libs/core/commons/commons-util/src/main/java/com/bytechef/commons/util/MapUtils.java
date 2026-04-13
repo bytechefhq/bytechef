@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,11 +61,11 @@ public class MapUtils {
         Validate.notNull(key, "'key' must not be null");
         Validate.notNull(values, "'values' must not be null");
 
-        Map<K, Object> submap = new HashMap<>(getMap(map, key, Map.of()));
+        Map<K, Object> submap = new LinkedHashMap<>(getMap(map, key, Map.of()));
 
         submap.putAll(values);
 
-        Map<K, Object> newMap = new HashMap<>(map);
+        Map<K, Object> newMap = new LinkedHashMap<>(map);
 
         newMap.put(key, submap);
 
@@ -808,7 +808,7 @@ public class MapUtils {
         Map<K, V> map, Function<Map.Entry<K, V>, ? extends K1> keyMapper,
         Function<Map.Entry<K, V>, ? extends V1> valueMapper) {
 
-        Map<K1, V1> newMap = new HashMap<>();
+        Map<K1, V1> newMap = new LinkedHashMap<>();
 
         for (Map.Entry<K, V> entry : map.entrySet()) {
             newMap.put(keyMapper.apply(entry), valueMapper.apply(entry));
