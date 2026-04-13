@@ -235,6 +235,7 @@ const WorkflowNodeDetailsPanel = ({
                                                 componentConnections={currentWorkflowNodeConnections}
                                                 currentComponentDefinition={currentComponentDefinition}
                                                 key={`${currentNode?.workflowNodeName}_connection`}
+                                                updateWorkflowMutation={updateWorkflowMutation}
                                                 workflowId={workflow.id!}
                                                 workflowNodeName={currentNode?.workflowNodeName}
                                                 workflowTestConfigurationConnections={
