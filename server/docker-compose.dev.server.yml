@@ -51,7 +51,7 @@ services:
         BUILDKIT_INLINE_CACHE: 1
     container_name: bytechef-server
     volumes:
-      - ~/.bytechef/key:/root/.bytechef/key:ro
+      - ~/.bytechef:/root/.bytechef
     depends_on:
       - postgres
       - pgvector
