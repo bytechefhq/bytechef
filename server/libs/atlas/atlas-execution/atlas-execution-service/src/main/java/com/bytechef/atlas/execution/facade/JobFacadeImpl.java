@@ -98,6 +98,10 @@ public class JobFacadeImpl implements JobFacade {
     @Override
     @Transactional
     public void deleteJob(long id) {
+        for (long childJobId : jobService.getChildJobIds(id)) {
+            deleteJob(childJobId);
+        }
+
         taskExecutionService.deleteJobTaskExecutions(id);
 
         jobService.deleteJob(id);
