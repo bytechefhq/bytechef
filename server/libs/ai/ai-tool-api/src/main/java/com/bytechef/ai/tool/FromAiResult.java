@@ -36,5 +36,7 @@ public record FromAiResult(
     public FromAiResult {
         Objects.requireNonNull(name, "name must not be null");
         Objects.requireNonNull(type, "type must not be null");
+
+        options = options == null ? null : List.copyOf(options);
     }
 }
