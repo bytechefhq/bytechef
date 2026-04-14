@@ -39,7 +39,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.infobip.util.InfobipUtils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -125,11 +124,12 @@ public class InfobipSendWhatsAppTemplateMessageAction {
     }
 
     private static List<String> extractPlaceholders(Parameters inputParameters) {
-        List<String> placeholders = new ArrayList<>();
+        Map<String, String> placeholdersMap = inputParameters.getMap(PLACEHOLDERS, String.class, Map.of());
 
-        inputParameters.getMap(PLACEHOLDERS, String.class, Map.of())
-            .forEach((key, value) -> placeholders.add(value));
-
-        return placeholders;
+        return placeholdersMap.entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByKey())
+            .map(Map.Entry::getValue)
+            .toList();
     }
 }
