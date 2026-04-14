@@ -91,8 +91,9 @@ public class FromAiInputSchemaUtils {
             return value;
         }
 
-        return switch (type.trim()
-            .toUpperCase()) {
+        String trimmedType = type.trim();
+
+        return switch (trimmedType.toUpperCase()) {
             case "BOOLEAN" -> Boolean.parseBoolean(stringValue);
             case "INTEGER" -> {
                 try {
