@@ -620,22 +620,71 @@ export const useProperty = ({
         [validatePropertyValue]
     );
 
-    const handleControlledModeSwitch = useCallback((toDynamic: boolean) => {
-        resetOnModeChangeRef.current = true;
+    const handleControlledModeSwitch = useCallback(
+        (toDynamic: boolean) => {
+            resetOnModeChangeRef.current = true;
 
-        setControlledDynamicMode(toDynamic);
-        setControlledFromAi(undefined);
-    }, []);
+            const wasFromAi = controlledFromAi === true;
+
+            setControlledDynamicMode(toDynamic);
+            setControlledFromAi(undefined);
+
+            if (wasFromAi && path && workflow.id) {
+                saveProperty({
+                    fromAi: false,
+                    includeInMetadata: custom,
+                    path,
+                    type,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    value: toDynamic ? '=' : '',
+                    workflowId: workflow.id,
+                });
+            }
+        },
+        [
+            controlledFromAi,
+            custom,
+            path,
+            type,
+            updateClusterElementParameterMutation,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+        ]
+    );
 
     const handleFromAiToggle = useCallback(
         (fromAi: boolean, fieldOnChange: (value: string) => void) => {
             setControlledFromAi(fromAi);
 
-            if (fromAi) {
-                fieldOnChange(fromAiExpression);
+            const value = fromAi ? fromAiExpression : '';
+
+            fieldOnChange(value);
+
+            if (!path || !workflow.id) {
+                return;
             }
+
+            saveProperty({
+                fromAi,
+                includeInMetadata: custom || fromAi,
+                path,
+                type,
+                updateClusterElementParameterMutation,
+                updateWorkflowNodeParameterMutation,
+                value,
+                workflowId: workflow.id,
+            });
         },
-        [fromAiExpression]
+        [
+            custom,
+            fromAiExpression,
+            path,
+            type,
+            updateClusterElementParameterMutation,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+        ]
     );
 
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
