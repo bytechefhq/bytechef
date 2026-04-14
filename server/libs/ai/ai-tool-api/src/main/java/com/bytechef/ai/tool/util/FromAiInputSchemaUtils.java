@@ -78,7 +78,7 @@ public class FromAiInputSchemaUtils {
 
             propertiesObjectNode.set(fromAiResult.name(), parameterObjectNode);
 
-            if (defaultValue == null) {
+            if (fromAiResult.required()) {
                 requiredArray.add(fromAiResult.name());
             }
         }

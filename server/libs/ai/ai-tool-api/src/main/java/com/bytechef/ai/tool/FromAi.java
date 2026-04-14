@@ -80,6 +80,7 @@ public class FromAi implements MethodExecutor {
         String description = null;
         Object defaultValue = null;
         List<Object> options = null;
+        boolean required = false;
 
         if (arguments.length > 2) {
             Object thirdArgument = arguments[2];
@@ -105,6 +106,16 @@ public class FromAi implements MethodExecutor {
                     List<Object> castedOptions = (List<Object>) optionsArg;
 
                     options = castedOptions;
+                }
+
+                Object requiredArg = paramMap.get("required");
+
+                if (requiredArg != null && !(requiredArg instanceof Boolean)) {
+                    throw new IllegalArgumentException("fromAi 'required' in map must be a boolean.");
+                }
+
+                if (requiredArg instanceof Boolean requiredBool) {
+                    required = requiredBool;
                 }
             } else {
                 if (thirdArgument != null && !(thirdArgument instanceof String)) {
@@ -134,6 +145,6 @@ public class FromAi implements MethodExecutor {
             }
         }
 
-        return new TypedValue(new FromAiResult(name, type, description, defaultValue, options));
+        return new TypedValue(new FromAiResult(name, type, description, defaultValue, options, required));
     }
 }

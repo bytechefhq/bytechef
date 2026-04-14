@@ -400,12 +400,10 @@ export const useProperty = ({
             mapEntries.push(`'options': {${optionValues}}`);
         }
 
-        if (mapEntries.length === 0) {
-            return `=fromAi('${name}', '${type}')`;
-        }
+        mapEntries.push(`'required': ${required}`);
 
         return `=fromAi('${name}', '${type}', {${mapEntries.join(', ')}})`;
-    }, [defaultValue, description, formattedOptions, name, type]);
+    }, [defaultValue, description, formattedOptions, name, required, type]);
 
     const isValidControlType = useMemo(
         () => controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType),
