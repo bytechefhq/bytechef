@@ -30,8 +30,8 @@ import java.util.Objects;
  * @param defaultValue fallback value when the AI model does not provide one (nullable)
  * @author Ivica Cardic
  */
-public record FromAiResult(String name, String type, String description, Object defaultValue, List<Object> options,
-    boolean required) {
+public record FromAiResult(
+    String name, String type, String description, Object defaultValue, List<Object> options, boolean required) {
 
     public FromAiResult {
         Objects.requireNonNull(name, "name must not be null");
