@@ -1,23 +1,6 @@
 {
   "actions": null,
   "clusterElements": [ {
-    "name": "askUserQuestionTool",
-    "description": "Ask the user clarifying questions to gather preferences, clarify instructions, or get decisions.",
-    "element": { },
-    "help": null,
-    "outputDefinition": null,
-    "processErrorResponse": null,
-    "properties": null,
-    "title": "Ask User Question Tool",
-    "type": {
-      "name": "TOOLS",
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
     "name": "fileSystemTools",
     "description": "Read, write, and edit files with precise control.",
     "element": { },
