@@ -39,6 +39,8 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
@@ -47,6 +49,8 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
     private final int pollingTriggerCheckPeriod;
     private final Scheduler scheduler;
+
+    private static final Logger log = LoggerFactory.getLogger(QuartzTriggerScheduler.class);
 
     @SuppressFBWarnings("EI")
     public QuartzTriggerScheduler(
@@ -152,19 +156,37 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
     private void deleteJob(String workflowExecutionId, String pollingTrigger) {
         try {
-            scheduler.deleteJob(JobKey.jobKey(workflowExecutionId, pollingTrigger));
+            JobKey jobKey = JobKey.jobKey(workflowExecutionId, pollingTrigger);
+
+            if (scheduler.checkExists(jobKey) && scheduler.deleteJob(jobKey)) {
+                log.trace(
+                    "Trigger job removed for workflowExecutionId: {}, pollingTrigger: {}", workflowExecutionId,
+                    pollingTrigger);
+
+                return;
+            }
+
+            log.error(
+                "Trigger job not found for workflowExecutionId: {}, pollingTrigger: {}", workflowExecutionId,
+                pollingTrigger);
         } catch (SchedulerException e) {
-            throw new RuntimeException(e);
+            log.error(
+                "Unable to delete trigger job for workflowExecutionId: {}, pollingTrigger: {}", workflowExecutionId,
+                pollingTrigger);
         }
     }
 
     private void schedule(JobDetail jobDetail, Trigger trigger) {
         try {
-            scheduler.deleteJob(jobDetail.getKey());
+            if (scheduler.checkExists(jobDetail.getKey())) {
+                scheduler.deleteJob(jobDetail.getKey());
+            }
 
             scheduler.scheduleJob(jobDetail, trigger);
+
+            log.trace("Re-scheduled trigger job with key: {}", jobDetail.getKey());
         } catch (SchedulerException e) {
-            throw new RuntimeException(e);
+            log.error("Unable to re-schedule trigger job with key: {}", jobDetail.getKey());
         }
     }
 }
