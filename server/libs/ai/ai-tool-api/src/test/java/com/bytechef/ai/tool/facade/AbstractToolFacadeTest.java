@@ -160,6 +160,45 @@ class AbstractToolFacadeTest {
     }
 
     @Test
+    void testExtractFromAiResultsWithListOfFromAiExpressions() {
+        when(evaluator.evaluate(eq(Map.of("value", "=fromAi('Email__0', 'STRING', {'description': 'The attendee email address.'})")), eq(Map.of())))
+            .thenReturn(Map.of("value", new FromAiResult("Email__0", "The attendee email address.", "STRING", null)));
+
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        List<FromAiResult> results = toolFacade.extractFromAiResults(
+            Map.of("attendees", List.of("=fromAi('Email__0', 'STRING', {'description': 'The attendee email address.'})")));
+
+        assertEquals(1, results.size());
+        assertEquals("Email__0", results.getFirst()
+            .name());
+        assertEquals("The attendee email address.", results.getFirst()
+            .description());
+    }
+
+    @Test
+    void testExtractFromAiResultsWithListOfPreEvaluatedFromAiResultMaps() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        Map<String, Object> fromAiResultMap = new LinkedHashMap<>();
+
+        fromAiResultMap.put("name", "Email__0");
+        fromAiResultMap.put("description", "The attendee's email address.");
+        fromAiResultMap.put("type", "STRING");
+        fromAiResultMap.put("defaultValue", null);
+        fromAiResultMap.put("options", null);
+
+        List<FromAiResult> results = toolFacade.extractFromAiResults(
+            Map.of("attendees", List.of(fromAiResultMap)));
+
+        assertEquals(1, results.size());
+        assertEquals("Email__0", results.getFirst()
+            .name());
+        assertEquals("The attendee's email address.", results.getFirst()
+            .description());
+    }
+
+    @Test
     void testExtractFromAiResultsWithNonFromAiParameters() {
         AbstractToolFacade toolFacade = createToolFacade();
 
@@ -315,6 +354,19 @@ class AbstractToolFacadeTest {
         Object result = toolFacade.resolveParameterValue("='Title: ' + fromAi('subject')", Map.of());
 
         assertEquals("Title: Default Subject", result);
+    }
+
+    @Test
+    void testResolveParameterValueWithListOfFromAiExpressions() {
+        when(evaluator.evaluate(eq(Map.of("value", "=fromAi('Email__0')")), eq(Map.of())))
+            .thenReturn(Map.of("value", new FromAiResult("Email__0", null, "STRING", null)));
+
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        Object result = toolFacade.resolveParameterValue(
+            List.of("=fromAi('Email__0')"), Map.of("Email__0", "user@example.com"));
+
+        assertEquals(List.of("user@example.com"), result);
     }
 
     @Test

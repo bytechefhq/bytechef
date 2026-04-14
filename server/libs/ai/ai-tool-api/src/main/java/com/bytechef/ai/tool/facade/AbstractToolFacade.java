@@ -56,6 +56,28 @@ public abstract class AbstractToolFacade {
                         extractFromAiResults((Map<String, ?>) map).forEach(
                             fromAiResult -> fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult));
                     }
+                } else if (value instanceof List<?> list) {
+                    for (Object item : list) {
+                        if (item instanceof String itemExpression && itemExpression.contains("fromAi(")) {
+                            for (String fromAiCall : extractFromAiCallStrings(itemExpression)) {
+                                FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCall);
+
+                                if (fromAiResult != null) {
+                                    fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
+                                }
+                            }
+                        } else if (item instanceof Map<?, ?> itemMap) {
+                            if (ConvertUtils.canConvert(itemMap, FromAiResult.class)) {
+                                FromAiResult fromAiResult = ConvertUtils.convertValue(item, FromAiResult.class);
+
+                                fromAiResultsByName.putIfAbsent(fromAiResult.name(), fromAiResult);
+                            } else {
+                                extractFromAiResults((Map<String, ?>) itemMap).forEach(
+                                    fromAiResult -> fromAiResultsByName.putIfAbsent(
+                                        fromAiResult.name(), fromAiResult));
+                            }
+                        }
+                    }
                 } else if (value instanceof String expression && expression.contains("fromAi(")) {
                     for (String fromAiCall : extractFromAiCallStrings(expression)) {
                         FromAiResult fromAiResult = evaluateSingleFromAi(fromAiCall);
@@ -94,6 +116,16 @@ public abstract class AbstractToolFacade {
             }
 
             return resolvedMap;
+        }
+
+        if (value instanceof List<?> list) {
+            List<Object> resolvedList = new ArrayList<>();
+
+            for (Object item : list) {
+                resolvedList.add(resolveParameterValue(item, request));
+            }
+
+            return resolvedList;
         }
 
         if (!(value instanceof String expression) || !expression.contains("fromAi(")) {

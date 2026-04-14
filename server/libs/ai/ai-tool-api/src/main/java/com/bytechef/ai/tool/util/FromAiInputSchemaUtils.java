@@ -63,21 +63,7 @@ public class FromAiInputSchemaUtils {
             Object defaultValue = fromAiResult.defaultValue();
 
             if (defaultValue != null) {
-                if (defaultValue instanceof Boolean booleanValue) {
-                    parameterObjectNode.put("default", booleanValue);
-                } else if (defaultValue instanceof Integer integerValue) {
-                    parameterObjectNode.put("default", integerValue);
-                } else if (defaultValue instanceof Long longValue) {
-                    parameterObjectNode.put("default", longValue);
-                } else if (defaultValue instanceof Double doubleValue) {
-                    parameterObjectNode.put("default", doubleValue);
-                } else if (defaultValue instanceof Float floatValue) {
-                    parameterObjectNode.put("default", floatValue);
-                } else if (defaultValue instanceof String stringValue) {
-                    parameterObjectNode.put("default", stringValue);
-                } else {
-                    parameterObjectNode.putPOJO("default", defaultValue);
-                }
+                addValueToObjectNode(parameterObjectNode, "default", coerceToType(defaultValue, fromAiResult.type()));
             }
 
             List<Object> options = fromAiResult.options();
@@ -86,21 +72,7 @@ public class FromAiInputSchemaUtils {
                 ArrayNode enumArrayNode = parameterObjectNode.putArray("enum");
 
                 for (Object option : options) {
-                    if (option instanceof Boolean booleanValue) {
-                        enumArrayNode.add(booleanValue);
-                    } else if (option instanceof Integer integerValue) {
-                        enumArrayNode.add(integerValue);
-                    } else if (option instanceof Long longValue) {
-                        enumArrayNode.add(longValue);
-                    } else if (option instanceof Double doubleValue) {
-                        enumArrayNode.add(doubleValue);
-                    } else if (option instanceof Float floatValue) {
-                        enumArrayNode.add(floatValue);
-                    } else if (option instanceof String stringValue) {
-                        enumArrayNode.add(stringValue);
-                    } else {
-                        enumArrayNode.addPOJO(option);
-                    }
+                    addValueToArrayNode(enumArrayNode, coerceToType(option, fromAiResult.type()));
                 }
             }
 
@@ -112,6 +84,68 @@ public class FromAiInputSchemaUtils {
         }
 
         return schemaObjectNode.toPrettyString();
+    }
+
+    private static Object coerceToType(Object value, String type) {
+        if (!(value instanceof String stringValue) || type == null) {
+            return value;
+        }
+
+        return switch (type.trim()
+            .toUpperCase()) {
+            case "BOOLEAN" -> Boolean.parseBoolean(stringValue);
+            case "INTEGER" -> {
+                try {
+                    yield Long.parseLong(stringValue);
+                } catch (NumberFormatException e) {
+                    yield value;
+                }
+            }
+            case "NUMBER" -> {
+                try {
+                    yield Double.parseDouble(stringValue);
+                } catch (NumberFormatException e) {
+                    yield value;
+                }
+            }
+            default -> value;
+        };
+    }
+
+    private static void addValueToObjectNode(ObjectNode objectNode, String fieldName, Object value) {
+        if (value instanceof Boolean booleanValue) {
+            objectNode.put(fieldName, booleanValue);
+        } else if (value instanceof Integer integerValue) {
+            objectNode.put(fieldName, integerValue);
+        } else if (value instanceof Long longValue) {
+            objectNode.put(fieldName, longValue);
+        } else if (value instanceof Double doubleValue) {
+            objectNode.put(fieldName, doubleValue);
+        } else if (value instanceof Float floatValue) {
+            objectNode.put(fieldName, floatValue);
+        } else if (value instanceof String stringValue) {
+            objectNode.put(fieldName, stringValue);
+        } else {
+            objectNode.putPOJO(fieldName, value);
+        }
+    }
+
+    private static void addValueToArrayNode(ArrayNode arrayNode, Object value) {
+        if (value instanceof Boolean booleanValue) {
+            arrayNode.add(booleanValue);
+        } else if (value instanceof Integer integerValue) {
+            arrayNode.add(integerValue);
+        } else if (value instanceof Long longValue) {
+            arrayNode.add(longValue);
+        } else if (value instanceof Double doubleValue) {
+            arrayNode.add(doubleValue);
+        } else if (value instanceof Float floatValue) {
+            arrayNode.add(floatValue);
+        } else if (value instanceof String stringValue) {
+            arrayNode.add(stringValue);
+        } else {
+            arrayNode.addPOJO(value);
+        }
     }
 
     private static String getJsonSchemaType(String type) {
