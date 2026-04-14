@@ -388,7 +388,7 @@ public abstract class AbstractAiAgentChatAction {
             }
 
             private String observeAndCall(String toolInput, Supplier<String> execution) {
-                logger.debug("Tool '{}' request: {}", toolDefinition.name(), toolInput);
+                AbstractAiAgentChatAction.logger.debug("Tool '{}' request: {}", toolDefinition.name(), toolInput);
 
                 Map<String, Object> inputs;
 
