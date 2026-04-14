@@ -50,7 +50,7 @@ class AbstractToolFacadeTest {
     @Test
     void testExtractFromAiResultsWithSingleFromAiExpression() {
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('subject')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("subject", null, "STRING", null)));
+            .thenReturn(Map.of("value", new FromAiResult("subject", "STRING", null, null, null, false)));
 
         AbstractToolFacade toolFacade = createToolFacade();
 
@@ -64,9 +64,9 @@ class AbstractToolFacadeTest {
     @Test
     void testExtractFromAiResultsWithMultipleFromAiCallsInOneExpression() {
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('subject')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("subject", null, "STRING", null)));
+            .thenReturn(Map.of("value", new FromAiResult("subject", "STRING", null, null, null, false)));
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('name')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("name", null, "STRING", null)));
+            .thenReturn(Map.of("value", new FromAiResult("name", "STRING", null, null, null, false)));
 
         AbstractToolFacade toolFacade = createToolFacade();
 
@@ -83,7 +83,7 @@ class AbstractToolFacadeTest {
     @Test
     void testExtractFromAiResultsDeduplicatesByName() {
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('subject')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("subject", null, "STRING", null)));
+            .thenReturn(Map.of("value", new FromAiResult("subject", "STRING", null, null, null, false)));
 
         AbstractToolFacade toolFacade = createToolFacade();
 
@@ -103,7 +103,7 @@ class AbstractToolFacadeTest {
     void testExtractFromAiResultsWithFromAiResultObjectValue() {
         AbstractToolFacade toolFacade = createToolFacade();
 
-        FromAiResult directResult = new FromAiResult("directParam", "A direct param", "STRING", null);
+        FromAiResult directResult = new FromAiResult("directParam", "STRING", "A direct param", null, null, false);
 
         List<FromAiResult> results = toolFacade.extractFromAiResults(Map.of("param", directResult));
 
@@ -124,6 +124,7 @@ class AbstractToolFacadeTest {
         fromAiResultMap.put("description", "A map-based param");
         fromAiResultMap.put("type", "STRING");
         fromAiResultMap.put("defaultValue", null);
+        fromAiResultMap.put("required", false);
 
         List<FromAiResult> results = toolFacade.extractFromAiResults(Map.of("param", fromAiResultMap));
 
@@ -138,7 +139,7 @@ class AbstractToolFacadeTest {
     void testExtractFromAiResultsWithMapConvertibleToFromAiResultDeduplicatesWithDirectResult() {
         AbstractToolFacade toolFacade = createToolFacade();
 
-        FromAiResult directResult = new FromAiResult("sharedName", "Direct", "STRING", null);
+        FromAiResult directResult = new FromAiResult("sharedName", "STRING", "Direct", null, null, false);
 
         Map<String, Object> fromAiResultMap = new LinkedHashMap<>();
 
@@ -161,13 +162,17 @@ class AbstractToolFacadeTest {
 
     @Test
     void testExtractFromAiResultsWithListOfFromAiExpressions() {
-        when(evaluator.evaluate(eq(Map.of("value", "=fromAi('Email__0', 'STRING', {'description': 'The attendee email address.'})")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("Email__0", "The attendee email address.", "STRING", null)));
+        when(evaluator.evaluate(
+            eq(Map.of("value", "=fromAi('Email__0', 'STRING', {'description': 'The attendee email address.'})")),
+            eq(Map.of())))
+                .thenReturn(Map.of("value",
+                    new FromAiResult("Email__0", "STRING", "The attendee email address.", null, null, false)));
 
         AbstractToolFacade toolFacade = createToolFacade();
 
         List<FromAiResult> results = toolFacade.extractFromAiResults(
-            Map.of("attendees", List.of("=fromAi('Email__0', 'STRING', {'description': 'The attendee email address.'})")));
+            Map.of("attendees",
+                List.of("=fromAi('Email__0', 'STRING', {'description': 'The attendee email address.'})")));
 
         assertEquals(1, results.size());
         assertEquals("Email__0", results.getFirst()
@@ -187,6 +192,7 @@ class AbstractToolFacadeTest {
         fromAiResultMap.put("type", "STRING");
         fromAiResultMap.put("defaultValue", null);
         fromAiResultMap.put("options", null);
+        fromAiResultMap.put("required", false);
 
         List<FromAiResult> results = toolFacade.extractFromAiResults(
             Map.of("attendees", List.of(fromAiResultMap)));
@@ -221,7 +227,7 @@ class AbstractToolFacadeTest {
     void testResolveParameterValueWithFromAiResultObject() {
         AbstractToolFacade toolFacade = createToolFacade();
 
-        FromAiResult fromAiResult = new FromAiResult("subject", null, "STRING", null);
+        FromAiResult fromAiResult = new FromAiResult("subject", "STRING", null, null, null, false);
 
         Object result = toolFacade.resolveParameterValue(fromAiResult, Map.of("subject", "Hello World"));
 
@@ -232,7 +238,7 @@ class AbstractToolFacadeTest {
     void testResolveParameterValueWithFromAiResultObjectFallsBackToDefault() {
         AbstractToolFacade toolFacade = createToolFacade();
 
-        FromAiResult fromAiResult = new FromAiResult("subject", null, "STRING", "default value");
+        FromAiResult fromAiResult = new FromAiResult("subject", "STRING", null, "default value", null, false);
 
         Object result = toolFacade.resolveParameterValue(fromAiResult, Map.of());
 
@@ -243,7 +249,7 @@ class AbstractToolFacadeTest {
     void testResolveParameterValueWithFromAiResultObjectReturnsNullWhenNoDefaultAndNotInRequest() {
         AbstractToolFacade toolFacade = createToolFacade();
 
-        FromAiResult fromAiResult = new FromAiResult("subject", null, "STRING", null);
+        FromAiResult fromAiResult = new FromAiResult("subject", "STRING", null, null, null, false);
 
         Object result = toolFacade.resolveParameterValue(fromAiResult, Map.of());
 
@@ -260,6 +266,7 @@ class AbstractToolFacadeTest {
         fromAiResultMap.put("description", null);
         fromAiResultMap.put("type", "STRING");
         fromAiResultMap.put("defaultValue", null);
+        fromAiResultMap.put("required", false);
 
         Object result = toolFacade.resolveParameterValue(fromAiResultMap, Map.of("subject", "Resolved Value"));
 
@@ -276,6 +283,7 @@ class AbstractToolFacadeTest {
         fromAiResultMap.put("description", null);
         fromAiResultMap.put("type", "STRING");
         fromAiResultMap.put("defaultValue", "fallback");
+        fromAiResultMap.put("required", "false");
 
         Object result = toolFacade.resolveParameterValue(fromAiResultMap, Map.of());
 
@@ -292,6 +300,7 @@ class AbstractToolFacadeTest {
         fromAiResultMap.put("description", null);
         fromAiResultMap.put("type", "STRING");
         fromAiResultMap.put("defaultValue", null);
+        fromAiResultMap.put("required", false);
 
         Object result = toolFacade.resolveParameterValue(fromAiResultMap, Map.of());
 
@@ -301,7 +310,7 @@ class AbstractToolFacadeTest {
     @Test
     void testResolveParameterValueWithPureFromAiExpression() {
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('subject')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("subject", null, "STRING", null)));
+            .thenReturn(Map.of("value", new FromAiResult("subject", "STRING", null, null, null, false)));
 
         AbstractToolFacade toolFacade = createToolFacade();
 
@@ -313,7 +322,7 @@ class AbstractToolFacadeTest {
     @Test
     void testResolveParameterValueWithPureFromAiExpressionPreservesIntegerType() {
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('count', null, 'INTEGER')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("count", null, "INTEGER", null)));
+            .thenReturn(Map.of("value", new FromAiResult("count", "INTEGER", null, null, null, false)));
 
         AbstractToolFacade toolFacade = createToolFacade();
 
@@ -326,9 +335,9 @@ class AbstractToolFacadeTest {
     @Test
     void testResolveParameterValueWithCompositeExpression() {
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('subject')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("subject", null, "STRING", null)));
+            .thenReturn(Map.of("value", new FromAiResult("subject", "STRING", null, null, null, false)));
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('name')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("name", null, "STRING", null)));
+            .thenReturn(Map.of("value", new FromAiResult("name", "STRING", null, null, null, false)));
         when(evaluator.evaluate(
             eq(Map.of("value", "='Generated by AI: ' + 'Hello World' + ' by ' + 'John'")), eq(Map.of())))
                 .thenReturn(Map.of("value", "Generated by AI: Hello World by John"));
@@ -345,7 +354,7 @@ class AbstractToolFacadeTest {
     @Test
     void testResolveParameterValueWithCompositeExpressionUsesDefaults() {
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('subject')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("subject", null, "STRING", "Default Subject")));
+            .thenReturn(Map.of("value", new FromAiResult("subject", "STRING", null, "Default Subject", null, false)));
         when(evaluator.evaluate(eq(Map.of("value", "='Title: ' + 'Default Subject'")), eq(Map.of())))
             .thenReturn(Map.of("value", "Title: Default Subject"));
 
@@ -359,7 +368,7 @@ class AbstractToolFacadeTest {
     @Test
     void testResolveParameterValueWithListOfFromAiExpressions() {
         when(evaluator.evaluate(eq(Map.of("value", "=fromAi('Email__0')")), eq(Map.of())))
-            .thenReturn(Map.of("value", new FromAiResult("Email__0", null, "STRING", null)));
+            .thenReturn(Map.of("value", new FromAiResult("Email__0", "STRING", null, null, null, false)));
 
         AbstractToolFacade toolFacade = createToolFacade();
 
