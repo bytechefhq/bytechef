@@ -42,7 +42,7 @@ public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade 
 
     @Override
     public void scheduleConnectionRefresh(
-        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType) {
+        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId) {
 
         try {
             if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
@@ -54,7 +54,7 @@ public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade 
                     .plusSeconds(expiresIn);
 
                 if (expiry != null) {
-                    connectionRefreshScheduler.scheduleConnectionRefresh(connectionId, expiry);
+                    connectionRefreshScheduler.scheduleConnectionRefresh(connectionId, expiry, tenantId);
                 }
             }
         } catch (Exception e) {
@@ -64,11 +64,13 @@ public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade 
     }
 
     @Override
-    public void deleteScheduledConnectionRefresh(Long connectionId, AuthorizationType authorizationType) {
+    public void deleteScheduledConnectionRefresh(
+        Long connectionId, AuthorizationType authorizationType, String tenantId) {
+
         if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
             authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
-            connectionRefreshScheduler.cancelConnectionRefresh(connectionId);
+            connectionRefreshScheduler.cancelConnectionRefresh(connectionId, tenantId);
         }
     }
 }

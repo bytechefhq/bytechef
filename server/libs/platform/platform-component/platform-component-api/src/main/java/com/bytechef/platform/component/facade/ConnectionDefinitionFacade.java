@@ -24,5 +24,5 @@ import javax.annotation.Nullable;
  */
 public interface ConnectionDefinitionFacade {
 
-    ComponentConnection executeConnectionRefresh(@Nullable Long connectionId);
+    ComponentConnection executeConnectionRefresh(String tenantId, @Nullable Long connectionId);
 }

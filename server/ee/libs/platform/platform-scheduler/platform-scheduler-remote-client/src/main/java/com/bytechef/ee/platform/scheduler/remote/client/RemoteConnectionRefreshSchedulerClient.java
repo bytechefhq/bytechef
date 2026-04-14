@@ -11,6 +11,8 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,25 +34,25 @@ public class RemoteConnectionRefreshSchedulerClient implements ConnectionRefresh
     }
 
     @Override
-    public void cancelConnectionRefresh(Long connectionId) {
+    public void cancelConnectionRefresh(Long connectionId, String tenantId) {
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(CONNECTION_REFRESH_SCHEDULER + "/cancel-connection-refresh")
                 .build(),
-            connectionId);
+            new ScheduleConnectionRefreshRequest(connectionId, Instant.now(), tenantId));
     }
 
     @Override
-    public void scheduleConnectionRefresh(Long connectionId, Instant expiry) {
+    public void scheduleConnectionRefresh(Long connectionId, Instant expiry, String tenantId) {
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(CONNECTION_REFRESH_SCHEDULER + "/schedule-connection-refresh")
                 .build(),
-            new ScheduleConnectionRefreshRequest(connectionId, expiry));
+            new ScheduleConnectionRefreshRequest(connectionId, expiry, tenantId));
     }
 
-    private record ScheduleConnectionRefreshRequest(Long connectionId, Instant expiry) {
+    private record ScheduleConnectionRefreshRequest(Long connectionId, Instant expiry, String tenantId) {
     }
 }

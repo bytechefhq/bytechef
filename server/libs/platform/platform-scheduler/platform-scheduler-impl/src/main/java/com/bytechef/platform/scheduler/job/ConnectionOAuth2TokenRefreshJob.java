@@ -18,6 +18,7 @@ package com.bytechef.platform.scheduler.job;
 
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
+import com.bytechef.tenant.TenantContext;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -48,8 +49,10 @@ public class ConnectionOAuth2TokenRefreshJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
         Long connectionId = jobDataMap.getLong("connectionId");
+        String tenantId = jobDataMap.getString("tenantId");
 
-        ComponentConnection componentConnection = connectionDefinitionFacade.executeConnectionRefresh(connectionId);
+        ComponentConnection componentConnection = TenantContext.callWithTenantId(
+            tenantId, () -> connectionDefinitionFacade.executeConnectionRefresh(tenantId, connectionId));
 
         Scheduler scheduler = context.getScheduler();
 

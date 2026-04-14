@@ -34,31 +34,34 @@ public class RemoteConnectionLifecycleFacadeClient implements ConnectionLifecycl
 
     @Override
     public void scheduleConnectionRefresh(
-        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType) {
+        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId) {
 
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(CONNECTION_LIFECYCLE_FACADE + "/schedule-connection-refresh")
                 .build(),
-            new ScheduleConnectionRefreshRequest(connectionId, parameters, authorizationType));
+            new ScheduleConnectionRefreshRequest(connectionId, parameters, authorizationType, tenantId));
     }
 
     @Override
-    public void deleteScheduledConnectionRefresh(Long connectionId, AuthorizationType authorizationType) {
+    public void deleteScheduledConnectionRefresh(
+        Long connectionId, AuthorizationType authorizationType, String tenantId) {
+
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(CONNECTION_LIFECYCLE_FACADE + "/delete-scheduled-connection-refresh")
                 .build(),
-            new DeleteScheduledConnectionRefreshRequest(connectionId, authorizationType));
+            new DeleteScheduledConnectionRefreshRequest(connectionId, authorizationType, tenantId));
     }
 
     @SuppressFBWarnings("EI")
     private record ScheduleConnectionRefreshRequest(
-        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType) {
+        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId) {
     }
 
-    private record DeleteScheduledConnectionRefreshRequest(Long connectionId, AuthorizationType authorizationType) {
+    private record DeleteScheduledConnectionRefreshRequest(
+        Long connectionId, AuthorizationType authorizationType, String tenantId) {
     }
 }

@@ -16,6 +16,8 @@
 
 package com.bytechef.config;
 
+import com.bytechef.config.ApplicationProperties.Coordinator.Trigger.Scheduler;
+import com.bytechef.config.ApplicationProperties.Coordinator.Trigger.Scheduler.Provider;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -2075,6 +2077,9 @@ public class ApplicationProperties {
         /** Trigger coordination configuration */
         private Trigger trigger = new Trigger();
 
+        /** Connection cordinator configuration */
+        private Connection connection = new Connection();
+
         public boolean isEnabled() {
             return enabled;
         }
@@ -2087,6 +2092,10 @@ public class ApplicationProperties {
             return trigger;
         }
 
+        public Connection getConnection() {
+            return connection;
+        }
+
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
@@ -2097,6 +2106,10 @@ public class ApplicationProperties {
 
         public void setTrigger(Trigger trigger) {
             this.trigger = trigger;
+        }
+
+        public void setConnection(Connection connection) {
+            this.connection = connection;
         }
 
         /**
@@ -2184,6 +2197,50 @@ public class ApplicationProperties {
 
                 public void setTaskExecutionErrorEvents(int taskExecutionErrorEvents) {
                     this.taskExecutionErrorEvents = taskExecutionErrorEvents;
+                }
+            }
+        }
+
+        /**
+         * Connection coordination configuration for connection refresh.
+         */
+        public static class Connection {
+
+            /** Scheduler configuration */
+            private Scheduler scheduler = new Scheduler();
+
+            public Scheduler getScheduler() {
+                return scheduler;
+            }
+
+            public void setScheduler(Scheduler scheduler) {
+                this.scheduler = scheduler;
+            }
+
+            /**
+             * Scheduler configuration for connection refresh.
+             */
+            public static class Scheduler {
+
+                /**
+                 * Available scheduler providers.
+                 */
+                public enum Provider {
+                    /** AWS EventBridge Scheduler */
+                    AWS,
+                    /** Quartz Scheduler */
+                    QUARTZ
+                }
+
+                /** Scheduler provider */
+                private Trigger.Scheduler.Provider provider = Trigger.Scheduler.Provider.QUARTZ;
+
+                public Trigger.Scheduler.Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Trigger.Scheduler.Provider provider) {
+                    this.provider = provider;
                 }
             }
         }
