@@ -61,18 +61,21 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
             return null;
         }
 
-        const modelElement = (Array.isArray(modelValue) ? modelValue[0] : modelValue) as unknown as NodeDataType;
+        const modelElement = (Array.isArray(modelValue) ? modelValue[0] : modelValue) as unknown as NodeDataType & {
+            name?: string;
+        };
         const typeSegments = modelElement.type?.split('/') || [];
         const componentName = modelElement.componentName || typeSegments[0] || '';
         const operationName = modelElement.operationName || typeSegments[2] || '';
         const definitionsMap = new Map(componentDefinitions.map((definition) => [definition.name, definition]));
         const componentDefinition = definitionsMap.get(componentName);
+        const modelName = modelElement.workflowNodeName || modelElement.name || '';
 
         return {
             componentName,
             icon: componentDefinition?.icon,
-            label: modelElement.label || modelElement.workflowNodeName || '',
-            name: modelElement.workflowNodeName || '',
+            label: modelElement.label || modelName,
+            name: modelName,
             operationName,
             title: componentDefinition?.title || componentName,
             type: modelElement.type || '',

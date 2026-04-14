@@ -100,7 +100,7 @@ export default function AiAgentEditor({
                 onToggleEditor={onToggleEditor}
             />
 
-            <div className="grid min-h-0 flex-1 grid-cols-2 gap-6 overflow-hidden px-4 pt-4">
+            <div className="grid min-h-0 flex-1 grid-cols-2 gap-6 overflow-hidden px-4 py-4">
                 <div className="min-h-0 overflow-y-auto">
                     <AiAgentConfigurationPanel />
                 </div>
