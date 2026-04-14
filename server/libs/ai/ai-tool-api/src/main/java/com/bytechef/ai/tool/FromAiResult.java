@@ -30,7 +30,7 @@ import java.util.Objects;
  * @param defaultValue fallback value when the AI model does not provide one (nullable)
  * @author Ivica Cardic
  */
-public record FromAiResult(String name, String type, String description, Object defaultValue, List<Object> options) {
+public record FromAiResult(String name, String type, String description, Object defaultValue, List<Object> options, boolean required) {
 
     private static final String DEFAULT_TYPE = "STRING";
 
@@ -40,18 +40,18 @@ public record FromAiResult(String name, String type, String description, Object 
     }
 
     public FromAiResult(String name) {
-        this(name, DEFAULT_TYPE, null, null, null);
+        this(name, DEFAULT_TYPE, null, null, null, false);
     }
 
     public FromAiResult(String name, String type) {
-        this(name, type, null, null, null);
+        this(name, type, null, null, null, false);
     }
 
     public FromAiResult(String name, String type, String description) {
-        this(name, type, description, null, null);
+        this(name, type, description, null, null, false);
     }
 
     public FromAiResult(String name, String type, String description, Object defaultValue) {
-        this(name, type, description, defaultValue, null);
+        this(name, type, description, defaultValue, null, false);
     }
 }
