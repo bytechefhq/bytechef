@@ -81,6 +81,7 @@ public class SnowflakeUpdateRowAction {
         return values
             .entrySet()
             .stream()
+            .sorted(Map.Entry.comparingByKey())
             .map(entry -> {
                 String columnName = entry.getKey();
                 Object value = entry.getValue();
