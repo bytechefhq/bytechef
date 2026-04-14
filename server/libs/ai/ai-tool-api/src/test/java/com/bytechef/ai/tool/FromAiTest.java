@@ -60,7 +60,8 @@ public class FromAiTest {
     @Test
     public void testFromAiWithNameAndDescription() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("param", "=fromAi('sifra_artikla', 'The product code')"), Collections.emptyMap());
+            Map.of("param", "=fromAi('sifra_artikla', 'STRING', {'description': 'The product code'})"),
+            Collections.emptyMap());
 
         Object result = MapUtils.get(map, "param");
 
@@ -77,7 +78,8 @@ public class FromAiTest {
     @Test
     public void testFromAiWithAllArguments() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("param", "=fromAi('price', 'Item price', 'NUMBER', 0)"), Collections.emptyMap());
+            Map.of("param", "=fromAi('price', 'NUMBER', {'description': 'Item price', 'defaultValue': 0})"),
+            Collections.emptyMap());
 
         Object result = MapUtils.get(map, "param");
 
@@ -100,13 +102,13 @@ public class FromAiTest {
     @Test
     public void testFromAiWithInvalidType() {
         assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
-            Map.of("param", "=fromAi('name', null, 'INVALID')"), Collections.emptyMap()));
+            Map.of("param", "=fromAi('name', 'INVALID')"), Collections.emptyMap()));
     }
 
     @Test
     public void testFromAiWithCaseInsensitiveType() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("param", "=fromAi('count', null, 'integer')"), Collections.emptyMap());
+            Map.of("param", "=fromAi('count', 'integer')"), Collections.emptyMap());
 
         Object result = MapUtils.get(map, "param");
 
@@ -120,7 +122,7 @@ public class FromAiTest {
     @Test
     public void testFromAiWithNullDescription() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("param", "=fromAi('name', null, 'BOOLEAN', true)"), Collections.emptyMap());
+            Map.of("param", "=fromAi('name', 'BOOLEAN', {'defaultValue': true})"), Collections.emptyMap());
 
         Object result = MapUtils.get(map, "param");
 
