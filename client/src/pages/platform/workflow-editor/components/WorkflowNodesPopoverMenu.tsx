@@ -3,7 +3,7 @@ import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/p
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
+import {MouseEvent, PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -45,10 +45,11 @@ const WorkflowNodesPopoverMenu = ({
     sourceNodeId,
     sourceNodeName,
 }: WorkflowNodesPopoverMenuProps) => {
-    const [actionPanelOpen, setActionPanelOpen] = useState(false);
     const [componentDefinitionToBeAdded, setComponentDefinitionToBeAdded] = useState<ComponentDefinition | null>(null);
     const [internalOpen, setInternalOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
+
+    const actionPanelOpen = !!componentDefinitionToBeAdded?.name;
 
     const popoverOpen = externalOpen ?? internalOpen;
     const setPopoverOpen = externalOnOpenChange ?? setInternalOpen;
@@ -68,16 +69,33 @@ const WorkflowNodesPopoverMenu = ({
     const sourceNode = useMemo(() => nodes.find((node) => node.id === sourceNodeId), [sourceNodeId, nodes]);
 
     const handleActionPanelClose = useCallback(() => {
-        setActionPanelOpen(false);
-
         setComponentDefinitionToBeAdded(null);
     }, []);
+
+    const handlePopoverOpenChange = useCallback(
+        (open: boolean) => {
+            setPopoverOpen(open);
+
+            if (!open) {
+                handleActionPanelClose();
+            }
+        },
+        [handleActionPanelClose, setPopoverOpen]
+    );
+
+    const handleStopPropagation = useCallback((event: MouseEvent) => event.stopPropagation(), []);
+
+    const handlePasteClose = useCallback(() => setPopoverOpen(false), [setPopoverOpen]);
 
     const handleComponentClick = useCallback(
         async (clickedItem: ClickedDefinitionType) => {
             const {componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
 
             if (taskDispatcher) {
+                if (!updateWorkflowMutation) {
+                    return;
+                }
+
                 const edge = edges.find((edge) => edge.id === edgeId);
 
                 const taskDispatcherContext = getTaskDispatcherContext({
@@ -93,7 +111,7 @@ const WorkflowNodesPopoverMenu = ({
                     taskDispatcherContext,
                     taskDispatcherDefinition: clickedItem,
                     taskDispatcherName: name as keyof typeof TASK_DISPATCHER_CONFIG,
-                    updateWorkflowMutation: updateWorkflowMutation!,
+                    updateWorkflowMutation,
                     workflow,
                 });
 
@@ -127,16 +145,7 @@ const WorkflowNodesPopoverMenu = ({
     );
 
     useEffect(() => {
-        if (componentDefinitionToBeAdded?.name) {
-            setActionPanelOpen(true);
-        } else {
-            setActionPanelOpen(false);
-        }
-    }, [componentDefinitionToBeAdded?.name]);
-
-    useEffect(() => {
         return () => {
-            setActionPanelOpen(false);
             setComponentDefinitionToBeAdded(null);
             setPopoverOpen(false);
             setTrigger(false);
@@ -148,16 +157,10 @@ const WorkflowNodesPopoverMenu = ({
         <Popover
             key={`${sourceNodeId}-popoverMenu-${nodeIndex}`}
             modal
-            onOpenChange={(open) => {
-                setPopoverOpen(open);
-
-                if (!open) {
-                    handleActionPanelClose();
-                }
-            }}
+            onOpenChange={handlePopoverOpenChange}
             open={popoverOpen}
         >
-            <PopoverTrigger asChild onClick={(event) => event.stopPropagation()}>
+            <PopoverTrigger asChild onClick={handleStopPropagation}>
                 {children}
             </PopoverTrigger>
 
@@ -167,7 +170,7 @@ const WorkflowNodesPopoverMenu = ({
                     'flex rounded-lg p-0 will-change-auto',
                     actionPanelOpen ? 'w-workflow-nodes-popover-menu-width' : 'w-node-popover-width'
                 )}
-                onClick={(event) => event.stopPropagation()}
+                onClick={handleStopPropagation}
                 side="right"
                 sideOffset={-34}
             >
@@ -181,7 +184,7 @@ const WorkflowNodesPopoverMenu = ({
                         hideClusterElementComponents={hideClusterElementComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
-                        onPasteClose={() => setPopoverOpen(false)}
+                        onPasteClose={handlePasteClose}
                         selectedComponentName={componentDefinitionToBeAdded?.name}
                         showPaste
                         sourceNodeId={sourceNodeId}
