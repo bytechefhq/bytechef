@@ -16,7 +16,7 @@ import {
     TextCursorInputIcon,
     Trash2Icon,
 } from 'lucide-react';
-import {ReactNode, useState} from 'react';
+import {ReactNode, useCallback, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface WorkflowNodeContextMenuProps {
@@ -55,10 +55,48 @@ const WorkflowNodeContextMenu = ({
         }))
     );
 
-    const handleOpenChange = (open: boolean) => {
-        setContextMenuOpen(open);
-        onContextMenuOpenChange?.(open);
-    };
+    const handleOpenChange = useCallback(
+        (open: boolean) => {
+            setContextMenuOpen(open);
+            onContextMenuOpenChange?.(open);
+        },
+        [onContextMenuOpenChange, setContextMenuOpen]
+    );
+
+    const handleDeleteClick = useCallback(() => setDeleteDialogOpen(true), []);
+
+    const handleDeleteCancel = useCallback(() => setDeleteDialogOpen(false), []);
+
+    const pasteMenuItem = useMemo(() => {
+        if (!canPaste || !copiedNode) {
+            return null;
+        }
+
+        const copiedNodeLabel = copiedNode.label ?? copiedNode.componentName ?? 'Node';
+
+        return (
+            <ContextMenuItem className="flex w-full flex-col items-start gap-1" onClick={onPaste}>
+                <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
+                    <ClipboardPlusIcon className="size-4 shrink-0" />
+
+                    <span>Paste After</span>
+                </div>
+
+                <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
+                    <span className="flex size-4 shrink-0 items-center justify-center">{copiedNode.icon ?? null}</span>
+
+                    <span
+                        className="line-clamp-1 flex-1 text-xs font-normal"
+                        title={`${copiedNodeLabel}${copiedNode.workflowNodeName ? ` (${copiedNode.workflowNodeName})` : ''}`}
+                    >
+                        {copiedNodeLabel}
+
+                        {copiedNode.workflowNodeName ? ` (${copiedNode.workflowNodeName})` : null}
+                    </span>
+                </div>
+            </ContextMenuItem>
+        );
+    }, [canPaste, copiedNode, onPaste]);
 
     return (
         <>
@@ -85,41 +123,7 @@ const WorkflowNodeContextMenu = ({
                                 Copy
                             </ContextMenuItem>
 
-                            {canPaste &&
-                                copiedNode &&
-                                (() => {
-                                    const copiedNodeLabel = copiedNode.label ?? copiedNode.componentName ?? 'Node';
-
-                                    return (
-                                        <ContextMenuItem
-                                            className="flex w-full flex-col items-start gap-1"
-                                            onClick={onPaste}
-                                        >
-                                            <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
-                                                <ClipboardPlusIcon className="size-4 shrink-0" />
-
-                                                <span>Paste After</span>
-                                            </div>
-
-                                            <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
-                                                <span className="flex size-4 shrink-0 items-center justify-center">
-                                                    {copiedNode.icon ?? null}
-                                                </span>
-
-                                                <span
-                                                    className="line-clamp-1 flex-1 text-xs font-normal"
-                                                    title={`${copiedNodeLabel}${copiedNode.workflowNodeName ? ` (${copiedNode.workflowNodeName})` : ''}`}
-                                                >
-                                                    {copiedNodeLabel}
-
-                                                    {copiedNode.workflowNodeName
-                                                        ? ` (${copiedNode.workflowNodeName})`
-                                                        : null}
-                                                </span>
-                                            </div>
-                                        </ContextMenuItem>
-                                    );
-                                })()}
+                            {pasteMenuItem}
 
                             <ContextMenuSeparator />
 
@@ -137,7 +141,7 @@ const WorkflowNodeContextMenu = ({
 
                             <ContextMenuSeparator />
 
-                            <ContextMenuItem destructive onClick={() => setDeleteDialogOpen(true)}>
+                            <ContextMenuItem destructive onClick={handleDeleteClick}>
                                 <Trash2Icon />
                                 Delete
                             </ContextMenuItem>
@@ -149,7 +153,7 @@ const WorkflowNodeContextMenu = ({
             {!data.trigger && (
                 <DeleteAlertDialog
                     nodeName={data.label}
-                    onCancel={() => setDeleteDialogOpen(false)}
+                    onCancel={handleDeleteCancel}
                     onDelete={onDelete}
                     open={deleteDialogOpen}
                 />
