@@ -107,6 +107,16 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
                 workflowNodeName: tool.name,
             };
 
+            // Close the simple-mode node details panel if it is currently showing
+            // the tool being removed — otherwise it keeps rendering stale data
+            // for a tool that no longer exists.
+            const {currentNode: activeNode} = useWorkflowNodeDetailsPanelStore.getState();
+
+            if (activeNode?.workflowNodeName === tool.name) {
+                setAiAgentNodeDetailsPanelOpen(false);
+                setCurrentNode(undefined);
+            }
+
             handleDeleteTask({
                 cancelWorkflowQueries: cancelWorkflowQueries!,
                 clusterElementsCanvasOpen: true,
@@ -125,6 +135,7 @@ export default function useAiAgentToolDropdownMenu(): UseAiAgentToolDropdownMenu
             invalidateWorkflowQueries,
             queryClient,
             rootClusterElementNodeData,
+            setAiAgentNodeDetailsPanelOpen,
             setCurrentNode,
             setRootClusterElementNodeData,
             updateWorkflowMutation,
