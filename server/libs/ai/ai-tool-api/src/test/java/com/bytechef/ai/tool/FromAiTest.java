@@ -135,6 +135,54 @@ public class FromAiTest {
     }
 
     @Test
+    public void testFromAiWithRequiredTrue() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("param", "=fromAi('title', 'STRING', {'description': 'The title.', 'required': true})"),
+            Collections.emptyMap());
+
+        Object result = MapUtils.get(map, "param");
+
+        assertInstanceOf(FromAiResult.class, result);
+
+        FromAiResult fromAiResult = (FromAiResult) result;
+
+        assertEquals("title", fromAiResult.name());
+        assertEquals("STRING", fromAiResult.type());
+        assertEquals("The title.", fromAiResult.description());
+        assertEquals(true, fromAiResult.required());
+    }
+
+    @Test
+    public void testFromAiWithRequiredFalse() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("param", "=fromAi('title', 'STRING', {'description': 'The title.', 'required': false})"),
+            Collections.emptyMap());
+
+        Object result = MapUtils.get(map, "param");
+
+        assertInstanceOf(FromAiResult.class, result);
+
+        FromAiResult fromAiResult = (FromAiResult) result;
+
+        assertEquals(false, fromAiResult.required());
+    }
+
+    @Test
+    public void testFromAiWithoutRequiredDefaultsFalse() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("param", "=fromAi('title', 'STRING', {'description': 'The title.'})"),
+            Collections.emptyMap());
+
+        Object result = MapUtils.get(map, "param");
+
+        assertInstanceOf(FromAiResult.class, result);
+
+        FromAiResult fromAiResult = (FromAiResult) result;
+
+        assertEquals(false, fromAiResult.required());
+    }
+
+    @Test
     public void testFromAiWithNullTypeDefaultsToString() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("param", "=fromAi('name', null, null)"), Collections.emptyMap());
