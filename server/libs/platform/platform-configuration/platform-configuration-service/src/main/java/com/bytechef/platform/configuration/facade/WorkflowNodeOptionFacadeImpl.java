@@ -143,26 +143,46 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     private Map<String, Map<String, ?>> evaluateClusterElementInputParameters(
         ClusterElementMap clusterElementMap, Map<String, Object> context) {
 
-        Map<String, Map<String, ?>> result = new java.util.HashMap<>();
+        Map<String, Map<String, ?>> parameterMap = new java.util.HashMap<>();
 
         for (Map.Entry<String, Object> entry : clusterElementMap.entrySet()) {
             Object value = entry.getValue();
 
             if (value instanceof ClusterElement clusterElement) {
-                result.put(
+                parameterMap.put(
                     clusterElement.getWorkflowNodeName(), evaluator.evaluate(clusterElement.getParameters(), context));
+
+                addNestedClusterElementParameters(clusterElement, context, parameterMap);
             } else if (value instanceof List<?> list) {
                 for (Object item : list) {
                     if (item instanceof ClusterElement clusterElement) {
-                        result.put(
+                        parameterMap.put(
                             clusterElement.getWorkflowNodeName(),
                             evaluator.evaluate(clusterElement.getParameters(), context));
+
+                        addNestedClusterElementParameters(clusterElement, context, parameterMap);
                     }
                 }
             }
         }
 
-        return result;
+        return parameterMap;
+    }
+
+    private void addNestedClusterElementParameters(
+        ClusterElement clusterElement, Map<String, Object> context, Map<String, Map<String, ?>> parameterMap) {
+
+        Map<String, ?> extensions = clusterElement.getExtensions();
+
+        if (extensions == null || !extensions.containsKey(
+            com.bytechef.platform.configuration.constant.WorkflowExtConstants.CLUSTER_ELEMENTS)) {
+
+            return;
+        }
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        parameterMap.putAll(evaluateClusterElementInputParameters(clusterElementMap, context));
     }
 
     @Override

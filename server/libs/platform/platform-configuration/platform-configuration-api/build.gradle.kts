@@ -12,4 +12,6 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+
+    testImplementation(project(":server:libs:test:test-support"))
 }
