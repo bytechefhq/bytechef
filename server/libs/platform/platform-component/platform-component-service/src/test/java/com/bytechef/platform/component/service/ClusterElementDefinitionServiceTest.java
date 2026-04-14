@@ -18,17 +18,28 @@ package com.bytechef.platform.component.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -179,7 +190,48 @@ class ClusterElementDefinitionServiceTest {
             exception.getMessage());
     }
 
-    @SuppressWarnings("unchecked")
+    @Test
+    void testExecuteToolDispatchesMultipleConnectionsToolFunction() throws Exception {
+        String clusterElementName = "aiAgent";
+        Object expectedResult = new Object();
+
+        MultipleConnectionsToolFunction toolFunction = mock(MultipleConnectionsToolFunction.class);
+
+        when(toolFunction.apply(any(), any(), any(), any(), any())).thenReturn(expectedResult);
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
+            mock(com.bytechef.component.definition.ClusterElementDefinition.class);
+
+        when(elementDefinition.getName()).thenReturn(clusterElementName);
+        when(elementDefinition.getElement()).thenAnswer(ignored -> toolFunction);
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(List.of(elementDefinition)));
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        ClusterElementContext clusterElementContext = mock(ClusterElementContext.class);
+
+        when(contextFactory.createClusterElementContext(
+            eq(COMPONENT_NAME), eq(COMPONENT_VERSION), eq(clusterElementName), isNull(), anyBoolean()))
+                .thenReturn(clusterElementContext);
+
+        Map<String, ?> inputParameters = Map.of("userPrompt", "hi");
+        Map<String, ?> extensions = Map.of("ext", "v");
+        Map<String, ComponentConnection> componentConnections = Map.of();
+
+        Object result = clusterElementDefinitionService.executeTool(
+            COMPONENT_NAME, COMPONENT_VERSION, clusterElementName, inputParameters, extensions, componentConnections,
+            true);
+
+        assertSame(expectedResult, result);
+
+        verify(toolFunction).apply(
+            any(Parameters.class), any(Parameters.class), any(Parameters.class), eq(componentConnections),
+            eq(clusterElementContext));
+    }
+
     private com.bytechef.component.definition.ClusterElementDefinition<?> createMatchableClusterElementDefinition(
         String name, ClusterElementType type) {
 
@@ -197,7 +249,6 @@ class ClusterElementDefinitionServiceTest {
         return elementDefinition;
     }
 
-    @SuppressWarnings("unchecked")
     private com.bytechef.component.definition.ClusterElementDefinition<?> createFilterOnlyClusterElementDefinition(
         String name, ClusterElementType type) {
 
