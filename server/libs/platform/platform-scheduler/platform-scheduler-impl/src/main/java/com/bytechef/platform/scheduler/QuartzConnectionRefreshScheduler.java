@@ -69,24 +69,31 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
 
     private void deleteJob(Long connectionId, String triggerKey) {
         try {
-            boolean deleted = scheduler.deleteJob(JobKey.jobKey(connectionId.toString(), triggerKey));
+            JobKey jobKey = JobKey.jobKey(connectionId.toString(), triggerKey);
 
-            if (!deleted) {
-                throw new RuntimeException(
-                    "Job not found for connectionId: " + connectionId + ", group: " + triggerKey);
+            if (scheduler.checkExists(jobKey) && scheduler.deleteJob(jobKey)) {
+                log.trace("Refresh token job removed for connectionId: {}, triggerKey: {}", connectionId, triggerKey);
+
+                return;
             }
+
+            log.error("Refresh token job not found for connectionId: {}, group: {}", connectionId, triggerKey);
         } catch (SchedulerException e) {
-            throw new RuntimeException(e);
+            log.error("Unable to delete refresh token job for connectionId: {}, group: {}", connectionId, triggerKey);
         }
     }
 
     private void schedule(JobDetail jobDetail, Trigger trigger) {
         try {
-            scheduler.deleteJob(jobDetail.getKey());
+            if (scheduler.checkExists(jobDetail.getKey())) {
+                scheduler.deleteJob(jobDetail.getKey());
+            }
 
             scheduler.scheduleJob(jobDetail, trigger);
+
+            log.trace("Re-scheduled refresh token job with key: {}", jobDetail.getKey());
         } catch (SchedulerException e) {
-            throw new RuntimeException(e);
+            log.error("Unable to re-schedule refresh token job with key: {}", jobDetail.getKey());
         }
     }
 }
