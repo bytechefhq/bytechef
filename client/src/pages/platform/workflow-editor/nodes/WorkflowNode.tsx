@@ -13,7 +13,7 @@ import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {ArrowLeftRightIcon, CheckIcon, ComponentIcon, PinOffIcon, Trash2Icon} from 'lucide-react';
-import {forwardRef, memo, useMemo, useState} from 'react';
+import {forwardRef, memo, useCallback, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -249,7 +249,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                 !hasSavedClusterElementPosition &&
                                 'border-dashed'
                         )}
-                        onClick={() => handleNodeClick()}
+                        onClick={handleNodeClick}
                         style={
                             isMainRootClusterElement
                                 ? {minWidth: `${nodeWidth}px`}
@@ -490,8 +490,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [switchPopoverOpen, setSwitchPopoverOpen] = useState(false);
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
-    const isHorizontal = layoutDirection === 'LR';
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
     const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,
@@ -499,12 +500,14 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
         }))
     );
+
     const {incrementLayoutResetCounter, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             incrementLayoutResetCounter: state.incrementLayoutResetCounter,
             workflow: state.workflow,
         }))
     );
+
     const {
         clusterElementsCanvasOpen,
         copiedNode,
@@ -539,6 +542,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const queryClient = useQueryClient();
 
+    const isHorizontal = layoutDirection === 'LR';
+
     const isSelected = currentNode?.name === data.name;
 
     const isMainRootClusterElement = !!data.clusterRoot && !data.isNestedClusterRoot;
@@ -568,7 +573,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         {
             environmentId: currentEnvironmentId,
             id: workflow.id!,
-            workflowNodeName: hoveredNodeName!,
+            workflowNodeName: hoveredNodeName as string,
         },
         hoveredNodeName !== undefined && !data.clusterElementType
     );
@@ -611,9 +616,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         data.operationName,
     ]);
 
-    const clusterElementTypesCount = useMemo(() => {
-        return filteredClusterElementTypes.length;
-    }, [filteredClusterElementTypes]);
+    const clusterElementTypesCount = filteredClusterElementTypes.length;
 
     const nodeWidth = useMemo(
         () =>
@@ -623,13 +626,17 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         [clusterElementsCanvasOpen, isMainRootClusterElement, isNestedClusterRoot, clusterElementTypesCount]
     );
 
-    const handleDeleteNodeClick = (data: NodeDataType) => {
-        if (data) {
+    const handleDeleteNodeClick = useCallback(
+        (nodeData: NodeDataType) => {
+            if (!nodeData) {
+                return;
+            }
+
             handleDeleteTask({
                 cancelWorkflowQueries: cancelWorkflowQueries!,
                 clusterElementsCanvasOpen,
                 currentNode,
-                data,
+                data: nodeData,
                 invalidateWorkflowQueries: invalidateWorkflowQueries!,
                 queryClient,
                 rootClusterElementNodeData,
@@ -638,79 +645,112 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 updateWorkflowMutation: updateWorkflowMutation!,
                 workflow,
             });
-        }
-    };
-
-    const handleRemoveSavedClusterElementPosition = (clickedNodeName: string) => {
-        if (!rootClusterElementNodeData) {
-            return;
-        }
-
-        saveClusterElementNodesPosition({
-            clickedNodeName,
+        },
+        [
+            cancelWorkflowQueries,
+            clusterElementsCanvasOpen,
+            currentNode,
+            invalidateWorkflowQueries,
+            queryClient,
+            rootClusterElementNodeData,
+            setCurrentNode,
+            setRootClusterElementNodeData,
             updateWorkflowMutation,
             workflow,
-        });
-    };
+        ]
+    );
 
-    const handleRemoveNodePosition = (nodeName: string) => {
-        removeWorkflowNodePosition({
-            incrementLayoutResetCounter,
-            invalidateWorkflowQueries: invalidateWorkflowQueries!,
-            nodeName,
-            updateWorkflowMutation: updateWorkflowMutation!,
-        });
-    };
+    const handleRemoveSavedClusterElementPosition = useCallback(
+        (clickedNodeName: string) => {
+            if (!rootClusterElementNodeData) {
+                return;
+            }
 
-    const handleRenameSubmit = (newLabel: string) => {
-        const trimmed = newLabel.trim();
+            saveClusterElementNodesPosition({
+                clickedNodeName,
+                updateWorkflowMutation,
+                workflow,
+            });
+        },
+        [rootClusterElementNodeData, updateWorkflowMutation, workflow]
+    );
 
-        if (trimmed && trimmed !== nodeLabel) {
-            saveWorkflowDefinition({
-                decorative: true,
-                nodeData: {
-                    ...data,
-                    label: trimmed,
-                    name: data.workflowNodeName,
-                },
+    const handleRemoveNodePosition = useCallback(
+        (nodeName: string) => {
+            removeWorkflowNodePosition({
+                incrementLayoutResetCounter,
+                invalidateWorkflowQueries: invalidateWorkflowQueries!,
+                nodeName,
                 updateWorkflowMutation: updateWorkflowMutation!,
             });
-        }
+        },
+        [incrementLayoutResetCounter, invalidateWorkflowQueries, updateWorkflowMutation]
+    );
 
-        setRenamingNodeName(undefined);
-    };
+    const handleRenameSubmit = useCallback(
+        (newLabel: string) => {
+            const trimmed = newLabel.trim();
 
-    const handleRenameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            handleRenameSubmit(renameValue);
-        }
+            if (trimmed && trimmed !== nodeLabel) {
+                saveWorkflowDefinition({
+                    decorative: true,
+                    nodeData: {
+                        ...data,
+                        label: trimmed,
+                        name: data.workflowNodeName,
+                    },
+                    updateWorkflowMutation: updateWorkflowMutation!,
+                });
+            }
 
-        if (event.key === 'Escape') {
             setRenamingNodeName(undefined);
-        }
-    };
+        },
+        [data, nodeLabel, setRenamingNodeName, updateWorkflowMutation]
+    );
 
-    const handleStartRename = () => {
+    const handleRenameKeyDown = useCallback(
+        (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (event.key === 'Enter') {
+                handleRenameSubmit(renameValue);
+            }
+
+            if (event.key === 'Escape') {
+                setRenamingNodeName(undefined);
+            }
+        },
+        [handleRenameSubmit, renameValue, setRenamingNodeName]
+    );
+
+    const handleStartRename = useCallback(() => {
         setRenameValue(nodeLabel ?? '');
         setRenamingNodeName(data.name);
-    };
+    }, [data.name, nodeLabel, setRenameValue, setRenamingNodeName]);
 
-    const handleCopyNode = () => {
+    const handleCopyNode = useCallback(() => {
         setTimeout(() => {
             setCopiedNode({...data, label: nodeLabel ?? data.label});
             setCopiedWorkflowId(workflow.id);
         }, 200);
-    };
+    }, [data, nodeLabel, setCopiedNode, setCopiedWorkflowId, workflow.id]);
 
-    const handlePasteNode = () => {
-        const taskDispatcherContext = getContextFromTaskNodeData(data, 1);
+    const handlePasteNode = useCallback(() => {
+        const taskDispatcherContext = data.taskDispatcher ? undefined : getContextFromTaskNodeData(data, 1);
 
         pasteNode({
             nodeSourceName: data.name,
             taskDispatcherContext,
             updateWorkflowMutation: updateWorkflowMutation!,
         });
-    };
+    }, [data, updateWorkflowMutation]);
+
+    const handleDelete = useCallback(() => handleDeleteNodeClick(data), [data, handleDeleteNodeClick]);
+
+    const handleResetPosition = useCallback(
+        () => handleRemoveNodePosition(data.name),
+        [data.name, handleRemoveNodePosition]
+    );
+
+    const handleSwitch = useCallback(() => setSwitchPopoverOpen(true), []);
 
     const isRenaming = renamingNodeName === data.name;
 
@@ -722,6 +762,10 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         workflowNodeDescription?.description && !data.clusterElementType
             ? workflowNodeDescription.description
             : clusterElementDefinitionData?.description;
+
+    if (!updateWorkflowMutation || !invalidateWorkflowQueries || !cancelWorkflowQueries) {
+        return null;
+    }
 
     const sharedContentProps = {
         clusterElementTypesCount,
@@ -765,11 +809,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 hasSavedPosition={!!hasSavedNodePosition}
                 onContextMenuOpenChange={setIsContextMenuOpen}
                 onCopy={handleCopyNode}
-                onDelete={() => handleDeleteNodeClick(data)}
+                onDelete={handleDelete}
                 onPaste={handlePasteNode}
                 onRename={handleStartRename}
-                onResetPosition={() => handleRemoveNodePosition(data.name)}
-                onSwitch={() => setSwitchPopoverOpen(true)}
+                onResetPosition={handleResetPosition}
+                onSwitch={handleSwitch}
             >
                 <WorkflowNodeContent {...sharedContentProps} />
             </WorkflowNodeContextMenu>
