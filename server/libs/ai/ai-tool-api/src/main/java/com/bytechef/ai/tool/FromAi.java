@@ -117,31 +117,6 @@ public class FromAi implements MethodExecutor {
                 if (requiredArg instanceof Boolean requiredBool) {
                     required = requiredBool;
                 }
-            } else {
-                if (thirdArgument != null && !(thirdArgument instanceof String)) {
-                    throw new IllegalArgumentException("fromAi description argument must be a String or null.");
-                }
-
-                description = (String) thirdArgument;
-
-                if (arguments.length > 3) {
-                    defaultValue = arguments[3];
-                }
-
-                if (arguments.length > 4) {
-                    Object optionsArgument = arguments[4];
-
-                    if (optionsArgument != null && !(optionsArgument instanceof List)) {
-                        throw new IllegalArgumentException("fromAi options argument must be a List or null.");
-                    }
-
-                    if (optionsArgument != null) {
-                        @SuppressWarnings("unchecked")
-                        List<Object> castedOptions = (List<Object>) optionsArgument;
-
-                        options = castedOptions;
-                    }
-                }
             }
         }
 
