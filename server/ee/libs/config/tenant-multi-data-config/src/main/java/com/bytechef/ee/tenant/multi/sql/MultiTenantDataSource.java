@@ -17,6 +17,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+import org.slf4j.LoggerFactory;
 
 /**
  * Multi-tenant DataSource wrapper that sets the PostgreSQL search_path based on tenant context.
@@ -24,10 +25,12 @@ import javax.sql.DataSource;
  * @version ee
  *
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class MultiTenantDataSource implements DataSource {
 
     private final DataSource dataSource;
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(MultiTenantDataSource.class);
 
     @SuppressFBWarnings("EI")
     public MultiTenantDataSource(DataSource dataSource) {
@@ -104,7 +107,11 @@ public class MultiTenantDataSource implements DataSource {
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
     private static void setSearchPath(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            statement.execute("SET search_path TO " + TenantContext.getCurrentDatabaseSchema());
+            String tenantSchemaDefinitionStatement = "SET search_path TO " + TenantContext.getCurrentDatabaseSchema();
+
+            statement.execute(tenantSchemaDefinitionStatement);
+
+            log.trace("Executing SQL: " + tenantSchemaDefinitionStatement);
         }
     }
 }
