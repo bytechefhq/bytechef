@@ -629,7 +629,12 @@ export const useProperty = ({
             setControlledDynamicMode(toDynamic);
             setControlledFromAi(undefined);
 
-            if (wasFromAi && path && workflow.id) {
+            if (
+                wasFromAi &&
+                path &&
+                workflow.id &&
+                (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
+            ) {
                 saveProperty({
                     fromAi: false,
                     includeInMetadata: custom,
@@ -661,7 +666,11 @@ export const useProperty = ({
 
             fieldOnChange(value);
 
-            if (!path || !workflow.id) {
+            if (
+                !path ||
+                !workflow.id ||
+                !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
+            ) {
                 return;
             }
 
