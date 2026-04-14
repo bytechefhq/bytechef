@@ -102,6 +102,7 @@ public class GoogleSlidesCreatePresentationFromTemplateAction {
         return values.entrySet()
             .stream()
             .filter(entry -> entry.getValue() != null)
+            .sorted(Map.Entry.comparingByKey())
             .map(entry -> {
                 String key = entry.getKey();
                 String textToReplace = isBracketFormat
