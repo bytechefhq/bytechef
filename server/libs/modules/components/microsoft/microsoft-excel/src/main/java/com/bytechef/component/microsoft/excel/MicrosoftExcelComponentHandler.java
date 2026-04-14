@@ -24,8 +24,10 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelAppendRowAction;
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelClearWorksheetAction;
+import com.bytechef.component.microsoft.excel.action.MicrosoftExcelCreateWorksheetAction;
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelDeleteRowAction;
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelFindRowByNumAction;
+import com.bytechef.component.microsoft.excel.action.MicrosoftExcelListWorksheetsAction;
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelUpdateRowAction;
 import com.bytechef.component.microsoft.excel.connection.MicrosoftExcelConnection;
 import com.bytechef.component.microsoft.excel.trigger.MicrosoftExcelNewRowTrigger;
@@ -52,14 +54,18 @@ public class MicrosoftExcelComponentHandler implements ComponentHandler {
         .actions(
             MicrosoftExcelAppendRowAction.ACTION_DEFINITION,
             MicrosoftExcelClearWorksheetAction.ACTION_DEFINITION,
+            MicrosoftExcelCreateWorksheetAction.ACTION_DEFINITION,
             MicrosoftExcelDeleteRowAction.ACTION_DEFINITION,
             MicrosoftExcelFindRowByNumAction.ACTION_DEFINITION,
+            MicrosoftExcelListWorksheetsAction.ACTION_DEFINITION,
             MicrosoftExcelUpdateRowAction.ACTION_DEFINITION)
         .clusterElements(
             tool(MicrosoftExcelAppendRowAction.ACTION_DEFINITION),
             tool(MicrosoftExcelClearWorksheetAction.ACTION_DEFINITION),
+            tool(MicrosoftExcelCreateWorksheetAction.ACTION_DEFINITION),
             tool(MicrosoftExcelDeleteRowAction.ACTION_DEFINITION),
             tool(MicrosoftExcelFindRowByNumAction.ACTION_DEFINITION),
+            tool(MicrosoftExcelListWorksheetsAction.ACTION_DEFINITION),
             tool(MicrosoftExcelUpdateRowAction.ACTION_DEFINITION))
         .triggers(MicrosoftExcelNewRowTrigger.TRIGGER_DEFINITION)
         .version(1);
