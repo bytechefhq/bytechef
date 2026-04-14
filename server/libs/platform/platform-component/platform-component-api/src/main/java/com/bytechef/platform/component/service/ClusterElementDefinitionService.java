@@ -61,6 +61,10 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
 
+    Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, boolean editorEnvironment);
+
     String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters);
 

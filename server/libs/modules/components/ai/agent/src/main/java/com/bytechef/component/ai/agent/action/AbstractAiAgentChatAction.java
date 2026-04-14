@@ -39,6 +39,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -249,6 +250,9 @@ public abstract class AbstractAiAgentChatAction {
                 } catch (Exception exception) {
                     throw new RuntimeException(exception);
                 }
+            } else if (clusterElementFunction instanceof MultipleConnectionsToolFunction) {
+                toolCallbacks.add(
+                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, connectionParameters, editorEnvironment));
             } else {
                 ComponentConnection componentConnection = connectionParameters.get(
                     clusterElement.getWorkflowNodeName());

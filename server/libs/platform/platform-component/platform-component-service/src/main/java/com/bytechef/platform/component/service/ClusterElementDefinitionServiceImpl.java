@@ -46,6 +46,7 @@ import com.bytechef.platform.component.definition.ActionContextAdapater;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -203,6 +204,24 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
         return doExecuteTool(
             componentName, componentVersion, clusterElementName, inputParameters, componentConnection,
+            clusterElementContext);
+    }
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, boolean editorEnvironment) {
+
+        ComponentConnection firstConnection = componentConnections.isEmpty()
+            ? null : componentConnections.values()
+                .iterator()
+                .next();
+
+        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
+            componentName, componentVersion, clusterElementName, firstConnection, editorEnvironment);
+
+        return doExecuteTool(
+            componentName, componentVersion, clusterElementName, inputParameters, extensions, componentConnections,
             clusterElementContext);
     }
 
@@ -442,6 +461,45 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         Parameters connectionParameters = ParametersFactory.create(componentConnection);
 
         try {
+            if (clusterElement instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
+                return toolCallbackProviderFunction.apply(inputParameters, connectionParameters, context);
+            }
+
+            if (clusterElement instanceof ToolFunction toolFunction) {
+                return toolFunction.apply(inputParameters, connectionParameters, context);
+            }
+
+            throw new ExecutionException(
+                "Unsupported cluster element type: " + clusterElement.getClass()
+                    .getName(),
+                inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException) {
+                throw (ProviderException) exception;
+            }
+
+            throw new ExecutionException(
+                exception, inputParameterMap, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
+        }
+    }
+
+    private Object doExecuteTool(
+        String componentName, Integer componentVersion, String clusterElementName, Map<String, ?> inputParameterMap,
+        Map<String, ?> extensionMap, Map<String, ComponentConnection> componentConnections,
+        ClusterElementContext context) {
+
+        Object clusterElement = getClusterElement(componentName, componentVersion, clusterElementName);
+
+        Parameters inputParameters = ParametersFactory.create(inputParameterMap);
+        Parameters connectionParameters = ParametersFactory.create(Map.of());
+        Parameters extensions = ParametersFactory.create(extensionMap);
+
+        try {
+            if (clusterElement instanceof MultipleConnectionsToolFunction multipleConnectionsToolFunction) {
+                return multipleConnectionsToolFunction.apply(
+                    inputParameters, connectionParameters, extensions, componentConnections, context);
+            }
+
             if (clusterElement instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
                 return toolCallbackProviderFunction.apply(inputParameters, connectionParameters, context);
             }

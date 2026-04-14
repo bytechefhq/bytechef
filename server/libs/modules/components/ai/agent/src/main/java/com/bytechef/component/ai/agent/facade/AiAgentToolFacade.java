@@ -86,6 +86,42 @@ public class AiAgentToolFacade extends AbstractToolFacade {
         return builder.build();
     }
 
+    public ToolCallback getFunctionToolCallback(
+        ClusterElement clusterElement, Map<String, ComponentConnection> componentConnections,
+        boolean editorEnvironment) {
+
+        ClusterElementDefinition clusterElementDefinition =
+            clusterElementDefinitionService.getClusterElementDefinition(
+                clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                clusterElement.getClusterElementName());
+
+        Map<String, ?> toolParameters = clusterElement.getParameters();
+
+        List<FromAiResult> fromAiResults = extractFromAiResults(toolParameters);
+
+        FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
+            getToolName(clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(),
+                toolParameters),
+            getMultipleConnectionsToolCallbackFunction(
+                clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                clusterElementDefinition.getName(), toolParameters, clusterElement.getExtensions(),
+                componentConnections, editorEnvironment))
+            .inputType(Map.class)
+            .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
+
+        String toolDescription = getToolDescription(toolParameters, clusterElement.getExtensions());
+
+        if (toolDescription == null) {
+            toolDescription = clusterElementDefinition.getDescription();
+        }
+
+        if (toolDescription != null) {
+            builder.description(toolDescription);
+        }
+
+        return builder.build();
+    }
+
     private Function<Map<String, Object>, Object> getFromAiToolCallbackFunction(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
@@ -100,6 +136,23 @@ public class AiAgentToolFacade extends AbstractToolFacade {
             return clusterElementDefinitionService.executeTool(
                 componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
                 componentConnection, editorEnvironment);
+        };
+    }
+
+    private Function<Map<String, Object>, Object> getMultipleConnectionsToolCallbackFunction(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, boolean editorEnvironment) {
+
+        return request -> {
+            Map<String, Object> resolvedParameters = new HashMap<>();
+
+            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
+                resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), request));
+            }
+
+            return clusterElementDefinitionService.executeTool(
+                componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
+                extensions, componentConnections, editorEnvironment);
         };
     }
 

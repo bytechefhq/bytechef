@@ -82,6 +82,14 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, boolean editorEnvironment) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters) {
 
