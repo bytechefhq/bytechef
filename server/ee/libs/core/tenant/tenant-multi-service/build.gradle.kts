@@ -1,5 +1,6 @@
 dependencies {
     implementation("org.liquibase:liquibase-core")
+    implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-liquibase")
