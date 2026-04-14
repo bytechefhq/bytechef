@@ -19,6 +19,8 @@ package com.bytechef.tenant;
 import com.bytechef.tenant.constant.TenantConstants;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.util.Assert;
 
@@ -31,6 +33,7 @@ public class TenantContext {
     public static final String DEFAULT_TENANT_ID = "public";
 
     private static final ThreadLocal<String> currentTenant = ThreadLocal.withInitial(() -> DEFAULT_TENANT_ID);
+    private static final Logger log = LoggerFactory.getLogger(TenantContext.class);
 
     public static <V> V callWithTenantId(String tenantId, Callable<V> callable) {
         String curTenantId = getCurrentTenantId();
@@ -40,6 +43,8 @@ public class TenantContext {
 
             return callable.call();
         } catch (Exception e) {
+            log.error("Unable to execute call with tenant ID {}", tenantId);
+
             throw new RuntimeException(e);
         } finally {
             setCurrentTenantId(curTenantId);
@@ -75,6 +80,8 @@ public class TenantContext {
             try {
                 runnable.run();
             } catch (Exception e) {
+                log.error("Unable to execute run with tenant ID {}", tenantId);
+
                 throw new RuntimeException(e);
             }
         } finally {
