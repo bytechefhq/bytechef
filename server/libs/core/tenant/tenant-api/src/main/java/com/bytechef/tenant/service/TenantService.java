@@ -16,6 +16,7 @@
 
 package com.bytechef.tenant.service;
 
+import com.bytechef.tenant.constant.Tenancy;
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public interface TenantService {
 
     boolean isMultiTenantEnabled();
 
-    void loadChangelog(List<String> tenantIds, String contexts);
+    void loadChangelog(List<String> tenantIds, Tenancy tenancy);
 
     boolean tenantIdsByUserEmailExist(String email);
 
