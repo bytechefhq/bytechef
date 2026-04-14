@@ -377,10 +377,35 @@ export const useProperty = ({
             .filter((option) => option !== null);
     }, [options]);
 
-    const fromAiExpression = useMemo(
-        () => (description ? `=fromAi('${name}', '${description}')` : `=fromAi('${name}')`),
-        [description, name]
-    );
+    const fromAiExpression = useMemo(() => {
+        const mapEntries: string[] = [];
+
+        if (description) {
+            const escapedDescription = description.replace(/'/g, "''");
+
+            mapEntries.push(`'description': '${escapedDescription}'`);
+        }
+
+        if (defaultValue !== '' && defaultValue !== null && defaultValue !== undefined) {
+            const escapedDefault = String(defaultValue).replace(/'/g, "''");
+
+            mapEntries.push(`'defaultValue': '${escapedDefault}'`);
+        }
+
+        if (formattedOptions != null && formattedOptions.length > 0) {
+            const optionValues = formattedOptions
+                .map((option) => `'${String(option?.value ?? '').replace(/'/g, "''")}'`)
+                .join(', ');
+
+            mapEntries.push(`'options': {${optionValues}}`);
+        }
+
+        if (mapEntries.length === 0) {
+            return `=fromAi('${name}', '${type}')`;
+        }
+
+        return `=fromAi('${name}', '${type}', {${mapEntries.join(', ')}})`;
+    }, [defaultValue, description, formattedOptions, name, type]);
 
     const isValidControlType = useMemo(
         () => controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType),
@@ -1045,16 +1070,10 @@ export const useProperty = ({
 
             if (fromAi) {
                 if (editorRef.current) {
-                    const escapedDescription = description?.replace(/'/g, "''");
-
-                    const fromAi = escapedDescription
-                        ? `=fromAi('${property.name}', '${escapedDescription}')`
-                        : `=fromAi('${property.name}')`;
-
-                    editorRef.current.commands.setContent(fromAi);
+                    editorRef.current.commands.setContent(fromAiExpression);
                     editorRef.current.setEditable(false);
 
-                    value = fromAi;
+                    value = fromAiExpression;
                 }
             } else {
                 if (editorRef.current) {
@@ -1079,9 +1098,8 @@ export const useProperty = ({
         },
         [
             custom,
-            description,
+            fromAiExpression,
             path,
-            property.name,
             propertyParameterValue,
             setFocusedInput,
             type,

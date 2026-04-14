@@ -16,6 +16,8 @@
 
 package com.bytechef.ai.tool;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.expression.AccessException;
@@ -29,7 +31,7 @@ import org.springframework.expression.TypedValue;
 public class FromAi implements MethodExecutor {
 
     private static final Set<String> VALID_TYPES = Set.of(
-        "STRING", "NUMBER", "INTEGER", "BOOLEAN", "ARRAY", "OBJECT");
+        "STRING", "NUMBER", "INTEGER", "BOOLEAN", "ARRAY", "OBJECT", "DATE", "TIME", "DATE_TIME");
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
@@ -37,9 +39,9 @@ public class FromAi implements MethodExecutor {
             throw new IllegalArgumentException("fromAi requires at least a name argument.");
         }
 
-        if (arguments.length > 4) {
+        if (arguments.length > 5) {
             throw new IllegalArgumentException(
-                "fromAi accepts at most 4 arguments (name, description, type, default).");
+                "fromAi accepts at most 5 arguments (name, type, description, default, options).");
         }
 
         Object nameArgument = arguments[0];
@@ -50,22 +52,10 @@ public class FromAi implements MethodExecutor {
 
         String name = string.trim();
 
-        String description = null;
-
-        if (arguments.length > 1) {
-            Object descriptionArgument = arguments[1];
-
-            if (descriptionArgument != null && !(descriptionArgument instanceof String)) {
-                throw new IllegalArgumentException("fromAi description argument must be a String or null.");
-            }
-
-            description = (String) descriptionArgument;
-        }
-
         String type = "STRING";
 
-        if (arguments.length > 2) {
-            Object typeArgument = arguments[2];
+        if (arguments.length > 1) {
+            Object typeArgument = arguments[1];
 
             if (typeArgument != null && !(typeArgument instanceof String)) {
                 throw new IllegalArgumentException("fromAi type argument must be a String or null.");
@@ -87,8 +77,63 @@ public class FromAi implements MethodExecutor {
             }
         }
 
-        Object defaultValue = arguments.length > 3 ? arguments[3] : null;
+        String description = null;
+        Object defaultValue = null;
+        List<Object> options = null;
 
-        return new TypedValue(new FromAiResult(name, description, type, defaultValue));
+        if (arguments.length > 2) {
+            Object thirdArgument = arguments[2];
+
+            if (thirdArgument instanceof Map<?, ?> paramMap) {
+                Object descArg = paramMap.get("description");
+
+                if (descArg != null && !(descArg instanceof String)) {
+                    throw new IllegalArgumentException("fromAi 'description' in map must be a String or null.");
+                }
+
+                description = (String) descArg;
+                defaultValue = paramMap.get("defaultValue");
+
+                Object optionsArg = paramMap.get("options");
+
+                if (optionsArg != null && !(optionsArg instanceof List)) {
+                    throw new IllegalArgumentException("fromAi 'options' in map must be a List or null.");
+                }
+
+                if (optionsArg != null) {
+                    @SuppressWarnings("unchecked")
+                    List<Object> castedOptions = (List<Object>) optionsArg;
+
+                    options = castedOptions;
+                }
+            } else {
+                if (thirdArgument != null && !(thirdArgument instanceof String)) {
+                    throw new IllegalArgumentException("fromAi description argument must be a String or null.");
+                }
+
+                description = (String) thirdArgument;
+
+                if (arguments.length > 3) {
+                    defaultValue = arguments[3];
+                }
+
+                if (arguments.length > 4) {
+                    Object optionsArgument = arguments[4];
+
+                    if (optionsArgument != null && !(optionsArgument instanceof List)) {
+                        throw new IllegalArgumentException("fromAi options argument must be a List or null.");
+                    }
+
+                    if (optionsArgument != null) {
+                        @SuppressWarnings("unchecked")
+                        List<Object> castedOptions = (List<Object>) optionsArgument;
+
+                        options = castedOptions;
+                    }
+                }
+            }
+        }
+
+        return new TypedValue(new FromAiResult(name, type, description, defaultValue, options));
     }
 }

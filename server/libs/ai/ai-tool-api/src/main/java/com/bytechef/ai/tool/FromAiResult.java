@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.tool;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Objects;
  * @param defaultValue fallback value when the AI model does not provide one (nullable)
  * @author Ivica Cardic
  */
-public record FromAiResult(String name, String description, String type, Object defaultValue) {
+public record FromAiResult(String name, String type, String description, Object defaultValue, List<Object> options) {
 
     private static final String DEFAULT_TYPE = "STRING";
 
@@ -39,14 +40,18 @@ public record FromAiResult(String name, String description, String type, Object 
     }
 
     public FromAiResult(String name) {
-        this(name, null, DEFAULT_TYPE, null);
+        this(name, DEFAULT_TYPE, null, null, null);
     }
 
-    public FromAiResult(String name, String description) {
-        this(name, description, DEFAULT_TYPE, null);
+    public FromAiResult(String name, String type) {
+        this(name, type, null, null, null);
     }
 
-    public FromAiResult(String name, String description, String type) {
-        this(name, description, type, null);
+    public FromAiResult(String name, String type, String description) {
+        this(name, type, description, null, null);
+    }
+
+    public FromAiResult(String name, String type, String description, Object defaultValue) {
+        this(name, type, description, defaultValue, null);
     }
 }
