@@ -25,11 +25,11 @@ case "$1" in
       $JAVA_BASE_OPTS \
       -jar server/server-app.jar \
       --spring.profiles.active="${LIQUIBASE_PROFILES}"
-    ;;
+  ;;
   *)
     exec java \
       $JAVA_BASE_OPTS \
       $JAVA_SERVER_OPTS \
       -jar server/server-app.jar
-    ;;
+  ;;
 esac
