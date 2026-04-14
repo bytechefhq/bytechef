@@ -79,6 +79,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
  */
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
+@Profile("!liquibase")
 public class SecurityConfiguration {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
