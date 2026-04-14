@@ -2,7 +2,7 @@ import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} fr
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
 import {ClipboardPlusIcon} from 'lucide-react';
-import {memo, useMemo, useState} from 'react';
+import {memo, useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -54,6 +54,18 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         return `${copiedNodeLabel} (${copiedNode.name})`;
     }, [copiedNode, copiedNodeLabel]);
 
+    const handlePasteClick = useCallback(() => {
+        if (!updateWorkflowMutation) {
+            return;
+        }
+
+        const placeholderNode = nodes.find((node) => node.id === id);
+
+        const taskDispatcherContext = placeholderNode ? getContextFromPlaceholderNode(placeholderNode) : undefined;
+
+        pasteNode({nodeIndex, taskDispatcherContext, updateWorkflowMutation});
+    }, [id, nodeIndex, nodes, updateWorkflowMutation]);
+
     return (
         <ContextMenu>
             <ContextMenuTrigger asChild disabled={!canPaste}>
@@ -103,28 +115,17 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
             <ContextMenuContent className="w-[280px]">
                 <ContextMenuItem
-                    className="flex w-full flex-col gap-1"
-                    onClick={() => {
-                        const placeholderNode = nodes.find((node) => node.id === id);
-
-                        const taskDispatcherContext = placeholderNode
-                            ? getContextFromPlaceholderNode(placeholderNode)
-                            : undefined;
-
-                        pasteNode({
-                            nodeIndex,
-                            taskDispatcherContext,
-                            updateWorkflowMutation: updateWorkflowMutation!,
-                        });
-                    }}
+                    className="flex w-full cursor-pointer flex-col items-start gap-1 px-[var(--spacing-1,4px)] py-0"
+                    disabled={!canPaste}
+                    onClick={handlePasteClick}
                 >
-                    <div className="flex items-center gap-2">
+                    <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
                         <ClipboardPlusIcon className="size-4 shrink-0" />
 
                         <span>Paste Here</span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-content-neutral-secondary">
+                    <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
                         <span className="flex size-4 shrink-0 items-center justify-center">
                             {copiedNode?.icon ?? null}
                         </span>

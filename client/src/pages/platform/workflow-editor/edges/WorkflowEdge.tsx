@@ -2,7 +2,7 @@ import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} fr
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -29,6 +29,8 @@ export default function WorkflowEdge({
     targetX,
     targetY,
 }: EdgeProps) {
+    const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
+
     const {edges, nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
@@ -45,8 +47,6 @@ export default function WorkflowEdge({
     const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
 
     const {updateWorkflowMutation} = useWorkflowEditor();
-
-    const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
 
     const sourceNodeId = id.split('=>')[0];
     const targetNodeId = id.split('=>')[1];
@@ -99,7 +99,7 @@ export default function WorkflowEdge({
 
     const caseKey = (targetNode?.data as NodeDataType)?.branchData?.caseKey;
 
-    const sourceNodeComponentName = useMemo(() => (sourceNode?.data as NodeDataType)?.componentName, [sourceNode]);
+    const sourceNodeComponentName = (sourceNode?.data as NodeDataType)?.componentName;
 
     const isSourceTaskDispatcherTopGhostNode = sourceNode?.type === 'taskDispatcherTopGhostNode';
 
@@ -113,7 +113,7 @@ export default function WorkflowEdge({
                 edgeCenterX,
                 edgeCenterY,
                 isHorizontal,
-                sourceNodeComponentName: sourceNodeComponentName as string | undefined,
+                sourceNodeComponentName,
                 sourceNodeTaskDispatcherId: (sourceNode?.data as NodeDataType)?.taskDispatcherId,
                 sourceNodeType: sourceNode?.type,
                 targetNodeType: targetNode?.type,
@@ -132,6 +132,26 @@ export default function WorkflowEdge({
             edgeCenterY,
         ]
     );
+
+    const handlePasteClick = useCallback(() => {
+        if (!updateWorkflowMutation) {
+            return;
+        }
+
+        const matchingEdge = edges.find((candidateEdge) => candidateEdge.id === id);
+
+        const taskDispatcherContext = getTaskDispatcherContext({
+            edge: matchingEdge,
+            node: matchingEdge?.type === 'workflow' ? undefined : sourceNode,
+            nodes,
+        });
+
+        pasteNode({
+            nodeSourceName: sourceNodeId,
+            taskDispatcherContext,
+            updateWorkflowMutation,
+        });
+    }, [edges, id, nodes, sourceNode, sourceNodeId, updateWorkflowMutation]);
 
     useEffect(() => {
         const handleGlobalDragEnd = () => {
@@ -229,29 +249,15 @@ export default function WorkflowEdge({
                                 <ContextMenuItem
                                     className="flex w-full cursor-pointer flex-col items-start gap-1 px-[var(--spacing-1,4px)] py-0"
                                     disabled={!canPaste}
-                                    onClick={() => {
-                                        const edge = edges.find((edge) => edge.id === id);
-
-                                        const taskDispatcherContext = getTaskDispatcherContext({
-                                            edge,
-                                            node: edge?.type === 'workflow' ? undefined : sourceNode,
-                                            nodes,
-                                        });
-
-                                        pasteNode({
-                                            nodeSourceName: sourceNodeId,
-                                            taskDispatcherContext,
-                                            updateWorkflowMutation: updateWorkflowMutation!,
-                                        });
-                                    }}
+                                    onClick={handlePasteClick}
                                 >
-                                    <div className="flex items-center gap-2 text-content-neutral-primary">
+                                    <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
                                         <ClipboardPlusIcon className="size-4 shrink-0" />
 
                                         <span>Paste Here</span>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-content-neutral-secondary">
+                                    <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
                                         <span className="flex size-4 shrink-0 items-center justify-center">
                                             {copiedNode?.icon ?? null}
                                         </span>
