@@ -45,6 +45,32 @@ const getNextAvailableName = (copiedLabel: string, existingLabels: string[]): st
     return `${copiedLabel} (${counter})`;
 };
 
+function stripEmptyValues(obj: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+        if (value === null || value === undefined || value === '') {
+            continue;
+        }
+
+        if (Array.isArray(value)) {
+            if (value.length > 0) {
+                result[key] = value;
+            }
+        } else if (typeof value === 'object') {
+            const stripped = stripEmptyValues(value as Record<string, unknown>);
+
+            if (Object.keys(stripped).length > 0) {
+                result[key] = stripped;
+            }
+        } else {
+            result[key] = value;
+        }
+    }
+
+    return result;
+}
+
 function renameNestedTasks(
     parameters: TaskParametersType,
     componentName: string,
@@ -189,6 +215,8 @@ export default function pasteNode({
         renameNestedTasks(clonedParameters, copiedNode.componentName, reservedNames);
     }
 
+    const cleanedParameters = stripEmptyValues(clonedParameters);
+
     const existingLabels = nodes.map((node) => node.data?.label).filter((label): label is string => !!label);
     const finalLabel = getNextAvailableName(copiedNode.label ?? '', existingLabels);
 
@@ -215,7 +243,7 @@ export default function pasteNode({
         label: finalLabel,
         metadata: cleanedMetadata,
         name: newName,
-        parameters: clonedParameters,
+        parameters: cleanedParameters,
         workflowNodeName: finalLabel,
     };
 
