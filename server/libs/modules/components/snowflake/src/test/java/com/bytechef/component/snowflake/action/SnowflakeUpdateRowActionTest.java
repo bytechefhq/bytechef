@@ -63,7 +63,7 @@ class SnowflakeUpdateRowActionTest {
             assertEquals(mockedObject, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(
-                "UPDATE \"database\".\"schema\".\"table\" SET \"col2\"=5,\"col1\"=5 WHERE col1 = 2",
+                "UPDATE \"database\".\"schema\".\"table\" SET \"col1\"=5,\"col2\"=5 WHERE col1 = 2",
                 stringArgumentCaptor.getValue());
         }
     }

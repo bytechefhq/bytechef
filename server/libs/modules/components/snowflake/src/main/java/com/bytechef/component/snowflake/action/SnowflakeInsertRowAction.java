@@ -33,6 +33,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -58,15 +60,19 @@ public class SnowflakeInsertRowAction {
         value = "SQL_INJECTION_SPRING_JDBC",
         justification = "Identifiers are quoted and string values are escaped; input from workflow creator, not end user")
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String columns = inputParameters.getRequiredMap(VALUES)
-            .keySet()
+        List<Map.Entry<String, Object>> sortedEntries = inputParameters.getRequiredMap(VALUES)
+            .entrySet()
             .stream()
-            .map(key -> SnowflakeUtils.quoteIdentifier(key.toString()))
+            .map(entry -> Map.entry(entry.getKey(), entry.getValue()))
+            .sorted(Map.Entry.comparingByKey())
+            .toList();
+
+        String columns = sortedEntries.stream()
+            .map(entry -> SnowflakeUtils.quoteIdentifier(entry.getKey()))
             .collect(Collectors.joining(","));
 
-        String values = inputParameters.getRequiredMap(VALUES)
-            .values()
-            .stream()
+        String values = sortedEntries.stream()
+            .map(Map.Entry::getValue)
             .map(value -> value instanceof String
                 ? "'" + SnowflakeUtils.escapeStringLiteral((String) value) + "'"
                 : value.toString())

@@ -61,7 +61,7 @@ class SnowflakeInsertRowActionTest {
             assertEquals(mockedObject, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(
-                "INSERT INTO \"database\".\"schema\".\"table\"(\"col2\",\"col1\") VALUES('abc',5)",
+                "INSERT INTO \"database\".\"schema\".\"table\"(\"col1\",\"col2\") VALUES(5,'abc')",
                 stringArgumentCaptor.getValue());
         }
     }
