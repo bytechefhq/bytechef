@@ -78,6 +78,8 @@ public class TextHelperExtractKeyRegExAction {
             }
         }
 
+        extractedKeys.sort(String::compareTo);
+
         return extractedKeys;
     }
 }
