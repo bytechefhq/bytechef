@@ -150,6 +150,70 @@ To find the Worksheet name, click [here](/reference/components/microsoft-excel_v
 
 
 
+### Create Worksheet
+Name: createWorksheet
+
+`Creates a new worksheet in the specified workbook.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workbookId | Workbook ID | STRING | The ID of the workbook. | true |
+| name | Worksheet Name | STRING | The name of the new worksheet. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Worksheet",
+  "name" : "createWorksheet",
+  "parameters" : {
+    "workbookId" : "",
+    "name" : ""
+  },
+  "type" : "microsoftExcel/v1/createWorksheet"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| @odata.context | STRING | The OData context URL. |
+| @odata.id | STRING | The OData ID. |
+| id | STRING | The ID of the new worksheet. |
+| position | INTEGER | The position of the new worksheet. |
+| name | STRING | The name of the new worksheet. |
+| visibility | STRING | The visibility of the new worksheet. |
+
+
+
+
+#### Output Example
+```json
+{
+  "@odata.context" : "",
+  "@odata.id" : "",
+  "id" : "",
+  "position" : 1,
+  "name" : "",
+  "visibility" : ""
+}
+```
+
+#### Find Workbook ID
+
+To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#how-to-find-workbook-id).
+
+
+
 ### Delete Row
 Name: deleteRow
 
@@ -235,6 +299,66 @@ To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#h
 #### Find Worksheet Name
 
 To find the Worksheet name, click [here](/reference/components/microsoft-excel_v1#how-to-find-worksheet-name).
+
+
+
+### List Worksheets
+Name: listWorksheets
+
+`List all worksheets in the specified workbook.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workbookId | Workbook ID | STRING | The ID of the workbook. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Worksheets",
+  "name" : "listWorksheets",
+  "parameters" : {
+    "workbookId" : ""
+  },
+  "type" : "microsoftExcel/v1/listWorksheets"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| @odata.id | STRING | The OData ID. |
+| id | STRING | The ID of the new worksheet. |
+| position | INTEGER | The position of the new worksheet. |
+| name | STRING | The name of the new worksheet. |
+| visibility | STRING | The visibility of the new worksheet. |
+
+
+
+
+#### Output Example
+```json
+{
+  "@odata.id" : "",
+  "id" : "",
+  "position" : 1,
+  "name" : "",
+  "visibility" : ""
+}
+```
+
+#### Find Workbook ID
+
+To find the Workbook ID, click [here](/reference/components/microsoft-excel_v1#how-to-find-workbook-id).
 
 
 
