@@ -5,7 +5,7 @@ import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middl
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, UpdateWorkflowMutationType} from '@/shared/types';
 import {ClipboardPasteIcon, ClipboardXIcon} from 'lucide-react';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {MouseEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useComponentFiltering} from '../../hooks/useComponentFiltering';
@@ -63,8 +63,10 @@ const WorkflowNodesTabs = ({
     const [activeTab, setActiveTab] = useState(
         !hideActionComponents ? 'components' : !hideClusterElementComponents ? 'clusterElements' : 'triggers'
     );
-
     const [pasteDismissed, setPasteDismissed] = useState(false);
+
+    const previousActionComponentsCountRef = useRef(actionComponentDefinitions.length);
+    const previousTriggerComponentsCountRef = useRef(triggerComponentDefinitions.length);
 
     const {copiedNode, copiedWorkflowId} = useWorkflowEditorStore(
         useShallow((state) => ({
@@ -81,9 +83,19 @@ const WorkflowNodesTabs = ({
         }))
     );
 
+    const ff_1057 = useFeatureFlagsStore()('ff-1057');
+
+    const actionFiltering = useComponentFiltering({
+        componentDefinitions: actionComponentDefinitions,
+    });
+
+    const triggerFiltering = useComponentFiltering({
+        componentDefinitions: triggerComponentDefinitions,
+    });
+
     const canPaste = showPaste && !!copiedNode && copiedWorkflowId === workflow.id;
 
-    const handlePasteClick = () => {
+    const handlePasteClick = useCallback(() => {
         if (!canPaste || !updateWorkflowMutation) {
             return;
         }
@@ -112,20 +124,12 @@ const WorkflowNodesTabs = ({
         if (onPasteClose) {
             onPasteClose();
         }
-    };
+    }, [canPaste, edgeId, edges, nodes, onPasteClose, sourceNodeId, updateWorkflowMutation]);
 
-    const ff_1057 = useFeatureFlagsStore()('ff-1057');
-
-    const actionFiltering = useComponentFiltering({
-        componentDefinitions: actionComponentDefinitions,
-    });
-
-    const triggerFiltering = useComponentFiltering({
-        componentDefinitions: triggerComponentDefinitions,
-    });
-
-    const previousActionComponentsCountRef = useRef(actionComponentDefinitions.length);
-    const previousTriggerComponentsCountRef = useRef(triggerComponentDefinitions.length);
+    const handleDismissPaste = useCallback((e: MouseEvent) => {
+        e.stopPropagation();
+        setPasteDismissed(true);
+    }, []);
 
     useEffect(() => {
         const currentCount = actionComponentDefinitions.length;
@@ -170,20 +174,16 @@ const WorkflowNodesTabs = ({
     }, [triggerFiltering.filteredComponents]);
 
     const availableTaskDispatchers = useMemo(() => {
-        let availableTaskDispatchers;
+        const filteredDefinitions = ff_1057
+            ? taskDispatcherDefinitions
+            : taskDispatcherDefinitions.filter(
+                  (taskDispatcherDefinition) =>
+                      taskDispatcherDefinition.name === 'branch' ||
+                      taskDispatcherDefinition.name === 'condition' ||
+                      taskDispatcherDefinition.name === 'loop'
+              );
 
-        if (ff_1057) {
-            availableTaskDispatchers = taskDispatcherDefinitions;
-        } else {
-            availableTaskDispatchers = taskDispatcherDefinitions.filter(
-                (taskDispatcherDefinition) =>
-                    taskDispatcherDefinition.name === 'branch' ||
-                    taskDispatcherDefinition.name === 'condition' ||
-                    taskDispatcherDefinition.name === 'loop'
-            );
-        }
-
-        return availableTaskDispatchers.map(
+        return filteredDefinitions.map(
             (dispatcher) =>
                 ({
                     ...dispatcher,
@@ -349,10 +349,7 @@ const WorkflowNodesTabs = ({
 
                         <button
                             className="group/discard flex min-w-9 cursor-pointer items-center justify-center self-stretch hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setPasteDismissed(true);
-                            }}
+                            onClick={handleDismissPaste}
                             type="button"
                         >
                             <ClipboardXIcon className="size-4 text-content-neutral-primary opacity-50 group-hover/discard:opacity-100 group-active/discard:text-content-brand-primary group-active/discard:opacity-100" />

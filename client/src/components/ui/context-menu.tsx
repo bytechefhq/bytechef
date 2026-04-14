@@ -4,7 +4,7 @@ import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import {Check, ChevronRight, Circle} from 'lucide-react';
 import * as React from 'react';
 
-import {cn} from '@/shared/util/cn-utils';
+import {twMerge} from 'tailwind-merge';
 
 const ContextMenu = ContextMenuPrimitive.Root;
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
@@ -20,7 +20,7 @@ const ContextMenuSubTrigger = React.forwardRef<
     }
 >(({children, className, inset, ...props}, ref) => (
     <ContextMenuPrimitive.SubTrigger
-        className={cn(
+        className={twMerge(
             'dropdown-menu-item flex select-none items-center text-sm outline-none data-[state=open]:bg-surface-neutral-primary-hover',
             inset && 'pl-8',
             className
@@ -39,7 +39,7 @@ const ContextMenuSubContent = React.forwardRef<
     React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.SubContent>
 >(({className, ...props}, ref) => (
     <ContextMenuPrimitive.SubContent
-        className={cn(
+        className={twMerge(
             'z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
             className
         )}
@@ -57,7 +57,7 @@ const ContextMenuContent = React.forwardRef<React.ElementRef<typeof ContextMenuP
     ({className, portal = true, ...props}, ref) => {
         const content = (
             <ContextMenuPrimitive.Content
-                className={cn(
+                className={twMerge(
                     'z-[9999] min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md',
                     'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
                     className
@@ -84,7 +84,7 @@ const ContextMenuItem = React.forwardRef<
     }
 >(({className, inset, destructive, ...props}, ref) => (
     <ContextMenuPrimitive.Item
-        className={cn(
+        className={twMerge(
             'relative flex select-none items-center gap-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0',
             destructive ? 'dropdown-menu-item-destructive' : 'dropdown-menu-item',
             inset && 'pl-8',
@@ -102,7 +102,7 @@ const ContextMenuCheckboxItem = React.forwardRef<
 >(({checked, children, className, ...props}, ref) => (
     <ContextMenuPrimitive.CheckboxItem
         checked={checked}
-        className={cn(
+        className={twMerge(
             'dropdown-menu-item relative flex select-none items-center text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 pl-8',
             className
         )}
@@ -124,7 +124,7 @@ const ContextMenuRadioItem = React.forwardRef<
     React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.RadioItem>
 >(({children, className, ...props}, ref) => (
     <ContextMenuPrimitive.RadioItem
-        className={cn(
+        className={twMerge(
             'dropdown-menu-item relative flex select-none items-center text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 pl-8',
             className
         )}
@@ -148,7 +148,7 @@ const ContextMenuLabel = React.forwardRef<
     }
 >(({className, inset, ...props}, ref) => (
     <ContextMenuPrimitive.Label
-        className={cn('px-4 py-2 text-sm font-semibold text-foreground', inset && 'pl-8', className)}
+        className={twMerge('px-4 py-2 text-sm font-semibold text-foreground', inset && 'pl-8', className)}
         ref={ref}
         {...props}
     />
@@ -159,12 +159,12 @@ const ContextMenuSeparator = React.forwardRef<
     React.ElementRef<typeof ContextMenuPrimitive.Separator>,
     React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Separator>
 >(({className, ...props}, ref) => (
-    <ContextMenuPrimitive.Separator className={cn('h-px bg-border', className)} ref={ref} {...props} />
+    <ContextMenuPrimitive.Separator className={twMerge('h-px bg-border', className)} ref={ref} {...props} />
 ));
 ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName;
 
 const ContextMenuShortcut = ({className, ...props}: React.HTMLAttributes<HTMLSpanElement>) => {
-    return <span className={cn('ml-auto text-xs tracking-widest text-muted-foreground', className)} {...props} />;
+    return <span className={twMerge('ml-auto text-xs tracking-widest text-muted-foreground', className)} {...props} />;
 };
 ContextMenuShortcut.displayName = 'ContextMenuShortcut';
 
