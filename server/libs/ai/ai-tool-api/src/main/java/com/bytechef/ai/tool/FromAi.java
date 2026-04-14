@@ -114,8 +114,8 @@ public class FromAi implements MethodExecutor {
                     throw new IllegalArgumentException("fromAi 'required' in map must be a boolean.");
                 }
 
-                if (requiredArg instanceof Boolean requiredBool) {
-                    required = requiredBool;
+                if (requiredArg != null) {
+                    required = (Boolean) requiredArg;
                 }
             }
         }
