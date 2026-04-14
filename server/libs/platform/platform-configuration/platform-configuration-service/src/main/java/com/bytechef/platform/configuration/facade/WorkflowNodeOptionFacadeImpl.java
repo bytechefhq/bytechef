@@ -28,6 +28,7 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
@@ -174,9 +175,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
         Map<String, ?> extensions = clusterElement.getExtensions();
 
-        if (extensions == null || !extensions.containsKey(
-            com.bytechef.platform.configuration.constant.WorkflowExtConstants.CLUSTER_ELEMENTS)) {
-
+        if (extensions == null || !extensions.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
             return;
         }
 

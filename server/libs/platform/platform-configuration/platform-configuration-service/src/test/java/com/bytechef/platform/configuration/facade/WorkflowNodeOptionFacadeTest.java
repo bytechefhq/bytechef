@@ -31,21 +31,25 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -53,7 +57,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class WorkflowNodeOptionFacadeTest {
 
     @Mock
@@ -225,5 +231,85 @@ class WorkflowNodeOptionFacadeTest {
             verify(triggerDefinitionFacade).executeOptions(
                 eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId));
         }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testGetClusterElementNodeOptionsAggregatesNestedClusterElementParameters() {
+        String workflowId = "workflow1";
+        String workflowNodeName = "aiAgent_1";
+        String clusterElementTypeName = "tools";
+        String clusterElementWorkflowNodeName = "aiAgent_tool_1";
+        String propertyName = "objectType";
+        long environmentId = 1L;
+
+        Map<String, ?> nestedToolMap = Map.of(
+            "name", "hubspot_1",
+            "type", "hubspot/v1/createContact",
+            "label", "Hubspot",
+            "parameters", Map.of("apiKey", "secret"));
+
+        Map<String, ?> outerToolMap = Map.of(
+            "name", clusterElementWorkflowNodeName,
+            "type", "aiAgent/v1/tool",
+            "label", "AI Agent Tool",
+            "parameters", Map.of("prompt", "do something"),
+            WorkflowExtConstants.CLUSTER_ELEMENTS, Map.of("tools", List.of(nestedToolMap)));
+
+        Map<String, ?> taskExtensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS, Map.of("tools", List.of(outerToolMap)));
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
+            .thenReturn(Optional.empty());
+        doReturn(Map.of()).when(workflowTestConfigurationService)
+            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+
+        Workflow workflow = mock(Workflow.class);
+        WorkflowTask workflowTask = mock(WorkflowTask.class);
+
+        when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+        when(workflow.getTask(workflowNodeName)).thenReturn(workflowTask);
+        when(workflowTask.getType()).thenReturn("aiAgent/v1");
+        when(workflowTask.getName()).thenReturn(workflowNodeName);
+        doReturn(taskExtensions).when(workflowTask)
+            .getExtensions();
+
+        doReturn(Map.of()).when(workflowNodeOutputFacade)
+            .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq(workflowNodeName), eq(environmentId));
+
+        ClusterElementType clusterElementType = new ClusterElementType(
+            clusterElementTypeName, "tools", "Tools", true, false);
+
+        when(clusterElementDefinitionService.getClusterElementType("aiAgent", 1, clusterElementTypeName))
+            .thenReturn(clusterElementType);
+
+        when(evaluator.evaluate(anyMap(), anyMap()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<Option> expectedOptions = List.of(mock(Option.class));
+
+        when(clusterElementDefinitionFacade.executeOptions(
+            eq("aiAgent"), eq(1), eq("tool"), eq(propertyName), anyMap(), anyMap(), anyList(), isNull(), isNull(),
+            anyMap(), anyMap()))
+                .thenReturn(expectedOptions);
+
+        List<Option> result = workflowNodeOptionFacade.getClusterElementNodeOptions(
+            workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, propertyName,
+            List.of(), null, environmentId);
+
+        assertEquals(expectedOptions, result);
+
+        ArgumentCaptor<Map<String, Map<String, ?>>> captor = ArgumentCaptor.forClass(Map.class);
+
+        verify(clusterElementDefinitionFacade).executeOptions(
+            eq("aiAgent"), eq(1), eq("tool"), eq(propertyName), anyMap(), anyMap(), anyList(), isNull(), isNull(),
+            anyMap(), captor.capture());
+
+        Map<String, Map<String, ?>> capturedInputParameters = captor.getValue();
+
+        assertEquals(true, capturedInputParameters.containsKey("aiAgent_tool_1"));
+        assertEquals(true, capturedInputParameters.containsKey("hubspot_1"));
+        assertEquals("secret", capturedInputParameters.get("hubspot_1")
+            .get("apiKey"));
     }
 }
