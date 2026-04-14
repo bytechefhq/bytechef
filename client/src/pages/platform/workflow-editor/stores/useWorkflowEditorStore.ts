@@ -31,6 +31,9 @@ export interface WorkflowEditorI {
     renamingNodeName: string | undefined;
     setRenamingNodeName: (renamingNodeName: string | undefined) => void;
 
+    resetWorkflowLayout: boolean;
+    setResetWorkflowLayout: (resetWorkflowLayout: boolean) => void;
+
     rootClusterElementNodeData: NodeDataType | undefined;
     setRootClusterElementNodeData: (rootClusterElementNodeData: NodeDataType | undefined) => void;
 
@@ -102,6 +105,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setRenamingNodeName: (renamingNodeName) =>
                 set(() => ({
                     renamingNodeName,
+                })),
+
+            resetWorkflowLayout: false,
+            setResetWorkflowLayout: (resetWorkflowLayout) =>
+                set(() => ({
+                    resetWorkflowLayout,
                 })),
 
             rootClusterElementNodeData: undefined,

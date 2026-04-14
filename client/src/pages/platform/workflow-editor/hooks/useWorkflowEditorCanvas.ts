@@ -1,6 +1,7 @@
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
@@ -70,6 +71,7 @@ const useWorkflowEditorCanvas = ({
         workflow = {...workflow, ...readOnlyWorkflow};
     }
 
+    const workflowId = workflow.id!;
     const {incrementLayoutResetCounter, onNodesChange, setIsNodeDragging, setNodes} = useWorkflowDataStore(
         useShallow((state) => ({
             incrementLayoutResetCounter: state.incrementLayoutResetCounter,
@@ -87,6 +89,7 @@ const useWorkflowEditorCanvas = ({
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
+    const resetWorkflowLayout = useWorkflowEditorStore((state) => state.resetWorkflowLayout);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
     );
@@ -99,6 +102,12 @@ const useWorkflowEditorCanvas = ({
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop({
         taskDispatcherDefinitions,
     });
+
+    const draggingDispatcherIdRef = useRef<string | null>(null);
+    const dispatcherDragStartRef = useRef<XYPosition | null>(null);
+    const childDragStartRef = useRef<Map<string, XYPosition>>(new Map());
+    const draggingPlaceholderRef = useRef<DraggingPlaceholderStateType | null>(null);
+    const resetPendingRef = useRef(false);
 
     const nodeTypes = useMemo(
         () => ({
@@ -271,11 +280,6 @@ const useWorkflowEditorCanvas = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    const draggingDispatcherIdRef = useRef<string | null>(null);
-    const dispatcherDragStartRef = useRef<XYPosition | null>(null);
-    const childDragStartRef = useRef<Map<string, XYPosition>>(new Map());
-    const draggingPlaceholderRef = useRef<DraggingPlaceholderStateType | null>(null);
 
     const handleNodeDragStart = useCallback(
         (_event: React.MouseEvent, node: Node) => {
@@ -503,16 +507,14 @@ const useWorkflowEditorCanvas = ({
 
     const canvasHeight = window.innerHeight - 60;
 
-    const resetPendingRef = useRef(false);
-
     useEffect(() => {
-        if (!updateWorkflowMutation?.isPending && !isWorkflowMutating(workflow.id!)) {
+        if (!updateWorkflowMutation?.isPending && !isWorkflowMutating(workflowId)) {
             resetPendingRef.current = false;
         }
-    }, [updateWorkflowMutation?.isPending, workflow.id]);
+    }, [updateWorkflowMutation?.isPending, workflowId]);
 
     const handleResetLayout = useCallback(() => {
-        if (!updateWorkflowMutation || resetPendingRef.current || isWorkflowMutating(workflow.id!)) {
+        if (!updateWorkflowMutation || resetPendingRef.current || isWorkflowMutating(workflowId)) {
             return;
         }
 
@@ -523,7 +525,20 @@ const useWorkflowEditorCanvas = ({
             invalidateWorkflowQueries: editorInvalidateWorkflowQueries,
             updateWorkflowMutation,
         });
-    }, [editorInvalidateWorkflowQueries, incrementLayoutResetCounter, updateWorkflowMutation, workflow.id]);
+    }, [editorInvalidateWorkflowQueries, incrementLayoutResetCounter, updateWorkflowMutation, workflowId]);
+
+    useEffect(() => {
+        if (!resetWorkflowLayout) {
+            return;
+        }
+
+        if (updateWorkflowMutation?.isPending || isWorkflowMutating(workflowId)) {
+            return;
+        }
+
+        handleResetLayout();
+        useWorkflowEditorStore.getState().setResetWorkflowLayout(false);
+    }, [resetWorkflowLayout, updateWorkflowMutation?.isPending, handleResetLayout, workflowId]);
 
     useLayout({
         canvasHeight,
