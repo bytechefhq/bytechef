@@ -44,15 +44,17 @@ export default function useAiAgentTools(): UseAiAgentToolsI {
         const definitionsMap = new Map(componentDefinitions.map((definition) => [definition.name, definition]));
 
         return toolElements.map((toolElement) => {
-            // Tool elements from rootClusterElementNodeData use NodeDataType shape
-            // (with workflowNodeName) rather than ClusterElementItemType shape (with name)
-            const tool = toolElement as unknown as NodeDataType;
+            // Tool elements can appear in either shape: NodeDataType (workflowNodeName)
+            // when synced in-memory, or ClusterElementItemType (name) when loaded from
+            // the workflow definition. Fall through both so the first load after an
+            // Add also produces a non-empty identifier.
+            const tool = toolElement as unknown as NodeDataType & {name?: string};
             const typeSegments = tool.type?.split('/') || [];
             const componentName = tool.componentName || typeSegments[0] || '';
             const componentVersion = parseInt(typeSegments[1]?.replace(/^v/, '')) || 1;
             const operationName = tool.operationName || typeSegments[2] || '';
             const componentDefinition = definitionsMap.get(componentName);
-            const toolName = tool.workflowNodeName || '';
+            const toolName = tool.workflowNodeName || tool.name || '';
 
             return {
                 componentName,
