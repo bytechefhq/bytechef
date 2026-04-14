@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Nikolina Spehar
+ * @author Igor Beslic
  */
 public class QuartzConnectionRefreshScheduler implements ConnectionRefreshScheduler {
 
@@ -77,9 +78,10 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
                 return;
             }
 
-            log.error("Refresh token job not found for connectionId: {}, group: {}", connectionId, triggerKey);
+            log.error("Refresh token job not found for connectionId: {}, triggerKey: {}", connectionId, triggerKey);
         } catch (SchedulerException e) {
-            log.error("Unable to delete refresh token job for connectionId: {}, group: {}", connectionId, triggerKey);
+            log.error(
+                "Unable to delete refresh token job for connectionId: {}, triggerKey: {}", connectionId, triggerKey);
         }
     }
 
