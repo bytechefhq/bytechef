@@ -124,17 +124,86 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
                 .filter(curClusterElement -> Objects.equals(
                     curClusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName))
                 .findFirst()
+                .or(() -> findNestedClusterElement(clusterElementType, clusterElementWorkflowNodeName))
                 .orElseThrow(() -> new IllegalArgumentException(
                     "Cluster element %s not found".formatted(clusterElementWorkflowNodeName)));
         } else {
-            ClusterElement clusterElement = getClusterElement(clusterElementType);
+            ClusterElement clusterElement = super.get(clusterElementType.key()) instanceof ClusterElement ce
+                ? ce : null;
 
-            if (!Objects.equals(clusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName)) {
-                throw new IllegalArgumentException("Cluster element type %s not found".formatted(clusterElementType));
+            if (clusterElement == null ||
+                !Objects.equals(clusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName)) {
+
+                return findNestedClusterElement(clusterElementType, clusterElementWorkflowNodeName)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "Cluster element type %s not found".formatted(clusterElementType)));
             }
 
             return clusterElement;
         }
+    }
+
+    private Optional<ClusterElement> findNestedClusterElement(
+        ClusterElementType clusterElementType, String clusterElementWorkflowNodeName) {
+
+        for (Entry<String, Object> entry : entrySet) {
+            Object value = entry.getValue();
+
+            if (value instanceof ClusterElement clusterElement) {
+                Optional<ClusterElement> clusterElementOptional = searchClusterElementInside(
+                    clusterElement, clusterElementType, clusterElementWorkflowNodeName);
+
+                if (clusterElementOptional.isPresent()) {
+                    return clusterElementOptional;
+                }
+            } else if (value instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof ClusterElement clusterElement) {
+                        Optional<ClusterElement> clusterElementOptional = searchClusterElementInside(
+                            clusterElement, clusterElementType, clusterElementWorkflowNodeName);
+
+                        if (clusterElementOptional.isPresent()) {
+                            return clusterElementOptional;
+                        }
+                    }
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private static Optional<ClusterElement> searchClusterElementInside(
+        ClusterElement clusterElement, ClusterElementType clusterElementType, String clusterElementWorkflowNodeName) {
+
+        Map<String, ?> extensions = clusterElement.getExtensions();
+
+        if (extensions == null || !extensions.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
+            return Optional.empty();
+        }
+
+        ClusterElementMap clusterElementMap = of(extensions);
+
+        if (clusterElementType.multipleElements()) {
+            Optional<ClusterElement> direct = clusterElementMap.getClusterElements(clusterElementType)
+                .stream()
+                .filter(curClusterElement -> Objects.equals(
+                    curClusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName))
+                .findFirst();
+
+            if (direct.isPresent()) {
+                return direct;
+            }
+        } else {
+            Optional<ClusterElement> clusterElementOptional = clusterElementMap.fetchClusterElement(clusterElementType)
+                .filter(ce -> Objects.equals(ce.getWorkflowNodeName(), clusterElementWorkflowNodeName));
+
+            if (clusterElementOptional.isPresent()) {
+                return clusterElementOptional;
+            }
+        }
+
+        return clusterElementMap.findNestedClusterElement(clusterElementType, clusterElementWorkflowNodeName);
     }
 
     @SuppressWarnings("unchecked")
