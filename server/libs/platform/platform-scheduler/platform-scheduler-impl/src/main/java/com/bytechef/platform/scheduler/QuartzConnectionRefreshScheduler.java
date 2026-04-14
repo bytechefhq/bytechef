@@ -29,6 +29,8 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Nikolina Spehar
@@ -36,6 +38,8 @@ import org.quartz.TriggerKey;
 public class QuartzConnectionRefreshScheduler implements ConnectionRefreshScheduler {
 
     private final Scheduler scheduler;
+
+    private static final Logger log = LoggerFactory.getLogger(QuartzConnectionRefreshScheduler.class);
 
     @SuppressFBWarnings("EI")
     public QuartzConnectionRefreshScheduler(Scheduler scheduler) {
@@ -48,8 +52,7 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
     }
 
     @Override
-    public void scheduleConnectionRefresh(Long connectionId, Instant expiry) {
-
+    public void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime) {
         JobDetail jobDetail = JobBuilder.newJob(ConnectionOAuth2TokenRefreshJob.class)
             .withIdentity(JobKey.jobKey(connectionId.toString(), "ConnectionOauth2TokenRefresh"))
             .usingJobData("connectionId", connectionId)
@@ -58,7 +61,7 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity(TriggerKey.triggerKey(connectionId.toString(), "ConnectionOauth2TokenRefresh"))
             .withDescription("Connection OAuth2 token refresh for " + connectionId)
-            .startAt(Date.from(expiry.minus(Duration.ofMinutes(5))))
+            .startAt(Date.from(tokenExpirationTime.minus(Duration.ofMinutes(5))))
             .build();
 
         schedule(jobDetail, trigger);
@@ -67,6 +70,7 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
     private void deleteJob(Long connectionId, String triggerKey) {
         try {
             boolean deleted = scheduler.deleteJob(JobKey.jobKey(connectionId.toString(), triggerKey));
+
             if (!deleted) {
                 throw new RuntimeException(
                     "Job not found for connectionId: " + connectionId + ", group: " + triggerKey);
