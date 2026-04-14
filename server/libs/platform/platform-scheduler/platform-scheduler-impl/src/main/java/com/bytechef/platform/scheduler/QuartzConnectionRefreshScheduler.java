@@ -48,19 +48,20 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
     }
 
     @Override
-    public void cancelConnectionRefresh(Long connectionId) {
-        deleteJob(connectionId, "ConnectionOauth2TokenRefresh");
+    public void cancelConnectionRefresh(Long connectionId, String tenantId) {
+        deleteJob(connectionId, tenantId, "ConnectionOauth2TokenRefresh");
     }
 
     @Override
-    public void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime) {
+    public void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime, String tenantId) {
         JobDetail jobDetail = JobBuilder.newJob(ConnectionOAuth2TokenRefreshJob.class)
-            .withIdentity(JobKey.jobKey(connectionId.toString(), "ConnectionOauth2TokenRefresh"))
+            .withIdentity(JobKey.jobKey(tenantId + connectionId, "ConnectionOauth2TokenRefresh"))
             .usingJobData("connectionId", connectionId)
+            .usingJobData("tenantId", tenantId)
             .build();
 
         Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(TriggerKey.triggerKey(connectionId.toString(), "ConnectionOauth2TokenRefresh"))
+            .withIdentity(TriggerKey.triggerKey(tenantId + connectionId, "ConnectionOauth2TokenRefresh"))
             .withDescription("Connection OAuth2 token refresh for " + connectionId)
             .startAt(Date.from(tokenExpirationTime.minus(Duration.ofMinutes(5))))
             .build();
@@ -68,20 +69,23 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
         schedule(jobDetail, trigger);
     }
 
-    private void deleteJob(Long connectionId, String triggerKey) {
+    private void deleteJob(Long connectionId, String tenantId, String triggerKey) {
         try {
-            JobKey jobKey = JobKey.jobKey(connectionId.toString(), triggerKey);
+            JobKey jobKey = JobKey.jobKey(tenantId + connectionId, triggerKey);
 
             if (scheduler.checkExists(jobKey) && scheduler.deleteJob(jobKey)) {
-                log.trace("Refresh token job removed for connectionId: {}, triggerKey: {}", connectionId, triggerKey);
+                log.trace("Refresh token job removed for connectionId: {}, tenantId: {}, triggerKey: {}",
+                    connectionId, tenantId, triggerKey);
 
                 return;
             }
 
-            log.error("Refresh token job not found for connectionId: {}, triggerKey: {}", connectionId, triggerKey);
+            log.error("Refresh token job not found for connectionId: {}, tenantId: {}, triggerKey: {}",
+                connectionId, tenantId, triggerKey);
         } catch (SchedulerException e) {
             log.error(
-                "Unable to delete refresh token job for connectionId: {}, triggerKey: {}", connectionId, triggerKey);
+                "Unable to delete refresh token job for connectionId: {}, tenantId: {}, triggerKey: {}",
+                connectionId, tenantId, triggerKey);
         }
     }
 

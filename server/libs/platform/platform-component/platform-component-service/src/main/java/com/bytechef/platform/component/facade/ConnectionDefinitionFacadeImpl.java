@@ -22,6 +22,7 @@ import com.bytechef.platform.component.aspect.TokenRefreshHandler;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -47,21 +48,23 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
     }
 
     @Override
-    public ComponentConnection executeConnectionRefresh(@Nullable Long connectionId) {
+    public ComponentConnection executeConnectionRefresh(String tenantId, @Nullable Long connectionId) {
 
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnection(tenantId, connectionId);
 
         Context context = connectionDefinitionService.createConnectionRefreshContext(
             componentConnection.getComponentName(), componentConnection);
 
-        return tokenRefreshHandler.refreshCredentials(componentConnection, context);
+        return TenantContext.callWithTenantId(
+            tenantId, () -> tokenRefreshHandler.refreshCredentials(componentConnection, context));
     }
 
-    private ComponentConnection getComponentConnection(Long connectionId) {
+    private ComponentConnection getComponentConnection(String tenantId, Long connectionId) {
         ComponentConnection componentConnection = null;
 
         if (connectionId != null) {
-            Connection connection = connectionService.getConnection(connectionId);
+            Connection connection = TenantContext.callWithTenantId(
+                tenantId, () -> connectionService.getConnection(connectionId));
 
             componentConnection = new ComponentConnection(
                 connection.getComponentName(), connection.getConnectionVersion(), connectionId,

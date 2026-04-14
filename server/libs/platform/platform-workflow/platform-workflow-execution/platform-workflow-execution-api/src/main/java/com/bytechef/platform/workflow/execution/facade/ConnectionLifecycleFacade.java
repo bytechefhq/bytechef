@@ -24,7 +24,8 @@ import java.util.Map;
  */
 public interface ConnectionLifecycleFacade {
 
-    void scheduleConnectionRefresh(Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType);
+    void scheduleConnectionRefresh(
+        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId);
 
-    void deleteScheduledConnectionRefresh(Long connectionId, AuthorizationType authorizationType);
+    void deleteScheduledConnectionRefresh(Long connectionId, AuthorizationType authorizationType, String tenantId);
 }

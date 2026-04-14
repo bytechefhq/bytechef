@@ -19,6 +19,8 @@ import com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConsta
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import org.slf4j.Logger;
