@@ -2,7 +2,9 @@ logging:
   level:
     ROOT: WARN
     liquibase: INFO
+    liquibase.changelog: WARN
     com.bytechef.liquibase: INFO
+    com.bytechef.ee: DEBUG
 
 spring:
   autoconfigure:
@@ -32,3 +34,7 @@ spring:
     web-application-type: none
   quartz:
     auto-startup: false
+
+bytechef:
+  coordinator:
+    enabled: false
