@@ -17,6 +17,7 @@
 package com.bytechef.tenant.single;
 
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
+import com.bytechef.tenant.constant.Tenancy;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -70,7 +71,7 @@ public class SingleTenantService implements TenantService {
     }
 
     @Override
-    public void loadChangelog(List<String> tenantIds, String contexts) {
+    public void loadChangelog(List<String> tenantIds, Tenancy tenancy) {
         throw new UnsupportedOperationException();
     }
 

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.tenant.multi.liquibase;
 
+import com.bytechef.tenant.constant.Tenancy;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -40,7 +41,7 @@ public class MultiTenantLiquibaseChangelogLoader implements InitializingBean {
             log.trace("Loading changelog for tenantIds={}", String.join(",", tenantIds));
         }
 
-        tenantService.loadChangelog(tenantIds, "multitenant");
+        tenantService.loadChangelog(tenantIds, Tenancy.MULTITENANT);
 
         log.info("Loading changelog completed");
     }
