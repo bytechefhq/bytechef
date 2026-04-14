@@ -48,6 +48,12 @@ public class FromAiInputSchemaUtils {
 
             parameterObjectNode.put("type", getJsonSchemaType(fromAiResult.type()));
 
+            String format = getJsonSchemaFormat(fromAiResult.type());
+
+            if (format != null) {
+                parameterObjectNode.put("format", format);
+            }
+
             String description = fromAiResult.description();
 
             if (description != null && !description.isEmpty()) {
@@ -74,6 +80,30 @@ public class FromAiInputSchemaUtils {
                 }
             }
 
+            List<Object> options = fromAiResult.options();
+
+            if (options != null && !options.isEmpty()) {
+                ArrayNode enumArrayNode = parameterObjectNode.putArray("enum");
+
+                for (Object option : options) {
+                    if (option instanceof Boolean booleanValue) {
+                        enumArrayNode.add(booleanValue);
+                    } else if (option instanceof Integer integerValue) {
+                        enumArrayNode.add(integerValue);
+                    } else if (option instanceof Long longValue) {
+                        enumArrayNode.add(longValue);
+                    } else if (option instanceof Double doubleValue) {
+                        enumArrayNode.add(doubleValue);
+                    } else if (option instanceof Float floatValue) {
+                        enumArrayNode.add(floatValue);
+                    } else if (option instanceof String stringValue) {
+                        enumArrayNode.add(stringValue);
+                    } else {
+                        enumArrayNode.addPOJO(option);
+                    }
+                }
+            }
+
             propertiesObjectNode.set(fromAiResult.name(), parameterObjectNode);
 
             if (defaultValue == null) {
@@ -97,6 +127,20 @@ public class FromAiInputSchemaUtils {
             case "ARRAY" -> "array";
             case "OBJECT" -> "object";
             default -> "string";
+        };
+    }
+
+    private static String getJsonSchemaFormat(String type) {
+        if (type == null || type.isBlank()) {
+            return null;
+        }
+
+        return switch (type.trim()
+            .toUpperCase()) {
+            case "DATE" -> "date";
+            case "TIME" -> "time";
+            case "DATE_TIME" -> "date-time";
+            default -> null;
         };
     }
 }
