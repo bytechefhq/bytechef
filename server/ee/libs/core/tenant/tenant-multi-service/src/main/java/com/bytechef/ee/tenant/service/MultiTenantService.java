@@ -31,8 +31,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import liquibase.integration.spring.MultiTenantSpringLiquibase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ResourceLoaderAware;
@@ -48,7 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnMultiTenant
 public class MultiTenantService implements TenantService, ResourceLoaderAware {
 
-    private static final Log log = LogFactory.getLog(MultiTenantService.class);
+    private static final Logger log = LoggerFactory.getLogger(MultiTenantService.class);
 
     private static final ReentrantLock LOCK = new ReentrantLock();
 
