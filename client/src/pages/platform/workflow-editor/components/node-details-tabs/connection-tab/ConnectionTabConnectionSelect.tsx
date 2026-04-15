@@ -1,7 +1,16 @@
 import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import ConnectionScopeBadge from '@/pages/automation/connections/components/ConnectionScopeBadge';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -21,7 +30,7 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon, XIcon} from 'lucide-react';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -48,7 +57,9 @@ const ConnectionTabConnectionSelect = ({
     const [currentConnection, setCurrentConnection] = useState<ConnectionI>();
     const [showConnectionDialog, setShowConnectionDialog] = useState<boolean>(false);
 
+    const clearedConnectionIdRef = useRef<number | undefined>(undefined);
     const connectionIdRef = useRef<number | undefined>(undefined);
+    const skipServerSyncRef = useRef(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -89,9 +100,9 @@ const ConnectionTabConnectionSelect = ({
     const {data: componentConnections} = useGetConnectionsQuery!(
         {
             componentName: componentConnection?.componentName,
-            connectionVersion: componentConnection?.componentVersion,
+            connectionVersion: connectionDefinition?.version,
         },
-        !!componentDefinition
+        !!componentDefinition && !!connectionDefinition
     );
 
     const queryClient = useQueryClient();
@@ -186,9 +197,6 @@ const ConnectionTabConnectionSelect = ({
         ]
     );
 
-    const skipServerSyncRef = useRef(false);
-    const clearedConnectionIdRef = useRef<number | undefined>(undefined);
-
     const handleClearConnectionClick = useCallback(
         (workflowConnectionKey: string) => {
             const previousConnectionId = connectionId ?? 0;
@@ -252,10 +260,40 @@ const ConnectionTabConnectionSelect = ({
         [ConnectionKeys, handleValueChange, key, queryClient]
     );
 
-    // Sync connectionId from prop to state (one-way sync)
+    const groupedConnections = useMemo(() => {
+        const visibilityOrder: Array<'ORGANIZATION' | 'PRIVATE' | 'PROJECT' | 'WORKSPACE'> = [
+            'PRIVATE',
+            'PROJECT',
+            'WORKSPACE',
+            'ORGANIZATION',
+        ];
+
+        const groupLabels: Record<string, string> = {
+            ORGANIZATION: 'Organization',
+            PRIVATE: 'Private',
+            PROJECT: 'Project',
+            WORKSPACE: 'Workspace',
+        };
+
+        const groups = visibilityOrder
+            .map((visibility) => ({
+                connections: (componentConnections ?? []).filter(
+                    (connection) => (connection.visibility || 'PRIVATE') === visibility
+                ),
+                label: groupLabels[visibility],
+                visibility,
+            }))
+            .filter((group) => group.connections.length > 0);
+
+        return groups;
+    }, [componentConnections]);
+
     useEffect(() => {
         const workflowConnectionId = workflowTestConfigurationConnection?.connectionId;
 
+        // skipServerSyncRef suppresses this effect after a local clear, so the server echo of the
+        // old value (still arriving inflight) does not re-populate the selector and undo the user's
+        // action. The ref is reset once the server confirms the cleared state.
         if (
             skipServerSyncRef.current &&
             workflowConnectionId !== undefined &&
@@ -277,7 +315,6 @@ const ConnectionTabConnectionSelect = ({
         }
     }, [workflowTestConfigurationConnection, connectionId]);
 
-    // Update connectionId ref when state changes (for the sync effect above)
     useEffect(() => {
         connectionIdRef.current = connectionId;
     }, [connectionId]);
@@ -353,20 +390,42 @@ const ConnectionTabConnectionSelect = ({
                     </div>
 
                     <SelectContent>
-                        {componentConnections &&
-                            componentConnections.map((connection) => (
-                                <SelectItem key={connection.id} value={connection.id!.toString()}>
-                                    <div className="flex items-center space-x-1">
-                                        <span>{connection.name}</span>
+                        {groupedConnections.length === 0 && (
+                            <div className="px-3 py-2 text-xs text-muted-foreground">
+                                <p>No connections found for this component in the current environment.</p>
 
-                                        <span className="text-xs text-gray-500">
-                                            {connection?.tags?.map((tag) => tag.name).join(', ')}
-                                        </span>
+                                <p className="mt-1">
+                                    Connections in other environments or with a different connection version are not
+                                    shown.
+                                </p>
+                            </div>
+                        )}
 
-                                        <EnvironmentBadge environmentId={+connection.environmentId!} />
-                                    </div>
-                                </SelectItem>
-                            ))}
+                        {groupedConnections.map((group) => (
+                            <SelectGroup key={group.visibility}>
+                                <SelectLabel className="text-xs font-semibold uppercase text-muted-foreground">
+                                    {group.label}
+                                </SelectLabel>
+
+                                {group.connections.map((connection) => (
+                                    <SelectItem key={connection.id} value={connection.id!.toString()}>
+                                        <div className="flex items-center space-x-1">
+                                            <span>{connection.name}</span>
+
+                                            <span className="text-xs text-gray-500">
+                                                {connection?.tags?.map((tag) => tag.name).join(', ')}
+                                            </span>
+
+                                            <EnvironmentBadge environmentId={+connection.environmentId!} />
+
+                                            {connection.visibility && (
+                                                <ConnectionScopeBadge visibility={connection.visibility} />
+                                            )}
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectGroup>
+                        ))}
                     </SelectContent>
                 </Select>
             </div>

@@ -138,11 +138,29 @@ export interface ConnectionBase {
      */
     parameters: { [key: string]: any; };
     /**
+     * IDs of projects this connection is shared with. Typically populated when visibility is PROJECT.
+     * @type {Array<number>}
+     * @memberof ConnectionBase
+     */
+    readonly sharedProjectIds?: Array<number>;
+    /**
      * 
      * @type {Array<Tag>}
      * @memberof ConnectionBase
      */
     tags?: Array<Tag>;
+    /**
+     * The status of the connection
+     * @type {ConnectionBaseStatusEnum}
+     * @memberof ConnectionBase
+     */
+    readonly status?: ConnectionBaseStatusEnum;
+    /**
+     * The visibility scope of the connection
+     * @type {ConnectionBaseVisibilityEnum}
+     * @memberof ConnectionBase
+     */
+    readonly visibility?: ConnectionBaseVisibilityEnum;
     /**
      * 
      * @type {number}
@@ -151,6 +169,27 @@ export interface ConnectionBase {
     version?: number;
 }
 
+
+/**
+ * @export
+ */
+export const ConnectionBaseStatusEnum = {
+    Active: 'ACTIVE',
+    PendingReassignment: 'PENDING_REASSIGNMENT',
+    Revoked: 'REVOKED'
+} as const;
+export type ConnectionBaseStatusEnum = typeof ConnectionBaseStatusEnum[keyof typeof ConnectionBaseStatusEnum];
+
+/**
+ * @export
+ */
+export const ConnectionBaseVisibilityEnum = {
+    Private: 'PRIVATE',
+    Project: 'PROJECT',
+    Workspace: 'WORKSPACE',
+    Organization: 'ORGANIZATION'
+} as const;
+export type ConnectionBaseVisibilityEnum = typeof ConnectionBaseVisibilityEnum[keyof typeof ConnectionBaseVisibilityEnum];
 
 
 /**
@@ -190,7 +229,10 @@ export function ConnectionBaseFromJSONTyped(json: any, ignoreDiscriminator: bool
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
         'parameters': json['parameters'],
+        'sharedProjectIds': json['sharedProjectIds'] == null ? undefined : json['sharedProjectIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
+        'status': json['status'] == null ? undefined : json['status'],
+        'visibility': json['visibility'] == null ? undefined : json['visibility'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
@@ -199,7 +241,7 @@ export function ConnectionBaseToJSON(json: any): ConnectionBase {
     return ConnectionBaseToJSONTyped(json, false);
 }
 
-export function ConnectionBaseToJSONTyped(value?: Omit<ConnectionBase, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionBaseToJSONTyped(value?: Omit<ConnectionBase, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'sharedProjectIds'|'status'|'visibility'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

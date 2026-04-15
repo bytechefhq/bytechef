@@ -1,7 +1,19 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import ConnectionsFilterTitle from '@/pages/automation/connections/components/ConnectionsFilterTitle';
+import {useVisibilityFeatureEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
+import {buildBulkPromoteToast} from '@/pages/automation/connections/utils/bulkPromoteToast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
@@ -9,6 +21,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {Connection} from '@/shared/middleware/automation/configuration';
+import {usePromoteAllPrivateConnectionsToWorkspaceMutation} from '@/shared/middleware/graphql';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {
@@ -17,9 +30,11 @@ import {
     useGetWorkspaceConnectionsQuery,
 } from '@/shared/queries/automation/connections.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {Link2Icon, TagIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
 
 import ConnectionList from './components/connection-list/ConnectionList';
 
@@ -36,6 +51,31 @@ export const Connections = () => {
 
     const componentName = searchParams.get('componentName');
     const tagId = searchParams.get('tagId');
+
+    const {enabled: visibilityFeatureEnabled, isAdmin} = useVisibilityFeatureEnabled();
+
+    const queryClient = useQueryClient();
+
+    const [showBulkPromoteConfirm, setShowBulkPromoteConfirm] = useState(false);
+
+    const promoteAllPrivateMutation = usePromoteAllPrivateConnectionsToWorkspaceMutation({
+        onError: () => {
+            setShowBulkPromoteConfirm(false);
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
+
+            const {message, type} = buildBulkPromoteToast(data.promoteAllPrivateConnectionsToWorkspace);
+
+            if (type === 'error') {
+                toast.error(message);
+            } else {
+                toast(message);
+            }
+
+            setShowBulkPromoteConfirm(false);
+        },
+    });
 
     const filterData = {
         id: componentName ? componentName : tagId ? parseInt(tagId) : undefined,
@@ -87,6 +127,12 @@ export const Connections = () => {
 
     const isAnyLoading = componentsLoading || connectionsIsLoading || tagsIsLoading || unfilteredConnectionsIsLoading;
 
+    const privateConnectionCount = useMemo(() => {
+        const source = hasActiveFilter ? unfilteredConnections : connections;
+
+        return (source ?? []).filter((connection) => (connection.visibility || 'PRIVATE') === 'PRIVATE').length;
+    }, [connections, hasActiveFilter, unfilteredConnections]);
+
     return (
         <LayoutContainer
             header={
@@ -97,6 +143,19 @@ export const Connections = () => {
                         connections && connections.length > 0 && componentDefinitions ? (
                             <div className="flex items-center gap-4">
                                 <EnvironmentSelect />
+
+                                {visibilityFeatureEnabled &&
+                                    isAdmin &&
+                                    currentWorkspaceId &&
+                                    privateConnectionCount > 0 && (
+                                        <Button
+                                            disabled={promoteAllPrivateMutation.isPending}
+                                            label={`Promote ${privateConnectionCount} private to workspace`}
+                                            onClick={() => setShowBulkPromoteConfirm(true)}
+                                            title="Promote every PRIVATE connection in this workspace to WORKSPACE visibility (CE→EE migration helper)"
+                                            variant="outline"
+                                        />
+                                    )}
 
                                 <ConnectionDialog
                                     componentDefinitions={componentDefinitions}
@@ -229,6 +288,34 @@ export const Connections = () => {
                     />
                 )}
             </PageLoader>
+
+            <AlertDialog
+                onOpenChange={(isOpen) => !isOpen && setShowBulkPromoteConfirm(false)}
+                open={showBulkPromoteConfirm}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Promote {privateConnectionCount} private connection(s)?</AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            Every PRIVATE connection in this workspace will become visible to all workspace members.
+                            This cannot be undone in bulk — you can demote individual connections back to private
+                            afterwards.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setShowBulkPromoteConfirm(false)}>Cancel</AlertDialogCancel>
+
+                        <AlertDialogAction
+                            disabled={promoteAllPrivateMutation.isPending}
+                            onClick={() => promoteAllPrivateMutation.mutate({workspaceId: String(currentWorkspaceId)})}
+                        >
+                            Promote all
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </LayoutContainer>
     );
 };

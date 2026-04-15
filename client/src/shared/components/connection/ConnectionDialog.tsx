@@ -16,6 +16,8 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import ConnectionScopeBadge from '@/pages/automation/connections/components/ConnectionScopeBadge';
+import {useIsVisibilityEditionEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -38,6 +40,7 @@ import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -61,6 +64,7 @@ export interface ConnectionDialogFormProps {
     parameters: {[key: string]: object};
     selectedScopes?: {[key: string]: boolean};
     tags: Array<Tag | {label: string; value: string}>;
+    visibility: 'PRIVATE' | 'WORKSPACE';
 }
 
 interface ConnectionDialogProps {
@@ -108,6 +112,12 @@ const ConnectionDialog = ({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentType = usePlatformTypeStore((state) => state.currentType);
+    const isAdmin = useAuthenticationStore((state) => state.account?.authorities?.includes('ROLE_ADMIN') ?? false);
+    // Compose the shared EE-edition primitive with this dialog's platform-type scope. Keeping the
+    // edition check in one hook means a future migration away from EditionType.EE updates the
+    // list-page gate (useVisibilityFeatureEnabled) and this dialog simultaneously.
+    const isEE = useIsVisibilityEditionEnabled();
+    const visibilityFeatureEnabled = isEE && currentType === PlatformType.AUTOMATION;
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -124,6 +134,7 @@ const ConnectionDialog = ({
                     ...tag,
                     label: tag.name,
                 })) || [],
+            visibility: 'PRIVATE',
         },
     });
 
@@ -295,7 +306,7 @@ const ConnectionDialog = ({
     }
 
     function getNewConnection(additionalParameters?: object) {
-        const {componentName, name, parameters, tags} = getValues();
+        const {componentName, name, parameters, tags, visibility} = getValues();
 
         return {
             authorizationType,
@@ -308,6 +319,7 @@ const ConnectionDialog = ({
                 ...additionalParameters,
             },
             tags: tags,
+            ...(visibilityFeatureEnabled ? {visibility} : {}),
         } as ConnectionI;
     }
 
@@ -557,6 +569,53 @@ const ConnectionDialog = ({
                                         </FormItem>
                                     )}
                                 />
+
+                                {!connection?.id && visibilityFeatureEnabled && (
+                                    <FormField
+                                        control={control}
+                                        name="visibility"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Visibility</FormLabel>
+
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <SelectTrigger className="mt-1">
+                                                        <FormControl>
+                                                            <SelectValue placeholder="Select visibility..." />
+                                                        </FormControl>
+                                                    </SelectTrigger>
+
+                                                    <SelectContent>
+                                                        <SelectItem value="PRIVATE">Private (only you)</SelectItem>
+
+                                                        {isAdmin && (
+                                                            <SelectItem value="WORKSPACE">
+                                                                Workspace (all workspace members)
+                                                            </SelectItem>
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
+                                {connection?.id && visibilityFeatureEnabled && connection.visibility && (
+                                    <FormItem className="space-x-2">
+                                        <FormLabel>Visibility</FormLabel>
+
+                                        <FormControl>
+                                            <ConnectionScopeBadge visibility={connection.visibility} />
+                                        </FormControl>
+
+                                        <p className="text-xs text-muted-foreground">
+                                            Change visibility from the connection list menu (Share with
+                                            workspace/projects, Make private).
+                                        </p>
+                                    </FormItem>
+                                )}
 
                                 {!connection?.id && showConnectionProperties && !!connectionDefinition.properties && (
                                     <WorkflowMockProvider>

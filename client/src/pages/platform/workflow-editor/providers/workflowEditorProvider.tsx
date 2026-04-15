@@ -41,6 +41,7 @@ export interface ConnectionI {
     parameters: {[key: string]: any};
     tags?: Array<Tag>;
     version?: number;
+    visibility?: 'ORGANIZATION' | 'PRIVATE' | 'PROJECT' | 'WORKSPACE';
     workspaceId?: number;
 }
 

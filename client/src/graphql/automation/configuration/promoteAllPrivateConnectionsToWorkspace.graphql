@@ -1,0 +1,13 @@
+mutation promoteAllPrivateConnectionsToWorkspace($workspaceId: ID!) {
+  promoteAllPrivateConnectionsToWorkspace(workspaceId: $workspaceId) {
+    attempted
+    promoted
+    skipped
+    failed
+    failures {
+      connectionId
+      errorCode
+      message
+    }
+  }
+}

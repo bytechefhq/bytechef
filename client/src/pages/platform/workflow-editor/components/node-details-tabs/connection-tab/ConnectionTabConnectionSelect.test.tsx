@@ -214,6 +214,38 @@ describe('ConnectionTabConnectionSelect', () => {
         vi.restoreAllMocks();
     });
 
+    it('passes connectionDefinition.version (not componentVersion) to useGetConnectionsQuery', () => {
+        const useGetConnectionsQuerySpy = vi.fn(() => ({data: mockConnections}));
+
+        // Definition.version (3) deliberately differs from componentConnection.componentVersion (1)
+        mockUseGetConnectionDefinitionQuery.mockReturnValue({
+            data: {authorizationTypes: ['oauth2'], componentName: 'test-component', version: 3},
+        });
+
+        mockUseWorkflowEditor.mockReturnValue({
+            ConnectionKeys: {connectionTags: ['connectionTags'], connections: ['connections']},
+            useCreateConnectionMutation: vi.fn(),
+            useGetComponentDefinitionsQuery: () => ({data: [mockComponentDefinition]}),
+            useGetConnectionTagsQuery: vi.fn(),
+            useGetConnectionsQuery: useGetConnectionsQuerySpy,
+        });
+
+        render(
+            <ConnectionTabConnectionSelect
+                componentConnection={mockComponentConnection}
+                componentConnectionsCount={1}
+                componentDefinition={mockComponentDefinition}
+                workflowId="workflow-1"
+                workflowNodeName="node-1"
+            />
+        );
+
+        expect(useGetConnectionsQuerySpy).toHaveBeenCalledWith(
+            expect.objectContaining({componentName: 'test-component', connectionVersion: 3}),
+            true
+        );
+    });
+
     it('should render the component with connection select', () => {
         render(
             <ConnectionTabConnectionSelect

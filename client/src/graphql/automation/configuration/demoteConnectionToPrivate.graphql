@@ -1,0 +1,3 @@
+mutation demoteConnectionToPrivate($workspaceId: ID!, $connectionId: ID!) {
+    demoteConnectionToPrivate(workspaceId: $workspaceId, connectionId: $connectionId)
+}

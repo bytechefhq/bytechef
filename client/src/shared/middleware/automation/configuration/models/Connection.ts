@@ -138,11 +138,29 @@ export interface Connection {
      */
     parameters: { [key: string]: any; };
     /**
+     * IDs of projects this connection is shared with. Typically populated when visibility is PROJECT.
+     * @type {Array<number>}
+     * @memberof Connection
+     */
+    readonly sharedProjectIds?: Array<number>;
+    /**
      * 
      * @type {Array<Tag>}
      * @memberof Connection
      */
     tags?: Array<Tag>;
+    /**
+     * The status of the connection
+     * @type {ConnectionStatusEnum}
+     * @memberof Connection
+     */
+    readonly status?: ConnectionStatusEnum;
+    /**
+     * The visibility scope of the connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. PROJECT is set via shareConnectionToProject mutation (requires ROLE_ADMIN). ORGANIZATION is not user-settable.
+     * @type {ConnectionVisibilityEnum}
+     * @memberof Connection
+     */
+    visibility?: ConnectionVisibilityEnum;
     /**
      * 
      * @type {number}
@@ -157,6 +175,27 @@ export interface Connection {
     workspaceId?: number;
 }
 
+
+/**
+ * @export
+ */
+export const ConnectionStatusEnum = {
+    Active: 'ACTIVE',
+    PendingReassignment: 'PENDING_REASSIGNMENT',
+    Revoked: 'REVOKED'
+} as const;
+export type ConnectionStatusEnum = typeof ConnectionStatusEnum[keyof typeof ConnectionStatusEnum];
+
+/**
+ * @export
+ */
+export const ConnectionVisibilityEnum = {
+    Private: 'PRIVATE',
+    Project: 'PROJECT',
+    Workspace: 'WORKSPACE',
+    Organization: 'ORGANIZATION'
+} as const;
+export type ConnectionVisibilityEnum = typeof ConnectionVisibilityEnum[keyof typeof ConnectionVisibilityEnum];
 
 
 /**
@@ -196,7 +235,10 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
         'parameters': json['parameters'],
+        'sharedProjectIds': json['sharedProjectIds'] == null ? undefined : json['sharedProjectIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
+        'status': json['status'] == null ? undefined : json['status'],
+        'visibility': json['visibility'] == null ? undefined : json['visibility'],
         'version': json['__version'] == null ? undefined : json['__version'],
         'workspaceId': json['workspaceId'] == null ? undefined : json['workspaceId'],
     };
@@ -206,7 +248,7 @@ export function ConnectionToJSON(json: any): Connection {
     return ConnectionToJSONTyped(json, false);
 }
 
-export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'sharedProjectIds'|'status'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -222,6 +264,7 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
         'name': value['name'],
         'parameters': value['parameters'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
+        'visibility': value['visibility'],
         '__version': value['version'],
         'workspaceId': value['workspaceId'],
     };

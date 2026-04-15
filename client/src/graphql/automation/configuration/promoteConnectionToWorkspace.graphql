@@ -1,0 +1,3 @@
+mutation promoteConnectionToWorkspace($workspaceId: ID!, $connectionId: ID!) {
+    promoteConnectionToWorkspace(workspaceId: $workspaceId, connectionId: $connectionId)
+}

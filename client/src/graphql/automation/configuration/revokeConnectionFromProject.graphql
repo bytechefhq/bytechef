@@ -1,0 +1,3 @@
+mutation revokeConnectionFromProject($workspaceId: ID!, $connectionId: ID!, $projectId: ID!) {
+    revokeConnectionFromProject(workspaceId: $workspaceId, connectionId: $connectionId, projectId: $projectId)
+}

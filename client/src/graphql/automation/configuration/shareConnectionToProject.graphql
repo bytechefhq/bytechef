@@ -1,0 +1,3 @@
+mutation shareConnectionToProject($workspaceId: ID!, $connectionId: ID!, $projectId: ID!) {
+    shareConnectionToProject(workspaceId: $workspaceId, connectionId: $connectionId, projectId: $projectId)
+}

@@ -92,7 +92,21 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                         loading: true,
                     }));
 
-                    const response = await fetchGetActuatorInfo();
+                    let response: Response;
+
+                    try {
+                        response = await fetchGetActuatorInfo();
+                    } catch (error) {
+                        set((state) => ({...state, loading: false}));
+
+                        throw error;
+                    }
+
+                    if (response.status !== 200) {
+                        set((state) => ({...state, loading: false}));
+
+                        return;
+                    }
 
                     if (response.status === 200) {
                         const json = await response.json();
