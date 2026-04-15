@@ -1,0 +1,27 @@
+query aiGatewayWorkspaceSettings($workspaceId: ID!) {
+    aiGatewayWorkspaceSettings(workspaceId: $workspaceId) {
+        cacheEnabled
+        cacheTtlSeconds
+        defaultRoutingPolicyId
+        logRetentionDays
+        redactPii
+        retryCount
+        softBudgetWarningPct
+        timeoutMs
+        workspaceId
+    }
+}
+
+mutation updateAiGatewayWorkspaceSettings($input: AiGatewayWorkspaceSettingsInput!) {
+    updateAiGatewayWorkspaceSettings(input: $input) {
+        cacheEnabled
+        cacheTtlSeconds
+        defaultRoutingPolicyId
+        logRetentionDays
+        redactPii
+        retryCount
+        softBudgetWarningPct
+        timeoutMs
+        workspaceId
+    }
+}

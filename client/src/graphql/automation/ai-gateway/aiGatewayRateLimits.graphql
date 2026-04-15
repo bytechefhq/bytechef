@@ -1,0 +1,57 @@
+query aiGatewayRateLimits($workspaceId: ID!) {
+    aiGatewayRateLimits(workspaceId: $workspaceId) {
+        createdDate
+        enabled
+        id
+        lastModifiedDate
+        limitType
+        limitValue
+        name
+        projectId
+        propertyKey
+        scope
+        version
+        windowSeconds
+        workspaceId
+    }
+}
+
+mutation createAiGatewayRateLimit($input: CreateAiGatewayRateLimitInput!) {
+    createAiGatewayRateLimit(input: $input) {
+        createdDate
+        enabled
+        id
+        lastModifiedDate
+        limitType
+        limitValue
+        name
+        projectId
+        propertyKey
+        scope
+        version
+        windowSeconds
+        workspaceId
+    }
+}
+
+mutation updateAiGatewayRateLimit($id: ID!, $input: UpdateAiGatewayRateLimitInput!) {
+    updateAiGatewayRateLimit(id: $id, input: $input) {
+        createdDate
+        enabled
+        id
+        lastModifiedDate
+        limitType
+        limitValue
+        name
+        projectId
+        propertyKey
+        scope
+        version
+        windowSeconds
+        workspaceId
+    }
+}
+
+mutation deleteAiGatewayRateLimit($id: ID!) {
+    deleteAiGatewayRateLimit(id: $id)
+}

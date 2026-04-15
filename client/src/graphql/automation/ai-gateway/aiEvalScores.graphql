@@ -1,0 +1,89 @@
+query aiEvalScores($workspaceId: ID!) {
+    aiEvalScores(workspaceId: $workspaceId) {
+        comment
+        createdBy
+        createdDate
+        dataType
+        evalRuleId
+        id
+        name
+        source
+        spanId
+        stringValue
+        traceId
+        value
+        workspaceId
+    }
+}
+
+query aiEvalScoresByTrace($traceId: ID!) {
+    aiEvalScoresByTrace(traceId: $traceId) {
+        comment
+        createdBy
+        createdDate
+        dataType
+        evalRuleId
+        id
+        name
+        source
+        spanId
+        stringValue
+        traceId
+        value
+        workspaceId
+    }
+}
+
+mutation createAiEvalScore(
+    $comment: String
+    $dataType: AiEvalScoreDataType!
+    $name: String!
+    $source: AiEvalScoreSource!
+    $spanId: ID
+    $stringValue: String
+    $traceId: ID!
+    $value: Float
+    $workspaceId: ID!
+) {
+    createAiEvalScore(
+        comment: $comment
+        dataType: $dataType
+        name: $name
+        source: $source
+        spanId: $spanId
+        stringValue: $stringValue
+        traceId: $traceId
+        value: $value
+        workspaceId: $workspaceId
+    ) {
+        id
+        name
+    }
+}
+
+mutation deleteAiEvalScore($id: ID!) {
+    deleteAiEvalScore(id: $id)
+}
+
+query aiEvalScoreAnalytics($workspaceId: ID!, $startDate: Long!, $endDate: Long!) {
+    aiEvalScoreAnalytics(workspaceId: $workspaceId, startDate: $startDate, endDate: $endDate) {
+        average
+        count
+        dataType
+        distribution {
+            count
+            value
+        }
+        max
+        min
+        name
+    }
+}
+
+query aiEvalScoreTrend($workspaceId: ID!, $name: String!, $startDate: Long!, $endDate: Long!) {
+    aiEvalScoreTrend(workspaceId: $workspaceId, name: $name, startDate: $startDate, endDate: $endDate) {
+        average
+        count
+        day
+    }
+}

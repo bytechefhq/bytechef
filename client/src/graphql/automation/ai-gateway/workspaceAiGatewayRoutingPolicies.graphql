@@ -1,0 +1,55 @@
+query workspaceAiGatewayRoutingPolicies($workspaceId: ID!) {
+    workspaceAiGatewayRoutingPolicies(workspaceId: $workspaceId) {
+        config
+        createdDate
+        deployments {
+            enabled
+            id
+            maxRpm
+            maxTpm
+            modelId
+            priorityOrder
+            routingPolicyId
+            weight
+        }
+        enabled
+        fallbackModel
+        id
+        lastModifiedDate
+        name
+        strategy
+        version
+    }
+}
+
+mutation createWorkspaceAiGatewayRoutingPolicy($input: CreateWorkspaceAiGatewayRoutingPolicyInput!) {
+    createWorkspaceAiGatewayRoutingPolicy(input: $input) {
+        config
+        createdDate
+        enabled
+        fallbackModel
+        id
+        lastModifiedDate
+        name
+        strategy
+        version
+    }
+}
+
+mutation deleteWorkspaceAiGatewayRoutingPolicy($workspaceId: ID!, $routingPolicyId: ID!) {
+    deleteWorkspaceAiGatewayRoutingPolicy(workspaceId: $workspaceId, routingPolicyId: $routingPolicyId)
+}
+
+mutation updateWorkspaceAiGatewayRoutingPolicy($workspaceId: ID!, $id: ID!, $input: UpdateAiGatewayRoutingPolicyInput!) {
+    updateWorkspaceAiGatewayRoutingPolicy(workspaceId: $workspaceId, id: $id, input: $input) {
+        config
+        createdDate
+        enabled
+        fallbackModel
+        id
+        lastModifiedDate
+        name
+        strategy
+        version
+    }
+}

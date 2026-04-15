@@ -1,0 +1,113 @@
+query aiEvalRules($workspaceId: ID!) {
+    aiEvalRules(workspaceId: $workspaceId) {
+        createdDate
+        delaySeconds
+        enabled
+        filters
+        id
+        lastModifiedDate
+        model
+        name
+        projectId
+        promptTemplate
+        samplingRate
+        scoreConfigId
+        version
+        workspaceId
+    }
+}
+
+query aiEvalRule($id: ID!) {
+    aiEvalRule(id: $id) {
+        createdDate
+        delaySeconds
+        enabled
+        filters
+        id
+        lastModifiedDate
+        model
+        name
+        projectId
+        promptTemplate
+        samplingRate
+        scoreConfigId
+        version
+        workspaceId
+    }
+}
+
+query aiEvalExecutions($evalRuleId: ID!) {
+    aiEvalExecutions(evalRuleId: $evalRuleId) {
+        createdDate
+        errorMessage
+        evalRuleId
+        id
+        scoreId
+        status
+        traceId
+    }
+}
+
+mutation createAiEvalRule(
+    $delaySeconds: Int
+    $enabled: Boolean!
+    $filters: String
+    $model: String!
+    $name: String!
+    $projectId: ID
+    $promptTemplate: String!
+    $samplingRate: Float!
+    $scoreConfigId: ID!
+    $workspaceId: ID!
+) {
+    createAiEvalRule(
+        delaySeconds: $delaySeconds
+        enabled: $enabled
+        filters: $filters
+        model: $model
+        name: $name
+        projectId: $projectId
+        promptTemplate: $promptTemplate
+        samplingRate: $samplingRate
+        scoreConfigId: $scoreConfigId
+        workspaceId: $workspaceId
+    ) {
+        id
+        name
+    }
+}
+
+mutation deleteAiEvalRule($id: ID!) {
+    deleteAiEvalRule(id: $id)
+}
+
+mutation runAiEvalRuleOnHistoricalTraces($ruleId: ID!, $startDate: Long!, $endDate: Long!) {
+    runAiEvalRuleOnHistoricalTraces(ruleId: $ruleId, startDate: $startDate, endDate: $endDate)
+}
+
+mutation updateAiEvalRule(
+    $delaySeconds: Int
+    $enabled: Boolean!
+    $filters: String
+    $id: ID!
+    $model: String!
+    $name: String!
+    $promptTemplate: String!
+    $samplingRate: Float!
+    $scoreConfigId: ID!
+) {
+    updateAiEvalRule(
+        delaySeconds: $delaySeconds
+        enabled: $enabled
+        filters: $filters
+        id: $id
+        model: $model
+        name: $name
+        promptTemplate: $promptTemplate
+        samplingRate: $samplingRate
+        scoreConfigId: $scoreConfigId
+    ) {
+        id
+        name
+    }
+}

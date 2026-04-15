@@ -1,0 +1,67 @@
+query aiObservabilityExportJobs($workspaceId: ID!) {
+    aiObservabilityExportJobs(workspaceId: $workspaceId) {
+        createdBy
+        createdDate
+        errorMessage
+        filePath
+        filters
+        format
+        id
+        projectId
+        recordCount
+        scope
+        status
+        type
+        workspaceId
+    }
+}
+
+query aiObservabilityExportJob($id: ID!) {
+    aiObservabilityExportJob(id: $id) {
+        createdBy
+        createdDate
+        errorMessage
+        filePath
+        filters
+        format
+        id
+        projectId
+        recordCount
+        scope
+        status
+        type
+        workspaceId
+    }
+}
+
+mutation createAiObservabilityExportJob(
+    $workspaceId: ID!
+    $projectId: ID
+    $format: AiObservabilityExportFormat!
+    $scope: AiObservabilityExportScope!
+    $filters: String
+) {
+    createAiObservabilityExportJob(
+        workspaceId: $workspaceId
+        projectId: $projectId
+        format: $format
+        scope: $scope
+        filters: $filters
+    ) {
+        createdBy
+        createdDate
+        format
+        id
+        scope
+        status
+        type
+        workspaceId
+    }
+}
+
+mutation cancelAiObservabilityExportJob($id: ID!) {
+    cancelAiObservabilityExportJob(id: $id) {
+        id
+        status
+    }
+}

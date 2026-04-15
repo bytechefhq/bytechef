@@ -1,0 +1,103 @@
+query aiObservabilityAlertRules($workspaceId: ID!) {
+    aiObservabilityAlertRules(workspaceId: $workspaceId) {
+        channelIds
+        condition
+        cooldownMinutes
+        createdDate
+        enabled
+        filters
+        id
+        lastModifiedDate
+        metric
+        name
+        projectId
+        snoozedUntil
+        threshold
+        version
+        windowMinutes
+        workspaceId
+    }
+}
+
+query aiObservabilityAlertRule($id: ID!) {
+    aiObservabilityAlertRule(id: $id) {
+        channelIds
+        condition
+        cooldownMinutes
+        createdDate
+        enabled
+        filters
+        id
+        lastModifiedDate
+        metric
+        name
+        projectId
+        snoozedUntil
+        threshold
+        version
+        windowMinutes
+        workspaceId
+    }
+}
+
+mutation createAiObservabilityAlertRule($input: AiObservabilityAlertRuleInput!) {
+    createAiObservabilityAlertRule(input: $input) {
+        channelIds
+        condition
+        cooldownMinutes
+        createdDate
+        enabled
+        filters
+        id
+        lastModifiedDate
+        metric
+        name
+        projectId
+        threshold
+        version
+        windowMinutes
+        workspaceId
+    }
+}
+
+mutation updateAiObservabilityAlertRule($id: ID!, $input: AiObservabilityAlertRuleInput!) {
+    updateAiObservabilityAlertRule(id: $id, input: $input) {
+        channelIds
+        condition
+        cooldownMinutes
+        createdDate
+        enabled
+        filters
+        id
+        lastModifiedDate
+        metric
+        name
+        projectId
+        threshold
+        version
+        windowMinutes
+        workspaceId
+    }
+}
+
+mutation deleteAiObservabilityAlertRule($id: ID!) {
+    deleteAiObservabilityAlertRule(id: $id)
+}
+
+mutation testAiObservabilityAlertRule($id: ID!) {
+    testAiObservabilityAlertRule(id: $id)
+}
+
+mutation snoozeAiObservabilityAlertRule($id: ID!, $until: Long!) {
+    snoozeAiObservabilityAlertRule(id: $id, until: $until) {
+        id
+        snoozedUntil
+    }
+}
+
+mutation unsnoozeAiObservabilityAlertRule($id: ID!) {
+    unsnoozeAiObservabilityAlertRule(id: $id) {
+        id
+        snoozedUntil
+    }
+}

@@ -1,0 +1,48 @@
+query aiGatewayBudget($workspaceId: ID!) {
+    aiGatewayBudget(workspaceId: $workspaceId) {
+        alertThreshold
+        amount
+        createdDate
+        enabled
+        enforcementMode
+        id
+        lastModifiedDate
+        period
+        version
+        workspaceId
+    }
+}
+
+mutation createAiGatewayBudget($input: CreateAiGatewayBudgetInput!) {
+    createAiGatewayBudget(input: $input) {
+        alertThreshold
+        amount
+        createdDate
+        enabled
+        enforcementMode
+        id
+        lastModifiedDate
+        period
+        version
+        workspaceId
+    }
+}
+
+mutation updateAiGatewayBudget($id: ID!, $input: UpdateAiGatewayBudgetInput!) {
+    updateAiGatewayBudget(id: $id, input: $input) {
+        alertThreshold
+        amount
+        createdDate
+        enabled
+        enforcementMode
+        id
+        lastModifiedDate
+        period
+        version
+        workspaceId
+    }
+}
+
+mutation deleteAiGatewayBudget($id: ID!) {
+    deleteAiGatewayBudget(id: $id)
+}

@@ -1,0 +1,95 @@
+query aiObservabilityWebhookSubscriptions($workspaceId: ID!) {
+    aiObservabilityWebhookSubscriptions(workspaceId: $workspaceId) {
+        createdDate
+        enabled
+        events
+        id
+        lastModifiedDate
+        lastTriggeredDate
+        name
+        projectId
+        url
+        version
+        workspaceId
+    }
+}
+
+query aiObservabilityWebhookSubscription($id: ID!) {
+    aiObservabilityWebhookSubscription(id: $id) {
+        createdDate
+        enabled
+        events
+        id
+        lastModifiedDate
+        lastTriggeredDate
+        name
+        projectId
+        url
+        version
+        workspaceId
+    }
+}
+
+mutation createAiObservabilityWebhookSubscription(
+    $workspaceId: ID!
+    $projectId: ID
+    $name: String!
+    $url: String!
+    $secret: String
+    $events: String!
+    $enabled: Boolean!
+) {
+    createAiObservabilityWebhookSubscription(
+        workspaceId: $workspaceId
+        projectId: $projectId
+        name: $name
+        url: $url
+        secret: $secret
+        events: $events
+        enabled: $enabled
+    ) {
+        createdDate
+        enabled
+        events
+        id
+        name
+        url
+        version
+        workspaceId
+    }
+}
+
+mutation updateAiObservabilityWebhookSubscription(
+    $id: ID!
+    $name: String!
+    $url: String!
+    $secret: String
+    $events: String!
+    $enabled: Boolean!
+) {
+    updateAiObservabilityWebhookSubscription(
+        id: $id
+        name: $name
+        url: $url
+        secret: $secret
+        events: $events
+        enabled: $enabled
+    ) {
+        createdDate
+        enabled
+        events
+        id
+        name
+        url
+        version
+        workspaceId
+    }
+}
+
+mutation deleteAiObservabilityWebhookSubscription($id: ID!) {
+    deleteAiObservabilityWebhookSubscription(id: $id)
+}
+
+mutation testAiObservabilityWebhookSubscription($id: ID!) {
+    testAiObservabilityWebhookSubscription(id: $id)
+}

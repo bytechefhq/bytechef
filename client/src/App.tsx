@@ -17,6 +17,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
+    BrainCircuitIcon,
     CircleIcon,
     FolderIcon,
     Layers3Icon,
@@ -83,6 +84,7 @@ const automationNavigation: NavigationType[] = [
         icon: VectorSquareIcon,
         name: 'Knowledge Base',
     },
+    {href: '/automation/ai-gateway', icon: BrainCircuitIcon, name: 'LLM Gateway'},
     {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
     {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
 ];
@@ -206,6 +208,10 @@ function App() {
 
         if (navItem.href === '/automation/approval-tasks') {
             return ff_732;
+        }
+
+        if (navItem.href === '/automation/ai-gateway') {
+            return edition === EditionType.EE && ai.gateway.enabled;
         }
 
         return true;

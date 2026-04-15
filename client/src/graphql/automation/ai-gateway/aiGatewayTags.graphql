@@ -1,0 +1,31 @@
+query aiGatewayTags($workspaceId: ID!) {
+    aiGatewayTags(workspaceId: $workspaceId) {
+        color
+        createdDate
+        id
+        lastModifiedDate
+        name
+        version
+        workspaceId
+    }
+}
+
+mutation createAiGatewayTag($input: CreateAiGatewayTagInput!) {
+    createAiGatewayTag(input: $input) {
+        color
+        id
+        name
+    }
+}
+
+mutation updateAiGatewayTag($id: ID!, $name: String, $color: String) {
+    updateAiGatewayTag(color: $color, id: $id, name: $name) {
+        color
+        id
+        name
+    }
+}
+
+mutation deleteAiGatewayTag($id: ID!) {
+    deleteAiGatewayTag(id: $id)
+}

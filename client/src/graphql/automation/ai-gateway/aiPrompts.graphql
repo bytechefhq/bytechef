@@ -1,0 +1,113 @@
+query aiPrompts($workspaceId: ID!) {
+    aiPrompts(workspaceId: $workspaceId) {
+        createdDate
+        description
+        id
+        lastModifiedDate
+        name
+        projectId
+        version
+        versions {
+            active
+            commitMessage
+            content
+            createdBy
+            createdDate
+            environment
+            id
+            metrics {
+                avgCostUsd
+                avgLatencyMs
+                errorRate
+                invocationCount
+            }
+            promptId
+            type
+            variables
+            versionNumber
+        }
+        workspaceId
+    }
+}
+
+query aiPrompt($id: ID!) {
+    aiPrompt(id: $id) {
+        createdDate
+        description
+        id
+        lastModifiedDate
+        name
+        projectId
+        version
+        versions {
+            active
+            commitMessage
+            content
+            createdBy
+            createdDate
+            environment
+            id
+            metrics {
+                avgCostUsd
+                avgLatencyMs
+                errorRate
+                invocationCount
+            }
+            promptId
+            type
+            variables
+            versionNumber
+        }
+        workspaceId
+    }
+}
+
+mutation createAiPrompt($input: CreateAiPromptInput!) {
+    createAiPrompt(input: $input) {
+        createdDate
+        description
+        id
+        lastModifiedDate
+        name
+        projectId
+        version
+        workspaceId
+    }
+}
+
+mutation updateAiPrompt($id: ID!, $input: UpdateAiPromptInput!) {
+    updateAiPrompt(id: $id, input: $input) {
+        createdDate
+        description
+        id
+        lastModifiedDate
+        name
+        projectId
+        version
+        workspaceId
+    }
+}
+
+mutation deleteAiPrompt($id: ID!) {
+    deleteAiPrompt(id: $id)
+}
+
+mutation createAiPromptVersion($input: CreateAiPromptVersionInput!) {
+    createAiPromptVersion(input: $input) {
+        active
+        commitMessage
+        content
+        createdBy
+        createdDate
+        environment
+        id
+        promptId
+        type
+        variables
+        versionNumber
+    }
+}
+
+mutation setActiveAiPromptVersion($promptVersionId: ID!, $environment: String!) {
+    setActiveAiPromptVersion(promptVersionId: $promptVersionId, environment: $environment)
+}

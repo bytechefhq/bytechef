@@ -31,6 +31,7 @@ import {lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
 
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
+const AiGateway = lazy(() => import('@/pages/automation/ai-gateway/AiGateway'));
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
 const AutomationConnections = lazy(() =>
     import('@/pages/automation/connections/Connections').then((module) => ({default: module.Connections}))
@@ -742,6 +743,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'approval-tasks',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper hasLeftSidebar>
+                                                    <AiGateway />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai-gateway',
                                 },
                                 {
                                     children: [

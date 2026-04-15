@@ -1,0 +1,39 @@
+query aiGatewayProjects($workspaceId: ID!) {
+    aiGatewayProjects(workspaceId: $workspaceId) {
+        cachingEnabled
+        cacheTtlMinutes
+        compressionEnabled
+        createdDate
+        description
+        id
+        lastModifiedDate
+        logRetentionDays
+        name
+        retryMaxAttempts
+        routingPolicyId
+        slug
+        timeoutSeconds
+        version
+        workspaceId
+    }
+}
+
+mutation createAiGatewayProject($input: CreateAiGatewayProjectInput!) {
+    createAiGatewayProject(input: $input) {
+        id
+        name
+        slug
+    }
+}
+
+mutation updateAiGatewayProject($id: ID!, $input: UpdateAiGatewayProjectInput!) {
+    updateAiGatewayProject(id: $id, input: $input) {
+        id
+        name
+        slug
+    }
+}
+
+mutation deleteAiGatewayProject($id: ID!) {
+    deleteAiGatewayProject(id: $id)
+}

@@ -1,0 +1,49 @@
+query aiObservabilityNotificationChannels($workspaceId: ID!) {
+    aiObservabilityNotificationChannels(workspaceId: $workspaceId) {
+        config
+        createdDate
+        enabled
+        id
+        lastModifiedDate
+        name
+        type
+        version
+        workspaceId
+    }
+}
+
+mutation createAiObservabilityNotificationChannel($input: AiObservabilityNotificationChannelInput!) {
+    createAiObservabilityNotificationChannel(input: $input) {
+        config
+        createdDate
+        enabled
+        id
+        lastModifiedDate
+        name
+        type
+        version
+        workspaceId
+    }
+}
+
+mutation updateAiObservabilityNotificationChannel($id: ID!, $input: AiObservabilityNotificationChannelInput!) {
+    updateAiObservabilityNotificationChannel(id: $id, input: $input) {
+        config
+        createdDate
+        enabled
+        id
+        lastModifiedDate
+        name
+        type
+        version
+        workspaceId
+    }
+}
+
+mutation deleteAiObservabilityNotificationChannel($id: ID!) {
+    deleteAiObservabilityNotificationChannel(id: $id)
+}
+
+mutation testAiObservabilityNotificationChannel($id: ID!) {
+    testAiObservabilityNotificationChannel(id: $id)
+}

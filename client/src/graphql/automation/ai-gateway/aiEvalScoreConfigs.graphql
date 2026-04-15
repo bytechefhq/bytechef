@@ -1,0 +1,81 @@
+query aiEvalScoreConfigs($workspaceId: ID!) {
+    aiEvalScoreConfigs(workspaceId: $workspaceId) {
+        categories
+        createdDate
+        dataType
+        description
+        id
+        lastModifiedDate
+        maxValue
+        minValue
+        name
+        version
+        workspaceId
+    }
+}
+
+query aiEvalScoreConfig($id: ID!) {
+    aiEvalScoreConfig(id: $id) {
+        categories
+        createdDate
+        dataType
+        description
+        id
+        lastModifiedDate
+        maxValue
+        minValue
+        name
+        version
+        workspaceId
+    }
+}
+
+mutation createAiEvalScoreConfig(
+    $categories: String
+    $dataType: AiEvalScoreDataType
+    $description: String
+    $maxValue: Float
+    $minValue: Float
+    $name: String!
+    $workspaceId: ID!
+) {
+    createAiEvalScoreConfig(
+        categories: $categories
+        dataType: $dataType
+        description: $description
+        maxValue: $maxValue
+        minValue: $minValue
+        name: $name
+        workspaceId: $workspaceId
+    ) {
+        id
+        name
+    }
+}
+
+mutation deleteAiEvalScoreConfig($id: ID!) {
+    deleteAiEvalScoreConfig(id: $id)
+}
+
+mutation updateAiEvalScoreConfig(
+    $categories: String
+    $dataType: AiEvalScoreDataType
+    $description: String
+    $id: ID!
+    $maxValue: Float
+    $minValue: Float
+    $name: String!
+) {
+    updateAiEvalScoreConfig(
+        categories: $categories
+        dataType: $dataType
+        description: $description
+        id: $id
+        maxValue: $maxValue
+        minValue: $minValue
+        name: $name
+    ) {
+        id
+        name
+    }
+}

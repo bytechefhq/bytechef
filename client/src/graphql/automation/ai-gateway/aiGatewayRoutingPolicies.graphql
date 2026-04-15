@@ -1,0 +1,55 @@
+query aiGatewayRoutingPolicies {
+    aiGatewayRoutingPolicies {
+        config
+        createdDate
+        deployments {
+            enabled
+            id
+            maxRpm
+            maxTpm
+            modelId
+            priorityOrder
+            routingPolicyId
+            weight
+        }
+        enabled
+        fallbackModel
+        id
+        lastModifiedDate
+        name
+        strategy
+        version
+    }
+}
+
+mutation createAiGatewayRoutingPolicy($input: CreateAiGatewayRoutingPolicyInput!) {
+    createAiGatewayRoutingPolicy(input: $input) {
+        config
+        createdDate
+        enabled
+        fallbackModel
+        id
+        lastModifiedDate
+        name
+        strategy
+        version
+    }
+}
+
+mutation updateAiGatewayRoutingPolicy($id: ID!, $input: UpdateAiGatewayRoutingPolicyInput!) {
+    updateAiGatewayRoutingPolicy(id: $id, input: $input) {
+        config
+        createdDate
+        enabled
+        fallbackModel
+        id
+        lastModifiedDate
+        name
+        strategy
+        version
+    }
+}
+
+mutation deleteAiGatewayRoutingPolicy($id: ID!) {
+    deleteAiGatewayRoutingPolicy(id: $id)
+}
