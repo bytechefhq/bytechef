@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.repository;
 
-import com.bytechef.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
@@ -23,9 +23,13 @@ import org.springframework.stereotype.Repository;
 @ConditionalOnEEVersion
 public interface WorkspaceUserRepository extends ListCrudRepository<WorkspaceUser, Long> {
 
+    long countByWorkspaceIdAndWorkspaceRole(long workspaceId, int workspaceRole);
+
+    void deleteByUserIdAndWorkspaceId(long userId, long workspaceId);
+
     List<WorkspaceUser> findAllByUserId(long userId);
 
     List<WorkspaceUser> findAllByWorkspaceId(long workspaceId);
 
-    Optional<WorkspaceUser> findByUserId(long userId);
+    Optional<WorkspaceUser> findByUserIdAndWorkspaceId(long userId, long workspaceId);
 }

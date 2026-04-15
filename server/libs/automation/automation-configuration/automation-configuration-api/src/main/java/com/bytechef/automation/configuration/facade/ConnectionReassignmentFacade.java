@@ -89,5 +89,11 @@ public interface ConnectionReassignmentFacade {
     }
 
     record AffectedWorkflow(String workflowId, String workflowName, List<Long> connectionIds) {
+
+        public AffectedWorkflow(String workflowId, String workflowName, List<Long> connectionIds) {
+            this.workflowId = workflowId;
+            this.workflowName = workflowName;
+            this.connectionIds = List.copyOf(connectionIds);
+        }
     }
 }

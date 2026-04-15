@@ -142,6 +142,37 @@ class ConnectionFacadeTest {
             .getVisibility()).isEqualTo(ConnectionVisibility.WORKSPACE);
     }
 
+    @Test
+    void testCeAutomationCreateForcesPrivateVisibilityRegardlessOfOrganizationRequest() {
+        // Defense-in-depth: the UI hides the visibility selector in CE, but a hand-crafted request body carrying any
+        // value above PRIVATE (including ORGANIZATION — the most privileged level, cross-workspace) must still land
+        // as PRIVATE. Pairs with the WORKSPACE-forcing test above; pins that the coercion is
+        // isAtLeast-style, not a specific WORKSPACE->PRIVATE mapping that would leak if ORGANIZATION were ever
+        // exercised.
+        ConnectionFacadeImpl facade = newFacade("CE");
+
+        Connection persisted = new Connection();
+
+        persisted.setId(4L);
+
+        when(connectionService.create(any(Connection.class))).thenReturn(persisted);
+
+        ConnectionDTO dto = ConnectionDTO.builder()
+            .componentName("dummy")
+            .name("c4")
+            .visibility(ConnectionVisibility.ORGANIZATION)
+            .build();
+
+        facade.create(dto, PlatformType.AUTOMATION);
+
+        ArgumentCaptor<Connection> captor = ArgumentCaptor.forClass(Connection.class);
+
+        verify(connectionService).create(captor.capture());
+
+        assertThat(captor.getValue()
+            .getVisibility()).isEqualTo(ConnectionVisibility.PRIVATE);
+    }
+
     private ConnectionFacadeImpl newFacade(String edition) {
         return new ConnectionFacadeImpl(
             connectionDefinitionService, connectionService, edition, jobPrincipalAccessorRegistry, oAuth2Service,

@@ -67,6 +67,8 @@ public interface UserService {
 
     User getUser(long id);
 
+    User getUser(String login);
+
     User registerUser(AdminUserDTO userDTO, String password);
 
     void removeNotActivatedUsers();

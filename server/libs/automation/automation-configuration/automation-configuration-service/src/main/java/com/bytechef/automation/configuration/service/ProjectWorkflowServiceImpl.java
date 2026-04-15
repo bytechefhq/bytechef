@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -39,6 +40,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasProjectScope(#projectId, 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId) {
         return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId));
     }
@@ -176,12 +178,14 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasProjectScope(#projectId, 'WORKFLOW_DELETE')")
     public void delete(long projectId, int projectVersion, String workflowId) {
         projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowId(projectId, projectVersion, workflowId)
             .ifPresent(projectWorkflow -> projectWorkflowRepository.deleteById(projectWorkflow.getId()));
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasProjectScope(#projectId, 'DEPLOYMENT_PUSH')")
     public void publishWorkflow(
         long projectId, int oldProjectVersion, String oldWorkflowId, ProjectWorkflow projectWorkflow) {
 

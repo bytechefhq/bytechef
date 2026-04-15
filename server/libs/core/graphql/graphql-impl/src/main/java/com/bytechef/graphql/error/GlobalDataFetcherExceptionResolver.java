@@ -17,9 +17,11 @@
 package com.bytechef.graphql.error;
 
 import com.bytechef.exception.AbstractException;
+import com.bytechef.exception.ConfigurationException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,11 +30,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
 import org.springframework.graphql.execution.ErrorType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
  * Global GraphQL exception resolver that extracts meaningful error messages from ByteChef exceptions instead of
  * returning the default sanitized "INTERNAL_ERROR" message.
+ *
+ * <p>
+ * Exception \u2192 error-type mapping:
+ * <ul>
+ * <li>{@link ConfigurationException} \u2192 {@code BAD_REQUEST}. Represents a precondition/validation failure caused by
+ * caller input (e.g., {@code ALREADY_MEMBER}, {@code LAST_ADMIN_PROTECTED}, {@code INVALID_ROLE}). Surfaces as a
+ * 4xx-equivalent classification so clients can treat it as a user error rather than a server bug.</li>
+ * <li>Any other {@link AbstractException} \u2192 {@code INTERNAL_ERROR}. Typically indicates a runtime failure that the
+ * caller cannot correct (e.g., {@code ExecutionException}).</li>
+ * <li>{@link GraphQlBadRequestException} \u2192 {@code BAD_REQUEST}. Controller-thrown input-shape validation.</li>
+ * <li>{@link AccessDeniedException} \u2192 {@code FORBIDDEN}. Raised by Spring Security {@code @PreAuthorize} denials.
+ * Returns a generic message (never the exception detail) so error shape alone cannot be used to enumerate resources the
+ * caller does not own. The permission-audit aspect has already recorded the denial; the client only needs to know the
+ * classification.</li>
+ * <li>{@link AuthenticationCredentialsNotFoundException} \u2192 {@code UNAUTHORIZED}. Raised when a protected GraphQL
+ * mutation is invoked without a SecurityContext. Mapped distinctly from {@code FORBIDDEN} so clients can prompt for
+ * re-authentication rather than signalling a permission error.</li>
+ * </ul>
+ *
+ * <p>
+ * For {@code AbstractException} subclasses, the structured {@code entityClass}, {@code errorKey}, and {@code errorCode}
+ * fields are forwarded to the GraphQL error {@code extensions} map so clients can discriminate between error variants
+ * (e.g., {@code ALREADY_MEMBER} vs {@code LAST_ADMIN_PROTECTED}) without string-matching on message text.
  *
  * @author Ivica Cardic
  */
@@ -56,11 +83,22 @@ class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAda
             logger.error(abstractException.getMessage(), abstractException);
 
             String detailMessage = getDeepestCauseMessage(abstractException);
+            ErrorType errorType = abstractException instanceof ConfigurationException
+                ? ErrorType.BAD_REQUEST
+                : ErrorType.INTERNAL_ERROR;
+
+            Map<String, Object> extensions = new HashMap<>();
+
+            extensions.put("entityClass", abstractException.getEntityClass()
+                .getSimpleName());
+            extensions.put("errorKey", abstractException.getErrorKey());
+            extensions.put("errorCode", abstractException.getErrorMessageCode());
 
             return GraphqlErrorBuilder
                 .newError(environment)
                 .message(detailMessage)
-                .errorType(ErrorType.INTERNAL_ERROR)
+                .errorType(errorType)
+                .extensions(extensions)
                 .build();
         }
 
@@ -79,6 +117,32 @@ class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAda
                 .message(throwable.getMessage())
                 .errorType(ErrorType.BAD_REQUEST)
                 .extensions(extensions)
+                .build();
+        }
+
+        // Distinguish unauthenticated (401/UNAUTHORIZED) from unauthorized (403/FORBIDDEN) so clients can route
+        // re-authentication prompts correctly. Both land here because Spring Security raises them from @PreAuthorize
+        // / method security interceptors, and without translation Spring GraphQL would tag the response as
+        // INTERNAL_ERROR and leak the exception class/stack to the caller.
+        //
+        // Messages stay intentionally generic so error shape alone cannot be used to enumerate resources. Clients
+        // that need to discriminate between failure modes (for routing UI behavior or telemetry) should branch on
+        // extensions.errorCode, which carries a stable code string, rather than parsing the message text.
+        if (throwable instanceof AuthenticationCredentialsNotFoundException) {
+            return GraphqlErrorBuilder
+                .newError(environment)
+                .message("Authentication required")
+                .errorType(ErrorType.UNAUTHORIZED)
+                .extensions(Map.of("errorCode", "AUTHENTICATION_REQUIRED"))
+                .build();
+        }
+
+        if (throwable instanceof AccessDeniedException) {
+            return GraphqlErrorBuilder
+                .newError(environment)
+                .message("Access denied")
+                .errorType(ErrorType.FORBIDDEN)
+                .extensions(Map.of("errorCode", "ACCESS_DENIED"))
                 .build();
         }
 

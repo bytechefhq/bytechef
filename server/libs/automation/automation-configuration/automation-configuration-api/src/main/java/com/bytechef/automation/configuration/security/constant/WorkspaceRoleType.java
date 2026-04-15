@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.service;
-
-import com.bytechef.automation.configuration.domain.WorkspaceUser;
-import java.util.List;
+package com.bytechef.automation.configuration.security.constant;
 
 /**
+ * Marker interface for workspace role enums. See {@link PermissionScopeType} for the rationale.
+ *
  * @author Ivica Cardic
  */
-public interface WorkspaceUserService {
+public interface WorkspaceRoleType {
 
-    List<WorkspaceUser> getUserWorkspaceUsers(long userId);
+    String name();
 }

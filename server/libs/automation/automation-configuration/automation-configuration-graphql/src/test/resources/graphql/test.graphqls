@@ -43,3 +43,47 @@ type Workflow {
     description: String
     label: String!
 }
+
+type WorkspaceUser {
+    id: ID!
+    workspaceId: ID!
+    userId: ID!
+    workspaceRole: WorkspaceRole
+    user: WorkspaceUserInfo
+    createdDate: String
+}
+
+type WorkspaceUserInfo {
+    email: String!
+    firstName: String
+    lastName: String
+}
+
+enum WorkspaceRole {
+    ADMIN
+    EDITOR
+    VIEWER
+}
+
+type ProjectUser {
+    id: ID!
+    projectId: ID!
+    userId: ID!
+    projectRole: ProjectRole
+    customRoleId: ID
+    user: ProjectUserInfo
+    createdDate: String
+}
+
+type ProjectUserInfo {
+    email: String!
+    firstName: String
+    lastName: String
+}
+
+enum ProjectRole {
+    ADMIN
+    EDITOR
+    OPERATOR
+    VIEWER
+}

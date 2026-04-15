@@ -1,0 +1,44 @@
+extend type Query {
+    "List all users of a project. Requires PROJECT_VIEW_USERS scope."
+    projectUsers(projectId: ID!): [ProjectUser!]!
+    "Returns the permission scope names the current user has for the given project"
+    myProjectScopes(projectId: ID!): [String!]!
+    "Returns the workspace role name for the current user in the given workspace"
+    myWorkspaceRole(workspaceId: ID!): String
+}
+
+extend type Mutation {
+    "Add a user to a project. Requires PROJECT_MANAGE_USERS scope."
+    addProjectUser(projectId: ID!, userId: ID!, role: ProjectRole!): ProjectUser!
+    "Update a project user's role. Requires PROJECT_MANAGE_USERS scope."
+    updateProjectUserRole(projectId: ID!, userId: ID!, role: ProjectRole!): ProjectUser!
+    "Remove a user from a project. Requires PROJECT_MANAGE_USERS scope."
+    removeProjectUser(projectId: ID!, userId: ID!): Boolean!
+}
+
+"A project user with an assigned role controlling their permissions within the project"
+type ProjectUser {
+    id: ID!
+    projectId: ID!
+    userId: ID!
+    "Built-in project role, null if using a custom role"
+    projectRole: ProjectRole
+    "Custom role ID (EE only), null if using a built-in role"
+    customRoleId: ID
+    user: ProjectUserInfo
+    createdDate: String
+}
+
+type ProjectUserInfo {
+    email: String!
+    firstName: String
+    lastName: String
+}
+
+"Project-level roles ordered from most to least privileged"
+enum ProjectRole {
+    ADMIN
+    EDITOR
+    OPERATOR
+    VIEWER
+}

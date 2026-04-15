@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.repository;
-
-import com.bytechef.automation.configuration.domain.WorkspaceUser;
-import com.bytechef.platform.annotation.ConditionalOnCEVersion;
-import java.util.List;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.stereotype.Repository;
+package com.bytechef.automation.configuration.event;
 
 /**
+ * Published when a new project is created. EE listeners use this to auto-assign the creator as project ADMIN so that
+ * {@code @PreAuthorize} checks allow the creator to access the project they just made.
+ *
  * @author Ivica Cardic
  */
-@Repository
-@ConditionalOnCEVersion
-public interface WorkspaceUserRepository extends ListCrudRepository<WorkspaceUser, Long> {
-
-    List<WorkspaceUser> findAllByUserId(long userId);
+public record ProjectCreatedEvent(long projectId, long creatorUserId) {
 }

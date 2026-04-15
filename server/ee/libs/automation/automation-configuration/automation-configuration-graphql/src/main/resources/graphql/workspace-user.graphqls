@@ -1,0 +1,34 @@
+extend type Query {
+    "List all users of a workspace. Requires at least VIEWER workspace role."
+    workspaceUsers(workspaceId: ID!): [WorkspaceUser!]!
+}
+
+extend type Mutation {
+    "Add a user to a workspace. Requires ADMIN workspace role."
+    addWorkspaceUser(workspaceId: ID!, userId: ID!, role: WorkspaceRole!): WorkspaceUser!
+    "Update a workspace user's role. Requires ADMIN workspace role."
+    updateWorkspaceUserRole(workspaceId: ID!, userId: ID!, role: WorkspaceRole!): WorkspaceUser!
+    "Remove a user from a workspace. Requires ADMIN workspace role."
+    removeWorkspaceUser(workspaceId: ID!, userId: ID!): Boolean!
+}
+
+type WorkspaceUser {
+    id: ID!
+    workspaceId: ID!
+    userId: ID!
+    workspaceRole: WorkspaceRole
+    user: WorkspaceUserInfo
+    createdDate: String
+}
+
+type WorkspaceUserInfo {
+    email: String!
+    firstName: String
+    lastName: String
+}
+
+enum WorkspaceRole {
+    ADMIN
+    EDITOR
+    VIEWER
+}

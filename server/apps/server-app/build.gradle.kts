@@ -257,6 +257,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-graphql"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-service"))
+    implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-graphql"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))

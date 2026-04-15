@@ -104,6 +104,7 @@ public class OrganizationConnectionGraphQlController {
                 .toString() : null);
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public record CreateOrganizationConnectionInput(
         String name, String componentName, int connectionVersion, int environmentId,
         Map<String, Object> parameters) {

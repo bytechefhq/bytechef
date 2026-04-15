@@ -17,18 +17,10 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Workspace;
-import com.bytechef.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.automation.configuration.service.WorkspaceService;
-import com.bytechef.automation.configuration.service.WorkspaceUserService;
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.user.domain.Authority;
-import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,49 +29,19 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnCEVersion
 public class WorkspaceFacadeImpl implements WorkspaceFacade {
 
-    private final AuthorityService authorityService;
-    private final UserService userService;
     private final WorkspaceService workspaceService;
-    private final WorkspaceUserService workspaceUserService;
 
     @SuppressFBWarnings("EI")
-    public WorkspaceFacadeImpl(
-        AuthorityService authorityService, UserService userService, WorkspaceService workspaceService,
-        WorkspaceUserService workspaceUserService) {
-
-        this.authorityService = authorityService;
-        this.userService = userService;
+    public WorkspaceFacadeImpl(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
-        this.workspaceUserService = workspaceUserService;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Workspace> getUserWorkspaces(long id) {
-        List<Authority> authorities = authorityService.getAuthorities();
-        User user = userService.getUser(id);
-        List<Workspace> workspaces = workspaceService.getWorkspaces();
-
-        List<String> userAuthorityNames = user.getAuthorityIds()
-            .stream()
-            .map(authorityId -> CollectionUtils.getFirst(
-                authorities, authority -> Objects.equals(authority.getId(), authorityId)))
-            .map(Authority::getName)
-            .toList();
-
-        if (!userAuthorityNames.contains(AuthorityConstants.ADMIN)) {
-            List<Long> userWorkspaceIds = workspaceUserService.getUserWorkspaceUsers(id)
-                .stream()
-                .map(WorkspaceUser::getWorkspaceId)
-                .toList();
-
-            workspaces = workspaces.stream()
-                .filter(workspace -> userWorkspaceIds.contains(workspace.getId()))
-                .toList();
-        }
-
-        return workspaces;
+        return workspaceService.getWorkspaces();
     }
 }

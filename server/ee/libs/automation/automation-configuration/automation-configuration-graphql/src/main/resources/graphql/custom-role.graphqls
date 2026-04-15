@@ -1,0 +1,39 @@
+extend type Query {
+    "List all custom roles. Requires tenant admin."
+    customRoles: [CustomRole!]!
+    "Get a custom role by ID. Requires tenant admin."
+    customRole(id: ID!): CustomRole!
+}
+
+extend type Mutation {
+    "Create a new custom role with the given scopes. Requires tenant admin."
+    createCustomRole(input: CreateCustomRoleInput!): CustomRole!
+    "Update an existing custom role. Requires tenant admin."
+    updateCustomRole(id: ID!, input: UpdateCustomRoleInput!): CustomRole!
+    "Delete a custom role. Fails if the role is in use by any project member. Requires tenant admin."
+    deleteCustomRole(id: ID!): Boolean!
+}
+
+"A custom permission role (EE) with a user-defined set of permission scopes"
+type CustomRole {
+    id: ID!
+    name: String!
+    description: String
+    "Permission scope names granted by this role (e.g., WORKFLOW_VIEW, EXECUTION_DATA)"
+    scopes: [String!]!
+    createdDate: String
+}
+
+input CreateCustomRoleInput {
+    name: String!
+    description: String
+    "Permission scope names to grant (must be valid PermissionScope enum values)"
+    scopes: [String!]!
+}
+
+input UpdateCustomRoleInput {
+    name: String!
+    description: String
+    "Permission scope names to grant (must be valid PermissionScope enum values)"
+    scopes: [String!]!
+}

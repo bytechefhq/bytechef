@@ -19,9 +19,13 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
+    implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework:spring-web")
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation("org.springframework.security:spring-security-core")
+    testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:config:jackson-config"))

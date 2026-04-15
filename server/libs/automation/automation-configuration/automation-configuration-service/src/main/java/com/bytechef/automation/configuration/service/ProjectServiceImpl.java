@@ -19,16 +19,23 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.event.ProjectCreatedEvent;
 import com.bytechef.automation.configuration.listener.ProjectGitSyncEventListener;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.user.service.UserService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -40,12 +47,22 @@ import org.springframework.util.Assert;
 @Transactional
 public class ProjectServiceImpl implements ProjectService {
 
-    private final ApplicationContext applicationContext;
-    private final ProjectRepository projectRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
-    public ProjectServiceImpl(ApplicationContext applicationContext, ProjectRepository projectRepository) {
+    private final ApplicationContext applicationContext;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ProjectRepository projectRepository;
+    private final UserService userService;
+
+    @SuppressFBWarnings("EI")
+    public ProjectServiceImpl(
+        ApplicationContext applicationContext, ApplicationEventPublisher applicationEventPublisher,
+        ProjectRepository projectRepository, UserService userService) {
+
         this.applicationContext = applicationContext;
+        this.applicationEventPublisher = applicationEventPublisher;
         this.projectRepository = projectRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -59,10 +76,27 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.isTrue(project.getId() == null, "'id' must be null");
         Assert.notNull(project.getName(), "'name' must not be null");
 
-        return projectRepository.save(project);
+        Project savedProject = projectRepository.save(project);
+
+        // Auto-admin assignment requires an authenticated creator. Without a SecurityContext (system-initiated
+        // creation, async thread without context propagation) the project ends up with no admin row and is
+        // unreachable through @PreAuthorize until a tenant admin manually fixes the membership. Log loudly so this
+        // surfaces in operations dashboards rather than silently rotting.
+        userService.fetchCurrentUser()
+            .ifPresentOrElse(
+                creator -> applicationEventPublisher.publishEvent(
+                    new ProjectCreatedEvent(savedProject.getId(), creator.getId())),
+                () -> logger.error(
+                    "ORPHAN PROJECT WARNING: Created project id={} without an authenticated creator. "
+                        + "No project_user ADMIN row was seeded. The project will be inaccessible to "
+                        + "non-tenant-admin users until membership is repaired.",
+                    savedProject.getId()));
+
+        return savedProject;
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasProjectScope(#id, 'PROJECT_DELETE')")
     public void delete(long id) {
         projectRepository.deleteById(id);
     }
@@ -80,6 +114,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasProjectScope(#id, 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));
@@ -133,6 +168,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasProjectScope(#id, 'DEPLOYMENT_PUSH')")
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = getProject(id);
 
@@ -158,6 +194,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasProjectScope(#id, 'WORKFLOW_EDIT')")
     public Project update(long id, List<Long> tagIds) {
         Project project = getProject(id);
 
@@ -167,6 +204,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasProjectScope(#project.id, 'WORKFLOW_EDIT')")
     public Project update(Project project) {
         Assert.notNull(project, "'project' must not be null");
         Assert.notNull(project.getId(), "id");
