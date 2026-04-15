@@ -117,7 +117,9 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
 
         @Override
         public Map<String, List<String>> getClusterElementClusterElementTypes() {
-            return Map.of(VECTOR_STORE, List.of());
+            return Map.of(
+                VECTOR_STORE, List.of(),
+                SEARCH, List.of());
         }
     }
 }
