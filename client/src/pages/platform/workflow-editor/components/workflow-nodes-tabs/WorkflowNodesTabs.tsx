@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
@@ -100,9 +101,9 @@ const WorkflowNodesTabs = ({
             return;
         }
 
-        const nodeSourceName = sourceNodeId || edgeId?.split('=>')[0];
+        const sourceNodeName = sourceNodeId || edgeId?.split('=>')[0];
 
-        if (!nodeSourceName) {
+        if (!sourceNodeName) {
             return;
         }
 
@@ -116,7 +117,7 @@ const WorkflowNodesTabs = ({
         });
 
         pasteNode({
-            nodeSourceName,
+            nodeSourceName: sourceNodeName,
             taskDispatcherContext,
             updateWorkflowMutation,
         });
@@ -126,8 +127,8 @@ const WorkflowNodesTabs = ({
         }
     }, [canPaste, edgeId, edges, nodes, onPasteClose, sourceNodeId, updateWorkflowMutation]);
 
-    const handleDismissPaste = useCallback((e: MouseEvent) => {
-        e.stopPropagation();
+    const handleDismissPaste = useCallback((event: MouseEvent) => {
+        event.stopPropagation();
         setPasteDismissed(true);
     }, []);
 
@@ -238,6 +239,13 @@ const WorkflowNodesTabs = ({
         ]
     );
 
+    const copiedNodeDisplayName = [
+        copiedNode?.label || copiedNode?.componentName,
+        copiedNode?.name ? `(${copiedNode.name})` : null,
+    ]
+        .filter(Boolean)
+        .join(' ');
+
     return (
         <Tabs className="flex h-full flex-col" onValueChange={setActiveTab} value={activeTab}>
             <div className="px-2">
@@ -302,7 +310,7 @@ const WorkflowNodesTabs = ({
                 />
             )}
 
-            {canPaste && !pasteDismissed && (
+            {canPaste && copiedNode && !pasteDismissed && (
                 <div className="px-3 py-2">
                     <div className="flex w-full overflow-hidden rounded-md border-2 border-stroke-brand-primary bg-surface-neutral-primary">
                         <Tooltip>
@@ -317,7 +325,7 @@ const WorkflowNodesTabs = ({
                                         Paste
                                     </span>
 
-                                    {copiedNode?.icon && (
+                                    {copiedNode.icon && (
                                         <span className="flex size-5 shrink-0 items-center justify-center [&_svg]:size-5">
                                             {copiedNode.icon}
                                         </span>
@@ -325,10 +333,10 @@ const WorkflowNodesTabs = ({
 
                                     <span className="min-w-0 flex-1 truncate text-sm text-content-neutral-primary group-active/paste:text-content-brand-primary">
                                         <span className="font-medium">
-                                            {copiedNode?.label || copiedNode?.componentName}
+                                            {copiedNode.label || copiedNode.componentName}
                                         </span>
 
-                                        {copiedNode?.name && (
+                                        {copiedNode.name && (
                                             <span className="font-normal text-content-neutral-secondary group-active/paste:text-content-brand-primary">
                                                 {` (${copiedNode.name})`}
                                             </span>
@@ -337,23 +345,18 @@ const WorkflowNodesTabs = ({
                                 </div>
                             </TooltipTrigger>
 
-                            <TooltipContent side="top">
-                                {[
-                                    copiedNode?.label || copiedNode?.componentName,
-                                    copiedNode?.name ? `(${copiedNode.name})` : null,
-                                ]
-                                    .filter(Boolean)
-                                    .join(' ')}
-                            </TooltipContent>
+                            <TooltipContent side="top">{copiedNodeDisplayName}</TooltipContent>
                         </Tooltip>
 
-                        <button
-                            className="group/discard flex min-w-9 cursor-pointer items-center justify-center self-stretch hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"
+                        <Button
+                            className="group/discard h-auto min-w-9 cursor-pointer self-stretch rounded-none hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"
+                            icon={
+                                <ClipboardXIcon className="size-4 text-content-neutral-primary opacity-50 group-hover/discard:opacity-100 group-active/discard:text-content-brand-primary group-active/discard:opacity-100" />
+                            }
                             onClick={handleDismissPaste}
-                            type="button"
-                        >
-                            <ClipboardXIcon className="size-4 text-content-neutral-primary opacity-50 group-hover/discard:opacity-100 group-active/discard:text-content-brand-primary group-active/discard:opacity-100" />
-                        </button>
+                            size="iconSm"
+                            variant="ghost"
+                        />
                     </div>
                 </div>
             )}

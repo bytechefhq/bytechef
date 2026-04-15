@@ -42,8 +42,6 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const rootClusterElementId = id.split('-')[0];
     const effectiveDirection = isClusterElement ? 'TB' : layoutDirection;
 
-    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
-
     const copiedNodeLabel = copiedNode?.label || '';
 
     const displayLabel = useMemo(() => {
@@ -65,6 +63,8 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
         pasteNode({nodeIndex, taskDispatcherContext, updateWorkflowMutation});
     }, [id, nodeIndex, nodes, updateWorkflowMutation]);
+
+    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
 
     return (
         <ContextMenu>

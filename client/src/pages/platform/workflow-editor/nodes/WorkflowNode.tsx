@@ -13,7 +13,7 @@ import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {ArrowLeftRightIcon, CheckIcon, ComponentIcon, PinOffIcon, Trash2Icon} from 'lucide-react';
-import {forwardRef, memo, useCallback, useMemo, useState} from 'react';
+import {KeyboardEvent, forwardRef, memo, useCallback, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -50,7 +50,7 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     handleNodeClick: () => void;
     handleRemoveNodePosition: (nodeName: string) => void;
     handleRemoveSavedClusterElementPosition: (clickedNodeName: string) => void;
-    handleRenameKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+    handleRenameKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
     handleRenameSubmit: (newLabel: string) => void;
     hasSavedClusterElementPosition: NodePositionType;
     hasSavedNodePosition: false | NodePositionType;
@@ -709,7 +709,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
 
     const handleRenameKeyDown = useCallback(
-        (event: React.KeyboardEvent<HTMLInputElement>) => {
+        (event: KeyboardEvent<HTMLInputElement>) => {
             if (event.key === 'Enter') {
                 handleRenameSubmit(renameValue);
             }
