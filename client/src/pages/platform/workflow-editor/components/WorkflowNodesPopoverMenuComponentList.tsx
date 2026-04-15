@@ -6,7 +6,7 @@ import {TaskDispatcherDefinition} from '@/shared/middleware/platform/configurati
 import {ComponentDefinitionWithActionsProps} from '@/shared/queries/platform/componentDefinitionsGraphQL.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
+import {ClickedDefinitionType, NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 import {memo, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -28,8 +28,7 @@ interface WorkflowNodesListProps {
     selectedComponentName?: string;
     showPaste?: boolean;
     sourceNodeId?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    updateWorkflowMutation?: any;
+    updateWorkflowMutation?: UpdateWorkflowMutationType;
 }
 
 const hasClusterElementType = (component: ComponentDefinitionWithActionsProps, clusterElementType: string): boolean => {
