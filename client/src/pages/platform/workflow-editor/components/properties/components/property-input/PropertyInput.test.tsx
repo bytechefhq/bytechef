@@ -131,4 +131,20 @@ describe('PropertyInput', async () => {
 
         expect(input).toHaveValue('=someValue');
     });
+
+    it('uses minute precision (step=60) for time inputs so the field is easily clearable', () => {
+        const {container} = render(<PropertyInput aria-label="Time" label="Time" name="time" type="time" />);
+
+        const input = container.querySelector('input[type="time"]');
+
+        expect(input).toHaveAttribute('step', '60');
+    });
+
+    it('keeps step=1 for non-time inputs', () => {
+        const {container} = render(<PropertyInput aria-label="Date" label="Date" name="date" type="date" />);
+
+        const input = container.querySelector('input[type="date"]');
+
+        expect(input).toHaveAttribute('step', '1');
+    });
 });
