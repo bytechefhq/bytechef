@@ -106,6 +106,7 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
+    "search": [ "EMBEDDING" ],
     "vectorStore": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {

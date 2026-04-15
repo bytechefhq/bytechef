@@ -106,7 +106,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ "EMBEDDING" ]
+    "vectorStore": [ "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",

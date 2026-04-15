@@ -193,7 +193,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ ]
+    "vectorStore": [ ],
+    "search": [ ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",

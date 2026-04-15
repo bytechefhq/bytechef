@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "search": [ "EMBEDDING" ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -106,7 +106,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ "EMBEDDING" ]
+    "vectorStore": [ "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
