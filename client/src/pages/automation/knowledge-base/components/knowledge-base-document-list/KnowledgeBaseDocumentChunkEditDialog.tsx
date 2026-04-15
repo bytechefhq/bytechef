@@ -35,20 +35,19 @@ const KnowledgeBaseDocumentChunkEditDialog = ({knowledgeBaseId}: KnowledgeBaseDo
                     <DialogCloseButton />
                 </DialogHeader>
 
-                <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="content">Content</Label>
+                <div className="space-y-2">
+                    <Label htmlFor="content">Content</Label>
 
-                        <Textarea
-                            id="content"
-                            onChange={(event) => handleContentChange(event.target.value)}
-                            rows={10}
-                            value={content}
-                        />
-                    </div>
+                    <Textarea
+                        className="resize-none"
+                        id="content"
+                        onChange={(event) => handleContentChange(event.target.value)}
+                        rows={10}
+                        value={content}
+                    />
                 </div>
 
-                <DialogFooter>
+                <DialogFooter className="pt-2">
                     <Button onClick={handleClose} variant="outline">
                         Cancel
                     </Button>
