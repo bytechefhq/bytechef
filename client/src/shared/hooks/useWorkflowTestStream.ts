@@ -5,6 +5,7 @@ import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {WorkflowTestExecutionFromJSON} from '@/shared/middleware/platform/workflow/test/models/WorkflowTestExecution';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
 import {useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -12,7 +13,7 @@ import {useShallow} from 'zustand/react/shallow';
 export interface UseWorkflowTestStreamProps {
     workflowId: string;
     onResult?: (execution: WorkflowTestExecution) => void;
-    onError?: () => void;
+    onError?: (errorMessage?: string) => void;
     onStart?: (jobId: string) => void;
 }
 
@@ -39,10 +40,11 @@ export function useWorkflowTestStream({
             setWorkflowTestExecution: state.setWorkflowTestExecution,
         }))
     );
-    const {appendToLastAssistantMessage, setLastAssistantMessageContent} = useWorkflowTestChatStore(
+    const {appendToLastAssistantMessage, setLastAssistantMessageContent, setResumeUrl} = useWorkflowTestChatStore(
         useShallow((state) => ({
             appendToLastAssistantMessage: state.appendToLastAssistantMessage,
             setLastAssistantMessageContent: state.setLastAssistantMessageContent,
+            setResumeUrl: state.setResumeUrl,
         }))
     );
 
@@ -50,14 +52,36 @@ export function useWorkflowTestStream({
 
     const {close, error} = useSSE<WorkflowTestExecution>(streamRequest, {
         eventHandlers: {
-            error: () => {
+            ask_user_question: (data) => {
+                if (typeof data !== 'object' || data === null || !('questions' in data)) {
+                    console.error('Received malformed ask_user_question event:', data);
+
+                    return;
+                }
+
+                const questionEvent = data as AskUserQuestionEventI;
+
+                setLastAssistantMessageContent(formatAskUserQuestionMessage(questionEvent));
+                setResumeUrl(questionEvent.resumeUrl ?? null);
+                setWorkflowIsRunning(false);
+                setStreamRequest(null);
+                persistJobId(null);
+            },
+            error: (data) => {
                 setWorkflowIsRunning(false);
                 setWorkflowTestExecution(undefined);
                 setStreamRequest(null);
                 persistJobId(null);
 
                 if (onError) {
-                    onError();
+                    const errorMessage =
+                        typeof data === 'string'
+                            ? data
+                            : data && typeof data === 'object' && 'message' in data
+                              ? String((data as {message: string}).message)
+                              : undefined;
+
+                    onError(errorMessage);
                 }
             },
             result: (data) => {
@@ -87,14 +111,25 @@ export function useWorkflowTestStream({
                 }
             },
             start: (data) => {
-                const startData = typeof data === 'string' ? JSON.parse(data) : (data as {jobId: number});
+                try {
+                    const startData = typeof data === 'string' ? JSON.parse(data) : (data as {jobId: number});
 
-                const jobId = String(startData.jobId);
+                    const jobId = String(startData.jobId);
 
-                persistJobId(jobId);
+                    persistJobId(jobId);
 
-                if (onStart) {
-                    onStart(jobId);
+                    if (onStart) {
+                        onStart(jobId);
+                    }
+                } catch (parseError) {
+                    console.error('Failed to parse workflow start event:', parseError);
+
+                    setWorkflowIsRunning(false);
+                    setStreamRequest(null);
+
+                    if (onError) {
+                        onError('Failed to start workflow: unable to parse start event');
+                    }
                 }
             },
             stream: (data) => {

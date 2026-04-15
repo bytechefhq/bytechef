@@ -54,10 +54,41 @@ export function WorkflowTestChatRuntimeProvider({
         }
 
         const input = message.content[0].text;
+        const currentResumeUrl = useWorkflowTestChatStore.getState().resumeUrl;
 
         setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
         setIsRunning(true);
         setWorkflowIsRunning(true);
+
+        if (currentResumeUrl) {
+            try {
+                useWorkflowTestChatStore.getState().setResumeUrl(null);
+
+                const response = await fetch(currentResumeUrl, {
+                    body: JSON.stringify({message: input}),
+                    headers: {'Content-Type': 'application/json'},
+                    method: 'POST',
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Resume request failed with status ${response.status}`);
+                }
+
+                setMessage({content: 'Answer submitted. The workflow will resume.', role: 'assistant'});
+            } catch (error) {
+                console.error('Failed to submit answer to resume URL:', error);
+
+                setMessage({
+                    content: 'Failed to submit your answer. Please try again.',
+                    role: 'assistant',
+                });
+            } finally {
+                setIsRunning(false);
+                setWorkflowIsRunning(false);
+            }
+
+            return;
+        }
 
         try {
             // Prepare an empty assistant message so streaming appears immediately

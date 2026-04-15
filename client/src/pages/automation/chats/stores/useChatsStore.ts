@@ -22,10 +22,12 @@ interface ChatStateI {
     resetAll: () => void;
     resetCurrentChat: () => void;
     resetMessages: () => void;
+    resumeUrl: string | null;
     setCurrentChatName: (name: string | null) => void;
     setIsRunning: (isRunning: boolean) => void;
     setLastAssistantMessageContent: (content: string) => void;
     setMessage: (message: ThreadMessageLike) => void;
+    setResumeUrl: (resumeUrl: string | null) => void;
     switchChat: (workflowExecutionId: string) => void;
 }
 
@@ -42,6 +44,7 @@ const initialState = {
     currentChatName: null as string | null,
     isRunning: false,
     messages: [] as ThreadMessageLike[],
+    resumeUrl: null as string | null,
 };
 
 export const useChatsStore = create<ChatStateI>()(
@@ -81,6 +84,7 @@ export const useChatsStore = create<ChatStateI>()(
             set((state) => ({
                 messages: [...state.messages, message],
             })),
+        setResumeUrl: (resumeUrl) => set({resumeUrl}),
         switchChat: (workflowExecutionId: string) =>
             set((state) => {
                 if (state.isRunning) {

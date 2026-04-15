@@ -19,6 +19,9 @@ interface WorkflowTestChatStateI {
     setLastAssistantMessageContent: (content: string) => void;
     resetMessages: () => void;
 
+    resumeUrl: string | null;
+    setResumeUrl: (resumeUrl: string | null) => void;
+
     workflowTestChatPanelOpen: boolean;
     setWorkflowTestChatPanelOpen: (workflowTestChatPanelOpen: boolean) => void;
 }
@@ -49,7 +52,10 @@ const useWorkflowTestChatStore = create<WorkflowTestChatStateI>()(
                     ...state,
                     messages: setContentHelper(state.messages, content),
                 })),
-            resetMessages: () => set({messages: []}),
+            resetMessages: () => set({messages: [], resumeUrl: null}),
+
+            resumeUrl: null,
+            setResumeUrl: (resumeUrl) => set({resumeUrl}),
 
             workflowTestChatPanelOpen: false,
             setWorkflowTestChatPanelOpen: (workflowTestChatPanelOpen) =>

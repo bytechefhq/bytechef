@@ -1,5 +1,22 @@
 import {ThreadMessageLike} from '@assistant-ui/react';
 
+export interface AskUserQuestionOptionI {
+    description: string;
+    label: string;
+}
+
+export interface AskUserQuestionI {
+    header: string;
+    multiSelect: boolean;
+    options: AskUserQuestionOptionI[];
+    question: string;
+}
+
+export interface AskUserQuestionEventI {
+    questions: AskUserQuestionI[];
+    resumeUrl?: string;
+}
+
 export interface ToolExecutionEventI {
     confidence: string;
     inputs: Record<string, unknown>;
@@ -82,6 +99,21 @@ export function setLastAssistantMessageContent(messages: ThreadMessageLike[], co
     }
 
     return [...updatedMessages, {content, role: 'assistant'} as ThreadMessageLike];
+}
+
+/**
+ * Formats an ask_user_question event as a readable assistant message with the questions and options.
+ */
+export function formatAskUserQuestionMessage(event: AskUserQuestionEventI): string {
+    return event.questions
+        .map((question) => {
+            const optionLines = question.options
+                .map((option, index) => `  ${index + 1}. **${option.label}** — ${option.description}`)
+                .join('\n');
+
+            return `**${question.header}**: ${question.question}\n${optionLines}`;
+        })
+        .join('\n\n');
 }
 
 /**
