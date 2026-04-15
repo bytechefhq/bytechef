@@ -1,0 +1,38 @@
+query AuditEvents(
+    $principal: String
+    $eventType: String
+    $fromDate: Long
+    $toDate: Long
+    $dataSearch: String
+    $page: Int
+    $size: Int
+) {
+    auditEvents(
+        principal: $principal
+        eventType: $eventType
+        fromDate: $fromDate
+        toDate: $toDate
+        dataSearch: $dataSearch
+        page: $page
+        size: $size
+    ) {
+        content {
+            data {
+                key
+                value
+            }
+            eventDate
+            eventType
+            id
+            principal
+        }
+        number
+        size
+        totalElements
+        totalPages
+    }
+}
+
+query AuditEventTypes {
+    auditEventTypes
+}

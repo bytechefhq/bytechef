@@ -59,6 +59,7 @@ const config: CodegenConfig = {
         '../server/ee/libs/automation/automation-ai/automation-ai-gateway/automation-ai-gateway-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/ai/ai-agent/ai-agent-eval/ai-agent-eval-graphql/src/main/resources/graphql/**/*.graphqls',
         '../server/libs/ai/ai-agent/ai-agent-skill/ai-agent-skill-graphql/src/main/resources/graphql/**/*.graphqls',
+        '../server/ee/libs/platform/platform-audit/platform-audit-graphql/src/main/resources/graphql/*.graphqls',
     ],
 };
 
