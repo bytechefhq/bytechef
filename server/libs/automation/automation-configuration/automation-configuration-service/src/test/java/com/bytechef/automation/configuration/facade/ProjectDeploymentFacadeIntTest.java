@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -211,10 +212,13 @@ public class ProjectDeploymentFacadeIntTest {
             .deletePrincipalJobs(parentJobId, PlatformType.AUTOMATION);
         inOrder.verify(principalJobService)
             .deletePrincipalJobs(childJobId, PlatformType.AUTOMATION);
-        inOrder.verify(jobFacade)
-            .deleteJob(parentJobId);
-        inOrder.verify(jobFacade)
-            .deleteJob(childJobId);
+        inOrder.verify(jobFacade, calls(1))
+            .deleteJob(anyLong());
+        inOrder.verify(jobFacade, calls(1))
+            .deleteJob(anyLong());
+
+        verify(jobFacade).deleteJob(parentJobId);
+        verify(jobFacade).deleteJob(childJobId);
     }
 
     @Disabled

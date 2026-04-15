@@ -62,6 +62,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -224,7 +225,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             principalJobService.deletePrincipalJobs(jobId, PlatformType.AUTOMATION);
         }
 
-        for (long jobId : jobIds) {
+        List<Long> orderedJobIds = jobIds.stream()
+            .distinct()
+            .sorted(Comparator.reverseOrder())
+            .toList();
+
+        for (long jobId : orderedJobIds) {
             jobFacade.deleteJob(jobId);
         }
 
