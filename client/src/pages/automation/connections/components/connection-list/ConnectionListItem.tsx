@@ -1,13 +1,27 @@
 import AlertDialog from '@/components/AlertDialog';
-import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
+import {useVisibilityFeatureEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
+import ConnectionVisibilityPicker from '@/shared/components/connection/ConnectionVisibilityPicker';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
+import {
+    ResourceVisibility,
+    useConnectionGrantsQuery,
+    useGrantConnectionAccessMutation,
+    useRevokeConnectionAccessMutation,
+    useSetConnectionVisibilityMutation,
+    useWorkspaceUsersQuery,
+} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
 import {
@@ -24,6 +38,8 @@ import {Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
+import ConnectionScopeBadge from '../ConnectionScopeBadge';
+
 interface ConnectionListItemProps {
     componentDefinitions: ComponentDefinitionBasic[];
     connection: Connection;
@@ -35,7 +51,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
 
-    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const {enabled: visibilityFeatureEnabled, workspaceId: currentWorkspaceId} = useVisibilityFeatureEnabled();
     const currentUserLogin = useAuthenticationStore((state) => state.account?.login);
 
     const canEdit = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
@@ -43,6 +59,25 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const isTenantAdmin = useIsTenantAdmin();
 
     const queryClient = useQueryClient();
+
+    const invalidateConnections = () => {
+        queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
+        queryClient.invalidateQueries({queryKey: ComponentDefinitionKeys.componentDefinitions});
+    };
+
+    const setConnectionVisibilityMutation = useSetConnectionVisibilityMutation({
+        onSuccess: () => {
+            invalidateConnections();
+        },
+    });
+
+    const grantConnectionAccessMutation = useGrantConnectionAccessMutation({
+        onSuccess: () => invalidateConnections(),
+    });
+
+    const revokeConnectionAccessMutation = useRevokeConnectionAccessMutation({
+        onSuccess: () => invalidateConnections(),
+    });
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
         onSuccess: () => {
@@ -127,9 +162,107 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         }
     };
 
+    // Only a withheld connection can have a meaningful audience, so the two lookups the picker needs are skipped
+    // entirely for the workspace-visible majority.
+    const isWithheld = connection.visibility === 'PRIVATE';
+
+    const connectionGrantsQuery = useConnectionGrantsQuery(
+        {connectionId: String(connection.id), workspaceId: String(currentWorkspaceId)},
+        {enabled: visibilityFeatureEnabled && isWithheld && !!connection.id && !!currentWorkspaceId}
+    );
+
+    const workspaceUsersQuery = useWorkspaceUsersQuery(
+        {workspaceId: String(currentWorkspaceId)},
+        {enabled: visibilityFeatureEnabled && isWithheld && !!currentWorkspaceId}
+    );
+
+    const grantedUserIds = (connectionGrantsQuery.data?.connectionGrants ?? []).map(Number);
+
+    const workspaceMembers = (workspaceUsersQuery.data?.workspaceUsers ?? []).map((workspaceUser) => ({
+        label: workspaceUser.user?.email ?? `User ${workspaceUser.userId}`,
+        userId: Number(workspaceUser.userId),
+    }));
+
+    const renderVisibilityPicker = () => {
+        if (!visibilityFeatureEnabled || !connection.id || !currentWorkspaceId) {
+            return null;
+        }
+
+        const connectionIdStr = String(connection.id);
+        const workspaceIdStr = String(currentWorkspaceId);
+
+        return (
+            <div className="min-w-64 p-3">
+                <ConnectionVisibilityPicker
+                    grantedUserIds={grantedUserIds}
+                    onGrantedUserIdsChange={(nextUserIds) => {
+                        // Diff rather than replace: the server has no set-grants operation, and expressing it as
+                        // one would mean revoking every grant and re-adding it on each keystroke.
+                        grantedUserIds
+                            .filter((userId) => !nextUserIds.includes(userId))
+                            .forEach((userId) =>
+                                revokeConnectionAccessMutation.mutate({
+                                    connectionId: connectionIdStr,
+                                    userId: String(userId),
+                                    workspaceId: workspaceIdStr,
+                                })
+                            );
+
+                        nextUserIds
+                            .filter((userId) => !grantedUserIds.includes(userId))
+                            .forEach((userId) =>
+                                grantConnectionAccessMutation.mutate({
+                                    connectionId: connectionIdStr,
+                                    userId: String(userId),
+                                    workspaceId: workspaceIdStr,
+                                })
+                            );
+                    }}
+                    onVisibilityChange={(visibility) =>
+                        setConnectionVisibilityMutation.mutate({
+                            connectionId: connectionIdStr,
+                            // The picker speaks plain strings so it does not depend on generated GraphQL types.
+                            // The generated enum's values are exactly those strings, so this is a representation
+                            // cast rather than a claim about the value.
+                            visibility: visibility as ResourceVisibility,
+                            workspaceId: workspaceIdStr,
+                        })
+                    }
+                    visibility={connection.visibility || 'WORKSPACE'}
+                    workspaceMembers={workspaceMembers}
+                />
+            </div>
+        );
+    };
+
     return (
         <ConnectionListItemLayout
             active={connection.active}
+            badges={
+                visibilityFeatureEnabled &&
+                (connection.id && currentWorkspaceId ? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button
+                                aria-label="Change visibility"
+                                className="cursor-pointer rounded-sm hover:bg-gray-100"
+                                type="button"
+                            >
+                                <ConnectionScopeBadge
+                                    grantedUserCount={grantedUserIds.length}
+                                    visibility={connection.visibility || 'WORKSPACE'}
+                                />
+                            </button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="start" className="p-0">
+                            {renderVisibilityPicker()}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : (
+                    <ConnectionScopeBadge visibility={connection.visibility || 'WORKSPACE'} />
+                ))
+            }
             createdDate={connection.createdDate}
             credentialStatus={connection.credentialStatus}
             icon={componentDefinition?.icon}

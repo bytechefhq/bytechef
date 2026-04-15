@@ -52,12 +52,13 @@ export const isNavItemCurrent = (pathname: string, href: string): boolean => {
 
 const TENANT_ADMIN_NAV_ITEM_HREFS = [
     '/automation/settings/workspaces',
+    '/embedded/settings/ai/memories',
     'ai-providers',
-    'ai/memories',
     'ai/skills',
     'api-connectors',
     'audit-events',
     'billing',
+    'connections',
     'git-configuration',
     'global-custom-roles',
     'identity-providers',

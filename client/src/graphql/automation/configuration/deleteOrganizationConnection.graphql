@@ -1,0 +1,3 @@
+mutation deleteOrganizationConnection($connectionId: ID!) {
+    deleteOrganizationConnection(connectionId: $connectionId)
+}

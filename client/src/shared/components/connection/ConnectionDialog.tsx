@@ -18,12 +18,15 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectionScopeBadge from '@/pages/automation/connections/components/ConnectionScopeBadge';
+import {useIsVisibilityEditionEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
+import ConnectionVisibilityPicker from '@/shared/components/connection/ConnectionVisibilityPicker';
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
@@ -69,6 +72,7 @@ export interface ConnectionDialogFormProps {
     selectedScopes?: {[key: string]: boolean};
     shared: boolean;
     tags: Array<Tag | {label: string; value: string}>;
+    visibility: 'PRIVATE' | 'WORKSPACE' | 'ORGANIZATION';
 }
 
 const NO_AUTHORIZATION_OPTION_VALUE = 'NONE';
@@ -84,6 +88,12 @@ interface ConnectionDialogProps {
     onClose?: () => void;
     onConnectionCreate?: (connectionId: number) => void;
     platformType?: PlatformType;
+    /**
+     * Offers the Organization rung in the visibility picker. Opt-in because ORGANIZATION is not reachable through the
+     * ordinary create path -- setConnectionVisibility rejects it outright -- so only a surface whose create mutation
+     * writes an organization connection may show it.
+     */
+    showOrganizationOption?: boolean;
     showSharedOption?: boolean;
     startInCredentialsMode?: boolean;
     title?: string;
@@ -118,6 +128,7 @@ const ConnectionDialog = ({
     onClose,
     onConnectionCreate,
     platformType,
+    showOrganizationOption,
     showSharedOption,
     startInCredentialsMode,
     title,
@@ -143,6 +154,8 @@ const ConnectionDialog = ({
     const storedPlatformType = usePlatformTypeStore((state) => state.currentType);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const currentType = platformType ?? storedPlatformType;
+
     const canEditEmbeddedConnection = useHasEmbeddedScope('CONNECTION_EDIT', connection?.environmentId);
     const isTenantAdmin = useIsTenantAdmin();
     const canEditWorkspaceConnection = useHasWorkspaceScope(
@@ -150,6 +163,14 @@ const ConnectionDialog = ({
         'CONNECTION_EDIT',
         connection?.environmentId
     );
+
+    // No admin check here any more: WORKSPACE is the default every connection is created with, so gating it would
+    // fail every ordinary create. ORGANIZATION, which does require admin, is not offered at creation at all.
+    // Compose the shared EE-edition primitive with this dialog's platform-type scope. Keeping the
+    // edition check in one hook means a future migration away from EditionType.EE updates the
+    // list-page gate (useVisibilityFeatureEnabled) and this dialog simultaneously.
+    const isEE = useIsVisibilityEditionEnabled();
+    const visibilityFeatureEnabled = isEE && currentType === PlatformType.AUTOMATION;
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
@@ -165,6 +186,7 @@ const ConnectionDialog = ({
                     ...tag,
                     label: tag.name,
                 })) || [],
+            visibility: 'WORKSPACE',
         },
         mode: 'onTouched',
     });
@@ -206,8 +228,6 @@ const ConnectionDialog = ({
     } = useGetOAuth2PropertiesQuery();
 
     const queryClient = useQueryClient();
-
-    const currentType = platformType ?? storedPlatformType;
 
     const isEdit = !!connection?.id;
 
@@ -395,7 +415,7 @@ const ConnectionDialog = ({
     }
 
     function getNewConnection(additionalParameters?: object) {
-        const {componentName, name, parameters, shared, tags} = getValues();
+        const {componentName, name, parameters, shared, tags, visibility} = getValues();
 
         return {
             authorizationType,
@@ -409,6 +429,7 @@ const ConnectionDialog = ({
             },
             tags: tags,
             ...(showSharedOption ? {shared} : {}),
+            ...(visibilityFeatureEnabled ? {visibility} : {}),
         } as ConnectionI;
     }
 
@@ -730,6 +751,48 @@ const ConnectionDialog = ({
                                                 </FormItem>
                                             )}
                                         />
+                                    )}
+
+                                    {!connection?.id && visibilityFeatureEnabled && (
+                                        <FormField
+                                            control={control}
+                                            name="visibility"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Visibility</FormLabel>
+
+                                                    <FormControl>
+                                                        {/* Grants cannot be written before the connection has
+                                                            an id, so creation offers reach only; the list-page
+                                                            picker adds people afterwards. */}
+
+                                                        <ConnectionVisibilityPicker
+                                                            grantedUserIds={[]}
+                                                            onGrantedUserIdsChange={() => undefined}
+                                                            onVisibilityChange={field.onChange}
+                                                            showOrganizationOption={showOrganizationOption}
+                                                            visibility={field.value}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+
+                                    {connection?.id && visibilityFeatureEnabled && connection.visibility && (
+                                        <FormItem className="space-x-2">
+                                            <FormLabel>Visibility</FormLabel>
+
+                                            <FormControl>
+                                                <ConnectionScopeBadge visibility={connection.visibility} />
+                                            </FormControl>
+
+                                            <p className="text-xs text-muted-foreground">
+                                                Change visibility and sharing from the connection list.
+                                            </p>
+                                        </FormItem>
                                     )}
 
                                     {(!connection?.id || (canEditConnectionProperties && !isUpdatingCredentials)) &&
