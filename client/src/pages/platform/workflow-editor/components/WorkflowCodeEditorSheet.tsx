@@ -159,10 +159,10 @@ const WorkflowCodeEditorSheet = ({
 
                             <SheetClose asChild>
                                 <Button
-                                    className="mb-2.5 ml-1"
+                                    className="[&_svg]:size-5"
                                     icon={<XIcon />}
                                     onClick={() => handleOpenChange(false)}
-                                    size="iconXs"
+                                    size="icon"
                                     variant="ghost"
                                 />
                             </SheetClose>
