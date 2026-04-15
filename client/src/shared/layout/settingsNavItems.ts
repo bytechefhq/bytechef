@@ -76,6 +76,10 @@ const organizationNavItems: SettingsNavItemI[] = [
         title: 'Roles',
     },
     {
+        href: `${ORGANIZATION_SETTINGS_PATH}/connections`,
+        title: 'Connections',
+    },
+    {
         href: BILLING_SETTINGS_PATH,
         title: 'Billing',
     },

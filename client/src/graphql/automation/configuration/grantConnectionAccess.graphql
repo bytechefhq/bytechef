@@ -1,0 +1,3 @@
+mutation GrantConnectionAccess($workspaceId: ID!, $connectionId: ID!, $userId: ID!) {
+    grantConnectionAccess(workspaceId: $workspaceId, connectionId: $connectionId, userId: $userId)
+}

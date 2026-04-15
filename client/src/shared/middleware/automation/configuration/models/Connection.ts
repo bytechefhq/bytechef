@@ -110,6 +110,18 @@ export interface Connection {
      */
     tags?: Array<Tag>;
     /**
+     * Lifecycle state of the connection. ACTIVE is the normal operating state. PENDING_REASSIGNMENT indicates the owner was removed from the workspace and the connection awaits reassignment. REVOKED is terminal and cannot transition back.
+     * @type {ConnectionStatusEnum}
+     * @memberof Connection
+     */
+    readonly status?: ConnectionStatusEnum;
+    /**
+     * The visibility scope of the connection. Defaults to WORKSPACE when omitted on create; PRIVATE is also accepted. ORGANIZATION is not user-settable.
+     * @type {ConnectionVisibilityEnum}
+     * @memberof Connection
+     */
+    visibility?: ConnectionVisibilityEnum;
+    /**
      * 
      */
     version?: number;
@@ -119,6 +131,26 @@ export interface Connection {
     workspaceId?: number;
 }
 
+
+/**
+ * @export
+ */
+export const ConnectionStatusEnum = {
+    Active: 'ACTIVE',
+    PendingReassignment: 'PENDING_REASSIGNMENT',
+    Revoked: 'REVOKED'
+} as const;
+export type ConnectionStatusEnum = typeof ConnectionStatusEnum[keyof typeof ConnectionStatusEnum];
+
+/**
+ * @export
+ */
+export const ConnectionVisibilityEnum = {
+    Private: 'PRIVATE',
+    Workspace: 'WORKSPACE',
+    Organization: 'ORGANIZATION'
+} as const;
+export type ConnectionVisibilityEnum = typeof ConnectionVisibilityEnum[keyof typeof ConnectionVisibilityEnum];
 
 
 /**
@@ -159,6 +191,8 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'name': json['name'],
         'parameters': json['parameters'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
+        'status': json['status'] == null ? undefined : json['status'],
+        'visibility': json['visibility'] == null ? undefined : json['visibility'],
         'version': json['__version'] == null ? undefined : json['__version'],
         'workspaceId': json['workspaceId'] == null ? undefined : json['workspaceId'],
     };
@@ -168,7 +202,7 @@ export function ConnectionToJSON(json: any): Connection {
     return ConnectionToJSONTyped(json, false);
 }
 
-export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'status'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -184,6 +218,7 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
         'name': value['name'],
         'parameters': value['parameters'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
+        'visibility': value['visibility'],
         '__version': value['version'],
         'workspaceId': value['workspaceId'],
     };

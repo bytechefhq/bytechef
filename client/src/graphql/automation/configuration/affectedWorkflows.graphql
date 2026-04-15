@@ -1,0 +1,7 @@
+query affectedWorkflows($workspaceId: ID!, $userLogin: String!) {
+    affectedWorkflows(workspaceId: $workspaceId, userLogin: $userLogin) {
+        workflowId
+        workflowName
+        connectionIds
+    }
+}

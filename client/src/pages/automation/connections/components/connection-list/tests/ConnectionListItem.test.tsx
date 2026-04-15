@@ -88,6 +88,7 @@ vi.mock('@/shared/mutations/automation/connections.mutations', () => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     ConnectionWorkflowUsage: {Deployment: 'DEPLOYMENT', Editor: 'EDITOR'},
+    useConnectionGrantsQuery: () => ({data: undefined}),
     useConnectionWorkflowsQuery: (variables: unknown, options: {enabled: boolean}) => {
         hoisted.connectionWorkflowsQueryOptions(variables, options);
 
@@ -100,6 +101,10 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isPending: false,
         mutate: hoisted.disconnectConnectionFromWorkflowMutate,
     }),
+    useGrantConnectionAccessMutation: () => ({mutate: vi.fn()}),
+    useRevokeConnectionAccessMutation: () => ({mutate: vi.fn()}),
+    useSetConnectionVisibilityMutation: () => ({mutate: vi.fn()}),
+    useWorkspaceUsersQuery: () => ({data: undefined}),
 }));
 
 vi.mock('@/shared/stores/useAuthenticationStore', () => ({

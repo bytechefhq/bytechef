@@ -44,6 +44,7 @@ export interface ConnectionI {
     shared?: boolean;
     tags?: Array<Tag>;
     version?: number;
+    visibility?: 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE';
     workspaceId?: number;
 }
 
