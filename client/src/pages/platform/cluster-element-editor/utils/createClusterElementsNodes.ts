@@ -87,7 +87,7 @@ export default function createClusterElementNodes({
                                 clusterElements: element.clusterElements,
                                 clusterRootId: element.name,
                                 currentRootComponentDefinition: nestedClusterRootDefinition,
-                                nestedClusterRootElementType: clusterElementTypeName,
+                                nestedClusterRootElementType: element.type?.split('/')[2] || clusterElementTypeName,
                                 nestedClusterRootsDefinitions,
                             });
 
@@ -147,7 +147,8 @@ export default function createClusterElementNodes({
                             clusterElements: clusterElementValue.clusterElements,
                             clusterRootId: clusterElementValue.name,
                             currentRootComponentDefinition: nestedClusterRootDefinition,
-                            nestedClusterRootElementType: clusterElementTypeName,
+                            nestedClusterRootElementType:
+                                clusterElementValue.type?.split('/')[2] || clusterElementTypeName,
                             nestedClusterRootsDefinitions,
                         });
 
