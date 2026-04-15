@@ -86,7 +86,7 @@ public class HubspotConnection {
                 scopeMap.put("crm.export", false);
                 scopeMap.put("crm.import", false);
                 scopeMap.put("crm.lists.read", false);
-                scopeMap.put("crm.lists.write", false);
+                scopeMap.put("crm.lists.write", true);
                 scopeMap.put("crm.objects.appointments.read", false);
                 scopeMap.put("crm.objects.appointments.sensitive.read", false);
                 scopeMap.put("crm.objects.appointments.sensitive.write", false);
