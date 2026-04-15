@@ -54,6 +54,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/Contact"
     get:
+      summary: "Get Contacts"
+      description: "Get all contacts."
+      operationId: "getContacts"
+      x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "crm.objects.contacts.read"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  results:
+                    type: "array"
+                    items:
+                      $ref: "#/components/schemas/Contact"
+  /crm/v3/objects/contacts/{contactId}:
+    get:
       summary: "Get Contact"
       description: "Get contact details."
       operationId: "getContact"
@@ -76,7 +97,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Contact"
-  /crm/v3/objects/contacts/{contactId}:
     delete:
       summary: "Delete Contact"
       description: "Move Contact to the recycling bin."
