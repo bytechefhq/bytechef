@@ -27,7 +27,9 @@ import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -35,6 +37,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunct
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +71,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
                 .output(
                     (MultipleConnectionsOutputFunction) (
                         inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
-                            inputParameters, null, context)));
+                            inputParameters, null, context))
+                .resumePerform(this::resumePerform));
     }
 
     public class ChatActionDefinitionWrapper extends AbstractActionDefinitionWrapper {
@@ -81,6 +85,14 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         public Optional<? extends BasePerformFunction> getPerform() {
             return Optional.of((MultipleConnectionsPerformFunction) AiAgentChatAction.this::perform);
         }
+    }
+
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    protected ResumeResponse resumePerform(
+        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
+        ActionContext context) {
+
+        return ResumeResponse.of(new HashMap<>(data.toMap()));
     }
 
     @Nullable
@@ -111,6 +123,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context);
+
+        chatClientRequestSpec.toolContext(Map.of(AiAgentToolContextKey.ACTION_CONTEXT, context));
 
         ChatClient.CallResponseSpec call = chatClientRequestSpec.call();
 

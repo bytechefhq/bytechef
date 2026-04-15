@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -253,21 +254,35 @@ class AiAgentTestApiController {
         @Override
         @SuppressWarnings("unchecked")
         public void send(Object data) {
-            if (data instanceof Map<?, ?> map && "tool_execution".equals(map.get("__eventType"))) {
+            if (!(data instanceof Map<?, ?> map)) {
+                if (data instanceof String stringData) {
+                    accumulatedContent.append(stringData);
+                }
+
+                sendEvent(springSseEmitter, "stream", data);
+
+                return;
+            }
+
+            Object eventType = map.get(AiAgentSseEventType.EVENT_TYPE);
+
+            if (AiAgentSseEventType.TOOL_EXECUTION.equals(eventType)) {
                 Map<String, Object> eventData = new LinkedHashMap<>((Map<String, Object>) map);
 
-                eventData.remove("__eventType");
+                eventData.remove(AiAgentSseEventType.EVENT_TYPE);
 
                 if (logger.isTraceEnabled()) {
                     logger.trace("Sending tool_execution SSE event: toolName={}", eventData.get("toolName"));
                 }
 
-                sendEvent(springSseEmitter, "tool_execution", eventData);
-            } else {
-                if (data instanceof String stringData) {
-                    accumulatedContent.append(stringData);
-                }
+                sendEvent(springSseEmitter, AiAgentSseEventType.TOOL_EXECUTION, eventData);
+            } else if (AiAgentSseEventType.ASK_USER_QUESTION.equals(eventType)) {
+                Map<String, Object> eventData = new LinkedHashMap<>((Map<String, Object>) map);
 
+                eventData.remove(AiAgentSseEventType.EVENT_TYPE);
+
+                sendEvent(springSseEmitter, AiAgentSseEventType.ASK_USER_QUESTION, eventData);
+            } else {
                 sendEvent(springSseEmitter, "stream", data);
             }
         }

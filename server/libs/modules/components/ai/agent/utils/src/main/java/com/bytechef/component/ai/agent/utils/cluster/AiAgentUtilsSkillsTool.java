@@ -28,6 +28,7 @@ import com.bytechef.ai.agent.skill.facade.AiAgentSkillFacade;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
@@ -91,10 +92,7 @@ public class AiAgentUtilsSkillsTool {
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private ToolCallbackProvider apply(
-        Parameters inputParameters, Parameters connectionParameters,
-        com.bytechef.component.definition.Context context) throws Exception {
-
+    private ToolCallbackProvider apply(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<Path> skillDirectories = new ArrayList<>();
         List<String> skippedSkillReasons = new ArrayList<>();
 

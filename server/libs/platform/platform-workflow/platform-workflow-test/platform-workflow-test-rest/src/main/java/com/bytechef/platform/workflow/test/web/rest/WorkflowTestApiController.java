@@ -21,6 +21,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
@@ -33,6 +34,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -353,21 +355,37 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void onEvent(Object payload) {
-            if (payload instanceof Map<?, ?> map && map.containsKey("event")) {
-                String event = (String) map.get("event");
-                Object data = map.entrySet()
-                    .stream()
-                    .filter(entry -> !"event".equals(entry.getKey()))
-                    .findFirst()
-                    .map(Map.Entry::getValue)
-                    .orElse(null);
+            if (payload instanceof Map<?, ?> map) {
+                if (map.containsKey(AiAgentSseEventType.EVENT_TYPE)) {
+                    String eventType = (String) map.get(AiAgentSseEventType.EVENT_TYPE);
 
-                sendToEmitter(key, createEvent(event, data));
-            } else {
-                sendToEmitter(key, createEvent("stream", payload));
+                    Map<String, Object> eventData = new LinkedHashMap<>((Map<String, Object>) map);
 
+                    eventData.remove(AiAgentSseEventType.EVENT_TYPE);
+
+                    sendToEmitter(key, createEvent(eventType, eventData));
+
+                    return;
+                }
+
+                if (map.containsKey("event")) {
+                    String event = (String) map.get("event");
+                    Object data = map.entrySet()
+                        .stream()
+                        .filter(entry -> !"event".equals(entry.getKey()))
+                        .findFirst()
+                        .map(Map.Entry::getValue)
+                        .orElse(null);
+
+                    sendToEmitter(key, createEvent(event, data));
+
+                    return;
+                }
             }
+
+            sendToEmitter(key, createEvent("stream", payload));
         }
 
         @Override

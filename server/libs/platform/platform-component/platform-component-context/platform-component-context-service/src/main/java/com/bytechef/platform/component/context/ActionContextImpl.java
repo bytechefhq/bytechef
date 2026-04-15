@@ -272,9 +272,10 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return null;
         }
 
-        JobResumeId jobResumeId = JobResumeId.of(jobId);
-
-        this.jobResumeId = jobResumeId.toString();
+        if (this.jobResumeId == null) {
+            this.jobResumeId = JobResumeId.of(jobId)
+                .toString();
+        }
 
         return publicUrl + "/api/job/resume/" + this.jobResumeId;
     }
