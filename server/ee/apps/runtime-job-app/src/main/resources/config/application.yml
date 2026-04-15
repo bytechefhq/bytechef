@@ -31,6 +31,10 @@ management:
 spring:
   application:
     name: runtime-job-app
+  autoconfigure:
+    exclude:
+      org.springaicommunity.agents.claude.autoconfigure.ClaudeAgentAutoConfiguration,
+      org.springaicommunity.agents.claude.autoconfigure.ClaudeHookAutoConfiguration
   cache:
     type: ${bytechef.cache.provider}
   jmx:

@@ -1,6 +1,11 @@
 spring:
   application:
     name: worker-app
+  autoconfigure:
+    exclude:
+      com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration,
+      org.springaicommunity.agents.claude.autoconfigure.ClaudeAgentAutoConfiguration,
+      org.springaicommunity.agents.claude.autoconfigure.ClaudeHookAutoConfiguration
   config:
     import: optional:configserver:http://localhost:6111
   profiles:

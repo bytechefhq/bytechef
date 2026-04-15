@@ -18,15 +18,15 @@ package com.bytechef.component.claude.code.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.markpollack.agents.claude.ClaudeAgentModel;
+import io.github.markpollack.agents.claude.ClaudeAgentOptions;
+import io.github.markpollack.agents.model.AgentApi;
+import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springaicommunity.agents.claude.ClaudeAgentModel;
-import org.springaicommunity.agents.claude.ClaudeAgentOptions;
-import org.springaicommunity.agents.model.AgentApi;
-import org.springaicommunity.claude.agent.sdk.mcp.McpServerConfig;
 
 /**
  * @author Marko Kriskovic

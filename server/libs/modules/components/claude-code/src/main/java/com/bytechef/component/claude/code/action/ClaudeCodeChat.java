@@ -28,12 +28,12 @@ import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import io.github.markpollack.agents.claude.ClaudeAgentOptions;
+import io.github.markpollack.agents.client.AgentClient;
+import io.github.markpollack.agents.client.AgentClientResponse;
+import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
 import java.util.List;
 import java.util.Map;
-import org.springaicommunity.agents.claude.ClaudeAgentOptions;
-import org.springaicommunity.agents.client.AgentClient;
-import org.springaicommunity.agents.client.AgentClientResponse;
-import org.springaicommunity.claude.agent.sdk.mcp.McpServerConfig;
 
 /**
  * @author Marko Kriskovic

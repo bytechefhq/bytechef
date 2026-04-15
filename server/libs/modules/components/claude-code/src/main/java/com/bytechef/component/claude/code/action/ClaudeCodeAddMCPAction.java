@@ -35,10 +35,10 @@ import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springaicommunity.claude.agent.sdk.mcp.McpServerConfig;
 
 /**
  * @author Marko Kriskovic

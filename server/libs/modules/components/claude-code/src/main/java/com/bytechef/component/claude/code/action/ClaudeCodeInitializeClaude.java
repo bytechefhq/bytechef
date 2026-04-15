@@ -25,9 +25,9 @@ import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
-import org.springaicommunity.agents.claude.ClaudeAgentOptions;
-import org.springaicommunity.agents.client.AgentClient;
-import org.springaicommunity.agents.client.AgentClientResponse;
+import io.github.markpollack.agents.claude.ClaudeAgentOptions;
+import io.github.markpollack.agents.client.AgentClient;
+import io.github.markpollack.agents.client.AgentClientResponse;
 
 /**
  * @author Marko Kriskovic
