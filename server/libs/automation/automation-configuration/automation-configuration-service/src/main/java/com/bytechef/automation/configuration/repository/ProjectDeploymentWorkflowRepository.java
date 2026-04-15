@@ -49,4 +49,11 @@ public interface ProjectDeploymentWorkflowRepository extends ListCrudRepository<
             WHERE project_deployment_workflow_connection.connection_id = :connectionId
         """)
     List<Long> findAllIdsByConnectionId(@Param("connectionId") long connectionId);
+
+    @Query("""
+            SELECT DISTINCT project_deployment_workflow.id FROM project_deployment_workflow
+            JOIN project_deployment_workflow_connection ON project_deployment_workflow.id = project_deployment_workflow_connection.project_deployment_workflow_id
+            WHERE project_deployment_workflow_connection.connection_id IN (:connectionIds)
+        """)
+    List<Long> findAllIdsByConnectionIdIn(@Param("connectionIds") List<Long> connectionIds);
 }

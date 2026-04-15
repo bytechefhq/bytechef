@@ -54,6 +54,8 @@ public interface ProjectDeploymentWorkflowService {
 
     boolean isConnectionUsed(long connectionId);
 
+    List<ProjectDeploymentWorkflow> getProjectDeploymentWorkflowsByConnectionIds(List<Long> connectionIds);
+
     boolean isProjectDeploymentWorkflowEnabled(long projectDeploymentId, String workflowId);
 
     ProjectDeploymentWorkflow update(ProjectDeploymentWorkflow projectDeploymentWorkflow);

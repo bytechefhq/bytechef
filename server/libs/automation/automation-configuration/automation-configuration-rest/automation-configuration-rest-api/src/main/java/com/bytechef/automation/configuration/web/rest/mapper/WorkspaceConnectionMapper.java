@@ -18,6 +18,8 @@ package com.bytechef.automation.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.domain.ConnectionVisibility;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -32,4 +34,20 @@ public interface WorkspaceConnectionMapper extends Converter<ConnectionDTO, Conn
     @Override
     @Mapping(target = "workspaceId", ignore = true)
     ConnectionModel convert(ConnectionDTO connectionDTO);
+
+    default ConnectionModel.StatusEnum map(ConnectionStatus status) {
+        if (status == null) {
+            return null;
+        }
+
+        return ConnectionModel.StatusEnum.fromValue(status.name());
+    }
+
+    default ConnectionModel.VisibilityEnum map(ConnectionVisibility visibility) {
+        if (visibility == null) {
+            return null;
+        }
+
+        return ConnectionModel.VisibilityEnum.fromValue(visibility.name());
+    }
 }

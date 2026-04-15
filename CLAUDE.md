@@ -354,6 +354,46 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Empty blocks are forbidden — a comment alone doesn't satisfy the `EmptyBlock` rule; add an executable statement
 - `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
+### Connection Visibility (EE-only feature)
+
+Connections in automation can be `PRIVATE` (creator only), `WORKSPACE` (all workspace members),
+`PROJECT` (members of the projects the connection is shared with), or `ORGANIZATION` (cross-workspace).
+
+- **CE**: only `PRIVATE` is reachable. `ConnectionFacadeImpl.create()` forces visibility to PRIVATE
+  whenever the running edition is not `EE`. The visibility selector, scope badge, promote/demote/share
+  menu items, project-share dialog, and demote-confirm dialog are all hidden in CE.
+- **EE**: visibility selector appears in the connection create dialog (only `PRIVATE` for non-admins,
+  `WORKSPACE` requires `ROLE_ADMIN`). The connection list ellipsis menu and the scope badge expose
+  promote/demote/share-with-projects actions to admins; the connection's creator can also demote a
+  WORKSPACE-promoted connection back to PRIVATE (orphan-recovery path if all admins lose role).
+- **Embedded**: visibility is server-side forced to PRIVATE in `ConnectionFacadeImpl.create()`
+  regardless of the incoming request body.
+- **Workflow editor connection dropdown**: filters by `connectionDefinition.version` (NOT
+  `componentConnection.componentVersion`); the two often differ.
+
+**GraphQL mutations** (admin-only via `@PreAuthorize` unless noted):
+- `promoteConnectionToWorkspace(workspaceId, connectionId)` — PRIVATE/PROJECT → WORKSPACE.
+- `demoteConnectionToPrivate(workspaceId, connectionId)` — any → PRIVATE. Admin OR creator
+  (orphan-recovery; no `@PreAuthorize`, check is in the facade).
+- `shareConnectionToProject(workspaceId, connectionId, projectId)` — adds project share, sets
+  visibility to PROJECT.
+- `revokeConnectionFromProject(workspaceId, connectionId, projectId)` — removes share; auto-demotes
+  to PRIVATE when the last project is removed.
+- `setConnectionProjects(workspaceId, connectionId, projectIds: [ID!]!)` — diff-based bulk replace;
+  emits `CONNECTION_SHARES_REPLACED` audit event with a correlation ID for grouping the
+  per-row share/revoke events.
+- `promoteAllPrivateConnectionsToWorkspace(workspaceId)` — CE→EE migration helper; returns
+  `BulkPromoteResult { promoted, skipped, failed, failures: [{connectionId, message}] }` so partial
+  failures surface to the caller instead of bailing on the first error. `skipped` counts benign
+  races where a connection was already promoted to the target visibility by a concurrent actor
+  (`CONNECTION_ALREADY_AT_TARGET_VISIBILITY`), so the UI can report "N promoted, M skipped" rather
+  than treating those as failures.
+
+**Metrics**:
+- `bytechef_connection_create` (Counter) — incremented on every successful workspace connection
+  creation. Tag: `visibility=PRIVATE|WORKSPACE`. Wired via `ObjectProvider<MeterRegistry>` so
+  lightweight app variants without actuator start cleanly.
+
 ### Spring Boot Project Conventions
 
 - **Integration Test Naming**: All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)

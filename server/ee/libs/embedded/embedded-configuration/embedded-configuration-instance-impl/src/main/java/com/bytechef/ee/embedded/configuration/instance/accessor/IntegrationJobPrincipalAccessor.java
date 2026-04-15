@@ -116,4 +116,10 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
 
         return integrationWorkflow.getUuidAsString();
     }
+
+    @Override
+    public void validateConnectionsForJob(long jobPrincipalId, String workflowUuid) {
+        // Embedded integration instances do not model user-owned connections with reassignment lifecycle; the
+        // automation-only ConnectionStatus.PENDING_REASSIGNMENT check does not apply here.
+    }
 }

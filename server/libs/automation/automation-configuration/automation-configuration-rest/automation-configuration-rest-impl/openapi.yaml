@@ -1246,6 +1246,17 @@ components:
             workspaceId:
               type: integer
               format: int64
+            visibility:
+              description: "The visibility scope of the connection. Accepted on create:\
+                \ PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN.\
+                \ PROJECT is set via shareConnectionToProject mutation (requires ROLE_ADMIN).\
+                \ ORGANIZATION is not user-settable."
+              type: "string"
+              enum:
+                - "PRIVATE"
+                - "PROJECT"
+                - "WORKSPACE"
+                - "ORGANIZATION"
     Project:
       description: "A group of workflows that make one logical project."
       allOf:

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.connection.facade;
 
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -37,6 +38,14 @@ public interface ConnectionFacade {
     List<ConnectionDTO> getConnections(
         String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Long environmentId,
         PlatformType type);
+
+    /**
+     * Materialize already-fetched {@link Connection} entities into {@link ConnectionDTO}s with tag batching and
+     * {@code isUsed} resolution. Use this overload when a caller has already queried the entities by a specialized
+     * predicate (e.g. visibility + environment) to avoid a redundant second-round-trip through
+     * {@link #getConnections(List, PlatformType)}.
+     */
+    List<ConnectionDTO> toConnectionDTOs(List<Connection> connections);
 
     List<Tag> getConnectionTags(PlatformType type);
 

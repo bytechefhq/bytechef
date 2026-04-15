@@ -1,0 +1,34 @@
+extend type Query {
+    """Get all organization-level connections, optionally filtered by environment. (admin only, EE only)"""
+    organizationConnections(environmentId: ID): [OrganizationConnection!]!
+}
+
+extend type Mutation {
+    """Create a new connection with ORGANIZATION visibility. (admin only, EE only)"""
+    createOrganizationConnection(input: CreateOrganizationConnectionInput!): ID!
+    """Delete an organization connection. Fails if the connection is not ORGANIZATION-scoped. (admin only, EE only)"""
+    deleteOrganizationConnection(connectionId: ID!): Boolean!
+    """Update an organization connection's name and tags. (admin only, EE only)"""
+    updateOrganizationConnection(connectionId: ID!, name: String!, tagIds: [ID!], version: Int!): Boolean!
+}
+
+"""An organization-scoped connection visible to all members across all workspaces."""
+type OrganizationConnection {
+    id: ID!
+    name: String!
+    componentName: String!
+    environmentId: Int!
+    visibility: ConnectionVisibility!
+    createdBy: String
+    createdDate: String
+    lastModifiedDate: String
+}
+
+"""Input for creating a new organization connection."""
+input CreateOrganizationConnectionInput {
+    name: String!
+    componentName: String!
+    connectionVersion: Int!
+    environmentId: Int!
+    parameters: Map!
+}

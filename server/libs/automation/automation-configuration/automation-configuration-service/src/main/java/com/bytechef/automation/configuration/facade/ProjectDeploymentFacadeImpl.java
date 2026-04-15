@@ -46,6 +46,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.connection.audit.ConnectionAuditEvent;
+import com.bytechef.platform.connection.audit.ConnectionAuditPublisher;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -85,6 +87,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
 
+    private final ConnectionAuditPublisher connectionAuditPublisher;
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
@@ -106,15 +109,17 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeImpl(
-        ConnectionService connectionService, Evaluator evaluator, EnvironmentService environmentService,
-        PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService, JobFacade jobFacade,
-        JobService jobService, ProjectDeploymentService projectDeploymentService,
+        ConnectionAuditPublisher connectionAuditPublisher, ConnectionService connectionService, Evaluator evaluator,
+        EnvironmentService environmentService, PrincipalJobFacade principalJobFacade,
+        PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
 
+        this.connectionAuditPublisher = connectionAuditPublisher;
         this.connectionService = connectionService;
         this.evaluator = evaluator;
         this.environmentService = environmentService;
@@ -198,6 +203,27 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 id, workflowId);
 
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
+
+        List<Long> connectionIds = projectDeploymentWorkflow.getConnections()
+            .stream()
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .toList();
+
+        List<Connection> inactiveConnections = connectionService.getInactiveConnections(connectionIds);
+
+        if (!inactiveConnections.isEmpty()) {
+            for (Connection connection : inactiveConnections) {
+                connectionAuditPublisher.publish(
+                    ConnectionAuditEvent.WORKFLOW_PAUSED, connection.getId(),
+                    Map.of(
+                        "projectDeploymentId", id,
+                        "workflowId", workflowId,
+                        "connectionStatus", connection.getStatus()
+                            .name()));
+            }
+
+            connectionService.validateConnectionsActive(connectionIds);
+        }
 
         return principalJobFacade.createJob(
             new JobParametersDTO(
@@ -510,6 +536,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             }
 
             validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+            validateDeploymentConnectionEnvironments(
+                projectDeploymentWorkflow.getConnections(), projectDeployment.getEnvironment());
 
             if (oldProjectDeploymentWorkflow == null) {
                 projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
@@ -870,6 +898,25 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectDeploymentWorkflow.getWorkflowId()),
             workflowUuid);
+    }
+
+    private void validateDeploymentConnectionEnvironments(
+        List<ProjectDeploymentWorkflowConnection> workflowConnections, Environment targetEnvironment) {
+
+        for (ProjectDeploymentWorkflowConnection workflowConnection : workflowConnections) {
+            if (workflowConnection.getConnectionId() == null) {
+                continue;
+            }
+
+            Connection connection = connectionService.getConnection(workflowConnection.getConnectionId());
+
+            if (connection.getEnvironmentId() != targetEnvironment.ordinal()) {
+                throw new ConfigurationException(
+                    "Connection '%s' environment does not match deployment environment %s".formatted(
+                        connection.getName(), targetEnvironment.name()),
+                    ConnectionErrorType.INVALID_CONNECTION);
+            }
+        }
     }
 
     private void validateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {

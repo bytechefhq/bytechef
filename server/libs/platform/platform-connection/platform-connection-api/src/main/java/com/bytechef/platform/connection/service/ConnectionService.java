@@ -18,6 +18,8 @@ package com.bytechef.platform.connection.service;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.domain.ConnectionVisibility;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,8 @@ public interface ConnectionService {
 
     List<Connection> getConnections(PlatformType type);
 
+    List<Connection> getConnectionsByVisibility(ConnectionVisibility visibility, PlatformType type);
+
     List<Connection> getConnections(String componentName, int version, PlatformType type);
 
     List<Connection> getConnections(
@@ -53,5 +57,21 @@ public interface ConnectionService {
 
     Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status);
 
+    Connection updateConnectionStatus(long connectionId, ConnectionStatus status);
+
+    Connection updateCreatedBy(long id, String newCreatedBy);
+
     Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters);
+
+    Connection updateVisibility(long id, ConnectionVisibility visibility);
+
+    /**
+     * Returns connections whose status is not {@link ConnectionStatus#ACTIVE}. {@link Connection#getStatus()} is total
+     * (it throws {@link IllegalStateException} on a corrupted ordinal rather than returning null), so callers can rely
+     * on each returned row having a usable status label. Returns an empty list for null/empty input or when all
+     * connections are active. Callers use this to emit per-connection audit events before rejecting the operation.
+     */
+    List<Connection> getInactiveConnections(List<Long> connectionIds);
+
+    void validateConnectionsActive(List<Long> connectionIds);
 }

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.connection.remote.client.fasade;
 
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
@@ -47,6 +48,11 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
         String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Long environmentId,
         PlatformType type) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectionDTO> toConnectionDTOs(List<Connection> connections) {
         throw new UnsupportedOperationException();
     }
 

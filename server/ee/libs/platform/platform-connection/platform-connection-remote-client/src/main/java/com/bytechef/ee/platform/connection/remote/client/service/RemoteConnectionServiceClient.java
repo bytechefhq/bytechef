@@ -10,6 +10,8 @@ package com.bytechef.ee.platform.connection.remote.client.service;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.domain.ConnectionVisibility;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -72,6 +74,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public List<Connection> getConnectionsByVisibility(ConnectionVisibility visibility, PlatformType type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         throw new UnsupportedOperationException();
     }
@@ -104,7 +111,32 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public Connection updateConnectionStatus(long connectionId, ConnectionStatus status) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection updateCreatedBy(long id, String newCreatedBy) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection updateVisibility(long id, ConnectionVisibility visibility) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void validateConnectionsActive(List<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 }

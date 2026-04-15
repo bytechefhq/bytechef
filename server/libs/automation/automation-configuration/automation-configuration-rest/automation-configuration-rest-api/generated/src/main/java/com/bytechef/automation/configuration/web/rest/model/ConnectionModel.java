@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.674883+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-15T11:42:43.031303+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
 public class ConnectionModel {
 
   private @Nullable Boolean active;
@@ -74,7 +74,90 @@ public class ConnectionModel {
   private Map<String, Object> parameters = new HashMap<>();
 
   @Valid
+  private List<Long> sharedProjectIds = new ArrayList<>();
+
+  @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
+
+  /**
+   * The status of the connection
+   */
+  public enum StatusEnum {
+    ACTIVE("ACTIVE"),
+    
+    PENDING_REASSIGNMENT("PENDING_REASSIGNMENT"),
+    
+    REVOKED("REVOKED");
+
+    private final String value;
+
+    StatusEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static StatusEnum fromValue(String value) {
+      for (StatusEnum b : StatusEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable StatusEnum status;
+
+  /**
+   * The visibility scope of the connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. PROJECT is set via shareConnectionToProject mutation (requires ROLE_ADMIN). ORGANIZATION is not user-settable.
+   */
+  public enum VisibilityEnum {
+    PRIVATE("PRIVATE"),
+    
+    PROJECT("PROJECT"),
+    
+    WORKSPACE("WORKSPACE"),
+    
+    ORGANIZATION("ORGANIZATION");
+
+    private final String value;
+
+    VisibilityEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static VisibilityEnum fromValue(String value) {
+      for (VisibilityEnum b : VisibilityEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable VisibilityEnum visibility;
 
   private @Nullable Integer version;
 
@@ -438,6 +521,34 @@ public class ConnectionModel {
     this.parameters = parameters;
   }
 
+  public ConnectionModel sharedProjectIds(List<Long> sharedProjectIds) {
+    this.sharedProjectIds = sharedProjectIds;
+    return this;
+  }
+
+  public ConnectionModel addSharedProjectIdsItem(Long sharedProjectIdsItem) {
+    if (this.sharedProjectIds == null) {
+      this.sharedProjectIds = new ArrayList<>();
+    }
+    this.sharedProjectIds.add(sharedProjectIdsItem);
+    return this;
+  }
+
+  /**
+   * IDs of projects this connection is shared with. Typically populated when visibility is PROJECT.
+   * @return sharedProjectIds
+   */
+  
+  @Schema(name = "sharedProjectIds", accessMode = Schema.AccessMode.READ_ONLY, description = "IDs of projects this connection is shared with. Typically populated when visibility is PROJECT.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sharedProjectIds")
+  public List<Long> getSharedProjectIds() {
+    return sharedProjectIds;
+  }
+
+  public void setSharedProjectIds(List<Long> sharedProjectIds) {
+    this.sharedProjectIds = sharedProjectIds;
+  }
+
   public ConnectionModel tags(List<@Valid TagModel> tags) {
     this.tags = tags;
     return this;
@@ -464,6 +575,46 @@ public class ConnectionModel {
 
   public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
+  }
+
+  public ConnectionModel status(@Nullable StatusEnum status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * The status of the connection
+   * @return status
+   */
+  
+  @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The status of the connection", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("status")
+  public @Nullable StatusEnum getStatus() {
+    return status;
+  }
+
+  public void setStatus(@Nullable StatusEnum status) {
+    this.status = status;
+  }
+
+  public ConnectionModel visibility(@Nullable VisibilityEnum visibility) {
+    this.visibility = visibility;
+    return this;
+  }
+
+  /**
+   * The visibility scope of the connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. PROJECT is set via shareConnectionToProject mutation (requires ROLE_ADMIN). ORGANIZATION is not user-settable.
+   * @return visibility
+   */
+  
+  @Schema(name = "visibility", description = "The visibility scope of the connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. PROJECT is set via shareConnectionToProject mutation (requires ROLE_ADMIN). ORGANIZATION is not user-settable.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("visibility")
+  public @Nullable VisibilityEnum getVisibility() {
+    return visibility;
+  }
+
+  public void setVisibility(@Nullable VisibilityEnum visibility) {
+    this.visibility = visibility;
   }
 
   public ConnectionModel version(@Nullable Integer version) {
@@ -531,14 +682,17 @@ public class ConnectionModel {
         Objects.equals(this.lastModifiedDate, connection.lastModifiedDate) &&
         Objects.equals(this.name, connection.name) &&
         Objects.equals(this.parameters, connection.parameters) &&
+        Objects.equals(this.sharedProjectIds, connection.sharedProjectIds) &&
         Objects.equals(this.tags, connection.tags) &&
+        Objects.equals(this.status, connection.status) &&
+        Objects.equals(this.visibility, connection.visibility) &&
         Objects.equals(this.version, connection.version) &&
         Objects.equals(this.workspaceId, connection.workspaceId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version, workspaceId);
+    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, sharedProjectIds, tags, status, visibility, version, workspaceId);
   }
 
   @Override
@@ -561,7 +715,10 @@ public class ConnectionModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
+    sb.append("    sharedProjectIds: ").append(toIndentedString(sharedProjectIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    visibility: ").append(toIndentedString(visibility)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");
     sb.append("}");

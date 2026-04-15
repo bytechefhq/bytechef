@@ -55,6 +55,9 @@ import org.springframework.context.annotation.Import;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
+@org.springframework.security.test.context.support.WithMockUser(
+    username = "admin@localhost.com",
+    authorities = com.bytechef.platform.security.constant.AuthorityConstants.ADMIN)
 public class WorkspaceConnectionFacadeIntTest {
 
     @Autowired

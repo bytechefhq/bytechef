@@ -19,11 +19,14 @@ package com.bytechef.platform.connection.dto;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.domain.ConnectionVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,18 +37,31 @@ public record ConnectionDTO(
     boolean active, @Nullable AuthorizationType authorizationType, Map<String, ?> authorizationParameters,
     String baseUri, String componentName, Map<String, ?> connectionParameters, int connectionVersion, String createdBy,
     Instant createdDate, CredentialStatus credentialStatus, int environmentId, Long id, String lastModifiedBy,
-    Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
+    Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Long> sharedProjectIds,
+    ConnectionStatus status, List<Tag> tags, int version, ConnectionVisibility visibility) {
+
+    public ConnectionDTO {
+        // status and visibility are load-bearing for authorization and audit; null here would cascade
+        // into silent defaults downstream (e.g. ConnectionFacadeImpl persists whatever visibility the
+        // DTO carries). The Builder supplies safe defaults (ACTIVE / PRIVATE); direct canonical-ctor
+        // callers must explicitly pick a value.
+        Objects.requireNonNull(status, "status");
+        Objects.requireNonNull(visibility, "visibility");
+
+        sharedProjectIds = sharedProjectIds == null ? List.of() : List.copyOf(sharedProjectIds);
+    }
 
     public ConnectionDTO(
         boolean active, Map<String, ?> authorizationParameters, String baseUri, Connection connection,
-        Map<String, ?> connectionParameters, List<Tag> tags) {
+        Map<String, ?> connectionParameters, List<Long> sharedProjectIds, List<Tag> tags) {
 
         this(
             active, connection.getAuthorizationType(), authorizationParameters, baseUri, connection.getComponentName(),
             connectionParameters, connection.getConnectionVersion(), connection.getCreatedBy(),
             connection.getCreatedDate(), connection.getCredentialStatus(), connection.getEnvironmentId(),
             connection.getId(), connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
-            connection.getParameters(), tags, connection.getVersion());
+            connection.getParameters(), sharedProjectIds, connection.getStatus(), tags, connection.getVersion(),
+            connection.getVisibility());
     }
 
     public Connection toConnection() {
@@ -58,8 +74,10 @@ public record ConnectionDTO(
         connection.setId(id);
         connection.setName(name);
         connection.setParameters(parameters);
+        connection.setStatus(status);
         connection.setTags(tags);
         connection.setVersion(version);
+        connection.setVisibility(visibility);
 
         return connection;
     }
@@ -83,8 +101,11 @@ public record ConnectionDTO(
         private Instant lastModifiedDate;
         private String name;
         private Map<String, Object> parameters;
+        private List<Long> sharedProjectIds = List.of();
+        private ConnectionStatus status = ConnectionStatus.ACTIVE;
         private List<Tag> tags;
         private int version;
+        private ConnectionVisibility visibility = ConnectionVisibility.PRIVATE;
 
         private Builder() {
         }
@@ -179,8 +200,27 @@ public record ConnectionDTO(
             return this;
         }
 
+        public Builder sharedProjectIds(List<Long> sharedProjectIds) {
+            this.sharedProjectIds = sharedProjectIds;
+
+            return this;
+        }
+
+        public Builder status(ConnectionStatus status) {
+            this.status = status;
+
+            return this;
+        }
+
         public Builder version(int version) {
             this.version = version;
+
+            return this;
+        }
+
+        public Builder visibility(ConnectionVisibility visibility) {
+            this.visibility = visibility;
+
             return this;
         }
 
@@ -188,7 +228,7 @@ public record ConnectionDTO(
             return new ConnectionDTO(
                 active, authorizationType, Map.of(), baseUri, componentName, Map.of(), connectionVersion, createdBy,
                 createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters,
-                tags, version);
+                sharedProjectIds, status, tags, version, visibility);
         }
     }
 }

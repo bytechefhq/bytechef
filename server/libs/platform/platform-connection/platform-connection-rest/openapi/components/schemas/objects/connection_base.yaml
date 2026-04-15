@@ -69,10 +69,39 @@ properties:
     type: "object"
     additionalProperties: true
     writeOnly: true
+  sharedProjectIds:
+    description: "IDs of projects this connection is shared with. Typically populated when visibility is PROJECT."
+    type: "array"
+    items:
+      type: "integer"
+      format: "int64"
+    readOnly: true
   tags:
     type: "array"
     items:
       $ref: "../../../../../../platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
+  status:
+    description: "Lifecycle state of the connection. ACTIVE is the normal operating state.\
+            \ PENDING_REASSIGNMENT indicates the owner was removed from the workspace and the\
+            \ connection awaits reassignment. REVOKED is terminal and cannot transition back."
+    type: "string"
+    enum:
+      - "ACTIVE"
+      - "PENDING_REASSIGNMENT"
+      - "REVOKED"
+    readOnly: true
+  visibility:
+    description: "Visibility scope controlling which users can see and use a connection.\
+            \ Accepted on create: PRIVATE (default) or WORKSPACE \u2014 setting WORKSPACE requires\
+            \ ROLE_ADMIN. PROJECT and ORGANIZATION are assigned by share / organization flows,\
+            \ not by direct client request. On CE or embedded surfaces the server always forces\
+            \ PRIVATE regardless of the request body."
+    type: "string"
+    enum:
+      - "PRIVATE"
+      - "PROJECT"
+      - "WORKSPACE"
+      - "ORGANIZATION"
   __version:
     type: "integer"
     format: "int32"

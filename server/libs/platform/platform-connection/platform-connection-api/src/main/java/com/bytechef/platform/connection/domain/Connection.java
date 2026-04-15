@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
@@ -94,13 +95,21 @@ public final class Connection {
     private EncryptedMapWrapper parameters;
 
     @Column
+    private int status;
+
+    @Column
     private int type;
 
     @Version
     private int version;
 
+    @Column
+    private int visibility;
+
     public Connection() {
         this.parameters = new EncryptedMapWrapper(Collections.emptyMap());
+        this.status = ConnectionStatus.ACTIVE.ordinal();
+        this.visibility = ConnectionVisibility.PRIVATE.ordinal();
     }
 
     public static Builder builder() {
@@ -213,6 +222,18 @@ public final class Connection {
         return Collections.unmodifiableMap(parameters == null ? Map.of() : parameters.getMap());
     }
 
+    public ConnectionStatus getStatus() {
+        ConnectionStatus[] values = ConnectionStatus.values();
+
+        if (status < 0 || status >= values.length) {
+            throw new IllegalStateException(
+                "Connection id=%s has invalid status ordinal %d (valid range: 0-%d)".formatted(
+                    id, status, values.length - 1));
+        }
+
+        return values[status];
+    }
+
     public List<Long> getTagIds() {
         return connectionTags.stream()
             .map(ConnectionTag::getTagId)
@@ -227,6 +248,18 @@ public final class Connection {
         return version;
     }
 
+    public ConnectionVisibility getVisibility() {
+        ConnectionVisibility[] values = ConnectionVisibility.values();
+
+        if (visibility < 0 || visibility >= values.length) {
+            throw new IllegalStateException(
+                "Connection id=%s has invalid visibility ordinal %d (valid range: 0-%d)".formatted(
+                    id, visibility, values.length - 1));
+        }
+
+        return values[visibility];
+    }
+
     public void putAllParameters(Map<String, ?> parameters) {
         this.parameters.putAll(parameters);
     }
@@ -239,12 +272,38 @@ public final class Connection {
         this.componentName = componentName;
     }
 
+    /**
+     * Overrides the auditing-populated creator login. Only the reassignment flow should call this directly; Spring Data
+     * auditing populates {@code createdBy} automatically for normal creates. Callers must also transition the
+     * connection's status (e.g. via {@code ConnectionService#updateConnectionStatus}) so that provenance and status
+     * stay in sync — otherwise a successful reassignment leaves {@code PENDING_REASSIGNMENT} in place and an operator
+     * cannot tell the flow completed.
+     */
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public void setConnectionVersion(int connectionVersion) {
         this.connectionVersion = connectionVersion;
     }
 
     public void setCredentialStatus(CredentialStatus credentialStatus) {
+        Objects.requireNonNull(credentialStatus, "credentialStatus");
+
         this.credentialStatus = credentialStatus.ordinal();
+    }
+
+    public void setStatus(ConnectionStatus status) {
+        Objects.requireNonNull(status, "status");
+
+        ConnectionStatus currentStatus = getStatus();
+
+        if (currentStatus != status && !currentStatus.canTransitionTo(status)) {
+            throw new IllegalStateException(
+                "Cannot transition connection status from %s to %s".formatted(currentStatus, status));
+        }
+
+        this.status = status.ordinal();
     }
 
     public void setEnvironmentId(int environmentId) {
@@ -291,6 +350,36 @@ public final class Connection {
         this.version = version;
     }
 
+    /**
+     * Assign visibility. Rejects illegal transitions via {@link ConnectionVisibility#canTransitionTo} — ORGANIZATION is
+     * not reachable from workspace-scoped transitions, PRIVATE cannot jump straight to ORGANIZATION, etc. Same-state
+     * writes are a silent no-op so idempotent callers (e.g. {@code shareConnectionToProject} re-setting visibility to
+     * PROJECT) are unaffected. Related invariants such as removing project shares when demoting to PRIVATE remain the
+     * caller's responsibility (typically {@code WorkspaceConnectionFacade}).
+     *
+     * <p>
+     * The state machine applies only to persisted connections (i.e. {@code id != null}). While a connection is still
+     * being assembled pre-persist (e.g. {@code ConnectionFacadeImpl.create} downgrading an incoming
+     * {@code ORGANIZATION} request to PRIVATE for defense-in-depth), setVisibility is a plain field assignment — there
+     * is no "transition" until a row exists in the database.
+     */
+    public void setVisibility(ConnectionVisibility visibility) {
+        Objects.requireNonNull(visibility, "visibility");
+
+        ConnectionVisibility currentVisibility = getVisibility();
+
+        if (currentVisibility == visibility) {
+            return;
+        }
+
+        if (id != null && !currentVisibility.canTransitionTo(visibility)) {
+            throw new IllegalStateException(
+                "Cannot transition connection visibility from %s to %s".formatted(currentVisibility, visibility));
+        }
+
+        this.visibility = visibility.ordinal();
+    }
+
     @Override
     public String toString() {
         return "Connection{" +
@@ -302,7 +391,9 @@ public final class Connection {
             ", environment=" + environment +
             ", credentialStatus=" + credentialStatus +
             ", connectionTags=" + connectionTags +
+            ", status=" + status +
             ", type=" + type +
+            ", visibility=" + visibility +
             ", parameters=" + parameters +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
@@ -320,9 +411,11 @@ public final class Connection {
         private Long id;
         private String name;
         private Map<String, Object> parameters;
+        private ConnectionStatus status;
         private List<Long> tagIds;
         private PlatformType type;
         private int version;
+        private ConnectionVisibility visibility;
 
         private Builder() {
         }
@@ -363,6 +456,12 @@ public final class Connection {
             return this;
         }
 
+        public Builder status(ConnectionStatus status) {
+            this.status = status;
+
+            return this;
+        }
+
         public Builder tagIds(List<Long> tagIds) {
             this.tagIds = tagIds;
 
@@ -381,6 +480,12 @@ public final class Connection {
             return this;
         }
 
+        public Builder visibility(ConnectionVisibility visibility) {
+            this.visibility = visibility;
+
+            return this;
+        }
+
         public Connection build() {
             Connection connection = new Connection();
 
@@ -393,6 +498,14 @@ public final class Connection {
             connection.setTagIds(tagIds);
             connection.setType(type);
             connection.setVersion(version);
+
+            if (status != null) {
+                connection.setStatus(status);
+            }
+
+            if (visibility != null) {
+                connection.setVisibility(visibility);
+            }
 
             return connection;
         }

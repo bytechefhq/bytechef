@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.web.graphql.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.facade.OrganizationConnectionFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
@@ -25,10 +26,12 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.test.config.graphql.GraphQLScalarTypes;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 
 /**
  * @author Ivica Cardic
@@ -82,6 +85,17 @@ public class AutomationConfigurationGraphQlTestConfiguration {
     @Primary
     public WorkflowFacade workflowFacade() {
         return Mockito.mock(WorkflowFacade.class);
+    }
+
+    @Bean
+    RuntimeWiringConfigurer mapScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.mapScalar());
+    }
+
+    @Bean
+    @Primary
+    public OrganizationConnectionFacade organizationConnectionFacade() {
+        return Mockito.mock(OrganizationConnectionFacade.class);
     }
 
     @Bean

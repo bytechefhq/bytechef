@@ -35,6 +35,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -54,6 +55,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * @author Ivica Cardic
@@ -65,6 +67,7 @@ import org.springframework.context.annotation.Import;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @ConnectionIntTestConfigurationSharedMocks
+@WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
 public class ConnectionFacadeIntTest {
 
     @Autowired
@@ -239,12 +242,37 @@ public class ConnectionFacadeIntTest {
         connection2.setName("name");
         connection2.setType(PlatformType.AUTOMATION);
 
-        connectionRepository.save(connection2);
+        connection2 = connectionRepository.save(connection2);
 
         connectionDTOs = connectionFacade.getConnections(null, null, List.of(), null, null, PlatformType.AUTOMATION);
 
-        Assertions.assertThat(CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
-            .isEqualTo(List.of(connection));
+        // ConnectionFacadeImpl#getConnections now returns a degraded placeholder DTO for connections whose
+        // component definition cannot be resolved (see buildDegradedConnectionDTO). Previously these rows were
+        // filtered out via `filter(Objects::nonNull)`, which made failing rows invisible to admins — they
+        // could not tell a mapping failure from a missing connection. The second row therefore surfaces with
+        // active=false, componentName preserved, and a suffixed name like "[unavailable: IllegalArgumentException]".
+        Assertions.assertThat(connectionDTOs)
+            .hasSize(2);
+
+        ConnectionDTO healthyDTO = connectionDTOs.stream()
+            .filter(dto -> "componentName".equals(dto.componentName()))
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertThat(healthyDTO)
+            .hasFieldOrPropertyWithValue("componentName", "componentName")
+            .hasFieldOrPropertyWithValue("name", "name");
+
+        ConnectionDTO degradedDTO = connectionDTOs.stream()
+            .filter(dto -> "componentName2".equals(dto.componentName()))
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertThat(degradedDTO)
+            .hasFieldOrPropertyWithValue("active", false)
+            .hasFieldOrPropertyWithValue("componentName", "componentName2")
+            .hasFieldOrPropertyWithValue("id", connection2.getId())
+            .hasFieldOrPropertyWithValue("name", "name [unavailable: IllegalArgumentException]");
     }
 
     @Test
@@ -373,6 +401,10 @@ public class ConnectionFacadeIntTest {
                 @Override
                 public String getWorkflowUuid(String workflowId) {
                     return "";
+                }
+
+                @Override
+                public void validateConnectionsForJob(long jobPrincipalId, String workflowUuid) {
                 }
             };
         }

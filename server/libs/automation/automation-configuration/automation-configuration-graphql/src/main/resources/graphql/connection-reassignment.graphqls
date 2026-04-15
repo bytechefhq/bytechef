@@ -1,0 +1,51 @@
+extend type Query {
+    """Get all connections owned by a user within a workspace, with metadata about how many workflows depend on each. (admin only)"""
+    unresolvedConnections(workspaceId: ID!, userLogin: String!): [ConnectionReassignmentItem!]!
+    """Get workflows that would be affected by reassigning a user's connections. (admin only)"""
+    affectedWorkflows(workspaceId: ID!, userLogin: String!): [AffectedWorkflow!]!
+}
+
+extend type Mutation {
+    """Mark all of a user's connections as pending reassignment. Returns per-row outcome so partial failures surface; a silent no-op batch does not look like an error. (admin only)"""
+    markConnectionsPendingReassignment(workspaceId: ID!, userLogin: String!): BulkReassignResult!
+    """Reassign a single connection to a new owner. Resets status to ACTIVE if pending. (admin only)"""
+    reassignConnection(workspaceId: ID!, connectionId: ID!, newOwnerLogin: String!): Boolean!
+    """Reassign all of a user's unresolved connections to a new owner. (admin only)"""
+    reassignAllConnections(workspaceId: ID!, userLogin: String!, newOwnerLogin: String!): Boolean!
+}
+
+"""A connection that needs reassignment, with metadata about its usage."""
+type ConnectionReassignmentItem {
+    connectionId: ID!
+    connectionName: String!
+    visibility: ConnectionVisibility!
+    environmentId: Int!
+    dependentWorkflowCount: Int!
+}
+
+"""A workflow affected by connection reassignment."""
+type AffectedWorkflow {
+    workflowId: String!
+    workflowName: String!
+    connectionIds: [ID!]!
+}
+
+"""Outcome of a bulk connection reassignment / mark-pending operation. Mirrors BulkPromoteResult."""
+type BulkReassignResult {
+    """Rows considered by the operation (pre-filter size of the candidate set)."""
+    total: Int!
+    """Rows whose state was successfully advanced in this call."""
+    updated: Int!
+    """Rows in a terminal state (e.g. REVOKED) that could not legally transition — counted separately from failed so a silent no-op does not look like an error."""
+    skipped: Int!
+    failed: Int!
+    failures: [BulkReassignFailure!]!
+}
+
+type BulkReassignFailure {
+    connectionId: ID!
+    "Stable classifier the client can key on for localized rendering — either a ConnectionErrorType key or UNEXPECTED."
+    errorCode: String!
+    "Human-readable fallback. Sanitized server-side so SQL/JDBC detail never reaches the admin UI."
+    message: String!
+}

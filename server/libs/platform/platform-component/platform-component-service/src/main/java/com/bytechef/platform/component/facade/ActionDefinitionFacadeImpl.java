@@ -16,11 +16,14 @@
 
 package com.bytechef.platform.component.facade;
 
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
@@ -102,12 +105,25 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         if (connectionId != null) {
             Connection connection = connectionService.getConnection(connectionId);
 
+            validateConnectionActive(connection);
+
             componentConnection = new ComponentConnection(
                 connection.getComponentName(), connection.getConnectionVersion(), connectionId,
                 connection.getParameters(), connection.getAuthorizationType());
         }
 
         return componentConnection;
+    }
+
+    private void validateConnectionActive(Connection connection) {
+        ConnectionStatus status = connection.getStatus();
+
+        if (status != ConnectionStatus.ACTIVE) {
+            throw new ConfigurationException(
+                "Connection '%s' has status %s and cannot be used for execution.".formatted(
+                    connection.getName(), status),
+                ConnectionErrorType.CONNECTION_NOT_ACTIVE);
+        }
     }
 
     private Map<String, ComponentConnection> getComponentConnections(Map<String, Long> connectionIds) {

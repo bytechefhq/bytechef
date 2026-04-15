@@ -90,6 +90,10 @@ public class TriggerCompletionHandler {
         String workflowId = getWorkflowId(workflowExecutionId);
         Map<String, ?> metadataMap = getMetadataMap(workflowExecutionId);
 
+        jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType())
+            .validateConnectionsForJob(
+                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+
         if (triggerExecution.getOutput() == null) {
             triggerExecution.addJobId(
                 createJob(
