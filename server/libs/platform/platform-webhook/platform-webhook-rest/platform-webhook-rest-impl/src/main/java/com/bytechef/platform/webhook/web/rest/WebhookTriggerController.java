@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -155,15 +156,17 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
         WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
+        WebhookSseStreamBridge bridge = new WebhookSseStreamBridge(emitter);
+
         CompletableFuture<Void> future = webhookWorkflowExecutor.executeAsync(
-            workflowExecutionId, webhookRequest, new WebhookSseStreamBridge(emitter));
+            workflowExecutionId, webhookRequest, bridge);
 
         future.whenComplete((unused, throwable) -> {
             if (throwable != null) {
-                sendEvent(emitter, "error", Objects.toString(throwable.getMessage(), "An error occurred"));
+                bridge.onError(throwable);
+            } else {
+                bridge.onComplete();
             }
-
-            emitter.complete();
         });
 
         return emitter;
@@ -197,18 +200,29 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
     }
 
     /**
-     * Bridge that broadcasts streamed payloads to SSE clients for webhook workflow execution.
+     * Bridge that broadcasts streamed payloads to SSE clients for webhook workflow execution. Events arrive on
+     * message-broker threads concurrently with job-status events and client-initiated disconnects, so callbacks must be
+     * idempotent and skip sends once the emitter is closed.
      */
     private static class WebhookSseStreamBridge implements SseStreamBridge {
 
+        private final AtomicBoolean completed = new AtomicBoolean();
         private final SseEmitter emitter;
 
         private WebhookSseStreamBridge(SseEmitter emitter) {
             this.emitter = emitter;
+
+            emitter.onCompletion(() -> completed.set(true));
+            emitter.onTimeout(() -> completed.set(true));
+            emitter.onError(throwable -> completed.set(true));
         }
 
         @Override
         public void onEvent(Object payload) {
+            if (completed.get()) {
+                return;
+            }
+
             if (payload instanceof Map<?, ?> map && map.containsKey("event")) {
                 String event = (String) map.get("event");
                 Object data = map.entrySet()
@@ -226,6 +240,10 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
         @Override
         public void onComplete() {
+            if (!completed.compareAndSet(false, true)) {
+                return;
+            }
+
             try {
                 emitter.complete();
             } catch (Exception exception) {
@@ -237,6 +255,10 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
         @Override
         public void onError(Throwable throwable) {
+            if (!completed.compareAndSet(false, true)) {
+                return;
+            }
+
             try {
                 sendEvent(emitter, "error", Objects.toString(throwable.getMessage(), "An error occurred"));
             } finally {
