@@ -41,11 +41,6 @@ export default function WorkflowEdge({
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
-    const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
-    const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);
-
-    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
-
     const {updateWorkflowMutation} = useWorkflowEditor();
 
     const sourceNodeId = id.split('=>')[0];
@@ -56,16 +51,6 @@ export default function WorkflowEdge({
 
     const isMiddleCaseEdge = !!(data as Record<string, unknown>)?.isMiddleCase;
     const isHorizontal = layoutDirection === 'LR';
-
-    const copiedNodeLabel = copiedNode?.label || '';
-
-    const displayLabel = useMemo(() => {
-        if (!copiedNode) {
-            return '';
-        }
-
-        return `${copiedNodeLabel} (${copiedNode.name})`;
-    }, [copiedNode, copiedNodeLabel]);
 
     const {
         correctedSourcePosition,
@@ -132,6 +117,21 @@ export default function WorkflowEdge({
             edgeCenterY,
         ]
     );
+
+    const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
+    const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);
+
+    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+
+    const copiedNodeLabel = copiedNode?.label || '';
+
+    const displayLabel = useMemo(() => {
+        if (!copiedNode) {
+            return '';
+        }
+
+        return `${copiedNodeLabel} (${copiedNode.name})`;
+    }, [copiedNode, copiedNodeLabel]);
 
     const handlePasteClick = useCallback(() => {
         if (!updateWorkflowMutation) {
