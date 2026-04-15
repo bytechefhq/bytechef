@@ -13,8 +13,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
+    implementation("org.apache.commons:commons-lang3")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:jdbc-config"))
+    implementation(project(":server:libs:config:logback-config"))
 
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-rest"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
