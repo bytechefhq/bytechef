@@ -103,7 +103,7 @@ public class QuestionAnswerRag {
             .builder(
                 vectorStoreFunction.apply(
                     ParametersFactory.create(clusterElement.getParameters()),
-                    ParametersFactory.create(componentConnection.getParameters()),
+                    ParametersFactory.create(componentConnection),
                     ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
             .searchRequest(
                 SearchRequest.builder()

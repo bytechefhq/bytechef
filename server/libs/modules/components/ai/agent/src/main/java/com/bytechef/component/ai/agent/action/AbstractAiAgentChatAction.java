@@ -175,8 +175,7 @@ public abstract class AbstractAiAgentChatAction {
 
         ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
-        return ParametersFactory.create(
-            componentConnection == null ? Map.of() : componentConnection.getParameters());
+        return ParametersFactory.create(componentConnection);
     }
 
     private Advisor getGuardrailsAdvisor(
