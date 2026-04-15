@@ -1,5 +1,6 @@
 import {useCreateKnowledgeBaseMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {getCookie} from '@/shared/util/cookie-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent, useState} from 'react';
 
@@ -38,53 +39,74 @@ export default function useCreateKnowledgeBaseDialog({workspaceId}: UseCreateKno
         setUploading(false);
     };
 
-    const startSimulatedUpload = () => {
-        setUploading(true);
+    const uploadFile = async (knowledgeBaseId: string, file: File, index: number) => {
+        setSelectedFiles((prev) => {
+            const copy = [...prev];
+            copy[index] = {...copy[index], status: 'uploading'};
 
-        selectedFiles.forEach((_, index) => {
+            return copy;
+        });
+
+        try {
+            const formData = new FormData();
+
+            formData.append('file', file);
+
+            const response = await fetch(`/api/automation/internal/knowledge-bases/${knowledgeBaseId}/documents`, {
+                body: formData,
+                headers: {
+                    'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+                },
+                method: 'POST',
+            });
+
+            if (!response.ok) {
+                throw new Error(`Upload failed: ${response.statusText}`);
+            }
+
             setSelectedFiles((prev) => {
                 const copy = [...prev];
-                copy[index] = {...copy[index], status: 'uploading'};
+                copy[index] = {
+                    ...copy[index],
+                    status: 'completed',
+                    statusMessage: 'Uploaded successfully',
+                };
 
                 return copy;
             });
+        } catch (error) {
+            setSelectedFiles((prev) => {
+                const copy = [...prev];
+                copy[index] = {
+                    ...copy[index],
+                    status: 'error',
+                    statusMessage: error instanceof Error ? error.message : 'Upload failed',
+                };
 
-            setTimeout(() => {
-                setSelectedFiles((prev) => {
-                    const copy = [...prev];
-                    copy[index] = {...copy[index], status: 'processing', statusMessage: 'Processing document...'};
+                return copy;
+            });
+        }
+    };
 
-                    return copy;
-                });
-            }, 1000);
+    const uploadFiles = async (knowledgeBaseId: string, files: SelectedFileI[]) => {
+        setUploading(true);
 
-            setTimeout(() => {
-                setSelectedFiles((prev) => {
-                    const copy = [...prev];
-                    copy[index] = {
-                        ...copy[index],
-                        status: 'completed',
-                        statusMessage: 'Document processed successfully',
-                    };
+        await Promise.all(files.map((selectedFile, index) => uploadFile(knowledgeBaseId, selectedFile.file, index)));
 
-                    return copy;
-                });
+        queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 
-                if (index === selectedFiles.length - 1) {
-                    setTimeout(() => {
-                        queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
-                        setOpen(false);
-                        resetForm();
-                    }, 500);
-                }
-            }, 3000);
-        });
+        setTimeout(() => {
+            setOpen(false);
+            resetForm();
+        }, 500);
     };
 
     const createMutation = useCreateKnowledgeBaseMutation({
-        onSuccess: () => {
-            if (selectedFiles.length > 0) {
-                startSimulatedUpload();
+        onSuccess: (data) => {
+            const knowledgeBaseId = data.createKnowledgeBase?.id;
+
+            if (selectedFiles.length > 0 && knowledgeBaseId) {
+                uploadFiles(knowledgeBaseId, selectedFiles);
             } else {
                 queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
                 setOpen(false);
