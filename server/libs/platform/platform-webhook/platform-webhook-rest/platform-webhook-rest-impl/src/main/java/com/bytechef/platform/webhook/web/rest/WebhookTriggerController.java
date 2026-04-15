@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -31,6 +32,7 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -212,24 +214,41 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void onEvent(Object payload) {
             if (completed.get()) {
                 return;
             }
 
-            if (payload instanceof Map<?, ?> map && map.containsKey("event")) {
-                String event = (String) map.get("event");
-                Object data = map.entrySet()
-                    .stream()
-                    .filter(entry -> !"event".equals(entry.getKey()))
-                    .findFirst()
-                    .map(Map.Entry::getValue)
-                    .orElse(null);
+            if (payload instanceof Map<?, ?> map) {
+                if (map.containsKey(AiAgentSseEventType.EVENT_TYPE)) {
+                    String eventType = (String) map.get(AiAgentSseEventType.EVENT_TYPE);
 
-                sendEvent(emitter, event, data);
-            } else {
-                sendEvent(emitter, "stream", payload);
+                    Map<String, Object> eventData = new LinkedHashMap<>((Map<String, Object>) map);
+
+                    eventData.remove(AiAgentSseEventType.EVENT_TYPE);
+
+                    sendEvent(emitter, eventType, eventData);
+
+                    return;
+                }
+
+                if (map.containsKey("event")) {
+                    String event = (String) map.get("event");
+                    Object data = map.entrySet()
+                        .stream()
+                        .filter(entry -> !"event".equals(entry.getKey()))
+                        .findFirst()
+                        .map(Map.Entry::getValue)
+                        .orElse(null);
+
+                    sendEvent(emitter, event, data);
+
+                    return;
+                }
             }
+
+            sendEvent(emitter, "stream", payload);
         }
 
         @Override

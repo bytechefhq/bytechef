@@ -512,7 +512,7 @@
       "required": true,
       "type": "OBJECT"
     } ],
-    "resumePerform": null,
+    "resumePerform": { },
     "title": "Chat",
     "workflowNodeDescription": null
   }, {
@@ -1027,7 +1027,7 @@
       "required": true,
       "type": "OBJECT"
     } ],
-    "resumePerform": null,
+    "resumePerform": { },
     "title": "Chat (stream)",
     "workflowNodeDescription": null
   } ],
