@@ -113,6 +113,9 @@ const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/works
 const WorkspaceUsers = lazy(() => import('@/ee/pages/settings/automation/users/WorkspaceUsers'));
 const GlobalCustomRoles = lazy(() => import('@/ee/pages/settings/platform/custom-roles/GlobalCustomRoles'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
+const OrganizationConnections = lazy(
+    () => import('@/pages/settings/platform/organization-connections/OrganizationConnections')
+);
 const UsersPage = lazy(() => import('@/pages/settings/platform/users/UsersPage'));
 
 const getAccountRoutes = (path: string) => ({
@@ -274,6 +277,18 @@ const platformSettingsRoutes = {
                 </PrivateRoute>
             ),
             path: 'global-custom-roles',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <OrganizationConnections />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'connections',
         },
         {
             element: (
@@ -445,6 +460,10 @@ const platformSettingsRoutes = {
         {
             href: 'global-custom-roles',
             title: 'Roles',
+        },
+        {
+            href: 'connections',
+            title: 'Connections',
         },
         {
             href: 'billing',
