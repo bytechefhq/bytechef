@@ -28,8 +28,13 @@ public interface ConnectionMapper extends Converter<ConnectionDTO, ConnectionMod
     @Mapping(target = "shared", ignore = true)
     ConnectionModel convert(ConnectionDTO connectionDTO);
 
+    // status (connection lifecycle) and visibility are server-assigned, never supplied by an embedded
+    // create request. Ignore them so ConnectionDTO.Builder's safe defaults (ACTIVE / PRIVATE) stand;
+    // otherwise the generated mapper would call .status(null)/.visibility(null), overriding the
+    // defaults and tripping the canonical constructor's requireNonNull guard.
     @InheritInverseConfiguration
     @DelegatingConverter
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "visibility", ignore = true)
     ConnectionDTO invertConvert(ConnectionModel connectionModel);
 }

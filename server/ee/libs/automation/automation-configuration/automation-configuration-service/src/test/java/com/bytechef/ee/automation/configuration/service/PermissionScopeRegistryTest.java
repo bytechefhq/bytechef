@@ -285,6 +285,9 @@ class PermissionScopeRegistryTest {
         // 'Connection'), so every such literal inside a gate is a scope whichever function names it.
         private static final Pattern GATE_SCOPE_LITERAL_PATTERN = Pattern.compile("'([A-Z][A-Z0-9_]{2,})'");
 
+        // hasResourceRole names a workspace role ('ADMIN', 'EDITOR'), which shares a scope's shape but is not one.
+        private static final Pattern RESOURCE_ROLE_CHECK_PATTERN = Pattern.compile("hasResourceRole\\([^)]*\\)");
+
         private static final Pattern PROGRAMMATIC_SCOPE_CHECK_PATTERN = Pattern.compile(
             "\\.(?:hasWorkspaceScope|hasWorkspaceScopeForProject)\\(([^)]*)\\)");
 
@@ -440,7 +443,9 @@ class PermissionScopeRegistryTest {
             Matcher gateAnnotationMatcher = GATE_ANNOTATION_PATTERN.matcher(source);
 
             while (gateAnnotationMatcher.find()) {
-                String annotationArguments = readAnnotationArguments(source, gateAnnotationMatcher.end());
+                String annotationArguments = RESOURCE_ROLE_CHECK_PATTERN
+                    .matcher(readAnnotationArguments(source, gateAnnotationMatcher.end()))
+                    .replaceAll("");
 
                 Matcher embeddedCallMatcher = EMBEDDED_SCOPE_CALL_PATTERN.matcher(annotationArguments);
 

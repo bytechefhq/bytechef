@@ -21,6 +21,8 @@ import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -76,7 +79,7 @@ class PermissionServiceResourceTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, ownershipResolvers, environmentResolvers,
+            workspaceUserRepository, ownershipResolvers, List.of(), permissiveResolver(), environmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, Mockito.mock(EmbeddedUserRepository.class),
             beanFactory.getBeanProvider(EmbeddedResourceResolver.class),
@@ -492,7 +495,7 @@ class PermissionServiceResourceTest {
 
         PermissionServiceImpl service = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(), List.of(),
+            workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, Mockito.mock(EmbeddedUserRepository.class),
             embeddedBeanFactory(embeddedResourceResolver).getBeanProvider(EmbeddedResourceResolver.class),
@@ -609,5 +612,15 @@ class PermissionServiceResourceTest {
         connection.setType(type);
 
         return connection;
+    }
+
+    /**
+     * A resolver that hides nothing, so these tests exercise workspace-scope and ownership resolution rather than
+     * visibility. The visibility precondition has its own test class.
+     */
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

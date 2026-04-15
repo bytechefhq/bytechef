@@ -27,6 +27,7 @@ import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,12 @@ public class ConnectionServiceImpl implements ConnectionService {
     public List<Connection> getConnections(PlatformType type) {
         return CollectionUtils.filter(
             connectionRepository.findAll(Sort.by("name", "id")), connection -> connection.getType() == type);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Connection> getConnectionsByVisibility(ResourceVisibility visibility, PlatformType type) {
+        return connectionRepository.findAllByVisibilityAndTypeOrderByName(visibility.ordinal(), type.ordinal());
     }
 
     @Override
@@ -225,6 +232,16 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    public Connection updateCreatedBy(long id, String newCreatedBy) {
+        Connection connection = connectionRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
+
+        connection.setCreatedBy(newCreatedBy);
+
+        return connectionRepository.save(connection);
+    }
+
+    @Override
     public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
         Assert.notNull(parameters, "'parameters' must not be null");
 
@@ -260,5 +277,52 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setParameters(new HashMap<>(parameters));
 
         return connectionRepository.save(connection);
+    }
+
+    @Override
+    public Connection updateVisibility(long id, ResourceVisibility visibility) {
+        Connection connection = connectionRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
+
+        connection.setVisibility(visibility);
+
+        return connectionRepository.save(connection);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
+        if (connectionIds == null || connectionIds.isEmpty()) {
+            return List.of();
+        }
+
+        // Connection.getStatus() is total: it throws IllegalStateException for a corrupted INT ordinal
+        // rather than returning null, so a simple != ACTIVE filter captures every non-ACTIVE status
+        // including any future value added by append-only enum extension. A corrupted row surfaces
+        // loudly here rather than silently masking as ACTIVE.
+        return connectionRepository.findAllByIdIn(connectionIds)
+            .stream()
+            .filter(connection -> connection.getStatus() != ConnectionStatus.ACTIVE)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateConnectionsActive(List<Long> connectionIds) {
+        List<Connection> inactive = getInactiveConnections(connectionIds);
+
+        if (inactive.isEmpty()) {
+            return;
+        }
+
+        String detail = inactive.stream()
+            .map(connection -> "id=%s status=%s".formatted(connection.getId(), connection.getStatus()))
+            .reduce((left, right) -> left + ", " + right)
+            .orElse("");
+
+        throw new ConfigurationException(
+            "Workflow execution blocked: %d non-ACTIVE connection(s): %s. Reassign or reactivate to resume."
+                .formatted(inactive.size(), detail),
+            ConnectionErrorType.CONNECTION_NOT_ACTIVE);
     }
 }

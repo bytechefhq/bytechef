@@ -18,12 +18,16 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.security.ConnectionEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ConnectionOwnershipResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
@@ -58,15 +62,18 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -408,14 +415,23 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
         }
 
         @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toSet());
+        }
+
+        @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
             ConnectionFacade connectionFacade, ConnectionService connectionService,
-            PermissionService permissionService, WorkspaceConnectionService workspaceConnectionService) {
+            PermissionService permissionService, ResourceVisibilityResolver resourceVisibilityResolver,
+            UserService userService, WorkspaceConnectionService workspaceConnectionService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, permissionService,
-                mock(ProjectDeploymentWorkflowService.class), mock(WorkflowTestConfigurationService.class),
-                workspaceConnectionService);
+                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, resourceVisibilityResolver,
+                new StaticListableBeanFactory().getBeanProvider(MeterRegistry.class), permissionService,
+                mock(ProjectDeploymentWorkflowService.class), mock(ProjectService.class), userService,
+                mock(WorkflowTestConfigurationService.class), workspaceConnectionService, mock(WorkspaceFacade.class));
         }
 
         @Bean
