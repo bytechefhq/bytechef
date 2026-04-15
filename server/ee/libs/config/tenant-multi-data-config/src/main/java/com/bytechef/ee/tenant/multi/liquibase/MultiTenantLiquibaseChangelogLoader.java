@@ -35,11 +35,7 @@ public class MultiTenantLiquibaseChangelogLoader implements InitializingBean {
     public void afterPropertiesSet() {
         List<String> tenantIds = tenantService.getTenantIds();
 
-        if (log.isDebugEnabled()) {
-            log.debug("Loading changelog for {} tenants", tenantIds.size());
-        } else if (log.isTraceEnabled()) {
-            log.trace("Loading changelog for tenantIds={}", String.join(",", tenantIds));
-        }
+        log.info("Loading changelog for {} tenants", tenantIds.size());
 
         tenantService.loadChangelog(tenantIds, Tenancy.MULTITENANT);
 
