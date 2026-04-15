@@ -1,0 +1,34 @@
+extend type Query {
+    auditEvents(
+        principal: String
+        eventType: String
+        fromDate: Long
+        toDate: Long
+        dataSearch: String
+        page: Int = 0
+        size: Int = 25
+    ): AuditEventPageType!
+
+    auditEventTypes: [String!]!
+}
+
+type AuditEventType {
+    data: [AuditEventDataEntryType!]!
+    eventDate: Long!
+    eventType: String!
+    id: ID!
+    principal: String
+}
+
+type AuditEventDataEntryType {
+    key: String!
+    value: String!
+}
+
+type AuditEventPageType {
+    content: [AuditEventType!]!
+    number: Int!
+    size: Int!
+    totalElements: Int!
+    totalPages: Int!
+}

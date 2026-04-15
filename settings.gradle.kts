@@ -624,6 +624,7 @@ include("server:ee:libs:platform:platform-api-connector:platform-api-connector-f
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-impl")
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-handler")
 include("server:ee:libs:platform:platform-audit:platform-audit-service")
+include("server:ee:libs:platform:platform-audit:platform-audit-graphql")
 include("server:ee:libs:platform:platform-component:platform-component-remote-client")
 include("server:ee:libs:platform:platform-component:platform-component-remote-rest")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-api")

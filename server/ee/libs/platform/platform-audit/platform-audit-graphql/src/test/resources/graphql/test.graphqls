@@ -1,0 +1,12 @@
+# Test-only GraphQL base operations for GraphQL slice tests in this module.
+
+# Base operation types so that 'extend type Query/Mutation' from main resources can merge.
+type Query {
+    _placeholder: Boolean
+}
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+scalar Long
