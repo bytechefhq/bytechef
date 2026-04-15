@@ -5,9 +5,10 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-// Mock the feature flags store
+// Mock the feature flags store — enable only ff-2482 (projectExportEnabled) so the Export button renders and the
+// git/share buttons stay hidden. Tests below verify each flag-gated button independently.
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => (flag: string) => flag === 'ff-2482', // Enable ff_2482 for export functionality, disable others
+    useFeatureFlagsStore: () => (flag: string) => flag === 'ff-2482',
 }));
 
 const createTestQueryClient = () =>
@@ -34,6 +35,7 @@ const mockProps = {
     onCloseDropdownMenuClick: vi.fn(),
     onDeleteProjectClick: vi.fn(),
     onDuplicateProjectClick: vi.fn(),
+    onMembersClick: vi.fn(),
     onPullProjectFromGitClick: vi.fn(),
     onShareProject: vi.fn(),
     onShowEditProjectDialogClick: vi.fn(),
@@ -146,7 +148,7 @@ describe('ProjectTabButtons Export Functionality', () => {
     it('should not show Git-related buttons when feature flag is disabled', () => {
         renderProjectTabButtons();
 
-        // These buttons should not be visible when ff_1039 is disabled
+        // These buttons should not be visible when gitIntegrationEnabled (ff-1039) is disabled
         expect(screen.queryByText('Pull Project from Git')).not.toBeInTheDocument();
         expect(screen.queryByText('Git Configuration')).not.toBeInTheDocument();
     });

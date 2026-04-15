@@ -2,12 +2,15 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
 import ProjectsLeftSidebar from '@/pages/automation/project/components/projects-sidebar/ProjectsLeftSidebar';
 import {useProject} from '@/pages/automation/project/hooks/useProject';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
+import {useLoadProjectPermissions} from '@/shared/hooks/useLoadProjectPermissions';
+import {useLoadWorkspacePermissions} from '@/shared/hooks/useLoadWorkspacePermissions';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
@@ -19,6 +22,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 const Project = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const {workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             workflow: state.workflow,
@@ -46,6 +50,9 @@ const Project = () => {
         updateWorkflowNodeParameterMutation,
         useGetConnectionsQuery,
     } = useProject();
+
+    useLoadProjectPermissions(projectId);
+    useLoadWorkspacePermissions(currentWorkspaceId);
 
     const {runDisabled} = useRun();
 

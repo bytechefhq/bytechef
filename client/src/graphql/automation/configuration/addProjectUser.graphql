@@ -1,0 +1,13 @@
+mutation AddProjectUser($projectId: ID!, $userId: ID!, $role: ProjectRole!) {
+    addProjectUser(projectId: $projectId, userId: $userId, role: $role) {
+        id
+        projectId
+        userId
+        projectRole
+        user {
+            email
+            firstName
+            lastName
+        }
+    }
+}

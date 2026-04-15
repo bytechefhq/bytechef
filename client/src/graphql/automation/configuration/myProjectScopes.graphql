@@ -1,0 +1,3 @@
+query MyProjectScopes($projectId: ID!) {
+    myProjectScopes(projectId: $projectId)
+}

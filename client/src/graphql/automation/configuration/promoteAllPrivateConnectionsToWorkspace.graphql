@@ -1,4 +1,4 @@
-mutation promoteAllPrivateConnectionsToWorkspace($workspaceId: ID!) {
+mutation PromoteAllPrivateConnectionsToWorkspace($workspaceId: ID!) {
   promoteAllPrivateConnectionsToWorkspace(workspaceId: $workspaceId) {
     attempted
     promoted

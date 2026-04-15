@@ -8,12 +8,15 @@ import ProjectVersionHistorySheet from '@/pages/automation/project/components/Pr
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
 import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons/ProjectTabButtons';
+import ProjectUsersDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectUsersDialog';
 import WorkflowTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/WorkflowTabButtons';
 import {useSettingsMenu} from '@/pages/automation/project/components/project-header/components/settings-menu/hooks/useSettingsMenu';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {useHasProjectScope} from '@/shared/hooks/useHasProjectScope';
+import {useLoadProjectPermissions} from '@/shared/hooks/useLoadProjectPermissions';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
@@ -33,6 +36,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
+    const [showProjectUsersDialog, setShowProjectUsersDialog] = useState(false);
     const [showProjectShareDialog, setShowProjectShareDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
     const [showWorkflowShareDialog, setShowWorkflowShareDialog] = useState(false);
@@ -43,6 +47,12 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
             showEditWorkflowDialog: state.showEditWorkflowDialog,
         }))
     );
+
+    // Prime the permission store with this project's scopes so downstream gating (Members, delete, etc.) resolves
+    // without each child component firing its own query.
+    useLoadProjectPermissions(project.id);
+
+    const canViewMembers = useHasProjectScope(project.id, 'PROJECT_VIEW_USERS');
 
     const {
         handleDeleteProjectAlertDialogClick,
@@ -104,9 +114,11 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
 
                         <TabsContent className="mt-0" value="project">
                             <ProjectTabButtons
+                                canViewMembers={canViewMembers}
                                 onCloseDropdownMenuClick={() => setOpenDropdownMenu(false)}
                                 onDeleteProjectClick={() => setShowDeleteProjectAlertDialog(true)}
                                 onDuplicateProjectClick={handleDuplicateProjectClick}
+                                onMembersClick={() => setShowProjectUsersDialog(true)}
                                 onPullProjectFromGitClick={handlePullProjectFromGitClick}
                                 onShareProject={() => setShowProjectShareDialog(true)}
                                 onShowEditProjectDialogClick={() => setShowEditProjectDialog(true)}
@@ -176,6 +188,14 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                     onSheetOpenChange={setShowProjectVersionHistorySheet}
                     projectVersions={projectVersions}
                     sheetOpen={showProjectVersionHistorySheet}
+                />
+            )}
+
+            {showProjectUsersDialog && (
+                <ProjectUsersDialog
+                    onClose={() => setShowProjectUsersDialog(false)}
+                    open={showProjectUsersDialog}
+                    projectId={project.id!}
                 />
             )}
 

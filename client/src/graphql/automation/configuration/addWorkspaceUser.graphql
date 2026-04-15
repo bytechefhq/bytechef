@@ -1,0 +1,13 @@
+mutation AddWorkspaceUser($workspaceId: ID!, $userId: ID!, $role: WorkspaceRole!) {
+    addWorkspaceUser(workspaceId: $workspaceId, userId: $userId, role: $role) {
+        id
+        workspaceId
+        userId
+        workspaceRole
+        user {
+            email
+            firstName
+            lastName
+        }
+    }
+}

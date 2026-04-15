@@ -6,6 +6,8 @@ import {getCookie} from '@/shared/util/cookie-utils';
 import {createStore, useStore} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
+import {permissionStore} from './usePermissionStore';
+
 import type {ExtractState} from 'zustand/vanilla';
 
 export interface AuthenticationI {
@@ -82,6 +84,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
                     showLogin: true,
                     authenticated: false,
                 }));
+
+                permissionStore.getState().clearPermissions();
             },
 
             getAccount: async (): Promise<UserI | undefined> => {
@@ -147,6 +151,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
                             loginError: true,
                             showLogin: true,
                         }));
+
+                        permissionStore.getState().clearPermissions();
                     }
                 });
             },
@@ -159,6 +165,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
                         ...initialState,
                         showLogin: true,
                     }));
+
+                    permissionStore.getState().clearPermissions();
                 }
 
                 const {getAccount} = get();
@@ -193,6 +201,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
                             loginError: true,
                         }));
 
+                        permissionStore.getState().clearPermissions();
+
                         return undefined;
                     }
                 } catch {
@@ -200,6 +210,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
                         ...state,
                         loginError: true,
                     }));
+
+                    permissionStore.getState().clearPermissions();
 
                     return undefined;
                 }
@@ -209,6 +221,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
                 set(() => ({
                     ...initialState,
                 }));
+
+                permissionStore.getState().clearPermissions();
             },
         }),
         {

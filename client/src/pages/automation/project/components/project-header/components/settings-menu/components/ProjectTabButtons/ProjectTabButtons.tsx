@@ -13,13 +13,16 @@ import {
     HistoryIcon,
     Share2Icon,
     Trash2Icon,
+    UsersIcon,
 } from 'lucide-react';
 import {MouseEvent} from 'react';
 
 const ProjectTabButtons = ({
+    canViewMembers = true,
     onCloseDropdownMenuClick,
     onDeleteProjectClick,
     onDuplicateProjectClick,
+    onMembersClick,
     onPullProjectFromGitClick,
     onShareProject,
     onShowEditProjectDialogClick,
@@ -28,12 +31,14 @@ const ProjectTabButtons = ({
     projectGitConfigurationEnabled,
     projectId,
 }: {
+    canViewMembers?: boolean;
     onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
+    onMembersClick: () => void;
+    onPullProjectFromGitClick: () => void;
     onShareProject: () => void;
     onShowEditProjectDialogClick: () => void;
-    onPullProjectFromGitClick: () => void;
     onShowProjectGitConfigurationDialog: () => void;
     onShowProjectVersionHistorySheet: () => void;
     projectGitConfigurationEnabled: boolean;
@@ -41,10 +46,10 @@ const ProjectTabButtons = ({
 }) => {
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
 
-    const ff_1039 = useFeatureFlagsStore()('ff-1039');
-    const ff_1042 = useFeatureFlagsStore()('ff-1042');
-    const ff_2482 = useFeatureFlagsStore()('ff-2482');
-    const ff_2939 = useFeatureFlagsStore()('ff-2939');
+    const gitIntegrationEnabled = useFeatureFlagsStore()('ff-1039');
+    const shareProjectEnabled = useFeatureFlagsStore()('ff-1042');
+    const projectExportEnabled = useFeatureFlagsStore()('ff-2482');
+    const shareWithCommunityEnabled = useFeatureFlagsStore()('ff-2939');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
@@ -72,7 +77,7 @@ const ProjectTabButtons = ({
                 variant="ghost"
             />
 
-            {ff_1042 && (
+            {shareProjectEnabled && (
                 <Button
                     aria-label="Share ProjectButton"
                     className="dropdown-menu-item"
@@ -83,7 +88,7 @@ const ProjectTabButtons = ({
                 />
             )}
 
-            {ff_2939 && (
+            {shareWithCommunityEnabled && (
                 <Button
                     aria-label="Share Project with Community Button"
                     className="dropdown-menu-item"
@@ -98,7 +103,7 @@ const ProjectTabButtons = ({
                 />
             )}
 
-            {ff_2482 && (
+            {projectExportEnabled && (
                 <Button
                     aria-label="Export Project"
                     className="dropdown-menu-item"
@@ -111,7 +116,7 @@ const ProjectTabButtons = ({
 
             <Separator />
 
-            {ff_1039 && (
+            {gitIntegrationEnabled && (
                 <EEVersion hidden={true}>
                     <Button
                         aria-label="Pull Project from Git"
@@ -134,6 +139,17 @@ const ProjectTabButtons = ({
 
                     <Separator />
                 </EEVersion>
+            )}
+
+            {canViewMembers && (
+                <Button
+                    aria-label="Members"
+                    className="dropdown-menu-item"
+                    icon={<UsersIcon />}
+                    label="Members"
+                    onClick={onMembersClick}
+                    variant="ghost"
+                />
             )}
 
             <Button

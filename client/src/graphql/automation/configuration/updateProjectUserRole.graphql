@@ -1,0 +1,6 @@
+mutation UpdateProjectUserRole($projectId: ID!, $userId: ID!, $role: ProjectRole!) {
+    updateProjectUserRole(projectId: $projectId, userId: $userId, role: $role) {
+        id
+        projectRole
+    }
+}
