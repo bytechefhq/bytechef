@@ -708,6 +708,10 @@ class ConnectionFacadeIntTest {
         public String getWorkflowUuid(String workflowId) {
             return "";
         }
+
+        @Override
+        public void validateConnectionsForJob(long jobPrincipalId, String workflowUuid) {
+        }
     }
 
     private static class MockConnectionDefinition implements com.bytechef.component.definition.ConnectionDefinition {

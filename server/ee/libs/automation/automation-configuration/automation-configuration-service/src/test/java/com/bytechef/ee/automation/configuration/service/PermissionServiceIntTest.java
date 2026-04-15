@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
@@ -359,6 +360,11 @@ class PermissionServiceIntTest {
             }
 
             return (ProjectDeploymentFacade) constructor.newInstance(arguments);
+        }
+
+        @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return mock(ResourceVisibilityResolver.class);
         }
 
         @Bean

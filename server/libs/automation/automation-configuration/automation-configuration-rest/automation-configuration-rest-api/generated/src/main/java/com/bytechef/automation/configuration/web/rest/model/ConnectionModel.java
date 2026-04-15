@@ -72,6 +72,84 @@ public class ConnectionModel {
 
   private List<@Valid TagModel> tags = new ArrayList<>();
 
+  /**
+   * Lifecycle state of the connection. ACTIVE is the normal operating state. PENDING_REASSIGNMENT indicates the owner was removed from the workspace and the connection awaits reassignment. REVOKED is terminal and cannot transition back.
+   */
+  public enum StatusEnum {
+    ACTIVE("ACTIVE"),
+    
+    PENDING_REASSIGNMENT("PENDING_REASSIGNMENT"),
+    
+    REVOKED("REVOKED");
+
+    private final String value;
+
+    StatusEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static StatusEnum fromValue(String value) {
+      for (StatusEnum b : StatusEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable StatusEnum status;
+
+  /**
+   * The visibility scope of the connection. Defaults to WORKSPACE when omitted on create; PRIVATE is also accepted. ORGANIZATION is not user-settable.
+   */
+  public enum VisibilityEnum {
+    PRIVATE("PRIVATE"),
+    
+    WORKSPACE("WORKSPACE"),
+    
+    ORGANIZATION("ORGANIZATION");
+
+    private final String value;
+
+    VisibilityEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static VisibilityEnum fromValue(String value) {
+      for (VisibilityEnum b : VisibilityEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable VisibilityEnum visibility;
+
   private @Nullable Integer version;
 
   private @Nullable Long workspaceId;
@@ -479,6 +557,48 @@ public class ConnectionModel {
     this.tags = tags;
   }
 
+  public ConnectionModel status(@Nullable StatusEnum status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * Lifecycle state of the connection. ACTIVE is the normal operating state. PENDING_REASSIGNMENT indicates the owner was removed from the workspace and the connection awaits reassignment. REVOKED is terminal and cannot transition back.
+   * @return status
+   */
+  
+  @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "Lifecycle state of the connection. ACTIVE is the normal operating state. PENDING_REASSIGNMENT indicates the owner was removed from the workspace and the connection awaits reassignment. REVOKED is terminal and cannot transition back.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("status")
+  public @Nullable StatusEnum getStatus() {
+    return status;
+  }
+
+  @JsonProperty("status")
+  public void setStatus(@Nullable StatusEnum status) {
+    this.status = status;
+  }
+
+  public ConnectionModel visibility(@Nullable VisibilityEnum visibility) {
+    this.visibility = visibility;
+    return this;
+  }
+
+  /**
+   * The visibility scope of the connection. Defaults to WORKSPACE when omitted on create; PRIVATE is also accepted. ORGANIZATION is not user-settable.
+   * @return visibility
+   */
+  
+  @Schema(name = "visibility", description = "The visibility scope of the connection. Defaults to WORKSPACE when omitted on create; PRIVATE is also accepted. ORGANIZATION is not user-settable.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("visibility")
+  public @Nullable VisibilityEnum getVisibility() {
+    return visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(@Nullable VisibilityEnum visibility) {
+    this.visibility = visibility;
+  }
+
   public ConnectionModel version(@Nullable Integer version) {
     this.version = version;
     return this;
@@ -547,13 +667,15 @@ public class ConnectionModel {
         Objects.equals(this.name, connection.name) &&
         Objects.equals(this.parameters, connection.parameters) &&
         Objects.equals(this.tags, connection.tags) &&
+        Objects.equals(this.status, connection.status) &&
+        Objects.equals(this.visibility, connection.visibility) &&
         Objects.equals(this.version, connection.version) &&
         Objects.equals(this.workspaceId, connection.workspaceId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version, workspaceId);
+    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, status, visibility, version, workspaceId);
   }
 
   @Override
@@ -577,6 +699,8 @@ public class ConnectionModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    visibility: ").append(toIndentedString(visibility)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");
     sb.append("}");
