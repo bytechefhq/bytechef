@@ -41,4 +41,10 @@ public interface JobPrincipalAccessor {
     String getLastWorkflowId(String workflowUuid);
 
     String getWorkflowUuid(String workflowId);
+
+    /**
+     * Pre-dispatch hook: verifies that every connection the workflow references is in a state that permits execution.
+     * Implementations that don't model workflow-scoped connections may leave this as a no-op.
+     */
+    void validateConnectionsForJob(long jobPrincipalId, String workflowUuid);
 }

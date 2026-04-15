@@ -16,10 +16,12 @@
 
 package com.bytechef.platform.workflow.coordinator.trigger.completion;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -100,6 +102,20 @@ class TriggerCompletionHandlerTest {
         doReturn(Map.of("metaKey", "metaValue"))
             .when(jobPrincipalAccessor)
             .getMetadataMap(1L);
+    }
+
+    @Test
+    void testHandleLeavesTriggerStateUntouchedWhenAConnectionIsInactive() {
+        IllegalStateException inactiveConnection = new IllegalStateException("inactive connection");
+
+        doThrow(inactiveConnection).when(jobPrincipalAccessor)
+            .validateConnectionsForJob(1L, "workflow-uuid");
+
+        assertThatThrownBy(() -> triggerCompletionHandler.handle(triggerExecution)).isSameAs(inactiveConnection);
+
+        verify(triggerExecution, never()).setStatus(any());
+        verify(triggerExecutionService, never()).update(any());
+        verify(triggerStateService, never()).save(any(), any());
     }
 
     @Test

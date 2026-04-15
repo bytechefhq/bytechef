@@ -14,10 +14,14 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.facade.WorkspaceUserFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.test.config.graphql.GraphQLScalarTypes;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,7 +31,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @version ee
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = WorkspaceUserGraphQlController.class)
+@ContextConfiguration(classes = {
+    WorkspaceUserGraphQlController.class,
+    WorkspaceUserGraphQlControllerIntTest.WorkspaceUserGraphQlControllerIntTestConfiguration.class
+})
 @GraphQlTest(
     controllers = WorkspaceUserGraphQlController.class,
     properties = {
@@ -92,5 +99,15 @@ class WorkspaceUserGraphQlControllerIntTest {
             .errors()
             .expect(error -> true)
             .verify();
+    }
+
+    @Configuration
+    static class WorkspaceUserGraphQlControllerIntTestConfiguration {
+
+        @Bean
+        RuntimeWiringConfigurer scalarWiringConfigurer() {
+            return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.longScalar())
+                .scalar(GraphQLScalarTypes.mapScalar());
+        }
     }
 }
