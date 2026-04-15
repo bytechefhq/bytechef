@@ -1,0 +1,3 @@
+mutation RevokeConnectionAccess($workspaceId: ID!, $connectionId: ID!, $userId: ID!) {
+    revokeConnectionAccess(workspaceId: $workspaceId, connectionId: $connectionId, userId: $userId)
+}
