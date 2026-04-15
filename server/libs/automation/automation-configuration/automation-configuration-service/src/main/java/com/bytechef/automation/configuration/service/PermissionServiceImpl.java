@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -51,14 +52,21 @@ public class PermissionServiceImpl implements PermissionService {
 
     private final UserService userService;
     private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
+    private final Map<String, ResourceVisibilityProvider> resourceVisibilityProviders;
+    private final ResourceVisibilityResolver resourceVisibilityResolver;
 
     @SuppressFBWarnings("EI")
     public PermissionServiceImpl(
-        UserService userService, List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
+        UserService userService, List<ResourceOwnershipResolver> resourceOwnershipResolvers,
+        List<ResourceVisibilityProvider> resourceVisibilityProviders,
+        ResourceVisibilityResolver resourceVisibilityResolver) {
 
         this.userService = userService;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
             .collect(Collectors.toMap(ResourceOwnershipResolver::resourceType, Function.identity()));
+        this.resourceVisibilityProviders = resourceVisibilityProviders.stream()
+            .collect(Collectors.toMap(ResourceVisibilityProvider::resourceType, Function.identity()));
+        this.resourceVisibilityResolver = resourceVisibilityResolver;
     }
 
     @Override
@@ -98,6 +106,13 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
+        // Visibility is a precondition of every scope check, not a filter running beside it. Without this a member
+        // would pass here for a resource the list correctly hides — the by-id half of the same authorization
+        // question answering differently from the list half.
+        if (!isResourceVisible(id, resourceType)) {
+            return false;
+        }
+
         ResourceOwnershipResolver resolver = resourceOwnershipResolvers.get(resourceType);
 
         if (resolver == null) {
@@ -106,6 +121,19 @@ public class PermissionServiceImpl implements PermissionService {
 
         ResourceOwner resourceOwner = resolver.resolveOwner(id);
 
+        if (resourceVisibilityProviders.containsKey(resourceType)) {
+            // Visibility already decided this, and it is the stricter answer: CE creates every connection
+            // WORKSPACE-visible, so also requiring the caller to be the owner would deny a colleague the list has
+            // already shown them. All that remains is that the resource actually exists somewhere.
+            return resourceOwner.workspaceId()
+                .isPresent() ||
+                resourceOwner.ownerUserId()
+                    .isPresent();
+        }
+
+        // Resource families that have not opted into visibility keep CE owner-isolation unchanged. API keys are
+        // user-owned and have no visibility concept; relaxing them here would hand every authenticated user a
+        // colleague's key.
         OptionalLong ownerUserId = resourceOwner.ownerUserId();
 
         if (ownerUserId.isPresent()) {
@@ -114,6 +142,35 @@ public class PermissionServiceImpl implements PermissionService {
 
         return resourceOwner.workspaceId()
             .isPresent();
+    }
+
+    /**
+     * Whether the current principal may see the resource at all, delegating to the same resolver the list path uses so
+     * the two cannot drift. A resource type with no registered provider has not opted into visibility and is
+     * unrestricted by it; a registered type whose resource does not exist fails closed.
+     */
+    private boolean isResourceVisible(Serializable id, String resourceType) {
+        ResourceVisibilityProvider resourceVisibilityProvider = resourceVisibilityProviders.get(resourceType);
+
+        if (resourceVisibilityProvider == null) {
+            return true;
+        }
+
+        if (!(id instanceof Number number)) {
+            return false;
+        }
+
+        return resourceVisibilityProvider.fetchVisibility(number.longValue())
+            .map(visibilityRecord -> {
+                // workspaceId is unused by both resolver implementations — they resolve against the current
+                // principal, not the argument — so 0 is safe. The parameter exists for a future SQL-predicate
+                // implementation.
+                Set<Long> visibleIds = resourceVisibilityResolver.filterVisibleIds(
+                    resourceType, 0L, List.of(visibilityRecord));
+
+                return !visibleIds.isEmpty();
+            })
+            .orElse(false);
     }
 
     @Override

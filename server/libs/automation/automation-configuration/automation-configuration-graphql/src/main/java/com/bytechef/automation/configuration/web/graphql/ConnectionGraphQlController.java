@@ -18,14 +18,16 @@ package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
-import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.service.ConnectionCredentialStoreType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
+ * Authorization (ADMIN) is enforced on {@link WorkspaceConnectionFacade}, not here.
+ *
  * @author Ivica Cardic
  */
 @Controller
@@ -40,10 +42,32 @@ public class ConnectionGraphQlController {
     }
 
     @MutationMapping(name = "disconnectConnection")
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Boolean disconnectConnection(@Argument long connectionId) {
         workspaceConnectionFacade.disconnectConnection(connectionId);
 
         return true;
+    }
+
+    @MutationMapping(name = "registerExistingConnection")
+    public Long registerExistingConnection(@Argument RegisterExistingConnectionInput input) {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .componentName(input.componentName())
+            .connectionVersion(input.connectionVersion())
+            .environmentId((int) input.environmentId())
+            .name(input.name())
+            .build();
+
+        return workspaceConnectionFacade.registerExisting(
+            input.workspaceId(), connectionDTO, input.credentialStoreType(), input.credentialRef());
+    }
+
+    public record RegisterExistingConnectionInput(
+        String componentName,
+        int connectionVersion,
+        String credentialRef,
+        ConnectionCredentialStoreType credentialStoreType,
+        long environmentId,
+        String name,
+        long workspaceId) {
     }
 }

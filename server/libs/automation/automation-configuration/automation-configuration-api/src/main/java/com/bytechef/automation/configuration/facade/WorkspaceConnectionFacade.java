@@ -20,6 +20,11 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import java.util.List;
 
 /**
+ * Workspace-scoped connection CRUD. The base contract carries only edition-agnostic operations (create, register,
+ * delete, disconnect, read); the EE-only visibility transitions (promote/demote/share/revoke) live on the EE
+ * {@code com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionFacade} sub-interface so no EE-licensed
+ * visibility logic ships in the CE artifact.
+ *
  * @author Ivica Cardic
  */
 public interface WorkspaceConnectionFacade {

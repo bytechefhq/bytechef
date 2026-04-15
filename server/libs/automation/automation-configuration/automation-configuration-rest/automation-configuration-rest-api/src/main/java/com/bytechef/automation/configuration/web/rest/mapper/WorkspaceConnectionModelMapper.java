@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationCo
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -29,5 +30,6 @@ import org.springframework.core.convert.converter.Converter;
 public interface WorkspaceConnectionModelMapper extends Converter<ConnectionModel, ConnectionDTO> {
 
     @Override
+    @Mapping(target = "status", ignore = true)
     ConnectionDTO convert(ConnectionModel connectionModel);
 }

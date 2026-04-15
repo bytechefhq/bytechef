@@ -30,6 +30,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,7 +57,19 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Long> createConnection(ConnectionModel connectionModel) {
+        // Authenticated-only at this layer. Workspace membership is enforced in
+        // WorkspaceConnectionFacadeImpl.create so every entry point (REST, GraphQL, future SDK clients) shares
+        // the same authorization path.
+
+        // A request that names no visibility gets the shared default: a connection is visible to its workspace
+        // unless its owner says otherwise. CE overwrites this with WORKSPACE and embedded with PRIVATE further
+        // down, in ConnectionFacadeImpl.
+        if (connectionModel.getVisibility() == null) {
+            connectionModel.setVisibility(ConnectionModel.VisibilityEnum.WORKSPACE);
+        }
+
         return ResponseEntity.ok(
             workspaceConnectionFacade.create(
                 Objects.requireNonNull(connectionModel.getWorkspaceId()),

@@ -25,6 +25,7 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSha
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * @author Ivica Cardic
@@ -43,6 +45,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @ConnectionIntTestConfigurationSharedMocks
+@WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
 public class ConnectionServiceIntTest {
 
     @Autowired

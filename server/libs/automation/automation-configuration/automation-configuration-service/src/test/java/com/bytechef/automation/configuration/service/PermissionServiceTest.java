@@ -19,9 +19,11 @@ package com.bytechef.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +38,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class PermissionServiceTest {
 
     private final PermissionService permissionService =
-        new PermissionServiceImpl(mock(UserService.class), List.of());
+        new PermissionServiceImpl(mock(UserService.class), List.of(), List.of(), permissiveResolver());
 
     @BeforeEach
     void setUp() {
@@ -127,5 +129,15 @@ class PermissionServiceTest {
     @Test
     void testEvictAllWorkspaceScopeCacheIsNoOp() {
         permissionService.evictAllWorkspaceScopeCache();
+    }
+
+    /**
+     * A resolver that hides nothing, so these tests exercise the ownership and scope logic rather than visibility.
+     * Visibility gating has its own tests.
+     */
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

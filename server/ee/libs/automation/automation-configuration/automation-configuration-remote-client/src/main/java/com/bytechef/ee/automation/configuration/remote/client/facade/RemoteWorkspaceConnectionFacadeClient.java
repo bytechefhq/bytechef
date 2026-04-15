@@ -7,8 +7,9 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
-import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -43,4 +44,25 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
 
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void setConnectionVisibility(long workspaceId, long connectionId, ResourceVisibility visibility) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void grantConnectionAccess(long workspaceId, long connectionId, long userId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void revokeConnectionAccess(long workspaceId, long connectionId, long userId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Long> getConnectionGrants(long workspaceId, long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
 }

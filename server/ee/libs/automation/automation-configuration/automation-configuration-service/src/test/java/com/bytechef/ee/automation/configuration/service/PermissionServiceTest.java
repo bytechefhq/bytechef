@@ -23,6 +23,8 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -34,6 +36,7 @@ import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,7 +81,7 @@ class PermissionServiceTest {
 
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of());
+            workspaceUserRepository, List.of(), List.of(), permissiveResolver());
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -470,7 +473,7 @@ class PermissionServiceTest {
     private PermissionServiceImpl createService(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers));
+            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver());
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
@@ -485,5 +488,15 @@ class PermissionServiceTest {
                 return owner;
             }
         };
+    }
+
+    /**
+     * A resolver that hides nothing, so these tests exercise workspace-scope and ownership resolution rather than
+     * visibility. The visibility precondition has its own test class.
+     */
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }
