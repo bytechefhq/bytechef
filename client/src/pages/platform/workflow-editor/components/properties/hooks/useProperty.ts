@@ -565,6 +565,18 @@ export const useProperty = ({
 
         isSavingRef.current = true;
 
+        const isDateOrTimeControlType = controlType === 'DATE' || controlType === 'DATE_TIME' || controlType === 'TIME';
+
+        let resolvedValue: unknown;
+
+        if (isNumericalInput) {
+            resolvedValue = parseFloat(valueToSave as string);
+        } else if (valueToSave === '' && isDateOrTimeControlType) {
+            resolvedValue = null;
+        } else {
+            resolvedValue = valueToSave;
+        }
+
         saveProperty({
             includeInMetadata: custom,
             path,
@@ -572,7 +584,7 @@ export const useProperty = ({
             type,
             updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
-            value: isNumericalInput ? parseFloat(valueToSave as string) : valueToSave,
+            value: resolvedValue,
             workflowId: workflow.id!,
         });
     }, 600);
