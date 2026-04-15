@@ -84,7 +84,7 @@ import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverI
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.ee.embedded.ai.mcp.facade.EmbeddedMcpServerFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.security.EmbeddedMcpServerOwnershipResolver;
@@ -1030,8 +1030,8 @@ class EmbeddedGatesIntTest {
         }
 
         @Bean
-        WorkspaceScopeCacheService workspaceScopeCacheService() {
-            return mock(WorkspaceScopeCacheService.class);
+        WorkspaceScopeCache workspaceScopeCache() {
+            return mock(WorkspaceScopeCache.class);
         }
 
         @Bean
@@ -1080,7 +1080,7 @@ class EmbeddedGatesIntTest {
         PermissionScopeRegistry.class, PermissionServiceImpl.class, ProjectOwnershipResolver.class,
         ProjectPermissionScopeProvider.class, ProjectWorkflowExecutionFacadeImpl.class,
         WorkflowPermissionScopeProvider.class,
-        WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
+        WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class
     })
     static class RealPermissionConfiguration {
 

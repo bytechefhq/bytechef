@@ -45,7 +45,7 @@ import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheServic
 import com.bytechef.ee.automation.configuration.service.EmbeddedUserServiceImpl;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.UserService;
@@ -242,7 +242,7 @@ class EmbeddedUserFacadeIntTest {
         ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
         ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class, ProjectPermissionScopeProvider.class,
         WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
-        WorkspaceScopeCacheService.class
+        WorkspaceScopeCache.class
     })
     static class RealEmbeddedUserFacadeConfiguration {
 
