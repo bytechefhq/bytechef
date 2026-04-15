@@ -59,6 +59,7 @@ import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -344,13 +345,30 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             (ClusterRootComponentDefinition) componentDefinitionRegistry.getComponentDefinition(
                 rootComponentName, rootComponentVersion);
 
+        Optional<ClusterElementType> found = findClusterElementType(rootComponentDefinition, clusterElementTypeName);
+
+        return found.orElseGet(
+            () -> componentDefinitionRegistry.getComponentDefinitions()
+                .stream()
+                .filter(ClusterRootComponentDefinition.class::isInstance)
+                .map(ClusterRootComponentDefinition.class::cast)
+                .map(nestedRoot -> findClusterElementType(nestedRoot, clusterElementTypeName))
+                .flatMap(Optional::stream)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Cluster element type %s not found in root component %s".formatted(
+                        clusterElementTypeName, rootComponentName))));
+
+    }
+
+    private static Optional<ClusterElementType> findClusterElementType(
+        ClusterRootComponentDefinition rootComponentDefinition, String clusterElementTypeName) {
+
         return rootComponentDefinition.getClusterElementTypes()
             .stream()
-            .filter(curClusterElementType -> clusterElementTypeName.equalsIgnoreCase(curClusterElementType.name()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Cluster element type %s not found in root component %s".formatted(
-                    clusterElementTypeName, rootComponentName)));
+            .filter(curClusterElementType -> clusterElementTypeName.equalsIgnoreCase(curClusterElementType.name())
+                || clusterElementTypeName.equalsIgnoreCase(curClusterElementType.key()))
+            .findFirst();
     }
 
     @Override
