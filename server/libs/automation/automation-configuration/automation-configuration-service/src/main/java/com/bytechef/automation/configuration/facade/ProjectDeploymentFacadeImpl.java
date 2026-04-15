@@ -222,7 +222,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
             principalJobService.deletePrincipalJobs(jobId, PlatformType.AUTOMATION);
+        }
 
+        for (long jobId : jobIds) {
             jobFacade.deleteJob(jobId);
         }
 

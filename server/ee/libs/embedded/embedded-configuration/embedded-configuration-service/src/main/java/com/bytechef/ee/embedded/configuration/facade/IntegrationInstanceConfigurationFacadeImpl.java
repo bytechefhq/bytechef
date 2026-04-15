@@ -237,7 +237,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
             principalJobService.deletePrincipalJobs(jobId, PlatformType.EMBEDDED);
+        }
 
+        for (long jobId : jobIds) {
             jobFacade.deleteJob(jobId);
         }
 

@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,6 +61,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -186,6 +188,33 @@ public class ProjectDeploymentFacadeIntTest {
             true);
 
         assertThat(workspaceProjectDeployments).hasSize(0);
+    }
+
+    @Test
+    public void testDeleteProjectDeploymentRemovesAllPrincipalJobsBeforeAnyJob() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDeploymentDTO projectDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), projectDTO);
+
+        long deploymentId = projectDeploymentDTO.id();
+        long parentJobId = 501L;
+        long childJobId = 502L;
+
+        when(principalJobService.getJobIds(deploymentId, PlatformType.AUTOMATION))
+            .thenReturn(List.of(parentJobId, childJobId));
+
+        projectDeploymentFacade.deleteProjectDeployment(deploymentId);
+
+        InOrder inOrder = inOrder(principalJobService, jobFacade);
+
+        inOrder.verify(principalJobService)
+            .deletePrincipalJobs(parentJobId, PlatformType.AUTOMATION);
+        inOrder.verify(principalJobService)
+            .deletePrincipalJobs(childJobId, PlatformType.AUTOMATION);
+        inOrder.verify(jobFacade)
+            .deleteJob(parentJobId);
+        inOrder.verify(jobFacade)
+            .deleteJob(childJobId);
     }
 
     @Disabled
