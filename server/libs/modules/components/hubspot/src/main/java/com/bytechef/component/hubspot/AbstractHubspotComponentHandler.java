@@ -25,6 +25,7 @@ import com.bytechef.component.hubspot.action.HubspotCreateContactAction;
 import com.bytechef.component.hubspot.action.HubspotCreateDealAction;
 import com.bytechef.component.hubspot.action.HubspotDeleteContactAction;
 import com.bytechef.component.hubspot.action.HubspotGetContactAction;
+import com.bytechef.component.hubspot.action.HubspotGetContactsAction;
 import com.bytechef.component.hubspot.action.HubspotGetTicketAction;
 import com.bytechef.component.hubspot.action.HubspotUpdateContactAction;
 import com.bytechef.component.hubspot.connection.HubspotConnection;
@@ -43,13 +44,13 @@ public abstract class AbstractHubspotComponentHandler implements OpenApiComponen
             .version(1))
                 .actions(modifyActions(HubspotCreateContactAction.ACTION_DEFINITION,
                     HubspotCreateDealAction.ACTION_DEFINITION, HubspotDeleteContactAction.ACTION_DEFINITION,
-                    HubspotGetContactAction.ACTION_DEFINITION, HubspotGetTicketAction.ACTION_DEFINITION,
-                    HubspotUpdateContactAction.ACTION_DEFINITION))
+                    HubspotGetContactAction.ACTION_DEFINITION, HubspotGetContactsAction.ACTION_DEFINITION,
+                    HubspotGetTicketAction.ACTION_DEFINITION, HubspotUpdateContactAction.ACTION_DEFINITION))
                 .connection(modifyConnection(HubspotConnection.CONNECTION_DEFINITION))
                 .clusterElements(modifyClusterElements(tool(HubspotCreateContactAction.ACTION_DEFINITION),
                     tool(HubspotCreateDealAction.ACTION_DEFINITION), tool(HubspotDeleteContactAction.ACTION_DEFINITION),
-                    tool(HubspotGetContactAction.ACTION_DEFINITION), tool(HubspotGetTicketAction.ACTION_DEFINITION),
-                    tool(HubspotUpdateContactAction.ACTION_DEFINITION)))
+                    tool(HubspotGetContactAction.ACTION_DEFINITION), tool(HubspotGetContactsAction.ACTION_DEFINITION),
+                    tool(HubspotGetTicketAction.ACTION_DEFINITION), tool(HubspotUpdateContactAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override

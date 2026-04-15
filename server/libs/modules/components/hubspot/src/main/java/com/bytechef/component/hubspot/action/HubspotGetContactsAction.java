@@ -16,17 +16,14 @@
 
 package com.bytechef.component.hubspot.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.hubspot.property.HubspotContactProperties;
-import com.bytechef.component.hubspot.util.HubspotUtils;
 import java.util.Map;
 
 /**
@@ -34,27 +31,24 @@ import java.util.Map;
  *
  * @generated
  */
-public class HubspotGetContactAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getContact")
-        .title("Get Contact")
-        .description("Get contact details.")
+public class HubspotGetContactsAction {
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getContacts")
+        .title("Get Contacts")
+        .description("Get all contacts.")
         .metadata(
             Map.of(
                 "method", "GET",
-                "path", "/crm/v3/objects/contacts/{contactId}"
+                "path", "/crm/v3/objects/contacts"
 
             ))
-        .properties(string("contactId").label("Contact ID")
-            .required(true)
-            .options((ActionDefinition.OptionsFunction<String>) HubspotUtils::getContactIdOptions)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.PATH)))
-        .output(outputSchema(object().properties(HubspotContactProperties.PROPERTIES)
+        .properties()
+        .output(outputSchema(object()
+            .properties(array("results").items(object().properties(HubspotContactProperties.PROPERTIES))
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));
 
-    private HubspotGetContactAction() {
+    private HubspotGetContactsAction() {
     }
 }
