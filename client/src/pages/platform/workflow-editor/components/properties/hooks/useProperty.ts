@@ -569,10 +569,10 @@ export const useProperty = ({
 
         let resolvedValue: unknown;
 
-        if (isNumericalInput) {
-            resolvedValue = parseFloat(valueToSave as string);
-        } else if (valueToSave === '' && isDateOrTimeControlType) {
+        if (valueToSave === '' && (isNumericalInput || isDateOrTimeControlType)) {
             resolvedValue = null;
+        } else if (isNumericalInput) {
+            resolvedValue = parseFloat(valueToSave as string);
         } else {
             resolvedValue = valueToSave;
         }
