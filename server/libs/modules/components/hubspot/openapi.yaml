@@ -249,6 +249,68 @@ paths:
                       hubspot_owner_id:
                         type: "string"
                         description: "ID for the HubSpot user responsible for managing the deal."
+  /crm/lists/2026-03:
+    post:
+      summary: "Create List"
+      description: "Create a new list."
+      operationId: "createList"
+      x-ai-agent-tool: true
+      security:
+        - "oauth2":
+            - "crm.lists.write"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "List"
+              type: "object"
+              required:
+                - "name"
+                - "objectTypeId"
+                - "processingType"
+              properties:
+                name:
+                  type: "string"
+                  title: "Name"
+                  description: "The name of the list, which must be globally unique across all public lists in the portal."
+                objectTypeId:
+                  type: "string"
+                  title: "Object Type ID"
+                  description: "The object type ID of the type of objects that the list will store. (e.g., 0-1 for contacts)."
+                  default: "0-1"
+                processingType:
+                  type: "string"
+                  title: "Processing Type"
+                  description: "The processing type of the list."
+                  enum:
+                    - "MANUAL"
+                    - "DYNAMIC"
+                    - "SNAPSHOT"
+                listFolderId:
+                  type: "integer"
+                  title: "List Folder ID"
+                  description: "The ID of the folder that the list should be created in. If left blank, then the list will be created in the root of the list folder structure."
+                membershipSettings:
+                  type: "object"
+                  title: "Membership Settings"
+                  description: "Settings controlling list membership."
+                  properties:
+                    includeUnassigned:
+                      type: "boolean"
+                      description: "Whether to include unassigned records."
+                    membershipTeamId:
+                      type: "integer"
+                      description: "The team ID for membership filtering."
+      responses:
+        201:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  list:
+                    $ref: "#/components/schemas/List"
   /crm/v3/objects/tickets/{ticketId}:
     get:
       summary: "Get Ticket"
@@ -301,6 +363,79 @@ paths:
                         description: "The subject or title of the ticket, summarizing the issue or request."
 components:
   schemas:
+    List:
+      type: "object"
+      properties:
+        listId:
+          type: "string"
+          description: "ID of the list."
+        listVersion:
+          type: "integer"
+          description: "Version of the list."
+        name:
+          type: "string"
+          description: "Name of the list."
+        objectTypeId:
+          type: "string"
+          description: "Object type ID of the list."
+        processingStatus:
+          type: "string"
+          description: "Current processing status of the list."
+        processingType:
+          type: "string"
+          description: "Processing type of the list."
+        createdAt:
+          type: "string"
+          format: "date-time"
+          description: "When the list was created."
+        createdById:
+          type: "string"
+          description: "ID of the user who created the list."
+        deletedAt:
+          type: "string"
+          format: "date-time"
+          description: "When the list was deleted."
+        filterBranch:
+          type: "object"
+          description: "Filter branch defining membership criteria."
+        filtersUpdatedAt:
+          type: "string"
+          format: "date-time"
+          description: "When the filters were last updated."
+        listPermissions:
+          type: "object"
+          description: "Permissions for the list."
+          properties:
+            teamsWithEditAccess:
+              type: "array"
+              description: "Team IDs with edit access."
+              items:
+                type: "integer"
+            usersWithEditAccess:
+              type: "array"
+              description: "User IDs with edit access."
+              items:
+                type: "integer"
+        membershipSettings:
+          type: "object"
+          description: "Settings controlling list membership."
+          properties:
+            includeUnassigned:
+              type: "boolean"
+              description: "Whether unassigned records are included."
+            membershipTeamId:
+              type: "integer"
+              description: "The team ID for membership filtering."
+        size:
+          type: "integer"
+          description: "Number of members in the list."
+        updatedAt:
+          type: "string"
+          format: "date-time"
+          description: "When the list was last updated."
+        updatedById:
+          type: "string"
+          description: "ID of the user who last updated the list."
     Contact:
       properties:
         id:
