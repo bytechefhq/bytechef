@@ -1,0 +1,9 @@
+query unresolvedConnections($workspaceId: ID!, $userLogin: String!) {
+    unresolvedConnections(workspaceId: $workspaceId, userLogin: $userLogin) {
+        connectionId
+        connectionName
+        visibility
+        environmentId
+        dependentWorkflowCount
+    }
+}
