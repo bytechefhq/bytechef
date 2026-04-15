@@ -31,9 +31,9 @@ const ProjectTabButtons = ({
     onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
+    onPullProjectFromGitClick: () => void;
     onShareProject: () => void;
     onShowEditProjectDialogClick: () => void;
-    onPullProjectFromGitClick: () => void;
     onShowProjectGitConfigurationDialog: () => void;
     onShowProjectVersionHistorySheet: () => void;
     projectGitConfigurationEnabled: boolean;
@@ -41,9 +41,9 @@ const ProjectTabButtons = ({
 }) => {
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
 
-    const ff_1039 = useFeatureFlagsStore()('ff-1039');
-    const ff_1042 = useFeatureFlagsStore()('ff-1042');
-    const ff_2939 = useFeatureFlagsStore()('ff-2939');
+    const gitIntegrationEnabled = useFeatureFlagsStore()('ff-1039');
+    const shareProjectEnabled = useFeatureFlagsStore()('ff-1042');
+    const shareWithCommunityEnabled = useFeatureFlagsStore()('ff-2939');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
@@ -71,7 +71,7 @@ const ProjectTabButtons = ({
                 variant="ghost"
             />
 
-            {ff_1042 && (
+            {shareProjectEnabled && (
                 <Button
                     aria-label="Share ProjectButton"
                     className="dropdown-menu-item"
@@ -82,7 +82,7 @@ const ProjectTabButtons = ({
                 />
             )}
 
-            {ff_2939 && (
+            {shareWithCommunityEnabled && (
                 <Button
                     aria-label="Share Project with Community Button"
                     className="dropdown-menu-item"
@@ -108,7 +108,7 @@ const ProjectTabButtons = ({
 
             <Separator />
 
-            {ff_1039 && (
+            {gitIntegrationEnabled && (
                 <EEVersion hidden={true}>
                     <Button
                         aria-label="Pull Project from Git"

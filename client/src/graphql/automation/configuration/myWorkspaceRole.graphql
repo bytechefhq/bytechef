@@ -1,0 +1,3 @@
+query MyWorkspaceRole($workspaceId: ID!) {
+    myWorkspaceRole(workspaceId: $workspaceId)
+}
