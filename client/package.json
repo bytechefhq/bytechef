@@ -18,13 +18,14 @@
         "not IE 11"
     ],
     "engines": {
-        "node": ">=20.19"
+        "node": "^20.19.0 || ^22.12.0 || >=23.0.0"
     },
     "scripts": {
         "dev": "vite",
         "codegen": "graphql-codegen --config codegen.ts",
-        "build": "tsc && vite build",
-        "build:cloud": "tsc && vite build --mode cloud",
+        "check:node": "node scripts/check-node-version.mjs",
+        "build": "npm run check:node && tsc && vite build",
+        "build:cloud": "npm run check:node && tsc && vite build --mode cloud",
         "serve": "vite preview",
         "test": "vitest run",
         "test:watch": "vitest watch",

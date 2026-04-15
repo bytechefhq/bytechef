@@ -30,6 +30,9 @@ if [ "$1" = "--registry-url" ]; then
     shift 2
 fi
 
+echo "Validating Node.js version required for client build..."
+node client/scripts/check-node-version.mjs || exit 1
+
 cd server/apps/server-app
 ../../../gradlew clean build -Pprod
 
