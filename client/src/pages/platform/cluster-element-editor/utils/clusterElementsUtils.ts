@@ -300,7 +300,7 @@ export function getFilteredClusterElementTypes({
 
             const nestedClusterRootElementTypes = elementTypes[currentClusterElementsType || ''];
 
-            if (!nestedClusterRootElementTypes || nestedClusterRootElementTypes.length === 0) {
+            if (!nestedClusterRootElementTypes) {
                 return true;
             }
 
@@ -316,7 +316,7 @@ export function getFilteredClusterElementTypes({
 
             const operationElementTypes = actionTypes[operationName];
 
-            if (!operationElementTypes || operationElementTypes.length === 0) {
+            if (!operationElementTypes) {
                 return true;
             }
 
