@@ -2,6 +2,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormattedName';
 import saveWorkflowDefinition from '@/pages/platform/workflow-editor/utils/saveWorkflowDefinition';
+import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType, TaskDispatcherContextType, UpdateWorkflowMutationType} from '@/shared/types';
 
@@ -14,30 +15,23 @@ interface PasteNodeI {
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
-const TASK_DISPATCHER_NAMES = new Set([
-    'condition',
-    'branch',
-    'loop',
-    'map',
-    'each',
-    'parallel',
-    'fork-join',
-    'on-error',
-]);
-
-const isTaskDispatcher = (componentName: string): boolean => TASK_DISPATCHER_NAMES.has(componentName);
+const isTaskDispatcher = (componentName: string): boolean => TASK_DISPATCHER_NAMES.includes(componentName);
 
 const getNextAvailableName = (copiedLabel: string, existingLabels: string[]): string => {
     let counter = 1;
-    const escapedBase = copiedLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`^${escapedBase} \\((\\d+)\\)$`);
+
+    const escapedCopiedLabel = copiedLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const labelWithCounterRegex = new RegExp(`^${escapedCopiedLabel} \\((\\d+)\\)$`);
 
     existingLabels.forEach((label) => {
-        const match = label.match(regex);
-        if (match) {
-            const num = parseInt(match[1], 10);
-            if (num >= counter) {
-                counter = num + 1;
+        const matchingLabel = label.match(labelWithCounterRegex);
+
+        if (matchingLabel) {
+            const number = parseInt(matchingLabel[1], 10);
+
+            if (number >= counter) {
+                counter = number + 1;
             }
         }
     });
@@ -45,10 +39,10 @@ const getNextAvailableName = (copiedLabel: string, existingLabels: string[]): st
     return `${copiedLabel} (${counter})`;
 };
 
-function stripEmptyValues(obj: Record<string, unknown>): Record<string, unknown> {
+function recursivelyStripEmptyValuesFromParameters(parameters: Record<string, unknown>): Record<string, unknown> {
     const result: Record<string, unknown> = {};
 
-    for (const [key, value] of Object.entries(obj)) {
+    for (const [key, value] of Object.entries(parameters)) {
         if (value === null || value === undefined || value === '') {
             continue;
         }
@@ -58,7 +52,7 @@ function stripEmptyValues(obj: Record<string, unknown>): Record<string, unknown>
                 result[key] = value;
             }
         } else if (typeof value === 'object') {
-            const stripped = stripEmptyValues(value as Record<string, unknown>);
+            const stripped = recursivelyStripEmptyValuesFromParameters(value as Record<string, unknown>);
 
             if (Object.keys(stripped).length > 0) {
                 result[key] = stripped;
@@ -71,11 +65,15 @@ function stripEmptyValues(obj: Record<string, unknown>): Record<string, unknown>
     return result;
 }
 
-function renameNestedTasks(
-    parameters: TaskParametersType,
-    componentName: string,
-    reservedNames: Set<string>
-): TaskParametersType {
+function renameNestedTasks({
+    componentName,
+    parameters,
+    reservedNames,
+}: {
+    parameters: TaskParametersType;
+    componentName: string;
+    reservedNames: Set<string>;
+}): TaskParametersType {
     const renameTask = (task: WorkflowTask) => {
         const subtaskComponentName = task.type?.split('/')?.[0];
 
@@ -88,11 +86,17 @@ function renameNestedTasks(
         }
 
         const newName = getFormattedName(subtaskComponentName, reservedNames);
+
         reservedNames.add(newName);
+
         task.name = newName;
 
         if (isTaskDispatcher(subtaskComponentName) && task.parameters) {
-            task.parameters = renameNestedTasks(task.parameters, subtaskComponentName, reservedNames);
+            task.parameters = renameNestedTasks({
+                componentName: subtaskComponentName,
+                parameters: task.parameters,
+                reservedNames,
+            });
         }
     };
 
@@ -101,46 +105,58 @@ function renameNestedTasks(
             if (Array.isArray(parameters.caseTrue)) {
                 (parameters.caseTrue as WorkflowTask[]).forEach(renameTask);
             }
+
             if (Array.isArray(parameters.caseFalse)) {
                 (parameters.caseFalse as WorkflowTask[]).forEach(renameTask);
             }
+
             break;
         case 'branch':
             if (Array.isArray(parameters.cases)) {
                 (parameters.cases as BranchCaseType[]).forEach((caseItem) => caseItem.tasks?.forEach(renameTask));
             }
+
             if (Array.isArray(parameters.default)) {
                 (parameters.default as WorkflowTask[]).forEach(renameTask);
             }
+
             break;
         case 'loop':
         case 'map':
             if (Array.isArray(parameters.iteratee)) {
                 (parameters.iteratee as WorkflowTask[]).forEach(renameTask);
             }
+
             break;
         case 'each':
             if (parameters.iteratee && typeof parameters.iteratee === 'object' && !Array.isArray(parameters.iteratee)) {
                 renameTask(parameters.iteratee as WorkflowTask);
             }
+
             break;
         case 'parallel':
             if (Array.isArray(parameters.tasks)) {
                 (parameters.tasks as WorkflowTask[]).forEach(renameTask);
             }
+
             break;
         case 'fork-join':
             if (Array.isArray(parameters.branches)) {
                 (parameters.branches as WorkflowTask[][]).forEach((branch) => branch.forEach(renameTask));
             }
+
             break;
         case 'on-error':
             if (Array.isArray(parameters['main-branch'])) {
                 (parameters['main-branch'] as WorkflowTask[]).forEach(renameTask);
             }
+
             if (Array.isArray(parameters['on-error-branch'])) {
                 (parameters['on-error-branch'] as WorkflowTask[]).forEach(renameTask);
             }
+
+            break;
+        default:
             break;
     }
 
@@ -173,6 +189,7 @@ export default function pasteNode({
 
     try {
         const workflowDefinition = JSON.parse(workflow.definition);
+
         definitionTasks = workflowDefinition.tasks ?? [];
     } catch {
         return;
@@ -186,6 +203,7 @@ export default function pasteNode({
 
             if (sourceIndex === -1) {
                 const sourceNode = nodes.find((node) => node.id === nodeSourceName);
+
                 const resolvedName = sourceNode?.data?.taskDispatcherId as string | undefined;
 
                 if (resolvedName) {
@@ -202,7 +220,9 @@ export default function pasteNode({
     }
 
     const reservedNames = new Set<string>();
+
     const newName = getFormattedName(copiedNode.componentName, reservedNames);
+
     reservedNames.add(newName);
 
     const clonedParameters = structuredClone(copiedNode.parameters ?? {});
@@ -212,12 +232,17 @@ export default function pasteNode({
     );
 
     if (isTaskDispatcher(copiedNode.componentName)) {
-        renameNestedTasks(clonedParameters, copiedNode.componentName, reservedNames);
+        renameNestedTasks({
+            componentName: copiedNode.componentName,
+            parameters: clonedParameters,
+            reservedNames,
+        });
     }
 
-    const cleanedParameters = stripEmptyValues(clonedParameters);
+    const cleanedParameters = recursivelyStripEmptyValuesFromParameters(clonedParameters);
 
     const existingLabels = nodes.map((node) => node.data?.label).filter((label): label is string => !!label);
+
     const finalLabel = getNextAvailableName(copiedNode.label ?? '', existingLabels);
 
     let cleanedMetadata = undefined;
@@ -225,8 +250,7 @@ export default function pasteNode({
     if (copiedNode.metadata) {
         const {ui, ...restMetadata} = copiedNode.metadata;
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {nodePosition, ...restUi} = ui || {};
+        const restUi = Object.fromEntries(Object.entries(ui || {}).filter(([key]) => key !== 'nodePosition'));
 
         const cleanedUi = Object.keys(restUi).length > 0 ? restUi : undefined;
 
