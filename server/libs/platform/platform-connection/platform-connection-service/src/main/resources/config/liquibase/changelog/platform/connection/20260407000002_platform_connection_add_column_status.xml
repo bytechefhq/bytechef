@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260407000002-01" author="Ivica Cardic">
+        <!-- defaultValueNumeric=0 maps to ConnectionStatus.ACTIVE (first ordinal). Ordinals are append-only; see enum javadoc. -->
+        <addColumn tableName="connection">
+            <column name="status" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="connection" columnName="status"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

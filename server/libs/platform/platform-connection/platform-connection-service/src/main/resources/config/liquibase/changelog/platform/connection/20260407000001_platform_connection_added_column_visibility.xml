@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260407000001-01" author="Ivica Cardic">
+        <!--
+            All rows (new and existing) default to PRIVATE (ordinal 0). On CE installations this
+            matches the pre-feature isolation model. On CE&#8594;EE upgrades the operator must
+            explicitly opt in by running promoteAllPrivateConnectionsToWorkspace per workspace,
+            which preserves least-privilege and avoids silently exposing legacy credentials to
+            every workspace member.
+        -->
+        <addColumn tableName="connection">
+            <column name="visibility" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <comment>Existing rows default to PRIVATE (0). On CE only PRIVATE is reachable; on EE, admins can
+            explicitly promote to WORKSPACE/PROJECT via the visibility UI.</comment>
+
+        <rollback>
+            <dropColumn tableName="connection" columnName="visibility"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
