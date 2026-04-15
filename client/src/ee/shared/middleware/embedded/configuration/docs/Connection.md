@@ -23,9 +23,10 @@ Name | Type
 `name` | string
 `parameters` | { [key: string]: any; }
 `tags` | [Array&lt;Tag&gt;](Tag.md)
+`status` | string
+`visibility` | string
 `version` | number
 `shared` | boolean
-`status` | string
 
 ## Example
 
@@ -51,9 +52,10 @@ const example = {
   "name": null,
   "parameters": null,
   "tags": null,
+  "status": null,
+  "visibility": null,
   "version": null,
   "shared": null,
-  "status": null,
 } satisfies Connection
 
 console.log(example)

@@ -21,6 +21,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -107,9 +108,13 @@ public final class Connection {
     @Version
     private int version;
 
+    @Column
+    private int visibility;
+
     public Connection() {
         this.parameters = new EncryptedMapWrapper(Collections.emptyMap());
         this.status = ConnectionStatus.ACTIVE.ordinal();
+        this.visibility = ResourceVisibility.PRIVATE.ordinal();
     }
 
     public static Builder builder() {
@@ -248,6 +253,18 @@ public final class Connection {
         return version;
     }
 
+    public ResourceVisibility getVisibility() {
+        ResourceVisibility[] values = ResourceVisibility.values();
+
+        if (visibility < 0 || visibility >= values.length) {
+            throw new IllegalStateException(
+                "Connection id=%s has invalid visibility ordinal %d (valid range: 0-%d)".formatted(
+                    id, visibility, values.length - 1));
+        }
+
+        return values[visibility];
+    }
+
     public void putAllParameters(Map<String, ?> parameters) {
         this.parameters.putAll(parameters);
     }
@@ -260,6 +277,13 @@ public final class Connection {
         this.componentName = componentName;
     }
 
+    /**
+     * Overrides the auditing-populated creator login. Only the reassignment flow should call this directly; Spring Data
+     * auditing populates {@code createdBy} automatically for normal creates. Callers must also transition the
+     * connection's status (e.g. via {@code ConnectionService#updateConnectionStatus}) so that provenance and status
+     * stay in sync — otherwise a successful reassignment leaves {@code PENDING_REASSIGNMENT} in place and an operator
+     * cannot tell the flow completed.
+     */
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
@@ -341,6 +365,22 @@ public final class Connection {
         this.version = version;
     }
 
+    /**
+     * Assign visibility. A plain field assignment: the entity no longer polices which rung may follow which.
+     *
+     * <p>
+     * The previous transition state machine encoded a one-way promote-from-private model (PRIVATE &rarr; WORKSPACE,
+     * ORGANIZATION terminal) that no longer exists — an owner may move a resource freely between the rungs its resource
+     * type supports. Which rungs those are is declared per resource by {@code ResourceVisibilityPolicy} and enforced
+     * centrally at the facade, so the rule lives in one place rather than being split between an entity setter and its
+     * callers.
+     */
+    public void setVisibility(ResourceVisibility visibility) {
+        Objects.requireNonNull(visibility, "visibility");
+
+        this.visibility = visibility.ordinal();
+    }
+
     @Override
     public String toString() {
         return "Connection{" +
@@ -354,6 +394,7 @@ public final class Connection {
             ", connectionTags=" + connectionTags +
             ", status=" + status +
             ", type=" + type +
+            ", visibility=" + visibility +
             ", parameters=" + parameters +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
@@ -375,6 +416,7 @@ public final class Connection {
         private List<Long> tagIds;
         private PlatformType type;
         private int version;
+        private ResourceVisibility visibility;
 
         private Builder() {
         }
@@ -439,6 +481,12 @@ public final class Connection {
             return this;
         }
 
+        public Builder visibility(ResourceVisibility visibility) {
+            this.visibility = visibility;
+
+            return this;
+        }
+
         public Connection build() {
             Connection connection = new Connection();
 
@@ -454,6 +502,10 @@ public final class Connection {
 
             if (status != null) {
                 connection.setStatus(status);
+            }
+
+            if (visibility != null) {
+                connection.setVisibility(visibility);
             }
 
             return connection;

@@ -1,3 +1,30 @@
+"""Connection status indicating the lifecycle state of a connection."""
+enum ConnectionStatus {
+    ACTIVE
+    PENDING_REASSIGNMENT
+    REVOKED
+}
+
+"""Visibility scope controlling which users can see and use a connection."""
+enum ResourceVisibility {
+    PRIVATE
+    WORKSPACE
+    ORGANIZATION
+}
+
 extend type Mutation {
+    """Unlink a connection from all deployed workflows and test configurations, without deleting the connection itself."""
     disconnectConnection(connectionId: ID!): Boolean!
+    """Register an existing connection backed by an externally-provisioned credential (e.g. AWS Secrets Manager)."""
+    registerExistingConnection(input: RegisterExistingConnectionInput!): Long!
+}
+
+input RegisterExistingConnectionInput {
+    componentName: String!
+    connectionVersion: Int!
+    credentialRef: String!
+    credentialStoreType: ConnectionCredentialStoreType!
+    environmentId: ID!
+    name: String!
+    workspaceId: ID!
 }
