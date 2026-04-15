@@ -10,33 +10,41 @@ type GetParentTaskType = {
 const ALL_COLLECTION_NAMES = Object.values(TASK_DISPATCHER_SUBTASK_COLLECTIONS).flat();
 
 export function getTask({tasks, workflowNodeName}: GetParentTaskType): WorkflowTask | undefined {
+    // Prefer a direct match at the current level before recursing.
+    // Server-flattened DTOs (with .connections, .clusterElements, .clusterRoot populated)
+    // coexist with raw nested maps embedded in task dispatcher parameters; recursing first
+    // would return the raw nested copy and shadow the enriched DTO.
+    const directMatch = tasks.find((task) => task?.name === workflowNodeName);
+
+    if (directMatch) {
+        return directMatch;
+    }
+
     for (const task of tasks) {
-        if (task?.name === workflowNodeName) {
-            return task;
+        if (!task.parameters) {
+            continue;
         }
 
-        if (task.parameters) {
-            for (const collectionName of ALL_COLLECTION_NAMES) {
-                let subtasks = task.parameters[collectionName];
+        for (const collectionName of ALL_COLLECTION_NAMES) {
+            let subtasks = task.parameters[collectionName];
 
-                if (collectionName === 'cases') {
-                    subtasks = subtasks?.flatMap((branchCase: BranchCaseType) => branchCase.tasks);
-                } else if (collectionName === 'branches') {
-                    subtasks = subtasks?.flat();
-                } else if (collectionName === 'iteratee') {
-                    if (subtasks && typeof subtasks === 'object' && !Array.isArray(subtasks)) {
-                        subtasks = [subtasks];
-                    } else if (!Array.isArray(subtasks)) {
-                        subtasks = [];
-                    }
+            if (collectionName === 'cases') {
+                subtasks = subtasks?.flatMap((branchCase: BranchCaseType) => branchCase.tasks);
+            } else if (collectionName === 'branches') {
+                subtasks = subtasks?.flat();
+            } else if (collectionName === 'iteratee') {
+                if (subtasks && typeof subtasks === 'object' && !Array.isArray(subtasks)) {
+                    subtasks = [subtasks];
+                } else if (!Array.isArray(subtasks)) {
+                    subtasks = [];
                 }
+            }
 
-                if (Array.isArray(subtasks) && subtasks.length > 0) {
-                    const foundTask = getTask({tasks: subtasks, workflowNodeName: workflowNodeName});
+            if (Array.isArray(subtasks) && subtasks.length > 0) {
+                const foundTask = getTask({tasks: subtasks, workflowNodeName: workflowNodeName});
 
-                    if (foundTask) {
-                        return foundTask;
-                    }
+                if (foundTask) {
+                    return foundTask;
                 }
             }
         }
