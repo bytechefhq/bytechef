@@ -38,12 +38,15 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,6 +59,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,31 +76,84 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ObjectProvider<ConnectionOwnershipExemption> connectionOwnershipExemptionProvider;
     private final ConnectionService connectionService;
+    private final boolean eeEdition;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private final MeterRegistry meterRegistry;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
-    @SuppressFBWarnings("EI2")
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI2"
+    })
     public ConnectionFacadeImpl(
         ConnectionDefinitionService connectionDefinitionService,
         ObjectProvider<ConnectionOwnershipExemption> connectionOwnershipExemptionProvider,
-        ConnectionService connectionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        OAuth2Service oAuth2Service, TagService tagService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        ConnectionService connectionService, @Value("${bytechef.edition:CE}") String edition,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
+        WorkflowTestConfigurationService workflowTestConfigurationService,
+        ObjectProvider<MeterRegistry> meterRegistryProvider) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionOwnershipExemptionProvider = connectionOwnershipExemptionProvider;
         this.connectionService = connectionService;
+        validateEdition(edition);
+        this.eeEdition = "EE".equalsIgnoreCase(edition);
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.meterRegistry = meterRegistryProvider.getIfAvailable();
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
+    /**
+     * Overwrite the requested visibility, logging when the two differ so the divergence from the request body shows up
+     * in audit/ops review rather than being silent.
+     */
+    private void forceVisibility(Connection connection, ResourceVisibility forced, PlatformType type) {
+        ResourceVisibility requested = connection.getVisibility();
+
+        if (requested != forced && log.isInfoEnabled()) {
+            log.info(
+                "Forcing {} visibility for connection (requested={}, platformType={}, eeEdition={})",
+                forced, requested, type, eeEdition);
+        }
+
+        connection.setVisibility(forced);
+    }
+
+    /**
+     * Fail loud at startup when {@code bytechef.edition} is set to an unknown value so an accidental misconfiguration
+     * (e.g. {@code Enterprise}, {@code ee }, a typo) does not silently disable EE features by falling through the
+     * {@code "EE".equalsIgnoreCase(edition)} check.
+     */
+    private static void validateEdition(String edition) {
+        if (edition == null
+            || !("CE".equalsIgnoreCase(edition) || "EE".equalsIgnoreCase(edition))) {
+            throw new IllegalStateException(
+                "bytechef.edition must be CE or EE (case-insensitive); got '" + edition + "'");
+        }
+    }
+
     @Override
     public long create(ConnectionDTO connectionDTO, PlatformType type) {
         Connection connection = connectionDTO.toConnection();
+
+        // Two overrides that ignore the request body entirely. The UI gates these surfaces too, but only a
+        // facade-level override stops a hand-crafted request.
+        //
+        // EMBEDDED: a connection belongs to a connected user — an end user of a customer's product — not to a
+        // workspace member, so "visible to the whole workspace" has no meaning and WORKSPACE would be wrong in a
+        // way that crosses customers. PRIVATE is the value that cannot widen anything if a query reaches the row
+        // by another path.
+        //
+        // CE: there is no authorization boundary between workspace members and no visibility picker, so every
+        // connection is workspace-visible.
+        if (type == PlatformType.EMBEDDED) {
+            forceVisibility(connection, ResourceVisibility.PRIVATE, type);
+        } else if (!eeEdition) {
+            forceVisibility(connection, ResourceVisibility.WORKSPACE, type);
+        }
 
         resolveOAuth2AuthorizationCode(connection);
 
@@ -440,6 +497,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                             connectionId, connection.getComponentName());
                     }
 
+                    if (meterRegistry != null) {
+                        Counter.builder("bytechef_connection_list_dto_failed")
+                            .description("Number of connections returned as degraded placeholders from list "
+                                + "responses due to DTO mapping errors")
+                            .tag("componentName", String.valueOf(connection.getComponentName()))
+                            .register(meterRegistry)
+                            .increment();
+                    }
+
                     return buildDegradedConnectionDTO(connection, filterTags(tags, connection), exception);
                 }
             })
@@ -464,6 +530,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .status(connection.getStatus())
             .tags(tags)
             .version(connection.getVersion())
+            .visibility(connection.getVisibility())
             .build();
     }
 
