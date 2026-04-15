@@ -25,9 +25,12 @@ import com.bytechef.automation.configuration.security.AutomationPermissionEvalua
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
@@ -40,6 +43,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,6 +70,7 @@ class ConnectedUserSkippedChecksExpressionTest {
     private CurrentUserResolver currentUserResolver;
     private AutomationPermissionEvaluator evaluator;
     private ProjectRepository projectRepository;
+    private ProjectService projectService;
     private AutomationMethodSecurityExpressionRoot root;
     private WorkspaceScopeCache workspaceScopeCache;
 
@@ -73,6 +78,7 @@ class ConnectedUserSkippedChecksExpressionTest {
     void setUp() {
         currentUserResolver = mock(CurrentUserResolver.class);
         projectRepository = mock(ProjectRepository.class);
+        projectService = mock(ProjectService.class);
         workspaceScopeCache = mock(WorkspaceScopeCache.class);
 
         ConnectedUserAccessDecider decider = mock(ConnectedUserAccessDecider.class);
@@ -87,8 +93,8 @@ class ConnectedUserSkippedChecksExpressionTest {
             Map.of("connectedUserAccessDecider", decider));
 
         PermissionServiceImpl permissionService = new PermissionServiceImpl(
-            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCache,
-            mock(WorkspaceUserRepository.class), List.of(), List.of(),
+            currentUserResolver, mock(PermissionScopeRegistry.class), projectService, workspaceScopeCache,
+            mock(WorkspaceUserRepository.class), List.of(), List.of(), permissiveResolver(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -192,5 +198,11 @@ class ConnectedUserSkippedChecksExpressionTest {
         assertThat(check.getAsBoolean()).isFalse();
 
         verifyNoInteractions(currentUserResolver, projectRepository, workspaceScopeCache);
+    }
+
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

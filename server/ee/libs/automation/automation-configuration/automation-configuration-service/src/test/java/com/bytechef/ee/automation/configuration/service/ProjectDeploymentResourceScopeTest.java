@@ -21,6 +21,10 @@ import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironme
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -29,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
@@ -56,6 +61,7 @@ class ProjectDeploymentResourceScopeTest {
     private final PermissionScopeRegistry permissionScopeRegistry = mock(PermissionScopeRegistry.class);
     private final ProjectDeploymentRepository projectDeploymentRepository = mock(ProjectDeploymentRepository.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
+    private final ProjectService projectService = mock(ProjectService.class);
     private final WorkspaceScopeCache workspaceScopeCache = mock(WorkspaceScopeCache.class);
     private final WorkspaceUserRepository workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
@@ -125,8 +131,9 @@ class ProjectDeploymentResourceScopeTest {
         List<ResourceEnvironmentResolver> resourceEnvironmentResolvers) {
 
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
-            workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
+            currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
+            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+            resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -137,4 +144,9 @@ class ProjectDeploymentResourceScopeTest {
         return List.of(new ProjectDeploymentEnvironmentResolver(projectDeploymentRepository));
     }
 
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+    }
 }

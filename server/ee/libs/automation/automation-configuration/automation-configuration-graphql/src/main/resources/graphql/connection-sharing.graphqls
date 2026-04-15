@@ -1,0 +1,13 @@
+extend type Query {
+    """The users a private connection has been granted to. Owner or admin only — an ordinary viewer of a shared connection must not learn who else it was handed to. (EE only)"""
+    connectionGrants(workspaceId: ID!, connectionId: ID!): [Long!]!
+}
+
+extend type Mutation {
+    """Set a connection's reach. PRIVATE withholds it from the workspace; WORKSPACE shares it. ORGANIZATION is set through createOrganizationConnection instead and is rejected here. Narrowing to PRIVATE fails while an active deployment uses the connection. (owner or admin, EE only)"""
+    setConnectionVisibility(workspaceId: ID!, connectionId: ID!, visibility: ResourceVisibility!): Boolean!
+    """Grant a named workspace member access to a connection its owner has withheld. Idempotent. (owner or admin, EE only)"""
+    grantConnectionAccess(workspaceId: ID!, connectionId: ID!, userId: ID!): Boolean!
+    """Revoke a grant. Silent when no grant exists. (owner or admin, EE only)"""
+    revokeConnectionAccess(workspaceId: ID!, connectionId: ID!, userId: ID!): Boolean!
+}

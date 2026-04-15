@@ -59,7 +59,7 @@ import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverI
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.security.domain.SigningKey;
@@ -630,7 +630,7 @@ class EmbeddedKeyGatesIntTest {
         OwnedApiKeyCreatorImpl.class, PermissionScopeRegistry.class, PermissionServiceImpl.class,
         ProjectPermissionScopeProvider.class, SigningKeyEnvironmentResolver.class, SigningKeyFacadeImpl.class,
         SigningKeyOwnershipResolver.class, SigningKeyServiceImpl.class, WorkflowPermissionScopeProvider.class,
-        WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
+        WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class
     })
     static class KeyGatesConfiguration {
 

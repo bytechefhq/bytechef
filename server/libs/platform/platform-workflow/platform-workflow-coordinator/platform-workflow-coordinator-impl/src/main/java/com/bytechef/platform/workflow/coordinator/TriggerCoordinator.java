@@ -279,6 +279,9 @@ public class TriggerCoordinator {
                 .orElse(null));
 
         try {
+            jobPrincipalAccessor.validateConnectionsForJob(
+                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+
             triggerDispatcher.dispatch(triggerExecution);
         } catch (Exception e) {
             publishTriggerError(triggerExecution, e);

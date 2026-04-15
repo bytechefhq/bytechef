@@ -72,4 +72,6 @@ public interface ConnectionRepository
     List<Connection> findAllByTagIdAndTypeOrderByName(@Param("tagId") long tagId, @Param("type") int type);
 
     List<Connection> findAllByTypeOrderByName(int type);
+
+    List<Connection> findAllByVisibilityAndTypeOrderByName(int visibility, int type);
 }

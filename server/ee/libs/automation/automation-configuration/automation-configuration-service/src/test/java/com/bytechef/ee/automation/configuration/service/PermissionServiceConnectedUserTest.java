@@ -23,6 +23,10 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -33,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +60,7 @@ class PermissionServiceConnectedUserTest {
     private ConnectedUserAccessDecider decider;
     private PermissionServiceImpl permissionService;
     private ProjectRepository projectRepository;
+    private ProjectService projectService;
     private WorkspaceScopeCache workspaceScopeCache;
     private WorkspaceUserRepository workspaceUserRepository;
 
@@ -63,6 +69,7 @@ class PermissionServiceConnectedUserTest {
         currentUserResolver = mock(CurrentUserResolver.class);
         decider = mock(ConnectedUserAccessDecider.class);
         projectRepository = mock(ProjectRepository.class);
+        projectService = mock(ProjectService.class);
         workspaceScopeCache = mock(WorkspaceScopeCache.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
@@ -70,8 +77,8 @@ class PermissionServiceConnectedUserTest {
             Map.of("connectedUserAccessDecider", decider));
 
         permissionService = new PermissionServiceImpl(
-            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCache,
-            workspaceUserRepository, List.of(), List.of(),
+            currentUserResolver, mock(PermissionScopeRegistry.class), projectService, workspaceScopeCache,
+            workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -142,8 +149,8 @@ class PermissionServiceConnectedUserTest {
     @Test
     void testIsAuthorizationSkippedFollowsSkipWithoutADecider() throws Throwable {
         PermissionServiceImpl permissionServiceWithoutDecider = new PermissionServiceImpl(
-            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCache,
-            workspaceUserRepository, List.of(), List.of(),
+            currentUserResolver, mock(PermissionScopeRegistry.class), projectService, workspaceScopeCache,
+            workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -263,5 +270,11 @@ class PermissionServiceConnectedUserTest {
 
     private void givenGovernedPrincipal() {
         when(decider.decideWorkspace(anyLong(), anyString())).thenReturn(Decision.DENY);
+    }
+
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

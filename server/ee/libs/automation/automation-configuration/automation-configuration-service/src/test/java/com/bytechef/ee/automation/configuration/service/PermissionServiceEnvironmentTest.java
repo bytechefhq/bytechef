@@ -19,6 +19,10 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -31,6 +35,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +60,7 @@ class PermissionServiceEnvironmentTest {
 
     private PermissionServiceImpl permissionService;
     private ProjectRepository projectRepository;
+    private ProjectService projectService;
     private UserService userService;
     private WorkspaceScopeCache workspaceScopeCache;
 
@@ -68,11 +74,13 @@ class PermissionServiceEnvironmentTest {
         userService = mock(UserService.class);
 
         projectRepository = mock(ProjectRepository.class);
+
+        projectService = mock(ProjectService.class);
         workspaceScopeCache = mock(WorkspaceScopeCache.class);
 
         permissionService = new PermissionServiceImpl(
-            new CurrentUserResolver(userService), permissionScopeRegistry, projectRepository,
-            workspaceScopeCache, workspaceUserRepository, List.of(), List.of(),
+            new CurrentUserResolverImpl(userService), permissionScopeRegistry, projectService,
+            workspaceScopeCache, workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -170,7 +178,7 @@ class PermissionServiceEnvironmentTest {
 
         project.setWorkspaceId(WORKSPACE_ID);
 
-        when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
+        when(projectService.fetchProject(PROJECT_ID)).thenReturn(Optional.of(project));
         when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
 
@@ -182,7 +190,7 @@ class PermissionServiceEnvironmentTest {
 
     @Test
     void testDeniesWhenTheProjectIsUnknown() {
-        when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.empty());
+        when(projectService.fetchProject(PROJECT_ID)).thenReturn(Optional.empty());
 
         assertThat(permissionService.hasWorkspaceScopeForProject(PROJECT_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
             .isFalse();
@@ -224,9 +232,9 @@ class PermissionServiceEnvironmentTest {
     @Test
     void testByIdCheckUsesTheResourcesOwnEnvironment() {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
-            new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
+            new CurrentUserResolverImpl(userService), mock(PermissionScopeRegistry.class), projectService,
             workspaceScopeCache, mock(WorkspaceUserRepository.class),
-            List.of(deploymentOwnershipResolver()),
+            List.of(deploymentOwnershipResolver()), List.of(), permissiveResolver(),
             List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
@@ -248,9 +256,9 @@ class PermissionServiceEnvironmentTest {
     @Test
     void testByIdCheckFallsBackWhenNoEnvironmentCanBeResolved() {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
-            new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
+            new CurrentUserResolverImpl(userService), mock(PermissionScopeRegistry.class), projectService,
             workspaceScopeCache, mock(WorkspaceUserRepository.class),
-            List.of(deploymentOwnershipResolver()),
+            List.of(deploymentOwnershipResolver()), List.of(), permissiveResolver(),
             List.of(deploymentEnvironmentResolver(null)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
@@ -281,9 +289,10 @@ class PermissionServiceEnvironmentTest {
         };
 
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
-            new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
+            new CurrentUserResolverImpl(userService), mock(PermissionScopeRegistry.class), projectService,
             workspaceScopeCache, mock(WorkspaceUserRepository.class),
-            List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver),
+            List.of(deploymentOwnershipResolver()), List.of(), permissiveResolver(),
+            List.of(failingEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -328,4 +337,9 @@ class PermissionServiceEnvironmentTest {
         };
     }
 
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+    }
 }

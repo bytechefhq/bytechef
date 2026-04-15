@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -33,6 +35,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.exception.ErrorType;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -154,6 +157,43 @@ class TriggerCoordinatorTest {
 
         verify(triggerScheduler).cancelPollingTrigger(workflowExecutionId.toString());
         verifyNoInteractions(triggerDispatcher);
+    }
+
+    @Test
+    void testOnTriggerPollEventDoesNotDispatchWhenAConnectionIsInactive() {
+        TenantContext.setCurrentTenantId("test-tenant");
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
+        Map<String, Object> workflowTriggerMap = Map.of("name", "trigger1", "type", "component/v1/trigger");
+        Workflow workflow = mock(Workflow.class);
+        WorkflowTrigger workflowTrigger = new WorkflowTrigger(workflowTriggerMap);
+
+        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.AUTOMATION))
+            .thenReturn(jobPrincipalAccessor);
+        when(jobPrincipalAccessor.getWorkflowId(1L, "workflow-uuid"))
+            .thenReturn("workflow-id");
+        when(jobPrincipalAccessor.getInputMap(1L, "workflow-uuid"))
+            .thenReturn(Map.of());
+        when(workflowService.getWorkflow("workflow-id"))
+            .thenReturn(workflow);
+        when(workflow.getExtensions(eq(WorkflowExtConstants.TRIGGERS), eq(WorkflowTrigger.class), any()))
+            .thenReturn(List.of(workflowTrigger));
+        when(evaluator.evaluate(any(), any()))
+            .thenReturn(workflowTriggerMap);
+        when(triggerExecutionService.create(any(TriggerExecution.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        doThrow(
+            new ConfigurationException("Workflow execution blocked: 1 non-ACTIVE connection(s)", mock(ErrorType.class)))
+                .when(jobPrincipalAccessor)
+                .validateConnectionsForJob(1L, "workflow-uuid");
+
+        triggerCoordinator.onTriggerPollEvent(new TriggerPollEvent(workflowExecutionId));
+
+        verifyNoInteractions(triggerDispatcher);
+        verify(eventPublisher).publishEvent(any(TriggerExecutionErrorEvent.class));
+        verify(triggerScheduler, never()).cancelPollingTrigger(anyString());
     }
 
     @Test

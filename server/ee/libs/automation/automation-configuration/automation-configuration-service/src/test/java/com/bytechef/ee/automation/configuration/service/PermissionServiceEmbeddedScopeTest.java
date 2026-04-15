@@ -20,6 +20,10 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
@@ -30,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +60,7 @@ class PermissionServiceEmbeddedScopeTest {
     private PermissionScopeRegistry permissionScopeRegistry;
     private PermissionServiceImpl permissionService;
     private ProjectRepository projectRepository;
+    private ProjectService projectService;
     private WorkspaceScopeCache workspaceScopeCache;
     private WorkspaceUserRepository workspaceUserRepository;
 
@@ -66,6 +72,7 @@ class PermissionServiceEmbeddedScopeTest {
         embeddedUserRepository = mock(EmbeddedUserRepository.class);
         permissionScopeRegistry = mock(PermissionScopeRegistry.class);
         projectRepository = mock(ProjectRepository.class);
+        projectService = mock(ProjectService.class);
         workspaceScopeCache = mock(WorkspaceScopeCache.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
@@ -76,8 +83,8 @@ class PermissionServiceEmbeddedScopeTest {
             Map.of("connectedUserAccessDecider", decider));
 
         permissionService = new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository,
-            workspaceScopeCache, workspaceUserRepository, List.of(), List.of(),
+            currentUserResolver, permissionScopeRegistry, projectService,
+            workspaceScopeCache, workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class), embeddedScopeCacheService,
             embeddedUserRepository,
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -220,5 +227,11 @@ class PermissionServiceEmbeddedScopeTest {
 
         verify(embeddedScopeCacheService).evictEmbeddedScopeCache(USER_ID);
         verify(embeddedScopeCacheService).evictAllEmbeddedScopeCache();
+    }
+
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

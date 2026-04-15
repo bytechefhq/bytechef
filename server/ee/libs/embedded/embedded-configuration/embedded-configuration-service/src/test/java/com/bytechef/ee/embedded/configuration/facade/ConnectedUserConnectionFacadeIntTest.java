@@ -1545,7 +1545,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
             connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(connectedUserBId, connectionDTO());
 
-            verify(connectionService).updateCreatedBy(PROVISIONED_CONNECTION_ID, externalUserBId);
+            verify(connectionService).reassignOwner(PROVISIONED_CONNECTION_ID, externalUserBId);
 
             assertThat(getProvisionedBy(PROVISIONED_CONNECTION_ID)).isEqualTo("admin@localhost.com");
         }
@@ -1578,7 +1578,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
             connectedUserConnectionFacade.createConnectedUserConnection(connectedUserAId, connectionDTO());
 
-            verify(connectionService, never()).updateCreatedBy(anyLong(), any());
+            verify(connectionService, never()).reassignOwner(anyLong(), any());
         }
 
         @Test

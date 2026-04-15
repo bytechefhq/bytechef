@@ -28,6 +28,8 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
+ * Authorization (ADMIN) is enforced on {@link WorkspaceConnectionFacade}, not here.
+ *
  * @author Ivica Cardic
  */
 @Controller
