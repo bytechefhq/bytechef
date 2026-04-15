@@ -10,7 +10,12 @@
     "help": null,
     "metadata": null,
     "name": "requestApproval",
-    "outputDefinition": null,
+    "outputDefinition": {
+      "output": { },
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
     "perform": { },
     "processErrorResponse": null,
     "properties": [ {
@@ -471,7 +476,7 @@
   "clusterElementTypes": [ {
     "name": "APPROVAL_CHANNELS",
     "key": "approvalChannels",
-    "label": "Approval Channels",
+    "label": "Channels",
     "multipleElements": true,
     "required": false
   } ],

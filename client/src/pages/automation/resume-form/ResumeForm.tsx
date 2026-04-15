@@ -13,11 +13,11 @@ import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
 import React from 'react';
 
 import {FieldType} from '../trigger-form/TriggerForm';
-import useApproveForm from './hooks/useApproveForm';
+import useResumeForm from './hooks/useResumeForm';
 
-export default function ApproveForm() {
+export default function ResumeForm() {
     const {approved, definition, error, form, handleSubmit, loading, submitError, submitted, submitting, uiDefinition} =
-        useApproveForm();
+        useResumeForm();
 
     if (loading) {
         return (
