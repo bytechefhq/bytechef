@@ -171,6 +171,7 @@ spring:
     name: server-app
   autoconfigure:
     exclude:
+      com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration,
       org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration,
       org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,
       org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration

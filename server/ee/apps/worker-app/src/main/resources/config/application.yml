@@ -1,6 +1,9 @@
 spring:
   application:
     name: worker-app
+  autoconfigure:
+    exclude:
+      com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration
   config:
     import: optional:configserver:http://localhost:6111
   profiles:
