@@ -2,6 +2,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
 import {
     AppendMessage,
@@ -40,6 +41,7 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         setLastAssistantMessageContent,
         setLastAssistantMessageError,
         setMessage,
+        setResumeUrl,
     } = useAiAgentTestingChatStore(
         useShallow((state) => ({
             addToolExecution: state.addToolExecution,
@@ -49,6 +51,7 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
             setLastAssistantMessageContent: state.setLastAssistantMessageContent,
             setLastAssistantMessageError: state.setLastAssistantMessageError,
             setMessage: state.setMessage,
+            setResumeUrl: state.setResumeUrl,
         }))
     );
     const {setJobKey} = useTestingModeStore();
@@ -57,6 +60,20 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
 
     const {connectionState, error: sseError} = useSSE(streamRequest, {
         eventHandlers: {
+            ask_user_question: (data) => {
+                if (typeof data !== 'object' || data === null || !('questions' in data)) {
+                    console.error('Received malformed ask_user_question event:', data);
+
+                    return;
+                }
+
+                const questionEvent = data as AskUserQuestionEventI;
+
+                setLastAssistantMessageContent(formatAskUserQuestionMessage(questionEvent));
+                setResumeUrl(questionEvent.resumeUrl ?? null);
+                setIsRunning(false);
+                setStreamRequest(null);
+            },
             error: (data) => {
                 const errorMessage = typeof data === 'string' ? data : 'An unexpected error occurred';
 
@@ -126,9 +143,36 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         }
 
         const input = message.content[0].text;
+        const currentResumeUrl = useAiAgentTestingChatStore.getState().resumeUrl;
 
         setMessage({content: input, role: 'user'});
         setIsRunning(true);
+
+        if (currentResumeUrl) {
+            try {
+                setResumeUrl(null);
+
+                const response = await fetch(currentResumeUrl, {
+                    body: JSON.stringify({message: input}),
+                    headers: {'Content-Type': 'application/json'},
+                    method: 'POST',
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Resume request failed with status ${response.status}`);
+                }
+
+                setMessage({content: 'Answer submitted. The workflow will resume.', role: 'assistant'});
+            } catch (error) {
+                console.error('Failed to submit answer to resume URL:', error);
+
+                setLastAssistantMessageError('Failed to submit your answer. Please try again.');
+            } finally {
+                setIsRunning(false);
+            }
+
+            return;
+        }
 
         try {
             setMessage({content: [], role: 'assistant'} as ThreadMessageLike);

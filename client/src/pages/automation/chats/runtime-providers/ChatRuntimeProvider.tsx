@@ -1,5 +1,6 @@
 import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
 import {useSSE} from '@/shared/hooks/useSSE';
+import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
 import {
     AppendMessage,
@@ -45,6 +46,7 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         setIsRunning,
         setLastAssistantMessageContent,
         setMessage,
+        setResumeUrl,
     } = useChatsStore(
         useShallow((state) => ({
             appendToLastAssistantMessage: state.appendToLastAssistantMessage,
@@ -53,6 +55,7 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             setIsRunning: state.setIsRunning,
             setLastAssistantMessageContent: state.setLastAssistantMessageContent,
             setMessage: state.setMessage,
+            setResumeUrl: state.setResumeUrl,
         }))
     );
 
@@ -93,13 +96,32 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         [appendToLastAssistantMessage]
     );
 
+    const handleAskUserQuestion = useCallback(
+        (data: unknown) => {
+            if (typeof data !== 'object' || data === null || !('questions' in data)) {
+                console.error('Received malformed ask_user_question event:', data);
+
+                return;
+            }
+
+            const questionEvent = data as AskUserQuestionEventI;
+
+            setLastAssistantMessageContent(formatAskUserQuestionMessage(questionEvent));
+            setResumeUrl(questionEvent.resumeUrl ?? null);
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
+        [setIsRunning, setLastAssistantMessageContent, setResumeUrl]
+    );
+
     const eventHandlers = useMemo(
         () => ({
+            ask_user_question: handleAskUserQuestion,
             error: handleError,
             result: handleResult,
             stream: handleStream,
         }),
-        [handleError, handleResult, handleStream]
+        [handleAskUserQuestion, handleError, handleResult, handleStream]
     );
 
     const onNew = useCallback(
@@ -109,9 +131,36 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             }
 
             const input = message.content[0].text;
+            const currentResumeUrl = useChatsStore.getState().resumeUrl;
 
             setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
             setIsRunning(true);
+
+            if (currentResumeUrl) {
+                try {
+                    setResumeUrl(null);
+
+                    const response = await fetch(currentResumeUrl, {
+                        body: JSON.stringify({message: input}),
+                        headers: {'Content-Type': 'application/json'},
+                        method: 'POST',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Resume request failed with status ${response.status}`);
+                    }
+
+                    setMessage({content: 'Answer submitted. The workflow will resume.', role: 'assistant'});
+                } catch (error) {
+                    console.error('Failed to submit answer to resume URL:', error);
+
+                    setMessage({content: 'Failed to submit your answer. Please try again.', role: 'assistant'});
+                } finally {
+                    setIsRunning(false);
+                }
+
+                return;
+            }
 
             const formData = new FormData();
 
@@ -162,6 +211,19 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
                         }
                     });
 
+                    if (result?.questions && Array.isArray(result.questions)) {
+                        const questionEvent = result as AskUserQuestionEventI;
+
+                        setMessage({
+                            content: formatAskUserQuestionMessage(questionEvent),
+                            role: 'assistant',
+                        });
+                        setResumeUrl(questionEvent.resumeUrl ?? null);
+                        setIsRunning(false);
+
+                        return;
+                    }
+
                     const content =
                         result?.message ??
                         (result?.error
@@ -185,7 +247,7 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
                 }
             }
         },
-        [environmentName, setIsRunning, setMessage, sseStreamResponse, workflowExecutionId]
+        [environmentName, setIsRunning, setMessage, setResumeUrl, sseStreamResponse, workflowExecutionId]
     );
 
     const runtime = useExternalStoreRuntime(
