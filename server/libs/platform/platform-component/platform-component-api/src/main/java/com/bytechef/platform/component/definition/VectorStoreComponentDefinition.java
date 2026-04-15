@@ -72,11 +72,13 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
     /**
      * Retrieves a mapping of root cluster element identifiers to their associated cluster element types.
      *
-     * @return a map where the keys are cluster element identifiers (e.g., VECTOR_STORE) and the values are lists of
-     *         cluster element type names (e.g., EMBEDDING) associated with each identifier.
+     * @return a map where the keys are cluster element identifiers (e.g., VECTOR_STORE, SEARCH) and the values are
+     *         lists of cluster element type names (e.g., EMBEDDING) associated with each identifier.
      */
     @Override
     default Map<String, List<String>> getClusterElementClusterElementTypes() {
-        return Map.of(VECTOR_STORE, List.of(EMBEDDING.name()));
+        return Map.of(
+            VECTOR_STORE, List.of(EMBEDDING.name()),
+            SEARCH, List.of(EMBEDDING.name()));
     }
 }
