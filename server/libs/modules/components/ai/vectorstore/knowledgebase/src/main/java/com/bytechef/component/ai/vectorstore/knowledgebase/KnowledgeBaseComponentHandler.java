@@ -18,6 +18,8 @@ package com.bytechef.component.ai.vectorstore.knowledgebase;
 
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
+import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
@@ -28,12 +30,15 @@ import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseL
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseSearchAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseSearchTool;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.tag.service.TagService;
+import java.util.List;
+import java.util.Map;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -96,6 +101,23 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                         KnowledgeBaseVectorStore.of(
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
                             knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService)));
+        }
+
+        @Override
+        public List<ClusterElementType> getClusterElementTypes() {
+            return List.of(DOCUMENT_READER, DOCUMENT_TRANSFORMER);
+        }
+
+        @Override
+        public Map<String, List<String>> getActionClusterElementTypes() {
+            return Map.of(
+                LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name()),
+                SEARCH, List.of());
+        }
+
+        @Override
+        public Map<String, List<String>> getClusterElementClusterElementTypes() {
+            return Map.of(VECTOR_STORE, List.of());
         }
     }
 }

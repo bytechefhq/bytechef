@@ -22,6 +22,7 @@ import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConsta
 import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
+import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.VECTOR_STORE;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
@@ -31,10 +32,11 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkS
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
-import com.bytechef.component.ai.vectorstore.cluster.VectorStoreDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.HashMap;
@@ -62,12 +64,18 @@ public final class KnowledgeBaseVectorStore {
         KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
         KnowledgeBaseService knowledgeBaseService) {
 
-        return VectorStoreDefinition.of(
-            "Knowledge Base",
-            createVectorStore(
-                knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
-                knowledgeBaseService, vectorStore),
-            clusterElementDefinitionService);
+        VectorStore kbVectorStore = createVectorStore(
+            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+            knowledgeBaseService, vectorStore);
+
+        return ComponentDsl.<VectorStoreFunction>clusterElement(VECTOR_STORE)
+            .title("Knowledge Base VectorStore")
+            .description("Knowledge Base VectorStore.")
+            .type(VectorStoreFunction.VECTOR_STORE)
+            .object(() -> (
+                inputParameters, connectionParameters, extensions,
+                componentConnections) -> kbVectorStore.createVectorStore(
+                    inputParameters, ParametersFactory.create(connectionParameters), null));
     }
 
     public static VectorStore createVectorStore(org.springframework.ai.vectorstore.VectorStore vectorStore) {
