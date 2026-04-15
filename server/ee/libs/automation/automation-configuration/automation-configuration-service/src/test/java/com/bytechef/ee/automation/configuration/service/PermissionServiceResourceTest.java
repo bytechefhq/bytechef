@@ -15,10 +15,13 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import java.util.List;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
@@ -42,7 +45,7 @@ class PermissionServiceResourceTest {
     private PermissionServiceImpl service(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers), List.of(),
+            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
@@ -153,5 +156,15 @@ class PermissionServiceResourceTest {
         PermissionServiceImpl service = service();
 
         assertThat(service.hasWorkflowScope("nope", "WORKFLOW_EDIT")).isFalse();
+    }
+
+    /**
+     * A resolver that hides nothing, so these tests exercise workspace-scope and ownership resolution rather than
+     * visibility. The visibility precondition has its own test class.
+     */
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

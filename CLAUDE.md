@@ -353,6 +353,60 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Empty blocks are forbidden — a comment alone doesn't satisfy the `EmptyBlock` rule; add an executable statement
 - `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
+### Resource Visibility & Sharing
+
+Connections carry a `visibility` column typed `ResourceVisibility` (`PRIVATE < WORKSPACE <
+ORGANIZATION`, in `platform-api`). Every resource is created **WORKSPACE-visible** — shared with its
+workspace unless its owner withholds it. The model is resource-agnostic; connections are the only
+resource wired to it so far.
+
+- **CE**: `ConnectionFacadeImpl.create()` force-writes `WORKSPACE`. No picker, no grants — CE has no
+  authorization boundary between workspace members, so everything is workspace-public.
+- **EE**: the picker offers Shared with workspace / Private / Specific people. No `ROLE_ADMIN` gate on
+  `WORKSPACE` — it is the default, so gating it would fail every ordinary create. `ORGANIZATION` is
+  **not** offered here: it is reached through `createOrganizationConnection`, and
+  `setConnectionVisibility` rejects it. (`ConnectionVisibilityPicker` can render an Organization
+  option behind `showOrganizationOption`, but no caller passes it today.)
+- **Embedded**: force-written `PRIVATE`, unchanged. An embedded connection belongs to a connected user,
+  not a workspace member, so workspace reach would be wrong in a way that crosses customers.
+
+**What sharing exposes.** `WORKSPACE` grants *use plus existence*, not *read plus write*: both REST
+controllers obfuscate `authorizationParameters` and null `parameters`, and no `ConnectionFacade` method
+mutates authorization parameters after creation. A member can run a workflow against a colleague's
+account; they cannot extract or repoint the credential.
+
+**"Specific people"** is not a fourth stored value — it is `PRIVATE` plus rows in `resource_grant`
+(EE, `platform-resource-grant`). A grant conveys visibility only; what the recipient may then do is
+decided by the usual `PermissionScope`/`WorkspaceRole` machinery. Grants survive promotion so demoting
+restores the previous audience, and are deleted with the connection because `resource_id` is
+polymorphic and has no foreign key.
+
+**Visibility is a precondition of `hasResourceScope`**, in both editions — not a filter running beside
+it. Without that, a member holding `CONNECTION_EDIT` would pass the by-id check for a connection the
+list correctly hides. In CE this replaces owner-isolation *only* for resource types that registered a
+`ResourceVisibilityProvider`; API keys and other user-owned resources keep it.
+`PermissionServiceVisibilityTest` is the regression guard.
+
+**GraphQL mutations** (owner-or-admin, annotated on the facade so they protect every caller):
+- `setConnectionVisibility(workspaceId, connectionId, visibility)` — rejects `ORGANIZATION` (set
+  through `createOrganizationConnection`) and refuses to narrow to `PRIVATE` while an active
+  deployment uses the connection.
+- `grantConnectionAccess` / `revokeConnectionAccess(workspaceId, connectionId, userId)` — grantee must
+  be a member of the owning workspace; rejection reuses the unknown-connection error so user ids
+  cannot be enumerated. Grant is idempotent via `ON CONFLICT DO NOTHING`, not a caught
+  `DuplicateKeyException` — PostgreSQL aborts the transaction on a constraint violation, so catching it
+  still fails at commit.
+- `connectionGrants(workspaceId, connectionId)` — owner-or-admin; a plain viewer must not learn who
+  else a connection was handed to.
+
+**Audit**: `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`.
+The first and last are `strictAudit` — both can remove access.
+
+**Metrics**: `bytechef_connection_create` (Counter), tagged
+`visibility=PRIVATE|WORKSPACE|ORGANIZATION`, wired via `ObjectProvider<MeterRegistry>` so lightweight
+app variants without actuator start cleanly.
+
+
 ### Spring Boot Project Conventions
 
 - **Integration Test Naming**: All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)

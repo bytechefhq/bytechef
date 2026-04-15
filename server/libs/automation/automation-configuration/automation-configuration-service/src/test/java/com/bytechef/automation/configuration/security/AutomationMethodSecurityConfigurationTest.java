@@ -85,9 +85,22 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry("BillingApiController#reactivateSubscription",
             "BillingSubscriptionFacadeImpl#reactivateSubscription"),
         Map.entry("BillingApiController#upgradeSubscription", "BillingSubscriptionFacadeImpl#updateSubscription"),
-        Map.entry("ConnectionApiController#createConnection", "WorkspaceConnectionFacadeImpl#create"),
         Map.entry("ConnectionApiController#deleteConnection", "WorkspaceConnectionFacadeImpl#delete"),
         Map.entry("ConnectionApiController#updateConnection", "WorkspaceConnectionFacadeImpl#update"),
+        Map.entry("ConnectionGraphQlController#disconnectConnection",
+            "WorkspaceConnectionFacadeImpl#disconnectConnection"),
+        Map.entry("ConnectionReassignmentGraphQlController#markConnectionsPendingReassignment",
+            "ConnectionReassignmentFacadeImpl#markConnectionsPendingReassignmentAsAdmin"),
+        Map.entry("ConnectionReassignmentGraphQlController#reassignAllConnections",
+            "ConnectionReassignmentFacadeImpl#reassignAllConnections"),
+        Map.entry("ConnectionReassignmentGraphQlController#reassignConnection",
+            "ConnectionReassignmentFacadeImpl#reassignConnection"),
+        Map.entry("ConnectionSharingGraphQlController#grantConnectionAccess",
+            "WorkspaceConnectionFacadeImpl#grantConnectionAccess"),
+        Map.entry("ConnectionSharingGraphQlController#revokeConnectionAccess",
+            "WorkspaceConnectionFacadeImpl#revokeConnectionAccess"),
+        Map.entry("ConnectionSharingGraphQlController#setConnectionVisibility",
+            "WorkspaceConnectionFacadeImpl#setConnectionVisibility"),
         Map.entry("ConnectionTagApiController#updateConnectionTags", "WorkspaceConnectionFacadeImpl#updateTags"),
         Map.entry("CustomComponentApiController#deployCustomComponent", "CustomComponentFacadeImpl#save"),
         Map.entry("CustomComponentGraphQlController#deleteCustomComponent", "CustomComponentFacadeImpl#delete"),
@@ -124,6 +137,12 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry("McpToolGraphQlController#createMcpTool", "McpToolServiceImpl#create"),
         Map.entry("McpToolGraphQlController#deleteMcpTool", "McpToolServiceImpl#delete"),
         Map.entry("McpToolGraphQlController#updateMcpTool", "McpToolServiceImpl#update"),
+        Map.entry("OrganizationConnectionGraphQlController#createOrganizationConnection",
+            "OrganizationConnectionFacadeImpl#create"),
+        Map.entry("OrganizationConnectionGraphQlController#deleteOrganizationConnection",
+            "OrganizationConnectionFacadeImpl#delete"),
+        Map.entry("OrganizationConnectionGraphQlController#updateOrganizationConnection",
+            "OrganizationConnectionFacadeImpl#update"),
         Map.entry("ProjectApiController#createProject", "ProjectFacadeImpl#createProject"),
         Map.entry("ProjectApiController#deleteProject", "ProjectFacadeImpl#deleteProject"),
         Map.entry("ProjectApiController#duplicateProject", "ProjectFacadeImpl#duplicateProject"),
@@ -626,16 +645,29 @@ class AutomationMethodSecurityConfigurationTest {
         }
 
         Set<String> receiverTypeNames = new TreeSet<>();
+        boolean declared = false;
 
+        // Two types can share a simple name, the EE facade extending its CE namesake. One that does not declare the
+        // method inherits it, and with it the parent's guard, so only the declaring types are checked.
         for (SourceType delegateType : delegateTypes) {
             Set<String> gatedMethodNames = delegateType.gatedMethodNames();
 
-            if (!delegateType.classGated() && !gatedMethodNames.contains(delegateMethodName)) {
-                return delegateTypeName + "." + delegateMethodName + " carries no @PreAuthorize";
+            if (delegateType.classGated()) {
+                declared = true;
+            } else if (declaresMember(delegateType, delegateMethodName)) {
+                declared = true;
+
+                if (!gatedMethodNames.contains(delegateMethodName)) {
+                    return delegateTypeName + "." + delegateMethodName + " carries no @PreAuthorize";
+                }
             }
 
             receiverTypeNames.add(delegateType.name());
             receiverTypeNames.addAll(delegateType.implementedTypeNames());
+        }
+
+        if (!declared) {
+            return delegateTypeName + "." + delegateMethodName + " carries no @PreAuthorize";
         }
 
         for (Endpoint endpoint : endpoints) {
@@ -648,6 +680,16 @@ class AutomationMethodSecurityConfigurationTest {
         }
 
         return null;
+    }
+
+    private static boolean declaresMember(SourceType sourceType, String methodName) {
+        for (Member member : sourceType.members()) {
+            if (methodName.equals(member.name())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static boolean callsDelegate(Endpoint endpoint, Set<String> receiverTypeNames, String methodName) {

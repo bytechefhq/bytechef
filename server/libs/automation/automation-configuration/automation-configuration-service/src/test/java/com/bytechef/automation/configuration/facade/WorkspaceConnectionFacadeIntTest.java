@@ -17,7 +17,6 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -43,6 +42,7 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
@@ -53,7 +53,9 @@ import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationR
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
@@ -81,6 +83,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
+@org.springframework.security.test.context.support.WithMockUser(
+    username = "admin@localhost.com",
+    authorities = com.bytechef.platform.security.constant.AuthorityConstants.ADMIN)
 public class WorkspaceConnectionFacadeIntTest {
 
     @Autowired
@@ -306,6 +311,12 @@ public class WorkspaceConnectionFacadeIntTest {
         private PermissionService permissionService;
 
         @MockitoBean
+        private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+
+        @Autowired
+        private UserService userService;
+
+        @MockitoBean
         private WorkspaceConnectionService workspaceConnectionService;
 
         @BeforeEach
@@ -321,6 +332,10 @@ public class WorkspaceConnectionFacadeIntTest {
                 .thenThrow(new IllegalStateException(BODY_REACHED));
             when(connectionFacade.getConnection(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
 
+            when(userService.fetchUserByLogin(anyString())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+            doThrow(new IllegalStateException(BODY_REACHED)).when(projectDeploymentWorkflowService)
+                .deleteProjectDeploymentWorkflowConnection(anyLong());
             doThrow(new IllegalStateException(BODY_REACHED)).when(workspaceConnectionService)
                 .deleteWorkspaceConnection(anyLong());
             doThrow(new IllegalStateException(BODY_REACHED)).when(connectionFacade)
@@ -427,9 +442,21 @@ public class WorkspaceConnectionFacadeIntTest {
         }
 
         @Test
-        void testDisconnectConnectionCarriesNoScopeGuard() {
-            assertThatCode(() -> workspaceConnectionFacade.disconnectConnection(CONNECTION_ID))
-                .doesNotThrowAnyException();
+        void testDisconnectConnectionDeniesANonAdmin() {
+            assertThatThrownBy(() -> workspaceConnectionFacade.disconnectConnection(CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(permissionService);
+        }
+
+        @Test
+        void testDisconnectConnectionAllowsATenantAdmin() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
+            assertInvocationOutcome(() -> workspaceConnectionFacade.disconnectConnection(CONNECTION_ID), true);
 
             verifyNoInteractions(permissionService);
         }

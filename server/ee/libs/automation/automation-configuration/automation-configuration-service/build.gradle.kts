@@ -12,10 +12,15 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     implementation(project(":server:ee:libs:automation:automation-code-workflow-loader"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:ee:libs:platform:platform-resource-grant:platform-resource-grant-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("org.liquibase:liquibase-core")

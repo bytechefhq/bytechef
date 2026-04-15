@@ -47,6 +47,8 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.
 import com.bytechef.automation.configuration.security.WorkspaceOwnershipResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -72,6 +74,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.aopalliance.intercept.MethodInvocation;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
@@ -131,7 +134,7 @@ class PermissionServiceTest {
 
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(), List.of(),
+            workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
@@ -883,7 +886,7 @@ class PermissionServiceTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
-            List.of(connectionEnvironmentResolver),
+            List.of(), permissiveResolver(), List.of(connectionEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
@@ -898,7 +901,7 @@ class PermissionServiceTest {
     private PermissionServiceImpl createService(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers), List.of(),
+            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
@@ -1041,7 +1044,7 @@ class PermissionServiceTest {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
-            List.of(deploymentOwnershipResolver()),
+            List.of(deploymentOwnershipResolver()), List.of(), permissiveResolver(),
             List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
 
@@ -1062,7 +1065,7 @@ class PermissionServiceTest {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
-            List.of(deploymentOwnershipResolver()),
+            List.of(deploymentOwnershipResolver()), List.of(), permissiveResolver(),
             List.of(deploymentEnvironmentResolver(null)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
 
@@ -1092,7 +1095,8 @@ class PermissionServiceTest {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
-            List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver),
+            List.of(deploymentOwnershipResolver()), List.of(), permissiveResolver(),
+            List.of(failingEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
 
         lenient().when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
@@ -1162,7 +1166,7 @@ class PermissionServiceTest {
 
             permissionService = new PermissionServiceImpl(
                 currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
-                workspaceUserRepository, List.of(), List.of(),
+                workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
                 beanFactory.getBeanProvider(ConnectedUserAccessDecider.class));
         }
 
@@ -1233,7 +1237,7 @@ class PermissionServiceTest {
         void testIsAuthorizationSkippedFollowsSkipWithoutADecider() throws Throwable {
             PermissionServiceImpl permissionServiceWithoutDecider = new PermissionServiceImpl(
                 currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
-                workspaceUserRepository, List.of(), List.of(),
+                workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
 
             assertThat(
@@ -1392,7 +1396,7 @@ class PermissionServiceTest {
 
             PermissionServiceImpl permissionService = new PermissionServiceImpl(
                 currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
-                mock(WorkspaceUserRepository.class), List.of(), List.of(),
+                mock(WorkspaceUserRepository.class), List.of(), List.of(), permissiveResolver(), List.of(),
                 beanFactory.getBeanProvider(ConnectedUserAccessDecider.class));
 
             AutomationMethodSecurityExpressionHandler expressionHandler =
@@ -1573,7 +1577,8 @@ class PermissionServiceTest {
         private PermissionServiceImpl service(List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
             return new PermissionServiceImpl(
                 currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-                workspaceUserRepository, resourceOwnershipResolvers, List.of(),
+                workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+                List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
         }
 
@@ -1664,7 +1669,8 @@ class PermissionServiceTest {
 
             return new PermissionServiceImpl(
                 currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-                workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
+                workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+                resourceEnvironmentResolvers,
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
         }
 
@@ -1798,7 +1804,8 @@ class PermissionServiceTest {
 
             return new PermissionServiceImpl(
                 currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-                workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
+                workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+                resourceEnvironmentResolvers,
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
         }
 
@@ -1876,7 +1883,8 @@ class PermissionServiceTest {
         private PermissionServiceImpl service(List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
             return new PermissionServiceImpl(
                 currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-                workspaceUserRepository, resourceOwnershipResolvers, List.of(),
+                workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+                List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
         }
 
@@ -2018,6 +2026,7 @@ class PermissionServiceTest {
                 mock(ProjectRepository.class),
                 mock(WorkspaceScopeCacheService.class), mock(WorkspaceUserRepository.class),
                 List.of(new AiSkillOwnershipResolver(aiSkillService, userService)), List.of(),
+                permissiveResolver(), List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
 
             PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager = new PreAuthorizeAuthorizationManager();
@@ -2105,5 +2114,15 @@ class PermissionServiceTest {
                 return "deleted";
             }
         }
+    }
+
+    /**
+     * A resolver that hides nothing, so these tests exercise workspace-scope and ownership resolution rather than
+     * visibility. The visibility precondition has its own test class.
+     */
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

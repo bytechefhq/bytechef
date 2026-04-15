@@ -22,9 +22,12 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.user.service.UserService;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,9 +40,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    CategoryService.class, ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class,
-    ProjectWorkflowService.class, TagService.class, WorkflowService.class, WorkflowFacade.class,
-    WorkspaceConnectionFacade.class
+    CategoryService.class, ComponentDefinitionService.class, ProjectFacade.class,
+    ProjectService.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class, TagService.class,
+    UserService.class, WorkflowService.class, WorkflowFacade.class, WorkspaceConnectionFacade.class,
+    WorkspaceUserService.class
 })
 public @interface AutomationConfigurationGraphQlConfigurationSharedMocks {
 }

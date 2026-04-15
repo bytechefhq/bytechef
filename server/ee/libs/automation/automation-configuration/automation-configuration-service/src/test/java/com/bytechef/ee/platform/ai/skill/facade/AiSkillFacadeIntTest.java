@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
@@ -44,6 +46,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
@@ -448,6 +451,7 @@ class AiSkillFacadeIntTest {
                 mock(ProjectRepository.class), mock(WorkspaceScopeCacheService.class),
                 mock(WorkspaceUserRepository.class),
                 List.of(new AiSkillOwnershipResolver(aiSkillService, userService)), List.of(),
+                permissiveResolver(), List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
 
             return new AutomationMethodSecurityExpressionHandler(permissionService);
@@ -485,5 +489,11 @@ class AiSkillFacadeIntTest {
         public long environmentId() {
             return 0L;
         }
+    }
+
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }
