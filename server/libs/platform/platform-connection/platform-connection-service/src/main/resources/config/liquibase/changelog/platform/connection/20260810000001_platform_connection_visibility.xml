@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260810000001-01" author="Ivica Cardic">
+        <!--
+            All rows default to WORKSPACE (ordinal 1) — a connection is visible to its whole workspace
+            unless its owner withholds it. CE force-writes this value and offers no picker; EE lets the
+            owner move it to PRIVATE and hand it to named users through resource_grant.
+
+            This replaces 20260407000001, which defaulted to PRIVATE for a promote-from-private model
+            that no longer exists. That changeset was never released &#8212; it existed only on the 0_732
+            branch &#8212; so it is deleted rather than superseded. A developer holding a database that ran
+            it must drop connection.visibility before this changeset applies; Liquibase will not re-add
+            an existing column.
+        -->
+        <addColumn tableName="connection">
+            <column name="visibility" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <comment>Connections default to WORKSPACE (1). PRIVATE (0) is reachable in EE through the
+            visibility picker; ORGANIZATION (2) through the organization connection facade.</comment>
+
+        <rollback>
+            <dropColumn tableName="connection" columnName="visibility"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
