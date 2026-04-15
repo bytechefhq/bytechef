@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.security.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
@@ -46,7 +47,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
     EmbeddedScopeCacheService.class, EmbeddedUserRepository.class, PermissionScopeRegistry.class,
-    ProjectRepository.class, UserService.class, WorkspaceScopeCache.class, WorkspaceUserRepository.class
+    ProjectRepository.class, ResourceVisibilityResolver.class, UserService.class, WorkspaceScopeCache.class,
+    WorkspaceUserRepository.class
 })
 class SigningKeyServiceIntTest {
 

@@ -250,6 +250,18 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
 
+        List<Long> connectionIds = projectDeploymentWorkflow.getConnections()
+            .stream()
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .toList();
+
+        List<Connection> inactiveConnections = connectionService.getInactiveConnections(connectionIds);
+
+        if (!inactiveConnections.isEmpty()) {
+
+            connectionService.validateConnectionsActive(connectionIds);
+        }
+
         return principalJobFacade.createJob(
             new JobParametersDTO(
                 workflowId, projectDeploymentWorkflow.getInputs(),

@@ -59,6 +59,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowCreatorImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacadeImpl;
 import com.bytechef.automation.data.table.web.graphql.DataTableGraphQlController;
@@ -558,6 +559,11 @@ class ConnectedUserAccessDeciderIntTest {
             }
 
             @Bean
+            ResourceVisibilityResolver resourceVisibilityResolver() {
+                return mock(ResourceVisibilityResolver.class);
+            }
+
+            @Bean
             UserService userService() {
                 return mock(UserService.class);
             }
@@ -947,6 +953,11 @@ class ConnectedUserAccessDeciderIntTest {
                             mock(WorkflowValidatorFacade.class)),
                         ProjectWorkflowService.class, projectWorkflowService,
                         WorkflowFacade.class, workflowFacade, WorkflowService.class, workflowService));
+            }
+
+            @Bean
+            ResourceVisibilityResolver resourceVisibilityResolver() {
+                return mock(ResourceVisibilityResolver.class);
             }
 
             @Bean

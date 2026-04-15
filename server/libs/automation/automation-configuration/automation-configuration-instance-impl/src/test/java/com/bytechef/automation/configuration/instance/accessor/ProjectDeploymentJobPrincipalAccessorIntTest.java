@@ -17,24 +17,39 @@
 package com.bytechef.automation.configuration.instance.accessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.instance.config.ProjectDeploymentJobPrincipalAccessorIntTestConfiguration;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -44,6 +59,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Import(PostgreSQLContainerConfiguration.class)
 class ProjectDeploymentJobPrincipalAccessorIntTest {
 
+    @MockitoBean
+    private ConnectionService connectionService;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -52,6 +70,9 @@ class ProjectDeploymentJobPrincipalAccessorIntTest {
 
     @Autowired
     private ProjectDeploymentService projectDeploymentService;
+
+    @Autowired
+    private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @Autowired
     private ProjectService projectService;
@@ -107,6 +128,59 @@ class ProjectDeploymentJobPrincipalAccessorIntTest {
         assertThat(
             projectDeploymentJobPrincipalAccessor.getJobPrincipalSummary(projectDeployment.getId(), "missing-workflow"))
                 .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), project.getId(), null, 3));
+    }
+
+    @Test
+    void testValidateConnectionsForJobPassesWhenEveryConnectionIsActive() {
+        UUID workflowUuid = UUID.randomUUID();
+
+        long projectDeploymentId = createDeployedWorkflowUsingConnection(workflowUuid, 10L);
+
+        when(connectionService.getInactiveConnections(List.of(10L))).thenReturn(List.of());
+
+        projectDeploymentJobPrincipalAccessor.validateConnectionsForJob(projectDeploymentId, workflowUuid.toString());
+
+        verify(connectionService, never()).validateConnectionsActive(anyList());
+    }
+
+    @Test
+    void testValidateConnectionsForJobRejectsAnInactiveConnection() {
+        UUID workflowUuid = UUID.randomUUID();
+
+        long projectDeploymentId = createDeployedWorkflowUsingConnection(workflowUuid, 11L);
+
+        ConfigurationException inactiveConnections = new ConfigurationException(
+            "inactive", ConnectionErrorType.CONNECTION_NOT_ACTIVE);
+
+        when(connectionService.getInactiveConnections(List.of(11L))).thenReturn(List.of(new Connection()));
+        doThrow(inactiveConnections).when(connectionService)
+            .validateConnectionsActive(List.of(11L));
+
+        assertThatThrownBy(
+            () -> projectDeploymentJobPrincipalAccessor.validateConnectionsForJob(projectDeploymentId,
+                workflowUuid.toString()))
+                    .isSameAs(inactiveConnections);
+    }
+
+    private long createDeployedWorkflowUsingConnection(UUID workflowUuid, long connectionId) {
+        Project project = createProject("CRM " + UUID.randomUUID());
+
+        ProjectDeployment projectDeployment = createProjectDeployment(project);
+
+        String workflowId = "workflow-" + UUID.randomUUID();
+
+        projectWorkflowService.addWorkflow(project.getId(), 3, workflowId, workflowUuid);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setConnections(
+            List.of(new ProjectDeploymentWorkflowConnection(connectionId, "connection", "node_1")));
+        projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
+        projectDeploymentWorkflow.setWorkflowId(workflowId);
+
+        projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
+
+        return projectDeployment.getId();
     }
 
     private Project createProject(String name) {

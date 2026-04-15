@@ -19,12 +19,15 @@ package com.bytechef.platform.component.facade;
 import static com.bytechef.platform.component.facade.FacadeTestComponentHandler.CHANNEL_ID;
 import static com.bytechef.platform.component.facade.FacadeTestComponentHandler.COMPONENT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.config.ComponentRegistryConfiguration;
 import com.bytechef.platform.component.config.ComponentRegistryConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.HashMap;
@@ -61,12 +64,54 @@ class TriggerDefinitionFacadeIntTest {
     void beforeEach() {
         facadeTestComponentHandler.clearInvocations();
 
-        connection = connectionRepository.save(createConnection());
+        connection = connectionRepository.save(createConnection(ConnectionStatus.ACTIVE));
     }
 
     @AfterEach
     void afterEach() {
         connectionRepository.deleteAll();
+    }
+
+    @Test
+    void testExecuteTriggerWithPendingReassignmentConnectionThrows() {
+        Connection pendingConnection = connectionRepository.save(
+            createConnection(ConnectionStatus.PENDING_REASSIGNMENT));
+
+        assertThatThrownBy(
+            () -> triggerDefinitionFacade.executeTrigger(
+                COMPONENT_NAME, 1, "newEvent", null, null, null, Map.of(), null, null, pendingConnection.getId(),
+                null, PlatformType.AUTOMATION, true))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("Facade Test Connection")
+                    .hasMessageContaining("PENDING_REASSIGNMENT");
+
+        assertThat(facadeTestComponentHandler.getInvocations()).isEmpty();
+    }
+
+    @Test
+    void testExecuteTriggerWithRevokedConnectionThrows() {
+        Connection revokedConnection = connectionRepository.save(createConnection(ConnectionStatus.REVOKED));
+
+        assertThatThrownBy(
+            () -> triggerDefinitionFacade.executeTrigger(
+                COMPONENT_NAME, 1, "newEvent", null, null, null, Map.of(), null, null, revokedConnection.getId(),
+                null, PlatformType.AUTOMATION, true))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("REVOKED");
+
+        assertThat(facadeTestComponentHandler.getInvocations()).isEmpty();
+    }
+
+    @Test
+    void testExecuteWebhookDisableWithPendingReassignmentConnectionStillTearsDown() {
+        Connection pendingConnection = connectionRepository.save(
+            createConnection(ConnectionStatus.PENDING_REASSIGNMENT));
+
+        triggerDefinitionFacade.executeWebhookDisable(
+            COMPONENT_NAME, 1, "newEvent", Map.of(), WORKFLOW_EXECUTION_ID, Map.of("subscription", "sub1"),
+            pendingConnection.getId());
+
+        assertThat(facadeTestComponentHandler.getInvocations()).containsExactly("webhookDisable:sub1@C1");
     }
 
     @Test
@@ -127,13 +172,14 @@ class TriggerDefinitionFacadeIntTest {
             .containsExactly("listenerEnable:" + WORKFLOW_EXECUTION_ID + "@none");
     }
 
-    private static Connection createConnection() {
+    private static Connection createConnection(ConnectionStatus connectionStatus) {
         return Connection.builder()
             .authorizationType(AuthorizationType.API_KEY)
             .componentName(COMPONENT_NAME)
             .connectionVersion(1)
             .name("Facade Test Connection")
             .parameters(new HashMap<>(Map.of(CHANNEL_ID, "C1")))
+            .status(connectionStatus)
             .type(PlatformType.AUTOMATION)
             .build();
     }

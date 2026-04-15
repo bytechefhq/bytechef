@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
@@ -109,6 +110,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -540,9 +542,12 @@ class EmbeddedHubGatesIntTest {
             ObjectProvider<ConnectionService> connectionServiceProvider) {
 
             return new PermissionServiceImpl(
-                currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
-                workspaceUserRepository, ownershipResolvers, environmentResolvers, connectedUserAccessDeciderProvider,
-                embeddedScopeCacheService, embeddedUserRepository, embeddedResourceResolverProvider,
+                currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+                workspaceUserRepository, ownershipResolvers, List.of(),
+                (resourceType, workspaceId, candidates) -> candidates.stream()
+                    .map(VisibilityRecord::id)
+                    .collect(Collectors.toSet()),
+                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService, embeddedUserRepository, embeddedResourceResolverProvider,
                 connectionServiceProvider);
         }
     }
