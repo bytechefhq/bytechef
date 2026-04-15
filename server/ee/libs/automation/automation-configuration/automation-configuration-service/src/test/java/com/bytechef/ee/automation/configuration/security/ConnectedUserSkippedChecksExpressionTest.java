@@ -25,6 +25,8 @@ import com.bytechef.automation.configuration.security.AutomationPermissionEvalua
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
@@ -40,6 +42,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +91,7 @@ class ConnectedUserSkippedChecksExpressionTest {
 
         PermissionServiceImpl permissionService = new PermissionServiceImpl(
             currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
-            mock(WorkspaceUserRepository.class), List.of(), List.of(),
+            mock(WorkspaceUserRepository.class), List.of(), List.of(), permissiveResolver(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -192,5 +195,11 @@ class ConnectedUserSkippedChecksExpressionTest {
         assertThat(check.getAsBoolean()).isFalse();
 
         verifyNoInteractions(currentUserResolver, projectRepository, workspaceScopeCacheService);
+    }
+
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

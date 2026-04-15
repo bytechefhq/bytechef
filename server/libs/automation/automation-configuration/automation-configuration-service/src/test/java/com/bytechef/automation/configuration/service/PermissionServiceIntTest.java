@@ -26,16 +26,20 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -219,9 +223,21 @@ class PermissionServiceIntTest {
         PermissionService twoResolverPermissionService = new PermissionServiceImpl(
             userService,
             List.of(resolver("Connection", ResourceOwner.unknown()),
-                resolver("Connection", ResourceOwner.ofWorkspace(42L))));
+                resolver("Connection", ResourceOwner.ofWorkspace(42L))),
+            List.of(), permissiveResolver());
 
         assertThat(twoResolverPermissionService.hasResourceScope(1L, "Connection", "CONNECTION_VIEW")).isTrue();
+    }
+
+    @Test
+    void testVisibilityBearingResourceDropsOwnerIsolationInCe() {
+        setCurrentUser(99L);
+
+        PermissionService visibilityPermissionService = new PermissionServiceImpl(
+            userService, List.of(resolver("Connection", ResourceOwner.ofUser(OWNER_USER_ID))),
+            List.of(visibilityProvider("Connection")), permissiveResolver());
+
+        assertThat(visibilityPermissionService.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isTrue();
     }
 
     @Test
@@ -269,6 +285,27 @@ class PermissionServiceIntTest {
                 List.of(new SimpleGrantedAuthority(authority))));
 
         SecurityContextHolder.setContext(securityContext);
+    }
+
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+    }
+
+    private static ResourceVisibilityProvider visibilityProvider(String resourceType) {
+        return new ResourceVisibilityProvider() {
+
+            @Override
+            public String resourceType() {
+                return resourceType;
+            }
+
+            @Override
+            public Optional<VisibilityRecord> fetchVisibility(long id) {
+                return Optional.of(new VisibilityRecord(id, ResourceVisibility.WORKSPACE, "someone-else"));
+            }
+        };
     }
 
     private static ResourceOwnershipResolver resolver(String resourceType, ResourceOwner resourceOwner) {

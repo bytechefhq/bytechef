@@ -149,7 +149,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
 
         connectedUserConnectionService.create(connectedUserId, connectionId, SecurityUtils.getCurrentUserLogin());
 
-        connectionService.updateCreatedBy(connectionId, externalId);
+        connectionService.reassignOwner(connectionId, externalId);
 
         return connectionId;
     }

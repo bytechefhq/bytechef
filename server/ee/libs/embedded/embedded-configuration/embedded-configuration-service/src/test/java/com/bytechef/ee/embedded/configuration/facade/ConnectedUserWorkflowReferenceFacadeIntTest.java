@@ -316,6 +316,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                 Connection connection = new Connection();
 
                 connection.setComponentName("slack");
+                connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
                 connection.setId(invocation.getArgument(0));
 
                 return connection;

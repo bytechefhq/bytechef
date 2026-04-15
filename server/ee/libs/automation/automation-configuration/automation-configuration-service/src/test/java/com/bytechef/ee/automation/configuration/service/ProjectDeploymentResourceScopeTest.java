@@ -21,6 +21,8 @@ import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironme
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
@@ -126,7 +129,8 @@ class ProjectDeploymentResourceScopeTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
+            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+            resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -137,4 +141,9 @@ class ProjectDeploymentResourceScopeTest {
         return List.of(new ProjectDeploymentEnvironmentResolver(projectDeploymentRepository));
     }
 
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+    }
 }
