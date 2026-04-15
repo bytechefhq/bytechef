@@ -587,7 +587,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
         return getFilteredClusterElementTypes({
             clusterRootComponentDefinition: nestedClusterRootDefinition || mainClusterRootComponentDefinition,
-            currentClusterElementsType: data.clusterElementType,
+            currentClusterElementsType: (data.clusterElementName as string) || data.clusterElementType,
             isNestedClusterRoot,
             operationName: data.operationName,
         });
@@ -598,6 +598,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         mainClusterRootComponentDefinition,
         nestedClusterRootsComponentDefinitions,
         data.componentName,
+        data.clusterElementName,
         data.clusterElementType,
         data.operationName,
     ]);
