@@ -1,0 +1,3 @@
+mutation reassignAllConnections($workspaceId: ID!, $userLogin: String!, $newOwnerLogin: String!) {
+    reassignAllConnections(workspaceId: $workspaceId, userLogin: $userLogin, newOwnerLogin: $newOwnerLogin)
+}
