@@ -47,6 +47,7 @@ const TENANT_ADMIN_NAV_ITEM_HREFS = [
     'api-connectors',
     'audit-events',
     'billing',
+    'connections',
     'git-configuration',
     'global-custom-roles',
     'identity-providers',

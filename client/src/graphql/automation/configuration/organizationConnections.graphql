@@ -1,0 +1,12 @@
+query organizationConnections($environmentId: ID) {
+    organizationConnections(environmentId: $environmentId) {
+        id
+        name
+        componentName
+        environmentId
+        visibility
+        createdBy
+        createdDate
+        lastModifiedDate
+    }
+}
