@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.automation.configuration.callback.ProjectCallback;
 import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
@@ -103,6 +104,11 @@ public class WorkspacePermissionIntTestConfiguration {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    ResourceVisibilityResolver resourceVisibilityResolver() {
+        return mock(ResourceVisibilityResolver.class);
     }
 
     @Bean

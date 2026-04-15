@@ -15,10 +15,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
@@ -30,6 +34,8 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -39,6 +45,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -68,6 +75,7 @@ class WorkspaceConnectionChangeAuditIntTest {
 
     private static final long CONNECTION_ID = 42L;
     private static final String CONFIDENTIAL_TOKEN = "confidential-access-token";
+    private static final long USER_ID = 5L;
     private static final long WORKSPACE_ID = 3L;
 
     @MockitoBean
@@ -79,8 +87,14 @@ class WorkspaceConnectionChangeAuditIntTest {
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
+    @MockitoBean
+    private UserService userService;
+
     @Autowired
     private WorkspaceConnectionFacade workspaceConnectionFacade;
+
+    @MockitoBean
+    private WorkspaceFacade workspaceFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -107,8 +121,15 @@ class WorkspaceConnectionChangeAuditIntTest {
             .parameters(Map.of("access_token", CONFIDENTIAL_TOKEN))
             .build();
 
+        User user = new User();
+
+        user.setId(USER_ID);
+
+        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
+        when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(List.of(new Workspace(WORKSPACE_ID, "Default")));
         when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.AUTOMATION)))
             .thenReturn(CONNECTION_ID);
+        when(connectionFacade.getConnection(CONNECTION_ID)).thenReturn(connectionDTO);
 
         workspaceConnectionFacade.create(WORKSPACE_ID, connectionDTO);
 
@@ -198,12 +219,14 @@ class WorkspaceConnectionChangeAuditIntTest {
 
         @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
-            ConnectionFacade connectionFacade, ConnectionService connectionService) {
+            ConnectionFacade connectionFacade, ConnectionService connectionService, UserService userService,
+            WorkspaceFacade workspaceFacade) {
 
             return new WorkspaceConnectionFacadeImpl(
                 connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService,
-                mock(PermissionService.class), mock(ProjectDeploymentWorkflowService.class),
-                mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class));
+                mock(ResourceVisibilityResolver.class), mock(ObjectProvider.class), mock(PermissionService.class),
+                mock(ProjectDeploymentWorkflowService.class), mock(ProjectService.class), userService,
+                mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class), workspaceFacade);
         }
     }
 }

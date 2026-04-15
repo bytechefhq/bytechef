@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
@@ -72,7 +73,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
     EmbeddedScopeCacheService.class, EmbeddedUserRepository.class, PermissionScopeRegistry.class,
-    ProjectRepository.class, UserService.class, WorkspaceScopeCacheService.class, WorkspaceUserRepository.class
+    ProjectRepository.class, ResourceVisibilityResolver.class, UserService.class, WorkspaceScopeCacheService.class,
+    WorkspaceUserRepository.class
 })
 class SigningKeyFacadeAuditIntTest {
 

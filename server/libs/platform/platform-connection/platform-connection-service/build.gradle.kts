@@ -1,9 +1,13 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.aspectj:aspectjweaver")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework:spring-aop")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.security:spring-security-config")
+    implementation("org.springframework.security:spring-security-core")
     api(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":sdks:backend:java:component-api"))
@@ -13,6 +17,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
+    testImplementation("org.springframework.boot:spring-boot-actuator")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("tools.jackson.core:jackson-databind")
     testImplementation(project(":server:libs:core:commons:commons-data"))

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.facade;
 
+import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.component;
@@ -27,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -70,6 +72,13 @@ public class FacadeTestComponentHandler implements ComponentHandler {
                 .authorizations(
                     authorization(AuthorizationType.API_KEY)
                         .properties(string(CHANNEL_ID))))
+        .actions(
+            action("send")
+                .title("Send")
+                .properties(
+                    string("channel")
+                        .options((OptionsFunction<String>) this::getChannelOptions))
+                .perform((PerformFunction) (inputParameters, connectionParameters, context) -> null))
         .inputs(
             string("channel")
                 .options((OptionsFunction<String>) this::getChannelOptions))

@@ -7,6 +7,9 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
+import java.util.stream.Collectors;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -113,7 +116,7 @@ class ProjectResourceScopeTest {
     private PermissionServiceImpl service(List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, resourceOwnershipResolvers, List.of(),
+            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -125,4 +128,9 @@ class ProjectResourceScopeTest {
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository));
     }
 
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+    }
 }
