@@ -1,3 +1,5 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {fireEvent, render, screen, waitFor} from '@/shared/util/test-utils';
 import {QueryClient} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -226,6 +228,38 @@ describe('ConnectionTabConnectionSelect', () => {
 
     afterEach(() => {
         vi.restoreAllMocks();
+    });
+
+    it('passes connectionDefinition.version (not componentVersion) to useGetConnectionsQuery', () => {
+        const useGetConnectionsQuerySpy = vi.fn(() => ({data: mockConnections}));
+
+        // Definition.version (3) deliberately differs from componentConnection.componentVersion (1)
+        mockUseGetConnectionDefinitionQuery.mockReturnValue({
+            data: {authorizationTypes: ['oauth2'], componentName: 'test-component', version: 3},
+        });
+
+        mockUseWorkflowEditor.mockReturnValue({
+            ConnectionKeys: {connectionTags: ['connectionTags'], connections: ['connections']},
+            useCreateConnectionMutation: vi.fn(),
+            useGetComponentDefinitionsQuery: () => ({data: [mockComponentDefinition]}),
+            useGetConnectionTagsQuery: vi.fn(),
+            useGetConnectionsQuery: useGetConnectionsQuerySpy,
+        });
+
+        render(
+            <ConnectionTabConnectionSelect
+                componentConnection={mockComponentConnection}
+                componentConnectionsCount={1}
+                componentDefinition={mockComponentDefinition}
+                workflowId="workflow-1"
+                workflowNodeName="node-1"
+            />
+        );
+
+        expect(useGetConnectionsQuerySpy).toHaveBeenCalledWith(
+            expect.objectContaining({componentName: 'test-component', connectionVersion: 3}),
+            true
+        );
     });
 
     it('should render the component with connection select', () => {
@@ -815,6 +849,47 @@ describe('ConnectionTabConnectionSelect', () => {
                 expect(mockRemoveQueries).toHaveBeenCalledTimes(3);
             });
         });
+    });
+
+    it('should list connections without visibility groups outside EE', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.CE}} as never);
+
+        render(
+            <ConnectionTabConnectionSelect
+                componentConnection={mockComponentConnection}
+                componentConnectionsCount={1}
+                componentDefinition={mockComponentDefinition}
+                workflowId="workflow-1"
+                workflowNodeName="node-1"
+            />
+        );
+
+        fireEvent.click(screen.getByRole('combobox'));
+
+        expect(screen.getByText('Test Connection 1')).toBeInTheDocument();
+        expect(screen.queryByText('Workspace')).not.toBeInTheDocument();
+        expect(screen.queryByText('Private')).not.toBeInTheDocument();
+    });
+
+    it('should group connections by visibility in EE', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}} as never);
+
+        render(
+            <TooltipProvider>
+                <ConnectionTabConnectionSelect
+                    componentConnection={mockComponentConnection}
+                    componentConnectionsCount={1}
+                    componentDefinition={mockComponentDefinition}
+                    workflowId="workflow-1"
+                    workflowNodeName="node-1"
+                />
+            </TooltipProvider>
+        );
+
+        fireEvent.click(screen.getByRole('combobox'));
+
+        expect(screen.getByText('Test Connection 1')).toBeInTheDocument();
+        expect(screen.getAllByText('Workspace').length).toBeGreaterThan(0);
     });
 
     it('should not show create connection button when dialog is not allowed', () => {

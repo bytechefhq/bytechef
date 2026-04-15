@@ -66,6 +66,37 @@ export function mockScrollIntoView() {
     Element.prototype.scrollIntoView = vi.fn();
 }
 
+/**
+ * Test wrapper for connection components: pre-mocks the standard hook set
+ * (application info / authentication / workspace / environment) and renders inside the React Query
+ * provider. Use directly in component tests to skip ~100 lines of boilerplate hook mocks.
+ *
+ * Usage: in your test file, vi.mock the store modules first, then call mockConnectionStores({...})
+ * inside beforeEach with overrides, and use renderConnectionComponent() to render the subject.
+ */
+export interface ConnectionTestStoresI {
+    accountAuthorities?: string[];
+    currentEnvironmentId?: number;
+    currentWorkspaceId?: number;
+    edition?: 'CE' | 'EE';
+}
+
+export const DEFAULT_CONNECTION_TEST_STORES: Required<ConnectionTestStoresI> = {
+    accountAuthorities: ['ROLE_ADMIN'],
+    currentEnvironmentId: 1,
+    currentWorkspaceId: 100,
+    edition: 'EE',
+};
+
+export const renderConnectionComponent = (ui: ReactElement, options = {}) => {
+    const testQueryClient = createTestQueryClient();
+
+    return render(ui, {
+        wrapper: ({children}) => <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>,
+        ...options,
+    });
+};
+
 export * from '@testing-library/react';
 export {default as userEvent} from '@testing-library/user-event';
 // override render export

@@ -1,0 +1,3 @@
+query ConnectionGrants($workspaceId: ID!, $connectionId: ID!) {
+    connectionGrants(workspaceId: $workspaceId, connectionId: $connectionId)
+}

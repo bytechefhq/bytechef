@@ -1,0 +1,3 @@
+mutation updateOrganizationConnection($connectionId: ID!, $name: String!, $tagIds: [ID!], $version: Int!) {
+    updateOrganizationConnection(connectionId: $connectionId, name: $name, tagIds: $tagIds, version: $version)
+}

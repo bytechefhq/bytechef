@@ -15,11 +15,14 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
+import ConnectionScopeBadge from '@/pages/automation/connections/components/ConnectionScopeBadge';
+import {useIsVisibilityEditionEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
+import ConnectionVisibilityPicker from '@/shared/components/connection/ConnectionVisibilityPicker';
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {
     Authorization,
@@ -59,6 +62,7 @@ export interface ConnectionDialogFormProps {
     parameters: {[key: string]: object};
     selectedScopes?: {[key: string]: boolean};
     tags: Array<Tag | {label: string; value: string}>;
+    visibility: 'PRIVATE' | 'WORKSPACE';
 }
 
 interface ConnectionDialogProps {
@@ -111,6 +115,14 @@ const ConnectionDialog = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
+    // No admin check here any more: WORKSPACE is the default every connection is created with, so gating it would
+    // fail every ordinary create. ORGANIZATION, which does require admin, is not offered at creation at all.
+    // Compose the shared EE-edition primitive with this dialog's platform-type scope. Keeping the
+    // edition check in one hook means a future migration away from EditionType.EE updates the
+    // list-page gate (useVisibilityFeatureEnabled) and this dialog simultaneously.
+    const isEE = useIsVisibilityEditionEnabled();
+    const visibilityFeatureEnabled = isEE && currentType === PlatformType.AUTOMATION;
+
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
 
@@ -126,6 +138,7 @@ const ConnectionDialog = ({
                     ...tag,
                     label: tag.name,
                 })) || [],
+            visibility: 'WORKSPACE',
         },
         mode: 'onTouched',
     });
@@ -300,7 +313,7 @@ const ConnectionDialog = ({
     }
 
     function getNewConnection(additionalParameters?: object) {
-        const {componentName, name, parameters, tags} = getValues();
+        const {componentName, name, parameters, tags, visibility} = getValues();
 
         return {
             authorizationType,
@@ -313,6 +326,7 @@ const ConnectionDialog = ({
                 ...additionalParameters,
             },
             tags: tags,
+            ...(visibilityFeatureEnabled ? {visibility} : {}),
         } as ConnectionI;
     }
 
@@ -558,6 +572,47 @@ const ConnectionDialog = ({
                                             </FormItem>
                                         )}
                                     />
+
+                                    {!connection?.id && visibilityFeatureEnabled && (
+                                        <FormField
+                                            control={control}
+                                            name="visibility"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Visibility</FormLabel>
+
+                                                    <FormControl>
+                                                        {/* Grants cannot be written before the connection has
+                                                            an id, so creation offers reach only; the list-page
+                                                            picker adds people afterwards. */}
+
+                                                        <ConnectionVisibilityPicker
+                                                            grantedUserIds={[]}
+                                                            onGrantedUserIdsChange={() => undefined}
+                                                            onVisibilityChange={field.onChange}
+                                                            visibility={field.value}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+
+                                    {connection?.id && visibilityFeatureEnabled && connection.visibility && (
+                                        <FormItem className="space-x-2">
+                                            <FormLabel>Visibility</FormLabel>
+
+                                            <FormControl>
+                                                <ConnectionScopeBadge visibility={connection.visibility} />
+                                            </FormControl>
+
+                                            <p className="text-xs text-muted-foreground">
+                                                Change visibility and sharing from the connection list.
+                                            </p>
+                                        </FormItem>
+                                    )}
 
                                     {!connection?.id &&
                                         showConnectionProperties &&
