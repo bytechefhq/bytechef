@@ -971,6 +971,10 @@ class ConnectionFacadeIntTest {
                 public String getWorkflowUuid(String workflowId) {
                     return "";
                 }
+
+                @Override
+                public void validateConnectionsForJob(long jobPrincipalId, String workflowUuid) {
+                }
             };
         }
 

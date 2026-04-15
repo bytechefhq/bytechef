@@ -240,7 +240,7 @@ class EmbeddedPermissionServiceIntTest {
         ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
         ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class, ProjectPermissionScopeProvider.class,
         WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
-        WorkspaceScopeCacheService.class
+        WorkspaceScopeCache.class
     })
     static class RealEmbeddedPermissionServiceConfiguration {
 
