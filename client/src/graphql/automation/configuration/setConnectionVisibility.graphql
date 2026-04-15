@@ -1,0 +1,3 @@
+mutation SetConnectionVisibility($workspaceId: ID!, $connectionId: ID!, $visibility: ResourceVisibility!) {
+    setConnectionVisibility(workspaceId: $workspaceId, connectionId: $connectionId, visibility: $visibility)
+}
