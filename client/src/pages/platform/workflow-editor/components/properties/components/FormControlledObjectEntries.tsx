@@ -10,6 +10,7 @@ interface ControlledObjectEntriesProps {
     control: Control<any, any>;
     controlPath: string;
     formState?: FormState<FieldValues>;
+    hideFromAi?: boolean;
     property: PropertyAllType;
     toolsMode?: boolean;
 }
@@ -18,6 +19,7 @@ const FormControlledObjectEntries = ({
     control,
     controlPath,
     formState,
+    hideFromAi,
     property,
     toolsMode,
 }: ControlledObjectEntriesProps) => {
@@ -84,6 +86,7 @@ const FormControlledObjectEntries = ({
                                 />
                             }
                             formState={formState}
+                            hideFromAi={hideFromAi}
                             parameterValue={entryValue}
                             property={
                                 {
