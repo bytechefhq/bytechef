@@ -50,7 +50,7 @@ public class FromAi implements MethodExecutor {
             throw new IllegalArgumentException("fromAi name argument must be a non-empty String.");
         }
 
-        String name = string.trim();
+        String name = sanitizeName(string.trim());
 
         String type = "STRING";
 
@@ -121,5 +121,11 @@ public class FromAi implements MethodExecutor {
         }
 
         return new TypedValue(new FromAiResult(name, type, description, defaultValue, options, required));
+    }
+
+    private static String sanitizeName(String name) {
+        String sanitized = name.replaceAll("[^a-zA-Z0-9_.\\-]", "_");
+
+        return sanitized.length() > 64 ? sanitized.substring(0, 64) : sanitized;
     }
 }
