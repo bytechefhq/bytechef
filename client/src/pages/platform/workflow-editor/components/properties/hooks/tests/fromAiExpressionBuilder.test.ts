@@ -12,6 +12,7 @@ import {describe, expect, it} from 'vitest';
  */
 
 interface BuildFromAiExpressionArgsI {
+    arrayName?: string;
     defaultValue?: unknown;
     description?: string;
     formattedOptions?: Array<{value?: string | null}> | null;
@@ -21,6 +22,7 @@ interface BuildFromAiExpressionArgsI {
 }
 
 function buildFromAiExpression({
+    arrayName,
     defaultValue,
     description,
     formattedOptions,
@@ -54,7 +56,9 @@ function buildFromAiExpression({
 
     mapEntries.push(`'required': ${required}`);
 
-    return `=fromAi('${name}', '${type}', {${mapEntries.join(', ')}})`;
+    const qualifiedName = arrayName ? `${arrayName}_${name}` : name;
+
+    return `=fromAi('${qualifiedName}', '${type}', {${mapEntries.join(', ')}})`;
 }
 
 describe('fromAiExpression builder', () => {
@@ -118,6 +122,29 @@ describe('fromAiExpression builder', () => {
                     type: 'STRING',
                 })
             ).toBe("=fromAi('firstName', 'STRING', {'required': false})");
+        });
+    });
+
+    describe('array item naming', () => {
+        it('qualifies array item identifiers with the parent array name', () => {
+            expect(
+                buildFromAiExpression({
+                    arrayName: 'messages',
+                    name: '0',
+                    required: false,
+                    type: 'STRING',
+                })
+            ).toBe("=fromAi('messages_0', 'STRING', {'required': false})");
+        });
+
+        it('leaves non-array property names unchanged', () => {
+            expect(
+                buildFromAiExpression({
+                    name: 'lastname',
+                    required: false,
+                    type: 'STRING',
+                })
+            ).toBe("=fromAi('lastname', 'STRING', {'required': false})");
         });
     });
 });

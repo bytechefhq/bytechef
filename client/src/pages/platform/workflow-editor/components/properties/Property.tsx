@@ -143,6 +143,7 @@ const Property = ({
         workflow,
     } = useProperty({
         arrayIndex,
+        arrayName,
         control,
         controlPath,
         displayConditionsQuery,
