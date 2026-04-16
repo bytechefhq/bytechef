@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -49,11 +50,17 @@ public class AnthropicChatAction {
         .output(ModelUtils::output)
         .perform(AnthropicChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL =
-        (inputParameters, connectionParameters, responseFormatRequired) -> AnthropicChatModel.builder()
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        String apiKey = connectionParameters.getString(TOKEN);
+
+        return AnthropicChatModel.builder()
             .anthropicClient(
                 AnthropicOkHttpClient.builder()
-                    .apiKey(connectionParameters.getString(TOKEN))
+                    .apiKey(apiKey)
+                    .build())
+            .anthropicClientAsync(
+                AnthropicOkHttpClientAsync.builder()
+                    .apiKey(apiKey)
                     .build())
             .options(
                 AnthropicChatOptions.builder()
@@ -65,6 +72,7 @@ public class AnthropicChatAction {
                     .topK(inputParameters.getInteger(TOP_K))
                     .build())
             .build();
+    };
 
     private AnthropicChatAction() {
     }
