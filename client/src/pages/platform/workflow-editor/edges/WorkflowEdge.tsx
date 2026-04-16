@@ -147,7 +147,7 @@ export default function WorkflowEdge({
         });
 
         pasteNode({
-            nodeSourceName: sourceNodeId,
+            sourceNodeName: sourceNodeId,
             taskDispatcherContext,
             updateWorkflowMutation,
         });
