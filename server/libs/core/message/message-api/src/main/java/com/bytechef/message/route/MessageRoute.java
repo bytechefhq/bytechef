@@ -46,6 +46,15 @@ public interface MessageRoute {
         return Exchange.MESSAGE == getExchange();
     }
 
+    /**
+     * Whether messages on this route must be delivered in strict FIFO order to receivers. In-memory broker
+     * implementations may dispatch unordered routes on a shared thread pool for throughput; ordered routes require
+     * per-route serial dispatch so tokens (e.g., SSE stream events) reach the receiver in the sequence they were sent.
+     */
+    default boolean isOrdered() {
+        return false;
+    }
+
     Exchange getExchange();
 
     String getName();
