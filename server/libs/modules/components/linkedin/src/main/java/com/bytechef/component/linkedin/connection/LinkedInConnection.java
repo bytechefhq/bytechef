@@ -88,7 +88,7 @@ public class LinkedInConnection {
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
                     Map.of(
                         "X-Restli-Protocol-Version", List.of("2.0.0"),
-                        "Linkedin-Version", List.of("202504"),
+                        "Linkedin-Version", List.of("202604"),
                         AUTHORIZATION, List.of(BEARER + " " + connectionParameters.getRequiredString(ACCESS_TOKEN))))));
 
     private LinkedInConnection() {
