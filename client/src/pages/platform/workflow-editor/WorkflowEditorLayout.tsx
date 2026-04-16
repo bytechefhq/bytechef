@@ -40,6 +40,7 @@ interface WorkflowEditorLayoutProps {
     runDisabled: boolean;
     showCopilot?: boolean;
     showWorkflowInputs: boolean;
+    workflowReferenceId?: number | string;
 }
 
 const WorkflowEditorLayout = ({
@@ -48,6 +49,7 @@ const WorkflowEditorLayout = ({
     runDisabled,
     showCopilot = true,
     showWorkflowInputs,
+    workflowReferenceId,
 }: WorkflowEditorLayoutProps) => {
     const [clusterDialogMounted, setClusterDialogMounted] = useState(false);
     const [rightSidebarMounted, setRightSidebarMounted] = useState(false);
@@ -214,6 +216,7 @@ const WorkflowEditorLayout = ({
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation!}
                     workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                    workflowReferenceId={workflowReferenceId}
                 />
             )}
 

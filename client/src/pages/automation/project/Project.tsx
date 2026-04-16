@@ -111,6 +111,7 @@ const Project = () => {
                                         leftSidebarOpen={projectLeftSidebarOpen}
                                         runDisabled={runDisabled}
                                         showWorkflowInputs={true}
+                                        workflowReferenceId={projectWorkflowId}
                                     />
                                 )}
                             </WorkflowEditorProvider>

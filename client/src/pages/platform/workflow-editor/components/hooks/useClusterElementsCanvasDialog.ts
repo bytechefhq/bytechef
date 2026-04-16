@@ -13,9 +13,13 @@ import {useCallback, useEffect, useMemo} from 'react';
 
 interface UseClusterElementsCanvasDialogProps {
     onOpenChange: (open: boolean) => void;
+    workflowReferenceId?: number | string;
 }
 
-export default function useClusterElementsCanvasDialog({onOpenChange}: UseClusterElementsCanvasDialogProps) {
+export default function useClusterElementsCanvasDialog({
+    onOpenChange,
+    workflowReferenceId,
+}: UseClusterElementsCanvasDialogProps) {
     const setCopilotPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setCopilotPanelOpen);
     const setShowAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.setShowAiAgentEditor);
     const setShowDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.setShowDataStreamEditor);
@@ -76,7 +80,8 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
         return componentName === 'dataStreamProcessor' && operationName === 'fieldMapper';
     }, [isDataStreamClusterRoot, workflowNodeName, workflow.definition]);
 
-    const preferenceKey = workflow.id && workflowNodeName ? `${workflow.id}:${workflowNodeName}` : undefined;
+    const preferenceKey =
+        workflowReferenceId && workflowNodeName ? `${workflowReferenceId}:${workflowNodeName}` : undefined;
 
     useEffect(() => {
         if (isAiAgentClusterRoot && preferenceKey) {
