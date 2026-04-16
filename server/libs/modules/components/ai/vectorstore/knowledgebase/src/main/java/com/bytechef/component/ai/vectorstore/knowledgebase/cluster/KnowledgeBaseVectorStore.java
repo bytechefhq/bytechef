@@ -25,7 +25,6 @@ import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.Knowl
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_IDS;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.VECTOR_STORE;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
@@ -39,18 +38,13 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
-import com.bytechef.platform.tag.domain.Tag;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
@@ -66,7 +60,6 @@ public final class KnowledgeBaseVectorStore {
     private KnowledgeBaseVectorStore() {
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
     public static ClusterElementDefinition<VectorStoreFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
@@ -85,83 +78,20 @@ public final class KnowledgeBaseVectorStore {
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to retrieve documents from.")
-                    .options(getKnowledgeBaseOptions(knowledgeBaseService))
+                    .options(KnowledgeBaseOptionsUtils.knowledgeBaseOptions(knowledgeBaseService))
                     .required(true),
                 array(TAG_IDS)
                     .label("Tags")
                     .description(
                         "Filter results by tags. Documents with ANY of the selected tags will be returned (OR logic).")
                     .items(integer())
-                    .options(getTagOptions(knowledgeBaseTagService))
+                    .options(KnowledgeBaseOptionsUtils.tagOptions(knowledgeBaseTagService))
                     .optionsLookupDependsOn(KNOWLEDGE_BASE_ID)
                     .required(false))
             .object(() -> (
                 inputParameters, connectionParameters, extensions,
                 componentConnections) -> kbVectorStore.createVectorStore(
                     inputParameters, ParametersFactory.create(connectionParameters), null));
-    }
-
-    private static ClusterElementDefinition.OptionsFunction<Long> getKnowledgeBaseOptions(
-        KnowledgeBaseService knowledgeBaseService) {
-
-        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
-            List<Option<Long>> options = new ArrayList<>();
-
-            List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases();
-
-            for (KnowledgeBase knowledgeBase : knowledgeBases) {
-                String name = knowledgeBase.getName();
-
-                if (searchText == null || name.toLowerCase()
-                    .contains(searchText.toLowerCase())) {
-
-                    options.add(option(name, knowledgeBase.getId()
-                        .longValue()));
-                }
-            }
-
-            return options;
-        };
-    }
-
-    private static ClusterElementDefinition.OptionsFunction<Long> getTagOptions(
-        KnowledgeBaseTagService knowledgeBaseTagService) {
-
-        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
-            Long knowledgeBaseId = inputParameters.getLong(KNOWLEDGE_BASE_ID);
-
-            List<Tag> tags;
-
-            if (knowledgeBaseId == null) {
-                tags = knowledgeBaseTagService.getAllTags();
-            } else {
-                tags = knowledgeBaseTagService.getTagsByKnowledgeBaseId()
-                    .getOrDefault(knowledgeBaseId, List.of());
-            }
-
-            Map<Long, Tag> unique = new LinkedHashMap<>();
-
-            for (Tag tag : tags) {
-                Long tagId = Objects.requireNonNull(tag.getId());
-
-                unique.putIfAbsent(tagId, tag);
-            }
-
-            List<Option<Long>> options = new ArrayList<>();
-
-            for (Tag tag : unique.values()) {
-                String tagName = tag.getName();
-
-                if (searchText == null || tagName.toLowerCase()
-                    .contains(searchText.toLowerCase())) {
-
-                    options.add(option(tagName, Objects.requireNonNull(tag.getId())
-                        .longValue()));
-                }
-            }
-
-            return options;
-        };
     }
 
     public static VectorStore createVectorStore(org.springframework.ai.vectorstore.VectorStore vectorStore) {
