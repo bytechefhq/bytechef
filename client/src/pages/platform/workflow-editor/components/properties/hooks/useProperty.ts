@@ -428,12 +428,12 @@ export const useProperty = ({
             return controlledFromAi;
         }
 
-        if (!currentComponent?.metadata?.ui?.fromAi || !path) {
-            return false;
+        if (path && currentComponent?.metadata?.ui?.fromAi?.includes(path)) {
+            return true;
         }
 
-        return currentComponent.metadata.ui.fromAi.includes(path);
-    }, [controlledFromAi, currentComponent?.metadata?.ui?.fromAi, path]);
+        return typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=fromAi(');
+    }, [controlledFromAi, currentComponent?.metadata?.ui?.fromAi, path, propertyParameterValue]);
 
     const memoizedWorkflowTask = useMemo(() => {
         return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(

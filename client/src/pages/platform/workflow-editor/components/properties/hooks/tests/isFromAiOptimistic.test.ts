@@ -1,28 +1,30 @@
 import {describe, expect, it} from 'vitest';
 
 /**
- * Replicates the `isFromAi` useMemo logic from useProperty.ts (lines 386-396)
- * and verifies that `controlledFromAi` provides an optimistic override so the
- * "Automatically defined by the model" message appears instantly when the user
- * clicks the fromAi button, without waiting for the server round-trip.
+ * Replicates the `isFromAi` useMemo logic from useProperty.ts and verifies:
+ * 1. `controlledFromAi` provides an optimistic override so "Automatically defined
+ *    by the model" appears instantly on click, before the server round-trip.
+ * 2. When metadata is missing after reload, a value matching `=fromAi(...)` still
+ *    resolves to true so the overlay and disabled input are preserved.
  */
 
 interface IsFromAiParamsI {
     controlledFromAi: boolean | undefined;
     fromAiPaths?: string[];
     path?: string;
+    propertyParameterValue?: unknown;
 }
 
-function isFromAi({controlledFromAi, fromAiPaths, path}: IsFromAiParamsI): boolean {
+function isFromAi({controlledFromAi, fromAiPaths, path, propertyParameterValue}: IsFromAiParamsI): boolean {
     if (controlledFromAi !== undefined) {
         return controlledFromAi;
     }
 
-    if (!fromAiPaths || !path) {
-        return false;
+    if (path && fromAiPaths?.includes(path)) {
+        return true;
     }
 
-    return fromAiPaths.includes(path);
+    return typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=fromAi(');
 }
 
 describe('isFromAi optimistic override', () => {
@@ -89,6 +91,65 @@ describe('isFromAi optimistic override', () => {
             const afterToggle = isFromAi({controlledFromAi: false, fromAiPaths: [path], path});
 
             expect(afterToggle).toBe(false);
+        });
+    });
+
+    describe('value-based fallback after reload', () => {
+        const fromAiValue = "=fromAi('lastname', 'STRING', {'required': false})";
+
+        it('should return true when value starts with =fromAi( even if metadata is missing', () => {
+            expect(
+                isFromAi({
+                    controlledFromAi: undefined,
+                    fromAiPaths: [],
+                    path,
+                    propertyParameterValue: fromAiValue,
+                })
+            ).toBe(true);
+        });
+
+        it('should return true when value starts with =fromAi( even if fromAiPaths is undefined', () => {
+            expect(
+                isFromAi({
+                    controlledFromAi: undefined,
+                    fromAiPaths: undefined,
+                    path,
+                    propertyParameterValue: fromAiValue,
+                })
+            ).toBe(true);
+        });
+
+        it('should return false for plain string values that are not fromAi expressions', () => {
+            expect(
+                isFromAi({
+                    controlledFromAi: undefined,
+                    fromAiPaths: [],
+                    path,
+                    propertyParameterValue: 'hello world',
+                })
+            ).toBe(false);
+        });
+
+        it('should return false for non-string values', () => {
+            expect(
+                isFromAi({
+                    controlledFromAi: undefined,
+                    fromAiPaths: [],
+                    path,
+                    propertyParameterValue: 42,
+                })
+            ).toBe(false);
+        });
+
+        it('should allow controlledFromAi=false to override a fromAi-shaped value', () => {
+            expect(
+                isFromAi({
+                    controlledFromAi: false,
+                    fromAiPaths: [path],
+                    path,
+                    propertyParameterValue: fromAiValue,
+                })
+            ).toBe(false);
         });
     });
 });
