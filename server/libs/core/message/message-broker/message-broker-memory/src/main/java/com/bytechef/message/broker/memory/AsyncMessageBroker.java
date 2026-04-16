@@ -24,13 +24,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.thread.Threading;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
@@ -43,13 +48,23 @@ import org.springframework.util.Assert;
  *
  * @author Ivica Cardic
  */
-public class AsyncMessageBroker extends AbstractMessageBroker {
+public class AsyncMessageBroker extends AbstractMessageBroker implements DisposableBean {
 
     private static final Logger logger = LoggerFactory.getLogger(AsyncMessageBroker.class);
 
-    private final Executor executor;
+    /**
+     * Backpressure threshold for ordered per-route executors. Large enough to absorb typical SSE streaming bursts (LLM
+     * tokens arrive at 50-200/sec, HTTP writer drains within the same cadence) without pinning much memory per route;
+     * small enough that a truly stuck receiver blocks the producer quickly instead of silently accumulating unbounded
+     * backlog.
+     */
+    private static final int ORDERED_QUEUE_CAPACITY = 1024;
+
+    private static final long SHUTDOWN_AWAIT_SECONDS = 5;
+
+    private final ExecutorService executor;
     private final boolean virtualThreads;
-    private final Map<MessageRoute, Executor> orderedRouteExecutors = new ConcurrentHashMap<>();
+    private final Map<MessageRoute, ExecutorService> orderedRouteExecutors = new ConcurrentHashMap<>();
 
     public AsyncMessageBroker(Environment environment) {
         this.virtualThreads = Threading.VIRTUAL.isActive(environment);
@@ -98,10 +113,68 @@ public class AsyncMessageBroker extends AbstractMessageBroker {
         }
     }
 
-    private Executor createOrderedExecutor(MessageRoute messageRoute) {
+    private ExecutorService createOrderedExecutor(MessageRoute messageRoute) {
         ThreadFactory threadFactory = buildOrderedThreadFactory(messageRoute);
 
-        return Executors.newSingleThreadExecutor(threadFactory);
+        // Single worker thread preserves FIFO; bounded queue caps memory; the blocking rejection
+        // handler applies backpressure to the producer when the receiver can't keep up, instead of
+        // dropping messages (which would break ordering semantics for SSE tokens).
+        return new ThreadPoolExecutor(
+            1, 1,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(ORDERED_QUEUE_CAPACITY),
+            threadFactory,
+            (task, runningExecutor) -> {
+                if (runningExecutor.isShutdown()) {
+                    throw new RejectedExecutionException(
+                        "Ordered executor is shut down; cannot enqueue message");
+                }
+
+                try {
+                    runningExecutor.getQueue()
+                        .put(task);
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread()
+                        .interrupt();
+
+                    throw new RejectedExecutionException(
+                        "Interrupted while waiting for ordered queue capacity", interruptedException);
+                }
+            });
+    }
+
+    @Override
+    public void destroy() {
+        shutdown();
+    }
+
+    public void shutdown() {
+        executor.shutdown();
+
+        for (ExecutorService routeExecutor : orderedRouteExecutors.values()) {
+            routeExecutor.shutdown();
+        }
+
+        awaitTermination(executor);
+
+        for (ExecutorService routeExecutor : orderedRouteExecutors.values()) {
+            awaitTermination(routeExecutor);
+        }
+
+        orderedRouteExecutors.clear();
+    }
+
+    private void awaitTermination(ExecutorService executorService) {
+        try {
+            if (!executorService.awaitTermination(SHUTDOWN_AWAIT_SECONDS, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException interruptedException) {
+            executorService.shutdownNow();
+
+            Thread.currentThread()
+                .interrupt();
+        }
     }
 
     private ThreadFactory buildOrderedThreadFactory(MessageRoute messageRoute) {

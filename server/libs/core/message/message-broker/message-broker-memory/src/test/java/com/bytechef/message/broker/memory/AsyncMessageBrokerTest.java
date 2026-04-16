@@ -19,14 +19,19 @@ package com.bytechef.message.broker.memory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.message.route.MessageRoute;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.env.MockEnvironment;
 
@@ -35,10 +40,23 @@ import org.springframework.mock.env.MockEnvironment;
  */
 class AsyncMessageBrokerTest {
 
+    private AsyncMessageBroker broker;
+
+    @BeforeEach
+    void setUp() {
+        broker = new AsyncMessageBroker(new MockEnvironment());
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Shut down all executors so test threads don't leak between cases and the JVM can exit
+        // cleanly after the suite (the cached thread pool's workers are non-daemon).
+        broker.shutdown();
+    }
+
     @Test
     void orderedRoutePreservesFifoUnderConcurrentSends() throws InterruptedException {
-        AsyncMessageBroker broker = new AsyncMessageBroker(new MockEnvironment());
-        List<Integer> received = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+        List<Integer> received = Collections.synchronizedList(new ArrayList<>());
         int messageCount = 500;
         CountDownLatch latch = new CountDownLatch(messageCount);
 
@@ -67,8 +85,7 @@ class AsyncMessageBrokerTest {
 
     @Test
     void unorderedRouteStillDispatchesAcrossMultipleThreads() throws InterruptedException {
-        AsyncMessageBroker broker = new AsyncMessageBroker(new MockEnvironment());
-        java.util.Set<String> dispatchThreads = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+        Set<String> dispatchThreads = Collections.synchronizedSet(new HashSet<>());
         int messageCount = 50;
         CountDownLatch allRunning = new CountDownLatch(messageCount);
         CountDownLatch releaseAll = new CountDownLatch(1);
@@ -104,27 +121,22 @@ class AsyncMessageBrokerTest {
 
     @Test
     void differentOrderedRoutesRunOnIndependentThreads() throws InterruptedException {
-        AsyncMessageBroker broker = new AsyncMessageBroker(new MockEnvironment());
-        AtomicInteger routeAThread = new AtomicInteger();
-        AtomicInteger routeBThread = new AtomicInteger();
         CountDownLatch latch = new CountDownLatch(2);
-        List<String> routeAThreadNames = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
-        List<String> routeBThreadNames = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+        List<String> routeAThreadNames = Collections.synchronizedList(new ArrayList<>());
+        List<String> routeBThreadNames = Collections.synchronizedList(new ArrayList<>());
 
         broker.receive(TestRoute.ORDERED, message -> {
-            Thread currentThread = Thread.currentThread();
-
-            routeAThreadNames.add(currentThread.getName());
-            routeAThread.incrementAndGet();
+            routeAThreadNames.add(
+                Thread.currentThread()
+                    .getName());
 
             latch.countDown();
         });
 
         broker.receive(TestRoute.ORDERED_OTHER, message -> {
-            Thread currentThread = Thread.currentThread();
-
-            routeBThreadNames.add(currentThread.getName());
-            routeBThread.incrementAndGet();
+            routeBThreadNames.add(
+                Thread.currentThread()
+                    .getName());
 
             latch.countDown();
         });
@@ -142,8 +154,7 @@ class AsyncMessageBrokerTest {
 
     @Test
     void orderedRoutePreservesFifoAcrossConcurrentProducers() throws InterruptedException {
-        AsyncMessageBroker broker = new AsyncMessageBroker(new MockEnvironment());
-        List<Integer> received = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+        List<Integer> received = Collections.synchronizedList(new ArrayList<>());
         int messagesPerProducer = 200;
         int producerCount = 4;
         int total = messagesPerProducer * producerCount;
@@ -190,6 +201,68 @@ class AsyncMessageBrokerTest {
                     .boxed()
                     .collect(Collectors.toList()));
         }
+    }
+
+    @Test
+    void orderedRouteBackpressuresProducerWithoutDroppingMessages() throws InterruptedException {
+        // Stalled receiver + producer burst larger than the bounded queue proves the blocking
+        // rejection handler applies backpressure instead of silently losing tokens — this is the
+        // property SSE streaming relies on to avoid mid-stream gaps.
+        List<Integer> received = Collections.synchronizedList(new ArrayList<>());
+        CountDownLatch firstReceived = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+
+        broker.receive(TestRoute.ORDERED, message -> {
+            firstReceived.countDown();
+
+            try {
+                release.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread()
+                    .interrupt();
+            }
+
+            received.add((Integer) message);
+        });
+
+        int burst = 1100;
+        CountDownLatch producerDone = new CountDownLatch(1);
+        Thread producer = new Thread(() -> {
+            for (int i = 0; i < burst; i++) {
+                broker.send(TestRoute.ORDERED, i);
+            }
+
+            producerDone.countDown();
+        });
+
+        producer.start();
+
+        assertThat(firstReceived.await(5, TimeUnit.SECONDS))
+            .as("first message should start being consumed")
+            .isTrue();
+        assertThat(producerDone.await(1, TimeUnit.SECONDS))
+            .as("producer should block on bounded queue once capacity is reached")
+            .isFalse();
+
+        release.countDown();
+
+        assertThat(producerDone.await(10, TimeUnit.SECONDS))
+            .as("producer should complete once receiver drains the queue")
+            .isTrue();
+
+        // Wait for receiver to drain fully.
+        long deadline = System.currentTimeMillis() + 10_000;
+
+        while (received.size() < burst && System.currentTimeMillis() < deadline) {
+            Thread.sleep(20);
+        }
+
+        assertThat(received)
+            .as("bounded queue must backpressure rather than drop messages")
+            .hasSize(burst)
+            .containsExactlyElementsOf(IntStream.range(0, burst)
+                .boxed()
+                .collect(Collectors.toList()));
     }
 
     private enum TestRoute implements MessageRoute {
