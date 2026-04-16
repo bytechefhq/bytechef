@@ -92,14 +92,18 @@ public class ChatNewRequestTrigger {
             .stream()
             .collect(Collectors.toMap(entry -> (String) entry.getKey(), entry -> {
                 if (entry.getValue() instanceof List<?> list) {
+                    if (list.isEmpty()) {
+                        return list;
+                    }
+
                     if (list.getFirst() instanceof FileEntry) {
                         return list;
-                    } else {
-                        return list.getFirst();
                     }
-                } else {
-                    return entry.getValue();
+
+                    return list.getFirst();
                 }
+
+                return entry.getValue();
             }));
     }
 }
