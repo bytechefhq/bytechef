@@ -18,15 +18,20 @@ package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_TIME;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MAX;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_TIME;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCustomEvents;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -36,6 +41,7 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -62,14 +68,26 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
                 .label("Date Range")
                 .description("Date range to find free time.")
                 .properties(
-                    dateTime(FROM)
-                        .label("From")
-                        .description("Start of the time range.")
+                    date(FROM_DATE)
+                        .label("From Date")
+                        .description("Start date of the range.")
                         .required(true),
-                    dateTime(TO)
-                        .label("To")
-                        .description("End of the time range.")
-                        .required(true))
+                    time(FROM_TIME)
+                        .label("From Time")
+                        .description("Start time of the range. If not specified, the start time is 00:00:00.")
+                        .displayCondition("%s != null".formatted(DATE_RANGE + "." + FROM_DATE))
+                        .defaultValue(LOCAL_TIME_MIN)
+                        .required(false),
+                    date(TO_DATE)
+                        .label("To Date")
+                        .description("End date of the range.")
+                        .required(true),
+                    time(TO_TIME)
+                        .label("To Time")
+                        .description("End time of the range. If not specified, the end time is 23:59:59.")
+                        .displayCondition("%s != null".formatted(DATE_RANGE + "." + TO_DATE))
+                        .defaultValue(LOCAL_TIME_MAX)
+                        .required(false))
                 .required(true))
         .output(
             outputSchema(
@@ -107,12 +125,19 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
             }
         }));
 
-        return getIntervals(customEvents, inputParameters.getMap(DATE_RANGE, LocalDateTime.class, Map.of()));
+        return getIntervals(customEvents, inputParameters.getMap(DATE_RANGE, Object.class, Map.of()));
     }
 
-    private static List<Interval> getIntervals(List<CustomEvent> customEvents, Map<String, LocalDateTime> timePeriod) {
-        LocalDateTime from = timePeriod.get(FROM);
-        LocalDateTime to = timePeriod.get(TO);
+    private static List<Interval> getIntervals(List<CustomEvent> customEvents, Map<String, Object> timePeriod) {
+        LocalDate fromLocalDate = LocalDate.parse((String) timePeriod.get(FROM_DATE));
+        Object fromTime = timePeriod.get(FROM_TIME);
+        LocalTime fromLocalTime = fromTime == null ? LOCAL_TIME_MIN : LocalTime.parse((String) fromTime);
+        LocalDateTime from = LocalDateTime.of(fromLocalDate, fromLocalTime);
+
+        LocalDate toLocalDate = LocalDate.parse((String) timePeriod.get(TO_DATE));
+        Object toTime = timePeriod.get(TO_TIME);
+        LocalTime toLocalTime = toTime == null ? LOCAL_TIME_MAX : LocalTime.parse((String) toTime);
+        LocalDateTime to = LocalDateTime.of(toLocalDate, toLocalTime);
 
         List<Interval> intervals = new ArrayList<>();
 
@@ -133,10 +158,10 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
                     previousEndTime = previousEndTime.isAfter(end) ? previousEndTime : end;
                 } else if (startTime instanceof LocalDate start && endTime instanceof LocalDate end) {
 
-                    if (LocalDateTime.of(start, LOCAL_TIME_MIN)
-                        .isAfter(previousEndTime)) {
-
-                        intervals.add(new Interval(previousEndTime, LocalDateTime.of(start, LOCAL_TIME_MIN)));
+                    LocalDateTime localDateTime = LocalDateTime.of(start, LOCAL_TIME_MIN);
+                    if (localDateTime.isAfter(previousEndTime)) {
+                        intervals.add(
+                            new Interval(previousEndTime, LocalDateTime.of(start.minusDays(1), LOCAL_TIME_MAX)));
                     }
 
                     previousEndTime = previousEndTime.isAfter(LocalDateTime.of(end.plusDays(1), LOCAL_TIME_MIN))

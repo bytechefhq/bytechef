@@ -18,20 +18,25 @@ package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_TIME;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MAX;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_TIME;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -89,13 +94,25 @@ public class GoogleCalendarGetEventsAction {
                 .label("Date Range")
                 .description("Date range to find events that exist in this range.")
                 .properties(
-                    dateTime(FROM)
-                        .label("From")
-                        .description("Start of the time range.")
+                    date(FROM_DATE)
+                        .label("From Date")
+                        .description("Start date of the range.")
                         .required(false),
-                    dateTime(TO)
-                        .label("To")
-                        .description("End of the time range.")
+                    time(FROM_TIME)
+                        .label("From Time")
+                        .description("Start time of the range. If not specified, the start time is 00:00:00.")
+                        .displayCondition("%s != null".formatted(DATE_RANGE + "." + FROM_DATE))
+                        .defaultValue(LOCAL_TIME_MIN)
+                        .required(false),
+                    date(TO_DATE)
+                        .label("To Date")
+                        .description("End date of the range.")
+                        .required(false),
+                    time(TO_TIME)
+                        .label("To Time")
+                        .description("End time of the range. If not specified, the end time is 23:59:59.")
+                        .displayCondition("%s != null".formatted(DATE_RANGE + "." + TO_DATE))
+                        .defaultValue(LOCAL_TIME_MAX)
                         .required(false))
                 .required(false))
         .output(

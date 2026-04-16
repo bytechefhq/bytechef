@@ -62,8 +62,10 @@ public class GoogleCalendarConstants {
     public static final String SEND_UPDATES = "sendUpdates";
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";
-    public static final String FROM = "from";
-    public static final String TO = "to";
+    public static final String FROM_DATE = "fromDate";
+    public static final String FROM_TIME = "fromTime";
+    public static final String TO_DATE = "toDate";
+    public static final String TO_TIME = "toTime";
     public static final String START = "start";
     public static final String USE_DEFAULT = "useDefault";
 

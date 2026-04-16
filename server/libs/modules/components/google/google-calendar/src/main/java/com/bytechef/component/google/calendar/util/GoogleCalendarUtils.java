@@ -23,12 +23,14 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.END;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_TIME;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MAX;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_TIME;
 import static com.bytechef.google.commons.GoogleUtils.getCalendarTimezone;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
@@ -52,6 +54,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -205,12 +208,29 @@ public class GoogleCalendarUtils {
         }
 
         String calendarTimezone = getCalendarTimezone(calendar);
-        Map<String, LocalDateTime> timePeriod = inputParameters.getMap(DATE_RANGE, LocalDateTime.class, Map.of());
 
-        LocalDateTime from = timePeriod.get(FROM);
-        LocalDateTime to = timePeriod.get(TO);
+        Map<String, Object> timePeriod = inputParameters.getMap(DATE_RANGE, Object.class, Map.of());
+
+        LocalDateTime from = getLocalDateTime(timePeriod, FROM_DATE, FROM_TIME, LOCAL_TIME_MIN);
+        LocalDateTime to = getLocalDateTime(timePeriod, TO_DATE, TO_TIME, LOCAL_TIME_MAX);
 
         return convertToCustomEvents(filterEvents(from, to, items, calendarTimezone), calendarTimezone);
+    }
+
+    private static LocalDateTime getLocalDateTime(
+        Map<String, Object> timePeriod, String dateKey, String timeKey, LocalTime defaultLocalTime) {
+
+        LocalDateTime localDateTime = null;
+
+        if (timePeriod.get(dateKey) != null) {
+            LocalDate localDate = LocalDate.parse((String) timePeriod.get(dateKey));
+            Object object = timePeriod.get(timeKey);
+            LocalTime localTime = object == null ? defaultLocalTime : LocalTime.parse((String) object);
+
+            localDateTime = LocalDateTime.of(localDate, localTime);
+        }
+
+        return localDateTime;
     }
 
     private static List<Event> filterEvents(LocalDateTime from, LocalDateTime to, List<Event> items, String timezone) {
@@ -254,16 +274,16 @@ public class GoogleCalendarUtils {
         Temporal end = convertToTemporalFromEventDateTime(event.getEnd(), timezone);
 
         if (start instanceof LocalDateTime startLDT && end instanceof LocalDateTime endLDT) {
-            return (startLDT.isAfter(from) && startLDT.isBefore(to)) ||
-                (endLDT.isAfter(from) && endLDT.isBefore(to)) ||
-                (startLDT.isBefore(from) && endLDT.isAfter(to));
+            return (!startLDT.isBefore(from) && !startLDT.isAfter(to)) ||
+                (!endLDT.isBefore(from) && !endLDT.isAfter(to)) ||
+                (!startLDT.isAfter(from) && !endLDT.isBefore(to));
         } else if (start instanceof LocalDate startLD && end instanceof LocalDate endLD) {
             LocalDateTime startMin = LocalDateTime.of(startLD, LOCAL_TIME_MIN);
             LocalDateTime endMax = LocalDateTime.of(endLD.minusDays(1), LOCAL_TIME_MAX);
 
-            return (startMin.isAfter(from) && startMin.isBefore(to)) ||
-                (endMax.isAfter(from) && endMax.isBefore(to)) ||
-                (startMin.isBefore(from) && endMax.isAfter(to));
+            return (!startMin.isBefore(from) && !startMin.isAfter(to)) ||
+                (!endMax.isBefore(from) && !endMax.isAfter(to)) ||
+                (!startMin.isAfter(from) && !endMax.isBefore(to));
         }
 
         return false;
