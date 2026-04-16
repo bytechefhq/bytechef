@@ -30,8 +30,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +68,7 @@ class AiAgentUtilsSkillsToolTest {
 
     @Test
     void testApplyWithEmptySkillsListThrows() {
-        when(inputParameters.getList("skills", Object.class, List.of())).thenReturn(List.of());
+        when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of());
 
         assertThrows(IllegalArgumentException.class, this::invokeApply);
         verifyNoInteractions(aiAgentSkillFacade);
@@ -78,8 +78,7 @@ class AiAgentUtilsSkillsToolTest {
     void testApplyWithValidSkillFetchesZipBytes() throws Exception {
         byte[] zipBytes = createZipWithMdFile("skill1/SKILL.md", createSkillMd("Test Skill", "Do something useful."));
 
-        when(inputParameters.getList("skills", Object.class, List.of()))
-            .thenReturn(List.of(Map.of("skillId", "42")));
+        when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(42L));
         when(aiAgentSkillFacade.getAiAgentSkillDownload(42L)).thenReturn(zipBytes);
 
         ToolCallbackProvider toolCallbackProvider = invokeApply();
@@ -89,58 +88,21 @@ class AiAgentUtilsSkillsToolTest {
     }
 
     @Test
-    void testApplyWithNonMapSkillItemThrows() {
-        when(inputParameters.getList("skills", Object.class, List.of()))
-            .thenReturn(List.of("not-a-map"));
+    void testApplyWithNullSkillItemCollectsError() {
+        when(inputParameters.getList("skills", Long.class, List.of()))
+            .thenReturn(Arrays.asList((Long) null));
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
 
         assertTrue(exception.getMessage()
             .contains("Failed to load 1 of 1"));
         assertTrue(exception.getMessage()
-            .contains("Unexpected skill item type"));
-    }
-
-    @Test
-    void testApplyWithMissingSkillIdKeyThrows() {
-        when(inputParameters.getList("skills", Object.class, List.of()))
-            .thenReturn(List.of(Map.of("wrongKey", "1")));
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
-
-        assertTrue(exception.getMessage()
-            .contains("missing 'skillId' key"));
-    }
-
-    @Test
-    void testApplyWithInvalidSkillIdThrows() {
-        when(inputParameters.getList("skills", Object.class, List.of()))
-            .thenReturn(List.of(Map.of("skillId", "not-a-number")));
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
-
-        assertTrue(exception.getMessage()
-            .contains("Invalid skill ID value"));
-    }
-
-    @Test
-    void testApplyAccumulatesMultipleErrors() {
-        when(inputParameters.getList("skills", Object.class, List.of()))
-            .thenReturn(List.of(
-                "not-a-map",
-                Map.of("wrongKey", "value"),
-                Map.of("skillId", "invalid")));
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
-
-        assertTrue(exception.getMessage()
-            .contains("Failed to load 3 of 3"));
+            .contains("Unexpected null skill item"));
     }
 
     @Test
     void testApplyWithSkillLoadFailureCollectsError() {
-        when(inputParameters.getList("skills", Object.class, List.of()))
-            .thenReturn(List.of(Map.of("skillId", "99")));
+        when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(99L));
         when(aiAgentSkillFacade.getAiAgentSkillDownload(99L))
             .thenThrow(new IllegalArgumentException("AiAgentSkill not found with id: 99"));
 
@@ -153,12 +115,24 @@ class AiAgentUtilsSkillsToolTest {
     }
 
     @Test
+    void testApplyAccumulatesMultipleErrors() {
+        when(inputParameters.getList("skills", Long.class, List.of()))
+            .thenReturn(Arrays.asList(null, 77L));
+        when(aiAgentSkillFacade.getAiAgentSkillDownload(77L))
+            .thenThrow(new IllegalArgumentException("AiAgentSkill not found with id: 77"));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
+
+        assertTrue(exception.getMessage()
+            .contains("Failed to load 2 of 2"));
+    }
+
+    @Test
     void testApplyWithMultipleValidSkillsFetchesAll() throws Exception {
         byte[] zipBytes1 = createZipWithMdFile("skill1/SKILL.md", createSkillMd("Skill 1", "First skill."));
         byte[] zipBytes2 = createZipWithMdFile("skill2/SKILL.md", createSkillMd("Skill 2", "Second skill."));
 
-        when(inputParameters.getList("skills", Object.class, List.of()))
-            .thenReturn(List.of(Map.of("skillId", "1"), Map.of("skillId", "2")));
+        when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(1L, 2L));
         when(aiAgentSkillFacade.getAiAgentSkillDownload(1L)).thenReturn(zipBytes1);
         when(aiAgentSkillFacade.getAiAgentSkillDownload(2L)).thenReturn(zipBytes2);
 
