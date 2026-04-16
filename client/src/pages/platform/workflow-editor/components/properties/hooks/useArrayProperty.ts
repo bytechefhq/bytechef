@@ -119,7 +119,31 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
             type: newItemType,
         };
 
-        setArrayItems([...arrayItems, newItem]);
+        // Refresh existing items' defaultValue from current workflow parameters before appending.
+        // Otherwise the re-render triggered by the new item passes a stale `defaultValue: undefined`
+        // (coerced to '' by getExplicitArrayCellParameterValue) down to useProperty, which then
+        // overwrites the user's just-selected value because '' !== undefined wins over the workflow.
+        const encodedParameters = encodeParameters(currentComponent.parameters ?? {});
+        const encodedBasePath = encodePath(path);
+
+        const refreshedExistingItems = arrayItems.map((existingItem, existingIndex) => {
+            if (Array.isArray(existingItem)) {
+                return existingItem;
+            }
+
+            const savedValue = resolvePath(encodedParameters, `${encodedBasePath}[${existingIndex}]`);
+
+            if (savedValue === undefined || savedValue === null) {
+                return existingItem;
+            }
+
+            return {
+                ...existingItem,
+                defaultValue: savedValue,
+            };
+        });
+
+        setArrayItems([...refreshedExistingItems, newItem]);
 
         if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
             if (newItemType === 'OBJECT') {
