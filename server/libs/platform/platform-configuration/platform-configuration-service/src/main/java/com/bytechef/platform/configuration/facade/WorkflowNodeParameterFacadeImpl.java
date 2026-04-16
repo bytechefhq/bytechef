@@ -1133,6 +1133,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     clusterElementTypeName, clusterElementWorkflowNodeName, taskMap);
 
                 metadataMap = (Map<String, Object>) clusterElementMap.get(METADATA);
+
+                if (metadataMap == null) {
+                    metadataMap = new HashMap<>();
+
+                    ((Map<String, Object>) clusterElementMap).put(METADATA, metadataMap);
+                }
             }
         } else {
             metadataMap = (Map<String, Object>) triggerMap.get(METADATA);
