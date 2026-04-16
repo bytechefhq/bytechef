@@ -464,7 +464,7 @@ Name: getEvents
 | eventType | Event Type | ARRAY <details> <summary> Items </summary> [STRING] </details> | Event types to return. | false |
 | maxResults | Max Results | INTEGER | Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. | false |
 | q | Search Terms | STRING | Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, workingLocationProperties.officeLocation.buildingId, workingLocationProperties.officeLocation.deskId, workingLocationProperties.officeLocation.label and workingLocationProperties.customLocation.label | false |
-| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find events that exist in this range. | false |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE\(fromDate), TIME\(fromTime), DATE\(toDate), TIME\(toTime)&#125; </details> | Date range to find events that exist in this range. | false |
 
 #### Example JSON Structure
 ```json
@@ -477,8 +477,10 @@ Name: getEvents
     "maxResults" : 1,
     "q" : "",
     "dateRange" : {
-      "from" : "2021-01-01T00:00:00",
-      "to" : "2021-01-01T00:00:00"
+      "fromDate" : "2021-01-01",
+      "fromTime" : "00:00:00",
+      "toDate" : "2021-01-01",
+      "toTime" : "00:00:00"
     }
   },
   "type" : "googleCalendar/v1/getEvents"
@@ -576,7 +578,7 @@ Name: getFreeTimeSlots
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar ID | STRING | Unique identifier of the calendar. | true |
-| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find free time. | true |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE\(fromDate), TIME\(fromTime), DATE\(toDate), TIME\(toTime)&#125; </details> | Date range to find free time. | true |
 
 #### Example JSON Structure
 ```json
@@ -586,8 +588,10 @@ Name: getFreeTimeSlots
   "parameters" : {
     "calendarId" : "",
     "dateRange" : {
-      "from" : "2021-01-01T00:00:00",
-      "to" : "2021-01-01T00:00:00"
+      "fromDate" : "2021-01-01",
+      "fromTime" : "00:00:00",
+      "toDate" : "2021-01-01",
+      "toTime" : "00:00:00"
     }
   },
   "type" : "googleCalendar/v1/getFreeTimeSlots"
