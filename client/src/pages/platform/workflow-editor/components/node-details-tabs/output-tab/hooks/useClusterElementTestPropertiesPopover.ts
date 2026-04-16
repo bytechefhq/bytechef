@@ -15,7 +15,9 @@ function isExpression(value: unknown): boolean {
 
 function filterValue(value: unknown): unknown {
     if (Array.isArray(value)) {
-        return value.filter((item) => !isExpression(item)).map((item) => filterValue(item));
+        // Preserve array length: replace expression items with '' so each slot still
+        // renders an empty input, instead of collapsing the array and hiding the slot.
+        return value.map((item) => (isExpression(item) ? '' : filterValue(item)));
     }
 
     if (value && typeof value === 'object') {
