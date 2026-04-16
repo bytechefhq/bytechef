@@ -387,9 +387,15 @@ export const useProperty = ({
         }
 
         if (defaultValue !== '' && defaultValue !== null && defaultValue !== undefined) {
-            const escapedDefault = String(defaultValue).replace(/'/g, "''");
+            const defaultValueString = String(defaultValue);
 
-            mapEntries.push(`'defaultValue': '${escapedDefault}'`);
+            // Skip expression-shaped defaults (including prior fromAi output) so repeat
+            // clicks don't keep nesting the previous expression as an escaped default.
+            if (!defaultValueString.startsWith('=')) {
+                const escapedDefault = defaultValueString.replace(/'/g, "''");
+
+                mapEntries.push(`'defaultValue': '${escapedDefault}'`);
+            }
         }
 
         if (formattedOptions != null && formattedOptions.length > 0) {
