@@ -19,8 +19,8 @@ package com.bytechef.component.ai.agent.utils.cluster;
 import static com.bytechef.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
 import static com.bytechef.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.ai.agent.skill.domain.AiAgentSkill;
@@ -82,10 +82,10 @@ public class AiAgentUtilsSkillsTool {
                         .description("Select skills to make available to the agent.")
                         .placeholder("Choose a skill...")
                         .items(
-                            string(SKILL_ID)
+                            integer(SKILL_ID)
                                 .label("Skill")
                                 .options(
-                                    (ClusterElementDefinition.OptionsFunction<String>) this::getSkillOptions)
+                                    (ClusterElementDefinition.OptionsFunction<Long>) this::getSkillOptions)
                                 .required(true)))
                 .object(() -> this::apply);
     }
@@ -98,49 +98,15 @@ public class AiAgentUtilsSkillsTool {
         List<Path> skillDirectories = new ArrayList<>();
         List<String> skippedSkillReasons = new ArrayList<>();
 
-        List<?> skillItems = inputParameters.getList(SKILLS, Object.class, List.of());
+        List<Long> skillIds = inputParameters.getList(SKILLS, Long.class, List.of());
 
-        if (skillItems.isEmpty()) {
+        if (skillIds.isEmpty()) {
             throw new IllegalArgumentException("At least one skill must be configured");
         }
 
-        for (Object skillItem : skillItems) {
-            if (skillItem == null) {
+        for (Long skillId : skillIds) {
+            if (skillId == null) {
                 String reason = "Unexpected null skill item in configuration";
-
-                logger.warn("{}, skipping", reason);
-                skippedSkillReasons.add(reason);
-
-                continue;
-            }
-
-            if (!(skillItem instanceof Map<?, ?> skillMap)) {
-                String reason = "Unexpected skill item type: " + skillItem.getClass()
-                    .getName();
-
-                logger.warn("{}, skipping", reason);
-                skippedSkillReasons.add(reason);
-
-                continue;
-            }
-
-            Object skillIdObj = skillMap.get(SKILL_ID);
-
-            if (skillIdObj == null) {
-                String reason = "Skill item missing '" + SKILL_ID + "' key, available keys: " + skillMap.keySet();
-
-                logger.warn("{}, skipping", reason);
-                skippedSkillReasons.add(reason);
-
-                continue;
-            }
-
-            long skillId;
-
-            try {
-                skillId = Long.parseLong(skillIdObj.toString());
-            } catch (NumberFormatException numberFormatException) {
-                String reason = "Invalid skill ID value: '" + skillIdObj + "'";
 
                 logger.warn("{}, skipping", reason);
                 skippedSkillReasons.add(reason);
@@ -164,7 +130,7 @@ public class AiAgentUtilsSkillsTool {
 
         if (!skippedSkillReasons.isEmpty()) {
             throw new IllegalStateException(
-                "Failed to load " + skippedSkillReasons.size() + " of " + skillItems.size() +
+                "Failed to load " + skippedSkillReasons.size() + " of " + skillIds.size() +
                     " configured skills: " + String.join("; ", skippedSkillReasons));
         }
 
@@ -180,16 +146,17 @@ public class AiAgentUtilsSkillsTool {
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private List<Option<String>> getSkillOptions(
+    private List<Option<Long>> getSkillOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ClusterElementContext context) {
 
-        List<Option<String>> options = new ArrayList<>();
+        List<Option<Long>> options = new ArrayList<>();
 
         List<AiAgentSkill> skills = aiAgentSkillFacade.getAiAgentSkills();
 
         for (AiAgentSkill skill : skills) {
-            options.add(option(skill.getName(), String.valueOf(skill.getId())));
+            options.add(option(skill.getName(), skill.getId()
+                .longValue()));
         }
 
         return options;

@@ -128,10 +128,9 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": "Skill",
-        "languageId": null,
-        "maxLength": null,
+        "maxValue": null,
         "metadata": { },
-        "minLength": null,
+        "minValue": null,
         "name": "skillId",
         "options": null,
         "optionsDataSource": {
@@ -139,9 +138,8 @@
           "optionsLookupDependsOn": null
         },
         "placeholder": null,
-        "regex": null,
         "required": true,
-        "type": "STRING"
+        "type": "INTEGER"
       } ],
       "label": "Skills",
       "maxItems": null,
