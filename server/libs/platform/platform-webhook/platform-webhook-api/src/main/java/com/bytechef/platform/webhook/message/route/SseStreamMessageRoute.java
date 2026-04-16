@@ -47,6 +47,11 @@ public enum SseStreamMessageRoute implements MessageRoute {
     }
 
     @Override
+    public boolean isOrdered() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "SseStreamMessageRoute{" +
             "exchange=" + exchange +

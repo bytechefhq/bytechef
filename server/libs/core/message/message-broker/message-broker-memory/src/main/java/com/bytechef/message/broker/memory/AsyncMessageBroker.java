@@ -21,9 +21,13 @@ import com.bytechef.message.route.MessageRoute;
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.context.ContextSnapshotFactory;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +48,13 @@ public class AsyncMessageBroker extends AbstractMessageBroker {
     private static final Logger logger = LoggerFactory.getLogger(AsyncMessageBroker.class);
 
     private final Executor executor;
+    private final boolean virtualThreads;
+    private final Map<MessageRoute, Executor> orderedRouteExecutors = new ConcurrentHashMap<>();
 
     public AsyncMessageBroker(Environment environment) {
-        if (Threading.VIRTUAL.isActive(environment)) {
+        this.virtualThreads = Threading.VIRTUAL.isActive(environment);
+
+        if (virtualThreads) {
             executor = Executors.newVirtualThreadPerTaskExecutor();
         } else {
             executor = Executors.newCachedThreadPool();
@@ -76,14 +84,43 @@ public class AsyncMessageBroker extends AbstractMessageBroker {
             .build()
             .captureAll();
 
+        Executor dispatchExecutor = messageRoute.isOrdered()
+            ? orderedRouteExecutors.computeIfAbsent(messageRoute, this::createOrderedExecutor)
+            : executor;
+
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
-            executor.execute(
+            dispatchExecutor.execute(
                 () -> {
                     try (ContextSnapshot.Scope scope = contextSnapshot.setThreadLocals()) {
                         receiver.receive(message);
                     }
                 });
         }
+    }
+
+    private Executor createOrderedExecutor(MessageRoute messageRoute) {
+        ThreadFactory threadFactory = buildOrderedThreadFactory(messageRoute);
+
+        return Executors.newSingleThreadExecutor(threadFactory);
+    }
+
+    private ThreadFactory buildOrderedThreadFactory(MessageRoute messageRoute) {
+        AtomicInteger counter = new AtomicInteger();
+        String prefix = "async-mb-ordered-" + messageRoute.getName() + "-";
+
+        if (virtualThreads) {
+            return runnable -> Thread.ofVirtual()
+                .name(prefix + counter.incrementAndGet())
+                .unstarted(runnable);
+        }
+
+        return runnable -> {
+            Thread thread = new Thread(runnable, prefix + counter.incrementAndGet());
+
+            thread.setDaemon(true);
+
+            return thread;
+        };
     }
 
     private void delay(long value) {
