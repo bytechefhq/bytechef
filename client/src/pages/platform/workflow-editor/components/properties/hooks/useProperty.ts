@@ -190,6 +190,7 @@ interface UsePropertyProps {
 
 export const useProperty = ({
     arrayIndex,
+    arrayName,
     control,
     controlPath = 'parameters',
     displayConditionsQuery,
@@ -408,8 +409,12 @@ export const useProperty = ({
 
         mapEntries.push(`'required': ${required}`);
 
-        return `=fromAi('${name}', '${type}', {${mapEntries.join(', ')}})`;
-    }, [defaultValue, description, formattedOptions, name, required, type]);
+        // Array items have `name` equal to the index (e.g. "0"). Qualifying it with
+        // the parent array's name gives the model a meaningful identifier.
+        const qualifiedName = arrayName ? `${arrayName}_${name}` : name;
+
+        return `=fromAi('${qualifiedName}', '${type}', {${mapEntries.join(', ')}})`;
+    }, [arrayName, defaultValue, description, formattedOptions, name, required, type]);
 
     const isValidControlType = useMemo(
         () => controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType),
