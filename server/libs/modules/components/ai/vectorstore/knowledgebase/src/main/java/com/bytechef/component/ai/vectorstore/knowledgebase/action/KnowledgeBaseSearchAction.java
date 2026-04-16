@@ -28,7 +28,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
-import com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
@@ -43,13 +42,13 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 /**
  * Search action for querying the internal knowledge base vector store. Supports three search modes:
@@ -151,7 +150,7 @@ public final class KnowledgeBaseSearchAction {
      * filtering since vector stores require a query.
      */
     private static List<Document> searchByTagsOnly(VectorStore vectorStore, List<Long> tagIds, int topK) {
-        Filter.Expression tagFilter = buildTagFilter(tagIds);
+        Filter.Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagIds);
 
         // For tag-only search, we use an empty query but rely on the filter
         // Note: The vector store will still compute embeddings, but filtering will narrow results
@@ -186,7 +185,7 @@ public final class KnowledgeBaseSearchAction {
     private static List<Document> searchWithTagFilter(
         VectorStore vectorStore, String query, List<Long> tagIds, int topK, double similarityThreshold) {
 
-        Filter.Expression tagFilter = buildTagFilter(tagIds);
+        Filter.Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagIds);
 
         SearchRequest searchRequest = SearchRequest.builder()
             .query(query)
@@ -196,32 +195,6 @@ public final class KnowledgeBaseSearchAction {
             .build();
 
         return vectorStore.similaritySearch(searchRequest);
-    }
-
-    /**
-     * Builds a filter expression for tags using OR logic. Documents matching ANY of the specified tags will be
-     * included.
-     */
-    private static Filter.Expression buildTagFilter(List<Long> tagIds) {
-        FilterExpressionBuilder filterExpressionBuilder = new FilterExpressionBuilder();
-
-        Filter.Expression[] tagExpressions = tagIds.stream()
-            .map(tagId -> filterExpressionBuilder.eq(KnowledgeBaseConstants.METADATA_TAG_IDS + "_" + tagId, true)
-                .build())
-            .toArray(Filter.Expression[]::new);
-
-        if (tagExpressions.length == 1) {
-            return tagExpressions[0];
-        }
-
-        // Combine with OR
-        Filter.Expression result = tagExpressions[0];
-
-        for (int i = 1; i < tagExpressions.length; i++) {
-            result = new Filter.Expression(Filter.ExpressionType.OR, result, tagExpressions[i]);
-        }
-
-        return result;
     }
 
     private static ActionDefinition.OptionsFunction<Long> getKnowledgeBaseOptions(
@@ -235,9 +208,9 @@ public final class KnowledgeBaseSearchAction {
             for (KnowledgeBase knowledgeBase : knowledgeBases) {
                 String knowledgeBaseName = knowledgeBase.getName();
 
-                String knowledgeBaseNameLowerCase = knowledgeBaseName.toLowerCase();
+                String knowledgeBaseNameLowerCase = knowledgeBaseName.toLowerCase(Locale.ROOT);
 
-                if (searchText == null || knowledgeBaseNameLowerCase.contains(searchText.toLowerCase())) {
+                if (searchText == null || knowledgeBaseNameLowerCase.contains(searchText.toLowerCase(Locale.ROOT))) {
                     Long knowledgeBaseIdValue = knowledgeBase.getId();
 
                     options.add(option(knowledgeBaseName, knowledgeBaseIdValue.longValue()));
@@ -257,9 +230,9 @@ public final class KnowledgeBaseSearchAction {
             for (Tag tag : tags) {
                 String tagName = tag.getName();
 
-                String tagNameLowerCase = tagName.toLowerCase();
+                String tagNameLowerCase = tagName.toLowerCase(Locale.ROOT);
 
-                if (searchText == null || tagNameLowerCase.contains(searchText.toLowerCase())) {
+                if (searchText == null || tagNameLowerCase.contains(searchText.toLowerCase(Locale.ROOT))) {
                     long tagId = Objects.requireNonNull(tag.getId());
 
                     options.add(option(tagName, tagId));

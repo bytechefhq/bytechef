@@ -111,7 +111,11 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
         return vectorStore.similaritySearch(filteredRequest);
     }
 
-    private static Filter.Expression buildTagFilter(List<Long> tagIds) {
+    /**
+     * Builds an OR-combined filter expression over the tag-id metadata keys. Documents matching ANY of the supplied
+     * tags will satisfy the expression.
+     */
+    public static Filter.Expression buildTagFilter(List<Long> tagIds) {
         FilterExpressionBuilder filterExpressionBuilder = new FilterExpressionBuilder();
 
         Filter.Expression[] tagExpressions = tagIds.stream()
