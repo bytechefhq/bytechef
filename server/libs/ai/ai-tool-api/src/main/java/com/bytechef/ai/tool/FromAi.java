@@ -85,17 +85,17 @@ public class FromAi implements MethodExecutor {
         if (arguments.length > 2) {
             Object thirdArgument = arguments[2];
 
-            if (thirdArgument instanceof Map<?, ?> paramMap) {
-                Object descArg = paramMap.get("description");
+            if (thirdArgument instanceof Map<?, ?> parameterMap) {
+                Object descArg = parameterMap.get("description");
 
                 if (descArg != null && !(descArg instanceof String)) {
                     throw new IllegalArgumentException("fromAi 'description' in map must be a String or null.");
                 }
 
                 description = (String) descArg;
-                defaultValue = paramMap.get("defaultValue");
+                defaultValue = parameterMap.get("defaultValue");
 
-                Object optionsArg = paramMap.get("options");
+                Object optionsArg = parameterMap.get("options");
 
                 if (optionsArg != null && !(optionsArg instanceof List)) {
                     throw new IllegalArgumentException("fromAi 'options' in map must be a List or null.");
@@ -108,7 +108,7 @@ public class FromAi implements MethodExecutor {
                     options = castedOptions;
                 }
 
-                Object requiredArg = paramMap.get("required");
+                Object requiredArg = parameterMap.get("required");
 
                 if (requiredArg != null && !(requiredArg instanceof Boolean)) {
                     throw new IllegalArgumentException("fromAi 'required' in map must be a boolean.");
