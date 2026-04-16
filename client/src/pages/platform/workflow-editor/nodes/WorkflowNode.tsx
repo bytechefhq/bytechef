@@ -738,7 +738,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         const taskDispatcherContext = data.taskDispatcher ? undefined : getContextFromTaskNodeData(data, 1);
 
         pasteNode({
-            nodeSourceName: data.name,
+            sourceNodeName: data.name,
             taskDispatcherContext,
             updateWorkflowMutation: updateWorkflowMutation!,
         });

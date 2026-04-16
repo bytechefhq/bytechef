@@ -10,7 +10,7 @@ type TaskParametersType = NonNullable<WorkflowTask['parameters']>;
 
 interface PasteNodeI {
     nodeIndex?: number;
-    nodeSourceName?: string;
+    sourceNodeName?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
@@ -165,7 +165,7 @@ function renameNestedTasks({
 
 export default function pasteNode({
     nodeIndex: directNodeIndex,
-    nodeSourceName,
+    sourceNodeName,
     taskDispatcherContext,
     updateWorkflowMutation,
 }: PasteNodeI) {
@@ -197,12 +197,12 @@ export default function pasteNode({
 
     let resolvedNodeIndex: number | undefined = directNodeIndex;
 
-    if (resolvedNodeIndex === undefined && nodeSourceName) {
+    if (resolvedNodeIndex === undefined && sourceNodeName) {
         if (!taskDispatcherContext?.taskDispatcherId) {
-            let sourceIndex = definitionTasks.findIndex((task) => task.name === nodeSourceName);
+            let sourceIndex = definitionTasks.findIndex((task) => task.name === sourceNodeName);
 
             if (sourceIndex === -1) {
-                const sourceNode = nodes.find((node) => node.id === nodeSourceName);
+                const sourceNode = nodes.find((node) => node.id === sourceNodeName);
 
                 const resolvedName = sourceNode?.data?.taskDispatcherId as string | undefined;
 

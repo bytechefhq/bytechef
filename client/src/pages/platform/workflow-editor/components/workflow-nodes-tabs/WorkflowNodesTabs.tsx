@@ -117,7 +117,7 @@ const WorkflowNodesTabs = ({
         });
 
         pasteNode({
-            nodeSourceName: sourceNodeName,
+            sourceNodeName,
             taskDispatcherContext,
             updateWorkflowMutation,
         });

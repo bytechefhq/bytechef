@@ -171,6 +171,7 @@ const WorkflowNodesPopoverMenu = ({
                     actionPanelOpen ? 'w-workflow-nodes-popover-menu-width' : 'w-node-popover-width'
                 )}
                 onClick={handleStopPropagation}
+                onContextMenu={handleStopPropagation}
                 side="right"
                 sideOffset={-34}
             >
