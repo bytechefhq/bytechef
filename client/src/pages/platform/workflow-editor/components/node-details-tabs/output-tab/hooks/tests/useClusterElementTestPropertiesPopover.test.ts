@@ -153,7 +153,7 @@ describe('useClusterElementTestPropertiesPopover', () => {
             expect(defaultValues).not.toHaveProperty('ref');
         });
 
-        it('should filter expressions inside array values', () => {
+        it('should replace expression items inside arrays with empty strings to preserve indices', () => {
             const currentNode = makeNode({
                 labels: ['hello', '=fromAi(label)', 'world', '${trigger_1.id}'],
                 model: 'gpt-4',
@@ -170,12 +170,12 @@ describe('useClusterElementTestPropertiesPopover', () => {
             );
 
             expect(result.current.form.getValues()).toEqual({
-                labels: ['hello', 'world'],
+                labels: ['hello', '', 'world', ''],
                 model: 'gpt-4',
             });
         });
 
-        it('should filter expressions inside objects nested in arrays', () => {
+        it('should filter expressions inside objects nested in arrays while keeping the slot', () => {
             const currentNode = makeNode({
                 items: [
                     {name: 'keep-me', value: 'plain'},
@@ -196,6 +196,24 @@ describe('useClusterElementTestPropertiesPopover', () => {
             expect(result.current.form.getValues()).toEqual({
                 items: [{name: 'keep-me', value: 'plain'}, {name: 'drop-expr'}],
             });
+        });
+
+        it('preserves a single-item array with a fromAi expression as an empty slot', () => {
+            const currentNode = makeNode({
+                messages: ["=fromAi('messages_0', 'STRING', {'required': false})"],
+            });
+
+            const properties = [makeProperty('messages', {type: 'ARRAY'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            expect(result.current.form.getValues()).toEqual({messages: ['']});
         });
 
         it('should recursively filter expressions inside nested objects', () => {
