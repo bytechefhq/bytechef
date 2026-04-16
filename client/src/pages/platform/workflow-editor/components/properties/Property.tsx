@@ -379,6 +379,7 @@ const Property = ({
                             control={control}
                             controlPath={calculatedPath}
                             formState={formState}
+                            hideFromAi={hideFromAi}
                             property={property}
                             toolsMode={isToolsClusterElement}
                         />
@@ -407,6 +408,7 @@ const Property = ({
                                         controlPath={calculatedPath}
                                         customClassName="w-full pl-2"
                                         formState={formState}
+                                        hideFromAi={hideFromAi}
                                         key={subProperty.name || `${property.name}_${index}`}
                                         property={subProperty}
                                         toolsMode={isToolsClusterElement}
@@ -424,6 +426,7 @@ const Property = ({
                                 control={control}
                                 controlPath={calculatedPath}
                                 formState={formState}
+                                hideFromAi={hideFromAi}
                                 property={property}
                                 toolsMode={isToolsClusterElement}
                             />

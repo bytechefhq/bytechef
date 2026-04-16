@@ -10,6 +10,7 @@ interface ControlledArrayItemsProps {
     control: Control<any, any>;
     controlPath: string;
     formState?: FormState<FieldValues>;
+    hideFromAi?: boolean;
     property: PropertyAllType;
     toolsMode?: boolean;
 }
@@ -18,6 +19,7 @@ const FormControlledArrayItems = ({
     control,
     controlPath,
     formState,
+    hideFromAi,
     property,
     toolsMode,
 }: ControlledArrayItemsProps) => {
@@ -65,6 +67,7 @@ const FormControlledArrayItems = ({
                                 />
                             }
                             formState={formState}
+                            hideFromAi={hideFromAi}
                             parameterValue={item}
                             property={
                                 {

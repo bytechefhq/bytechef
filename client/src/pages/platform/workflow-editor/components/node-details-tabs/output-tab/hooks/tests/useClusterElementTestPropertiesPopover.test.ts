@@ -153,6 +153,51 @@ describe('useClusterElementTestPropertiesPopover', () => {
             expect(defaultValues).not.toHaveProperty('ref');
         });
 
+        it('should filter expressions inside array values', () => {
+            const currentNode = makeNode({
+                labels: ['hello', '=fromAi(label)', 'world', '${trigger_1.id}'],
+                model: 'gpt-4',
+            });
+
+            const properties = [makeProperty('labels', {type: 'ARRAY'}), makeProperty('model')];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            expect(result.current.form.getValues()).toEqual({
+                labels: ['hello', 'world'],
+                model: 'gpt-4',
+            });
+        });
+
+        it('should filter expressions inside objects nested in arrays', () => {
+            const currentNode = makeNode({
+                items: [
+                    {name: 'keep-me', value: 'plain'},
+                    {name: 'drop-expr', value: '=fromAi(v)'},
+                ],
+            });
+
+            const properties = [makeProperty('items', {type: 'ARRAY'})];
+
+            const {result} = renderHook(() =>
+                useClusterElementTestPropertiesPopover({
+                    currentNode,
+                    onSubmit: mockOnSubmit,
+                    properties,
+                })
+            );
+
+            expect(result.current.form.getValues()).toEqual({
+                items: [{name: 'keep-me', value: 'plain'}, {name: 'drop-expr'}],
+            });
+        });
+
         it('should recursively filter expressions inside nested objects', () => {
             const currentNode = makeNode({
                 fields: {

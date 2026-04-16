@@ -69,15 +69,15 @@ describe('fromAiExpression builder', () => {
     });
 
     it('includes literal default values', () => {
-        expect(
-            buildFromAiExpression({defaultValue: 'Smith', name: 'lastname', required: true, type: 'STRING'})
-        ).toBe("=fromAi('lastname', 'STRING', {'defaultValue': 'Smith', 'required': true})");
+        expect(buildFromAiExpression({defaultValue: 'Smith', name: 'lastname', required: true, type: 'STRING'})).toBe(
+            "=fromAi('lastname', 'STRING', {'defaultValue': 'Smith', 'required': true})"
+        );
     });
 
     it('escapes single quotes inside literal defaults', () => {
-        expect(
-            buildFromAiExpression({defaultValue: "O'Hara", name: 'lastname', required: false, type: 'STRING'})
-        ).toBe("=fromAi('lastname', 'STRING', {'defaultValue': 'O''Hara', 'required': false})");
+        expect(buildFromAiExpression({defaultValue: "O'Hara", name: 'lastname', required: false, type: 'STRING'})).toBe(
+            "=fromAi('lastname', 'STRING', {'defaultValue': 'O''Hara', 'required': false})"
+        );
     });
 
     it('omits defaultValue for empty strings', () => {
