@@ -110,6 +110,7 @@ const Integration = () => {
                                         leftSidebarOpen={leftSidebarOpen}
                                         runDisabled={runDisabled}
                                         showWorkflowInputs={true}
+                                        workflowReferenceId={integrationWorkflowId}
                                     />
                                 )}
                             </WorkflowEditorProvider>
