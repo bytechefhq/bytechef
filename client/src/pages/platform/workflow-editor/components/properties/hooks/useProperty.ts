@@ -432,8 +432,8 @@ export const useProperty = ({
             return true;
         }
 
-        return typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=fromAi(');
-    }, [controlledFromAi, currentComponent?.metadata?.ui?.fromAi, path, propertyParameterValue]);
+        return propertyParameterValue === fromAiExpression;
+    }, [controlledFromAi, currentComponent?.metadata?.ui?.fromAi, fromAiExpression, path, propertyParameterValue]);
 
     const memoizedWorkflowTask = useMemo(() => {
         return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(

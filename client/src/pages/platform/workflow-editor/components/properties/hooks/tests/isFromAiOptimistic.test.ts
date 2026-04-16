@@ -4,18 +4,31 @@ import {describe, expect, it} from 'vitest';
  * Replicates the `isFromAi` useMemo logic from useProperty.ts and verifies:
  * 1. `controlledFromAi` provides an optimistic override so "Automatically defined
  *    by the model" appears instantly on click, before the server round-trip.
- * 2. When metadata is missing after reload, a value matching `=fromAi(...)` still
- *    resolves to true so the overlay and disabled input are preserved.
+ * 2. When metadata is missing after reload, a value that exactly equals the
+ *    computed default `fromAiExpression` still resolves to true so the overlay
+ *    is preserved. Modified fromAi expressions stay editable.
  */
 
 interface IsFromAiParamsI {
     controlledFromAi: boolean | undefined;
+    fromAiExpression?: string;
     fromAiPaths?: string[];
     path?: string;
     propertyParameterValue?: unknown;
 }
 
-function isFromAi({controlledFromAi, fromAiPaths, path, propertyParameterValue}: IsFromAiParamsI): boolean {
+// In production `fromAiExpression` is always a non-empty string computed from
+// the property's name/type/etc. Using a sentinel default mirrors that so tests
+// that don't care about the value-based fallback don't collide with undefined.
+const DEFAULT_FROM_AI_EXPRESSION = "=fromAi('message', 'STRING', {'required': false})";
+
+function isFromAi({
+    controlledFromAi,
+    fromAiExpression = DEFAULT_FROM_AI_EXPRESSION,
+    fromAiPaths,
+    path,
+    propertyParameterValue,
+}: IsFromAiParamsI): boolean {
     if (controlledFromAi !== undefined) {
         return controlledFromAi;
     }
@@ -24,7 +37,7 @@ function isFromAi({controlledFromAi, fromAiPaths, path, propertyParameterValue}:
         return true;
     }
 
-    return typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=fromAi(');
+    return propertyParameterValue === fromAiExpression;
 }
 
 describe('isFromAi optimistic override', () => {
@@ -95,34 +108,51 @@ describe('isFromAi optimistic override', () => {
     });
 
     describe('value-based fallback after reload', () => {
-        const fromAiValue = "=fromAi('lastname', 'STRING', {'required': false})";
+        const fromAiExpression = "=fromAi('lastname', 'STRING', {'required': false})";
 
-        it('should return true when value starts with =fromAi( even if metadata is missing', () => {
+        it('should return true when value exactly matches the computed fromAiExpression (metadata missing)', () => {
             expect(
                 isFromAi({
                     controlledFromAi: undefined,
+                    fromAiExpression,
                     fromAiPaths: [],
                     path,
-                    propertyParameterValue: fromAiValue,
+                    propertyParameterValue: fromAiExpression,
                 })
             ).toBe(true);
         });
 
-        it('should return true when value starts with =fromAi( even if fromAiPaths is undefined', () => {
+        it('should return true when value matches default even if fromAiPaths is undefined', () => {
             expect(
                 isFromAi({
                     controlledFromAi: undefined,
+                    fromAiExpression,
                     fromAiPaths: undefined,
                     path,
-                    propertyParameterValue: fromAiValue,
+                    propertyParameterValue: fromAiExpression,
                 })
             ).toBe(true);
+        });
+
+        it('should return false when user has modified the fromAi expression from the default', () => {
+            const modified = "=fromAi('lastname', 'STRING', {'required': true, 'description': 'custom'})";
+
+            expect(
+                isFromAi({
+                    controlledFromAi: undefined,
+                    fromAiExpression,
+                    fromAiPaths: [],
+                    path,
+                    propertyParameterValue: modified,
+                })
+            ).toBe(false);
         });
 
         it('should return false for plain string values that are not fromAi expressions', () => {
             expect(
                 isFromAi({
                     controlledFromAi: undefined,
+                    fromAiExpression,
                     fromAiPaths: [],
                     path,
                     propertyParameterValue: 'hello world',
@@ -134,6 +164,7 @@ describe('isFromAi optimistic override', () => {
             expect(
                 isFromAi({
                     controlledFromAi: undefined,
+                    fromAiExpression,
                     fromAiPaths: [],
                     path,
                     propertyParameterValue: 42,
@@ -141,13 +172,14 @@ describe('isFromAi optimistic override', () => {
             ).toBe(false);
         });
 
-        it('should allow controlledFromAi=false to override a fromAi-shaped value', () => {
+        it('should allow controlledFromAi=false to override a default fromAi value', () => {
             expect(
                 isFromAi({
                     controlledFromAi: false,
+                    fromAiExpression,
                     fromAiPaths: [path],
                     path,
-                    propertyParameterValue: fromAiValue,
+                    propertyParameterValue: fromAiExpression,
                 })
             ).toBe(false);
         });
