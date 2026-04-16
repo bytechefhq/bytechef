@@ -22,11 +22,13 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_TIME;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_TIME;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertLocalDateTimeToDateInTimezone;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
@@ -58,6 +60,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -311,8 +314,8 @@ class GoogleCalendarUtilsTest {
                 CALENDAR_ID, "calendarId", EVENT_TYPE, eventTypes, MAX_RESULTS, 10, Q, "q",
                 DATE_RANGE,
                 Map.of(
-                    FROM, LocalDateTime.of(2024, Month.SEPTEMBER, 3, 12, 0, 0),
-                    TO, LocalDateTime.of(2024, Month.SEPTEMBER, 5, 10, 0, 0))));
+                    FROM_DATE, LocalDate.of(2024, Month.SEPTEMBER, 3), FROM_TIME, LocalTime.of(12, 0, 0),
+                    TO_DATE, LocalDate.of(2024, Month.SEPTEMBER, 5), TO_TIME, LocalTime.of(10, 0, 0))));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))

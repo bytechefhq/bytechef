@@ -17,9 +17,11 @@
 package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM_TIME;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MAX;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_DATE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO_TIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
@@ -33,6 +35,7 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEve
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +53,8 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(DATE_RANGE,
             Map.of(
-                FROM, LocalDateTime.of(2000, 1, 14, 8, 0, 0),
-                TO, LocalDateTime.of(2000, 1, 20, 8, 0, 0))));
+                FROM_DATE, LocalDate.of(2000, 1, 14), FROM_TIME, LocalTime.of(8, 0, 0),
+                TO_DATE, LocalDate.of(2000, 1, 20), TO_TIME, LocalTime.of(8, 0, 0))));
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
 
     @Test
@@ -75,7 +78,7 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
                 .add(new Interval(LocalDateTime.of(2000, 1, 16, 9, 30, 0), LocalDateTime.of(2000, 1, 16, 9, 45, 0)));
             expectedIntervals
                 .add(new Interval(LocalDateTime.of(2000, 1, 16, 10, 45, 0),
-                    LocalDateTime.of(LocalDate.of(2000, 1, 18), LOCAL_TIME_MIN)));
+                    LocalDateTime.of(LocalDate.of(2000, 1, 17), LOCAL_TIME_MAX)));
             expectedIntervals
                 .add(new Interval(LocalDateTime.of(2000, 1, 20, 7, 0, 0), LocalDateTime.of(2000, 1, 20, 8, 0, 0)));
 
