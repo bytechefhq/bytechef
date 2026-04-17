@@ -256,12 +256,42 @@ test.describe('Saving to Workflow Definition', () => {
         expectedPropertyLabel = 'Integer property';
     });
 
+    test('should save negative value to the INTEGER property', async () => {
+        const integerProperty = configurationPanel.getByLabel('Integer property');
+
+        const integerInput = integerProperty.getByRole('textbox');
+
+        const testValue = -123;
+
+        await integerInput.fill(testValue.toString());
+
+        expectedPropertyType = typeof testValue;
+        expectedPropertyValue = testValue;
+        expectedPropertyName = 'Integer';
+        expectedPropertyLabel = 'Integer property';
+    });
+
     test('should save basic NUMBER property', async () => {
         const numberProperty = configurationPanel.getByLabel('Number property');
 
         const numberInput = numberProperty.getByRole('textbox');
 
         const testValue = 123.45;
+
+        await numberInput.fill(testValue.toString());
+
+        expectedPropertyType = typeof testValue;
+        expectedPropertyValue = testValue;
+        expectedPropertyName = 'Number';
+        expectedPropertyLabel = 'Number property';
+    });
+
+    test('should save negative value to the NUMBER property', async () => {
+        const numberProperty = configurationPanel.getByLabel('Number property');
+
+        const numberInput = numberProperty.getByRole('textbox');
+
+        const testValue = -123.45;
 
         await numberInput.fill(testValue.toString());
 
