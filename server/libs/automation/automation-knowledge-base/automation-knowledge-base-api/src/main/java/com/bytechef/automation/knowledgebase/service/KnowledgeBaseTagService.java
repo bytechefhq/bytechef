@@ -50,6 +50,14 @@ public interface KnowledgeBaseTagService {
     Map<String, List<Tag>> getTagsByKnowledgeBaseName();
 
     /**
+     * Retrieves a mapping from document ID to list of tags for all documents belonging to the given knowledgeBase.
+     *
+     * @param knowledgeBaseId the unique identifier of the knowledgebase whose documents' tags are to be retrieved
+     * @return a map where keys are document IDs and values are lists of Tag objects assigned to each document
+     */
+    List<Tag> getDocumentTagsByKnowledgeBaseId(Long knowledgeBaseId);
+
+    /**
      * Updates the tags associated with a specific knowledgeBase.
      *
      * @param knowledgeBaseId the unique identifier of the knowledgebase whose tags are to be updated

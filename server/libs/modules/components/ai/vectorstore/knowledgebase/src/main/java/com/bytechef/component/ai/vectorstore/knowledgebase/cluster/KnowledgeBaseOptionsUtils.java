@@ -72,8 +72,7 @@ final class KnowledgeBaseOptionsUtils {
             if (knowledgeBaseId == null) {
                 tags = knowledgeBaseTagService.getAllTags();
             } else {
-                tags = knowledgeBaseTagService.getTagsByKnowledgeBaseId()
-                    .getOrDefault(knowledgeBaseId, List.of());
+                tags = knowledgeBaseTagService.getDocumentTagsByKnowledgeBaseId(knowledgeBaseId);
             }
 
             Map<Long, Tag> unique = new LinkedHashMap<>();

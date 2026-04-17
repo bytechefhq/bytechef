@@ -17,6 +17,8 @@
 package com.bytechef.automation.knowledgebase.service;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.automation.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import com.bytechef.automation.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -38,11 +40,16 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseTagServiceImpl implements KnowledgeBaseTagService {
 
+    private final KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository;
     private final KnowledgeBaseRepository knowledgeBaseRepository;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseTagServiceImpl(KnowledgeBaseRepository knowledgeBaseRepository, TagService tagService) {
+    public KnowledgeBaseTagServiceImpl(
+        KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository,
+        KnowledgeBaseRepository knowledgeBaseRepository, TagService tagService) {
+
+        this.knowledgeBaseDocumentRepository = knowledgeBaseDocumentRepository;
         this.knowledgeBaseRepository = knowledgeBaseRepository;
         this.tagService = tagService;
     }
@@ -110,6 +117,26 @@ public class KnowledgeBaseTagServiceImpl implements KnowledgeBaseTagService {
         }
 
         return map;
+    }
+
+    @Override
+    public List<Tag> getDocumentTagsByKnowledgeBaseId(Long knowledgeBaseId) {
+        Set<Long> ids = new HashSet<>();
+
+        for (KnowledgeBaseDocument document : knowledgeBaseDocumentRepository
+            .findAllByKnowledgeBaseId(knowledgeBaseId)) {
+            List<Long> tagIds = document.getTagIds();
+
+            if (tagIds != null) {
+                ids.addAll(tagIds);
+            }
+        }
+
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        return tagService.getTags(new ArrayList<>(ids));
     }
 
     @Override
