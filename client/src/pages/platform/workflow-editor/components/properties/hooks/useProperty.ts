@@ -820,7 +820,8 @@ export const useProperty = ({
                 setHasError(false);
             }
 
-            const onlyNumericValue = type === 'NUMBER' ? value.replace(/[^0-9.-]/g, '') : value.replace(/\D/g, '');
+            const onlyNumericValue =
+                type === 'NUMBER' ? value.replace(/(?!^-)[^0-9.]/g, '') : value.replace(/(?!^-)\D/g, '');
 
             if (onlyNumericValue === undefined) {
                 return;
