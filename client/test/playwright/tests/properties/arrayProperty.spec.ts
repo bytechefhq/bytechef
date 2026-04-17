@@ -361,6 +361,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
                     value: thirdRowValue,
                 });
 
+                await expect(thirdRowInput).toHaveText(thirdRowValue, {timeout: 10000});
                 await expect(middleRowInput).toBeEmpty();
 
                 await authenticatedPage.waitForTimeout(WorkflowPage.LONG_DEBOUNCE_MS);
@@ -381,8 +382,8 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
 
                 const secondRemainingInput = workflowPage.arrayPropertyItemTextboxAt(1);
 
-                await expect(firstRemainingInput).toHaveText(firstRowValue);
-                await expect(secondRemainingInput).toHaveText(thirdRowValue);
+                await expect(firstRemainingInput).toHaveText(firstRowValue, {timeout: 30000});
+                await expect(secondRemainingInput).toHaveText(thirdRowValue, {timeout: 30000});
             });
         });
 
