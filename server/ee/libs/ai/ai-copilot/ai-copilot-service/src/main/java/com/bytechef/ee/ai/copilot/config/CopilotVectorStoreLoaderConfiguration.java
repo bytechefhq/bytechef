@@ -57,7 +57,7 @@ class CopilotVectorStoreLoaderConfiguration {
     @SuppressFBWarnings(value = "EI")
     public CopilotVectorStoreLoaderConfiguration(
         CopilotVectorStoreService copilotVectorStoreService,
-        @Qualifier("aiCopilotPgVectorStore") VectorStore vectorStore) {
+        @Qualifier("copilotPgVectorStore") VectorStore vectorStore) {
 
         this.batchingStrategy = new TokenCountBatchingStrategy(
             EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
