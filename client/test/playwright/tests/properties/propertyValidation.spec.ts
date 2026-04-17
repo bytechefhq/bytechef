@@ -343,10 +343,11 @@ test.describe('Property validation - array', () => {
                 await addButton.click();
             });
 
-            await test.step('Verify item count and Add button disabled', async () => {
+            await test.step('Verify item count, Add button disabled, and maxItems validation hint', async () => {
                 const arrayItems = arrayProperty.getByLabel(/Array property item at index \d+/);
                 await expect(arrayItems).toHaveCount(ARRAY_MAX_ITEMS);
                 await expect(addButton).toBeDisabled();
+                await expect(arrayProperty.getByText('Maximum 3 items')).toBeVisible();
             });
         });
 
@@ -369,11 +370,12 @@ test.describe('Property validation - array', () => {
         test('should show Add button when array is empty (below minItems)', async () => {
             const arrayProperty = configurationPanel.getByLabel('arrayMinItems property');
 
-            await test.step('Verify no items and Add button visible', async () => {
+            await test.step('Verify no items, Add button visible, and minItems validation hint', async () => {
                 const arrayItems = arrayProperty.getByLabel(/Array property item at index \d+/);
                 await expect(arrayItems).toHaveCount(0);
                 const addButton = arrayProperty.getByRole('button', {name: 'Add array item'});
                 await expect(addButton).toBeEnabled();
+                await expect(arrayProperty.getByText('Minimum 3 items')).toBeVisible();
             });
         });
 
