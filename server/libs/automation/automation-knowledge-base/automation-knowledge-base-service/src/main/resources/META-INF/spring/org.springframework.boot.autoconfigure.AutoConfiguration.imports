@@ -1,1 +1,1 @@
-com.bytechef.automation.knowledgebase.config.AutomationKnowledgeBaseJdbcRepositoryConfiguration
+com.bytechef.automation.knowledgebase.config.KnowledgeBaseJdbcRepositoryConfiguration

@@ -27,5 +27,5 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
 @EnableJdbcRepositories(basePackages = "com.bytechef.automation.knowledgebase.repository")
-class AutomationKnowledgeBaseJdbcRepositoryConfiguration {
+class KnowledgeBaseJdbcRepositoryConfiguration {
 }

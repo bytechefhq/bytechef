@@ -7,11 +7,17 @@
 
 package com.bytechef.ee.tenant.multi.config;
 
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.ee.tenant.multi.pgvector.MultiTenantPgVectorStore;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
+import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,14 +46,56 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
 
     @Bean
     VectorStore knowledgeBasePgVectorStore(
-        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel,
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
+        @Qualifier("knowledgeBaseEmbeddingModel") EmbeddingModel knowledgeBaseEmbeddingModel,
         PgVectorStoreProperties properties, BatchingStrategy batchingStrategy) {
 
-        return MultiTenantPgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
+        return MultiTenantPgVectorStore.builder(pgVectorJdbcTemplate, knowledgeBaseEmbeddingModel)
             .vectorTableName("kb_" + properties.getTableName())
             .distanceType(properties.getDistanceType())
             .idType(properties.getIdType())
             .batchingStrategy(batchingStrategy)
             .build();
+    }
+
+    @Bean("knowledgeBaseEmbeddingModel")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    OpenAiEmbeddingModel knowledgeBaseOpenAiEmbeddingModel(
+        ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
+
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ApplicationProperties.Ai.OpenAi openAi = ai.getOpenAi();
+
+        ApplicationProperties.Ai.OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
+            .getOptions();
+
+        return new OpenAiEmbeddingModel(
+            openAiApi,
+            MetadataMode.ALL,
+            OpenAiEmbeddingOptions.builder()
+                .model(openAiEmbeddingOptions.getModel())
+                .build());
+    }
+
+    @Bean("knowledgeBaseEmbeddingModel")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    OpenAiEmbeddingModel knowledgeBaseAnthropicOpenAiEmbeddingModel(
+        ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
+
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        Anthropic anthropic = ai.getAnthropic();
+
+        Anthropic.Embedding.OpenAi.Options anthropicEmbeddingOpenAiOptions = anthropic.getEmbedding()
+            .getOpenAi()
+            .getOptions();
+
+        return new OpenAiEmbeddingModel(
+            openAiApi,
+            MetadataMode.ALL,
+            OpenAiEmbeddingOptions.builder()
+                .model(anthropicEmbeddingOpenAiOptions.getModel())
+                .build());
     }
 }
