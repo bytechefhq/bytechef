@@ -20,6 +20,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javax.sql.DataSource;
+import org.springframework.ai.embedding.BatchingStrategy;
+import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -56,6 +58,11 @@ class PgVectorJdbcConfiguration {
         this.pgVector = applicationProperties.getAi()
             .getVectorstore()
             .getPgVector();
+    }
+
+    @Bean
+    BatchingStrategy pgVectorStoreBatchingStrategy() {
+        return new TokenCountBatchingStrategy();
     }
 
     @Bean

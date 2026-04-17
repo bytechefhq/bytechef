@@ -50,12 +50,9 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,13 +76,11 @@ public class CopilotConfiguration {
     private final String anthropicApiKey;
     private final String anthropicChatModel;
     private final Double anthropicChatTemperature;
-    private final String anthropicEmbeddingModel;
     private final String openAiApiKey;
     private final String openAiChatModel;
     private final Double openAiChatTemperature;
     private final String openAiChatReasoningEffort;
     private final String openAiChatVerbosity;
-    private final String openAiEmbeddingModel;
     private final Resource promptWorkflowEditorAskResource;
     private final Resource promptWorkflowEditorBuildResource;
     private final Resource promptCodeEditorAskResource;
@@ -116,12 +111,6 @@ public class CopilotConfiguration {
         this.anthropicChatModel = anthropicChatOptions.getModel();
         this.anthropicChatTemperature = anthropicChatOptions.getTemperature();
 
-        Anthropic.Embedding.OpenAi.Options anthropicEmbeddingOpenAiOptions = anthropic.getEmbedding()
-            .getOpenAi()
-            .getOptions();
-
-        this.anthropicEmbeddingModel = anthropicEmbeddingOpenAiOptions.getModel();
-
         OpenAi openAi = ai.getOpenAi();
 
         this.openAiApiKey = openAi.getApiKey();
@@ -137,12 +126,6 @@ public class CopilotConfiguration {
         this.openAiChatVerbosity = openAiChatOptions.getVerbosity()
             .name()
             .toLowerCase();
-
-        OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
-            .getOptions();
-
-        this.openAiEmbeddingModel = openAiEmbeddingOptions.getModel();
-
         this.promptWorkflowEditorAskResource = promptWorkflowEditorAskResource;
         this.promptWorkflowEditorBuildResource = promptWorkflowEditorBuildResource;
         this.promptCodeEditorAskResource = promptCodeEditorAskResource;
@@ -177,17 +160,6 @@ public class CopilotConfiguration {
             .build();
 
         return new SafeAnthropicChatModel(delegate);
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    OpenAiEmbeddingModel anthropicOpenAiEmbeddingModel(OpenAiApi openAiApi) {
-        return new OpenAiEmbeddingModel(
-            openAiApi,
-            MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(anthropicEmbeddingModel)
-                .build());
     }
 
     @Bean
@@ -310,19 +282,8 @@ public class CopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
-    OpenAiEmbeddingModel openAiEmbeddingModel(OpenAiApi openAiApi) {
-        return new OpenAiEmbeddingModel(
-            openAiApi,
-            MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(openAiEmbeddingModel)
-                .build());
-    }
-
-    @Bean
-    QuestionAnswerAdvisor questionAnswerAdvisor(VectorStore aiCopilotPgVectorStore) {
-        return QuestionAnswerAdvisor.builder(aiCopilotPgVectorStore)
+    QuestionAnswerAdvisor questionAnswerAdvisor(VectorStore copilotPgVectorStore) {
+        return QuestionAnswerAdvisor.builder(copilotPgVectorStore)
             .build();
     }
 
