@@ -115,6 +115,29 @@ public class KnowledgeBaseDocumentTagServiceImpl implements KnowledgeBaseDocumen
     }
 
     @Override
+    public List<Long> getDocumentIdsByTagIds(Long knowledgeBaseId, List<Long> tagIds) {
+        Set<Long> tagIdSet = new HashSet<>(tagIds);
+        List<Long> documentIds = new ArrayList<>();
+
+        for (KnowledgeBaseDocument document : knowledgeBaseDocumentRepository
+            .findAllByKnowledgeBaseId(knowledgeBaseId)) {
+            List<Long> docTagIds = document.getTagIds();
+
+            if (docTagIds != null) {
+                for (Long tagId : docTagIds) {
+                    if (tagIdSet.contains(tagId)) {
+                        documentIds.add(document.getId());
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return documentIds;
+    }
+
+    @Override
     public void updateTags(long knowledgeBaseDocumentId, List<Tag> tags) {
         KnowledgeBaseDocument document = knowledgeBaseDocumentRepository.findById(knowledgeBaseDocumentId)
             .orElseThrow(
