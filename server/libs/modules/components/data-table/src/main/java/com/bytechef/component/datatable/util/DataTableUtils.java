@@ -227,21 +227,21 @@ public final class DataTableUtils {
                 columnProperties.add(mapColumn(columnSpec));
             }
 
+            if (singleRecord) {
+                return columnProperties;
+            }
+
             var valuesObject = object(VALUES)
                 .label("Values")
                 .properties(columnProperties)
                 .required(true);
 
-            if (singleRecord) {
-                return List.of(valuesObject);
-            } else {
-                var recordsArray = array(VALUES)
-                    .label("Records")
-                    .items(valuesObject)
-                    .required(true);
+            var recordsArray = array(VALUES)
+                .label("Records")
+                .items(valuesObject)
+                .required(true);
 
-                return List.of(recordsArray);
-            }
+            return List.of(recordsArray);
         };
     }
 
