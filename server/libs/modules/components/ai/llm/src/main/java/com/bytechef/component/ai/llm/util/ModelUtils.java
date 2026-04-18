@@ -113,8 +113,9 @@ public class ModelUtils {
                     Generation result = chatResponse.getResult();
 
                     if (result != null) {
-                        String text = result.getOutput()
-                            .getText();
+                        AssistantMessage output = result.getOutput();
+
+                        String text = output.getText();
 
                         if (text != null) {
                             JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
