@@ -54,7 +54,7 @@ public class WorkflowTaskUtils {
                             returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
                         }
 
-                        if (firstItem instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.PARAMETERS) &&
+                        if (firstItem instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.NAME) &&
                             map.containsKey(WorkflowConstants.TYPE)) {
 
                             List<WorkflowTask> curWorkflowTasks = curList.stream()
@@ -75,7 +75,8 @@ public class WorkflowTaskUtils {
                             }
                             // Fork/join support
                         } else if (firstItem instanceof List<?> list && !list.isEmpty() &&
-                            list.getFirst() instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.PARAMETERS)) {
+                            list.getFirst() instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.NAME) &&
+                            map.containsKey(WorkflowConstants.TYPE)) {
 
                             for (Object curItem : curList) {
                                 List<?> curSubList = (List<?>) curItem;
@@ -90,7 +91,7 @@ public class WorkflowTaskUtils {
                     }
                     // Each support
                 } else if (entry.getValue() instanceof Map<?, ?> curMap &&
-                    curMap.containsKey(WorkflowConstants.PARAMETERS)) {
+                    curMap.containsKey(WorkflowConstants.NAME) && curMap.containsKey(WorkflowConstants.TYPE)) {
 
                     returnedWorkflowTasks.addAll(
                         getTasks(List.of(new WorkflowTask((Map<String, ?>) curMap)), lastWorkflowNodeName));

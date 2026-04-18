@@ -7,4 +7,6 @@ dependencies {
     implementation("org.springframework.data:spring-data-relational")
     implementation("tools.jackson.dataformat:jackson-dataformat-yaml")
     implementation(project(":server:libs:core:commons:commons-util"))
+
+    testImplementation(project(":server:libs:test:test-support"))
 }
