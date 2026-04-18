@@ -22,6 +22,7 @@ interface AiAgentTestingChatStateI {
     setLastAssistantMessageContent: (content: string) => void;
     setLastAssistantMessageError: (errorMessage: string) => void;
     resetMessages: () => void;
+    truncateMessagesFrom: (index: number) => void;
 
     resumeUrl: string | null;
     setResumeUrl: (resumeUrl: string | null) => void;
@@ -73,6 +74,10 @@ const useAiAgentTestingChatStore = create<AiAgentTestingChatStateI>()(
                     };
                 }),
             resetMessages: () => set({messages: [], resumeUrl: null}),
+            truncateMessagesFrom: (index: number) =>
+                set((state) => ({
+                    messages: state.messages.slice(0, Math.max(0, index)),
+                })),
 
             resumeUrl: null,
             setResumeUrl: (resumeUrl) => set({resumeUrl}),
