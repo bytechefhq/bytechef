@@ -95,8 +95,23 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         path = path.replace('.__item', '');
     }
 
+    const encodedNewPropertyName = useMemo(
+        () => (newPropertyName ? encodePath(newPropertyName) : ''),
+        [newPropertyName]
+    );
+
+    const isDuplicateName = useMemo(() => {
+        if (!encodedNewPropertyName) {
+            return false;
+        }
+
+        return !!subProperties?.some((subProperty) => subProperty.name === encodedNewPropertyName);
+    }, [encodedNewPropertyName, subProperties]);
+
     const handleAddItemClick = useCallback(() => {
-        const encodedPropertyName = encodePath(newPropertyName);
+        if (!newPropertyName || isDuplicateName) {
+            return;
+        }
 
         const newItem: SubPropertyType = {
             additionalProperties,
@@ -104,7 +119,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             custom: true,
             expressionEnabled: true,
             label: newPropertyName,
-            name: encodedPropertyName,
+            name: encodedNewPropertyName,
             type: (newPropertyType ||
                 additionalProperties?.[0].type ||
                 'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES,
@@ -117,7 +132,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
             saveProperty({
                 includeInMetadata: true,
-                path: `${path}.${encodedPropertyName}`,
+                path: `${path}.${encodedNewPropertyName}`,
                 type: newPropertyType,
                 updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
@@ -126,6 +141,8 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         }
     }, [
         additionalProperties,
+        encodedNewPropertyName,
+        isDuplicateName,
         newPropertyName,
         newPropertyType,
         path,
@@ -486,6 +503,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         handleAddItemClick,
         handleDeleteClick,
         isContainerObject,
+        isDuplicateName,
         label,
         name,
         newPropertyName,

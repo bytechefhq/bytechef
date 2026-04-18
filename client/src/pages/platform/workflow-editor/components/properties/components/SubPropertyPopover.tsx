@@ -16,6 +16,7 @@ interface SubPropertyPopoverProps {
     disabledTooltip?: string;
     handleClick: () => void;
     insideConditionTaskDispatcher?: boolean;
+    isDuplicateName?: boolean;
     newPropertyName?: string;
     newPropertyType: keyof typeof VALUE_PROPERTY_CONTROL_TYPES | string;
     propertyName?: string;
@@ -31,6 +32,7 @@ const SubPropertyPopover = ({
     disabledTooltip,
     handleClick,
     insideConditionTaskDispatcher,
+    isDuplicateName = false,
     newPropertyName,
     newPropertyType,
     propertyName,
@@ -103,6 +105,8 @@ const SubPropertyPopover = ({
                     {!array && (
                         <PropertyInput
                             className="mb-2"
+                            error={isDuplicateName}
+                            errorMessage="A property with this name already exists."
                             label="Name"
                             name="additionalPropertyName"
                             onChange={handleNewPropertyNameChange}
@@ -154,7 +158,12 @@ const SubPropertyPopover = ({
 
                 <footer className="flex items-center justify-end space-x-2">
                     <PopoverClose asChild>
-                        <Button disabled={!array && !newPropertyName} label="Add" onClick={handleClick} size="sm" />
+                        <Button
+                            disabled={isDuplicateName || (!array && !newPropertyName)}
+                            label="Add"
+                            onClick={handleClick}
+                            size="sm"
+                        />
                     </PopoverClose>
                 </footer>
             </PopoverContent>
