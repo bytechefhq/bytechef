@@ -17,6 +17,9 @@
 package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CONVERSATION_ID;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.RESPONSE_PROMPT;
 import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.SIMULATION_MODEL;
 import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.TOOL_SIMULATIONS;
@@ -29,7 +32,9 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
+import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -112,7 +117,7 @@ public abstract class AbstractAiAgentChatAction {
         ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
 
-        return chatClient.prompt()
+        return createPrompt(chatClient, inputParameters, context)
             .advisors(getAdvisors(clusterElementMap, connectionParameters, context))
             .advisors(getConversationAdvisor(inputParameters))
             .messages(ModelUtils.getMessages(inputParameters, context))
@@ -120,6 +125,22 @@ public abstract class AbstractAiAgentChatAction {
                 getToolCallbacks(
                     clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
                     context.isEditorEnvironment(), toolExecutionListener, toolSimulations, chatModel, context));
+    }
+
+    private static ChatClient.ChatClientRequestSpec createPrompt(
+        ChatClient chatClient, Parameters inputParameters, ActionContext context) {
+
+        ResponseFormat responseFormat = inputParameters.getFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
+
+        if (responseFormat == ResponseFormat.TEXT) {
+            return chatClient.prompt();
+        }
+
+        JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
+            inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
+
+        return chatClient.prompt(converter.getFormat());
     }
 
     private List<Advisor> getAdvisors(
