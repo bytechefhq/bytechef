@@ -24,6 +24,7 @@ import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RA
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -33,5 +34,16 @@ public interface AiAgentComponentDefinition extends ClusterRootComponentDefiniti
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
         return List.of(MODEL, CHAT_MEMORY, RAG, GUARDRAILS, TOOLS);
+    }
+
+    @Override
+    default Map<String, List<String>> getClusterElementClusterElementTypes() {
+        return Map.of(
+            "checkForViolations", List.of("checkForViolations"),
+            "sanitizeText", List.of("sanitizeText"),
+            "jailbreak", List.of("model"),
+            "nsfw", List.of("model"),
+            "topicalAlignment", List.of("model"),
+            "custom", List.of("model"));
     }
 }

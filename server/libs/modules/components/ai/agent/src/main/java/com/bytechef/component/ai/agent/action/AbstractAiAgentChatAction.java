@@ -27,6 +27,8 @@ import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunc
 import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction.CHECK_FOR_VIOLATIONS;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction.SANITIZE_TEXT;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
@@ -149,11 +151,41 @@ public abstract class AbstractAiAgentChatAction {
 
         List<Advisor> advisors = new ArrayList<>();
 
-        // guardrails (first to block early)
+        // guardrails (check-for-violations runs first to block early; sanitize-text wraps the LLM response —
+        // both declare type GUARDRAILS and are ordered by Spring AI via Advisor.getOrder()). Each parent advisor
+        // declares a fixed precedence (HIGHEST/LOWEST), so configuring more than one instance of the same parent
+        // produces an undefined ordering; reject the configuration before it reaches Spring AI.
 
-        clusterElementMap.fetchClusterElement(GUARDRAILS)
-            .map(clusterElement -> getGuardrailsAdvisor(connectionParameters, clusterElement))
-            .ifPresent(advisors::add);
+        // Pre-validate uniqueness against the cluster-element component name (the canonical SPI key) before
+        // calling getGuardrailsAdvisor, which would otherwise instantiate ChatClient and run cluster builder
+        // side effects for the duplicate before being discarded.
+        List<ClusterElement> guardrailClusterElements = clusterElementMap.getClusterElements(GUARDRAILS);
+
+        long checkForViolationsCount = guardrailClusterElements.stream()
+            .filter(clusterElement -> CHECK_FOR_VIOLATIONS.key()
+                .equals(clusterElement.getComponentName()))
+            .count();
+
+        if (checkForViolationsCount > 1) {
+            throw new IllegalStateException(
+                "Multiple CheckForViolations parent cluster elements configured — advisor order collides at "
+                    + "HIGHEST_PRECEDENCE and Spring AI ordering becomes undefined. Configure at most one.");
+        }
+
+        long sanitizeTextCount = guardrailClusterElements.stream()
+            .filter(clusterElement -> SANITIZE_TEXT.key()
+                .equals(clusterElement.getComponentName()))
+            .count();
+
+        if (sanitizeTextCount > 1) {
+            throw new IllegalStateException(
+                "Multiple SanitizeText parent cluster elements configured — advisor order collides at "
+                    + "LOWEST_PRECEDENCE and Spring AI ordering becomes undefined. Configure at most one.");
+        }
+
+        for (ClusterElement clusterElement : guardrailClusterElements) {
+            advisors.add(getGuardrailsAdvisor(connectionParameters, clusterElement));
+        }
 
         // memory
 
@@ -187,7 +219,7 @@ public abstract class AbstractAiAgentChatAction {
                 getConnectionParameters(componentConnections, clusterElement),
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw clusterElementInitializationException(clusterElement, "chat memory", e);
         }
     }
 
@@ -212,7 +244,7 @@ public abstract class AbstractAiAgentChatAction {
                 getConnectionParameters(componentConnections, clusterElement),
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw clusterElementInitializationException(clusterElement, "guardrails", e);
         }
     }
 
@@ -239,8 +271,23 @@ public abstract class AbstractAiAgentChatAction {
                 getConnectionParameters(componentConnections, clusterElement),
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw clusterElementInitializationException(clusterElement, "RAG", e);
         }
+    }
+
+    private static RuntimeException clusterElementInitializationException(
+        ClusterElement clusterElement, String kind, Throwable cause) {
+
+        String message = String.format(
+            "Failed to initialize %s advisor for cluster element '%s' (component=%s v%d): %s",
+            kind, clusterElement.getClusterElementName(), clusterElement.getComponentName(),
+            clusterElement.getComponentVersion(),
+            cause.getMessage() == null ? cause.getClass()
+                .getSimpleName() : cause.getMessage());
+
+        logger.error(message, cause);
+
+        return new IllegalStateException(message, cause);
     }
 
     private List<ToolCallback> getToolCallbacks(

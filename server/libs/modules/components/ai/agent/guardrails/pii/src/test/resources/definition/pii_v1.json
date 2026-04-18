@@ -1,0 +1,630 @@
+{
+  "actionClusterElementTypes": { },
+  "actions": [ ],
+  "clusterElementClusterElementTypes": { },
+  "clusterElementTypes": [ ],
+  "clusterElements": [ {
+    "name": "piiCheck",
+    "description": "Flags the input when personally identifiable information is detected.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "ALL",
+      "description": "Scan for all available PII types or a user-selected subset.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Type",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "type",
+      "options": [ {
+        "description": null,
+        "label": "All",
+        "value": "ALL"
+      }, {
+        "description": null,
+        "label": "Selected",
+        "value": "SELECTED"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "MULTI_SELECT",
+      "defaultValue": null,
+      "description": "Which PII types to scan for.",
+      "displayCondition": "type == 'SELECTED'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Entities",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "entities",
+      "options": [ {
+        "description": null,
+        "label": "Email address",
+        "value": "EMAIL_ADDRESS"
+      }, {
+        "description": null,
+        "label": "Phone number",
+        "value": "PHONE_NUMBER"
+      }, {
+        "description": null,
+        "label": "Credit card number",
+        "value": "CREDIT_CARD"
+      }, {
+        "description": null,
+        "label": "IP address (IPv4)",
+        "value": "IP_ADDRESS"
+      }, {
+        "description": null,
+        "label": "IBAN code",
+        "value": "IBAN_CODE"
+      }, {
+        "description": null,
+        "label": "Bitcoin/crypto address",
+        "value": "CRYPTO"
+      }, {
+        "description": null,
+        "label": "Date or date-time (ISO-8601)",
+        "value": "DATE_TIME"
+      }, {
+        "description": null,
+        "label": "Street address / location",
+        "value": "LOCATION"
+      }, {
+        "description": null,
+        "label": "Medical license",
+        "value": "MEDICAL_LICENSE"
+      }, {
+        "description": null,
+        "label": "US Social Security Number",
+        "value": "US_SSN"
+      }, {
+        "description": null,
+        "label": "US bank account number",
+        "value": "US_BANK_NUMBER"
+      }, {
+        "description": null,
+        "label": "US driver license",
+        "value": "US_DRIVER_LICENSE"
+      }, {
+        "description": null,
+        "label": "US Individual Taxpayer Identification Number (ITIN)",
+        "value": "US_ITIN"
+      }, {
+        "description": null,
+        "label": "US passport number",
+        "value": "US_PASSPORT"
+      }, {
+        "description": null,
+        "label": "UK NHS number",
+        "value": "UK_NHS"
+      }, {
+        "description": null,
+        "label": "UK National Insurance Number",
+        "value": "UK_NINO"
+      }, {
+        "description": null,
+        "label": "Spanish NIF",
+        "value": "ES_NIF"
+      }, {
+        "description": null,
+        "label": "Spanish NIE",
+        "value": "ES_NIE"
+      }, {
+        "description": null,
+        "label": "Italian fiscal code (Codice Fiscale)",
+        "value": "IT_FISCAL_CODE"
+      }, {
+        "description": null,
+        "label": "Italian VAT code (Partita IVA)",
+        "value": "IT_VAT_CODE"
+      }, {
+        "description": null,
+        "label": "Italian driver license",
+        "value": "IT_DRIVER_LICENSE"
+      }, {
+        "description": null,
+        "label": "Italian passport",
+        "value": "IT_PASSPORT"
+      }, {
+        "description": null,
+        "label": "Italian identity card",
+        "value": "IT_IDENTITY_CARD"
+      }, {
+        "description": null,
+        "label": "Polish PESEL",
+        "value": "PL_PESEL"
+      }, {
+        "description": null,
+        "label": "Singapore NRIC/FIN",
+        "value": "SG_NRIC_FIN"
+      }, {
+        "description": null,
+        "label": "Singapore UEN (Unique Entity Number)",
+        "value": "SG_UEN"
+      }, {
+        "description": null,
+        "label": "Australian Business Number (ABN)",
+        "value": "AU_ABN"
+      }, {
+        "description": null,
+        "label": "Australian Company Number (ACN)",
+        "value": "AU_ACN"
+      }, {
+        "description": null,
+        "label": "Australian Tax File Number (TFN)",
+        "value": "AU_TFN"
+      }, {
+        "description": null,
+        "label": "Australian Medicare card number",
+        "value": "AU_MEDICARE"
+      }, {
+        "description": null,
+        "label": "Indian Aadhaar number",
+        "value": "IN_AADHAAR"
+      }, {
+        "description": null,
+        "label": "Indian Permanent Account Number (PAN)",
+        "value": "IN_PAN"
+      }, {
+        "description": null,
+        "label": "Indian passport number",
+        "value": "IN_PASSPORT"
+      }, {
+        "description": null,
+        "label": "Indian vehicle registration",
+        "value": "IN_VEHICLE_REGISTRATION"
+      }, {
+        "description": null,
+        "label": "Indian voter ID (EPIC)",
+        "value": "IN_VOTER"
+      }, {
+        "description": null,
+        "label": "Finnish Personal Identity Code (HETU)",
+        "value": "FI_PERSONAL_IDENTITY_CODE"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Additional regex patterns to detect (alongside the built-in PII entities). Use the /pattern/flags literal form to specify case-insensitivity, e.g. /MY-CUSTOMER-\\d{4}/i.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Custom Regexes",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "customRegexes",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "FAIL_CLOSED",
+      "description": "What to do when this check cannot run. FAIL_CLOSED blocks the request (safer); FAIL_OPEN records the failure and lets the request through (availability-first).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Fail Mode",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "failMode",
+      "options": [ {
+        "description": null,
+        "label": "Fail closed (block)",
+        "value": "FAIL_CLOSED"
+      }, {
+        "description": null,
+        "label": "Fail open (allow)",
+        "value": "FAIL_OPEN"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "PII",
+    "type": {
+      "name": "CHECK_FOR_VIOLATIONS",
+      "key": "checkForViolations",
+      "label": "Check for Violations",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "piiSanitize",
+    "description": "Replaces detected personally identifiable information with placeholders.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "ALL",
+      "description": "Scan for all available PII types or a user-selected subset.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Type",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "type",
+      "options": [ {
+        "description": null,
+        "label": "All",
+        "value": "ALL"
+      }, {
+        "description": null,
+        "label": "Selected",
+        "value": "SELECTED"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "MULTI_SELECT",
+      "defaultValue": null,
+      "description": "Which PII types to scan for.",
+      "displayCondition": "type == 'SELECTED'",
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Entities",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "entities",
+      "options": [ {
+        "description": null,
+        "label": "Email address",
+        "value": "EMAIL_ADDRESS"
+      }, {
+        "description": null,
+        "label": "Phone number",
+        "value": "PHONE_NUMBER"
+      }, {
+        "description": null,
+        "label": "Credit card number",
+        "value": "CREDIT_CARD"
+      }, {
+        "description": null,
+        "label": "IP address (IPv4)",
+        "value": "IP_ADDRESS"
+      }, {
+        "description": null,
+        "label": "IBAN code",
+        "value": "IBAN_CODE"
+      }, {
+        "description": null,
+        "label": "Bitcoin/crypto address",
+        "value": "CRYPTO"
+      }, {
+        "description": null,
+        "label": "Date or date-time (ISO-8601)",
+        "value": "DATE_TIME"
+      }, {
+        "description": null,
+        "label": "Street address / location",
+        "value": "LOCATION"
+      }, {
+        "description": null,
+        "label": "Medical license",
+        "value": "MEDICAL_LICENSE"
+      }, {
+        "description": null,
+        "label": "US Social Security Number",
+        "value": "US_SSN"
+      }, {
+        "description": null,
+        "label": "US bank account number",
+        "value": "US_BANK_NUMBER"
+      }, {
+        "description": null,
+        "label": "US driver license",
+        "value": "US_DRIVER_LICENSE"
+      }, {
+        "description": null,
+        "label": "US Individual Taxpayer Identification Number (ITIN)",
+        "value": "US_ITIN"
+      }, {
+        "description": null,
+        "label": "US passport number",
+        "value": "US_PASSPORT"
+      }, {
+        "description": null,
+        "label": "UK NHS number",
+        "value": "UK_NHS"
+      }, {
+        "description": null,
+        "label": "UK National Insurance Number",
+        "value": "UK_NINO"
+      }, {
+        "description": null,
+        "label": "Spanish NIF",
+        "value": "ES_NIF"
+      }, {
+        "description": null,
+        "label": "Spanish NIE",
+        "value": "ES_NIE"
+      }, {
+        "description": null,
+        "label": "Italian fiscal code (Codice Fiscale)",
+        "value": "IT_FISCAL_CODE"
+      }, {
+        "description": null,
+        "label": "Italian VAT code (Partita IVA)",
+        "value": "IT_VAT_CODE"
+      }, {
+        "description": null,
+        "label": "Italian driver license",
+        "value": "IT_DRIVER_LICENSE"
+      }, {
+        "description": null,
+        "label": "Italian passport",
+        "value": "IT_PASSPORT"
+      }, {
+        "description": null,
+        "label": "Italian identity card",
+        "value": "IT_IDENTITY_CARD"
+      }, {
+        "description": null,
+        "label": "Polish PESEL",
+        "value": "PL_PESEL"
+      }, {
+        "description": null,
+        "label": "Singapore NRIC/FIN",
+        "value": "SG_NRIC_FIN"
+      }, {
+        "description": null,
+        "label": "Singapore UEN (Unique Entity Number)",
+        "value": "SG_UEN"
+      }, {
+        "description": null,
+        "label": "Australian Business Number (ABN)",
+        "value": "AU_ABN"
+      }, {
+        "description": null,
+        "label": "Australian Company Number (ACN)",
+        "value": "AU_ACN"
+      }, {
+        "description": null,
+        "label": "Australian Tax File Number (TFN)",
+        "value": "AU_TFN"
+      }, {
+        "description": null,
+        "label": "Australian Medicare card number",
+        "value": "AU_MEDICARE"
+      }, {
+        "description": null,
+        "label": "Indian Aadhaar number",
+        "value": "IN_AADHAAR"
+      }, {
+        "description": null,
+        "label": "Indian Permanent Account Number (PAN)",
+        "value": "IN_PAN"
+      }, {
+        "description": null,
+        "label": "Indian passport number",
+        "value": "IN_PASSPORT"
+      }, {
+        "description": null,
+        "label": "Indian vehicle registration",
+        "value": "IN_VEHICLE_REGISTRATION"
+      }, {
+        "description": null,
+        "label": "Indian voter ID (EPIC)",
+        "value": "IN_VOTER"
+      }, {
+        "description": null,
+        "label": "Finnish Personal Identity Code (HETU)",
+        "value": "FI_PERSONAL_IDENTITY_CODE"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Additional regex patterns to detect (alongside the built-in PII entities). Use the /pattern/flags literal form to specify case-insensitivity, e.g. /MY-CUSTOMER-\\d{4}/i.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Custom Regexes",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "customRegexes",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "FAIL_CLOSED",
+      "description": "What to do when this check cannot run. FAIL_CLOSED blocks the request (safer); FAIL_OPEN records the failure and lets the request through (availability-first).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Fail Mode",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "failMode",
+      "options": [ {
+        "description": null,
+        "label": "Fail closed (block)",
+        "value": "FAIL_CLOSED"
+      }, {
+        "description": null,
+        "label": "Fail open (allow)",
+        "value": "FAIL_OPEN"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "PII",
+    "type": {
+      "name": "SANITIZE_TEXT",
+      "key": "sanitizeText",
+      "label": "Sanitize Text",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "Detects — and optionally masks — personally identifiable information.",
+  "icon": "path:assets/pii.svg",
+  "metadata": null,
+  "name": "pii",
+  "resources": null,
+  "tags": null,
+  "title": "PII",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
+}

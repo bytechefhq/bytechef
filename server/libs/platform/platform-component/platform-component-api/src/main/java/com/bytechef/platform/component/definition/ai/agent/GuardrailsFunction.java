@@ -31,7 +31,7 @@ public interface GuardrailsFunction {
     /**
      * Cluster element type for guardrails.
      */
-    ClusterElementType GUARDRAILS = new ClusterElementType("GUARDRAILS", "guardrails", "Guardrails");
+    ClusterElementType GUARDRAILS = new ClusterElementType("GUARDRAILS", "guardrails", "Guardrails", true, false);
 
     /**
      * @param inputParameters      the input parameters for the guardrails configuration

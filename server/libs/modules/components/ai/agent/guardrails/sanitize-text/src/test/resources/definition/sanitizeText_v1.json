@@ -1,0 +1,47 @@
+{
+  "actionClusterElementTypes": { },
+  "actions": [ ],
+  "clusterElementClusterElementTypes": { },
+  "clusterElementTypes": [ {
+    "name": "SANITIZE_TEXT",
+    "key": "sanitizeText",
+    "label": "Sanitize Text",
+    "multipleElements": true,
+    "required": false
+  } ],
+  "clusterElements": [ {
+    "name": "sanitizeText",
+    "description": "Runs configured sanitizers over the assistant response.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Sanitize Text",
+    "type": {
+      "name": "GUARDRAILS",
+      "key": "guardrails",
+      "label": "Guardrails",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "Runs configured sanitizers on the model response.",
+  "icon": "path:assets/sanitize-text.svg",
+  "metadata": null,
+  "name": "sanitizeText",
+  "resources": null,
+  "tags": null,
+  "title": "Sanitize Text",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
+}
