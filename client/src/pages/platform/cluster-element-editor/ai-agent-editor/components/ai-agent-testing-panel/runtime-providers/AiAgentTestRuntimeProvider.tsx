@@ -42,6 +42,7 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         setLastAssistantMessageError,
         setMessage,
         setResumeUrl,
+        truncateMessagesFrom,
     } = useAiAgentTestingChatStore(
         useShallow((state) => ({
             addToolExecution: state.addToolExecution,
@@ -52,6 +53,7 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
             setLastAssistantMessageError: state.setLastAssistantMessageError,
             setMessage: state.setMessage,
             setResumeUrl: state.setResumeUrl,
+            truncateMessagesFrom: state.truncateMessagesFrom,
         }))
     );
     const {setJobKey} = useTestingModeStore();
@@ -84,6 +86,8 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
             result: (data) => {
                 if (typeof data === 'string' && data.trim().length > 0) {
                     setLastAssistantMessageContent(data);
+                } else if (data !== null && typeof data === 'object') {
+                    setLastAssistantMessageContent('```json\n' + JSON.stringify(data, null, 2) + '\n```');
                 }
 
                 setIsRunning(false);
@@ -202,6 +206,15 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         }
     };
 
+    const onEdit = async (message: AppendMessage) => {
+        const parentIndex = message.parentId != null ? Number.parseInt(message.parentId, 10) : -1;
+        const editedIndex = Number.isNaN(parentIndex) ? messages.length : parentIndex + 1;
+
+        truncateMessagesFrom(editedIndex);
+
+        await onNew(message);
+    };
+
     const runtime = useExternalStoreRuntime({
         adapters: {
             attachments: attachmentAdapter,
@@ -209,6 +222,7 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         convertMessage,
         isRunning,
         messages,
+        onEdit,
         onNew,
     });
 
