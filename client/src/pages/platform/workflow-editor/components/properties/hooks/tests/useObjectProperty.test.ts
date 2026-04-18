@@ -154,6 +154,45 @@ describe('useObjectProperty — default value save guard', () => {
         expect(hoisted.mockSaveProperty).not.toHaveBeenCalled();
     });
 
+    it('should not add a duplicate subproperty when the typed name matches an existing one', async () => {
+        hoisted.storeState.currentComponent = {
+            parameters: {response: {outputSchema: {testField: {}}}},
+        };
+
+        const {useObjectProperty} = await import('../useObjectProperty');
+
+        const {result} = renderHook(() =>
+            useObjectProperty({
+                path: 'response.outputSchema',
+                property: {
+                    controlType: 'OBJECT_BUILDER',
+                    name: 'outputSchema',
+                    properties: subPropertyDefinitions,
+                    type: 'OBJECT',
+                } as unknown as Parameters<typeof useObjectProperty>[0]['property'],
+            })
+        );
+
+        await act(async () => {
+            vi.advanceTimersByTime(700);
+        });
+
+        expect(result.current.subProperties).toHaveLength(1);
+
+        act(() => {
+            result.current.setNewPropertyName('testField');
+        });
+
+        expect(result.current.isDuplicateName).toBe(true);
+
+        act(() => {
+            result.current.handleAddItemClick();
+        });
+
+        expect(result.current.subProperties).toHaveLength(1);
+        expect(hoisted.mockSaveProperty).not.toHaveBeenCalled();
+    });
+
     it('should reset save guard when path changes', async () => {
         const {useObjectProperty} = await import('../useObjectProperty');
 

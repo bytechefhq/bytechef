@@ -27,6 +27,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         handleAddItemClick,
         handleDeleteClick,
         isContainerObject,
+        isDuplicateName,
         label,
         name,
         newPropertyName,
@@ -87,6 +88,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                     availablePropertyTypes={availablePropertyTypes}
                     buttonLabel={placeholder}
                     handleClick={handleAddItemClick}
+                    isDuplicateName={isDuplicateName}
                     newPropertyName={newPropertyName}
                     newPropertyType={newPropertyType}
                     propertyName={name}
