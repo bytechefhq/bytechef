@@ -46,15 +46,17 @@ module.exports = {
                 content: {
                     brand: {
                         primary: 'hsl(var(--content-brand-primary))',
-                        'primary-hover': 'hsl(var(--content-brand-primary-hover))',
                         'primary-active': 'hsl(var(--content-brand-primary-active))',
+                        'primary-hover': 'hsl(var(--content-brand-primary-hover))',
                         secondary: 'hsl(var(--content-brand-secondary))',
                     },
+                    canvas_dot: 'hsl(var(--content-canvas_dot))',
                     destructive: {
                         DEFAULT: 'hsl(var(--content-destructive))',
                         primary: 'hsl(var(--content-destructive-primary))',
                         secondary: 'hsl(var(--content-destructive-secondary))',
                     },
+                    disabled: 'hsl(var(--content-disabled))',
                     neutral: {
                         primary: 'hsl(var(--content-neutral-primary))',
                         secondary: 'hsl(var(--content-neutral-secondary))',
@@ -66,8 +68,6 @@ module.exports = {
                         secondary: 'hsl(var(--content-onsurface-secondary))',
                     },
                     onwarning: 'hsl(var(--content-onwarning))',
-                    disabled: 'hsl(var(--content-disabled))',
-                    canvas_dot: 'hsl(var(--content-canvas_dot))',
                     success: {
                         DEFAULT: 'hsl(var(--content-success))',
                         primary: 'hsl(var(--content-success-primary))',
@@ -114,12 +114,12 @@ module.exports = {
                     brand: {
                         focus: 'hsl(var(--stroke-brand-focus))',
                         primary: 'hsl(var(--stroke-brand-primary))',
-                        'primary-hover': 'hsl(var(--stroke-brand-primary-hover))',
                         'primary-active': 'hsl(var(--stroke-brand-primary-active))',
+                        'primary-hover': 'hsl(var(--stroke-brand-primary-hover))',
                         'primary-pressed': 'hsl(var(--stroke-brand-primary-pressed))',
                         secondary: 'hsl(var(--stroke-brand-secondary))',
-                        'secondary-hover': 'hsl(var(--stroke-brand-secondary-hover))',
                         'secondary-active': 'hsl(var(--stroke-brand-secondary-active))',
+                        'secondary-hover': 'hsl(var(--stroke-brand-secondary-hover))',
                     },
                     condition: {
                         primary: 'hsl(var(--stroke-condition-primary))',
@@ -128,8 +128,8 @@ module.exports = {
                     },
                     destructive: {
                         primary: 'hsl(var(--stroke-destructive-primary))',
-                        'primary-hover': 'hsl(var(--stroke-destructive-primary-hover))',
                         'primary-active': 'hsl(var(--stroke-destructive-primary-active))',
+                        'primary-hover': 'hsl(var(--stroke-destructive-primary-hover))',
                         secondary: 'hsl(var(--stroke-destructive-secondary))',
                         'secondary-hover': 'hsl(var(--stroke-destructive-secondary-hover))',
                     },
@@ -145,12 +145,12 @@ module.exports = {
                         tertiary: 'hsl(var(--stroke-fork-join-tertiary))',
                     },
                     loop: {
-                        primary: 'hsl(var(--stroke-loop-primary))',
-                        secondary: 'hsl(var(--stroke-loop-secondary))',
-                        tertiary: 'hsl(var(--stroke-loop-tertiary))',
                         'break-primary': 'hsl(var(--stroke-loop-break-primary))',
                         'break-secondary': 'hsl(var(--stroke-loop-break-secondary))',
                         'break-tertiary': 'hsl(var(--stroke-loop-break-tertiary))',
+                        primary: 'hsl(var(--stroke-loop-primary))',
+                        secondary: 'hsl(var(--stroke-loop-secondary))',
+                        tertiary: 'hsl(var(--stroke-loop-tertiary))',
                     },
                     map: {
                         primary: 'hsl(var(--stroke-map-primary))',
@@ -179,14 +179,15 @@ module.exports = {
                     },
                     success: {
                         primary: 'hsl(var(--stroke-success-primary))',
-                        'primary-hover': 'hsl(var(--stroke-success-primary-hover))',
                         'primary-active': 'hsl(var(--stroke-success-primary-active))',
+                        'primary-hover': 'hsl(var(--stroke-success-primary-hover))',
                         secondary: 'hsl(var(--stroke-success-secondary))',
                     },
                     warning: {
                         primary: 'hsl(var(--stroke-warning-primary))',
-                        'primary-hover': 'hsl(var(--stroke-warning-primary-hover))',
                         'primary-active': 'hsl(var(--stroke-warning-primary-active))',
+                        'primary-hover': 'hsl(var(--stroke-warning-primary-hover))',
+                        secondary: 'hsl(var(--stroke-warning-secondary))',
                     },
                 },
                 success: {
@@ -208,8 +209,8 @@ module.exports = {
                         'primary-active': 'hsl(var(--surface-destructive-primary-active))',
                         'primary-hover': 'hsl(var(--surface-destructive-primary-hover))',
                         secondary: 'hsl(var(--surface-destructive-secondary))',
-                        'secondary-hover': 'hsl(var(--surface-destructive-secondary-hover))',
                         'secondary-active': 'hsl(var(--surface-destructive-secondary-active))',
+                        'secondary-hover': 'hsl(var(--surface-destructive-secondary-hover))',
                     },
                     disabled: 'hsl(var(--surface-disabled))',
                     main: 'hsl(var(--surface-main))',
@@ -232,8 +233,8 @@ module.exports = {
                     },
                     success: {
                         primary: 'hsl(var(--surface-success-primary))',
-                        'primary-hover': 'hsl(var(--surface-success-primary-hover))',
                         'primary-active': 'hsl(var(--surface-success-primary-active))',
+                        'primary-hover': 'hsl(var(--surface-success-primary-hover))',
                         secondary: 'hsl(var(--surface-success-secondary))',
                         'secondary-hover': 'hsl(var(--surface-success-secondary-hover))',
                     },
@@ -241,8 +242,8 @@ module.exports = {
                     warning: {
                         primary: 'hsl(var(--surface-warning-primary))',
                         secondary: 'hsl(var(--surface-warning-secondary))',
-                        'secondary-hover': 'hsl(var(--surface-warning-secondary-hover))',
                         'secondary-active': 'hsl(var(--surface-warning-secondary-active))',
+                        'secondary-hover': 'hsl(var(--surface-warning-secondary-hover))',
                     },
                 },
             },
