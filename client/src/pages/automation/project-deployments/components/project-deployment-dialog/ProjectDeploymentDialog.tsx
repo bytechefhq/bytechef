@@ -48,7 +48,10 @@ interface ProjectDeploymentDialogProps {
     changeProjectVersion?: boolean;
     filterWorkflowUuids?: string[];
     onClose?: () => void;
+    onOpenChange?: (isOpen: boolean) => void;
     projectDeployment?: ProjectDeployment;
+    projectDeployments?: ProjectDeployment[];
+    projectDeploymentsLoading?: boolean;
     triggerNode?: ReactNode;
 }
 
@@ -56,7 +59,10 @@ const ProjectDeploymentDialog = ({
     changeProjectVersion = false,
     filterWorkflowUuids,
     onClose,
+    onOpenChange,
     projectDeployment,
+    projectDeployments,
+    projectDeploymentsLoading,
     triggerNode,
 }: ProjectDeploymentDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
@@ -186,6 +192,8 @@ const ProjectDeploymentDialog = ({
                     control={control}
                     getValues={getValues}
                     projectDeployment={projectDeployment}
+                    projectDeployments={projectDeployments}
+                    projectDeploymentsLoading={projectDeploymentsLoading}
                     setValue={setValue}
                 />
             ),
@@ -326,12 +334,20 @@ const ProjectDeploymentDialog = ({
                 } else {
                     closeDialog();
                 }
+
+                if (onOpenChange) {
+                    onOpenChange(isOpen);
+                }
             }}
             open={isOpen}
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className="flex flex-col gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
+            <DialogContent
+                className="flex flex-col gap-0 p-0"
+                onClick={(event) => event.stopPropagation()}
+                onInteractOutside={(event) => event.preventDefault()}
+            >
                 <Form {...form}>
                     <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 p-6">
                         <div className="flex w-full flex-col space-y-1">

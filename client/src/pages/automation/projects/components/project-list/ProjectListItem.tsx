@@ -27,10 +27,12 @@ import {
     useUpdateProjectGitConfigurationMutation,
 } from '@/ee/shared/mutations/automation/projectGit.mutations';
 import {ProjectGitConfigurationKeys} from '@/ee/shared/mutations/automation/projectGit.queries';
+import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import EEVersion from '@/shared/edition/EEVersion';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -39,6 +41,7 @@ import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projec
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectCategoryKeys} from '@/shared/queries/automation/projectCategories.queries';
+import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
@@ -55,6 +58,7 @@ import {
     GitPullRequestArrowIcon,
     LayoutTemplateIcon,
     PlusIcon,
+    RocketIcon,
     SendIcon,
     Share2Icon,
     Trash2Icon,
@@ -90,6 +94,16 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
+        {
+            id: currentWorkspaceId ?? 0,
+            projectId: project.id ?? 0,
+        },
+        false
+    );
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
     const ff_1041 = useFeatureFlagsStore()('ff-1041');
@@ -192,27 +206,42 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         pullProjectFromGitMutation.mutate({id: project.id!});
     };
 
-    const handleProjectListItemClick = useCallback((event: React.MouseEvent) => {
-        const target = event.target as HTMLElement;
+    const [isProjectDeploymentDialogOpen, setIsProjectDeploymentDialogOpen] = useState(false);
 
-        const interactiveSelectors = [
-            '[data-interactive]',
-            '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-item]',
-            '[data-radix-dropdown-menu-trigger]',
-            '[data-radix-collapsible-trigger]',
-        ].join(', ');
+    const handleProjectDeploymentDialogOpen = async (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
 
-        if (target.closest(interactiveSelectors)) {
+        if (!currentWorkspaceId || !project.id) {
             return;
         }
 
-        if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
-            return;
-        }
+        await projectDeploymentsQuery.refetch();
+    };
 
-        workflowsCollapsibleTriggerRef.current?.click();
-    }, []);
+    const handleProjectListItemClick = useCallback(
+        (event: MouseEvent) => {
+            if (isProjectDeploymentDialogOpen) {
+                return;
+            }
+
+            const target = event.target as HTMLElement;
+
+            const interactiveSelectors = [
+                '[data-interactive]',
+                '.dropdown-menu-item',
+                '[data-radix-dropdown-menu-item]',
+                '[data-radix-dropdown-menu-trigger]',
+                '[data-radix-collapsible-trigger]',
+            ].join(', ');
+
+            if (target.closest(interactiveSelectors) || workflowsCollapsibleTriggerRef.current?.contains(target)) {
+                return;
+            }
+
+            workflowsCollapsibleTriggerRef.current?.click();
+        },
+        [isProjectDeploymentDialogOpen]
+    );
 
     return (
         <>
@@ -362,21 +391,25 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             <span>PUBLISHED</span>
                                         </Badge>
 
-                                        {/*<ProjectDeploymentDialog*/}
-                                        {/*    projectDeployment={{*/}
-                                        {/*        name: project.name,*/}
-                                        {/*        projectId: project.id,*/}
-                                        {/*    }}*/}
-                                        {/*    triggerNode={*/}
-                                        {/*        <Button*/}
-                                        {/*            className="hover:bg-surface-neutral-primary-hover"*/}
-                                        {/*            size="sm"*/}
-                                        {/*            variant="ghost"*/}
-                                        {/*        >*/}
-                                        {/*            <RocketIcon /> Deploy*/}
-                                        {/*        </Button>*/}
-                                        {/*    }*/}
-                                        {/*/>*/}
+                                        <ProjectDeploymentDialog
+                                            onOpenChange={setIsProjectDeploymentDialogOpen}
+                                            projectDeployment={{
+                                                name: project.name,
+                                                projectId: project.id,
+                                            }}
+                                            projectDeployments={projectDeploymentsQuery.data}
+                                            projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+                                            triggerNode={
+                                                <Button
+                                                    className="hover:bg-surface-neutral-primary-hover"
+                                                    onClick={handleProjectDeploymentDialogOpen}
+                                                    size="sm"
+                                                    variant="outline"
+                                                >
+                                                    <RocketIcon /> Deploy
+                                                </Button>
+                                            }
+                                        />
                                     </>
                                 ) : (
                                     <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
