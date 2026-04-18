@@ -18,6 +18,7 @@ package com.bytechef.component.ai.llm.converter;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
@@ -71,7 +72,21 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
      */
     @Override
     public Object convert(@NonNull String text) {
-        return context.json(json -> json.read(processText(text), this.typeReference));
+        String processedText = processText(text);
+
+        try {
+            return context.json(json -> json.read(processedText, this.typeReference));
+        } catch (RuntimeException e) {
+            throw new ProviderException(
+                "The LLM response could not be parsed as JSON matching the configured response schema. "
+                    + "The model likely prefaced its output with narration, reasoning, or unsupported markdown "
+                    + "(only ```json fences are stripped automatically). "
+                    + "Try lowering the model temperature, tightening the system prompt to require JSON-only "
+                    + "output, or removing any non-JSON example outputs from the prompt. "
+                    + "Response preview: \"" + preview(processedText) + "\". "
+                    + "Parser error: " + e.getMessage(),
+                e);
+        }
     }
 
     /**
@@ -91,6 +106,12 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
                 ```%s```%n\
                 """;
         return String.format(template, this.jsonSchema);
+    }
+
+    private static String preview(String text) {
+        int limit = 200;
+
+        return text.length() <= limit ? text : text.substring(0, limit) + "...";
     }
 
     private static String processText(String text) {
