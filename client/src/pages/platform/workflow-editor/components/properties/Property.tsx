@@ -8,6 +8,7 @@ import {useClusterElementContext} from '@/pages/platform/workflow-editor/compone
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
 import FormControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/FormControlledArrayItems';
 import FormControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/FormControlledObjectEntries';
+import FormLookupValuesWatcher from '@/pages/platform/workflow-editor/components/properties/components/FormLookupValuesWatcher';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
@@ -135,6 +136,7 @@ const Property = ({
         selectValue,
         setDataPillPanelOpen,
         setIsFormulaMode,
+        setLookupDependsOnValues,
         setSelectValue,
         showInputTypeSwitchButton,
         type,
@@ -191,6 +193,18 @@ const Property = ({
             )}
             key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
         >
+            {control &&
+                (propertiesDataSource?.propertiesLookupDependsOn?.length ||
+                    optionsDataSource?.optionsLookupDependsOn?.length) && (
+                    <FormLookupValuesWatcher
+                        arrayIndex={arrayIndex}
+                        control={control}
+                        optionsLookupDependsOn={optionsDataSource?.optionsLookupDependsOn}
+                        propertiesLookupDependsOn={propertiesDataSource?.propertiesLookupDependsOn}
+                        setLookupDependsOnValues={setLookupDependsOnValues}
+                    />
+                )}
+
             {mentionInput && currentComponent && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
                 <PropertyMentionsInput
                     controlType={controlType || 'TEXT'}

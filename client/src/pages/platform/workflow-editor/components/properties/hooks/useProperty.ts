@@ -161,6 +161,7 @@ type UsePropertyReturnType = {
     setControlledFromAi: Dispatch<SetStateAction<boolean | undefined>>;
     setDataPillPanelOpen: (open: boolean) => void;
     setIsFormulaMode: Dispatch<SetStateAction<boolean>>;
+    setLookupDependsOnValues: Dispatch<SetStateAction<Array<unknown> | undefined>>;
     setSelectValue: Dispatch<SetStateAction<string>>;
     showInputTypeSwitchButton: boolean;
     type?: PropertyAllType['type'];
@@ -1543,22 +1544,26 @@ export const useProperty = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps -- omit mentionInputValue/inputValue to avoid feedback loop
     }, [propertyParameterValue, mentionInput, controlType]);
 
-    // set options lookup dependencies
+    // Set options lookup dependencies from the saved workflow parameters. When `control`
+    // is provided (array item / dialog form), FormLookupValuesWatcher subscribes to
+    // react-hook-form values instead so in-progress edits trigger a refetch immediately.
     useEffect(() => {
+        if (control) {
+            return;
+        }
+
         if (!optionsDataSource?.optionsLookupDependsOn) {
             return;
         }
 
-        const parametersSource = currentComponent?.parameters || (control ? control._formValues : undefined);
-
-        if (!parametersSource) {
+        if (!currentComponent?.parameters) {
             return;
         }
 
         const optionsLookupDependsOnValues: unknown[] = optionsDataSource.optionsLookupDependsOn.map(
             (optionLookupDependency) => {
                 const resolvedValue = resolvePath(
-                    parametersSource,
+                    currentComponent.parameters,
                     optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
                 );
 
@@ -1573,22 +1578,24 @@ export const useProperty = ({
         setLookupDependsOnValues(optionsLookupDependsOnValues);
     }, [arrayIndex, control, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
 
-    // set properties lookup dependencies
+    // See comment above; same control-present carve-out.
     useEffect(() => {
+        if (control) {
+            return;
+        }
+
         if (!propertiesDataSource?.propertiesLookupDependsOn) {
             return;
         }
 
-        const parametersSource = currentComponent?.parameters || (control ? control._formValues : undefined);
-
-        if (!parametersSource) {
+        if (!currentComponent?.parameters) {
             return;
         }
 
         const propertiesLookupDependsOnValues: unknown[] = propertiesDataSource.propertiesLookupDependsOn.map(
             (propertyLookupDependency) => {
                 const resolvedValue = resolvePath(
-                    parametersSource,
+                    currentComponent.parameters,
                     propertyLookupDependency.replace('[index]', `[${arrayIndex}]`)
                 );
 
@@ -1800,6 +1807,7 @@ export const useProperty = ({
         setControlledFromAi,
         setDataPillPanelOpen,
         setIsFormulaMode,
+        setLookupDependsOnValues,
         setSelectValue,
         showInputTypeSwitchButton,
         type,
