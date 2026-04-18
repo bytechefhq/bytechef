@@ -6,7 +6,18 @@ import {
     UpdateWorkflowNodeParameterOperationRequest,
     WorkflowNodeParameterApi,
 } from '@/shared/middleware/platform/configuration';
-import {useMutation} from '@tanstack/react-query';
+import {QueryClient, useMutation, useQueryClient} from '@tanstack/react-query';
+
+// Dependent queries read their inputs from the persisted workflow on the backend, so any
+// parameter write can shift their results. Invalidate here to force a refetch instead of
+// serving cached (possibly empty) responses keyed by a since-stale dependency snapshot.
+function invalidateDependentQueries(queryClient: QueryClient) {
+    queryClient.invalidateQueries({queryKey: ['workflowNodeDynamicProperties']});
+    queryClient.invalidateQueries({queryKey: ['clusterElementDynamicProperties']});
+    queryClient.invalidateQueries({queryKey: ['workflowNodeOptions']});
+    queryClient.invalidateQueries({queryKey: ['clusterElementNodeOptions']});
+    queryClient.invalidateQueries({queryKey: ['clusterElementOptions']});
+}
 
 interface DeleteWorkflowNodeParameterProps {
     onSuccess?: (
@@ -16,14 +27,21 @@ interface DeleteWorkflowNodeParameterProps {
     onError?: (error: Error, variables: DeleteWorkflowNodeParameterRequest) => void;
 }
 
-export const useDeleteWorkflowNodeParameterMutation = (mutationProps?: DeleteWorkflowNodeParameterProps) =>
-    useMutation({
+export const useDeleteWorkflowNodeParameterMutation = (mutationProps?: DeleteWorkflowNodeParameterProps) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
         mutationFn: (request: DeleteWorkflowNodeParameterRequest) => {
             return new WorkflowNodeParameterApi().deleteWorkflowNodeParameter(request);
         },
         onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
+        onSuccess: (result, variables) => {
+            invalidateDependentQueries(queryClient);
+
+            mutationProps?.onSuccess?.(result, variables);
+        },
     });
+};
 
 interface DeleteClusterElementParameterProps {
     onSuccess?: (
@@ -33,14 +51,21 @@ interface DeleteClusterElementParameterProps {
     onError?: (error: Error, variables: DeleteClusterElementParameterOperationRequest) => void;
 }
 
-export const useDeleteClusterElementParameterMutation = (mutationProps?: DeleteClusterElementParameterProps) =>
-    useMutation({
+export const useDeleteClusterElementParameterMutation = (mutationProps?: DeleteClusterElementParameterProps) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
         mutationFn: (request: DeleteClusterElementParameterOperationRequest) => {
             return new WorkflowNodeParameterApi().deleteClusterElementParameter(request);
         },
         onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
+        onSuccess: (result, variables) => {
+            invalidateDependentQueries(queryClient);
+
+            mutationProps?.onSuccess?.(result, variables);
+        },
     });
+};
 
 interface UpdateWorkflowNodeParameterProps {
     onSuccess?: (
@@ -50,14 +75,21 @@ interface UpdateWorkflowNodeParameterProps {
     onError?: (error: Error, variables: UpdateWorkflowNodeParameterOperationRequest) => void;
 }
 
-export const useUpdateWorkflowNodeParameterMutation = (mutationProps?: UpdateWorkflowNodeParameterProps) =>
-    useMutation({
+export const useUpdateWorkflowNodeParameterMutation = (mutationProps?: UpdateWorkflowNodeParameterProps) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
         mutationFn: (request: UpdateWorkflowNodeParameterOperationRequest) => {
             return new WorkflowNodeParameterApi().updateWorkflowNodeParameter(request);
         },
         onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
+        onSuccess: (result, variables) => {
+            invalidateDependentQueries(queryClient);
+
+            mutationProps?.onSuccess?.(result, variables);
+        },
     });
+};
 
 interface UpdateClusterElementParameterProps {
     onSuccess?: (
@@ -67,11 +99,18 @@ interface UpdateClusterElementParameterProps {
     onError?: (error: Error, variables: UpdateClusterElementParameterOperationRequest) => void;
 }
 
-export const useUpdateClusterElementParameterMutation = (mutationProps?: UpdateClusterElementParameterProps) =>
-    useMutation({
+export const useUpdateClusterElementParameterMutation = (mutationProps?: UpdateClusterElementParameterProps) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
         mutationFn: (request: UpdateClusterElementParameterOperationRequest) => {
             return new WorkflowNodeParameterApi().updateClusterElementParameter(request);
         },
         onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
+        onSuccess: (result, variables) => {
+            invalidateDependentQueries(queryClient);
+
+            mutationProps?.onSuccess?.(result, variables);
+        },
     });
+};
