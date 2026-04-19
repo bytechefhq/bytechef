@@ -156,18 +156,18 @@ public class KnowledgeBaseTagServiceImpl implements KnowledgeBaseTagService {
             if (!tagsToSave.isEmpty()) {
                 List<Tag> savedTags = tagService.save(tagsToSave);
 
-                List<Tag> withIds = new ArrayList<>(tags);
+                List<Tag> tagsWithIds = new ArrayList<>(tags);
                 int index = 0;
 
-                for (int i = 0; i < withIds.size(); i++) {
-                    Tag tag = withIds.get(i);
+                for (int i = 0; i < tagsWithIds.size(); i++) {
+                    Tag tag = tagsWithIds.get(i);
 
                     if (tag.getId() == null) {
-                        withIds.set(i, savedTags.get(index++));
+                        tagsWithIds.set(i, savedTags.get(index++));
                     }
                 }
 
-                resolvedTags = withIds;
+                resolvedTags = tagsWithIds;
             } else {
                 resolvedTags = tags;
             }

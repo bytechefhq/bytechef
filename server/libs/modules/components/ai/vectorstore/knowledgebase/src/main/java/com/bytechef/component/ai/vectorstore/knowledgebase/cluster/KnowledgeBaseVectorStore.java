@@ -97,10 +97,6 @@ public final class KnowledgeBaseVectorStore {
                     inputParameters, ParametersFactory.create(connectionParameters), null));
     }
 
-    public static VectorStore createVectorStore(org.springframework.ai.vectorstore.VectorStore vectorStore) {
-        return new VectorStoreImpl(null, null, null, null, null, vectorStore);
-    }
-
     public static VectorStore createVectorStore(
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
         org.springframework.ai.vectorstore.VectorStore vectorStore) {
@@ -110,21 +106,20 @@ public final class KnowledgeBaseVectorStore {
 
     public static VectorStore createVectorStore(
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
         KnowledgeBaseService knowledgeBaseService, org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
         return new VectorStoreImpl(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, null,
-            knowledgeBaseFileStorage, knowledgeBaseService, vectorStore);
+            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, null, knowledgeBaseFileStorage,
+            knowledgeBaseService, vectorStore);
     }
 
     public static VectorStore createVectorStore(
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService, org.springframework.ai.vectorstore.VectorStore vectorStore) {
+        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
+        org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
         return new VectorStoreImpl(
             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseDocumentTagService,

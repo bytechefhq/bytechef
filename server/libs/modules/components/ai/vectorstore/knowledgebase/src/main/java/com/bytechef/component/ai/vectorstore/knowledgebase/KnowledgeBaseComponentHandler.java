@@ -62,9 +62,9 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagService knowledgeBaseTagService,
-        TagService tagService, @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
+        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
+        KnowledgeBaseTagService knowledgeBaseTagService, TagService tagService,
+        @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
 
         this.componentDefinition =
             new KnowledgeBaseVectorStoreComponentDefinitionImpl(

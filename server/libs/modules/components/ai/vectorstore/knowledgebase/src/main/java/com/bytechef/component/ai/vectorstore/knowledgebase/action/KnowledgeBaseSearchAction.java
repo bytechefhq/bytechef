@@ -33,18 +33,15 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagSer
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
 import com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -107,16 +104,13 @@ public final class KnowledgeBaseSearchAction {
                     .required(false))
             .output()
             .perform((MultipleConnectionsPerformFunction) (
-                inputParameters, componentConnections, extensions,
-                context) -> perform(
-                    inputParameters, componentConnections, extensions, context, vectorStore,
-                    knowledgeBaseDocumentTagService));
+                inputParameters, componentConnections, extensions, context) -> perform(
+                    inputParameters, vectorStore, knowledgeBaseDocumentTagService));
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static Object perform(
-        Parameters inputParameters, Map<String, ComponentConnection> componentConnections, Parameters extensions,
-        ActionContext context, VectorStore vectorStore,
+        Parameters inputParameters, VectorStore vectorStore,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
         Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
