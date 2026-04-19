@@ -53,7 +53,12 @@ export function useWorkflowTestStream({
     const {close, error} = useSSE<WorkflowTestExecution>(streamRequest, {
         eventHandlers: {
             ask_user_question: (data) => {
-                if (typeof data !== 'object' || data === null || !('questions' in data)) {
+                if (
+                    typeof data !== 'object' ||
+                    data === null ||
+                    !('questions' in data) ||
+                    !Array.isArray((data as {questions: unknown}).questions)
+                ) {
                     console.error('Received malformed ask_user_question event:', data);
 
                     return;
@@ -65,7 +70,6 @@ export function useWorkflowTestStream({
                 setResumeUrl(questionEvent.resumeUrl ?? null);
                 setWorkflowIsRunning(false);
                 setStreamRequest(null);
-                persistJobId(null);
             },
             error: (data) => {
                 setWorkflowIsRunning(false);

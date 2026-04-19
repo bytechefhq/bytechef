@@ -80,8 +80,11 @@ export default function useClusterElementsCanvasDialog({
         return componentName === 'dataStreamProcessor' && operationName === 'fieldMapper';
     }, [isDataStreamClusterRoot, workflowNodeName, workflow.definition]);
 
+    const preferenceWorkflowReferenceId = workflowReferenceId ?? workflow.id;
     const preferenceKey =
-        workflowReferenceId && workflowNodeName ? `${workflowReferenceId}:${workflowNodeName}` : undefined;
+        preferenceWorkflowReferenceId && workflowNodeName
+            ? `${preferenceWorkflowReferenceId}:${workflowNodeName}`
+            : undefined;
 
     useEffect(() => {
         if (isAiAgentClusterRoot && preferenceKey) {

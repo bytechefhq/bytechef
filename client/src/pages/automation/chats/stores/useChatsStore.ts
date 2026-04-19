@@ -9,6 +9,7 @@ import {devtools} from 'zustand/middleware';
 interface ConversationCacheEntryI {
     conversationId: string;
     messages: ThreadMessageLike[];
+    resumeUrl: string | null;
 }
 
 interface ChatStateI {
@@ -71,9 +72,10 @@ export const useChatsStore = create<ChatStateI>()(
                     conversationCache: updatedCache,
                     conversationId: generateId(),
                     messages: [],
+                    resumeUrl: null,
                 };
             }),
-        resetMessages: () => set({messages: []}),
+        resetMessages: () => set({messages: [], resumeUrl: null}),
         setCurrentChatName: (name) => set({currentChatName: name}),
         setIsRunning: (isRunning) => set({isRunning}),
         setLastAssistantMessageContent: (content: string) =>
@@ -97,6 +99,7 @@ export const useChatsStore = create<ChatStateI>()(
                     updatedCache[state.activeWorkflowExecutionId] = {
                         conversationId: state.conversationId,
                         messages: state.messages,
+                        resumeUrl: state.resumeUrl,
                     };
                 }
 
@@ -108,6 +111,7 @@ export const useChatsStore = create<ChatStateI>()(
                     conversationId: cached?.conversationId ?? generateId(),
                     currentChatName: null,
                     messages: cached?.messages ?? [],
+                    resumeUrl: cached?.resumeUrl ?? null,
                 };
             }),
     }))

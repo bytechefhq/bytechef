@@ -98,7 +98,12 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
 
     const handleAskUserQuestion = useCallback(
         (data: unknown) => {
-            if (typeof data !== 'object' || data === null || !('questions' in data)) {
+            if (
+                typeof data !== 'object' ||
+                data === null ||
+                !('questions' in data) ||
+                !Array.isArray((data as {questions: unknown}).questions)
+            ) {
                 console.error('Received malformed ask_user_question event:', data);
 
                 return;
