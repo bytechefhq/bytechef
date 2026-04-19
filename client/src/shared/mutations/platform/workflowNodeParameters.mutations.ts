@@ -6,17 +6,24 @@ import {
     UpdateWorkflowNodeParameterOperationRequest,
     WorkflowNodeParameterApi,
 } from '@/shared/middleware/platform/configuration';
+import {
+    ClusterElementDynamicPropertyKeys,
+    WorkflowNodeDynamicPropertyKeys,
+} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
+import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {QueryClient, useMutation, useQueryClient} from '@tanstack/react-query';
+
+const clusterElementOptionsQueryKey = ['clusterElementOptions'] as const;
 
 // Dependent queries read their inputs from the persisted workflow on the backend, so any
 // parameter write can shift their results. Invalidate here to force a refetch instead of
 // serving cached (possibly empty) responses keyed by a since-stale dependency snapshot.
 function invalidateDependentQueries(queryClient: QueryClient) {
-    queryClient.invalidateQueries({queryKey: ['workflowNodeDynamicProperties']});
-    queryClient.invalidateQueries({queryKey: ['clusterElementDynamicProperties']});
-    queryClient.invalidateQueries({queryKey: ['workflowNodeOptions']});
-    queryClient.invalidateQueries({queryKey: ['clusterElementNodeOptions']});
-    queryClient.invalidateQueries({queryKey: ['clusterElementOptions']});
+    queryClient.invalidateQueries({queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties});
+    queryClient.invalidateQueries({queryKey: ClusterElementDynamicPropertyKeys.clusterElementDynamicProperties});
+    queryClient.invalidateQueries({queryKey: WorkflowNodeOptionKeys.workflowNodeOptions});
+    queryClient.invalidateQueries({queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions});
+    queryClient.invalidateQueries({queryKey: clusterElementOptionsQueryKey});
 }
 
 interface DeleteWorkflowNodeParameterProps {
