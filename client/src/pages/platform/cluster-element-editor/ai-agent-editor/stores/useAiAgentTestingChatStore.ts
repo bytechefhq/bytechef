@@ -77,6 +77,7 @@ const useAiAgentTestingChatStore = create<AiAgentTestingChatStateI>()(
             truncateMessagesFrom: (index: number) =>
                 set((state) => ({
                     messages: state.messages.slice(0, Math.max(0, index)),
+                    resumeUrl: null,
                 })),
 
             resumeUrl: null,

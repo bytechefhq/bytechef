@@ -63,7 +63,12 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
     const {connectionState, error: sseError} = useSSE(streamRequest, {
         eventHandlers: {
             ask_user_question: (data) => {
-                if (typeof data !== 'object' || data === null || !('questions' in data)) {
+                if (
+                    typeof data !== 'object' ||
+                    data === null ||
+                    !('questions' in data) ||
+                    !Array.isArray((data as {questions: unknown}).questions)
+                ) {
                     console.error('Received malformed ask_user_question event:', data);
 
                     return;
