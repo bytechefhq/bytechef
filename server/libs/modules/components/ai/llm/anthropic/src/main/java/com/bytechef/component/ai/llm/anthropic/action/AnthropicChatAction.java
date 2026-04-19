@@ -53,6 +53,25 @@ public class AnthropicChatAction {
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
         String apiKey = connectionParameters.getString(TOKEN);
 
+        AnthropicChatOptions.Builder optionsBuilder = AnthropicChatOptions.builder()
+            .model(inputParameters.getRequiredString(MODEL))
+            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .topK(inputParameters.getInteger(TOP_K));
+
+        // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
+        Double temperature = inputParameters.getDouble(TEMPERATURE);
+
+        if (temperature != null) {
+            optionsBuilder.temperature(temperature);
+        } else {
+            Double topP = inputParameters.getDouble(TOP_P);
+
+            if (topP != null) {
+                optionsBuilder.topP(topP);
+            }
+        }
+
         return AnthropicChatModel.builder()
             .anthropicClient(
                 AnthropicOkHttpClient.builder()
@@ -62,15 +81,7 @@ public class AnthropicChatAction {
                 AnthropicOkHttpClientAsync.builder()
                     .apiKey(apiKey)
                     .build())
-            .options(
-                AnthropicChatOptions.builder()
-                    .model(inputParameters.getRequiredString(MODEL))
-                    .temperature(inputParameters.getDouble(TEMPERATURE))
-                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .topP(inputParameters.getDouble(TOP_P))
-                    .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                    .topK(inputParameters.getInteger(TOP_K))
-                    .build())
+            .options(optionsBuilder.build())
             .build();
     };
 
