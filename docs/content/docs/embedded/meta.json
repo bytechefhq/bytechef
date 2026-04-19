@@ -6,6 +6,22 @@
   "pages": [
     "---Getting Started---",
     "index",
-    "quickstart"
+    "quickstart",
+    "integrations/index",
+    "...integrations",
+    "configurations/index",
+    "...configurations",
+    "mcp-servers/index",
+    "...mcp-servers",
+    "app-events/index",
+    "...app-events",
+    "automations/index",
+    "...automations",
+    "connected-users/index",
+    "...connected-users",
+    "executions/index",
+    "...executions",
+    "connections/index",
+    "...connections"
   ]
 }
