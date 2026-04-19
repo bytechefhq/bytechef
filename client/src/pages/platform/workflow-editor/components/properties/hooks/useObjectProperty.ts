@@ -105,7 +105,9 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             return false;
         }
 
-        return !!subProperties?.some((subProperty) => subProperty.name === encodedNewPropertyName);
+        return !!subProperties?.some(
+            (subProperty) => !!subProperty.name && encodePath(subProperty.name) === encodedNewPropertyName
+        );
     }, [encodedNewPropertyName, subProperties]);
 
     const handleAddItemClick = useCallback(() => {
