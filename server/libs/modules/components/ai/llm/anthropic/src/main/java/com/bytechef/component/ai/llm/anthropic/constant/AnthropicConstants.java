@@ -25,14 +25,16 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERT
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
@@ -49,6 +51,25 @@ public class AnthropicConstants {
         .label("Max Tokens")
         .description("The maximum number of tokens to generate in the chat completion.")
         .required(true);
+
+    // Anthropic models accept either Temperature or Top P, never both — leave the unused field empty.
+    public static final ModifiableNumberProperty TEMPERATURE_PROPERTY = number(TEMPERATURE)
+        .label("Temperature")
+        .description(
+            "Controls randomness: higher values make the output more random, lower values make it more focused " +
+                "and deterministic. Set either Temperature or Top P, not both.")
+        .minValue(0)
+        .maxValue(1)
+        .advancedOption(true);
+
+    public static final ModifiableNumberProperty TOP_P_PROPERTY = number(TOP_P)
+        .label("Top P")
+        .description(
+            "Nucleus sampling: the model considers tokens whose cumulative probability mass adds up to top_p. " +
+                "Set either Temperature or Top P, not both.")
+        .minValue(0)
+        .maxValue(1)
+        .advancedOption(true);
 
     private static final Map<String, String> MODEL_MAP = new LinkedHashMap<>();
 
