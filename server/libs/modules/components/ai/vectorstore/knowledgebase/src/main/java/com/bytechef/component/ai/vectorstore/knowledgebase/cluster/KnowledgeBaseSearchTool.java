@@ -35,7 +35,6 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -45,8 +44,7 @@ public class KnowledgeBaseSearchTool {
 
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
-        KnowledgeBaseService knowledgeBaseService,
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService, KnowledgeBaseService knowledgeBaseService,
         KnowledgeBaseTagService knowledgeBaseTagService) {
 
         VectorStore kbVectorStore = createVectorStore(knowledgeBaseDocumentTagService, vectorStore);
@@ -82,11 +80,7 @@ public class KnowledgeBaseSearchTool {
                 ComponentConnection vectorStoreComponentConnection = componentConnections.get(KNOWLEDGE_BASE);
 
                 return kbVectorStore.search(
-                    inputParameters,
-                    ParametersFactory.create(
-                        vectorStoreComponentConnection == null
-                            ? Map.of() : vectorStoreComponentConnection.getParameters()),
-                    null);
+                    inputParameters, ParametersFactory.create(vectorStoreComponentConnection), null);
             });
     }
 }
