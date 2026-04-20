@@ -1,8 +1,6 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {Skeleton} from '@/components/ui/skeleton';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
-import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {Project} from '@/shared/middleware/automation/configuration';
 import {FocusEventHandler} from 'react';
 
 const ProjectLabel = ({project}: {project: Project}) => (
@@ -13,27 +11,20 @@ const ProjectLabel = ({project}: {project: Project}) => (
     </div>
 );
 
-const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
-    apiCollections,
-    onBlur,
-    onChange,
-    value,
-}: {
-    apiCollections: boolean;
+interface ProjectDeploymentDialogBasicStepProjectsComboBoxProps {
     onBlur: FocusEventHandler;
     onChange: (item?: ComboBoxItemType) => void;
+    projects?: Project[];
     value?: number;
-}) => {
-    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+}
 
-    const {data: projects} = useGetWorkspaceProjectsQuery({
-        apiCollections,
-        id: currentWorkspaceId!,
-        includeAllFields: false,
-        status: ProjectStatus.Published,
-    });
-
-    return projects ? (
+const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
+    onBlur,
+    onChange,
+    projects,
+    value,
+}: ProjectDeploymentDialogBasicStepProjectsComboBoxProps) =>
+    projects ? (
         <ComboBox
             emptyMessage="No published projects found. Please publish a project first."
             items={projects.map(
@@ -52,6 +43,5 @@ const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
     ) : (
         <Skeleton className="h-9 w-full" />
     );
-};
 
 export default ProjectDeploymentDialogBasicStepProjectsComboBox;

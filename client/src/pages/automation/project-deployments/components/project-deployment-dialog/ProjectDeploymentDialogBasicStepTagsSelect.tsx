@@ -1,17 +1,20 @@
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
+import {Skeleton} from '@/components/ui/skeleton';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {ControllerRenderProps} from 'react-hook-form';
+
+interface ProjectDeploymentDialogBasicStepTagsSelectProps {
+    field: ControllerRenderProps<ProjectDeployment, 'tags'>;
+    onCreateOption: (inputValue: string) => void;
+    projectDeployment?: ProjectDeployment;
+}
 
 const ProjectDeploymentDialogBasicStepTagsSelect = ({
     field,
     onCreateOption,
     projectDeployment,
-}: {
-    field: ControllerRenderProps<ProjectDeployment, 'tags'>;
-    onCreateOption: (inputValue: string) => void;
-    projectDeployment?: ProjectDeployment;
-}) => {
+}: ProjectDeploymentDialogBasicStepTagsSelectProps) => {
     const {data: tags} = useGetProjectDeploymentTagsQuery();
 
     const tagNames = projectDeployment?.tags?.map((tag) => tag.name);
@@ -32,7 +35,7 @@ const ProjectDeploymentDialogBasicStepTagsSelect = ({
             })}
         />
     ) : (
-        <>Loading....</>
+        <Skeleton className="h-9 w-full" />
     );
 };
 

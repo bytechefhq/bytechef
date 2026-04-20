@@ -23,6 +23,8 @@ import {
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
@@ -65,6 +67,13 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
     const [curProjectVersion, setCurProjectVersion] = useState<number | undefined>(apiCollection?.projectVersion);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {data: projects} = useGetWorkspaceProjectsQuery({
+        apiCollections: true,
+        id: currentWorkspaceId!,
+        includeAllFields: false,
+    });
 
     const form = useForm<FormInputType, void, FormOutputType>({
         defaultValues: {
@@ -170,7 +179,6 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
 
                                         <FormControl>
                                             <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                                apiCollections={true}
                                                 onBlur={field.onBlur}
                                                 onChange={(item) => {
                                                     if (item) {
@@ -185,6 +193,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                                         setCurProjectVersion(undefined);
                                                     }
                                                 }}
+                                                projects={projects}
                                                 value={field.value}
                                             />
                                         </FormControl>

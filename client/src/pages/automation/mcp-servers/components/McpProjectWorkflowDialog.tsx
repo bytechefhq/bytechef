@@ -16,6 +16,7 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     McpProject,
     McpServer,
@@ -23,6 +24,7 @@ import {
     useToolEligibleProjectVersionWorkflowsQuery,
     useUpdateMcpProjectMutation,
 } from '@/shared/middleware/graphql';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useMemo, useState} from 'react';
@@ -54,6 +56,14 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
     const [currentProjectVersion, setCurrentProjectVersion] = useState<number | undefined>(
         isEditMode ? (mcpProject.projectVersion ?? undefined) : undefined
     );
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {data: projects} = useGetWorkspaceProjectsQuery({
+        apiCollections: false,
+        id: currentWorkspaceId!,
+        includeAllFields: false,
+    });
 
     const initialSelectedWorkflowIds = useMemo(() => {
         if (!isEditMode) {
@@ -230,7 +240,6 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
 
                                             <FormControl>
                                                 <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                                    apiCollections={false}
                                                     onBlur={field.onBlur}
                                                     onChange={(item) => {
                                                         if (item) {
@@ -241,6 +250,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                                                             setCurrentProjectVersion(undefined);
                                                         }
                                                     }}
+                                                    projects={projects}
                                                     value={field.value}
                                                 />
                                             </FormControl>
