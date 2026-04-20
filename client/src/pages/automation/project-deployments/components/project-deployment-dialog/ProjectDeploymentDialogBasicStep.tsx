@@ -1,4 +1,6 @@
 import {Note} from '@/components/Note';
+import ReadOnlyInput from '@/components/ReadOnlyInput/ReadOnlyInput';
+import {Empty} from '@/components/ui/empty';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -9,8 +11,10 @@ import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/autom
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import ProjectDeploymentDialogBasicStepTagsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {InfoIcon, LayersIcon, PlusIcon, RefreshCwIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -21,6 +25,7 @@ interface ProjectDialogBasicStepProps {
     changeProjectVersion: boolean;
     control: Control<ProjectDeployment>;
     getValues: UseFormGetValues<ProjectDeployment>;
+    handleTabChange: (tab: 'new-deployment' | 'change-version') => void;
     projectDeployment: ProjectDeployment | undefined;
     projectDeployments?: ProjectDeployment[];
     projectDeploymentsLoading?: boolean;
@@ -31,6 +36,7 @@ const ProjectDeploymentDialogBasicStep = ({
     changeProjectVersion,
     control,
     getValues,
+    handleTabChange,
     projectDeployment,
     projectDeployments,
     projectDeploymentsLoading,
@@ -41,8 +47,17 @@ const ProjectDeploymentDialogBasicStep = ({
     const [currentProjectVersion, setCurrentProjectVersion] = useState<number | undefined>(getValues('projectVersion'));
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {data: projects} = useGetWorkspaceProjectsQuery({
+        apiCollections: false,
+        id: currentWorkspaceId!,
+        includeAllFields: false,
+    });
 
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
+
+    const currentProjectName = projects?.find((project) => project.id === currentProjectId)?.name;
 
     const handleDeploymentSelectChange = (value: string) => {
         setSelectedDeploymentId(value);
@@ -87,7 +102,14 @@ const ProjectDeploymentDialogBasicStep = ({
     const hasDeployments = (projectDeployments?.length ?? 0) > 0;
 
     return (
-        <Tabs defaultValue="new-deployment">
+        <Tabs
+            defaultValue={projectDeployments?.length ? 'change-version' : 'new-deployment'}
+            onValueChange={(value) => {
+                const normalizedValue = value as 'new-deployment' | 'change-version';
+
+                handleTabChange(normalizedValue);
+            }}
+        >
             <TabsList>
                 <TabsTrigger className="gap-2 px-3 py-1" value="new-deployment">
                     <PlusIcon className="size-4" />
@@ -119,9 +141,9 @@ const ProjectDeploymentDialogBasicStep = ({
 
                                 <FormControl>
                                     <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                        apiCollections={false}
                                         onBlur={field.onBlur}
                                         onChange={handleProjectSelectionChange}
+                                        projects={projects}
                                         value={field.value}
                                     />
                                 </FormControl>
@@ -244,7 +266,13 @@ const ProjectDeploymentDialogBasicStep = ({
             <TabsContent className="m-0 flex flex-col gap-4" value="change-version">
                 {hasDeployments && currentProjectId && (!projectDeployment?.id || changeProjectVersion) && (
                     <>
-                        <FormItem className="pt-4">
+                        <ReadOnlyInput
+                            className="pt-4"
+                            label="Project"
+                            text={currentProjectName || `Project ${currentProjectId}`}
+                        />
+
+                        <FormItem>
                             <FormLabel>Deployment</FormLabel>
 
                             <FormControl>
@@ -306,13 +334,19 @@ const ProjectDeploymentDialogBasicStep = ({
                 )}
 
                 {!hasDeployments && (
-                    <div className="flex w-full flex-col items-center justify-center gap-4 pt-4">
-                        <div className="flex size-10 items-center justify-center rounded-lg bg-surface-neutral-secondary">
+                    <Empty>
+                        <div className="flex items-center justify-center rounded-lg bg-surface-neutral-secondary p-2">
                             <LayersIcon />
                         </div>
 
-                        <h2 className="text-xl">No deployments for this project yet</h2>
-                    </div>
+                        <div className="flex flex-col items-center gap-2">
+                            <h2 className="text-xl">No deployments for this project yet</h2>
+
+                            <p className="text-sm text-content-neutral-secondary">
+                                Head to the "New" tab to create one.
+                            </p>
+                        </div>
+                    </Empty>
                 )}
             </TabsContent>
         </Tabs>
