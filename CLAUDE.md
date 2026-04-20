@@ -75,12 +75,12 @@ docker compose -f docker-compose.dev.server.yml up -d
 ## Architecture Overview
 
 ### Core Technology Stack
-- **Backend**: Java 25 with Spring Boot 4.0.2
-- **Frontend**: React 19.2 with TypeScript 5.9, Vite 7.3, TailwindCSS 3.4
+- **Backend**: Java 25 with Spring Boot 4.0.5
+- **Frontend**: React 19.2 with TypeScript 5.9, Vite 8, TailwindCSS 3.4
 - **Database**: PostgreSQL 15+ with Liquibase migrations
 - **Message Broker**: Memory(default), Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS
 - **Build System**: Gradle 8+ with Kotlin DSL
-- **Code Execution**: GraalVM Polyglot 25.0.1 (Java, JavaScript, Python, Ruby)
+- **Code Execution**: GraalVM Polyglot 25.0.2 (Java, JavaScript, Python, Ruby)
 - **Testing**: JUnit 5, Vitest 4, Testcontainers
 - **Node.js**: Version 20.19+ required for client development
 - **Additional Tools**: MapStruct 1.6.3, Jackson 3.x (`tools.jackson` package), SpringDoc OpenAPI 3.0.0
@@ -98,9 +98,10 @@ docker compose -f docker-compose.dev.server.yml up -d
     - `automation-ai/` - AI-powered automation features
     - `automation-configuration/` - Project and workflow configuration
     - `automation-data-table/` - Data table management
-    - `automation-execution/` - Workflow execution services
     - `automation-knowledge-base/` - Knowledge base integration
     - `automation-mcp/` - MCP (Model Context Protocol) integration
+    - `automation-search/` - Search services for automation entities
+    - `automation-swagger/` - OpenAPI/Swagger surface for automation APIs
     - `automation-task/` - Task management services
     - `automation-workflow/` - Workflow coordination and execution
 
@@ -133,6 +134,7 @@ The `server/ee/` directory contains microservices for distributed deployment:
 - Use ByteChef Enterprise license header (not Apache 2.0) for all files under `server/ee/`
 - Add `@version ee` Javadoc tag to all classes under `server/ee/`
 - `api-gateway-app/` - API Gateway with routing
+- `ai-gateway-app/` - AI gateway service for routing model traffic
 - `ai-copilot-app/` - AI Copilot service for workflow assistance
 - `config-server-app/` - Spring Cloud Config server
 - `configuration-app/` - Configuration management service
@@ -145,7 +147,7 @@ The `server/ee/` directory contains microservices for distributed deployment:
 - `runtime-job-app/` - Runtime job execution
 
 ### Available Components
-ByteChef includes 160+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
+ByteChef includes 180+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
 
 ## Development Patterns
 
