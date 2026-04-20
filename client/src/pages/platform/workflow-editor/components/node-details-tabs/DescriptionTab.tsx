@@ -1,3 +1,4 @@
+import ReadOnlyInput from '@/components/ReadOnlyInput/ReadOnlyInput';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
@@ -188,19 +189,19 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
-            <fieldset className="space-y-1">
-                <Label>{currentNode?.taskDispatcher ? 'Flow Control' : 'Component'}</Label>
-
-                <div className="flex h-9 w-full items-center gap-2 rounded-md border border-dashed border-input bg-white px-3 py-1 md:text-sm">
-                    {'icon' in nodeDefinition && nodeDefinition.icon ? (
-                        <InlineSVG className="size-5 shrink-0" src={nodeDefinition.icon} />
-                    ) : (
-                        <ComponentIcon />
-                    )}
-
-                    <span className="min-w-0 truncate">{nodeDefinition.title}</span>
-                </div>
-            </fieldset>
+            {nodeDefinition.title && (
+                <ReadOnlyInput
+                    inlineIcon={
+                        'icon' in nodeDefinition && nodeDefinition.icon ? (
+                            <InlineSVG className="size-5 shrink-0" src={nodeDefinition.icon} />
+                        ) : (
+                            <ComponentIcon />
+                        )
+                    }
+                    label="Component"
+                    text={nodeDefinition.title}
+                />
+            )}
 
             <fieldset className="space-y-1">
                 <Label>Title</Label>
