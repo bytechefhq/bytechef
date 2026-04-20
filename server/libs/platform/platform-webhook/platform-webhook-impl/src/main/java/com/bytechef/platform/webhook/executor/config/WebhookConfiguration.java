@@ -88,16 +88,16 @@ public class WebhookConfiguration {
     @Bean
     WebhookWorkflowExecutor webhookExecutor(
         ChildJobPrincipalFactory childJobPrincipalFactory, ContextService contextService,
-        CounterService counterService, Environment environment, Evaluator evaluator,
-        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        PrincipalJobFacade principalJobFacade, JobService jobService,
-        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
+        CounterService counterService, TaskFileStorage durableTaskFileStorage, Environment environment,
+        Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
+        JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         SseStreamBridgeRegistry sseStreamBridgeRegistry, SubflowResolver subflowResolver,
         TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
-        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage(durableTaskFileStorage);
 
         ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 

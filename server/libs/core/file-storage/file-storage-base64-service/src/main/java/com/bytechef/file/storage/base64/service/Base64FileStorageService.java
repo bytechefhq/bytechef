@@ -56,9 +56,7 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public long getContentLength(String directory, FileEntry fileEntry) throws FileStorageException {
-        String url = fileEntry.getUrl();
-
-        String string = EncodingUtils.base64DecodeToString(url.replace(URL_PREFIX, ""));
+        String string = EncodingUtils.base64DecodeToString(stripUrlPrefix(fileEntry.getUrl()));
 
         byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
 
@@ -82,9 +80,7 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public InputStream getInputStream(String directory, FileEntry fileEntry) {
-        String url = fileEntry.getUrl();
-
-        return new ByteArrayInputStream(EncodingUtils.base64Decode(url.replace(URL_PREFIX, "")));
+        return new ByteArrayInputStream(EncodingUtils.base64Decode(stripUrlPrefix(fileEntry.getUrl())));
     }
 
     @Override
@@ -94,16 +90,12 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
-        String url = fileEntry.getUrl();
-
-        return EncodingUtils.base64Decode(url.replace(URL_PREFIX, ""));
+        return EncodingUtils.base64Decode(stripUrlPrefix(fileEntry.getUrl()));
     }
 
     @Override
     public String readFileToString(String directory, FileEntry fileEntry) throws FileStorageException {
-        String url = fileEntry.getUrl();
-
-        return EncodingUtils.base64DecodeToString(url.replace(URL_PREFIX, ""));
+        return EncodingUtils.base64DecodeToString(stripUrlPrefix(fileEntry.getUrl()));
     }
 
     @Override
@@ -151,6 +143,16 @@ public class Base64FileStorageService implements FileStorageService {
         throws FileStorageException {
 
         return storeFileContent(directory, filename, inputStream);
+    }
+
+    private static String stripUrlPrefix(String url) {
+        if (url == null || !url.startsWith(URL_PREFIX)) {
+            throw new FileStorageException(
+                "FileEntry URL '%s' does not use the expected '%s' scheme; it was likely stored with a different file-storage provider (check bytechef.workflow.output-storage.provider)."
+                    .formatted(url, URL_PREFIX));
+        }
+
+        return url.substring(URL_PREFIX.length());
     }
 
     private byte[] toByteArray(InputStream inputStream) throws FileStorageException, IOException {

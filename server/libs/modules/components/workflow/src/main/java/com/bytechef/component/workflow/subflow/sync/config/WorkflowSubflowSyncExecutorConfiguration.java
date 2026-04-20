@@ -91,8 +91,8 @@ public class WorkflowSubflowSyncExecutorConfiguration {
     @Bean
     SubflowSyncExecutor subflowSyncExecutor(
         ChildJobPrincipalFactory childJobPrincipalFactory, ContextService contextService, CounterService counterService,
-        Environment environment, Evaluator evaluator, JobService jobService, SubflowResolver subflowResolver,
-        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
+        TaskFileStorage durableTaskFileStorage, Environment environment, Evaluator evaluator, JobService jobService,
+        SubflowResolver subflowResolver, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
         WorkflowService workflowService) {
 
@@ -100,7 +100,7 @@ public class WorkflowSubflowSyncExecutorConfiguration {
 
         SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 
-        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage(durableTaskFileStorage);
 
         ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 
