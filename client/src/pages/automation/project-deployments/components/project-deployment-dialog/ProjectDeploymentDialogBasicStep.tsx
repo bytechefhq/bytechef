@@ -12,7 +12,7 @@ import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/s
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {InfoIcon, PlusIcon, RefreshCwIcon} from 'lucide-react';
+import {InfoIcon, LayersIcon, PlusIcon, RefreshCwIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
@@ -242,7 +242,7 @@ const ProjectDeploymentDialogBasicStep = ({
             </TabsContent>
 
             <TabsContent className="m-0 flex flex-col gap-4" value="change-version">
-                {currentProjectId && (!projectDeployment?.id || changeProjectVersion) && (
+                {hasDeployments && currentProjectId && (!projectDeployment?.id || changeProjectVersion) && (
                     <>
                         <FormItem className="pt-4">
                             <FormLabel>Deployment</FormLabel>
@@ -303,6 +303,16 @@ const ProjectDeploymentDialogBasicStep = ({
                             shouldUnregister={false}
                         />
                     </>
+                )}
+
+                {!hasDeployments && (
+                    <div className="flex w-full flex-col items-center justify-center gap-4 pt-4">
+                        <div className="flex size-10 items-center justify-center rounded-lg bg-surface-neutral-secondary">
+                            <LayersIcon />
+                        </div>
+
+                        <h2 className="text-xl">No deployments for this project yet</h2>
+                    </div>
                 )}
             </TabsContent>
         </Tabs>
