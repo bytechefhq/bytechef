@@ -16,9 +16,12 @@
 
 package com.bytechef.component.ai.llm.open.router.action;
 
-import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
+import static com.bytechef.component.ai.llm.ChatModel.Format.SIMPLE;
+import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.JSON;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
@@ -26,9 +29,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
@@ -36,39 +39,48 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_PROP
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROMPT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.SUPPORTED_PARAMETERS;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.getOpenRouterModels;
-import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.Body;
+import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
+import com.bytechef.component.ai.llm.ChatModel.Role;
+import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.openai.api.ResponseFormat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -125,15 +137,10 @@ public class OpenRouterChatAction {
             TEMPERATURE_PROPERTY
                 .displayCondition("contains(%s, 'temperature')".formatted(SUPPORTED_PARAMETERS))
                 .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
-            TOP_K_PROPERTY
-                .displayCondition("contains(%s, 'top_k')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
             TOP_P_PROPERTY
                 .displayCondition("contains(%s, 'top_p')".formatted(SUPPORTED_PARAMETERS))
                 .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
-            VERBOSITY_PROPERTY
-                .displayCondition("contains(%s, 'verbosity')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS))
+            USER_PROPERTY)
         .output(ModelUtils::output)
         .perform(OpenRouterChatAction::perform);
 
@@ -158,49 +165,173 @@ public class OpenRouterChatAction {
         };
     }
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
-        ResponseFormat responseFormat = null;
-
-        if (responseFormatRequired) {
-            ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
-                RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
-
-            ResponseFormat.Type type =
-                chatModelResponseFormat.equals(TEXT) ? ResponseFormat.Type.TEXT : ResponseFormat.Type.JSON_OBJECT;
-
-            responseFormat = ResponseFormat.builder()
-                .type(type)
-                .build();
-        }
-
-        return OpenAiChatModel.builder()
-            .openAiApi(
-                OpenAiApi.builder()
-                    .apiKey(connectionParameters.getString(TOKEN))
-                    .baseUrl("https://openrouter.ai/api")
-                    .restClientBuilder(ModelUtils.getRestClientBuilder())
-                    .build())
-            .defaultOptions(
-                OpenAiChatOptions.builder()
-                    .model(inputParameters.getRequiredString(MODEL))
-                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                    .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .N(inputParameters.getInteger(N))
-                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .responseFormat(responseFormat)
-                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                    .temperature(inputParameters.getDouble(TEMPERATURE))
-                    .topP(inputParameters.getDouble(TOP_P))
-                    .user(inputParameters.getString(USER))
-                    .build())
-            .build();
-    };
-
     private OpenRouterChatAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
+        List<Map<String, Object>> messages = buildMessages(inputParameters, context);
+        Map<String, Object> body = buildRequestBody(inputParameters, messages);
+
+        Map<String, Object> response = context.http(http -> http.post("/chat/completions"))
+            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .body(Body.of(body))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        String content = extractContent(response);
+
+        ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+
+        if (responseFormat == JSON) {
+            JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
+                inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
+
+            return converter.convert(content);
+        }
+
+        return content;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String extractContent(Map<String, Object> response) {
+        List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
+        Map<String, Object> message = (Map<String, Object>) choices.getFirst().get("message");
+
+        return (String) message.get("content");
+    }
+
+    private static List<Map<String, Object>> buildMessages(Parameters inputParameters, ActionContext context) {
+        String format = inputParameters.getRequiredString(FORMAT);
+        List<Map<String, Object>> messages = new ArrayList<>();
+
+        if (format.equals(SIMPLE.name())) {
+            String systemPrompt = inputParameters.getString(SYSTEM_PROMPT);
+
+            if (systemPrompt != null && !systemPrompt.isEmpty()) {
+                messages.add(Map.of("role", "system", "content", systemPrompt));
+            }
+
+            String userPrompt = inputParameters.getRequiredString(USER_PROMPT);
+            List<FileEntry> attachments = inputParameters.getList(ATTACHMENTS, FileEntry.class);
+
+            messages.add(buildUserMessage(userPrompt, attachments, context));
+        } else {
+            List<ChatModel.Message> chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
+
+            for (ChatModel.Message chatModelMessage : chatModelMessages) {
+                if (chatModelMessage.role() == Role.USER) {
+                    messages.add(buildUserMessage(chatModelMessage.content(), chatModelMessage.attachments(), context));
+                } else {
+                    messages.add(Map.of(
+                        "role", chatModelMessage.role().name().toLowerCase(),
+                        "content", chatModelMessage.content()));
+                }
+            }
+        }
+
+        return messages;
+    }
+
+    private static Map<String, Object> buildUserMessage(
+        String text, List<FileEntry> attachments, ActionContext context) {
+
+        if (attachments == null || attachments.isEmpty()) {
+            return Map.of("role", "user", "content", text);
+        }
+
+        List<Map<String, Object>> contentParts = new ArrayList<>();
+        StringBuilder textBuilder = new StringBuilder(text);
+
+        for (FileEntry attachment : attachments) {
+            String mimeType = attachment.getMimeType();
+
+            if (mimeType.startsWith("text/")) {
+                String fileText = context.file(file -> file.readToString(attachment));
+
+                textBuilder.append("\n").append(fileText);
+            } else if (mimeType.startsWith("image/")) {
+                byte[] bytes = context.file(file -> file.readAllBytes(attachment));
+                String base64 = Base64.getEncoder().encodeToString(bytes);
+
+                contentParts.add(Map.of(
+                    "type", "image_url",
+                    "image_url", Map.of("url", "data:" + mimeType + ";base64," + base64)));
+            }
+        }
+
+        contentParts.addFirst(Map.of("type", "text", "text", textBuilder.toString()));
+
+        return Map.of("role", "user", "content", contentParts);
+    }
+
+    private static Map<String, Object> buildRequestBody(
+        Parameters inputParameters, List<Map<String, Object>> messages) {
+
+        Map<String, Object> body = new HashMap<>();
+
+        body.put("model", inputParameters.getRequiredString(MODEL));
+        body.put("messages", messages);
+
+        Double frequencyPenalty = inputParameters.getDouble(FREQUENCY_PENALTY);
+
+        if (frequencyPenalty != null) {
+            body.put("frequency_penalty", frequencyPenalty);
+        }
+
+        Map<String, Double> logitBias = inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {});
+
+        if (logitBias != null) {
+            body.put("logit_bias", logitBias);
+        }
+
+        Integer maxTokens = inputParameters.getInteger(MAX_TOKENS);
+
+        if (maxTokens != null) {
+            body.put("max_tokens", maxTokens);
+        }
+
+        Double presencePenalty = inputParameters.getDouble(PRESENCE_PENALTY);
+
+        if (presencePenalty != null) {
+            body.put("presence_penalty", presencePenalty);
+        }
+
+        Integer seed = inputParameters.getInteger(SEED);
+
+        if (seed != null) {
+            body.put("seed", seed);
+        }
+
+        List<String> stop = inputParameters.getList(STOP, new TypeReference<>() {});
+
+        if (stop != null && !stop.isEmpty()) {
+            body.put("stop", stop);
+        }
+
+        Double temperature = inputParameters.getDouble(TEMPERATURE);
+
+        if (temperature != null) {
+            body.put("temperature", temperature);
+        }
+
+        Double topP = inputParameters.getDouble(TOP_P);
+
+        if (topP != null) {
+            body.put("top_p", topP);
+        }
+
+        String user = inputParameters.getString(USER);
+
+        if (user != null) {
+            body.put("user", user);
+        }
+
+        ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+
+        body.put("response_format", Map.of("type", responseFormat == JSON ? "json_object" : "text"));
+
+        return body;
     }
 }
