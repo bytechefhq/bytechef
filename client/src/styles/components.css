@@ -290,7 +290,16 @@
     * {
         @apply border-border;
     }
+
     body {
         @apply bg-background text-foreground;
+    }
+
+    h2 {
+        @apply font-medium;
+    }
+
+    p {
+        @apply font-normal;
     }
 }
