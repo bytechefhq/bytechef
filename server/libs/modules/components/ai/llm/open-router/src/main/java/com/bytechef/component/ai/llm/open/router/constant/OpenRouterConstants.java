@@ -16,18 +16,11 @@
 
 package com.bytechef.component.ai.llm.open.router.constant;
 
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.TypeReference;
-import org.springframework.ai.openai.api.OpenAiApi;
 
 import java.util.Comparator;
 import java.util.List;
@@ -38,12 +31,22 @@ import java.util.stream.Collectors;
  */
 public class OpenRouterConstants {
 
-    private static ActionDefinition.OptionsFunction<String> getOpenRouterModels() {
+    public static ActionDefinition.OptionsFunction<String> getOpenRouterModels() {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
-            ModelsResponse response = context.http(http -> http.get("/models"))
+            List<String> supportedParametersArray = inputParameters.getList(SUPPORTED_PARAMETERS, String.class);
+            String supportedParametersString = supportedParametersArray != null && !supportedParametersArray.isEmpty()
+                ? String.join(",", supportedParametersArray)
+                : null;
+
+            Context.Http.Executor executor = context.http(http -> http.get("/models"))
                 .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-                .queryParameters("output_modalities", "text")
-                .execute()
+                .queryParameter("output_modalities", "text");
+
+            if (supportedParametersString != null) {
+                executor = executor.queryParameter("supported_parameters", supportedParametersString);
+            }
+
+            ModelsResponse response = executor.execute()
                 .getBody(new TypeReference<>() {
                 });
 
@@ -57,11 +60,7 @@ public class OpenRouterConstants {
         };
     }
 
-    public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
-        .label("Model")
-        .description("ID of the model to use.")
-        .options(getOpenRouterModels())
-        .required(true);
+    public static final String SUPPORTED_PARAMETERS = "supportedParameters";
 
     private OpenRouterConstants() {
     }
