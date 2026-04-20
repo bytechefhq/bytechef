@@ -164,6 +164,7 @@ spring:
         distance-type: cosine_distance
         dimensions: 1536
         max-document-batch-size: 10000
+        initialize-schema: true
   application:
     name: server-app
   autoconfigure:
