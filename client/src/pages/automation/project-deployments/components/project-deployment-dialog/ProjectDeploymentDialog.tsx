@@ -66,6 +66,9 @@ const ProjectDeploymentDialog = ({
     triggerNode,
 }: ProjectDeploymentDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
+    const [basicStepTab, setBasicStepTab] = useState<'new-deployment' | 'change-version'>(
+        changeProjectVersion ? 'change-version' : 'new-deployment'
+    );
     const [connectionsGrouped, setConnectionsGrouped] = useState(false);
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
@@ -191,6 +194,7 @@ const ProjectDeploymentDialog = ({
                     changeProjectVersion={changeProjectVersion}
                     control={control}
                     getValues={getValues}
+                    handleTabChange={setBasicStepTab}
                     projectDeployment={projectDeployment}
                     projectDeployments={projectDeployments}
                     projectDeploymentsLoading={projectDeploymentsLoading}
@@ -406,7 +410,15 @@ const ProjectDeploymentDialog = ({
                                 </DialogClose>
 
                                 {(!projectDeployment?.id || changeProjectVersion) && (
-                                    <Button label="Next" onClick={handleSubmit(handleNextClick)} />
+                                    <Button
+                                        disabled={
+                                            basicStepTab === 'change-version' &&
+                                            !projectDeploymentsLoading &&
+                                            (projectDeployments?.length ?? 0) === 0
+                                        }
+                                        label="Next"
+                                        onClick={handleSubmit(handleNextClick)}
+                                    />
                                 )}
                             </>
                         )}
