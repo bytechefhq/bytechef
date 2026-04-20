@@ -14,6 +14,7 @@ import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +45,7 @@ public class MultiTenantDataSourceConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "spring.liquibase", name = "enabled", havingValue = "true", matchIfMissing = true)
     MultiTenantLiquibaseChangelogLoader multiTenantLiquibaseChangelogLoader(TenantService tenantService) {
         return new MultiTenantLiquibaseChangelogLoader(tenantService);
     }
