@@ -25,7 +25,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
-import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.CHAT_MODEL_PROPERTY;
 
 import com.bytechef.component.ai.llm.open.router.action.OpenRouterChatAction;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -46,7 +45,6 @@ public class OpenRouterChatModel {
             .type(ModelFunction.MODEL)
             .object(() -> OpenRouterChatModel::apply)
             .properties(
-                CHAT_MODEL_PROPERTY,
                 MAX_TOKENS_PROPERTY,
                 N_PROPERTY,
                 TEMPERATURE_PROPERTY,
