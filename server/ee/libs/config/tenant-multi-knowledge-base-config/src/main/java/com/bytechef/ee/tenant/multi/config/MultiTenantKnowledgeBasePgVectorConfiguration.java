@@ -22,6 +22,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,6 +42,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Configuration
 @ConditionalOnEEVersion
 @ConditionalOnMultiTenant
+@EnableConfigurationProperties(PgVectorStoreProperties.class)
 @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 class MultiTenantKnowledgeBasePgVectorConfiguration {
 
@@ -59,7 +61,7 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
     }
 
     @Bean("knowledgeBaseEmbeddingModel")
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "provider", havingValue = "openai")
     OpenAiEmbeddingModel knowledgeBaseOpenAiEmbeddingModel(
         ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
 
@@ -79,7 +81,7 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
     }
 
     @Bean("knowledgeBaseEmbeddingModel")
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "provider", havingValue = "anthropic")
     OpenAiEmbeddingModel knowledgeBaseAnthropicOpenAiEmbeddingModel(
         ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
 

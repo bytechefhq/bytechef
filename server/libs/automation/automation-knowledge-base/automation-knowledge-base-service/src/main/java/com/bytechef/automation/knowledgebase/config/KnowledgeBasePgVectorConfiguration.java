@@ -70,7 +70,7 @@ class KnowledgeBasePgVectorConfiguration {
     }
 
     @Bean("knowledgeBaseEmbeddingModel")
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "provider", havingValue = "openai")
     OpenAiEmbeddingModel knowledgeBaseOpenAiEmbeddingModel(
         ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
 
@@ -89,7 +89,7 @@ class KnowledgeBasePgVectorConfiguration {
     }
 
     @Bean("knowledgeBaseEmbeddingModel")
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "provider", havingValue = "anthropic")
     OpenAiEmbeddingModel knowledgeBaseAnthropicOpenAiEmbeddingModel(
         ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
 
