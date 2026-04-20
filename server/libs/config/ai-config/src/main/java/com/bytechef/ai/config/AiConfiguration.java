@@ -40,7 +40,7 @@ class AiConfiguration {
     private final String anthropicApiKey;
     private final String openAiApiKey;
 
-    public AiConfiguration(ApplicationProperties applicationProperties) {
+    AiConfiguration(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
         Anthropic anthropic = ai.getAnthropic();
