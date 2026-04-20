@@ -10,7 +10,6 @@ package com.bytechef.ee.ai.copilot.config;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.anthropic.client.AnthropicClient;
-import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.bytechef.ai.mcp.tool.automation.impl.ClusterElementTools;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
@@ -31,13 +30,10 @@ import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
-import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.observation.ObservationRegistry;
 import java.io.InputStream;
-import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,9 +56,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.client.RestClient;
 
 /**
  * @version ee
@@ -73,10 +67,8 @@ import org.springframework.web.client.RestClient;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class CopilotConfiguration {
 
-    private final String anthropicApiKey;
     private final String anthropicChatModel;
     private final Double anthropicChatTemperature;
-    private final String openAiApiKey;
     private final String openAiChatModel;
     private final Double openAiChatTemperature;
     private final String openAiChatReasoningEffort;
@@ -103,8 +95,6 @@ public class CopilotConfiguration {
 
         Anthropic anthropic = ai.getAnthropic();
 
-        this.anthropicApiKey = anthropic.getApiKey();
-
         Anthropic.Chat.Options anthropicChatOptions = anthropic.getChat()
             .getOptions();
 
@@ -112,8 +102,6 @@ public class CopilotConfiguration {
         this.anthropicChatTemperature = anthropicChatOptions.getTemperature();
 
         OpenAi openAi = ai.getOpenAi();
-
-        this.openAiApiKey = openAi.getApiKey();
 
         OpenAi.Chat.Options openAiChatOptions = openAi.getChat()
             .getOptions();
@@ -132,14 +120,6 @@ public class CopilotConfiguration {
         this.promptCodeEditorBuildResource = promptCodeEditorBuildResource;
         this.promptClusterElementAskResource = promptClusterElementAskResource;
         this.promptClusterElementBuildResource = promptClusterElementBuildResource;
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    AnthropicClient anthropicClient() {
-        return AnthropicOkHttpClient.builder()
-            .apiKey(anthropicApiKey)
-            .build();
     }
 
     @Bean
@@ -214,6 +194,7 @@ public class CopilotConfiguration {
     ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
         ComponentTools componentTools, TaskTools taskTools) throws AGUIException {
+
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.ASK.name();
 
         return ClusterElementSpringAIAgent.builder()
@@ -229,9 +210,9 @@ public class CopilotConfiguration {
     @Bean
     ClusterElementSpringAIAgent clusterElementBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ClusterElementTools clusterElementTools,
-        ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
-        ComponentTools componentTools, TaskTools taskTools)
+        ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl, ComponentTools componentTools, TaskTools taskTools)
         throws AGUIException {
+
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.BUILD.name();
 
         return ClusterElementSpringAIAgent.builder()
@@ -241,14 +222,6 @@ public class CopilotConfiguration {
             .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
             .tools(List.of(readProjectWorkflowToolsImpl, clusterElementTools, componentTools, taskTools))
             .state(state)
-            .build();
-    }
-
-    @Bean
-    OpenAiApi openAiApi() {
-        return OpenAiApi.builder()
-            .apiKey(openAiApiKey)
-            .restClientBuilder(getRestClientBuilder())
             .build();
     }
 
@@ -318,9 +291,8 @@ public class CopilotConfiguration {
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectToolsImpl,
-        ProjectWorkflowToolsImpl projectWorkflowToolsImpl,
-        TaskTools taskTools, ScriptTools scriptTools, WorkflowService workflowService,
-        WorkflowNodeOutputFacade workflowNodeOutputFacade)
+        ProjectWorkflowToolsImpl projectWorkflowToolsImpl, TaskTools taskTools, ScriptTools scriptTools,
+        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name();
@@ -335,24 +307,6 @@ public class CopilotConfiguration {
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();
-    }
-
-    private static RestClient.Builder getRestClientBuilder() {
-        HttpClient httpClient = Methanol.newBuilder()
-            .autoAcceptEncoding(true)
-            .connectTimeout(Duration.ofSeconds(60))
-            .defaultHeaders(httpHeaders -> {
-                httpHeaders.setHeader("Accept-Encoding", "gzip, deflate");
-            })
-            .headersTimeout(Duration.ofSeconds(60))
-            .readTimeout(Duration.ofSeconds(60))
-            .requestTimeout(Duration.ofSeconds(60))
-            .build();
-
-        JdkClientHttpRequestFactory jdkClientHttpRequestFactory = new JdkClientHttpRequestFactory(httpClient);
-
-        return RestClient.builder()
-            .requestFactory(jdkClientHttpRequestFactory);
     }
 
     private String getSystemPrompt(Resource systemPromptResource) {
