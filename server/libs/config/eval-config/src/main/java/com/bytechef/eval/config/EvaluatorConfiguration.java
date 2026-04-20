@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class EvaluatorConfiguration {
+class EvaluatorConfiguration {
 
     @Bean
     Evaluator evaluator() {
