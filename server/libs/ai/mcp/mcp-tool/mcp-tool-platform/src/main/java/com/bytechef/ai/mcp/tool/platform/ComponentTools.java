@@ -110,7 +110,7 @@ public class ComponentTools {
     public ComponentTools(ComponentDefinitionService componentDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
         ConnectionService connectionService,
-        @Autowired(required = false) @Qualifier("aiCopilotPgVectorStore") VectorStore vectorStore) {
+        @Autowired(required = false) @Qualifier("copilotPgVectorStore") VectorStore vectorStore) {
         this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
