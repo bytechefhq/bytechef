@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.configuration.config;
+package com.bytechef.eval.config;
 
+import com.bytechef.ai.tool.FromAi;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,8 @@ public class EvaluatorConfiguration {
 
     @Bean
     Evaluator evaluator() {
-        return SpelEvaluator.create();
+        return SpelEvaluator.builder()
+            .methodExecutor("fromAi", new FromAi())
+            .build();
     }
 }
