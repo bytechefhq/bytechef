@@ -125,17 +125,17 @@ public class AutomationMcpServerConfiguration {
         ChildJobPrincipalFactory childJobPrincipalFactory,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, ContextService contextService,
-        CounterService counterService, Environment environment, Evaluator evaluator, JobService jobService,
-        McpComponentService mcpComponentService, McpProjectWorkflowService mcpProjectWorkflowService,
-        McpServerService mcpServerService, PrincipalJobFacade principalJobFacade,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, SubflowResolver subflowResolver,
-        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
+        CounterService counterService, TaskFileStorage durableTaskFileStorage, Environment environment,
+        Evaluator evaluator, JobService jobService, McpComponentService mcpComponentService,
+        McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
+        PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        SubflowResolver subflowResolver, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
-        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage(durableTaskFileStorage);
 
         ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 

@@ -144,8 +144,9 @@ public class EmbeddedMcpServerConfiguration {
         ApplicationProperties applicationProperties, ChildJobPrincipalFactory childJobPrincipalFactory,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, ConnectedUserService connectedUserService,
-        ContextService contextService, CounterService counterService, Environment environment,
-        Evaluator evaluator, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        ContextService contextService, CounterService counterService, TaskFileStorage durableTaskFileStorage,
+        Environment environment, Evaluator evaluator,
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
         JobService jobService, JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
@@ -160,7 +161,7 @@ public class EmbeddedMcpServerConfiguration {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
-        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage(durableTaskFileStorage);
 
         ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 

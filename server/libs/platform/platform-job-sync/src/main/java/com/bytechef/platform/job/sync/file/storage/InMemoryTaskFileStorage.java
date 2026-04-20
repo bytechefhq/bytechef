@@ -19,145 +19,135 @@ package com.bytechef.platform.job.sync.file.storage;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.exception.FileStorageException;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import org.jspecify.annotations.Nullable;
 
 /**
- * In-memory TaskFileStorage implementation that stores objects directly without serialization or compression, using
- * job-scoped storage. This is useful for testing scenarios where you want to preserve the exact objects (like Publisher
- * instances) without JSON serialization, isolated per job execution.
+ * Read-through cache layered over a durable {@link TaskFileStorage}. Used by the synchronous job executors (webhook
+ * sync, subflow sync, MCP sync) and by workflow test mode.
+ * <p>
+ * Every write is forwarded to the durable delegate; the {@link FileEntry} URL returned by the delegate becomes the
+ * cache key so that any read that follows in the same sync execution skips the gzip + base64 + Jackson round-trip the
+ * durable storage would otherwise do. Reads miss → delegate → fill cache. Sync executors run against real JDBC-backed
+ * {@code JobService} / {@code TaskExecutionService} / {@code ContextService}, so these {@link FileEntry} URLs land in
+ * the {@code Job.outputs}, {@code TaskExecution.output} and {@code Context.value} columns — durable storage is
+ * mandatory here so the async read path (the UI) can later read those columns through the registry-configured
+ * {@code FileStorageService}.
+ * <p>
+ * The cache uses Caffeine's {@code expireAfterAccess(30, MINUTES)} as a bounded-memory safety net; it's in-process
+ * only. Caffeine is used directly (not via Spring {@code CacheManager}) so a Redis swap can't break this cache — the
+ * values are arbitrary deserialized {@code Map}/{@code Object} instances, some of which aren't {@code Serializable}.
  *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public class InMemoryTaskFileStorage implements TaskFileStorage {
 
-    private static final String CONTEXT_FILES_DIR = "outputs/workflow_contexts";
-    private static final String JOB_FILES_DIR = "outputs/workflow_jobs";
-    private static final String TASK_EXECUTION_FILES_DIR = "outputs/workflow_task_executions";
-    private static final String URL_PREFIX = "inmemory://";
+    private final Cache<String, Object> jobDataStorage = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.MINUTES)
+        .build();
 
-    private final Map<Long, Map<String, Object>> jobDataStorage = new ConcurrentHashMap<>();
+    private final TaskFileStorage durableTaskFileStorage;
 
-    public void initializeJobStorage(long jobId) {
-        jobDataStorage.putIfAbsent(jobId, new ConcurrentHashMap<>());
-    }
-
-    public void cleanupJobStorage(long jobId) {
-        jobDataStorage.remove(jobId);
+    public InMemoryTaskFileStorage(TaskFileStorage durableTaskFileStorage) {
+        this.durableTaskFileStorage = Objects.requireNonNull(durableTaskFileStorage, "durableTaskFileStorage");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, ?> readContextValue(FileEntry fileEntry) {
-        Object data = readObject(fileEntry);
+        Object cached = jobDataStorage.getIfPresent(fileEntry.getUrl());
 
-        if (!(data instanceof Map)) {
-            throw new FileStorageException("Expected Map but found: " + data.getClass());
+        if (cached instanceof Map<?, ?> map) {
+            return (Map<String, ?>) map;
         }
 
-        return (Map<String, ?>) data;
+        Map<String, ?> value = durableTaskFileStorage.readContextValue(fileEntry);
+
+        cache(fileEntry, value);
+
+        return value;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, ?> readJobOutputs(FileEntry fileEntry) {
-        Object data = readObject(fileEntry);
+        Object cached = jobDataStorage.getIfPresent(fileEntry.getUrl());
 
-        if (!(data instanceof Map)) {
-            throw new FileStorageException("Expected Map but found: " + data.getClass());
+        if (cached instanceof Map<?, ?> map) {
+            return (Map<String, ?>) map;
         }
 
-        return (Map<String, ?>) data;
+        Map<String, ?> value = durableTaskFileStorage.readJobOutputs(fileEntry);
+
+        cache(fileEntry, value);
+
+        return value;
     }
 
     @Override
     public Object readTaskExecutionOutput(FileEntry fileEntry) {
-        return readObject(fileEntry);
+        Object cached = jobDataStorage.getIfPresent(fileEntry.getUrl());
+
+        if (cached != null) {
+            return cached;
+        }
+
+        Object value = durableTaskFileStorage.readTaskExecutionOutput(fileEntry);
+
+        cache(fileEntry, value);
+
+        return value;
     }
 
     @Override
-    public FileEntry storeContextValue(
-        long stackId, Context.Classname classname, Map<String, ?> value) {
+    public FileEntry storeContextValue(long stackId, Context.Classname classname, Map<String, ?> value) {
+        FileEntry fileEntry = durableTaskFileStorage.storeContextValue(stackId, classname, value);
 
-        String filename = stackId + "_" + classname.name() + ".dat";
+        cache(fileEntry, value);
 
-        return storeObject(CONTEXT_FILES_DIR, filename, value, stackId);
+        return fileEntry;
     }
 
     @Override
     public FileEntry storeContextValue(
         long stackId, int subStackId, Context.Classname classname, Map<String, ?> value) {
 
-        String filename = stackId + "_" + subStackId + "_" + classname.name() + ".dat";
+        FileEntry fileEntry = durableTaskFileStorage.storeContextValue(stackId, subStackId, classname, value);
 
-        return storeObject(CONTEXT_FILES_DIR, filename, value, stackId);
+        cache(fileEntry, value);
+
+        return fileEntry;
     }
 
     @Override
     public FileEntry storeJobOutputs(long jobId, Map<String, ?> outputs) {
-        String filename = jobId + ".dat";
+        FileEntry fileEntry = durableTaskFileStorage.storeJobOutputs(jobId, outputs);
 
-        return storeObject(JOB_FILES_DIR, filename, outputs, jobId);
+        cache(fileEntry, outputs);
+
+        return fileEntry;
     }
 
     @Override
     public FileEntry storeTaskExecutionOutput(long jobId, long taskExecutionId, Object output) {
-        String filename = taskExecutionId + ".dat";
+        FileEntry fileEntry = durableTaskFileStorage.storeTaskExecutionOutput(jobId, taskExecutionId, output);
 
-        return storeObject(TASK_EXECUTION_FILES_DIR, filename, output, jobId);
+        cache(fileEntry, output);
+
+        return fileEntry;
     }
 
-    private Object readObject(FileEntry fileEntry) {
-        UrlParts urlParts = extractJobIdAndKeyFromUrl(fileEntry.getUrl());
-        Map<String, Object> storage = jobDataStorage.get(urlParts.jobId());
-
-        if (storage == null || !storage.containsKey(urlParts.key())) {
-            throw new FileStorageException("Data not found: " + fileEntry.getName());
+    private void cache(FileEntry fileEntry, @Nullable Object value) {
+        if (value == null) {
+            return;
         }
 
-        return storage.get(urlParts.key());
-    }
-
-    private FileEntry storeObject(String directory, String filename, Object data, long jobId) {
-        Map<String, Object> storage = jobDataStorage.computeIfAbsent(jobId, k -> new ConcurrentHashMap<>());
-        String key = getKey(directory, filename);
-
-        // ConcurrentHashMap doesn't allow null values, so wrap it
-        storage.put(key, data);
-
-        // Encode job ID in URL so we can retrieve it later
-        return new FileEntry(filename, URL_PREFIX + jobId + "/" + key);
-    }
-
-    private static String getKey(String directory, String filename) {
-        return directory + "/" + filename;
-    }
-
-    private static UrlParts extractJobIdAndKeyFromUrl(String url) {
-        if (!url.startsWith(URL_PREFIX)) {
-            throw new FileStorageException("Invalid URL format: " + url);
-        }
-
-        String remainder = url.substring(URL_PREFIX.length());
-        int slashIndex = remainder.indexOf('/');
-
-        if (slashIndex == -1) {
-            throw new FileStorageException("Invalid URL format - missing job ID: " + url);
-        }
-
-        try {
-            long jobId = Long.parseLong(remainder.substring(0, slashIndex));
-            String key = remainder.substring(slashIndex + 1);
-
-            return new UrlParts(jobId, key);
-        } catch (NumberFormatException e) {
-            throw new FileStorageException("Invalid job ID in URL: " + url, e);
-        }
-    }
-
-    private record UrlParts(long jobId, String key) {
+        jobDataStorage.put(fileEntry.getUrl(), value);
     }
 }
