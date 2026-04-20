@@ -25,6 +25,7 @@ import com.github.mizosoft.methanol.Methanol;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -52,6 +53,7 @@ class AiConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.anthropic", name = "api-key")
     AnthropicClient anthropicClient() {
         return AnthropicOkHttpClient.builder()
             .apiKey(anthropicApiKey)
@@ -59,6 +61,7 @@ class AiConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.openai", name = "api-key")
     OpenAiApi openAiApi() {
         return OpenAiApi.builder()
             .apiKey(openAiApiKey)
