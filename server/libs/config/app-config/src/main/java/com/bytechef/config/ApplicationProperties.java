@@ -115,6 +115,9 @@ public class ApplicationProperties {
     /** Multi-tenancy configuration */
     private Tenant tenant = new Tenant();
 
+    /** Database upgrade (Liquibase) configuration */
+    private Upgrade upgrade = new Upgrade();
+
     /** User guiding configuration */
     private UserGuiding userGuiding = new UserGuiding();
 
@@ -219,6 +222,10 @@ public class ApplicationProperties {
 
     public Tenant getTenant() {
         return tenant;
+    }
+
+    public Upgrade getUpgrade() {
+        return upgrade;
     }
 
     public UserGuiding getUserGuiding() {
@@ -331,6 +338,10 @@ public class ApplicationProperties {
 
     public void setTenant(Tenant tenant) {
         this.tenant = tenant;
+    }
+
+    public void setUpgrade(Upgrade upgrade) {
+        this.upgrade = upgrade;
     }
 
     public void setUserGuiding(UserGuiding userGuiding) {
@@ -3133,6 +3144,25 @@ public class ApplicationProperties {
 
         public void setMode(Mode mode) {
             this.mode = mode;
+        }
+    }
+
+    /**
+     * Database upgrade configuration. Controls whether Liquibase migrations run at application startup. Useful for
+     * disabling migrations on read-only replicas or when only a designated instance should apply schema changes in a
+     * multi-instance deployment.
+     */
+    public static class Upgrade {
+
+        /** Whether database upgrades (Liquibase migrations) run at startup */
+        private boolean enabled = true;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
     }
 
