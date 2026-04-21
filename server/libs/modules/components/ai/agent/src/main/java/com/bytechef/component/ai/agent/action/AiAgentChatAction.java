@@ -121,7 +121,7 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
             response.put("response", chatResponse);
 
-            List<Map<String, Object>> toolExecutions = toolExecutionEvents.stream()
+            List<Map<String, @Nullable Object>> toolExecutions = toolExecutionEvents.stream()
                 .map(toolExecutionEvent -> {
                     Map<String, @Nullable Object> eventData = new LinkedHashMap<>();
 
