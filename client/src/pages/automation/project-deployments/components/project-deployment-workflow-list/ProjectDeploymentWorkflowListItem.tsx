@@ -65,7 +65,7 @@ const ProjectDeploymentWorkflowListItem = ({
         workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1 &&
         (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
 
-    const hostedChatTriggerPageUrl = getPageUrl('chat', undefined, projectDeploymentWorkflow.staticWebhookUrl);
+    const hostedChatTriggerPageUrl = getPageUrl('chats', undefined, projectDeploymentWorkflow.staticWebhookUrl);
 
     const enableProjectDeploymentWorkflowMutation = useEnableProjectDeploymentWorkflowMutation({
         onSuccess: () => {
