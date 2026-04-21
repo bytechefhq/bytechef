@@ -221,7 +221,7 @@ spring:
       enabled: ${bytechef.mail.ssl.enabled}
   liquibase:
     contexts: mono, #spring.profiles.active#
-    enabled: ${bytechef.upgrade.enabled}
+    enabled: ${bytechef.upgrade.enabled:true}
   output:
     ansi:
       enabled: always
