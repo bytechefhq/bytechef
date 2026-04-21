@@ -1,4 +1,4 @@
-export const getPageUrl = (type: 'form' | 'chat', environmentId?: number, staticWebhookUrl?: string) => {
+export const getPageUrl = (type: 'form' | 'chats', environmentId?: number, staticWebhookUrl?: string) => {
     if (!staticWebhookUrl) {
         return '';
     }
@@ -7,5 +7,5 @@ export const getPageUrl = (type: 'form' | 'chat', environmentId?: number, static
         staticWebhookUrl.lastIndexOf('/webhooks/') + '/webhooks/'.length
     );
 
-    return `${type === 'chat' ? '/automation' : ''}/${type}${type === 'form' ? `/${environmentId}` : ''}/${workflowExecutionId}`;
+    return `${type === 'chats' ? '/automation' : ''}/${type}${type === 'form' ? `/${environmentId}` : ''}/${workflowExecutionId}`;
 };

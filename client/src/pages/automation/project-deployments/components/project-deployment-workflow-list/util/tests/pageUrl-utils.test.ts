@@ -22,9 +22,9 @@ describe('getPageUrl', () => {
     });
 
     it('generates chat trigger URL', () => {
-        const result = getPageUrl('chat', undefined, 'https://example.com/webhooks/xyz789');
+        const result = getPageUrl('chats', undefined, 'https://example.com/webhooks/xyz789');
 
-        expect(result).toBe('/automation/chat/xyz789');
+        expect(result).toBe('/automation/chats/xyz789');
     });
 
     it('handles different environment IDs', () => {
@@ -34,9 +34,9 @@ describe('getPageUrl', () => {
     });
 
     it('extracts webhook ID from URL with path segments', () => {
-        const result = getPageUrl('chat', undefined, 'https://api.example.com/v1/webhooks/webhook-identifier-123');
+        const result = getPageUrl('chats', undefined, 'https://api.example.com/v1/webhooks/webhook-identifier-123');
 
-        expect(result).toBe('/automation/chat/webhook-identifier-123');
+        expect(result).toBe('/automation/chats/webhook-identifier-123');
     });
 
     it('handles webhook URL with trailing slash', () => {
@@ -46,9 +46,9 @@ describe('getPageUrl', () => {
     });
 
     it('handles webhook URL with query parameters', () => {
-        const result = getPageUrl('chat', 1, 'https://example.com/webhooks/abc123?param=value');
+        const result = getPageUrl('chats', 1, 'https://example.com/webhooks/abc123?param=value');
 
-        expect(result).toBe('/automation/chat/abc123?param=value');
+        expect(result).toBe('/automation/chats/abc123?param=value');
     });
 
     it('handles complex webhook IDs', () => {
