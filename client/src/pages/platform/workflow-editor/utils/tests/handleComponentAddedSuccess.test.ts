@@ -20,6 +20,7 @@ const makeNodeData = (overrides: Partial<NodeDataType> = {}): NodeDataType =>
 describe('openNodeDetailsPanelForNewNode', () => {
     beforeEach(() => {
         useWorkflowNodeDetailsPanelStore.setState({
+            activeTab: 'description',
             currentComponent: undefined,
             currentNode: undefined,
             workflowNodeDetailsPanelOpen: false,
@@ -37,6 +38,14 @@ describe('openNodeDetailsPanelForNewNode', () => {
         expect(state.currentNode?.name).toBe('slack_1');
         expect(state.currentNode?.description).toBe('');
         expect(state.currentComponent?.componentName).toBe('slack');
+    });
+
+    it('should reset activeTab to description when opening the panel for a new node', () => {
+        useWorkflowNodeDetailsPanelStore.setState({activeTab: 'properties'});
+
+        openNodeDetailsPanelForNewNode(makeNodeData());
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().activeTab).toBe('description');
     });
 
     it('should not open the panel for cluster element nodes', () => {
