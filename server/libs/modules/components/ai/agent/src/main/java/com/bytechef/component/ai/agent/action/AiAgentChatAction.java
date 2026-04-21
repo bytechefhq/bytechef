@@ -95,6 +95,7 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
             toolExecutionLogEntry.put("confidence", toolExecutionEvent.confidence());
             toolExecutionLogEntry.put("inputs", toolExecutionEvent.inputs());
+            toolExecutionLogEntry.put("output", toolExecutionEvent.output());
             toolExecutionLogEntry.put("reasoning", toolExecutionEvent.reasoning());
             toolExecutionLogEntry.put("toolName", toolExecutionEvent.toolName());
 
