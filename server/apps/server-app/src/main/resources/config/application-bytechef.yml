@@ -140,6 +140,8 @@ bytechef:
     mode: single
   user-guiding:
     enabled: false
+  upgrade:
+    enabled: true
   webhook-url:
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
