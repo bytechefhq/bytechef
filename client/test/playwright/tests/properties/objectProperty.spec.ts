@@ -215,6 +215,64 @@ test.describe('ObjectProperty - Object property type (ObjectProperty.tsx)', () =
             });
         });
 
+        test('should block adding a subproperty whose name matches an existing one', async () => {
+            const existingPropertyName = workflowPage.objectPropertyParameterKeys[0];
+
+            expect(existingPropertyName, 'sample workflow must expose at least one existing subproperty').toBeTruthy();
+
+            const initialSubpropertyCount = await workflowPage.subPropertyListItems.count();
+
+            const addButton = workflowPage.parentObjectProperty.getByRole('button', {
+                name: /Add value object property/i,
+            });
+
+            const popover = authenticatedPage.getByRole('dialog', {name: /value object property popover/i});
+
+            await test.step('Open Add object property popover', async () => {
+                await clickAndExpectToBeVisible({
+                    target: popover,
+                    trigger: addButton,
+                });
+            });
+
+            const nameInput = popover.getByRole('textbox', {name: /name/i});
+            const submitButton = popover.getByRole('button', {exact: true, name: 'Add'});
+            const duplicateError = popover.getByText('A property with this name already exists.');
+
+            await test.step('Typing an existing subproperty name shows an inline duplicate-name error', async () => {
+                await nameInput.fill(existingPropertyName);
+
+                await expect(duplicateError).toBeVisible();
+            });
+
+            await test.step('Add button is disabled while the name is a duplicate', async () => {
+                await expect(submitButton).toBeDisabled();
+            });
+
+            await test.step('Subproperty list stays unchanged while the duplicate name is in place', async () => {
+                await expect(workflowPage.subPropertyListItems).toHaveCount(initialSubpropertyCount);
+            });
+
+            const uniquePropertyName = `${existingPropertyName}Unique`;
+
+            await test.step('Editing the name to a unique value clears the duplicate-name error', async () => {
+                await nameInput.fill(uniquePropertyName);
+
+                await expect(duplicateError).toBeHidden();
+            });
+
+            await test.step('Submitting the unique name adds the subproperty', async () => {
+                await addObjectSubPropertyViaPopover({
+                    itemType: 'STRING',
+                    objectProperty: workflowPage.parentObjectProperty,
+                    page: authenticatedPage,
+                    propertyName: uniquePropertyName,
+                });
+
+                await expect(workflowPage.subPropertyListItems).toHaveCount(initialSubpropertyCount + 1);
+            });
+        });
+
         test('should prefix the property name with an underscore in the UI after creation if it starts with a number', async () => {
             const numericPropertyName = '123property';
             const expectedPrefixedName = '_123property';
