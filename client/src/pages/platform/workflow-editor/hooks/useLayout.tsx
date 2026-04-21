@@ -16,7 +16,6 @@ import {
     Workflow,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
-import {WIDTHS} from '@/shared/theme/constants';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
@@ -869,23 +868,7 @@ export default function useLayout({
                 return;
             }
 
-            let targetNodes: Node[];
-
-            if (readOnlyWorkflow) {
-                const SHEET_WIDTH = WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH;
-
-                const centeringOffsetX = (canvasWidthRef.current - SHEET_WIDTH) / 2;
-
-                targetNodes = elements.nodes.map((node) => ({
-                    ...node,
-                    position: {
-                        x: node.position.x - centeringOffsetX,
-                        y: node.position.y,
-                    },
-                }));
-            } else {
-                targetNodes = elements.nodes;
-            }
+            const targetNodes: Node[] = elements.nodes;
 
             if (isInitialLayoutRef.current || readOnlyWorkflow) {
                 setNodes(targetNodes);
@@ -930,8 +913,8 @@ export default function useLayout({
     }, [layoutDirection, layoutResetCounter, tasks, triggers, isWorkflowLoaded]);
 
     useEffect(() => {
-        if (canvasWidth > 0 && !isWorkflowLoaded) {
+        if (canvasWidth > 0 && !isWorkflowLoaded && !readOnlyWorkflow) {
             initializeWithCanvasWidth(canvasWidth);
         }
-    }, [canvasWidth, initializeWithCanvasWidth, isWorkflowLoaded]);
+    }, [canvasWidth, initializeWithCanvasWidth, isWorkflowLoaded, readOnlyWorkflow]);
 }
