@@ -73,6 +73,10 @@ const ChatsSidebar = () => {
         return <ChatsSidebarSkeleton />;
     }
 
+    if (!data?.workspaceChatWorkflows) {
+        return null;
+    }
+
     return (
         <>
             {workflowsByProject.size === 0 ? (
