@@ -74,9 +74,16 @@ public class SupabaseUploadFileAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context.http(http -> http.post(
-            "/storage/v1/object/%s/%s".formatted(
-                inputParameters.getRequiredString(BUCKET_NAME), inputParameters.getRequiredString(FILE_NAME))))
+        String bucketNameUrlEncoded = context.encoder(encoder -> encoder.base64UrlEncode(
+            inputParameters.getRequiredString(BUCKET_NAME)))
+            .replace("+", "%20");
+
+        String fileNameUrlEncoded = context.encoder(encoder -> encoder.base64UrlEncode(
+            inputParameters.getRequiredString(FILE_NAME)))
+            .replace("+", "%20");
+
+        return context.http(http -> http.post("/storage/v1/object/%s/%s".formatted(
+            bucketNameUrlEncoded, fileNameUrlEncoded)))
             .body(
                 Body.of(
                     inputParameters.getRequiredFileEntry(FILE)))
