@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Upload file to Supabase Bucket.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/supabase_v1#upload-file"
+    },
     "metadata": null,
     "name": "uploadFile",
     "outputDefinition": {
@@ -599,7 +602,7 @@
     "authorizationRequired": null,
     "authorizations": [ {
       "acquire": null,
-      "apply": null,
+      "apply": { },
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
@@ -634,7 +637,7 @@
         "advancedOption": null,
         "controlType": "TEXT",
         "defaultValue": null,
-        "description": "Can be found in Project Settings -> Data API. Choose service_role/secret API key.",
+        "description": "Can be found in Project Settings -> API Keys. Copy key under Secret keys.",
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
@@ -662,14 +665,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/supabase_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://supabase.com/docs/guides/api"
+  },
   "description": "Supabase is an open source Firebase alternative. Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage, and Vector embeddings.",
   "icon": "path:assets/supabase.svg",
   "metadata": null,
