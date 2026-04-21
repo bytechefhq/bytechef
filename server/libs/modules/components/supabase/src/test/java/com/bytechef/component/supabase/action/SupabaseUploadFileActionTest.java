@@ -20,53 +20,61 @@ import static com.bytechef.component.supabase.constant.SupabaseConstants.BUCKET_
 import static com.bytechef.component.supabase.constant.SupabaseConstants.FILE;
 import static com.bytechef.component.supabase.constant.SupabaseConstants.FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class SupabaseUploadFileActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Response mockedResponse = mock(Response.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
+        FILE, mockedFileEntry, BUCKET_NAME, "bucketName", FILE_NAME, "fileName"));
     private final Map<String, Object> responseMap = Map.of();
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedParameters.getRequiredFileEntry(FILE))
-            .thenReturn(mockedFileEntry);
-        when(mockedParameters.getRequiredString(BUCKET_NAME))
-            .thenReturn("bucketName");
-        when(mockedParameters.getRequiredString(FILE_NAME))
-            .thenReturn("fileName");
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedContext.http(any()))
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
+
+        String urlEncodedString = "encoded";
+
+        when(mockedContext.encoder(any()))
+            .thenReturn(urlEncodedString);
 
         Map<String, Object> result = SupabaseUploadFileAction.perform(
             mockedParameters, mockedParameters, mockedContext);
@@ -76,5 +84,14 @@ class SupabaseUploadFileActionTest {
         Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(mockedFileEntry, body.getContent());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(
+            "/storage/v1/object/%s/%s".formatted(urlEncodedString, urlEncodedString),
+            stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
