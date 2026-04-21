@@ -39,9 +39,10 @@ import org.jspecify.annotations.Nullable;
  * mandatory here so the async read path (the UI) can later read those columns through the registry-configured
  * {@code FileStorageService}.
  * <p>
- * The cache uses Caffeine's {@code expireAfterAccess(30, MINUTES)} as a bounded-memory safety net; it's in-process
- * only. Caffeine is used directly (not via Spring {@code CacheManager}) so a Redis swap can't break this cache — the
- * values are arbitrary deserialized {@code Map}/{@code Object} instances, some of which aren't {@code Serializable}.
+ * The cache uses Caffeine's {@code expireAfterAccess(30, MINUTES)} paired with {@code maximumSize(10_000)} as a
+ * bounded-memory safety net; it's in-process only. Caffeine is used directly (not via Spring {@code CacheManager}) so a
+ * Redis swap can't break this cache — the values are arbitrary deserialized {@code Map}/{@code Object} instances, some
+ * of which aren't {@code Serializable}.
  *
  * @author Ivica Cardic
  */
@@ -50,6 +51,7 @@ public class InMemoryTaskFileStorage implements TaskFileStorage {
 
     private final Cache<String, Object> jobDataStorage = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.MINUTES)
+        .maximumSize(10_000)
         .build();
 
     private final TaskFileStorage durableTaskFileStorage;
