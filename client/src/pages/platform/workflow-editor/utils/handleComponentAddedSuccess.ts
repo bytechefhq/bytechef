@@ -23,6 +23,7 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
     const {
         currentComponent,
         currentNode,
+        setActiveTab,
         setCurrentComponent,
         setCurrentNode,
         setWorkflowNodeDetailsPanelOpen,
@@ -35,6 +36,9 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
             setCurrentComponent({...currentComponent, ...nodeData});
         }
     } else {
+        // Reset to 'description' so the Properties tab's display-conditions query
+        // doesn't fire against the server before the optimistic workflow update lands.
+        setActiveTab('description');
         setCurrentNode({...nodeData, description: ''});
         setCurrentComponent({...nodeData, description: ''});
         setWorkflowNodeDetailsPanelOpen(true);
