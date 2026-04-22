@@ -20,7 +20,7 @@ import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Domiter
+ * @author Marko Kriskovic
  */
 class OpenRouterComponentHandlerTest {
 
