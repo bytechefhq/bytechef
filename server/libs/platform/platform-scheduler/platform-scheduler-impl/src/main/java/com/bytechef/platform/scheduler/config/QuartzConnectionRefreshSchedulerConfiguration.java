@@ -44,7 +44,7 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 @Configuration
 @EnableConfigurationProperties(QuartzProperties.class)
 @ConditionalOnProperty(
-    prefix = "bytechef", name = "coordinator.connection.scheduler.provider", havingValue = "quartz",
+    prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "quartz",
     matchIfMissing = true)
 public class QuartzConnectionRefreshSchedulerConfiguration {
 

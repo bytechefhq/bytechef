@@ -25,7 +25,6 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
-import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -61,35 +60,17 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Override
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
-        String tenantId = TenantContext.getCurrentTenantId();
 
         workspaceConnectionService.create(connectionId, workspaceId);
-
-        ConnectionDTO connection = connectionFacade.getConnection(connectionId);
-
-        connectionLifecycleFacade.scheduleConnectionRefresh(
-            connectionId, connection.parameters(), connection.authorizationType(), tenantId);
 
         return connectionId;
     }
 
     @Override
     public void delete(long connectionId) {
-        ConnectionDTO connection = connectionFacade.getConnection(connectionId);
-        String tenantId = TenantContext.getCurrentTenantId();
+        workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
-        try {
-            connectionLifecycleFacade.deleteScheduledConnectionRefresh(
-                connectionId, connection.authorizationType(), tenantId);
-
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-
-        } finally {
-            workspaceConnectionService.deleteWorkspaceConnection(connectionId);
-
-            connectionFacade.delete(connectionId);
-        }
+        connectionFacade.delete(connectionId);
     }
 
     @Override

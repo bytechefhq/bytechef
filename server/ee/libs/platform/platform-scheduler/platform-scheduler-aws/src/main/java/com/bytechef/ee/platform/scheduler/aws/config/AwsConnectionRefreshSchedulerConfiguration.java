@@ -35,7 +35,7 @@ import software.amazon.awssdk.services.scheduler.SchedulerClient;
  */
 @Configuration
 @ConditionalOnProperty(
-    prefix = "bytechef", name = "coordinator.connection.scheduler.provider", havingValue = "aws")
+    prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "aws")
 @ConditionalOnEEVersion
 public class AwsConnectionRefreshSchedulerConfiguration {
 
