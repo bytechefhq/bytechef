@@ -34,7 +34,8 @@ public class OpenRouterComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("openRouter")
         .title("Open Router")
-        .description("OpenRouter provides a unified API that gives you access to hundreds of AI models through a single endpoint, while automatically handling fallbacks and selecting the most cost-effective options.")
+        .description(
+            "OpenRouter provides a unified API that gives you access to hundreds of AI models through a single endpoint, while automatically handling fallbacks and selecting the most cost-effective options.")
         .icon("path:assets/open-router.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OpenRouterConnection.CONNECTION_DEFINITION)
