@@ -1,0 +1,554 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The AI Gateway Public V1 API"
+  version: "1"
+servers:
+  - url: "/api/ai-gateway/v1"
+tags:
+  - name: "chat-completion"
+    description: "The AI Gateway Chat Completion Public API"
+  - name: "embedding"
+    description: "The AI Gateway Embedding Public API"
+  - name: "model"
+    description: "The AI Gateway Model Public API"
+  - name: "routing"
+    description: "The AI Gateway Routing Public API"
+  - name: "tag"
+    description: "The AI Gateway Tag Public API"
+  - name: "score"
+    description: "The AI Gateway Score Public API"
+paths:
+  /chat/completions:
+    post:
+      description: "Create a chat completion. Supports both synchronous and streaming responses."
+      summary: "Create a chat completion"
+      tags:
+        - "chat-completion"
+      operationId: "chatCompletions"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatCompletionRequest"
+        required: true
+      responses:
+        "200":
+          description: "The chat completion response. Returns SSE stream when stream=true."
+          headers:
+            x-gateway-provider:
+              description: "Resolved provider name (e.g. openai, anthropic)"
+              schema: {type: "string"}
+            x-gateway-model:
+              description: "Model that actually served the request after routing"
+              schema: {type: "string"}
+            x-gateway-latency-ms:
+              description: "Gateway-observed end-to-end latency in milliseconds"
+              schema: {type: "integer"}
+            x-gateway-cache-hit:
+              description: "true when the response came from the request cache"
+              schema: {type: "boolean"}
+            x-gateway-routing-policy:
+              description: "Routing policy name or ID that selected the provider/model"
+              schema: {type: "string"}
+            x-gateway-request-id:
+              description: "Opaque request correlation ID"
+              schema: {type: "string"}
+            x-gateway-budget-warning:
+              description: "Remaining USD budget when the workspace has crossed the soft warning threshold"
+              schema: {type: "string"}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatCompletionResponse"
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/ChatCompletionResponse"
+        "402":
+          description: "Budget hard limit reached. Body: { error: { type: 'budget_exceeded', message, budgetUsd, spentUsd } }."
+  /embeddings:
+    post:
+      description: "Create an embedding vector representation of the given input."
+      summary: "Create an embedding"
+      tags:
+        - "embedding"
+      operationId: "embeddings"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmbeddingRequest"
+        required: true
+      responses:
+        "200":
+          description: "The embedding response."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmbeddingResponse"
+  /models:
+    get:
+      description: "List all available models."
+      summary: "List models"
+      tags:
+        - "model"
+      operationId: "listModels"
+      responses:
+        "200":
+          description: "The list of models."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelList"
+  /models/{modelId}:
+    get:
+      description: "Retrieve a model by its ID."
+      summary: "Get model"
+      tags:
+        - "model"
+      operationId: "getModel"
+      parameters:
+        - name: "modelId"
+          description: "The model ID in provider/model format."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The model."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Model"
+        "400":
+          description: "Invalid model ID format."
+  /routing/strategies:
+    get:
+      description: "List all available routing strategies with descriptions."
+      summary: "List routing strategies"
+      tags:
+        - "routing"
+      operationId: "listRoutingStrategies"
+      responses:
+        "200":
+          description: "The list of routing strategies."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoutingStrategyList"
+  /routing/policies:
+    get:
+      description: "List all enabled routing policies."
+      summary: "List routing policies"
+      tags:
+        - "routing"
+      operationId: "listRoutingPolicies"
+      responses:
+        "200":
+          description: "The list of routing policies."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoutingPolicyList"
+  /tags:
+    get:
+      description: "List all supported request tags for the given routing policy."
+      summary: "List tags"
+      tags:
+        - "tag"
+      operationId: "listTags"
+      parameters:
+        - name: "routing_policy_id"
+          in: "query"
+          required: true
+          description: "The routing policy ID to list tags for."
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of supported tags."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagList"
+  /scores:
+    post:
+      description: "Create a score (annotation or evaluation result) for a trace or a specific\
+        \ span within a trace. Scores can be numeric, categorical, or boolean and are used\
+        \ for manual annotation, programmatic scoring, and LLM-as-judge evaluation."
+      summary: "Create a score for a trace or span"
+      tags:
+        - "score"
+      operationId: "createScore"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScoreRequest"
+        required: true
+      responses:
+        "200":
+          description: "The score was created."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScoreResponse"
+        "400":
+          description: "Invalid input (e.g. unknown data type, missing required fields)."
+        "404":
+          description: "The referenced trace does not exist."
+components:
+  schemas:
+    ChatCompletionRequest:
+      description: "A chat completion request."
+      type: "object"
+      required:
+        - "model"
+        - "messages"
+      properties:
+        model:
+          description: "The model to use in provider/model format."
+          type: "string"
+        messages:
+          description: "The messages to generate chat completions for."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+        temperature:
+          description: "Sampling temperature between 0 and 2."
+          type: "number"
+          format: "double"
+        max_tokens:
+          description: "Maximum number of tokens to generate."
+          type: "integer"
+        top_p:
+          description: "Nucleus sampling parameter."
+          type: "number"
+          format: "double"
+        stream:
+          description: "Whether to stream the response."
+          type: "boolean"
+          default: false
+        routing_policy:
+          description: "The name of the routing policy to use."
+          type: "string"
+        cache:
+          description: "Whether to enable response caching."
+          type: "boolean"
+        tool_choice:
+          description: "Controls which tool is called by the model."
+          type: "object"
+        tools:
+          description: "A list of tools the model may call."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tool"
+        tags:
+          description: "Custom tags for the request."
+          type: "object"
+          additionalProperties:
+            type: "string"
+    ChatMessage:
+      description: "A chat message."
+      type: "object"
+      properties:
+        role:
+          description: "The role of the message author."
+          type: "string"
+        content:
+          description: "The content of the message."
+          type: "string"
+        tool_calls:
+          description: "Tool calls generated by the model."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ToolCall"
+        tool_call_id:
+          description: "The ID of the tool call this message is responding to."
+          type: "string"
+        content_blocks:
+          description: "Multimodal content blocks."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ContentBlock"
+    ContentBlock:
+      description: "A content block for multimodal messages."
+      type: "object"
+      properties:
+        type:
+          description: "The type of content block."
+          type: "string"
+        text:
+          description: "The text content."
+          type: "string"
+        image_url:
+          description: "The image URL."
+          type: "object"
+          properties:
+            url:
+              type: "string"
+            detail:
+              type: "string"
+    Tool:
+      description: "A tool the model may call."
+      type: "object"
+      properties:
+        type:
+          description: "The type of the tool."
+          type: "string"
+        function:
+          description: "The function definition."
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            description:
+              type: "string"
+            parameters:
+              type: "object"
+    ToolCall:
+      description: "A tool call generated by the model."
+      type: "object"
+      properties:
+        id:
+          description: "The ID of the tool call."
+          type: "string"
+        type:
+          description: "The type of the tool call."
+          type: "string"
+        function:
+          description: "The function the model called."
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            arguments:
+              type: "string"
+    ChatCompletionResponse:
+      description: "A chat completion response."
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        object:
+          type: "string"
+        created:
+          type: "integer"
+          format: "int64"
+        model:
+          type: "string"
+        choices:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Choice"
+        usage:
+          $ref: "#/components/schemas/Usage"
+    Choice:
+      description: "A chat completion choice."
+      type: "object"
+      properties:
+        index:
+          type: "integer"
+        message:
+          $ref: "#/components/schemas/ChatMessage"
+        finish_reason:
+          type: "string"
+    Usage:
+      description: "Token usage information."
+      type: "object"
+      properties:
+        prompt_tokens:
+          type: "integer"
+          format: "int64"
+        completion_tokens:
+          type: "integer"
+          format: "int64"
+        total_tokens:
+          type: "integer"
+          format: "int64"
+    EmbeddingRequest:
+      description: "An embedding request."
+      type: "object"
+      required:
+        - "model"
+        - "input"
+      properties:
+        model:
+          description: "The model to use in provider/model format."
+          type: "string"
+        input:
+          description: "The input texts to embed."
+          type: "array"
+          items:
+            type: "string"
+        tags:
+          description: "Custom tags for the request."
+          type: "object"
+          additionalProperties:
+            type: "string"
+    EmbeddingResponse:
+      description: "An embedding response."
+      type: "object"
+      properties:
+        object:
+          type: "string"
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/EmbeddingData"
+        model:
+          type: "string"
+        usage:
+          $ref: "#/components/schemas/EmbeddingUsage"
+    EmbeddingData:
+      description: "A single embedding result."
+      type: "object"
+      properties:
+        object:
+          type: "string"
+        index:
+          type: "integer"
+        embedding:
+          type: "array"
+          items:
+            type: "number"
+            format: "float"
+    EmbeddingUsage:
+      description: "Token usage for embedding."
+      type: "object"
+      properties:
+        prompt_tokens:
+          type: "integer"
+        total_tokens:
+          type: "integer"
+    ModelList:
+      description: "A list of models."
+      type: "object"
+      properties:
+        object:
+          type: "string"
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Model"
+    Model:
+      description: "A model object."
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        object:
+          type: "string"
+        owned_by:
+          type: "string"
+    RoutingStrategy:
+      description: "A routing strategy."
+      type: "object"
+      properties:
+        id:
+          description: "The strategy identifier."
+          type: "string"
+        name:
+          description: "The display name."
+          type: "string"
+        description:
+          description: "A description of the strategy behavior."
+          type: "string"
+    RoutingStrategyList:
+      description: "A list of routing strategies."
+      type: "object"
+      properties:
+        object:
+          type: "string"
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/RoutingStrategy"
+    RoutingPolicy:
+      description: "A routing policy."
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          description: "The policy name."
+          type: "string"
+        strategy:
+          description: "The routing strategy used by this policy."
+          type: "string"
+        enabled:
+          description: "Whether the policy is enabled."
+          type: "boolean"
+    RoutingPolicyList:
+      description: "A list of routing policies."
+      type: "object"
+      properties:
+        object:
+          type: "string"
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/RoutingPolicy"
+    Tag:
+      description: "A supported request tag."
+      type: "object"
+      properties:
+        key:
+          description: "The tag name."
+          type: "string"
+    TagList:
+      description: "A list of supported tags."
+      type: "object"
+      properties:
+        object:
+          type: "string"
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+    ScoreRequest:
+      description: "A request to create a score for a trace or span."
+      type: "object"
+      required:
+        - "traceId"
+        - "name"
+        - "dataType"
+      properties:
+        traceId:
+          description: "The ID of the trace to score."
+          type: "integer"
+          format: "int64"
+        spanId:
+          description: "Optional ID of a specific span within the trace. If omitted the score\
+            \ applies to the whole trace."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The score name (e.g. 'helpfulness', 'hallucination')."
+          type: "string"
+        dataType:
+          description: "The score data type: NUMERIC, CATEGORICAL, or BOOLEAN."
+          type: "string"
+        value:
+          description: "Numeric value, required when dataType is NUMERIC or BOOLEAN\
+            \ (0/1)."
+          type: "number"
+        stringValue:
+          description: "String value, required when dataType is CATEGORICAL."
+          type: "string"
+        comment:
+          description: "Optional free-text comment explaining the score."
+          type: "string"
+    ScoreResponse:
+      description: "The result of creating a score."
+      type: "object"
+      properties:
+        id:
+          description: "The generated score ID."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The score name."
+          type: "string"

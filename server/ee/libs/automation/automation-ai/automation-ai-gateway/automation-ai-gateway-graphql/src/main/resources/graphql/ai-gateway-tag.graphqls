@@ -1,0 +1,26 @@
+extend type Query {
+    aiGatewayTag(id: ID!): AiGatewayTag
+    aiGatewayTags(workspaceId: ID!): [AiGatewayTag]
+}
+
+extend type Mutation {
+    createAiGatewayTag(input: CreateAiGatewayTagInput!): AiGatewayTag
+    deleteAiGatewayTag(id: ID!): Boolean
+    updateAiGatewayTag(id: ID!, name: String, color: String): AiGatewayTag
+}
+
+type AiGatewayTag {
+    color: String
+    createdDate: Long
+    id: ID!
+    lastModifiedDate: Long
+    name: String!
+    version: Int
+    workspaceId: ID!
+}
+
+input CreateAiGatewayTagInput {
+    color: String
+    name: String!
+    workspaceId: ID!
+}

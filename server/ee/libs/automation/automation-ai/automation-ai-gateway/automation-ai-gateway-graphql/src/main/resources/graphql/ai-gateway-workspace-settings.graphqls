@@ -1,0 +1,31 @@
+extend type Query {
+    aiGatewayWorkspaceSettings(workspaceId: ID!): AiGatewayWorkspaceSettings
+}
+
+extend type Mutation {
+    updateAiGatewayWorkspaceSettings(input: AiGatewayWorkspaceSettingsInput!): AiGatewayWorkspaceSettings
+}
+
+type AiGatewayWorkspaceSettings {
+    cacheEnabled: Boolean
+    cacheTtlSeconds: Int
+    defaultRoutingPolicyId: ID
+    logRetentionDays: Int
+    redactPii: Boolean
+    retryCount: Int
+    softBudgetWarningPct: Int
+    timeoutMs: Int
+    workspaceId: ID!
+}
+
+input AiGatewayWorkspaceSettingsInput {
+    cacheEnabled: Boolean
+    cacheTtlSeconds: Int
+    defaultRoutingPolicyId: ID
+    logRetentionDays: Int
+    redactPii: Boolean
+    retryCount: Int
+    softBudgetWarningPct: Int
+    timeoutMs: Int
+    workspaceId: ID!
+}

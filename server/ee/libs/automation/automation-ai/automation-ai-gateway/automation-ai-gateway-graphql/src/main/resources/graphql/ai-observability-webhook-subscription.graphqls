@@ -1,0 +1,43 @@
+extend type Query {
+    aiObservabilityWebhookSubscription(id: ID!): AiObservabilityWebhookSubscription
+    aiObservabilityWebhookSubscriptions(workspaceId: ID!): [AiObservabilityWebhookSubscription]
+}
+
+extend type Mutation {
+    createAiObservabilityWebhookSubscription(
+        workspaceId: ID!
+        projectId: ID
+        name: String!
+        url: String!
+        secret: String
+        events: String!
+        enabled: Boolean!
+    ): AiObservabilityWebhookSubscription
+
+    updateAiObservabilityWebhookSubscription(
+        id: ID!
+        name: String!
+        url: String!
+        secret: String
+        events: String!
+        enabled: Boolean!
+    ): AiObservabilityWebhookSubscription
+
+    deleteAiObservabilityWebhookSubscription(id: ID!): Boolean
+
+    testAiObservabilityWebhookSubscription(id: ID!): Boolean
+}
+
+type AiObservabilityWebhookSubscription {
+    createdDate: Long
+    enabled: Boolean!
+    events: String!
+    id: ID!
+    lastModifiedDate: Long
+    lastTriggeredDate: Long
+    name: String!
+    projectId: ID
+    url: String!
+    version: Int
+    workspaceId: ID!
+}

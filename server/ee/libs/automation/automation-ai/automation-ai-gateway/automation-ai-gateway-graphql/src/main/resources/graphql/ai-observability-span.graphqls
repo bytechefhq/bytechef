@@ -1,0 +1,44 @@
+type AiObservabilitySpan {
+    cost: Float
+    createdDate: Long
+    endTime: Long
+    id: ID!
+    input: String
+    inputTokens: Int
+    latencyMs: Int
+    level: AiObservabilitySpanLevel!
+    metadata: String
+    model: String
+    name: String
+    output: String
+    outputTokens: Int
+    parentSpanId: ID
+    promptId: ID
+    promptVersionId: ID
+    provider: String
+    startTime: Long
+    status: AiObservabilitySpanStatus!
+    traceId: ID!
+    type: AiObservabilitySpanType!
+    version: Int
+}
+
+enum AiObservabilitySpanType {
+    EVENT
+    GENERATION
+    SPAN
+    TOOL_CALL
+}
+
+enum AiObservabilitySpanStatus {
+    ACTIVE
+    COMPLETED
+    ERROR
+}
+
+enum AiObservabilitySpanLevel {
+    DEBUG
+    DEFAULT
+    ERROR
+    WARNING
+}

@@ -17,6 +17,10 @@
 package com.bytechef.platform.scheduler.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.scheduler.AlertScheduler;
+import com.bytechef.platform.scheduler.ExportScheduler;
+import com.bytechef.platform.scheduler.QuartzAlertScheduler;
+import com.bytechef.platform.scheduler.QuartzExportScheduler;
 import com.bytechef.platform.scheduler.QuartzTriggerScheduler;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import org.quartz.Scheduler;
@@ -62,6 +66,16 @@ public class QuartzTriggerSchedulerConfiguration {
             .getPolling();
 
         return new QuartzTriggerScheduler(polling, scheduler);
+    }
+
+    @Bean
+    AlertScheduler quartzAlertScheduler(@Lazy Scheduler scheduler) {
+        return new QuartzAlertScheduler(scheduler);
+    }
+
+    @Bean
+    ExportScheduler quartzExportScheduler(@Lazy Scheduler scheduler) {
+        return new QuartzExportScheduler(scheduler);
     }
 
     @Bean

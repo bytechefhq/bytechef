@@ -1,0 +1,25 @@
+extend type Query {
+    workspaceAiGatewayProviders(workspaceId: ID!): [AiGatewayProvider]
+}
+
+extend type Mutation {
+    createWorkspaceAiGatewayProvider(input: CreateWorkspaceAiGatewayProviderInput!): AiGatewayProvider
+    deleteWorkspaceAiGatewayProvider(workspaceId: ID!, providerId: ID!): Boolean
+    testWorkspaceAiGatewayProviderConnection(workspaceId: ID!, providerId: ID!): ProviderConnectionResult
+    updateWorkspaceAiGatewayProvider(workspaceId: ID!, id: ID!, input: UpdateAiGatewayProviderInput!): AiGatewayProvider
+}
+
+type ProviderConnectionResult {
+    errorMessage: String
+    latencyMs: Int
+    ok: Boolean!
+}
+
+input CreateWorkspaceAiGatewayProviderInput {
+    apiKey: String!
+    baseUrl: String
+    config: String
+    name: String!
+    type: AiGatewayProviderType!
+    workspaceId: ID!
+}

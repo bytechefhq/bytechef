@@ -1,0 +1,55 @@
+extend type Query {
+    aiGatewayProject(id: ID!): AiGatewayProject
+    aiGatewayProjects(workspaceId: ID!): [AiGatewayProject!]!
+}
+
+extend type Mutation {
+    createAiGatewayProject(input: CreateAiGatewayProjectInput!): AiGatewayProject
+    updateAiGatewayProject(id: ID!, input: UpdateAiGatewayProjectInput!): AiGatewayProject
+    deleteAiGatewayProject(id: ID!): Boolean
+}
+
+type AiGatewayProject {
+    cachingEnabled: Boolean
+    cacheTtlMinutes: Int
+    compressionEnabled: Boolean
+    createdDate: Long
+    description: String
+    id: ID!
+    lastModifiedDate: Long
+    logRetentionDays: Int
+    name: String!
+    retryMaxAttempts: Int
+    routingPolicyId: ID
+    slug: String!
+    timeoutSeconds: Int
+    version: Int
+    workspaceId: ID!
+}
+
+input CreateAiGatewayProjectInput {
+    cachingEnabled: Boolean
+    cacheTtlMinutes: Int
+    compressionEnabled: Boolean
+    description: String
+    logRetentionDays: Int
+    name: String!
+    retryMaxAttempts: Int
+    routingPolicyId: ID
+    slug: String!
+    timeoutSeconds: Int
+    workspaceId: ID!
+}
+
+input UpdateAiGatewayProjectInput {
+    cachingEnabled: Boolean
+    cacheTtlMinutes: Int
+    compressionEnabled: Boolean
+    description: String
+    logRetentionDays: Int
+    name: String
+    retryMaxAttempts: Int
+    routingPolicyId: ID
+    slug: String
+    timeoutSeconds: Int
+}

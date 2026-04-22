@@ -1,0 +1,74 @@
+extend type Query {
+    aiPrompt(id: ID!): AiPrompt
+    aiPrompts(workspaceId: ID!): [AiPrompt]
+    aiPromptVersions(promptId: ID!): [AiPromptVersion]
+}
+
+extend type Mutation {
+    createAiPrompt(input: CreateAiPromptInput!): AiPrompt
+    createAiPromptVersion(input: CreateAiPromptVersionInput!): AiPromptVersion
+    deleteAiPrompt(id: ID!): Boolean
+    setActiveAiPromptVersion(promptVersionId: ID!, environment: String!): Boolean
+    updateAiPrompt(id: ID!, input: UpdateAiPromptInput!): AiPrompt
+}
+
+type AiPrompt {
+    createdDate: Long
+    description: String
+    id: ID!
+    lastModifiedDate: Long
+    name: String!
+    projectId: ID
+    version: Int
+    versions: [AiPromptVersion]
+    workspaceId: ID!
+}
+
+type AiPromptVersion {
+    active: Boolean!
+    commitMessage: String
+    content: String!
+    createdBy: String!
+    createdDate: Long
+    environment: String
+    id: ID!
+    metrics: AiPromptVersionMetrics
+    promptId: ID!
+    type: AiPromptVersionType!
+    variables: String
+    versionNumber: Int!
+}
+
+type AiPromptVersionMetrics {
+    avgCostUsd: Float
+    avgLatencyMs: Float
+    errorRate: Float
+    invocationCount: Int!
+}
+
+enum AiPromptVersionType {
+    CHAT
+    TEXT
+}
+
+input CreateAiPromptInput {
+    description: String
+    name: String!
+    projectId: ID
+    workspaceId: ID!
+}
+
+input CreateAiPromptVersionInput {
+    active: Boolean
+    commitMessage: String
+    content: String!
+    environment: String
+    promptId: ID!
+    type: AiPromptVersionType!
+    variables: String
+}
+
+input UpdateAiPromptInput {
+    description: String
+    name: String
+}

@@ -1,0 +1,36 @@
+extend type Mutation {
+    playgroundChatCompletion(input: PlaygroundChatCompletionInput!): PlaygroundChatCompletionResponse
+}
+
+input PlaygroundChatCompletionInput {
+    maxTokens: Int
+    messages: [PlaygroundChatMessageInput!]!
+    model: String!
+    promptId: ID
+    promptVariables: String
+    temperature: Float
+    topP: Float
+}
+
+input PlaygroundChatMessageInput {
+    content: String!
+    role: PlaygroundChatRole!
+}
+
+enum PlaygroundChatRole {
+    ASSISTANT
+    SYSTEM
+    USER
+}
+
+type PlaygroundChatCompletionResponse {
+    completionTokens: Int
+    content: String
+    cost: Float
+    finishReason: String
+    latencyMs: Int
+    model: String
+    promptTokens: Int
+    totalTokens: Int
+    traceId: ID
+}

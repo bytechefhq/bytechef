@@ -481,6 +481,7 @@ public class ApplicationProperties {
         private Anthropic anthropic = new Anthropic();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
+        private Gateway gateway = new Gateway();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
         private Mcp mcp = new Mcp();
         private OpenAi openAi = new OpenAi();
@@ -501,6 +502,10 @@ public class ApplicationProperties {
 
         public Firecrawl getFirecrawl() {
             return firecrawl;
+        }
+
+        public Gateway getGateway() {
+            return gateway;
         }
 
         public KnowledgeBase getKnowledgeBase() {
@@ -537,6 +542,10 @@ public class ApplicationProperties {
 
         public void setFirecrawl(Firecrawl firecrawl) {
             this.firecrawl = firecrawl;
+        }
+
+        public void setGateway(Gateway gateway) {
+            this.gateway = gateway;
         }
 
         public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
@@ -1014,7 +1023,56 @@ public class ApplicationProperties {
         }
 
         /**
-         * Knowledge base AI configuration.
+         * Gateway configuration.
+         */
+        public static class Gateway {
+
+            private boolean enabled;
+
+            private RateLimiting rateLimiting = new RateLimiting();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public RateLimiting getRateLimiting() {
+                return rateLimiting;
+            }
+
+            public void setRateLimiting(RateLimiting rateLimiting) {
+                this.rateLimiting = rateLimiting;
+            }
+
+            public static class RateLimiting {
+
+                private boolean enabled;
+
+                private String provider;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public String getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(String provider) {
+                    this.provider = provider;
+                }
+            }
+        }
+
+        /**
+         * Knowledge base configuration.
          */
         public static class KnowledgeBase {
 

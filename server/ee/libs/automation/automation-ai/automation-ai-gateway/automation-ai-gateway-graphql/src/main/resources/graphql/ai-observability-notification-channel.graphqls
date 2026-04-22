@@ -1,0 +1,37 @@
+extend type Query {
+    aiObservabilityNotificationChannel(id: ID!): AiObservabilityNotificationChannel
+    aiObservabilityNotificationChannels(workspaceId: ID!): [AiObservabilityNotificationChannel]
+}
+
+extend type Mutation {
+    createAiObservabilityNotificationChannel(input: AiObservabilityNotificationChannelInput!): AiObservabilityNotificationChannel
+    deleteAiObservabilityNotificationChannel(id: ID!): Boolean
+    testAiObservabilityNotificationChannel(id: ID!): Boolean
+    updateAiObservabilityNotificationChannel(id: ID!, input: AiObservabilityNotificationChannelInput!): AiObservabilityNotificationChannel
+}
+
+type AiObservabilityNotificationChannel {
+    config: String!
+    createdDate: Long
+    enabled: Boolean!
+    id: ID!
+    lastModifiedDate: Long
+    name: String!
+    type: AiObservabilityNotificationChannelType!
+    version: Int
+    workspaceId: ID!
+}
+
+input AiObservabilityNotificationChannelInput {
+    config: String!
+    enabled: Boolean!
+    name: String!
+    type: AiObservabilityNotificationChannelType!
+    workspaceId: ID!
+}
+
+enum AiObservabilityNotificationChannelType {
+    EMAIL
+    SLACK
+    WEBHOOK
+}

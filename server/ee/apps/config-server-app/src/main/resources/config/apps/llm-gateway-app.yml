@@ -1,0 +1,10 @@
+bytechef:
+  ai:
+    ai-gateway:
+      enabled: true
+  edition: ee
+
+spring:
+  task:
+    execution:
+      thread-name-prefix: ai-gateway-app-task-

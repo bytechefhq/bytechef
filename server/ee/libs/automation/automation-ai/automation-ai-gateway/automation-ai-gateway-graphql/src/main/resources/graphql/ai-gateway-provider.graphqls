@@ -1,0 +1,52 @@
+extend type Query {
+    aiGatewayProvider(id: ID!): AiGatewayProvider
+    aiGatewayProviders: [AiGatewayProvider]
+}
+
+extend type Mutation {
+    createAiGatewayProvider(input: CreateAiGatewayProviderInput!): AiGatewayProvider
+    deleteAiGatewayProvider(id: ID!): Boolean
+    updateAiGatewayProvider(id: ID!, input: UpdateAiGatewayProviderInput!): AiGatewayProvider
+}
+
+type AiGatewayProvider {
+    id: ID!
+    name: String!
+    type: AiGatewayProviderType!
+    baseUrl: String
+    enabled: Boolean!
+    config: String
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+enum AiGatewayProviderType {
+    ANTHROPIC
+    AZURE_OPENAI
+    COHERE
+    DEEPSEEK
+    GOOGLE_GEMINI
+    GROQ
+    MISTRAL
+    OPENAI
+}
+
+input CreateAiGatewayProviderInput {
+    name: String!
+    type: AiGatewayProviderType!
+    apiKey: String!
+    baseUrl: String
+    config: String
+}
+
+input UpdateAiGatewayProviderInput {
+    name: String!
+    type: AiGatewayProviderType!
+    apiKey: String
+    baseUrl: String
+    enabled: Boolean
+    config: String
+}

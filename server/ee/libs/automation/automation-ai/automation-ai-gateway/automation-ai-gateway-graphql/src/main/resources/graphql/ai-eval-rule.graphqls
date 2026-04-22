@@ -1,0 +1,52 @@
+extend type Query {
+    aiEvalRule(id: ID!): AiEvalRule
+    aiEvalRules(workspaceId: ID!): [AiEvalRule]
+}
+
+extend type Mutation {
+    createAiEvalRule(
+        delaySeconds: Int,
+        enabled: Boolean!,
+        filters: String,
+        model: String!,
+        name: String!,
+        projectId: ID,
+        promptTemplate: String!,
+        samplingRate: Float!,
+        scoreConfigId: ID!,
+        workspaceId: ID!
+    ): AiEvalRule
+
+    deleteAiEvalRule(id: ID!): Boolean
+
+    runAiEvalRuleOnHistoricalTraces(ruleId: ID!, startDate: Long!, endDate: Long!): Int
+
+    updateAiEvalRule(
+        delaySeconds: Int,
+        enabled: Boolean!,
+        filters: String,
+        id: ID!,
+        model: String!,
+        name: String!,
+        promptTemplate: String!,
+        samplingRate: Float!,
+        scoreConfigId: ID!
+    ): AiEvalRule
+}
+
+type AiEvalRule {
+    createdDate: Long
+    delaySeconds: Int
+    enabled: Boolean!
+    filters: String
+    id: ID!
+    lastModifiedDate: Long
+    model: String!
+    name: String!
+    projectId: ID
+    promptTemplate: String!
+    samplingRate: Float!
+    scoreConfigId: ID!
+    version: Int
+    workspaceId: ID!
+}

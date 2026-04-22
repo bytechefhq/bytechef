@@ -1,0 +1,60 @@
+extend type Query {
+    aiObservabilityAlertRule(id: ID!): AiObservabilityAlertRule
+    aiObservabilityAlertRules(workspaceId: ID!): [AiObservabilityAlertRule]
+}
+
+extend type Mutation {
+    createAiObservabilityAlertRule(input: AiObservabilityAlertRuleInput!): AiObservabilityAlertRule
+    deleteAiObservabilityAlertRule(id: ID!): Boolean
+    snoozeAiObservabilityAlertRule(id: ID!, until: Long!): AiObservabilityAlertRule
+    testAiObservabilityAlertRule(id: ID!): Float
+    unsnoozeAiObservabilityAlertRule(id: ID!): AiObservabilityAlertRule
+    updateAiObservabilityAlertRule(id: ID!, input: AiObservabilityAlertRuleInput!): AiObservabilityAlertRule
+}
+
+type AiObservabilityAlertRule {
+    channelIds: [ID]
+    condition: AiObservabilityAlertCondition!
+    cooldownMinutes: Int!
+    createdDate: Long
+    enabled: Boolean!
+    filters: String
+    id: ID!
+    lastModifiedDate: Long
+    metric: AiObservabilityAlertMetric!
+    name: String!
+    projectId: ID
+    snoozedUntil: Long
+    threshold: Float!
+    version: Int
+    windowMinutes: Int!
+    workspaceId: ID!
+}
+
+input AiObservabilityAlertRuleInput {
+    channelIds: [ID]
+    condition: AiObservabilityAlertCondition!
+    cooldownMinutes: Int!
+    enabled: Boolean!
+    filters: String
+    metric: AiObservabilityAlertMetric!
+    name: String!
+    projectId: ID
+    threshold: Float!
+    windowMinutes: Int!
+    workspaceId: ID!
+}
+
+enum AiObservabilityAlertMetric {
+    COST
+    ERROR_RATE
+    LATENCY_P95
+    REQUEST_VOLUME
+    TOKEN_USAGE
+}
+
+enum AiObservabilityAlertCondition {
+    EQUALS
+    GREATER_THAN
+    LESS_THAN
+}

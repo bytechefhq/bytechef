@@ -1,0 +1,29 @@
+extend type Query {
+    aiGatewayRequestLogs(startDate: Long!, endDate: Long!): [AiGatewayRequestLog]
+    workspaceAiGatewayRequestLogs(
+        workspaceId: ID!
+        startDate: Long!
+        endDate: Long!
+        propertyKey: String
+        propertyValue: String
+    ): [AiGatewayRequestLog]
+}
+
+type AiGatewayRequestLog {
+    id: ID!
+    requestId: String!
+    apiKeyId: ID
+    requestedModel: String
+    routedModel: String
+    routedProvider: String
+    routingPolicyId: ID
+    routingStrategy: String
+    latencyMs: Int
+    inputTokens: Int
+    outputTokens: Int
+    cost: String
+    status: Int
+    errorMessage: String
+    cacheHit: Boolean
+    createdDate: Long
+}

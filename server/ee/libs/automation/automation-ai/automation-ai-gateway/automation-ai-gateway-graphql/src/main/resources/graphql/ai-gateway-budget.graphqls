@@ -1,0 +1,51 @@
+extend type Query {
+    aiGatewayBudget(workspaceId: ID!): AiGatewayBudget
+}
+
+extend type Mutation {
+    createAiGatewayBudget(input: CreateAiGatewayBudgetInput!): AiGatewayBudget
+    updateAiGatewayBudget(id: ID!, input: UpdateAiGatewayBudgetInput!): AiGatewayBudget
+    deleteAiGatewayBudget(id: ID!): Boolean
+}
+
+type AiGatewayBudget {
+    alertThreshold: Int!
+    amount: String!
+    createdDate: Long
+    enabled: Boolean!
+    enforcementMode: AiGatewayBudgetEnforcementMode!
+    id: ID!
+    lastModifiedDate: Long
+    period: AiGatewayBudgetPeriod!
+    version: Int
+    workspaceId: ID!
+}
+
+enum AiGatewayBudgetPeriod {
+    DAILY
+    MONTHLY
+    QUARTERLY
+    WEEKLY
+    YEARLY
+}
+
+enum AiGatewayBudgetEnforcementMode {
+    HARD
+    SOFT
+}
+
+input CreateAiGatewayBudgetInput {
+    alertThreshold: Int
+    amount: String!
+    enforcementMode: AiGatewayBudgetEnforcementMode!
+    period: AiGatewayBudgetPeriod!
+    workspaceId: ID!
+}
+
+input UpdateAiGatewayBudgetInput {
+    alertThreshold: Int
+    amount: String
+    enabled: Boolean
+    enforcementMode: AiGatewayBudgetEnforcementMode
+    period: AiGatewayBudgetPeriod
+}

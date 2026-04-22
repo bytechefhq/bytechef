@@ -1,0 +1,60 @@
+extend type Query {
+    aiGatewayRateLimits(workspaceId: ID!): [AiGatewayRateLimit!]!
+}
+
+extend type Mutation {
+    createAiGatewayRateLimit(input: CreateAiGatewayRateLimitInput!): AiGatewayRateLimit
+    updateAiGatewayRateLimit(id: ID!, input: UpdateAiGatewayRateLimitInput!): AiGatewayRateLimit
+    deleteAiGatewayRateLimit(id: ID!): Boolean
+}
+
+type AiGatewayRateLimit {
+    createdDate: Long
+    enabled: Boolean!
+    id: ID!
+    lastModifiedDate: Long
+    limitType: AiGatewayRateLimitType!
+    limitValue: Int!
+    name: String!
+    projectId: ID
+    propertyKey: String
+    scope: AiGatewayRateLimitScope!
+    version: Int
+    windowSeconds: Int!
+    workspaceId: ID!
+}
+
+enum AiGatewayRateLimitScope {
+    GLOBAL
+    PER_PROPERTY
+    PER_USER
+}
+
+enum AiGatewayRateLimitType {
+    COST
+    REQUESTS
+    TOKENS
+}
+
+input CreateAiGatewayRateLimitInput {
+    enabled: Boolean
+    limitType: AiGatewayRateLimitType!
+    limitValue: Int!
+    name: String!
+    projectId: ID
+    propertyKey: String
+    scope: AiGatewayRateLimitScope!
+    windowSeconds: Int!
+    workspaceId: ID!
+}
+
+input UpdateAiGatewayRateLimitInput {
+    enabled: Boolean
+    limitType: AiGatewayRateLimitType
+    limitValue: Int
+    name: String
+    projectId: ID
+    propertyKey: String
+    scope: AiGatewayRateLimitScope
+    windowSeconds: Int
+}

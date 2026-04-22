@@ -1,0 +1,43 @@
+extend type Query {
+    aiObservabilityTrace(id: ID!): AiObservabilityTrace
+    aiObservabilityTraces(workspaceId: ID!, startDate: Long!, endDate: Long!, userId: String, status: AiObservabilityTraceStatus, source: AiObservabilityTraceSource, model: String, tagId: ID): [AiObservabilityTrace]
+}
+
+extend type Mutation {
+    setAiObservabilityTraceTags(traceId: ID!, tagIds: [ID!]!): AiObservabilityTrace
+}
+
+type AiObservabilityTrace {
+    apiKeyId: ID
+    createdDate: Long
+    id: ID!
+    input: String
+    lastModifiedDate: Long
+    metadata: String
+    name: String
+    output: String
+    projectId: ID
+    sessionId: ID
+    source: AiObservabilityTraceSource!
+    spans: [AiObservabilitySpan]
+    status: AiObservabilityTraceStatus!
+    tagIds: [ID!]
+    totalCost: Float
+    totalInputTokens: Int
+    totalLatencyMs: Int
+    totalOutputTokens: Int
+    userId: String
+    version: Int
+    workspaceId: ID!
+}
+
+enum AiObservabilityTraceSource {
+    API
+    PLAYGROUND
+}
+
+enum AiObservabilityTraceStatus {
+    ACTIVE
+    COMPLETED
+    ERROR
+}

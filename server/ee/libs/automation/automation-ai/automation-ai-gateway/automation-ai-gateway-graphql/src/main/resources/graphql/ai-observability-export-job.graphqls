@@ -1,0 +1,61 @@
+extend type Query {
+    aiObservabilityExportJob(id: ID!): AiObservabilityExportJob
+    aiObservabilityExportJobs(workspaceId: ID!): [AiObservabilityExportJob]
+}
+
+extend type Mutation {
+    createAiObservabilityExportJob(
+        workspaceId: ID!
+        projectId: ID
+        format: AiObservabilityExportFormat!
+        scope: AiObservabilityExportScope!
+        filters: String
+        type: AiObservabilityExportJobType
+        cronExpression: String
+    ): AiObservabilityExportJob
+
+    cancelAiObservabilityExportJob(id: ID!): AiObservabilityExportJob
+}
+
+type AiObservabilityExportJob {
+    createdBy: String!
+    createdDate: Long
+    cronExpression: String
+    errorMessage: String
+    filePath: String
+    filters: String
+    format: AiObservabilityExportFormat!
+    id: ID!
+    projectId: ID
+    recordCount: Int
+    scope: AiObservabilityExportScope!
+    status: AiObservabilityExportJobStatus!
+    type: AiObservabilityExportJobType!
+    workspaceId: ID!
+}
+
+enum AiObservabilityExportJobType {
+    ON_DEMAND
+    SCHEDULED
+}
+
+enum AiObservabilityExportFormat {
+    CSV
+    JSON
+    JSONL
+}
+
+enum AiObservabilityExportScope {
+    PROMPTS
+    REQUEST_LOGS
+    SESSIONS
+    TRACES
+}
+
+enum AiObservabilityExportJobStatus {
+    CANCELLED
+    COMPLETED
+    FAILED
+    PENDING
+    PROCESSING
+}

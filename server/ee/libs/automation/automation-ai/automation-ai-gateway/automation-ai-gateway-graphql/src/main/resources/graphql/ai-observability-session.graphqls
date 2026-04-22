@@ -1,0 +1,17 @@
+extend type Query {
+    aiObservabilitySession(id: ID!): AiObservabilitySession
+    aiObservabilitySessions(workspaceId: ID!): [AiObservabilitySession]
+}
+
+type AiObservabilitySession {
+    createdDate: Long
+    id: ID!
+    lastModifiedDate: Long
+    name: String
+    projectId: ID
+    traceCount: Int
+    traces: [AiObservabilityTrace]
+    userId: String
+    version: Int
+    workspaceId: ID!
+}
