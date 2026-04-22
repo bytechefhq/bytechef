@@ -37,6 +37,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -88,7 +89,6 @@ class KlaviyoSubscribeProfilesActionTest {
                 .thenReturn(mockedExecutor);
 
             assertNull(KlaviyoSubscribeProfilesAction.perform(mockedParameters, null, mockedContext));
-
             assertNotNull(httpFunctionArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
@@ -96,20 +96,19 @@ class KlaviyoSubscribeProfilesActionTest {
 
             assertEquals(ResponseType.JSON, configuration.getResponseType());
 
-            Body capturedBody = bodyArgumentCaptor.getValue();
-
             List<Map<String, Object>> expectedProfiles = List.of(
                 profileMap("1", "test1@example.com", "+1111111"),
                 profileMap("2", "test2@example.com", "+2222222"),
                 profileMap("3", "test3@example.com", "+3333333"));
 
             assertEquals(
-                Map.of(
-                    DATA, Map.of(
-                        TYPE, "profile-subscription-bulk-create-job",
-                        ATTRIBUTES, Map.of("profiles", Map.of(DATA, expectedProfiles)))),
-                capturedBody.getContent());
-
+                Body.of(
+                    Map.of(
+                        DATA, Map.of(
+                            TYPE, "profile-subscription-bulk-create-job",
+                            ATTRIBUTES, Map.of("profiles", Map.of(DATA, expectedProfiles)))),
+                    BodyContentType.JSON),
+                bodyArgumentCaptor.getValue());
             assertEquals(
                 List.of(mockedContext, mockedContext, mockedContext, mockedContext, mockedContext, mockedContext),
                 contextArgumentCaptor.getAllValues());

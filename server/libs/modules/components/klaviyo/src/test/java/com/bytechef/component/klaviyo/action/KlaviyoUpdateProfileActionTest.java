@@ -48,6 +48,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -101,12 +102,9 @@ class KlaviyoUpdateProfileActionTest {
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
-
-        Body capturedBody = bodyArgumentCaptor.getValue();
-
         assertEquals(
-            Map.of(DATA, Map.of(TYPE, PROFILE, ID, "1", ATTRIBUTES, getAttributes())),
-            capturedBody.getContent());
+            Body.of(Map.of(DATA, Map.of(TYPE, PROFILE, ID, "1", ATTRIBUTES, getAttributes())), BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
 
         assertEquals("/api/profiles/1", stringArgumentCaptor.getValue());
     }
