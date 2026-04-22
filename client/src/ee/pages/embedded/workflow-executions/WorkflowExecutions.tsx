@@ -22,6 +22,7 @@ import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedd
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -368,6 +369,24 @@ export const WorkflowExecutions = () => {
             filterPageNumber
         );
     };
+
+    useOnEnvironmentChange(() => {
+        setFilterIntegrationInstanceConfigurationId(undefined);
+        setFilterPageNumber(undefined);
+        setFilterWorkflowId(undefined);
+
+        filter(
+            filterAutomations,
+            filterStatus,
+            filterStartDate,
+            filterEndDate,
+            filterIntegrationId,
+            undefined,
+            filterProjectId,
+            undefined,
+            undefined
+        );
+    });
 
     return (
         <LayoutContainer
