@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+      Backfill RBAC rows for deployments that existed before @PreAuthorize was enforced. Without this, every
+      pre-existing workspace and project would have no administrators and nobody could access anything once the
+      permission checks turn on.
+
+      Strategy: promote every workspace_user that is still on the column default (EDITOR=1) to workspace ADMIN, then
+      seed one project_user ADMIN row per (workspace_user × project-in-that-workspace) pair that does not already have
+      one. Both statements run in a single changeset so the database commit is atomic — partial application would
+      leave the deployment half-RBAC'd and is harder to recover from than re-running the whole thing.
+
+      Safety:
+       - <preConditions> is the primary re-run guard: on a populated database the changeset is marked RAN exactly
+         once, so a normal re-run is a no-op regardless of the WHERE clauses below. The WHERE/NOT EXISTS clauses are
+         defensive — they only matter on the abnormal path where an operator has run `clearCheckSums` and forced
+         re-application. In that case `workspace_role = 1` filters keep already-promoted admins from being re-touched
+         (their ordinal is now 0) and `WHERE NOT EXISTS` prevents duplicate project_user rows. A demoted-to-EDITOR
+         admin would still be re-promoted on a clearCheckSums re-run; operators relying on that path must be aware.
+       - <rollback> is documented as no-op because there is no way to recover the original distinct workspace_role
+         values once the blanket promote has run; rolling back would silently drop assigned admin grants.
+
+      Auditability: the blanket-promote semantics are potentially surprising (every default-EDITOR user becomes
+      ADMIN), so the companion changeset below seeds a one-row `rbac_backfill_report` audit record with the
+      pre-backfill counts. Operators can SELECT from it after deployment to verify the migration's blast radius
+      matches expectations. The report table is created before the backfill runs and populated after, so the counts
+      recorded are the deltas the backfill actually applied.
+    -->
+
+    <changeSet id="202604061200050-audit-report-table" author="Ivica Cardic">
+        <!--
+          Create the audit report table BEFORE the backfill runs so the INSERT in the next changeset has somewhere
+          to write. Kept in a separate changeset (instead of CREATE TABLE + backfill in one) because the backfill
+          changeset uses runInTransaction="true" and some Liquibase DDL executors prefer DDL to live in its own
+          atomic unit for rollback granularity. The table is auto-skipped on re-run by Liquibase checksum tracking.
+        -->
+        <createTable tableName="rbac_backfill_report">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="executed_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace_users_promoted" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_users_seeded" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notes" type="VARCHAR(500)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="202604061200050-backfill-project-user" author="Ivica Cardic" runInTransaction="true">
+        <preConditions onError="HALT" onFail="MARK_RAN">
+            <!--
+              Skip the changeset on fresh installs (empty workspace_user). We cannot use `<sqlCheck
+              expectedResult="true">SELECT EXISTS(...)</sqlCheck>` here because PostgreSQL returns the boolean as 't'
+              or 'f', not the literal 'true' / 'false' — that mismatch would silently mark the changeset as RAN on
+              populated databases and lock out every existing EE user. `<not><rowCount expectedRows="0"/></not>`
+              works across dialects because `rowCount` compares integers, not booleans.
+
+              onError="HALT" / onFail="MARK_RAN" are split deliberately: a precondition-check error (permission
+              denied on workspace_user, missing table, connection failure) must HALT the deployment so operators
+              see the problem at startup. Folding errors into MARK_RAN would silently boot a half-RBAC'd database
+              where the backfill never ran but the change is marked complete. Only a FAIL (the populated-db check
+              legitimately returned "empty") may safely MARK_RAN.
+            -->
+            <not>
+                <rowCount tableName="workspace_user" expectedRows="0"/>
+            </not>
+        </preConditions>
+
+        <comment>
+            Atomic RBAC backfill: promote default-EDITOR workspace_user rows to ADMIN (ordinal 0), seed
+            project_user ADMIN rows for every (workspace member, project) pair lacking one, then record the row
+            counts for operator audit. The promote/seed/audit steps run as a single CTE-based statement so the
+            audit row reflects exactly the deltas this run applied (CTEs use RETURNING to count actual mutations,
+            avoiding the double-count that a SELECT-from-the-post-state query would produce on a clearCheckSums
+            re-run where prior runs already left admin rows behind).
+        </comment>
+
+        <sql>
+            WITH promoted AS (
+                UPDATE workspace_user SET workspace_role = 0 WHERE workspace_role = 1
+                RETURNING 1
+            ),
+            seeded AS (
+                INSERT INTO project_user (
+                    project_id, user_id, project_role, created_date, created_by,
+                    last_modified_date, last_modified_by, version
+                )
+                SELECT p.id, wu.user_id, 0, CURRENT_TIMESTAMP, 'rbac-backfill',
+                       CURRENT_TIMESTAMP, 'rbac-backfill', 0
+                FROM project p
+                JOIN workspace_user wu ON wu.workspace_id = p.workspace_id
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM project_user pu
+                    WHERE pu.project_id = p.id AND pu.user_id = wu.user_id
+                )
+                RETURNING 1
+            )
+            INSERT INTO rbac_backfill_report (workspace_users_promoted, project_users_seeded, notes)
+            SELECT
+                (SELECT COUNT(*) FROM promoted),
+                (SELECT COUNT(*) FROM seeded),
+                'RBAC backfill run. workspace_users_promoted = rows updated from EDITOR to ADMIN by this run. '
+                || 'project_users_seeded = creator-inferred ADMIN rows inserted by this run. Counts are deltas, '
+                || 'not totals \u2014 sum across all rbac_backfill_report rows for the cumulative blast radius.'
+        </sql>
+
+        <rollback>
+            <!--
+              Rollback is intentionally a hard failure because the forward migration's promote half is irreversible:
+              we cannot reconstruct the original distinct workspace_role values (everything was ordinal 1 before,
+              but admins promoted some rows to other ordinals between the migration and the rollback). Even so,
+              we tag the backfill-inserted project_user rows with created_by='rbac-backfill' specifically so that a
+              dev-mode operator performing manual recovery can DELETE them without risk of sweeping legitimate
+              application-inserted 'system' rows. A silent no-op rollback (the prior implementation) would let an
+              operator believe a rollback succeeded while the schema and data were unchanged \u2014 worse, on dev
+              environments rolling forward again would attempt to redo the backfill on top of the post-rollback
+              state. Failing loudly forces operators to consciously acknowledge the irreversibility and either
+              perform manual recovery or accept the data loss.
+            -->
+            <sql>
+                DO $$
+                BEGIN
+                    RAISE EXCEPTION 'BACKFILL_ROLLBACK_BLOCKED: changeset 202604061200050-backfill-project-user '
+                        'cannot be safely rolled back. The forward migration promoted EDITOR rows to ADMIN and '
+                        'seeded creator-inferred admin grants; reversing it would silently drop legitimate admin '
+                        'assignments. To force-rollback in dev: manually restore workspace_user.workspace_role, '
+                        'then DELETE FROM project_user WHERE created_by = ''rbac-backfill'' (safe \u2014 the '
+                        'sentinel scopes the delete to rows this migration inserted and avoids collisions with '
+                        'application-inserted ''system'' rows), then mark the changeset rolled back via Liquibase '
+                        'tooling.';
+                END $$;
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

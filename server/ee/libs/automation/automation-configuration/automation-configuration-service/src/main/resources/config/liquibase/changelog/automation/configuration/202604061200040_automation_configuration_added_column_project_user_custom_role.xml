@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="202604061200040" author="Ivica Cardic">
+        <addColumn tableName="project_user">
+            <column name="custom_role_id" type="BIGINT"/>
+        </addColumn>
+
+        <!--
+            ON DELETE RESTRICT rather than SET NULL: the chk_project_user_role_xor CHECK constraint below requires
+            exactly one of (project_role, custom_role_id) to be non-null, so SET NULL on the FK would violate the XOR
+            and abort the delete with a cryptic constraint violation. RESTRICT matches the service-layer guard in
+            CustomRoleServiceImpl.deleteCustomRole (which refuses deletion while any project_user still references
+            the role) and makes the intent explicit at the DB level: deleting a custom_role requires first reassigning
+            every member that uses it.
+        -->
+        <addForeignKeyConstraint
+            baseTableName="project_user"
+            baseColumnNames="custom_role_id"
+            constraintName="fk_project_user_custom_role"
+            referencedTableName="custom_role"
+            referencedColumnNames="id"
+            onDelete="RESTRICT"/>
+
+        <dropNotNullConstraint tableName="project_user" columnName="project_role" columnDataType="INT"/>
+
+        <sql>
+            ALTER TABLE project_user ADD CONSTRAINT chk_project_user_role_xor
+            CHECK ((project_role IS NOT NULL AND custom_role_id IS NULL) OR
+                   (project_role IS NULL AND custom_role_id IS NOT NULL));
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="202604061200020-create-table" author="Ivica Cardic">
+        <createTable tableName="project_user">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_role" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            tableName="project_user"
+            columnNames="project_id,user_id"
+            constraintName="uk_project_user_project_user"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_user"
+            baseColumnNames="project_id"
+            constraintName="fk_project_user_project"
+            referencedTableName="project"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="project_user" indexName="idx_project_user_user_id">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="202604061200020-fk-user" author="Ivica Cardic" contextFilter="mono">
+        <addForeignKeyConstraint
+            baseTableName="project_user"
+            baseColumnNames="user_id"
+            constraintName="fk_project_user_user"
+            referencedTableName="user"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

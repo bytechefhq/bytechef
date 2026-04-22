@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+      Add a unique constraint on (workspace_id, user_id) for workspace_user. Without it, a duplicate row
+      (concurrent add, retry, double-click) would make `findByUserIdAndWorkspaceId` throw
+      IncorrectResultSizeDataAccessException, which propagates as a 500 to every PermissionService call for that user.
+      Mirrors the constraint already present on project_user (uk_project_user_project_user).
+
+      Pre-existing EE deployments may already contain duplicate rows from the period before this constraint existed.
+      Adding the constraint on a database with duplicates would fail startup, so we dedup first in a separate
+      changeset that keeps the row with the most-privileged workspace_role per (workspace_id, user_id) pair (ties
+      broken by MIN(id)).
+    -->
+
+    <changeSet id="202604061200060-dedup-and-unique-workspace-user" author="Ivica Cardic">
+        <preConditions onError="HALT" onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="workspace_user" indexName="uk_workspace_user_workspace_user"/>
+            </not>
+        </preConditions>
+
+        <comment>
+            Dedup workspace_user on (workspace_id, user_id) before adding the unique constraint. Preserves the
+            highest-privilege row (MIN(workspace_role) \u2014 0=ADMIN is the most privileged ordinal); ties broken by
+            MIN(id) so the longest-surviving row wins when roles are identical. Without this preference, a duplicate
+            history like {id=1 EDITOR, id=2 ADMIN} would silently demote the ADMIN on migration (the MIN(id) row
+            would win), with no audit trail or warning. Idempotent: on a database with no duplicates this is a
+            no-op.
+        </comment>
+
+        <sql>
+            DELETE FROM workspace_user wu
+            USING workspace_user wu2
+            WHERE wu.workspace_id = wu2.workspace_id
+              AND wu.user_id = wu2.user_id
+              AND (
+                    wu.workspace_role > wu2.workspace_role
+                 OR (wu.workspace_role = wu2.workspace_role AND wu.id > wu2.id)
+              )
+        </sql>
+
+        <comment>Add unique constraint on workspace_user(workspace_id, user_id)</comment>
+
+        <addUniqueConstraint
+            tableName="workspace_user"
+            columnNames="workspace_id,user_id"
+            constraintName="uk_workspace_user_workspace_user"/>
+    </changeSet>
+</databaseChangeLog>
