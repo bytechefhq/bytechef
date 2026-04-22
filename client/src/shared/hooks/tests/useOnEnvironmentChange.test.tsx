@@ -5,14 +5,17 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {useOnEnvironmentChange} from '../useOnEnvironmentChange';
 
 const INITIAL_ENVIRONMENT_ID = 1;
+const ENVIRONMENT_STORAGE_KEY = 'bytechef.environment';
 
 describe('useOnEnvironmentChange', () => {
     beforeEach(() => {
+        localStorage.removeItem(ENVIRONMENT_STORAGE_KEY);
         environmentStore.setState({currentEnvironmentId: INITIAL_ENVIRONMENT_ID, environments: []});
     });
 
     afterEach(() => {
         environmentStore.setState({currentEnvironmentId: INITIAL_ENVIRONMENT_ID, environments: []});
+        localStorage.removeItem(ENVIRONMENT_STORAGE_KEY);
     });
 
     it('does not invoke callback on initial mount', () => {
