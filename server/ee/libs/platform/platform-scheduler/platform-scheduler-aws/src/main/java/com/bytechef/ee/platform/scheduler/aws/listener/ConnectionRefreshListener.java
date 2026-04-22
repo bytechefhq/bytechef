@@ -1,25 +1,19 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
 package com.bytechef.ee.platform.scheduler.aws.listener;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.awspring.cloud.sqs.annotation.SqsListener;
-import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
-import software.amazon.awssdk.services.scheduler.SchedulerClient;
-import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindow;
-import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindowMode;
-import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Map;
-
-import static com.bytechef.ee.platform.scheduler.aws.constant.AwsConnectionRefreshSchedulerConstants.CONNECTION_REFRESH;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsConnectionRefreshSchedulerConstants.SCHEDULER_CONNECTION_REFRESH_QUEUE;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SPLITTER;
+
+import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.awspring.cloud.sqs.annotation.SqsListener;
 
 /**
  * @version ee
@@ -28,15 +22,11 @@ import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedule
  */
 public class ConnectionRefreshListener {
 
-    private final ConnectionDefinitionFacade remoteConnectionDefinitionFacade;
-    private final SchedulerClient schedulerClient;
+    private final ConnectionFacade connectionFacade;
 
     @SuppressFBWarnings("EI")
-    public ConnectionRefreshListener(
-        SchedulerClient schedulerClient, ConnectionDefinitionFacade remoteConnectionDefinitionFacade) {
-
-        this.schedulerClient = schedulerClient;
-        this.remoteConnectionDefinitionFacade = remoteConnectionDefinitionFacade;
+    public ConnectionRefreshListener(ConnectionFacade connectionFacade) {
+        this.connectionFacade = connectionFacade;
     }
 
     @SqsListener(SCHEDULER_CONNECTION_REFRESH_QUEUE)
@@ -45,24 +35,6 @@ public class ConnectionRefreshListener {
         String tenantId = split[0];
         Long connectionId = Long.valueOf(split[1]);
 
-        refreshConnection(tenantId, connectionId);
-    }
-
-    private Instant refreshConnection(String tenantId, Long connectionId) {
-        Instant connectionExpiry = null;
-
-        ComponentConnection componentConnection = remoteConnectionDefinitionFacade.executeConnectionRefresh(
-            tenantId, connectionId);
-
-        if (componentConnection != null) {
-            Map<String, ?> parameters = componentConnection.getParameters();
-
-            Long expiresIn = (Long) parameters.get("expires_in");
-
-            connectionExpiry = Instant.now()
-                .plusSeconds(expiresIn);
-        }
-
-        return connectionExpiry;
+        TenantContext.runWithTenantId(tenantId, () -> connectionFacade.executeConnectionRefresh(connectionId));
     }
 }

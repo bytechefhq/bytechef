@@ -16,8 +16,6 @@
 
 package com.bytechef.config;
 
-import com.bytechef.config.ApplicationProperties.Coordinator.Trigger.Scheduler;
-import com.bytechef.config.ApplicationProperties.Coordinator.Trigger.Scheduler.Provider;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;

@@ -148,6 +148,23 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
+    public Long executeConnectionRefresh(Long connectionId) {
+        Connection connection = connectionService.getConnection(connectionId);
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            connection.getComponentName(), connection.getConnectionVersion(), connection.getId(),
+            connection.getParameters(), connection.getAuthorizationType());
+
+        connectionDefinitionService.executeConnectionRefresh(componentConnection);
+
+        connection = connectionService.getConnection(connectionId);
+
+        Map<String, ?> parameters = connection.getParameters();
+
+        return (Long) parameters.get("expires_in");
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ConnectionDTO getConnection(Long id) {
         Connection connection = connectionService.getConnection(id);
@@ -316,8 +333,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 componentName, connectionVersion, connection.getId(), parameters,
                 connection.getAuthorizationType());
 
-            uri = connectionDefinitionService
-                .executeBaseUri(componentName, componentConnection)
+            uri = connectionDefinitionService.executeBaseUri(componentName, componentConnection)
                 .orElse(null);
         } catch (IllegalStateException e) {
             if (logger.isDebugEnabled()) {

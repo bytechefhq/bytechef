@@ -53,6 +53,7 @@ import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.annotation.WithTokenRefresh;
 import com.bytechef.platform.component.annotation.WithTokenRefresh.ComponentNameParam;
 import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionParam;
+import com.bytechef.platform.component.aspect.TokenRefreshHandler;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
@@ -92,12 +93,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
+    private final TokenRefreshHandler tokenRefreshHandler;
 
     public ConnectionDefinitionServiceImpl(
-        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        @Lazy TokenRefreshHandler tokenRefreshHandler) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
+        this.tokenRefreshHandler = tokenRefreshHandler;
     }
 
     @Override
@@ -163,19 +167,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return executeBaseUriInternal(componentName, componentConnection, context);
     }
 
-    private Optional<String> executeBaseUriInternal(
-        String componentName, ComponentConnection componentConnection, Context context) {
-
-        com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
-            componentDefinitionRegistry.getConnectionDefinition(componentName, componentConnection.getVersion());
-
-        BaseUriFunction baseUriFunction = connectionDefinition.getBaseUri()
-            .orElse((connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
-
-        return Optional.ofNullable(
-            baseUriFunction.apply(ParametersFactory.create(componentConnection.parameters()), context));
-    }
-
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,
@@ -197,10 +188,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Context createConnectionRefreshContext(
-        String componentName, ComponentConnection componentConnection) {
+    public ComponentConnection executeConnectionRefresh(ComponentConnection componentConnection) {
+        Context context = contextFactory.createContext(
+            componentConnection.getComponentName(), componentConnection);
 
-        return contextFactory.createContext(componentName, componentConnection);
+        return tokenRefreshHandler.refreshCredentials(componentConnection, context);
     }
 
     @Override
@@ -395,6 +387,19 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             throw new ConfigurationException(
                 e, ConnectionDefinitionErrorType.AUTHORIZATION_CALLBACK_FAILED);
         }
+    }
+
+    private Optional<String> executeBaseUriInternal(
+        String componentName, ComponentConnection componentConnection, Context context) {
+
+        com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
+            componentDefinitionRegistry.getConnectionDefinition(componentName, componentConnection.getVersion());
+
+        BaseUriFunction baseUriFunction = connectionDefinition.getBaseUri()
+            .orElse((connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
+
+        return Optional.ofNullable(
+            baseUriFunction.apply(ParametersFactory.create(componentConnection.parameters()), context));
     }
 
     private List<ComponentDefinition> getConnectableComponentDefinitions(

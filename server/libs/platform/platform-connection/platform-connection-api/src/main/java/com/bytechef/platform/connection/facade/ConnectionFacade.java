@@ -30,6 +30,8 @@ public interface ConnectionFacade {
 
     void delete(Long id);
 
+    Long executeConnectionRefresh(Long connectionId);
+
     ConnectionDTO getConnection(Long id);
 
     List<ConnectionDTO> getConnections(List<Long> connectionIds, PlatformType type);
@@ -43,4 +45,5 @@ public interface ConnectionFacade {
     void update(long id, List<Tag> tags);
 
     void update(long id, String name, List<Tag> tags, int version);
+
 }

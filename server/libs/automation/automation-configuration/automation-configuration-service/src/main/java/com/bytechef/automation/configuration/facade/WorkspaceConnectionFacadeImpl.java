@@ -46,8 +46,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
-        ConnectionFacade connectionFacade,
-        ConnectionLifecycleFacade connectionLifecycleFacade,
+        ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
