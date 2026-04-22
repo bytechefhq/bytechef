@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
 import software.amazon.awssdk.services.scheduler.model.ConflictException;
 import software.amazon.awssdk.services.scheduler.model.FlexibleTimeWindowMode;
+import software.amazon.awssdk.services.scheduler.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.scheduler.model.Target;
 
 /**
@@ -82,9 +83,15 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
-        schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
-            .groupName(POLLING_TRIGGER)
-            .name(POLLING_TRIGGER + workflowExecutionId.substring(0, 16)));
+        try {
+            schedulerClient.deleteSchedule(request -> request.clientToken(workflowExecutionId.substring(16))
+                .groupName(POLLING_TRIGGER)
+                .name(POLLING_TRIGGER + workflowExecutionId.substring(0, 16)));
+        } catch (ResourceNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Polling trigger schedule already deleted: {}", workflowExecutionId);
+            }
+        }
     }
 
     @Override
