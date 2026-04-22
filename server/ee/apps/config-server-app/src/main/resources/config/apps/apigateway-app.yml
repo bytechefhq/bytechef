@@ -18,6 +18,10 @@ spring:
             uri: lb://execution-app
             predicates:
               - Path=/api/automation/**,/api/embedded/**
+          - id: ai-gateway-service
+            uri: lb://ai-gateway-app
+            predicates:
+              - Path=/api/ai-gateway/**
           - id: webhook-service
             uri: lb://webhook-app
             predicates:

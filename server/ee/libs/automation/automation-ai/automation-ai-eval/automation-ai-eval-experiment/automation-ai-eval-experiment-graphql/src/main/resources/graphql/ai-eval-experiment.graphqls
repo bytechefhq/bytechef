@@ -1,0 +1,83 @@
+extend type Query {
+    aiEvalExperimentRunByTraceId(traceId: ID!): AiEvalExperimentRunView
+    aiEvalExperiments(workspaceId: ID!): [AiEvalExperimentView!]!
+    aiEvalExperimentRuns(experimentId: ID!): [AiEvalExperimentRunView!]!
+    experimentComparison(experimentIds: [ID!]!): ExperimentComparisonView
+}
+
+type AiEvalExperimentView {
+    completedDate: Long
+    completedRuns: Int!
+    createdDate: Long
+    datasetVersionId: ID!
+    failedRuns: Int!
+    id: ID!
+    metadata: String
+    model: String
+    promptVersionId: ID
+    startedDate: Long
+    status: String!
+    stopRequested: Boolean!
+    totalRuns: Int!
+}
+
+type AiEvalExperimentRunView {
+    cost: Float
+    createdDate: Long
+    datasetItemId: ID!
+    errorMessage: String
+    experimentId: ID!
+    id: ID!
+    latencyMs: Int
+    status: String!
+    traceId: ID
+}
+
+type ExperimentComparisonView {
+    experiments: [ExperimentSummary!]!
+    rows: [ExperimentComparisonRow!]!
+    aggregateScoreDeltas: [AggregateScoreDelta!]!
+}
+
+type ExperimentSummary {
+    id: ID!
+    model: String
+    totalRuns: Int!
+    completedRuns: Int!
+    failedRuns: Int!
+    totalCost: Float
+    averageLatencyMs: Int
+}
+
+type ExperimentComparisonRow {
+    datasetItemId: ID!
+    runsByExperiment: [ExperimentRunPoint!]!
+}
+
+type ExperimentRunPoint {
+    experimentId: ID!
+    runId: ID!
+    traceId: ID
+    status: String!
+    cost: Float
+    latencyMs: Int
+    scores: [ScorePoint!]!
+}
+
+type ScorePoint {
+    name: String!
+    value: Float
+    stringValue: String
+    dataType: String!
+}
+
+type AggregateScoreDelta {
+    scoreName: String!
+    deltas: [ExperimentScoreAverage!]!
+}
+
+type ExperimentScoreAverage {
+    experimentId: ID!
+    average: Float
+    count: Int!
+}

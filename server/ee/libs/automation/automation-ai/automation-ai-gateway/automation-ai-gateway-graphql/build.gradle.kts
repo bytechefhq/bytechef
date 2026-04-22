@@ -1,10 +1,20 @@
 dependencies {
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.graphql:spring-graphql")
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-web")
+    implementation("org.springframework:spring-webflux")
 
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
 
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-api"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 }

@@ -1,0 +1,21 @@
+extend type Query {
+    workspaceAiGatewayModels(workspaceId: ID!): [AiGatewayModel]
+}
+
+extend type Mutation {
+    createWorkspaceAiGatewayModel(input: CreateWorkspaceAiGatewayModelInput!): AiGatewayModel
+    deleteWorkspaceAiGatewayModel(workspaceId: ID!, modelId: ID!): Boolean
+    updateWorkspaceAiGatewayModel(id: ID!, input: UpdateAiGatewayModelInput!): AiGatewayModel
+}
+
+input CreateWorkspaceAiGatewayModelInput {
+    alias: String
+    capabilities: String
+    contextWindow: Int
+    defaultRoutingPolicyId: ID
+    inputCostPerMTokens: Float
+    name: String!
+    outputCostPerMTokens: Float
+    providerId: ID!
+    workspaceId: ID!
+}

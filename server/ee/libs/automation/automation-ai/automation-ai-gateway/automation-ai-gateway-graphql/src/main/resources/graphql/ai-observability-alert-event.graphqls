@@ -1,0 +1,22 @@
+extend type Query {
+    aiObservabilityAlertEvents(alertRuleId: ID!): [AiObservabilityAlertEvent]
+}
+
+extend type Mutation {
+    acknowledgeAiObservabilityAlertEvent(id: ID!): AiObservabilityAlertEvent
+}
+
+type AiObservabilityAlertEvent {
+    alertRuleId: ID!
+    createdDate: Long
+    id: ID!
+    message: String
+    status: AiObservabilityAlertEventStatus!
+    triggeredValue: Float
+}
+
+enum AiObservabilityAlertEventStatus {
+    ACKNOWLEDGED
+    RESOLVED
+    TRIGGERED
+}

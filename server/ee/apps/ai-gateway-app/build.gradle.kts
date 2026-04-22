@@ -1,0 +1,58 @@
+group = "com.bytechef.AiGatewayApplication"
+description = ""
+
+springBoot {
+    mainClass.set("com.bytechef.aigateway.AiGatewayApplication")
+}
+
+dependencies {
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-aspectj")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
+    implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
+    implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:config:async-config"))
+    implementation(project(":server:libs:config:cache-config"))
+    implementation(project(":server:libs:config:environment-config"))
+    implementation(project(":server:libs:config:jackson-config"))
+    implementation(project(":server:libs:config:logback-config"))
+    implementation(project(":server:libs:config:messages-config"))
+    implementation(project(":server:libs:core:commons:commons-util"))
+
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-api"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-public-rest"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-prompt:automation-ai-prompt-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-dataset:platform-ai-eval-dataset-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-dataset:platform-ai-eval-dataset-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-dataset:automation-ai-eval-dataset-api"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-dataset:automation-ai-eval-dataset-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-dataset:automation-ai-eval-dataset-public-rest"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-experiment:platform-ai-eval-experiment-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-experiment:platform-ai-eval-experiment-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-experiment:automation-ai-eval-experiment-api"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-experiment:automation-ai-eval-experiment-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-experiment:automation-ai-eval-experiment-graphql"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-experiment:automation-ai-eval-experiment-public-rest"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-observability:automation-ai-observability-api"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-observability:automation-ai-observability-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-observability:automation-ai-observability-graphql"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway-otlp:platform-ai-gateway-otlp-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway-otlp:platform-ai-gateway-otlp-service"))
+    implementation(project(":server:ee:libs:config:observability-config"))
+    implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+
+    testImplementation(project(":server:libs:test:test-int-support"))
+}

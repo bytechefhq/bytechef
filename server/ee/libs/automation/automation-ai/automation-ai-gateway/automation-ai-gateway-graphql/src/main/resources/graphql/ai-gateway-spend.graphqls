@@ -1,0 +1,17 @@
+extend type Query {
+    aiGatewaySpendSummaries(startDate: Long!, endDate: Long!): [AiGatewaySpendSummary]
+}
+
+type AiGatewaySpendSummary {
+    id: ID!
+    apiKeyId: ID
+    model: String
+    provider: String
+    periodStart: Long
+    periodEnd: Long
+    requestCount: Int
+    totalInputTokens: Long
+    totalOutputTokens: Long
+    totalCost: String
+    createdDate: Long
+}

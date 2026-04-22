@@ -622,6 +622,7 @@ public class ApplicationProperties {
 
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
+        private Gateway gateway = new Gateway();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
         private Mcp mcp = new Mcp();
         private Memory memory = new Memory();
@@ -634,6 +635,10 @@ public class ApplicationProperties {
 
         public Firecrawl getFirecrawl() {
             return firecrawl;
+        }
+
+        public Gateway getGateway() {
+            return gateway;
         }
 
         public KnowledgeBase getKnowledgeBase() {
@@ -662,6 +667,10 @@ public class ApplicationProperties {
 
         public void setFirecrawl(Firecrawl firecrawl) {
             this.firecrawl = firecrawl;
+        }
+
+        public void setGateway(Gateway gateway) {
+            this.gateway = gateway;
         }
 
         public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
@@ -804,6 +813,28 @@ public class ApplicationProperties {
                 public void setKeyPrefix(String keyPrefix) {
                     this.keyPrefix = keyPrefix;
                 }
+            }
+        }
+
+        /**
+         * AI Hub properties. Mirrors the {@link Copilot} flag pattern: a single {@code enabled} switch toggles the
+         * whole hub surface (REST/GraphQL controllers, JDBC repositories, service beans). Kept as a sibling of
+         * {@code copilot} rather than nested inside it because AI Hub is its own product surface — workflow-chat
+         * dispatch and personal-agent management live here even on deployments where the LLM copilot is disabled.
+         */
+        public static class Hub {
+
+            /**
+             * Whether AI Hub is enabled
+             */
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
         }
 
@@ -952,6 +983,109 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+        }
+
+        /**
+         * Gateway configuration.
+         */
+        public static class Gateway {
+
+            private boolean enabled;
+
+            private Otlp otlp = new Otlp();
+
+            private RateLimiting rateLimiting = new RateLimiting();
+
+            private ExternalScores externalScores = new ExternalScores();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public Otlp getOtlp() {
+                return otlp;
+            }
+
+            public void setOtlp(Otlp otlp) {
+                this.otlp = otlp;
+            }
+
+            public RateLimiting getRateLimiting() {
+                return rateLimiting;
+            }
+
+            public void setRateLimiting(RateLimiting rateLimiting) {
+                this.rateLimiting = rateLimiting;
+            }
+
+            public ExternalScores getExternalScores() {
+                return externalScores;
+            }
+
+            public void setExternalScores(ExternalScores externalScores) {
+                this.externalScores = externalScores;
+            }
+
+            public static class Otlp {
+
+                /**
+                 * Maximum spans accepted in a single OTLP request body. Requests exceeding this return HTTP 413.
+                 */
+                private int maxSpansPerRequest = 1_000;
+
+                public int getMaxSpansPerRequest() {
+                    return maxSpansPerRequest;
+                }
+
+                public void setMaxSpansPerRequest(int maxSpansPerRequest) {
+                    this.maxSpansPerRequest = maxSpansPerRequest;
+                }
+            }
+
+            public static class ExternalScores {
+
+                /**
+                 * Maximum scores accepted in a single batch POST. Requests exceeding this return HTTP 413. Without this
+                 * cap, a single workspace could ship a multi-million-row batch and monopolise the connection pool (each
+                 * row opens its own transaction in {@code AiExternalScoreFacadeImpl.recordBatch}).
+                 */
+                private int maxBatchSize = 1_000;
+
+                public int getMaxBatchSize() {
+                    return maxBatchSize;
+                }
+
+                public void setMaxBatchSize(int maxBatchSize) {
+                    this.maxBatchSize = maxBatchSize;
+                }
+            }
+
+            public static class RateLimiting {
+
+                private boolean enabled;
+
+                private String provider;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public String getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(String provider) {
+                    this.provider = provider;
+                }
             }
         }
 

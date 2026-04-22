@@ -1,0 +1,10 @@
+extend type AiPromptVersion {
+    metrics: AiPromptVersionMetrics
+}
+
+type AiPromptVersionMetrics {
+    avgCostUsd: Float
+    avgLatencyMs: Float
+    errorRate: Float
+    invocationCount: Int!
+}

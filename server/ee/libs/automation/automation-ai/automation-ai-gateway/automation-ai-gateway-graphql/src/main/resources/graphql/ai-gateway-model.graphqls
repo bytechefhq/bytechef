@@ -1,0 +1,49 @@
+extend type Query {
+    aiGatewayModel(id: ID!): AiGatewayModel
+    aiGatewayModels: [AiGatewayModel]
+    aiGatewayModelsByProvider(providerId: ID!): [AiGatewayModel]
+}
+
+extend type Mutation {
+    createAiGatewayModel(input: CreateAiGatewayModelInput!): AiGatewayModel
+    deleteAiGatewayModel(id: ID!): Boolean
+    updateAiGatewayModel(id: ID!, input: UpdateAiGatewayModelInput!): AiGatewayModel
+}
+
+type AiGatewayModel {
+    alias: String
+    capabilities: String
+    contextWindow: Int
+    createdDate: Long
+    defaultRoutingPolicyId: ID
+    enabled: Boolean!
+    id: ID!
+    inputCostPerMTokens: Float
+    lastModifiedDate: Long
+    name: String!
+    outputCostPerMTokens: Float
+    providerId: ID!
+    version: Int
+}
+
+input CreateAiGatewayModelInput {
+    alias: String
+    capabilities: String
+    contextWindow: Int
+    defaultRoutingPolicyId: ID
+    inputCostPerMTokens: Float
+    name: String!
+    outputCostPerMTokens: Float
+    providerId: ID!
+}
+
+input UpdateAiGatewayModelInput {
+    alias: String
+    capabilities: String
+    contextWindow: Int
+    defaultRoutingPolicyId: ID
+    enabled: Boolean
+    inputCostPerMTokens: Float
+    name: String
+    outputCostPerMTokens: Float
+}

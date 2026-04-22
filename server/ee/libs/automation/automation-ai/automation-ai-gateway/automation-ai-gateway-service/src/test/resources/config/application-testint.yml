@@ -1,0 +1,13 @@
+spring:
+  liquibase:
+    contexts: mono
+
+bytechef:
+  edition: ee
+  ai:
+    gateway:
+      enabled: true
+      rate-limiting:
+        enabled: true
+  file-storage:
+    provider: jdbc

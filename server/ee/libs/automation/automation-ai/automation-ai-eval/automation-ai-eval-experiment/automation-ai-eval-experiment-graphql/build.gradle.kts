@@ -1,0 +1,22 @@
+dependencies {
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.graphql:spring-graphql")
+    implementation("org.springframework.security:spring-security-core")
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-dataset:platform-ai-eval-dataset-api"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-dataset:automation-ai-eval-dataset-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-experiment:platform-ai-eval-experiment-api"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-experiment:automation-ai-eval-experiment-api"))
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
+}
