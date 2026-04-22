@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <createTable tableName="workspace_file">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="mime_type" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size_bytes" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="generated_by_agent_source" type="SMALLINT"/>
+            <column name="generated_from_prompt" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="workspace_file" indexName="idx_workspace_file_name">
+            <column name="name"/>
+        </createIndex>
+
+        <createTable tableName="workspace_file_tag">
+            <column name="workspace_file_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="workspace_file_tag" columnNames="workspace_file_id,tag_id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_file_tag"
+            baseColumnNames="workspace_file_id"
+            constraintName="fk_workspace_file_tag_workspace_file"
+            referencedTableName="workspace_file"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_file_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_workspace_file_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="workspace_workspace_file">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace_file_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            constraintName="uk_workspace_workspace_file"
+            tableName="workspace_workspace_file"
+            columnNames="workspace_id,workspace_file_id"/>
+
+        <createIndex tableName="workspace_workspace_file" indexName="idx_workspace_workspace_file_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_workspace_file"
+            baseColumnNames="workspace_file_id"
+            constraintName="fk_workspace_workspace_file_workspace_file"
+            referencedTableName="workspace_file"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_workspace_file"
+            baseColumnNames="workspace_id"
+            constraintName="fk_workspace_workspace_file_workspace"
+            referencedTableName="workspace"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>
