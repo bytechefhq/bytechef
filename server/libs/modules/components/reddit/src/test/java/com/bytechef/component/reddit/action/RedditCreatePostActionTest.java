@@ -21,6 +21,7 @@ import static com.bytechef.component.reddit.constant.RedditConstants.SUBREDDIT_N
 import static com.bytechef.component.reddit.constant.RedditConstants.TEXT;
 import static com.bytechef.component.reddit.constant.RedditConstants.TITLE;
 import static com.bytechef.component.reddit.constant.RedditConstants.URL;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -38,8 +39,6 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,22 +72,18 @@ class RedditCreatePostActionTest {
         Object result = RedditCreatePostAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
-
-        assertEquals(mockedObject, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/api/submit", stringArgumentCaptor.getValue());
 
-        Object[] query = queryArgumentCaptor.getValue();
+        Object[] queryParameters = {
+            SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", URL, "This is URL.", TEXT, "This is a test."
+        };
 
-        assertEquals(
-            List.of(SUBREDDIT_NAME, "test", TITLE, "Title", KIND, "self", URL, "This is URL.", TEXT, "This is a test."),
-            Arrays.asList(query));
-
+        assertArrayEquals(queryParameters, queryArgumentCaptor.getValue());
     }
 }
