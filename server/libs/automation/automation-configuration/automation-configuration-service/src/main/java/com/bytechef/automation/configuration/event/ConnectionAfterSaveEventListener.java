@@ -20,10 +20,10 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Objects;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteEvent;
+import org.springframework.data.relational.core.mapping.event.Identifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,12 +50,9 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
 
     @Override
     protected void onBeforeDelete(BeforeDeleteEvent<Connection> beforeDeleteEvent) {
-        Connection connection = beforeDeleteEvent.getEntity();
+        Identifier connectionId = beforeDeleteEvent.getId();
         String tenantId = TenantContext.getCurrentTenantId();
 
-        connectionLifecycleFacade.deleteScheduledConnectionRefresh(
-            Objects.requireNonNull(connection)
-                .getId(),
-            connection.getAuthorizationType(), tenantId);
+        connectionLifecycleFacade.deleteScheduledConnectionRefresh((Long) connectionId.getValue(), tenantId);
     }
 }

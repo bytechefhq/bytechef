@@ -46,14 +46,14 @@ public class RemoteConnectionLifecycleFacadeClient implements ConnectionLifecycl
 
     @Override
     public void deleteScheduledConnectionRefresh(
-        Long connectionId, AuthorizationType authorizationType, String tenantId) {
+        Long connectionId, String tenantId) {
 
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(CONNECTION_LIFECYCLE_FACADE + "/delete-scheduled-connection-refresh")
                 .build(),
-            new DeleteScheduledConnectionRefreshRequest(connectionId, authorizationType, tenantId));
+            new DeleteScheduledConnectionRefreshRequest(connectionId, tenantId));
     }
 
     @SuppressFBWarnings("EI")
@@ -62,6 +62,6 @@ public class RemoteConnectionLifecycleFacadeClient implements ConnectionLifecycl
     }
 
     private record DeleteScheduledConnectionRefreshRequest(
-        Long connectionId, AuthorizationType authorizationType, String tenantId) {
+        Long connectionId, String tenantId) {
     }
 }
