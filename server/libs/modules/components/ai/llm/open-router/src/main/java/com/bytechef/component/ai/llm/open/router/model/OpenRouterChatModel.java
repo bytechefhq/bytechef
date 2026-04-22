@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.llm.open.router.util;
+package com.bytechef.component.ai.llm.open.router.model;
 
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import java.util.ArrayList;
