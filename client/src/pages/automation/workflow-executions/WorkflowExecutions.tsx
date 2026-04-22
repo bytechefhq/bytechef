@@ -7,6 +7,7 @@ import {Label} from '@/components/ui/label';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowExecutionsFilterTitle from '@/pages/automation/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -295,6 +296,14 @@ export const WorkflowExecutions = () => {
             filterPageNumber
         );
     };
+
+    useOnEnvironmentChange(() => {
+        setFilterPageNumber(undefined);
+        setFilterProjectDeploymentId(undefined);
+        setFilterWorkflowId(undefined);
+
+        filter(filterStatus, filterStartDate, filterEndDate, filterProjectId, undefined, undefined, undefined);
+    });
 
     return (
         <LayoutContainer
