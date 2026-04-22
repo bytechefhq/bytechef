@@ -29,5 +29,6 @@ public enum SearchAssetType {
     KNOWLEDGE_BASE,
     KNOWLEDGE_BASE_DOCUMENT,
     PROJECT,
-    WORKFLOW
+    WORKFLOW,
+    WORKSPACE_FILE
 }

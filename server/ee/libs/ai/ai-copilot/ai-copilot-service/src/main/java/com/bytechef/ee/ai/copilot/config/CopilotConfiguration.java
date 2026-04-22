@@ -20,15 +20,23 @@ import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.workspacefile.service.WorkspaceFileFacade;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
 import com.bytechef.ee.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
+import com.bytechef.ee.ai.copilot.agent.FilesSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;
+import com.bytechef.ee.ai.copilot.model.WorkspaceContextPropagatingChatModel;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
+import com.bytechef.ee.automation.workspacefile.ai.tool.AgUiToolContextWorkspaceContextProvider;
+import com.bytechef.ee.automation.workspacefile.ai.tool.CreateWorkspaceFileToolCallback;
+import com.bytechef.ee.automation.workspacefile.ai.tool.GetWorkspaceFileContentToolCallback;
+import com.bytechef.ee.automation.workspacefile.ai.tool.ListWorkspaceFilesToolCallback;
+import com.bytechef.ee.automation.workspacefile.ai.tool.WorkspaceContextProvider;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.observation.ObservationRegistry;
@@ -50,7 +58,9 @@ import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -79,6 +89,7 @@ public class CopilotConfiguration {
     private final Resource promptCodeEditorBuildResource;
     private final Resource promptClusterElementAskResource;
     private final Resource promptClusterElementBuildResource;
+    private final Resource promptFilesResource;
     private final State state = new State();
 
     @SuppressFBWarnings("EI")
@@ -89,7 +100,8 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_code_editor_ask.txt") Resource promptCodeEditorAskResource,
         @Value("classpath:prompt_code_editor_build.txt") Resource promptCodeEditorBuildResource,
         @Value("classpath:prompt_cluster_element_ask.txt") Resource promptClusterElementAskResource,
-        @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource) {
+        @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource,
+        @Value("classpath:prompt_files.txt") Resource promptFilesResource) {
 
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
@@ -120,6 +132,7 @@ public class CopilotConfiguration {
         this.promptCodeEditorBuildResource = promptCodeEditorBuildResource;
         this.promptClusterElementAskResource = promptClusterElementAskResource;
         this.promptClusterElementBuildResource = promptClusterElementBuildResource;
+        this.promptFilesResource = promptFilesResource;
     }
 
     @Bean
@@ -139,7 +152,7 @@ public class CopilotConfiguration {
             .observationRegistry(ObservationRegistry.NOOP)
             .build();
 
-        return new SafeAnthropicChatModel(delegate);
+        return new WorkspaceContextPropagatingChatModel(new SafeAnthropicChatModel(delegate));
     }
 
     @Bean
@@ -154,7 +167,8 @@ public class CopilotConfiguration {
     @Bean
     CodeEditorSpringAIAgent codeEditorAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
-        ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools) throws AGUIException {
+        ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools,
+        ObjectProvider<ToolCallback> toolCallbackProvider) throws AGUIException {
         String name = Source.CODE_EDITOR.name() + "_" + Mode.ASK.name();
 
         List<Object> tools = new ArrayList<>(
@@ -168,6 +182,8 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorAskResource))
             .tools(tools)
+            .toolCallbacks(toolCallbackProvider.orderedStream()
+                .toList())
             .state(state)
             .build();
     }
@@ -176,7 +192,8 @@ public class CopilotConfiguration {
     CodeEditorSpringAIAgent codeEditorBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ScriptTools scriptTools,
         ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
-        ComponentTools componentTools)
+        ComponentTools componentTools,
+        ObjectProvider<ToolCallback> toolCallbackProvider)
         throws AGUIException {
         String name = Source.CODE_EDITOR.name() + "_" + Mode.BUILD.name();
 
@@ -186,6 +203,8 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorBuildResource))
             .tools(List.of(readProjectWorkflowToolsImpl, scriptTools, componentTools))
+            .toolCallbacks(toolCallbackProvider.orderedStream()
+                .toList())
             .state(state)
             .build();
     }
@@ -193,7 +212,8 @@ public class CopilotConfiguration {
     @Bean
     ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
-        ComponentTools componentTools, TaskTools taskTools) throws AGUIException {
+        ComponentTools componentTools, TaskTools taskTools,
+        ObjectProvider<ToolCallback> toolCallbackProvider) throws AGUIException {
 
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.ASK.name();
 
@@ -203,6 +223,8 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementAskResource))
             .tools(List.of(readProjectWorkflowToolsImpl, componentTools, taskTools))
+            .toolCallbacks(toolCallbackProvider.orderedStream()
+                .toList())
             .state(state)
             .build();
     }
@@ -210,7 +232,8 @@ public class CopilotConfiguration {
     @Bean
     ClusterElementSpringAIAgent clusterElementBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ClusterElementTools clusterElementTools,
-        ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl, ComponentTools componentTools, TaskTools taskTools)
+        ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl, ComponentTools componentTools, TaskTools taskTools,
+        ObjectProvider<ToolCallback> toolCallbackProvider)
         throws AGUIException {
 
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.BUILD.name();
@@ -221,6 +244,50 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
             .tools(List.of(readProjectWorkflowToolsImpl, clusterElementTools, componentTools, taskTools))
+            .toolCallbacks(toolCallbackProvider.orderedStream()
+                .toList())
+            .state(state)
+            .build();
+    }
+
+    @Bean
+    WorkspaceContextProvider workspaceContextProvider() {
+        return new AgUiToolContextWorkspaceContextProvider();
+    }
+
+    @Bean
+    CreateWorkspaceFileToolCallback createWorkspaceFileToolCallback(
+        WorkspaceFileFacade workspaceFileFacade, WorkspaceContextProvider workspaceContextProvider) {
+
+        return new CreateWorkspaceFileToolCallback(workspaceFileFacade, workspaceContextProvider);
+    }
+
+    @Bean
+    ListWorkspaceFilesToolCallback listWorkspaceFilesToolCallback(
+        WorkspaceFileFacade workspaceFileFacade, WorkspaceContextProvider workspaceContextProvider) {
+
+        return new ListWorkspaceFilesToolCallback(workspaceFileFacade, workspaceContextProvider);
+    }
+
+    @Bean
+    GetWorkspaceFileContentToolCallback getWorkspaceFileContentToolCallback(WorkspaceFileFacade workspaceFileFacade) {
+        return new GetWorkspaceFileContentToolCallback(workspaceFileFacade);
+    }
+
+    @Bean
+    FilesSpringAIAgent filesSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ObjectProvider<ToolCallback> toolCallbackProvider)
+        throws AGUIException {
+
+        String name = Source.FILES.name();
+
+        return FilesSpringAIAgent.builder()
+            .agentId(name.toLowerCase())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptFilesResource))
+            .toolCallbacks(toolCallbackProvider.orderedStream()
+                .toList())
             .state(state)
             .build();
     }
@@ -238,6 +305,8 @@ public class CopilotConfiguration {
                     .verbosity(openAiChatVerbosity)
                     .build())
             .build();
+
+//        return new WorkspaceContextPropagatingChatModel(delegate);
     }
 
     @Bean
@@ -265,7 +334,8 @@ public class CopilotConfiguration {
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectToolsImpl readProjectToolsImpl,
         ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl, ComponentTools componentTools, TaskTools taskTools,
         Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
-        WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor)
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor,
+        ObjectProvider<ToolCallback> toolCallbackProvider)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.ASK.name();
@@ -282,6 +352,8 @@ public class CopilotConfiguration {
             .systemMessage(getSystemPrompt(promptWorkflowEditorAskResource))
             .state(state)
             .tools(tools)
+            .toolCallbacks(toolCallbackProvider.orderedStream()
+                .toList())
             .advisor(questionAnswerAdvisor)
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
@@ -292,7 +364,8 @@ public class CopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectToolsImpl,
         ProjectWorkflowToolsImpl projectWorkflowToolsImpl, TaskTools taskTools, ScriptTools scriptTools,
-        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade)
+        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        ObjectProvider<ToolCallback> toolCallbackProvider)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name();
@@ -304,6 +377,8 @@ public class CopilotConfiguration {
             .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
             .state(state)
             .tools(List.of(projectToolsImpl, projectWorkflowToolsImpl, taskTools, scriptTools))
+            .toolCallbacks(toolCallbackProvider.orderedStream()
+                .toList())
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();

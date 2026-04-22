@@ -57,25 +57,17 @@ public class CopilotApiController {
         Map<String, Object> stateMap = state.getState();
         Object mode = stateMap.get("mode");
 
-        if (agentId.equals("workflow_editor")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "workflow_editor_build";
-            } else {
-                agentId = "workflow_editor_ask";
-            }
-        } else if (agentId.equals("code_editor")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "code_editor_build";
-            } else {
-                agentId = "code_editor_ask";
-            }
-        } else if (agentId.equals("cluster_element")) {
-            if (Mode.valueOf((String) mode) == Mode.BUILD) {
-                agentId = "cluster_element_build";
-            } else {
-                agentId = "cluster_element_ask";
-            }
-        }
+        agentId = switch (agentId) {
+            case "workflow_editor" -> Mode.valueOf((String) mode) == Mode.BUILD
+                ? "workflow_editor_build" : "workflow_editor_ask";
+            case "code_editor" -> Mode.valueOf((String) mode) == Mode.BUILD
+                ? "code_editor_build" : "code_editor_ask";
+            case "cluster_element" -> Mode.valueOf((String) mode) == Mode.BUILD
+                ? "cluster_element_build" : "cluster_element_ask";
+            // FilesSpringAIAgent has no ASK/BUILD split; dispatch directly by agentId.
+            case "files" -> "files";
+            default -> agentId;
+        };
 
         LocalAgent localAgent = localAgentMap.get(agentId);
 

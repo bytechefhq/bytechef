@@ -1,0 +1,41 @@
+type WorkspaceFile {
+    id: ID!
+    name: String!
+    description: String
+    mimeType: String!
+    sizeBytes: Long!
+    source: WorkspaceFileSource!
+    generatedByAgentSource: Int
+    generatedFromPrompt: String
+    tags: [Tag!]!
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    downloadUrl: String!
+}
+
+enum WorkspaceFileSource {
+    USER_UPLOAD
+    AI_GENERATED
+}
+
+extend type Query {
+    workspaceFile(id: ID!): WorkspaceFile
+    workspaceFiles(workspaceId: ID!, tagIds: [ID!], mimeTypePrefix: String): [WorkspaceFile!]!
+    workspaceFileTags(workspaceId: ID!): [Tag!]!
+    workspaceFileTextContent(id: ID!): String
+}
+
+extend type Mutation {
+    updateWorkspaceFile(input: UpdateWorkspaceFileInput!): WorkspaceFile!
+    updateWorkspaceFileTextContent(id: ID!, content: String!): WorkspaceFile!
+    deleteWorkspaceFile(id: ID!): Boolean!
+    updateWorkspaceFileTags(id: ID!, tagIds: [ID!]!): WorkspaceFile!
+}
+
+input UpdateWorkspaceFileInput {
+    id: ID!
+    name: String
+    description: String
+}

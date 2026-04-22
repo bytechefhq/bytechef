@@ -1,0 +1,12 @@
+bytechef:
+  file-storage:
+    provider: base64
+  workspace-file:
+    max-file-size-bytes: 1024
+    per-workspace-total-bytes: 1500
+    orphan-cleanup:
+      enabled: false
+
+spring:
+  liquibase:
+    contexts: configuration,connection,execution

@@ -122,4 +122,11 @@ dependencies {
     implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
 
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
+    implementation(project(":server:ee:libs:automation:automation-workspace-file:automation-workspace-file-ai:automation-workspace-file-ai-service"))
+    implementation(project(":server:libs:automation:automation-workspace-file:automation-workspace-file-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
 }
