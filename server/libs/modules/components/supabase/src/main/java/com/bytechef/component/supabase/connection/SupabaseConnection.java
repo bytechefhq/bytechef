@@ -47,8 +47,7 @@ public class SupabaseConnection {
                         .required(true),
                     string(TOKEN)
                         .label("Project API Key")
-                        .description(
-                            "Can be found in Project Settings -> API Keys. Copy key under Secret keys.")
+                        .description("Can be found in Project Settings -> API Keys. Copy key under Secret keys.")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
                     Map.of(

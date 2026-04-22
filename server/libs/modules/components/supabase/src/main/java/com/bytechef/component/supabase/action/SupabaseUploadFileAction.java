@@ -82,11 +82,9 @@ public class SupabaseUploadFileAction {
             inputParameters.getRequiredString(FILE_NAME)))
             .replace("+", "%20");
 
-        return context.http(http -> http.post("/storage/v1/object/%s/%s".formatted(
-            bucketNameUrlEncoded, fileNameUrlEncoded)))
-            .body(
-                Body.of(
-                    inputParameters.getRequiredFileEntry(FILE)))
+        return context
+            .http(http -> http.post("/storage/v1/object/%s/%s".formatted(bucketNameUrlEncoded, fileNameUrlEncoded)))
+            .body(Body.of(inputParameters.getRequiredFileEntry(FILE)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

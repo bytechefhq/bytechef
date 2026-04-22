@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Encoder;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration;
@@ -40,6 +41,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,6 +54,10 @@ import org.mockito.ArgumentCaptor;
 class SupabaseUploadFileActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Encoder, Executor>> encoderFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final Encoder mockedEncoder = mock(Encoder.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         FILE, mockedFileEntry, BUCKET_NAME, "bucketName", FILE_NAME, "fileName"));
@@ -64,6 +70,15 @@ class SupabaseUploadFileActionTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
+        when(mockedContext.encoder(encoderFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Encoder, Executor> value = encoderFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedEncoder);
+            });
+        when(mockedEncoder.base64UrlEncode(stringArgumentCaptor.capture()))
+            .thenReturn("encoded");
+
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -71,23 +86,16 @@ class SupabaseUploadFileActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        String urlEncodedString = "encoded";
-
-        when(mockedContext.encoder(any()))
-            .thenReturn(urlEncodedString);
-
         Map<String, Object> result = SupabaseUploadFileAction.perform(
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(mockedFileEntry, body.getContent());
+        assertNotNull(encoderFunctionArgumentCaptor.getValue());
         assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(Body.of(mockedFileEntry), bodyArgumentCaptor.getValue());
         assertEquals(
-            "/storage/v1/object/%s/%s".formatted(urlEncodedString, urlEncodedString),
-            stringArgumentCaptor.getValue());
+            List.of("bucketName", "fileName", "/storage/v1/object/encoded/encoded"),
+            stringArgumentCaptor.getAllValues());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
