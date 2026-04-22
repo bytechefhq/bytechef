@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000003" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_prompt"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_prompt">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="ai_prompt"
+                             columnNames="workspace_id, project_id, name"
+                             constraintName="uq_ai_obs_prompt_workspace_project_name"/>
+
+        <createIndex tableName="ai_prompt" indexName="idx_ai_obs_prompt_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_prompt" indexName="idx_ai_obs_prompt_project">
+            <column name="project_id"/>
+        </createIndex>
+
+        <createTable tableName="ai_prompt_version">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="prompt_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="variables" type="TEXT"/>
+            <column name="environment" type="VARCHAR(64)"/>
+            <column name="commit_message" type="VARCHAR(512)"/>
+            <column name="active" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_prompt_version_prompt"
+                                 baseTableName="ai_prompt_version" baseColumnNames="prompt_id"
+                                 referencedTableName="ai_prompt" referencedColumnNames="id"/>
+
+        <addUniqueConstraint tableName="ai_prompt_version"
+                             columnNames="prompt_id, version_number"
+                             constraintName="uq_ai_obs_prompt_version_number"/>
+
+        <createIndex tableName="ai_prompt_version" indexName="idx_ai_obs_prompt_version_prompt">
+            <column name="prompt_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_prompt_version" indexName="idx_ai_obs_prompt_version_env">
+            <column name="environment"/>
+        </createIndex>
+
+        <createIndex tableName="ai_prompt_version" indexName="idx_ai_obs_prompt_version_active">
+            <column name="active"/>
+        </createIndex>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_span_prompt"
+                                 baseTableName="ai_observability_span" baseColumnNames="prompt_id"
+                                 referencedTableName="ai_prompt" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_span_prompt_version"
+                                 baseTableName="ai_observability_span" baseColumnNames="prompt_version_id"
+                                 referencedTableName="ai_prompt_version" referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000002" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_observability_session"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_observability_session">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(256)"/>
+            <column name="external_session_id" type="VARCHAR(256)"/>
+            <column name="user_id" type="VARCHAR(256)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_observability_session" indexName="idx_ai_obs_session_ext_session_id" unique="true">
+            <column name="workspace_id"/>
+            <column name="external_session_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_session" indexName="idx_ai_obs_session_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_session" indexName="idx_ai_obs_session_project">
+            <column name="project_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_session" indexName="idx_ai_obs_session_user">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_session" indexName="idx_ai_obs_session_workspace_user">
+            <column name="workspace_id"/>
+            <column name="user_id"/>
+        </createIndex>
+
+        <createTable tableName="ai_observability_trace">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_trace_id" type="VARCHAR(256)"/>
+            <column name="project_id" type="BIGINT"/>
+            <column name="session_id" type="BIGINT">
+                <constraints foreignKeyName="fk_ai_obs_trace_session" references="ai_observability_session(id)"/>
+            </column>
+            <column name="name" type="VARCHAR(256)"/>
+            <column name="user_id" type="VARCHAR(256)"/>
+            <column name="api_key_id" type="BIGINT"/>
+            <column name="input" type="TEXT"/>
+            <column name="output" type="TEXT"/>
+            <column name="metadata" type="TEXT"/>
+            <column name="source" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_cost" type="DECIMAL(10,6)"/>
+            <column name="total_input_tokens" type="INT"/>
+            <column name="total_output_tokens" type="INT"/>
+            <column name="total_latency_ms" type="INT"/>
+            <column name="pii_redacted" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_observability_trace" indexName="idx_ai_obs_trace_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_trace" indexName="idx_ai_obs_trace_project">
+            <column name="project_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_trace" indexName="idx_ai_obs_trace_session">
+            <column name="session_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_trace" indexName="idx_ai_obs_trace_user">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_trace" indexName="idx_ai_obs_trace_created">
+            <column name="created_date"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_trace" indexName="idx_ai_obs_trace_source">
+            <column name="source"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_trace" indexName="idx_ai_obs_trace_ext_trace_id" unique="true">
+            <column name="workspace_id"/>
+            <column name="external_trace_id"/>
+        </createIndex>
+
+        <createTable tableName="ai_observability_trace_tag">
+            <column name="ai_observability_trace" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="ai_observability_trace_tag" baseColumnNames="ai_observability_trace"
+                                 referencedTableName="ai_observability_trace" referencedColumnNames="id"
+                                 constraintName="fk_ai_obs_trace_tag_trace"/>
+
+        <addForeignKeyConstraint baseTableName="ai_observability_trace_tag" baseColumnNames="tag_id"
+                                 referencedTableName="tag" referencedColumnNames="id"
+                                 constraintName="fk_ai_obs_trace_tag_tag"/>
+
+        <createTable tableName="ai_observability_span">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="trace_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ai_obs_span_trace" references="ai_observability_trace(id)"/>
+            </column>
+            <column name="parent_span_id" type="BIGINT">
+                <constraints foreignKeyName="fk_ai_obs_span_parent" references="ai_observability_span(id)"/>
+            </column>
+            <column name="name" type="VARCHAR(256)"/>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="model" type="VARCHAR(256)"/>
+            <column name="provider" type="VARCHAR(64)"/>
+            <column name="prompt_id" type="BIGINT"/>
+            <column name="prompt_version_id" type="BIGINT"/>
+            <column name="input" type="TEXT"/>
+            <column name="output" type="TEXT"/>
+            <column name="metadata" type="TEXT"/>
+            <column name="input_tokens" type="INT"/>
+            <column name="output_tokens" type="INT"/>
+            <column name="cost" type="DECIMAL(10,6)"/>
+            <column name="latency_ms" type="INT"/>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="TIMESTAMP"/>
+            <column name="end_time" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_observability_span" indexName="idx_ai_obs_span_trace">
+            <column name="trace_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_span" indexName="idx_ai_obs_span_parent">
+            <column name="parent_span_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_span" indexName="idx_ai_obs_span_type">
+            <column name="type"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_span" indexName="idx_ai_obs_span_model">
+            <column name="model"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_span" indexName="idx_ai_obs_span_created">
+            <column name="created_date"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="00000000000002-10" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_observability_alert_rule"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_observability_alert_rule">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="metric" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="condition" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="threshold" type="DECIMAL(12,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="window_minutes" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cooldown_minutes" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="snoozed_until" type="TIMESTAMP"/>
+            <column name="filters" type="TEXT"/>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_observability_alert_rule" indexName="idx_ai_obs_alert_rule_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_alert_rule" indexName="idx_ai_obs_alert_rule_enabled">
+            <column name="enabled"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="00000000000002-11" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_observability_notification_channel"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_observability_notification_channel">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_error" type="TEXT"/>
+            <column name="last_error_date" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_observability_notification_channel" indexName="idx_ai_obs_notif_channel_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="00000000000002-12" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_observability_alert_rule_channel"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_observability_alert_rule_channel">
+            <column name="ai_observability_alert_rule" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification_channel_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_arc_alert_rule"
+                                 baseTableName="ai_observability_alert_rule_channel" baseColumnNames="ai_observability_alert_rule"
+                                 referencedTableName="ai_observability_alert_rule" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_arc_notif_channel"
+                                 baseTableName="ai_observability_alert_rule_channel" baseColumnNames="notification_channel_id"
+                                 referencedTableName="ai_observability_notification_channel" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="00000000000002-13" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_observability_alert_event"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_observability_alert_event">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="alert_rule_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="triggered_value" type="DECIMAL(12,4)"/>
+            <column name="message" type="TEXT"/>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resolved_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_alert_event_rule"
+                                 baseTableName="ai_observability_alert_event" baseColumnNames="alert_rule_id"
+                                 referencedTableName="ai_observability_alert_rule" referencedColumnNames="id"/>
+
+        <createIndex tableName="ai_observability_alert_event" indexName="idx_ai_obs_alert_event_rule">
+            <column name="alert_rule_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_alert_event" indexName="idx_ai_obs_alert_event_created">
+            <column name="created_date"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="00000000000002-6" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_observability_export_job"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_observability_export_job">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="format" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scope" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filters" type="TEXT"/>
+            <column name="cron_expression" type="VARCHAR(64)"/>
+            <column name="next_run_date" type="TIMESTAMP"/>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_path" type="VARCHAR(512)"/>
+            <column name="record_count" type="INT"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_observability_export_job" indexName="idx_ai_obs_export_job_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_export_job" indexName="idx_ai_obs_export_job_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_export_job" indexName="idx_ai_obs_export_job_created">
+            <column name="created_date"/>
+        </createIndex>
+
+        <createTable tableName="ai_observability_webhook_subscription">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret" type="TEXT"/>
+            <column name="events" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_triggered_date" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_observability_webhook_subscription" indexName="idx_ai_obs_webhook_sub_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_webhook_subscription" indexName="idx_ai_obs_webhook_sub_enabled">
+            <column name="enabled"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="00000000000002-15" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_observability_webhook_delivery"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_observability_webhook_delivery">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="subscription_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_type" type="VARCHAR(64)"/>
+            <column name="payload" type="TEXT"/>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="http_status" type="INT"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="attempt_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delivered_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_webhook_delivery_sub"
+                                 baseTableName="ai_observability_webhook_delivery" baseColumnNames="subscription_id"
+                                 referencedTableName="ai_observability_webhook_subscription" referencedColumnNames="id"/>
+
+        <createIndex tableName="ai_observability_webhook_delivery" indexName="idx_ai_obs_webhook_delivery_sub">
+            <column name="subscription_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_observability_webhook_delivery" indexName="idx_ai_obs_webhook_delivery_created">
+            <column name="created_date"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

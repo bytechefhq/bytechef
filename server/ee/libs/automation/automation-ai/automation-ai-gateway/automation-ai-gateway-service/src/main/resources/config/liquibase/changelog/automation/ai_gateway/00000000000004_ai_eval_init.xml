@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="00000000000004" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="ai_eval_score_config"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="ai_eval_score_config">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_type" type="INT"/>
+            <column name="min_value" type="DECIMAL(10,4)"/>
+            <column name="max_value" type="DECIMAL(10,4)"/>
+            <column name="categories" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="ai_eval_score_config"
+                             columnNames="workspace_id, name"
+                             constraintName="uk_ai_eval_score_config_workspace_name"/>
+
+        <createTable tableName="ai_eval_rule">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score_config_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="prompt_template" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="model" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filters" type="TEXT"/>
+            <column name="sampling_rate" type="DECIMAL(5,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delay_seconds" type="INT"/>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_ai_eval_rule_score_config"
+                                 baseTableName="ai_eval_rule" baseColumnNames="score_config_id"
+                                 referencedTableName="ai_eval_score_config" referencedColumnNames="id"/>
+
+        <createTable tableName="ai_eval_score">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="span_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="DECIMAL(10,4)"/>
+            <column name="string_value" type="VARCHAR(256)"/>
+            <column name="data_type" type="INT"/>
+            <column name="source" type="INT"/>
+            <column name="comment" type="TEXT"/>
+            <column name="eval_rule_id" type="BIGINT"/>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_ai_eval_score_trace"
+                                 baseTableName="ai_eval_score" baseColumnNames="trace_id"
+                                 referencedTableName="ai_observability_trace" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_ai_eval_score_span"
+                                 baseTableName="ai_eval_score" baseColumnNames="span_id"
+                                 referencedTableName="ai_observability_span" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_ai_eval_score_eval_rule"
+                                 baseTableName="ai_eval_score" baseColumnNames="eval_rule_id"
+                                 referencedTableName="ai_eval_rule" referencedColumnNames="id"/>
+
+        <createIndex tableName="ai_eval_score" indexName="idx_ai_eval_score_trace">
+            <column name="trace_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_eval_score" indexName="idx_ai_eval_score_span">
+            <column name="span_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_eval_score" indexName="idx_ai_eval_score_name">
+            <column name="name"/>
+        </createIndex>
+
+        <createIndex tableName="ai_eval_score" indexName="idx_ai_eval_score_source">
+            <column name="source"/>
+        </createIndex>
+
+        <createIndex tableName="ai_eval_score" indexName="idx_ai_eval_score_created">
+            <column name="created_date"/>
+        </createIndex>
+
+        <createTable tableName="ai_eval_execution">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="eval_rule_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score_id" type="BIGINT"/>
+            <column name="status" type="INT"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_ai_eval_exec_rule"
+                                 baseTableName="ai_eval_execution" baseColumnNames="eval_rule_id"
+                                 referencedTableName="ai_eval_rule" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_ai_eval_exec_trace"
+                                 baseTableName="ai_eval_execution" baseColumnNames="trace_id"
+                                 referencedTableName="ai_observability_trace" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_ai_eval_exec_score"
+                                 baseTableName="ai_eval_execution" baseColumnNames="score_id"
+                                 referencedTableName="ai_eval_score" referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
