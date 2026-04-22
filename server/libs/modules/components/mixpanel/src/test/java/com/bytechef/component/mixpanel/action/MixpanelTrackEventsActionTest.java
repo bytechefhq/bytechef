@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -74,19 +75,17 @@ class MixpanelTrackEventsActionTest {
         Object result = MixpanelTrackEventsAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
-
-        Body body = bodyArgumentCaptor.getValue();
-        List<Map<String, Object>> expected = List.of(Map.of(
-            EVENT, "test1",
-            "properties", Map.of(TIME, 1744735452L, DISTINCT_ID, 1, INSERT_ID, 1)));
-
-        assertEquals(expected, body.getContent());
-        assertEquals(List.of("/import", "strict", "1"), stringArgumentCaptor.getAllValues());
-
         assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        List<Map<String, Object>> expectedBody = List.of(
+            Map.of(EVENT, "test1", "properties", Map.of(TIME, 1744735452L, DISTINCT_ID, 1, INSERT_ID, 1)));
+
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
+        assertEquals(List.of("/import", "strict", "1"), stringArgumentCaptor.getAllValues());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
+
         assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
