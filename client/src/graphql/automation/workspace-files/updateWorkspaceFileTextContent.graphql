@@ -1,0 +1,7 @@
+mutation UpdateWorkspaceFileTextContent($id: ID!, $content: String!) {
+    updateWorkspaceFileTextContent(id: $id, content: $content) {
+        id
+        lastModifiedDate
+        sizeBytes
+    }
+}

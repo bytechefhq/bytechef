@@ -87,10 +87,7 @@ export const useHasProjectScope = (projectId: number | undefined, scope: Project
  * derived from the discriminated union state in `usePermissionStore`, populated by `useLoadProjectPermissions`.
  * `undefined` projectId reports `{error: false, granted: false, loading: false}` — nothing to load, nothing denied.
  */
-export const useProjectScopeState = (
-    projectId: number | undefined,
-    scope: ProjectScopeType
-): ProjectScopeStateI => {
+export const useProjectScopeState = (projectId: number | undefined, scope: ProjectScopeType): ProjectScopeStateI => {
     const account = useAuthenticationStore((state) => state.account);
     const authenticated = useAuthenticationStore((state) => state.authenticated);
     const projectState = usePermissionStore((state) =>

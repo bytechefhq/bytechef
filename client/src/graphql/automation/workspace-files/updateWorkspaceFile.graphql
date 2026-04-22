@@ -1,0 +1,15 @@
+mutation UpdateWorkspaceFile($input: UpdateWorkspaceFileInput!) {
+    updateWorkspaceFile(input: $input) {
+        createdBy
+        createdDate
+        description
+        downloadUrl
+        id
+        lastModifiedBy
+        lastModifiedDate
+        mimeType
+        name
+        sizeBytes
+        source
+    }
+}

@@ -1,0 +1,21 @@
+query GetWorkspaceFiles($workspaceId: ID!, $tagIds: [ID!], $mimeTypePrefix: String) {
+    workspaceFiles(workspaceId: $workspaceId, tagIds: $tagIds, mimeTypePrefix: $mimeTypePrefix) {
+        createdBy
+        createdDate
+        description
+        downloadUrl
+        generatedByAgentSource
+        generatedFromPrompt
+        id
+        lastModifiedBy
+        lastModifiedDate
+        mimeType
+        name
+        sizeBytes
+        source
+        tags {
+            id
+            name
+        }
+    }
+}

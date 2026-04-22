@@ -1,0 +1,6 @@
+query GetWorkspaceFileTags($workspaceId: ID!) {
+    workspaceFileTags(workspaceId: $workspaceId) {
+        id
+        name
+    }
+}

@@ -1,0 +1,9 @@
+mutation UpdateWorkspaceFileTags($id: ID!, $tagIds: [ID!]!) {
+    updateWorkspaceFileTags(id: $id, tagIds: $tagIds) {
+        id
+        tags {
+            id
+            name
+        }
+    }
+}

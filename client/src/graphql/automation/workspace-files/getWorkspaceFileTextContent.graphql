@@ -1,0 +1,3 @@
+query GetWorkspaceFileTextContent($id: ID!) {
+    workspaceFileTextContent(id: $id)
+}

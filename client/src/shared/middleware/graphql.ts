@@ -2360,6 +2360,7 @@ export type Mutation = {
   deleteWorkspaceAiGatewayProvider?: Maybe<Scalars['Boolean']['output']>;
   deleteWorkspaceAiGatewayRoutingPolicy?: Maybe<Scalars['Boolean']['output']>;
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
+  deleteWorkspaceFile: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
   /** Demote a connection to PRIVATE visibility, removing all project associations. Authorized for workspace administrators OR the connection creator (orphan-recovery path when no admins remain). Fails if the connection is used by active deployments. */
   demoteConnectionToPrivate: Scalars['Boolean']['output'];
@@ -2473,6 +2474,9 @@ export type Mutation = {
   updateWorkspaceAiGatewayProvider?: Maybe<AiGatewayProvider>;
   updateWorkspaceAiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
+  updateWorkspaceFile: WorkspaceFile;
+  updateWorkspaceFileTags: WorkspaceFile;
+  updateWorkspaceFileTextContent: WorkspaceFile;
   /** Update a workspace user's role. Requires ADMIN workspace role. */
   updateWorkspaceUserRole: WorkspaceUser;
 };
@@ -3043,6 +3047,11 @@ export type MutationDeleteWorkspaceAiGatewayRoutingPolicyArgs = {
 
 export type MutationDeleteWorkspaceApiKeyArgs = {
   apiKeyId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteWorkspaceFileArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3663,6 +3672,23 @@ export type MutationUpdateWorkspaceApiKeyArgs = {
 };
 
 
+export type MutationUpdateWorkspaceFileArgs = {
+  input: UpdateWorkspaceFileInput;
+};
+
+
+export type MutationUpdateWorkspaceFileTagsArgs = {
+  id: Scalars['ID']['input'];
+  tagIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationUpdateWorkspaceFileTextContentArgs = {
+  content: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateWorkspaceUserRoleArgs = {
   role: WorkspaceRole;
   userId: Scalars['ID']['input'];
@@ -4186,6 +4212,10 @@ export type Query = {
   workspaceAiGatewayRoutingPolicies?: Maybe<Array<Maybe<AiGatewayRoutingPolicy>>>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceChatWorkflows: Array<ChatWorkflow>;
+  workspaceFile?: Maybe<WorkspaceFile>;
+  workspaceFileTags: Array<Tag>;
+  workspaceFileTextContent?: Maybe<Scalars['String']['output']>;
+  workspaceFiles: Array<WorkspaceFile>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
   /** List all users of a workspace. Requires at least VIEWER workspace role. */
@@ -5076,6 +5106,28 @@ export type QueryWorkspaceChatWorkflowsArgs = {
 };
 
 
+export type QueryWorkspaceFileArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceFileTagsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceFileTextContentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceFilesArgs = {
+  mimeTypePrefix?: InputMaybe<Scalars['String']['input']>;
+  tagIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkspaceMcpServersArgs = {
   workspaceId: Scalars['ID']['input'];
 };
@@ -5407,6 +5459,12 @@ export type UpdateRowInput = {
   values: Scalars['Map']['input'];
 };
 
+export type UpdateWorkspaceFileInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Workflow = {
   __typename?: 'Workflow';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -5468,6 +5526,29 @@ export type WorkflowTrigger = {
   parameters?: Maybe<Scalars['Map']['output']>;
   type: Scalars['String']['output'];
 };
+
+export type WorkspaceFile = {
+  __typename?: 'WorkspaceFile';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  downloadUrl: Scalars['String']['output'];
+  generatedByAgentSource?: Maybe<Scalars['Int']['output']>;
+  generatedFromPrompt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  mimeType: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  sizeBytes: Scalars['Long']['output'];
+  source: WorkspaceFileSource;
+  tags: Array<Tag>;
+};
+
+export enum WorkspaceFileSource {
+  AiGenerated = 'AI_GENERATED',
+  UserUpload = 'USER_UPLOAD'
+}
 
 export enum WorkspaceRole {
   Admin = 'ADMIN',
@@ -7351,6 +7432,66 @@ export type AutomationSearchQuery = { __typename?: 'Query', automationSearch: Ar
     | { __typename?: 'ProjectSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
     | { __typename?: 'WorkflowSearchResult', projectId: string, label: string, id: string, name: string, description?: string | null, type: SearchAssetType }
   > };
+
+export type DeleteWorkspaceFileMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteWorkspaceFileMutation = { __typename?: 'Mutation', deleteWorkspaceFile: boolean };
+
+export type GetWorkspaceFileQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetWorkspaceFileQuery = { __typename?: 'Query', workspaceFile?: { __typename?: 'WorkspaceFile', createdBy?: string | null, createdDate?: any | null, description?: string | null, downloadUrl: string, generatedByAgentSource?: number | null, generatedFromPrompt?: string | null, id: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, mimeType: string, name: string, sizeBytes: any, source: WorkspaceFileSource, tags: Array<{ __typename?: 'Tag', id: string, name: string }> } | null };
+
+export type GetWorkspaceFileTagsQueryVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+}>;
+
+
+export type GetWorkspaceFileTagsQuery = { __typename?: 'Query', workspaceFileTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
+
+export type GetWorkspaceFileTextContentQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetWorkspaceFileTextContentQuery = { __typename?: 'Query', workspaceFileTextContent?: string | null };
+
+export type GetWorkspaceFilesQueryVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+  tagIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
+  mimeTypePrefix?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetWorkspaceFilesQuery = { __typename?: 'Query', workspaceFiles: Array<{ __typename?: 'WorkspaceFile', createdBy?: string | null, createdDate?: any | null, description?: string | null, downloadUrl: string, generatedByAgentSource?: number | null, generatedFromPrompt?: string | null, id: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, mimeType: string, name: string, sizeBytes: any, source: WorkspaceFileSource, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
+
+export type UpdateWorkspaceFileMutationVariables = Exact<{
+  input: UpdateWorkspaceFileInput;
+}>;
+
+
+export type UpdateWorkspaceFileMutation = { __typename?: 'Mutation', updateWorkspaceFile: { __typename?: 'WorkspaceFile', createdBy?: string | null, createdDate?: any | null, description?: string | null, downloadUrl: string, id: string, lastModifiedBy?: string | null, lastModifiedDate?: any | null, mimeType: string, name: string, sizeBytes: any, source: WorkspaceFileSource } };
+
+export type UpdateWorkspaceFileTagsMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  tagIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type UpdateWorkspaceFileTagsMutation = { __typename?: 'Mutation', updateWorkspaceFileTags: { __typename?: 'WorkspaceFile', id: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> } };
+
+export type UpdateWorkspaceFileTextContentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  content: Scalars['String']['input'];
+}>;
+
+
+export type UpdateWorkspaceFileTextContentMutation = { __typename?: 'Mutation', updateWorkspaceFileTextContent: { __typename?: 'WorkspaceFile', id: string, lastModifiedDate?: any | null, sizeBytes: any } };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -14875,6 +15016,235 @@ export const useAutomationSearchQuery = <
       {
     queryKey: ['automationSearch', variables],
     queryFn: fetcher<AutomationSearchQuery, AutomationSearchQueryVariables>(AutomationSearchDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteWorkspaceFileDocument = new TypedDocumentString(`
+    mutation DeleteWorkspaceFile($id: ID!) {
+  deleteWorkspaceFile(id: $id)
+}
+    `);
+
+export const useDeleteWorkspaceFileMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWorkspaceFileMutation, TError, DeleteWorkspaceFileMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWorkspaceFileMutation, TError, DeleteWorkspaceFileMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteWorkspaceFile'],
+    mutationFn: (variables?: DeleteWorkspaceFileMutationVariables) => fetcher<DeleteWorkspaceFileMutation, DeleteWorkspaceFileMutationVariables>(DeleteWorkspaceFileDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GetWorkspaceFileDocument = new TypedDocumentString(`
+    query GetWorkspaceFile($id: ID!) {
+  workspaceFile(id: $id) {
+    createdBy
+    createdDate
+    description
+    downloadUrl
+    generatedByAgentSource
+    generatedFromPrompt
+    id
+    lastModifiedBy
+    lastModifiedDate
+    mimeType
+    name
+    sizeBytes
+    source
+    tags {
+      id
+      name
+    }
+  }
+}
+    `);
+
+export const useGetWorkspaceFileQuery = <
+      TData = GetWorkspaceFileQuery,
+      TError = unknown
+    >(
+      variables: GetWorkspaceFileQueryVariables,
+      options?: Omit<UseQueryOptions<GetWorkspaceFileQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetWorkspaceFileQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetWorkspaceFileQuery, TError, TData>(
+      {
+    queryKey: ['GetWorkspaceFile', variables],
+    queryFn: fetcher<GetWorkspaceFileQuery, GetWorkspaceFileQueryVariables>(GetWorkspaceFileDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetWorkspaceFileTagsDocument = new TypedDocumentString(`
+    query GetWorkspaceFileTags($workspaceId: ID!) {
+  workspaceFileTags(workspaceId: $workspaceId) {
+    id
+    name
+  }
+}
+    `);
+
+export const useGetWorkspaceFileTagsQuery = <
+      TData = GetWorkspaceFileTagsQuery,
+      TError = unknown
+    >(
+      variables: GetWorkspaceFileTagsQueryVariables,
+      options?: Omit<UseQueryOptions<GetWorkspaceFileTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetWorkspaceFileTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetWorkspaceFileTagsQuery, TError, TData>(
+      {
+    queryKey: ['GetWorkspaceFileTags', variables],
+    queryFn: fetcher<GetWorkspaceFileTagsQuery, GetWorkspaceFileTagsQueryVariables>(GetWorkspaceFileTagsDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetWorkspaceFileTextContentDocument = new TypedDocumentString(`
+    query GetWorkspaceFileTextContent($id: ID!) {
+  workspaceFileTextContent(id: $id)
+}
+    `);
+
+export const useGetWorkspaceFileTextContentQuery = <
+      TData = GetWorkspaceFileTextContentQuery,
+      TError = unknown
+    >(
+      variables: GetWorkspaceFileTextContentQueryVariables,
+      options?: Omit<UseQueryOptions<GetWorkspaceFileTextContentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetWorkspaceFileTextContentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetWorkspaceFileTextContentQuery, TError, TData>(
+      {
+    queryKey: ['GetWorkspaceFileTextContent', variables],
+    queryFn: fetcher<GetWorkspaceFileTextContentQuery, GetWorkspaceFileTextContentQueryVariables>(GetWorkspaceFileTextContentDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetWorkspaceFilesDocument = new TypedDocumentString(`
+    query GetWorkspaceFiles($workspaceId: ID!, $tagIds: [ID!], $mimeTypePrefix: String) {
+  workspaceFiles(
+    workspaceId: $workspaceId
+    tagIds: $tagIds
+    mimeTypePrefix: $mimeTypePrefix
+  ) {
+    createdBy
+    createdDate
+    description
+    downloadUrl
+    generatedByAgentSource
+    generatedFromPrompt
+    id
+    lastModifiedBy
+    lastModifiedDate
+    mimeType
+    name
+    sizeBytes
+    source
+    tags {
+      id
+      name
+    }
+  }
+}
+    `);
+
+export const useGetWorkspaceFilesQuery = <
+      TData = GetWorkspaceFilesQuery,
+      TError = unknown
+    >(
+      variables: GetWorkspaceFilesQueryVariables,
+      options?: Omit<UseQueryOptions<GetWorkspaceFilesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetWorkspaceFilesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetWorkspaceFilesQuery, TError, TData>(
+      {
+    queryKey: ['GetWorkspaceFiles', variables],
+    queryFn: fetcher<GetWorkspaceFilesQuery, GetWorkspaceFilesQueryVariables>(GetWorkspaceFilesDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceFileDocument = new TypedDocumentString(`
+    mutation UpdateWorkspaceFile($input: UpdateWorkspaceFileInput!) {
+  updateWorkspaceFile(input: $input) {
+    createdBy
+    createdDate
+    description
+    downloadUrl
+    id
+    lastModifiedBy
+    lastModifiedDate
+    mimeType
+    name
+    sizeBytes
+    source
+  }
+}
+    `);
+
+export const useUpdateWorkspaceFileMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceFileMutation, TError, UpdateWorkspaceFileMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceFileMutation, TError, UpdateWorkspaceFileMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateWorkspaceFile'],
+    mutationFn: (variables?: UpdateWorkspaceFileMutationVariables) => fetcher<UpdateWorkspaceFileMutation, UpdateWorkspaceFileMutationVariables>(UpdateWorkspaceFileDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceFileTagsDocument = new TypedDocumentString(`
+    mutation UpdateWorkspaceFileTags($id: ID!, $tagIds: [ID!]!) {
+  updateWorkspaceFileTags(id: $id, tagIds: $tagIds) {
+    id
+    tags {
+      id
+      name
+    }
+  }
+}
+    `);
+
+export const useUpdateWorkspaceFileTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceFileTagsMutation, TError, UpdateWorkspaceFileTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceFileTagsMutation, TError, UpdateWorkspaceFileTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateWorkspaceFileTags'],
+    mutationFn: (variables?: UpdateWorkspaceFileTagsMutationVariables) => fetcher<UpdateWorkspaceFileTagsMutation, UpdateWorkspaceFileTagsMutationVariables>(UpdateWorkspaceFileTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceFileTextContentDocument = new TypedDocumentString(`
+    mutation UpdateWorkspaceFileTextContent($id: ID!, $content: String!) {
+  updateWorkspaceFileTextContent(id: $id, content: $content) {
+    id
+    lastModifiedDate
+    sizeBytes
+  }
+}
+    `);
+
+export const useUpdateWorkspaceFileTextContentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceFileTextContentMutation, TError, UpdateWorkspaceFileTextContentMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceFileTextContentMutation, TError, UpdateWorkspaceFileTextContentMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateWorkspaceFileTextContent'],
+    mutationFn: (variables?: UpdateWorkspaceFileTextContentMutationVariables) => fetcher<UpdateWorkspaceFileTextContentMutation, UpdateWorkspaceFileTextContentMutationVariables>(UpdateWorkspaceFileTextContentDocument, variables)(),
     ...options
   }
     )};

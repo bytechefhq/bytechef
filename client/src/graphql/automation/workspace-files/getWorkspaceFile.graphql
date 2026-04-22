@@ -1,0 +1,21 @@
+query GetWorkspaceFile($id: ID!) {
+    workspaceFile(id: $id) {
+        createdBy
+        createdDate
+        description
+        downloadUrl
+        generatedByAgentSource
+        generatedFromPrompt
+        id
+        lastModifiedBy
+        lastModifiedDate
+        mimeType
+        name
+        sizeBytes
+        source
+        tags {
+            id
+            name
+        }
+    }
+}
