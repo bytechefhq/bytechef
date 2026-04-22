@@ -23,7 +23,6 @@ import com.bytechef.automation.assetfile.config.AssetFileIntTestConfiguration;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.repository.AssetFileRepository;
-import com.bytechef.automation.assetfile.repository.WorkspaceAssetFileRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -58,14 +57,10 @@ class AssetFileFacadeIntTest {
     @Autowired
     private AssetFileRepository assetFileRepository;
 
-    @Autowired
-    private WorkspaceAssetFileRepository workspaceAssetFileRepository;
-
     private Long workspaceId;
 
     @BeforeEach
     public void beforeEach() {
-        workspaceAssetFileRepository.deleteAll();
         assetFileRepository.deleteAll();
 
         jdbcTemplate.update("DELETE FROM workspace");
@@ -83,7 +78,6 @@ class AssetFileFacadeIntTest {
 
     @AfterEach
     public void afterEach() {
-        workspaceAssetFileRepository.deleteAll();
         assetFileRepository.deleteAll();
 
         jdbcTemplate.update("DELETE FROM workspace");

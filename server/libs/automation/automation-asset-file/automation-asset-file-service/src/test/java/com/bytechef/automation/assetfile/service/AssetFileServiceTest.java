@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.repository.AssetFileRepository;
-import com.bytechef.automation.assetfile.repository.WorkspaceAssetFileRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,18 +40,15 @@ class AssetFileServiceTest {
     @Mock
     private AssetFileRepository repository;
 
-    @Mock
-    private WorkspaceAssetFileRepository workspaceRepository;
-
     private AssetFileService service;
 
     @BeforeEach
     void setUp() {
-        service = new AssetFileServiceImpl(repository, workspaceRepository);
+        service = new AssetFileServiceImpl(repository);
     }
 
     @Test
-    void testCreatePersistsAndLinksToWorkspace() {
+    void testCreatePersistsWorkspaceIdOnEntity() {
         AssetFile input = new AssetFile();
 
         input.setName("spec.md");
@@ -61,18 +57,18 @@ class AssetFileServiceTest {
 
         saved.setId(42L);
         saved.setName("spec.md");
+        saved.setWorkspaceId(7L);
 
-        when(repository.save(input)).thenReturn(saved);
+        when(repository.save(argThat(assetFile -> assetFile.getWorkspaceId() != null
+            && assetFile.getWorkspaceId()
+                .equals(7L)))).thenReturn(saved);
 
         AssetFile result = service.create(input, 7L);
 
         assertThat(result.getId()).isEqualTo(42L);
+        assertThat(input.getWorkspaceId()).isEqualTo(7L);
 
-        verify(workspaceRepository).save(argThat(
-            link -> link.getWorkspaceId()
-                .equals(7L)
-                && link.getAssetFileId()
-                    .equals(42L)));
+        verify(repository).save(input);
     }
 
     @Test

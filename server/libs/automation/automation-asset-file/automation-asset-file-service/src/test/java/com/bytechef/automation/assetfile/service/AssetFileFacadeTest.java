@@ -34,11 +34,9 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.assetfile.config.AutomationAssetFileQuotaProperties;
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileSource;
-import com.bytechef.automation.assetfile.domain.WorkspaceAssetFile;
 import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.file.storage.AssetFileFileStorage;
 import com.bytechef.automation.assetfile.metric.AssetFileMetrics;
-import com.bytechef.automation.assetfile.repository.WorkspaceAssetFileRepository;
 import com.bytechef.file.storage.domain.FileEntry;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -64,9 +62,6 @@ class AssetFileFacadeTest {
     private AssetFileService service;
 
     @Mock
-    private WorkspaceAssetFileRepository workspaceRepository;
-
-    @Mock
     private AssetFileFileStorage fileStorage;
 
     @Mock
@@ -80,7 +75,7 @@ class AssetFileFacadeTest {
     void setUp() {
         quota = new AutomationAssetFileQuotaProperties(26_214_400L, 1_073_741_824L, 1_048_576L);
 
-        facade = new AssetFileFacadeImpl(service, workspaceRepository, fileStorage, metrics, quota, new Tika());
+        facade = new AssetFileFacadeImpl(service, fileStorage, metrics, quota, new Tika());
     }
 
     @Test
@@ -96,6 +91,7 @@ class AssetFileFacadeTest {
             AssetFile assetFile = invocation.getArgument(0);
 
             assetFile.setId(10L);
+            assetFile.setWorkspaceId(invocation.getArgument(1));
 
             return assetFile;
         });
@@ -108,6 +104,7 @@ class AssetFileFacadeTest {
         assertThat(result.getSource()).isEqualTo(AssetFileSource.USER_UPLOAD);
         assertThat(result.getMimeType()).isNotNull();
         assertThat(result.getFile()).isEqualTo(stored);
+        assertThat(result.getWorkspaceId()).isEqualTo(1L);
 
         verify(metrics).recordCreate(eq(AssetFileSource.USER_UPLOAD), anyString());
     }
@@ -116,7 +113,7 @@ class AssetFileFacadeTest {
     void testCreateFromUploadRejectsWhenSingleFileOverLimit() {
         quota = new AutomationAssetFileQuotaProperties(1024L, 1_073_741_824L, 1_048_576L);
 
-        facade = new AssetFileFacadeImpl(service, workspaceRepository, fileStorage, metrics, quota, new Tika());
+        facade = new AssetFileFacadeImpl(service, fileStorage, metrics, quota, new Tika());
 
         byte[] bytes = new byte[2048];
 
@@ -136,7 +133,7 @@ class AssetFileFacadeTest {
     void testCreateFromUploadRejectsWhenWorkspaceTotalOver() {
         quota = new AutomationAssetFileQuotaProperties(1_000_000L, 10_000L, 1_048_576L);
 
-        facade = new AssetFileFacadeImpl(service, workspaceRepository, fileStorage, metrics, quota, new Tika());
+        facade = new AssetFileFacadeImpl(service, fileStorage, metrics, quota, new Tika());
 
         byte[] bytes = new byte[2];
 
@@ -184,6 +181,7 @@ class AssetFileFacadeTest {
             AssetFile assetFile = invocation.getArgument(0);
 
             assetFile.setId(99L);
+            assetFile.setWorkspaceId(invocation.getArgument(1));
 
             return assetFile;
         });
@@ -214,6 +212,7 @@ class AssetFileFacadeTest {
             AssetFile assetFile = invocation.getArgument(0);
 
             assetFile.setId(77L);
+            assetFile.setWorkspaceId(invocation.getArgument(1));
 
             return assetFile;
         });
@@ -243,7 +242,7 @@ class AssetFileFacadeTest {
     void testUpdateContentEnforcesDeltaQuota() {
         quota = new AutomationAssetFileQuotaProperties(1_000_000L, 10_000L, 1_048_576L);
 
-        facade = new AssetFileFacadeImpl(service, workspaceRepository, fileStorage, metrics, quota, new Tika());
+        facade = new AssetFileFacadeImpl(service, fileStorage, metrics, quota, new Tika());
 
         AssetFile existing = new AssetFile();
 
@@ -251,11 +250,9 @@ class AssetFileFacadeTest {
         existing.setName("note.md");
         existing.setSizeBytes(900);
         existing.setFile(new FileEntry("note.md", "asset-files/old.md"));
-
-        WorkspaceAssetFile link = new WorkspaceAssetFile(5L, 1L);
+        existing.setWorkspaceId(1L);
 
         when(service.findById(5L)).thenReturn(existing);
-        when(workspaceRepository.findByAssetFileId(5L)).thenReturn(Optional.of(link));
         when(service.sumSizeBytesByWorkspaceIdAndEnvironment(1L, 0)).thenReturn(9000L);
 
         byte[] newBytes = new byte[5900];
@@ -274,16 +271,15 @@ class AssetFileFacadeTest {
 
         existing.setId(5L);
         existing.setName("old.md");
+        existing.setWorkspaceId(1L);
 
         AssetFile other = new AssetFile();
 
         other.setId(6L);
         other.setName("foo.md");
-
-        WorkspaceAssetFile link = new WorkspaceAssetFile(5L, 1L);
+        other.setWorkspaceId(1L);
 
         when(service.findById(5L)).thenReturn(existing);
-        when(workspaceRepository.findByAssetFileId(5L)).thenReturn(Optional.of(link));
         when(service.fetchByWorkspaceIdAndEnvironmentAndName(1L, 0, "foo.md")).thenReturn(Optional.of(other));
         when(service.fetchByWorkspaceIdAndEnvironmentAndName(1L, 0, "foo-2.md")).thenReturn(Optional.empty());
         when(service.update(any(AssetFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -346,16 +342,19 @@ class AssetFileFacadeTest {
 
     @Test
     void testGetOwningWorkspaceIdReturnsLink() {
-        WorkspaceAssetFile link = new WorkspaceAssetFile(42L, 11L);
+        AssetFile assetFile = new AssetFile();
 
-        when(workspaceRepository.findByAssetFileId(42L)).thenReturn(Optional.of(link));
+        assetFile.setId(42L);
+        assetFile.setWorkspaceId(11L);
+
+        when(service.findById(42L)).thenReturn(assetFile);
 
         assertThat(facade.getOwningWorkspaceId(42L)).isEqualTo(11L);
     }
 
     @Test
     void testGetOwningWorkspaceIdThrowsWhenLinkMissing() {
-        when(workspaceRepository.findByAssetFileId(42L)).thenReturn(Optional.empty());
+        when(service.findById(42L)).thenThrow(new IllegalArgumentException("AssetFile 42 not found"));
 
         assertThatThrownBy(() -> facade.getOwningWorkspaceId(42L))
             .isInstanceOf(com.bytechef.automation.assetfile.exception.AssetFileNotFoundException.class)

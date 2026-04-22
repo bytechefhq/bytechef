@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260429130000-1" author="Ivica Cardic">
+        <addColumn tableName="asset_file">
+            <column name="environment" type="INT"/>
+        </addColumn>
+
+        <!-- Backfill existing rows to DEVELOPMENT (ordinal 0). The Environment enum is append-only; -->
+        <!-- DEVELOPMENT must remain at ordinal 0 for this default to stay correct. -->
+        <update tableName="asset_file">
+            <column name="environment" valueNumeric="0"/>
+        </update>
+
+        <addNotNullConstraint tableName="asset_file" columnName="environment" columnDataType="INT"/>
+
+        <createIndex tableName="asset_file" indexName="idx_asset_file_environment">
+            <column name="environment"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

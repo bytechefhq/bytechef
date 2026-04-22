@@ -20,12 +20,10 @@ import com.bytechef.automation.assetfile.config.AutomationAssetFileQuotaProperti
 import com.bytechef.automation.assetfile.domain.AssetFile;
 import com.bytechef.automation.assetfile.domain.AssetFileFormat;
 import com.bytechef.automation.assetfile.domain.AssetFileSource;
-import com.bytechef.automation.assetfile.domain.WorkspaceAssetFile;
 import com.bytechef.automation.assetfile.exception.AssetFileNotFoundException;
 import com.bytechef.automation.assetfile.exception.AssetFileQuotaExceededException;
 import com.bytechef.automation.assetfile.file.storage.AssetFileFileStorage;
 import com.bytechef.automation.assetfile.metric.AssetFileMetrics;
-import com.bytechef.automation.assetfile.repository.WorkspaceAssetFileRepository;
 import com.bytechef.automation.assetfile.util.AssetFileNameSanitizer;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -57,7 +55,6 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
     private static final Logger log = LoggerFactory.getLogger(AssetFileFacadeImpl.class);
 
     private final AssetFileService service;
-    private final WorkspaceAssetFileRepository workspaceAssetFileRepository;
     private final AssetFileFileStorage fileStorage;
     private final AssetFileMetrics metrics;
     private final AutomationAssetFileQuotaProperties quota;
@@ -65,14 +62,12 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
 
     public AssetFileFacadeImpl(
         AssetFileService service,
-        WorkspaceAssetFileRepository workspaceAssetFileRepository,
         AssetFileFileStorage fileStorage,
         AssetFileMetrics metrics,
         AutomationAssetFileQuotaProperties quota,
         Tika tika) {
 
         this.service = service;
-        this.workspaceAssetFileRepository = workspaceAssetFileRepository;
         this.fileStorage = fileStorage;
         this.metrics = metrics;
         this.quota = quota;
@@ -276,30 +271,49 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
             throw new IllegalArgumentException("workspaceId is required");
         }
 
-        Long owningWorkspaceId = workspaceAssetFileRepository.findByAssetFileId(id)
-            .map(WorkspaceAssetFile::getWorkspaceId)
-            .orElse(null);
+        AssetFile assetFile;
+
+        try {
+            assetFile = service.findById(id);
+        } catch (IllegalArgumentException exception) {
+            throw new AssetFileNotFoundException(
+                "Asset file %d not found in workspace %d".formatted(id, workspaceId));
+        }
+
+        Long owningWorkspaceId = assetFile.getWorkspaceId();
 
         if (owningWorkspaceId == null || !owningWorkspaceId.equals(workspaceId)) {
             throw new AssetFileNotFoundException(
                 "Asset file %d not found in workspace %d".formatted(id, workspaceId));
         }
 
-        return service.findById(id);
+        return assetFile;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long getOwningWorkspaceId(Long id) {
-        return workspaceAssetFileRepository.findByAssetFileId(id)
-            .map(WorkspaceAssetFile::getWorkspaceId)
-            .orElseThrow(() -> new AssetFileNotFoundException("Asset file %d not found".formatted(id)));
+        AssetFile assetFile;
+
+        try {
+            assetFile = service.findById(id);
+        } catch (IllegalArgumentException exception) {
+            throw new AssetFileNotFoundException("Asset file %d not found".formatted(id));
+        }
+
+        Long workspaceId = assetFile.getWorkspaceId();
+
+        if (workspaceId == null) {
+            throw new AssetFileNotFoundException("Asset file %d not found".formatted(id));
+        }
+
+        return workspaceId;
     }
 
     @Override
     public AssetFile rename(Long id, String newName) {
         AssetFile assetFile = service.findById(id);
-        Long workspaceId = resolveWorkspaceIdForFile(id);
+        Long workspaceId = resolveWorkspaceIdForFile(assetFile);
         int environment = (int) assetFile.getEnvironmentId();
 
         String sanitized = AssetFileNameSanitizer.sanitize(newName);
@@ -385,7 +399,7 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
     @Override
     public AssetFile updateContent(Long id, String contentType, InputStream data) {
         AssetFile assetFile = service.findById(id);
-        Long workspaceId = resolveWorkspaceIdForFile(id);
+        Long workspaceId = resolveWorkspaceIdForFile(assetFile);
         int environment = (int) assetFile.getEnvironmentId();
 
         byte[] bytes = readAllBoundedByPerFileQuota(data);
@@ -513,12 +527,15 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         }
     }
 
-    private Long resolveWorkspaceIdForFile(Long fileId) {
-        WorkspaceAssetFile link = workspaceAssetFileRepository.findByAssetFileId(fileId)
-            .orElseThrow(() -> new IllegalStateException(
-                "No workspace link found for workspace file %d".formatted(fileId)));
+    private Long resolveWorkspaceIdForFile(AssetFile assetFile) {
+        Long workspaceId = assetFile.getWorkspaceId();
 
-        return link.getWorkspaceId();
+        if (workspaceId == null) {
+            throw new IllegalStateException(
+                "No workspace id set on asset file %d".formatted(assetFile.getId()));
+        }
+
+        return workspaceId;
     }
 
     /**

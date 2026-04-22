@@ -31,6 +31,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -64,6 +65,9 @@ public class AssetFile {
     private String metadataJson;
 
     private int environment;
+
+    @Column("workspace_id")
+    private Long workspaceId;
 
     @MappedCollection(idColumn = "asset_file_id")
     private Set<AssetFileTag> assetFileTags = new HashSet<>();
@@ -225,6 +229,14 @@ public class AssetFile {
         }
     }
 
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     public Instant getCreatedDate() {
         return createdDate;
     }
@@ -273,6 +285,10 @@ public class AssetFile {
      * or miss the inconsistent one.
      */
     public void validate() {
+        if (workspaceId == null) {
+            throw new IllegalStateException("AssetFile must have a non-null workspaceId");
+        }
+
         AssetFileSource sourceEnum = getSource();
 
         if (sourceEnum == AssetFileSource.AI_GENERATED && generatedByAgentSource == null) {
@@ -351,6 +367,7 @@ public class AssetFile {
             ", format=" + format +
             ", metadataJson='" + metadataJson + '\'' +
             ", environment=" + environment +
+            ", workspaceId=" + workspaceId +
             ", assetFileTags=" + assetFileTags +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +

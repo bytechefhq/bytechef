@@ -17,9 +17,7 @@
 package com.bytechef.automation.assetfile.service;
 
 import com.bytechef.automation.assetfile.domain.AssetFile;
-import com.bytechef.automation.assetfile.domain.WorkspaceAssetFile;
 import com.bytechef.automation.assetfile.repository.AssetFileRepository;
-import com.bytechef.automation.assetfile.repository.WorkspaceAssetFileRepository;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,27 +33,19 @@ import org.springframework.util.Assert;
 public class AssetFileServiceImpl implements AssetFileService {
 
     private final AssetFileRepository assetFileRepository;
-    private final WorkspaceAssetFileRepository workspaceAssetFileRepository;
 
-    public AssetFileServiceImpl(
-        AssetFileRepository assetFileRepository,
-        WorkspaceAssetFileRepository workspaceAssetFileRepository) {
-
+    public AssetFileServiceImpl(AssetFileRepository assetFileRepository) {
         this.assetFileRepository = assetFileRepository;
-        this.workspaceAssetFileRepository = workspaceAssetFileRepository;
     }
 
     @Override
     public AssetFile create(AssetFile assetFile, Long workspaceId) {
         Assert.notNull(workspaceId, "workspaceId is required");
 
+        assetFile.setWorkspaceId(workspaceId);
         assetFile.validate();
 
-        AssetFile savedAssetFile = assetFileRepository.save(assetFile);
-
-        workspaceAssetFileRepository.save(new WorkspaceAssetFile(savedAssetFile.getId(), workspaceId));
-
-        return savedAssetFile;
+        return assetFileRepository.save(assetFile);
     }
 
     @Override

@@ -29,20 +29,18 @@ import org.springframework.data.repository.query.Param;
 public interface AssetFileRepository extends ListCrudRepository<AssetFile, Long> {
 
     @Query("""
-        SELECT wf.* FROM asset_file wf
-        JOIN workspace_asset_file wwf ON wwf.asset_file_id = wf.id
-        WHERE wwf.workspace_id = :workspaceId AND wf.environment = :environment
-        ORDER BY wf.last_modified_date DESC
+        SELECT * FROM asset_file
+        WHERE workspace_id = :workspaceId AND environment = :environment
+        ORDER BY last_modified_date DESC
         """)
     List<AssetFile> findAllByWorkspaceIdAndEnvironment(
         @Param("workspaceId") Long workspaceId, @Param("environment") int environment);
 
     @Query("""
-        SELECT DISTINCT wf.* FROM asset_file wf
-        JOIN workspace_asset_file wwf ON wwf.asset_file_id = wf.id
-        JOIN asset_file_tag wft ON wft.asset_file_id = wf.id
-        WHERE wwf.workspace_id = :workspaceId AND wf.environment = :environment AND wft.tag_id IN (:tagIds)
-        ORDER BY wf.last_modified_date DESC
+        SELECT DISTINCT af.* FROM asset_file af
+        JOIN asset_file_tag aft ON aft.asset_file_id = af.id
+        WHERE af.workspace_id = :workspaceId AND af.environment = :environment AND aft.tag_id IN (:tagIds)
+        ORDER BY af.last_modified_date DESC
         """)
     List<AssetFile> findAllByWorkspaceIdAndEnvironmentAndTagIdsIn(
         @Param("workspaceId") Long workspaceId, @Param("environment") int environment,
@@ -51,9 +49,8 @@ public interface AssetFileRepository extends ListCrudRepository<AssetFile, Long>
     Optional<AssetFile> findFirstByName(String name);
 
     @Query("""
-        SELECT COALESCE(SUM(wf.size_bytes), 0) FROM asset_file wf
-        JOIN workspace_asset_file wwf ON wwf.asset_file_id = wf.id
-        WHERE wwf.workspace_id = :workspaceId AND wf.environment = :environment
+        SELECT COALESCE(SUM(size_bytes), 0) FROM asset_file
+        WHERE workspace_id = :workspaceId AND environment = :environment
         """)
     long sumSizeBytesByWorkspaceIdAndEnvironment(
         @Param("workspaceId") Long workspaceId, @Param("environment") int environment);
