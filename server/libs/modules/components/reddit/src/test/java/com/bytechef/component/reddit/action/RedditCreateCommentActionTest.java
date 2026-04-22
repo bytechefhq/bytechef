@@ -18,6 +18,7 @@ package com.bytechef.component.reddit.action;
 
 import static com.bytechef.component.reddit.constant.RedditConstants.TEXT;
 import static com.bytechef.component.reddit.constant.RedditConstants.THING_ID;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -35,8 +36,6 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +44,6 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Marija Horvat
  */
-
 @ExtendWith(MockContextSetupExtension.class)
 class RedditCreateCommentActionTest {
 
@@ -74,16 +72,15 @@ class RedditCreateCommentActionTest {
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/api/comment", stringArgumentCaptor.getValue());
 
-        Object[] query = queryArgumentCaptor.getValue();
+        Object[] queryParameters = {
+            THING_ID, "test", TEXT, "This is a comment."
+        };
 
-        assertEquals(
-            List.of(THING_ID, "test", TEXT, "This is a comment."),
-            Arrays.asList(query));
+        assertArrayEquals(queryParameters, queryArgumentCaptor.getValue());
     }
 }
