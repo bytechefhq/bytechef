@@ -16,9 +16,9 @@
 
 package com.bytechef.automation.mcp.web.graphql;
 
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 import static com.bytechef.platform.component.constant.WorkflowConstants.WORKFLOW;
 

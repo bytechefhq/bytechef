@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
-    implementation(project(":server:libs:ai:ai-tool-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-api"))

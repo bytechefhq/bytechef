@@ -1,0 +1,2 @@
+com.bytechef.platform.ai.agent.eval.config.AiAgentEvalJdbcRepositoryConfiguration
+com.bytechef.platform.ai.agent.eval.config.AiAgentEvalAsyncConfiguration

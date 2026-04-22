@@ -2,7 +2,7 @@ version="1.0"
 
 dependencies {
     implementation("org.springframework:spring-context")
-    implementation(project(":server:libs:ai:ai-tool-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool-api"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))

@@ -16,20 +16,20 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
-import static com.bytechef.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
-import static com.bytechef.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
+import static com.bytechef.platform.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
+import static com.bytechef.platform.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 
-import com.bytechef.ai.agent.skill.domain.AiAgentSkill;
-import com.bytechef.ai.agent.skill.facade.AiAgentSkillFacade;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.agent.skill.domain.AiAgentSkill;
+import com.bytechef.platform.ai.agent.skill.facade.AiAgentSkillFacade;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;

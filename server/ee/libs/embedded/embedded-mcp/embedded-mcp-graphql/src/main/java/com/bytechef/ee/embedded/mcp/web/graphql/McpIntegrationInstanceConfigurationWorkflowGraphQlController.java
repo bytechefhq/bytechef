@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.embedded.mcp.web.graphql;
 
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;

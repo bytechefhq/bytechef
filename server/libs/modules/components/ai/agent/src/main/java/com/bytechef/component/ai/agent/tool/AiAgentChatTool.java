@@ -16,8 +16,6 @@
 
 package com.bytechef.component.ai.agent.tool;
 
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CONVERSATION_ID;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
@@ -28,6 +26,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;

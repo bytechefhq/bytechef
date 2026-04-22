@@ -16,11 +16,11 @@
 
 package com.bytechef.component.ai.agent.facade;
 
-import com.bytechef.ai.tool.FromAiResult;
-import com.bytechef.ai.tool.facade.AbstractToolFacade;
-import com.bytechef.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.ai.tool.FromAiResult;
+import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
+import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;

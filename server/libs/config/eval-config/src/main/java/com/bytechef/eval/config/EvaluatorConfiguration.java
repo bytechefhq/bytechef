@@ -16,9 +16,9 @@
 
 package com.bytechef.eval.config;
 
-import com.bytechef.ai.tool.FromAi;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.platform.ai.tool.FromAi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
