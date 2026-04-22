@@ -12,7 +12,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
-    implementation(project(":server:libs:ai:ai-tool-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool-api"))
     implementation(project(":server:libs:automation:automation-mcp:automation-mcp-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-api"))

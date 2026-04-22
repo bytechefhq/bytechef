@@ -16,11 +16,11 @@
 
 package com.bytechef.component.http.client.cluster;
 
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;

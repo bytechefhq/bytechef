@@ -16,14 +16,14 @@
 
 package com.bytechef.component.workflow.cluster;
 
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.INPUTS;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 
 import com.bytechef.component.definition.ClusterElementDefinition;

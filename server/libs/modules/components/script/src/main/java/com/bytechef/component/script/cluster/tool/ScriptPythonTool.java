@@ -16,8 +16,6 @@
 
 package com.bytechef.component.script.cluster.tool;
 
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
@@ -33,6 +31,8 @@ import static com.bytechef.component.definition.Property.ControlType.CODE_EDITOR
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
+import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.component.script.cluster.tool.definition.ScriptToolDefinition;

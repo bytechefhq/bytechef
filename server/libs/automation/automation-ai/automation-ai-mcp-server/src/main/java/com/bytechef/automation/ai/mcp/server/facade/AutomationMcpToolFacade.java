@@ -16,10 +16,6 @@
 
 package com.bytechef.automation.ai.mcp.server.facade;
 
-import com.bytechef.ai.tool.FromAiResult;
-import com.bytechef.ai.tool.constant.ToolConstants;
-import com.bytechef.ai.tool.facade.AbstractToolFacade;
-import com.bytechef.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
@@ -37,6 +33,10 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.ai.tool.FromAiResult;
+import com.bytechef.platform.ai.tool.constant.ToolConstants;
+import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
+import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;

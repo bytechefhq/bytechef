@@ -37,7 +37,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-impl"))
     implementation(project(":server:libs:platform:platform-webhook:platform-websocket-webhook-rest"))
 
-    implementation(project(":server:libs:ai:ai-tool-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool-api"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))

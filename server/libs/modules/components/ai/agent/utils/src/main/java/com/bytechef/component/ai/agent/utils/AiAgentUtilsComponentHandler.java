@@ -18,7 +18,6 @@ package com.bytechef.component.ai.agent.utils;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 
-import com.bytechef.ai.agent.skill.facade.AiAgentSkillFacade;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools;
@@ -31,6 +30,7 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTodoWriteTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.platform.ai.agent.skill.facade.AiAgentSkillFacade;
 import org.springframework.stereotype.Component;
 
 /**
