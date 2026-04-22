@@ -48,12 +48,20 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROMPT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.LOGPROBS;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.LOGPROBS_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.MAX_COMPLETION_TOKENS;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.MAX_COMPLETION_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.SUPPORTED_PARAMETERS;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.TOP_LOGPROBS;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.TOP_LOGPROBS_PROPERTY;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.getOpenRouterModels;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -110,36 +118,36 @@ public class OpenRouterChatAction {
             SYSTEM_PROMPT_PROPERTY,
             ATTACHMENTS_PROPERTY,
             MESSAGES_PROPERTY,
-            RESPONSE_PROPERTY
-                .displayCondition("contains({'response_format', 'structured_outputs'}, %s)".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+            RESPONSE_PROPERTY,
+//                .displayCondition("contains({'response_format','structured_outputs'}, %s)".formatted(SUPPORTED_PARAMETERS))
             FREQUENCY_PENALTY_PROPERTY
-                .displayCondition("contains(%s, 'frequency_penalty')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'frequency_penalty')".formatted(SUPPORTED_PARAMETERS)),
             LOGIT_BIAS_PROPERTY
-                .displayCondition("contains(%s, 'logit_bias')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'logit_bias')".formatted(SUPPORTED_PARAMETERS)),
+            LOGPROBS_PROPERTY
+                .displayCondition("contains(%s, 'logprobs')".formatted(SUPPORTED_PARAMETERS)),
+            MAX_COMPLETION_TOKENS_PROPERTY
+                .displayCondition("contains(%s, 'max_completion_tokens')".formatted(SUPPORTED_PARAMETERS)),
             MAX_TOKENS_PROPERTY
-                .displayCondition("contains(%s, 'max_tokens')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'max_tokens')".formatted(SUPPORTED_PARAMETERS)),
             PRESENCE_PENALTY_PROPERTY
-                .displayCondition("contains(%s, 'presence_penalty')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'presence_penalty')".formatted(SUPPORTED_PARAMETERS)),
             REASONING_PROPERTY
-                .displayCondition("contains(%s, 'reasoning')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'reasoning')".formatted(SUPPORTED_PARAMETERS)),
             SEED_PROPERTY
-                .displayCondition("contains(%s, 'seed')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'seed')".formatted(SUPPORTED_PARAMETERS)),
             STOP_PROPERTY
-                .displayCondition("contains(%s, 'stop')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'stop')".formatted(SUPPORTED_PARAMETERS)),
             TEMPERATURE_PROPERTY
-                .displayCondition("contains(%s, 'temperature')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'temperature')".formatted(SUPPORTED_PARAMETERS)),
+            TOP_LOGPROBS_PROPERTY
+                .displayCondition("contains(%s, 'top_logprobs')".formatted(SUPPORTED_PARAMETERS)),
+            TOP_K_PROPERTY
+                .displayCondition("contains(%s, 'top_k')".formatted(SUPPORTED_PARAMETERS)),
             TOP_P_PROPERTY
-                .displayCondition("contains(%s, 'top_p')".formatted(SUPPORTED_PARAMETERS))
-                .optionsLookupDependsOn(SUPPORTED_PARAMETERS),
+                .displayCondition("contains(%s, 'top_p')".formatted(SUPPORTED_PARAMETERS)),
+            VERBOSITY_PROPERTY
+                .displayCondition("contains(%s, 'verbosity')".formatted(SUPPORTED_PARAMETERS)),
             USER_PROPERTY)
         .output(ModelUtils::output)
         .perform(OpenRouterChatAction::perform);
@@ -159,7 +167,7 @@ public class OpenRouterChatAction {
             "parallel_tool_calls", "presence_penalty",
             "reasoning", "reasoning_effort", "response_format", "repetition_penalty",
             "seed", "stop", "structured_outputs",
-            "temperature", "tools", "tool_choice", "top_p", "top_k", "top_a", "top_k", "top_logprobs",
+            "temperature", "tools", "tool_choice", "top_a", "top_k", "top_p", "top_logprobs",
             "verbosity",
             "web_search_options"
         };
@@ -285,6 +293,18 @@ public class OpenRouterChatAction {
             body.put("logit_bias", logitBias);
         }
 
+        Boolean logprobs = inputParameters.getBoolean(LOGPROBS);
+
+        if (logprobs != null) {
+            body.put("logprobs", logprobs);
+        }
+
+        Integer maxCompletionTokens = inputParameters.getInteger(MAX_COMPLETION_TOKENS);
+
+        if (maxCompletionTokens != null) {
+            body.put("max_completion_tokens", maxCompletionTokens);
+        }
+
         Integer maxTokens = inputParameters.getInteger(MAX_TOKENS);
 
         if (maxTokens != null) {
@@ -319,6 +339,12 @@ public class OpenRouterChatAction {
 
         if (topP != null) {
             body.put("top_p", topP);
+        }
+
+        Integer topLogprobs = inputParameters.getInteger(TOP_LOGPROBS);
+
+        if (topLogprobs != null) {
+            body.put("top_logprobs", topLogprobs);
         }
 
         String user = inputParameters.getString(USER);
