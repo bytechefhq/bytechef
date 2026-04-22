@@ -16,21 +16,20 @@
 
 package com.bytechef.platform.scheduler.job;
 
-import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Map;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,10 +38,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConnectionOAuth2TokenRefreshJob implements Job {
 
-    @Autowired
-    private ConnectionDefinitionFacade connectionDefinitionFacade;
+    private final ConnectionFacade connectionFacade;
 
-    public ConnectionOAuth2TokenRefreshJob() {
+    @SuppressFBWarnings("EI")
+    public ConnectionOAuth2TokenRefreshJob(ConnectionFacade connectionFacade) {
+        this.connectionFacade = connectionFacade;
     }
 
     @Override
@@ -51,25 +51,22 @@ public class ConnectionOAuth2TokenRefreshJob implements Job {
         Long connectionId = jobDataMap.getLong("connectionId");
         String tenantId = jobDataMap.getString("tenantId");
 
-        ComponentConnection componentConnection = TenantContext.callWithTenantId(
-            tenantId, () -> connectionDefinitionFacade.executeConnectionRefresh(tenantId, connectionId));
+        Long expiresIn = TenantContext.callWithTenantId(
+            tenantId, () -> connectionFacade.executeConnectionRefresh(connectionId));
 
         Scheduler scheduler = context.getScheduler();
 
         try {
-            Map<String, ?> parameters = componentConnection.getParameters();
+            Instant now = Instant.now();
 
-            Long expiresIn = (Long) parameters.get("expires_in");
+            Instant nextTriggerTime = now.plusSeconds(expiresIn);
 
-            Instant nextTriggerTime = Instant.now()
-                .plusSeconds(expiresIn);
+            Trigger trigger = context.getTrigger();
 
             scheduler.rescheduleJob(
-                context.getTrigger()
-                    .getKey(),
+                trigger.getKey(),
                 TriggerBuilder.newTrigger()
-                    .withIdentity(context.getTrigger()
-                        .getKey())
+                    .withIdentity(trigger.getKey())
                     .withDescription("Connection OAuth2 token refresh for " + connectionId)
                     .startAt(Date.from(nextTriggerTime.minus(Duration.ofMinutes(5))))
                     .build());

@@ -33,6 +33,11 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     }
 
     @Override
+    public Long executeConnectionRefresh(Long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ConnectionDTO getConnection(Long id) {
         throw new UnsupportedOperationException();
     }

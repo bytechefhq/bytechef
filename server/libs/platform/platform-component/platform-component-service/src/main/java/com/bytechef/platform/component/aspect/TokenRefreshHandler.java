@@ -185,7 +185,7 @@ public class TokenRefreshHandler {
      *
      * @param connectionId the ID of the connection to mark as invalid
      */
-    public void markCredentialsInvalid(long connectionId) {
+    private void markCredentialsInvalid(long connectionId) {
         connectionService.updateConnectionCredentialStatus(connectionId, Connection.CredentialStatus.INVALID);
     }
 }

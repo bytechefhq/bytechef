@@ -11,8 +11,6 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 
 /**

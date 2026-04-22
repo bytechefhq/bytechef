@@ -16,15 +16,11 @@
 
 package com.bytechef.ee.platform.scheduler.aws.config;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.aws.AwsConnectionRefreshScheduler;
 import com.bytechef.ee.platform.scheduler.aws.listener.ConnectionRefreshListener;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
-import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -61,29 +57,17 @@ public class AwsConnectionRefreshSchedulerConfiguration {
 
         ApplicationProperties.Cloud.Aws aws = applicationProperties.getCloud()
             .getAws();
-        ApplicationProperties.Coordinator.Trigger.Polling polling = applicationProperties
-            .getCoordinator()
-            .getTrigger()
-            .getPolling();
 
         SchedulerClient schedulerClient = SchedulerClient.builder()
             .credentialsProvider(awsCredentialsProvider)
             .region(awsRegionProvider.getRegion())
             .build();
 
-        return new AwsConnectionRefreshScheduler(aws, polling, schedulerClient);
+        return new AwsConnectionRefreshScheduler(aws, schedulerClient);
     }
 
     @Bean
-    ConnectionRefreshListener connectionRefreshListener(
-        AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider,
-        ConnectionDefinitionFacade remoteConnectionDefinitionFacade) {
-
-        SchedulerClient schedulerClient = SchedulerClient.builder()
-            .credentialsProvider(awsCredentialsProvider)
-            .region(awsRegionProvider.getRegion())
-            .build();
-
-        return new ConnectionRefreshListener(schedulerClient, remoteConnectionDefinitionFacade);
+    ConnectionRefreshListener connectionRefreshListener(ConnectionFacade connectionFacade) {
+        return new ConnectionRefreshListener(connectionFacade);
     }
 }

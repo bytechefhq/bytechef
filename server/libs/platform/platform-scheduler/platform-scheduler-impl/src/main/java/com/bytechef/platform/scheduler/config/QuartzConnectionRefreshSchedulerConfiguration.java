@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.scheduler.config;
 
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import com.bytechef.platform.scheduler.QuartzConnectionRefreshScheduler;
 import org.quartz.Scheduler;
@@ -57,9 +56,7 @@ public class QuartzConnectionRefreshSchedulerConfiguration {
     }
 
     @Bean
-    ConnectionRefreshScheduler quartzConnectionRefreshScheduler(
-        ApplicationProperties applicationProperties, @Lazy Scheduler scheduler) {
-
+    ConnectionRefreshScheduler quartzConnectionRefreshScheduler(@Lazy Scheduler scheduler) {
         return new QuartzConnectionRefreshScheduler(scheduler);
     }
 

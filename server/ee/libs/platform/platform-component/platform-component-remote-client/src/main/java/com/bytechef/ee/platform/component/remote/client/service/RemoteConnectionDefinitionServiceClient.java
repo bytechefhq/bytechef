@@ -78,7 +78,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public Context createConnectionRefreshContext(String componentName, ComponentConnection componentConnection) {
+    public ComponentConnection executeConnectionRefresh(ComponentConnection componentConnection) {
         throw new UnsupportedOperationException();
     }
 
