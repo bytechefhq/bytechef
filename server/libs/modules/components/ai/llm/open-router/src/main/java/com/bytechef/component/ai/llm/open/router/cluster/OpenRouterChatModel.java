@@ -16,22 +16,35 @@
 
 package com.bytechef.component.ai.llm.open.router.cluster;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 
-import com.bytechef.component.ai.llm.open.router.action.OpenRouterChatAction;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 
 /**
  * @author Marko Kriskovic
@@ -46,7 +59,6 @@ public class OpenRouterChatModel {
             .object(() -> OpenRouterChatModel::apply)
             .properties(
                 MAX_TOKENS_PROPERTY,
-                N_PROPERTY,
                 TEMPERATURE_PROPERTY,
                 TOP_P_PROPERTY,
                 FREQUENCY_PENALTY_PROPERTY,
@@ -58,6 +70,25 @@ public class OpenRouterChatModel {
     protected static ChatModel apply(
         Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
 
-        return OpenRouterChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters, responseFormatRequired);
+        return OpenAiChatModel.builder()
+            .openAiApi(
+                OpenAiApi.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .baseUrl("https://openrouter.ai/api")
+                    .restClientBuilder(ModelUtils.getRestClientBuilder())
+                    .build())
+            .defaultOptions(
+                OpenAiChatOptions.builder()
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                    .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .user(inputParameters.getString(USER))
+                    .build())
+            .build();
     }
 }

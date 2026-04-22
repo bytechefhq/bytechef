@@ -16,9 +16,13 @@
 
 package com.bytechef.component.ai.llm.open.router.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TypeReference;
 
@@ -60,7 +64,27 @@ public class OpenRouterConstants {
         };
     }
 
+    public static final String LOGPROBS = "logprobs";
+    public static final String MAX_COMPLETION_TOKENS = "maxCompletionTokens";
     public static final String SUPPORTED_PARAMETERS = "supportedParameters";
+    public static final String TOP_LOGPROBS = "topLogprobs";
+
+    public static final ModifiableBooleanProperty LOGPROBS_PROPERTY = bool(LOGPROBS)
+        .label("Logprobs")
+        .description("Return log probabilities.")
+        .required(false);
+
+    public static final ModifiableIntegerProperty MAX_COMPLETION_TOKENS_PROPERTY = integer(MAX_COMPLETION_TOKENS)
+        .label("Max Completion Tokens")
+        .description("Maximum tokens in completion.")
+        .required(false);
+
+    public static final ModifiableIntegerProperty TOP_LOGPROBS_PROPERTY = integer(TOP_LOGPROBS)
+        .label("Top Logprobs")
+        .description("Number of top log probabilities to return (0-20).")
+        .minValue(0)
+        .maxValue(20)
+        .required(false);
 
     private OpenRouterConstants() {
     }
