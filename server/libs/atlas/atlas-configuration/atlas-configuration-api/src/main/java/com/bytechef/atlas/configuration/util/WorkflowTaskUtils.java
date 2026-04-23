@@ -129,7 +129,21 @@ public class WorkflowTaskUtils {
         // Workflow task types always follow the format: componentName/vVersion[/operation].
         // This distinguishes real tasks from user-defined data structures that happen to have
         // name/type keys (e.g., PostgreSQL column definitions like {"name": "ime", "type": "STRING"}).
-        return map.get(WorkflowConstants.TYPE) instanceof String type && type.contains("/");
+        return map.get(WorkflowConstants.TYPE) instanceof String type && isWorkflowNodeType(type);
+    }
+
+    private static boolean isWorkflowNodeType(String type) {
+        String[] parts = type.split("/", -1);
+
+        if (parts.length < 2 || parts.length > 3) {
+            return false;
+        }
+
+        if (parts[0].isEmpty() || !parts[1].matches("v\\d+")) {
+            return false;
+        }
+
+        return parts.length == 2 || !parts[2].isEmpty();
     }
 
     private static List<WorkflowTask> getPrevious(List<WorkflowTask> workflowTasks, String workflowTaskName) {
