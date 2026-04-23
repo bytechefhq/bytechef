@@ -161,6 +161,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         Map<String, ?> parameters = connection.getParameters();
 
+        logger.info("Scheduled refresh of connection parameters for connection with connectionId: {}", connectionId);
+
         return (Long) parameters.get("expires_in");
     }
 

@@ -52,6 +52,8 @@ public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler
             schedulerClient.deleteSchedule(request -> request.clientToken(tenantId + connectionId)
                 .groupName(CONNECTION_REFRESH)
                 .name(CONNECTION_REFRESH + tenantId + connectionId));
+
+            log.info("Canceling connection refresh for connection: {}, tenant: {}", connectionId, tenantId);
         } catch (RuntimeException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Dynamic Webhook Trigger Refresh not defined");
