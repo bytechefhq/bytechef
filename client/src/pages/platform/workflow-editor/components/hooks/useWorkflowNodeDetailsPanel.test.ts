@@ -1,5 +1,7 @@
 import {describe, expect, it} from 'vitest';
 
+import isActionDefinitionFresh from './isActionDefinitionFresh';
+
 /**
  * Tests for the workflowTestConfigurationConnections query enabled condition
  * in useWorkflowNodeDetailsPanel.
@@ -109,77 +111,58 @@ describe('workflowTestConfigurationConnections query enabled condition', () => {
  * effect of useWorkflowNodeDetailsPanel.
  *
  * Two components can expose actions with the same name (e.g., OpenRouter/ask and OpenAI/ask).
- * Before this fix the guard only compared the action name, so switching between such components
- * short-circuited the fetch and left the panel rendering the previous component's properties.
- * The guard must also consider the owning component name + version.
+ * Before bytechefhq/bytechef#4831 the guard only compared the action name, so switching between
+ * such components short-circuited the fetch and left the panel rendering the previous
+ * component's properties. The guard must also consider the owning component name + version.
+ *
+ * These tests exercise the real isActionDefinitionFresh function used by the hook so that any
+ * regression in production logic also fails the tests.
  */
-type IsActionDefinitionFreshInputType = {
-    currentActionDefinition: {componentName: string; componentVersion: number; name: string} | undefined;
-    currentComponentDefinition: {name: string; version: number} | undefined;
-    currentOperationName: string;
-};
-
-function isActionDefinitionFresh({
-    currentActionDefinition,
-    currentComponentDefinition,
-    currentOperationName,
-}: IsActionDefinitionFreshInputType): boolean {
-    return (
-        currentActionDefinition?.name === currentOperationName &&
-        currentActionDefinition?.componentName === currentComponentDefinition?.name &&
-        currentActionDefinition?.componentVersion === currentComponentDefinition?.version
-    );
-}
+type ActionDefinitionFixtureType = {componentName: string; componentVersion: number; name: string};
 
 describe('currentActionDefinition freshness guard', () => {
     it('treats the definition as stale when switching components that share an action name', () => {
         expect(
-            isActionDefinitionFresh({
-                currentActionDefinition: {componentName: 'openrouter', componentVersion: 1, name: 'ask'},
-                currentComponentDefinition: {name: 'openai', version: 1},
-                currentOperationName: 'ask',
-            })
+            isActionDefinitionFresh(
+                {componentName: 'openrouter', componentVersion: 1, name: 'ask'},
+                {name: 'openai', version: 1},
+                'ask'
+            )
         ).toBe(false);
     });
 
     it('treats the definition as fresh when component and operation both match', () => {
         expect(
-            isActionDefinitionFresh({
-                currentActionDefinition: {componentName: 'openai', componentVersion: 1, name: 'ask'},
-                currentComponentDefinition: {name: 'openai', version: 1},
-                currentOperationName: 'ask',
-            })
+            isActionDefinitionFresh(
+                {componentName: 'openai', componentVersion: 1, name: 'ask'},
+                {name: 'openai', version: 1},
+                'ask'
+            )
         ).toBe(true);
     });
 
     it('treats the definition as stale when the operation name changes within the same component', () => {
         expect(
-            isActionDefinitionFresh({
-                currentActionDefinition: {componentName: 'openai', componentVersion: 1, name: 'ask'},
-                currentComponentDefinition: {name: 'openai', version: 1},
-                currentOperationName: 'chat',
-            })
+            isActionDefinitionFresh(
+                {componentName: 'openai', componentVersion: 1, name: 'ask'},
+                {name: 'openai', version: 1},
+                'chat'
+            )
         ).toBe(false);
     });
 
     it('treats the definition as stale when the component version changes', () => {
         expect(
-            isActionDefinitionFresh({
-                currentActionDefinition: {componentName: 'openai', componentVersion: 1, name: 'ask'},
-                currentComponentDefinition: {name: 'openai', version: 2},
-                currentOperationName: 'ask',
-            })
+            isActionDefinitionFresh(
+                {componentName: 'openai', componentVersion: 1, name: 'ask'},
+                {name: 'openai', version: 2},
+                'ask'
+            )
         ).toBe(false);
     });
 
     it('treats the definition as stale when no definition has been fetched yet', () => {
-        expect(
-            isActionDefinitionFresh({
-                currentActionDefinition: undefined,
-                currentComponentDefinition: {name: 'openai', version: 1},
-                currentOperationName: 'ask',
-            })
-        ).toBe(false);
+        expect(isActionDefinitionFresh(undefined, {name: 'openai', version: 1}, 'ask')).toBe(false);
     });
 
     /**
@@ -189,48 +172,20 @@ describe('currentActionDefinition freshness guard', () => {
      * 3. Switch back to OpenRouter `ask` → guard must flag stale again.
      */
     it('re-flags the definition as stale every time the user switches between components sharing an action name', () => {
-        let currentActionDefinition: IsActionDefinitionFreshInputType['currentActionDefinition'];
+        let currentActionDefinition: ActionDefinitionFixtureType | undefined;
 
-        const selectOpenRouterAsk: IsActionDefinitionFreshInputType = {
-            currentActionDefinition,
-            currentComponentDefinition: {name: 'openrouter', version: 1},
-            currentOperationName: 'ask',
-        };
-
-        expect(isActionDefinitionFresh(selectOpenRouterAsk)).toBe(false);
+        expect(isActionDefinitionFresh(currentActionDefinition, {name: 'openrouter', version: 1}, 'ask')).toBe(false);
 
         currentActionDefinition = {componentName: 'openrouter', componentVersion: 1, name: 'ask'};
 
-        expect(
-            isActionDefinitionFresh({
-                ...selectOpenRouterAsk,
-                currentActionDefinition,
-            })
-        ).toBe(true);
+        expect(isActionDefinitionFresh(currentActionDefinition, {name: 'openrouter', version: 1}, 'ask')).toBe(true);
 
-        const switchToOpenAiAsk: IsActionDefinitionFreshInputType = {
-            currentActionDefinition,
-            currentComponentDefinition: {name: 'openai', version: 1},
-            currentOperationName: 'ask',
-        };
-
-        expect(isActionDefinitionFresh(switchToOpenAiAsk)).toBe(false);
+        expect(isActionDefinitionFresh(currentActionDefinition, {name: 'openai', version: 1}, 'ask')).toBe(false);
 
         currentActionDefinition = {componentName: 'openai', componentVersion: 1, name: 'ask'};
 
-        expect(
-            isActionDefinitionFresh({
-                ...switchToOpenAiAsk,
-                currentActionDefinition,
-            })
-        ).toBe(true);
+        expect(isActionDefinitionFresh(currentActionDefinition, {name: 'openai', version: 1}, 'ask')).toBe(true);
 
-        expect(
-            isActionDefinitionFresh({
-                currentActionDefinition,
-                currentComponentDefinition: {name: 'openrouter', version: 1},
-                currentOperationName: 'ask',
-            })
-        ).toBe(false);
+        expect(isActionDefinitionFresh(currentActionDefinition, {name: 'openrouter', version: 1}, 'ask')).toBe(false);
     });
 });
