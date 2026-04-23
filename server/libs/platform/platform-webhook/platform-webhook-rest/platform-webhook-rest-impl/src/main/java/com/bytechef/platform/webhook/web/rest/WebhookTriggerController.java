@@ -153,23 +153,31 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
-        WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+        return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+            if (isWorkflowDisabled(workflowExecutionId)) {
+                emitter.complete();
 
-        WebhookSseStreamBridge bridge = new WebhookSseStreamBridge(emitter);
-
-        CompletableFuture<Void> future = webhookWorkflowExecutor.executeAsync(
-            workflowExecutionId, webhookRequest, bridge);
-
-        future.whenComplete((unused, throwable) -> {
-            if (throwable != null) {
-                bridge.onError(throwable);
-            } else {
-                bridge.onComplete();
+                return emitter;
             }
-        });
 
-        return emitter;
+            WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+            WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+
+            WebhookSseStreamBridge bridge = new WebhookSseStreamBridge(emitter);
+
+            CompletableFuture<Void> future = webhookWorkflowExecutor.executeAsync(
+                workflowExecutionId, webhookRequest, bridge);
+
+            future.whenComplete((unused, throwable) -> {
+                if (throwable != null) {
+                    bridge.onError(throwable);
+                } else {
+                    bridge.onComplete();
+                }
+            });
+
+            return emitter;
+        });
     }
 
     private ResponseEntity<?> doValidateOnEnable(
