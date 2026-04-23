@@ -611,7 +611,10 @@ export const useProperty = ({
 
         saveInputValue();
 
-        inputRef.current?.focus();
+        // Defer focus() so React commits value='' while PropertyInput is still unfocused —
+        // otherwise onFocus flips isFocused=true before the sync effect runs, the clear never
+        // reaches the input's internal localValue, and the stale time stays visible until blur.
+        requestAnimationFrame(() => inputRef.current?.focus());
     }, [saveInputValue]);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
