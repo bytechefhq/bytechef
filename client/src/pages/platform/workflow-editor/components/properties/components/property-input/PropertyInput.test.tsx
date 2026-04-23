@@ -102,6 +102,29 @@ describe('PropertyInput', async () => {
         expect(screen.getByTestId('trailing-action')).toBeInTheDocument();
     });
 
+    it('invokes trailingAction click handler (covers the TIME clear button pattern from #4768)', async () => {
+        const handleClear = vi.fn();
+
+        render(
+            <PropertyInput
+                aria-label="Time"
+                label="Time"
+                name="time"
+                trailingAction={
+                    <button aria-label="Clear time" onClick={handleClear} type="button">
+                        X
+                    </button>
+                }
+                type="time"
+                value="12:30"
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: /clear time/i}));
+
+        expect(handleClear).toHaveBeenCalledTimes(1);
+    });
+
     it('strips leading = from display value on input change when expressionPrefix is true', async () => {
         const handleChange = vi.fn();
 

@@ -122,6 +122,7 @@ type UsePropertyReturnType = {
     handleFromAiClick: ((fromAi: boolean) => void) | undefined;
     handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
+    handleInputClear: () => void;
     handleInputTypeSwitchButtonClick: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
     handleMentionInputValueChange: (value: string | number) => void;
@@ -600,6 +601,18 @@ export const useProperty = ({
             workflowId: workflow.id!,
         });
     }, 600);
+
+    const handleInputClear = useCallback(() => {
+        setInputValue('');
+        setHasError(false);
+        setErrorMessage('');
+
+        latestValueRef.current = '';
+
+        saveInputValue();
+
+        inputRef.current?.focus();
+    }, [saveInputValue]);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
         if (
@@ -1770,6 +1783,7 @@ export const useProperty = ({
         handleFromAiClick: hideFromAi ? undefined : handleFromAiClick,
         handleFromAiToggle,
         handleInputChange,
+        handleInputClear,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
         handleMentionInputValueChange,
