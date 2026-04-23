@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMapAdapter;
@@ -107,15 +108,20 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;
 
-            if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||
-                isWorkflowDisabled(workflowExecutionId)) {
+            boolean head = Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name());
+            boolean disabled = isWorkflowDisabled(workflowExecutionId);
 
+            if (head || disabled) {
                 WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
 
                 WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
                 if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
                     responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);
+                } else if (disabled && webhookTriggerFlags.workflowSyncExecution()) {
+                    responseEntity = ResponseEntity.status(HttpStatus.GONE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Map.of("detail", "Workflow is disabled."));
                 } else {
                     responseEntity = ResponseEntity.ok()
                         .build();
@@ -154,16 +160,16 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+            WebhookSseStreamBridge bridge = new WebhookSseStreamBridge(emitter);
+
             if (isWorkflowDisabled(workflowExecutionId)) {
-                emitter.complete();
+                bridge.onError(new IllegalStateException("Workflow is disabled."));
 
                 return emitter;
             }
 
             WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
             WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
-
-            WebhookSseStreamBridge bridge = new WebhookSseStreamBridge(emitter);
 
             CompletableFuture<Void> future = webhookWorkflowExecutor.executeAsync(
                 workflowExecutionId, webhookRequest, bridge);
