@@ -27,11 +27,12 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author Nikolina Spehar
+ * @author Igor Beslic
  */
 @Service
 public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConnectionLifecycleFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ConnectionLifecycleFacadeImpl.class);
 
     private final ConnectionRefreshScheduler connectionRefreshScheduler;
 
@@ -44,22 +45,25 @@ public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade 
     public void scheduleConnectionRefresh(
         Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId) {
 
+        if (!authorizationType.hasRefreshToken()) {
+            log.debug("Connection authorization type does not support refresh token");
+        }
+
         try {
-            if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
-                authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+            Integer expiresIn = (Integer) parameters.get("expires_in");
 
-                Integer expiresIn = (Integer) parameters.get("expires_in");
+            Instant expiry = Instant.now()
+                .plusSeconds(expiresIn);
 
-                Instant expiry = Instant.now()
-                    .plusSeconds(expiresIn);
-
-                if (expiry != null) {
-                    connectionRefreshScheduler.scheduleConnectionRefresh(connectionId, expiry, tenantId);
-                }
+            if (expiry != null) {
+                connectionRefreshScheduler.scheduleConnectionRefresh(connectionId, expiry, tenantId);
             }
         } catch (Exception e) {
-            logger.debug(
-                "Connection creation error");
+            log.error("Unable to schedule connection refresh");
+
+            if (log.isDebugEnabled()) {
+                log.debug("Problem details", e);
+            }
         }
     }
 
