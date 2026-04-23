@@ -34,12 +34,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.expression.EvaluationException;
 
 /**
  * @author Ivica Cardic
  */
 public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSendProcessor {
 
+    private static final Logger log = LoggerFactory.getLogger(TestTaskDispatcherPreSendProcessor.class);
     private final JobService jobService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -70,8 +74,13 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
         taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, Environment.DEVELOPMENT.ordinal());
         taskExecution.putMetadata(MetadataConstants.EDITOR_ENVIRONMENT, true);
 
-        WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
-            job.getWorkflowId(), taskExecution.getName(), Environment.DEVELOPMENT.ordinal());
+        WorkflowNodeOutputDTO workflowNodeOutputDTO = null;
+        try {
+            workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
+                job.getWorkflowId(), taskExecution.getName(), Environment.DEVELOPMENT.ordinal());
+        } catch (EvaluationException e) {
+            log.error("Couldn't evaluate expression with sample output", e);
+        }
 
         if (workflowNodeOutputDTO != null && workflowNodeOutputDTO.getSampleOutput() instanceof Map map &&
             MapUtils.getBoolean(map, ResumeResponse.RESUMED, false)) {
