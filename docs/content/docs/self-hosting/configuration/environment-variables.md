@@ -82,7 +82,6 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_COORDINATOR_TRIGGER_POLLING_CHECK_PERIOD` | Trigger polling interval in minutes | `5` |
-| `BYTECHEF_COORDINATOR_TRIGGER_SCHEDULER_PROVIDER` | Scheduler provider (AWS, QUARTZ) | `QUARTZ` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_APPLICATION_EVENTS` | Number of application event subscribers | `1` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_COMPLETE_EVENTS` | Number of trigger execution complete event subscribers | `1` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_ERROR_EVENTS` | Number of trigger execution error event subscribers | `1` |
@@ -209,6 +208,12 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_SECURITY_SYSTEM_PASSWORD` | System administrator password (sensitive) | - |
 
 System administrator is used for accessing protected data reachable through /actuator/** endpoints. For example /actuator/env returns all environment properties.
+
+## Scheduler Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_SCHEDULER_PROVIDER` | Scheduler provider (AWS, QUARTZ) | `QUARTZ` |
 
 ## Sign Up Configuration
 
