@@ -4,10 +4,12 @@ import {describe, expect, it, vi} from 'vitest';
  * Exercises the TIME-clearing flow introduced for issue #4768.
  *
  * Why: Chrome's <input type="time"> does not expose a native clear button,
- * so the UI must render an explicit X. This test locks in three things:
+ * so the UI must render an explicit X. This test locks in two things:
  *   1. The TIME clear button is shown only when inputValue is non-empty.
- *   2. Invoking handleInputClear resets local state and triggers the save.
- *   3. The saved value for an empty TIME input is null (not '').
+ *   2. Invoking handleInputClear resets local state and invokes the save callback.
+ *
+ * The empty-string -> null coercion for DATE/DATE_TIME/TIME is covered by
+ * saveInputValueResolvedValue.test.ts to avoid duplicating the resolver logic.
  */
 
 type ClearStateType = {
@@ -28,16 +30,6 @@ const makeHandleInputClear = (state: ClearStateType, saveInputValue: () => void)
     saveInputValue();
 };
 
-const resolveSaveValue = (controlType: string | undefined, valueToSave: string): unknown => {
-    const isDateOrTimeControlType = controlType === 'DATE' || controlType === 'DATE_TIME' || controlType === 'TIME';
-
-    if (valueToSave === '' && isDateOrTimeControlType) {
-        return null;
-    }
-
-    return valueToSave;
-};
-
 describe('TIME field clear affordance', () => {
     it('shows the clear button only when a TIME input has a value', () => {
         expect(shouldShowTimeClearButton('TIME', '12:30')).toBe(true);
@@ -56,7 +48,7 @@ describe('TIME field clear affordance', () => {
 });
 
 describe('handleInputClear', () => {
-    it('resets inputValue, clears error state, and triggers the debounced save', () => {
+    it('resets inputValue, clears error state, and invokes the save callback', () => {
         const state: ClearStateType = {
             controlType: 'TIME',
             hasError: true,
@@ -73,23 +65,5 @@ describe('handleInputClear', () => {
         expect(state.hasError).toBe(false);
         expect(state.latestValue).toBe('');
         expect(saveInputValue).toHaveBeenCalledTimes(1);
-    });
-
-    it('persists null (not empty string) when clearing a TIME field', () => {
-        const state: ClearStateType = {
-            controlType: 'TIME',
-            hasError: false,
-            inputValue: '09:45',
-            latestValue: '09:45',
-        };
-        const saveSpy = vi.fn();
-
-        const handleInputClear = makeHandleInputClear(state, () => {
-            saveSpy(resolveSaveValue(state.controlType, state.latestValue));
-        });
-
-        handleInputClear();
-
-        expect(saveSpy).toHaveBeenCalledWith(null);
     });
 });
