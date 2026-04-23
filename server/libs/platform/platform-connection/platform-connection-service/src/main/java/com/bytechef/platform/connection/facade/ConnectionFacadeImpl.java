@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.connection.facade;
 
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
@@ -94,15 +97,28 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
+                Map<String, ?> predefinedParameters = oAuth2Service.checkPredefinedParameters(
+                    connection.getComponentName(), connection.getParameters());
+
                 AuthorizationCallbackResponse authorizationCallbackResponse =
                     connectionDefinitionService.executeAuthorizationCallback(
                         connection.getComponentName(), connection.getConnectionVersion(),
-                        connection.getAuthorizationType(),
-                        oAuth2Service.checkPredefinedParameters(
-                            connection.getComponentName(), connection.getParameters()),
+                        connection.getAuthorizationType(), predefinedParameters,
                         oAuth2Service.getRedirectUri());
 
                 connection.putAllParameters(authorizationCallbackResponse.result());
+
+                Map<String, ?> parameters = connection.getParameters();
+
+                Object clientId = parameters.get(CLIENT_ID);
+                Object clientSecret = parameters.get(CLIENT_SECRET);
+
+                if ((clientId == null || clientId.equals("")) && (clientSecret == null || clientSecret.equals(""))) {
+                    connection.putAllParameters(
+                        Map.of(
+                            CLIENT_ID, predefinedParameters.get(CLIENT_ID),
+                            CLIENT_SECRET, predefinedParameters.get(CLIENT_SECRET)));
+                }
 
                 if (logger.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
                     logger.warn(
