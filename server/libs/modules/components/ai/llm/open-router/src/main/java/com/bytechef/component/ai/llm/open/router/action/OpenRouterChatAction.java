@@ -21,49 +21,49 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY_PROPERTY;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.CHAT_MODEL_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.LOGPROBS;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.LOGPROBS_PROPERTY;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.MAX_COMPLETION_TOKENS;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.MAX_COMPLETION_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.SUPPORTED_PARAMETERS;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.REASONING_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.SEED_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.SUPPORTED_PARAMETERS_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.TOP_LOGPROBS;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.TOP_LOGPROBS_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.VERBOSITY_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.open.router.model.OpenRouterChatModel;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -88,34 +88,20 @@ public class OpenRouterChatAction {
             ATTACHMENTS_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
-            FREQUENCY_PENALTY_PROPERTY
-                .displayCondition("contains(%s, 'frequency_penalty')".formatted(SUPPORTED_PARAMETERS)),
-            LOGIT_BIAS_PROPERTY
-                .displayCondition("contains(%s, 'logit_bias')".formatted(SUPPORTED_PARAMETERS)),
-            LOGPROBS_PROPERTY
-                .displayCondition("contains(%s, 'logprobs')".formatted(SUPPORTED_PARAMETERS)),
-            MAX_COMPLETION_TOKENS_PROPERTY
-                .displayCondition("contains(%s, 'max_completion_tokens')".formatted(SUPPORTED_PARAMETERS)),
-            MAX_TOKENS_PROPERTY
-                .displayCondition("contains(%s, 'max_tokens')".formatted(SUPPORTED_PARAMETERS)),
-            PRESENCE_PENALTY_PROPERTY
-                .displayCondition("contains(%s, 'presence_penalty')".formatted(SUPPORTED_PARAMETERS)),
-            REASONING_PROPERTY
-                .displayCondition("contains(%s, 'reasoning')".formatted(SUPPORTED_PARAMETERS)),
-            SEED_PROPERTY
-                .displayCondition("contains(%s, 'seed')".formatted(SUPPORTED_PARAMETERS)),
-            STOP_PROPERTY
-                .displayCondition("contains(%s, 'stop')".formatted(SUPPORTED_PARAMETERS)),
-            TEMPERATURE_PROPERTY
-                .displayCondition("contains(%s, 'temperature')".formatted(SUPPORTED_PARAMETERS)),
-            TOP_LOGPROBS_PROPERTY
-                .displayCondition("contains(%s, 'top_logprobs')".formatted(SUPPORTED_PARAMETERS)),
-            TOP_K_PROPERTY
-                .displayCondition("contains(%s, 'top_k')".formatted(SUPPORTED_PARAMETERS)),
-            TOP_P_PROPERTY
-                .displayCondition("contains(%s, 'top_p')".formatted(SUPPORTED_PARAMETERS)),
-            VERBOSITY_PROPERTY
-                .displayCondition("contains(%s, 'verbosity')".formatted(SUPPORTED_PARAMETERS)),
+            FREQUENCY_PENALTY_PROPERTY,
+            LOGIT_BIAS_PROPERTY,
+            LOGPROBS_PROPERTY,
+            MAX_COMPLETION_TOKENS_PROPERTY,
+            MAX_TOKENS_PROPERTY,
+            PRESENCE_PENALTY_PROPERTY,
+            REASONING_PROPERTY,
+            SEED_PROPERTY,
+            STOP_PROPERTY,
+            TEMPERATURE_PROPERTY,
+            TOP_LOGPROBS_PROPERTY,
+            TOP_K_PROPERTY,
+            TOP_P_PROPERTY,
+            VERBOSITY_PROPERTY,
             USER_PROPERTY)
         .output(ModelUtils::output)
         .perform(OpenRouterChatAction::perform);
@@ -124,8 +110,8 @@ public class OpenRouterChatAction {
         boolean jsonFormat = false;
 
         if (responseFormatRequired) {
-            ChatModel.ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-                RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+            ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
 
             jsonFormat = !responseFormat.equals(TEXT);
         }
