@@ -1,4 +1,5 @@
 import {Separator} from '@/components/ui/separator';
+import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
 import ProjectBreadcrumb from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumb';
@@ -119,6 +120,8 @@ const ProjectHeader = ({
                     isPending={publishProjectMutationIsPending}
                     onPublishProjectSubmit={handlePublishProjectSubmit}
                 />
+
+                <DeployButton project={project} />
             </div>
         </header>
     );
