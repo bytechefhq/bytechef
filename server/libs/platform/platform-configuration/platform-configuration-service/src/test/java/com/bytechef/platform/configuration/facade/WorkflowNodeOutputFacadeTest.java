@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -58,6 +59,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.expression.EvaluationException;
 
 /**
  * @author Ivica Cardic
@@ -410,6 +412,39 @@ class WorkflowNodeOutputFacadeTest {
                 WORKFLOW_ID, "action1", ENVIRONMENT_ID);
 
             assertTrue(result.isEmpty());
+        }
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputThrowsEvaluationExceptionOnParameterEvaluationFailure() {
+        WorkflowTask action1Task = new WorkflowTask(
+            Map.of("name", "action1", "type", "component/v1/action1"));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(true)).thenReturn(List.of(action1Task));
+        when(workflow.getTasks(eq("action1"))).thenReturn(List.of(action1Task));
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "action1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(actionDefinitionService.getActionDefinition("component", 1, "action1"))
+            .thenReturn(actionDefinition);
+        when(actionDefinition.getOutputResponse()).thenReturn(null);
+        when(actionDefinitionService.isDynamicOutputDefined("component", 1, "action1")).thenReturn(true);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(evaluator.evaluate(any(), any())).thenThrow(new RuntimeException("evaluation error"));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            assertThrows(
+                EvaluationException.class,
+                () -> workflowNodeOutputFacade.getWorkflowNodeOutput(WORKFLOW_ID, "action1", ENVIRONMENT_ID));
         }
     }
 }
