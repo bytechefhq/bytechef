@@ -42,6 +42,12 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
     @Override
     protected void onAfterSave(AfterSaveEvent<Connection> afterSaveEvent) {
         Connection connection = afterSaveEvent.getEntity();
+
+        if (!connection.isCredentialsStatusUpdated()
+            || (connection.getCredentialStatus() != Connection.CredentialStatus.INVALID)) {
+            return;
+        }
+
         String tenantId = TenantContext.getCurrentTenantId();
 
         connectionLifecycleFacade.scheduleConnectionRefresh(
