@@ -25,5 +25,5 @@ public interface ConnectionRefreshScheduler {
 
     void cancelConnectionRefresh(Long connectionId, String tenantId);
 
-    void scheduleConnectionRefresh(Long connectionId, Instant expiry, String tenantId);
+    void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime, String tenantId);
 }

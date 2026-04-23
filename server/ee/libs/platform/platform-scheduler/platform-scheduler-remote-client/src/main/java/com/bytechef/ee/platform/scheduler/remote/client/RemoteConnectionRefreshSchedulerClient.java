@@ -42,13 +42,13 @@ public class RemoteConnectionRefreshSchedulerClient implements ConnectionRefresh
     }
 
     @Override
-    public void scheduleConnectionRefresh(Long connectionId, Instant expiry, String tenantId) {
+    public void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime, String tenantId) {
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(CONNECTION_REFRESH_SCHEDULER + "/schedule-connection-refresh")
                 .build(),
-            new ScheduleConnectionRefreshRequest(connectionId, expiry, tenantId));
+            new ScheduleConnectionRefreshRequest(connectionId, tokenExpirationTime, tenantId));
     }
 
     private record ScheduleConnectionRefreshRequest(Long connectionId, Instant expiry, String tenantId) {
