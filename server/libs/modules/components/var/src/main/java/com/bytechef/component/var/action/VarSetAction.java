@@ -122,7 +122,7 @@ public class VarSetAction {
     protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        if (!inputParameters.containsKey(VALUE)) {
+        if (!inputParameters.containsKey(VALUE) || inputParameters.get(VALUE, null) == null) {
             return null;
         }
 
