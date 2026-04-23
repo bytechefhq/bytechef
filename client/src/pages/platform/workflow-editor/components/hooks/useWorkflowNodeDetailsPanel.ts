@@ -1299,7 +1299,11 @@ export default function useWorkflowNodeDetailsPanel({
 
     // Fetch current action definition when operation changes
     useEffect(() => {
-        if (currentActionDefinition?.name === currentOperationName) {
+        if (
+            currentActionDefinition?.name === currentOperationName &&
+            currentActionDefinition?.componentName === currentComponentDefinition?.name &&
+            currentActionDefinition?.componentVersion === currentComponentDefinition?.version
+        ) {
             return;
         }
 
