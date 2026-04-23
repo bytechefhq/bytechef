@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
-import {render, screen, userEvent} from '@/shared/util/test-utils';
+import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
+import {useRef, useState} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
 import PropertyInput from './PropertyInput';
@@ -169,5 +170,49 @@ describe('PropertyInput', async () => {
         const input = screen.getByLabelText(/date/i);
 
         expect(input).toHaveAttribute('step', '1');
+    });
+
+    // Regression for #4768: clearing the TIME field used to call inputRef.focus() synchronously
+    // after setInputValue(''). The focus flipped PropertyInput's isFocused to true inside the same
+    // batch, so the value-sync useEffect skipped, localValue stayed at the old time, and the input
+    // only visually cleared after the next blur. The fix defers focus() via requestAnimationFrame
+    // so value='' lands in a render where isFocused is still false.
+    it('clears the displayed value when the parent sets value to "" and defers focus via rAF', async () => {
+        const Harness = () => {
+            const [value, setValue] = useState('12:30');
+            const inputRef = useRef<HTMLInputElement>(null);
+
+            const handleClear = () => {
+                setValue('');
+
+                requestAnimationFrame(() => inputRef.current?.focus());
+            };
+
+            return (
+                <PropertyInput
+                    aria-label="Time"
+                    label="Time"
+                    name="time"
+                    ref={inputRef}
+                    trailingAction={
+                        <button aria-label="Clear time" onClick={handleClear} type="button">
+                            X
+                        </button>
+                    }
+                    type="time"
+                    value={value}
+                />
+            );
+        };
+
+        const {container} = render(<Harness />);
+
+        const input = container.querySelector('input[name="time"]') as HTMLInputElement;
+
+        expect(input.value).toBe('12:30');
+
+        await userEvent.click(screen.getByRole('button', {name: /clear time/i}));
+
+        await waitFor(() => expect(input.value).toBe(''));
     });
 });
