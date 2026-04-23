@@ -100,6 +100,147 @@ const ProjectDeploymentDialogBasicStep = ({
     };
 
     const hasDeployments = (projectDeployments?.length ?? 0) > 0;
+    const shouldShowTabs =
+        changeProjectVersion || projectDeployment?.id != null || projectDeployment?.projectId != null;
+
+    const newDeploymentForm = (
+        <>
+            {!projectDeployment?.id && (
+                <FormField
+                    control={control}
+                    name="projectId"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Project</FormLabel>
+
+                            <FormControl>
+                                <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                    onBlur={field.onBlur}
+                                    onChange={handleProjectSelectionChange}
+                                    projects={projects}
+                                    value={field.value}
+                                />
+                            </FormControl>
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    rules={{required: true}}
+                    shouldUnregister={false}
+                />
+            )}
+
+            <FormField
+                control={control}
+                name="environmentId"
+                render={() => (
+                    <FormItem className="space-x-2">
+                        <FormLabel>Environment</FormLabel>
+
+                        <FormControl>
+                            <EnvironmentBadge environmentId={currentEnvironmentId} />
+                        </FormControl>
+
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            {!changeProjectVersion && (
+                <FormField
+                    control={control}
+                    name="name"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+
+                            <FormControl>
+                                <Input onChange={field.onChange} placeholder="My CRM Project" value={field.value} />
+                            </FormControl>
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    rules={{required: true}}
+                />
+            )}
+
+            {currentProjectId && (!projectDeployment?.id || changeProjectVersion) && (
+                <FormField
+                    control={control}
+                    name="projectVersion"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Version</FormLabel>
+
+                            <FormControl>
+                                <ProjectDeploymentDialogBasicStepProjectVersionsSelect
+                                    onChange={(value) => handleProjectVersionChange(value, field.onChange)}
+                                    projectId={currentProjectId}
+                                    projectVersion={currentProjectVersion}
+                                />
+                            </FormControl>
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    rules={{required: true}}
+                    shouldUnregister={false}
+                />
+            )}
+
+            {!changeProjectVersion && (
+                <FormField
+                    control={control}
+                    name="description"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Description</FormLabel>
+
+                            <FormControl>
+                                <Textarea placeholder="Cute description of your project deployment" {...field} />
+                            </FormControl>
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            )}
+
+            {!changeProjectVersion && (
+                <FormField
+                    control={control}
+                    name="tags"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Tags</FormLabel>
+
+                            <ProjectDeploymentDialogBasicStepTagsSelect
+                                field={field}
+                                onCreateOption={(inputValue: string) =>
+                                    setValue('tags', [
+                                        ...(getValues().tags ?? []),
+                                        {
+                                            label: inputValue,
+                                            name: inputValue,
+                                            value: inputValue,
+                                        },
+                                    ] as never[])
+                                }
+                                projectDeployment={projectDeployment}
+                            />
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            )}
+        </>
+    );
+
+    if (!shouldShowTabs) {
+        return <div className="flex flex-col gap-4">{newDeploymentForm}</div>;
+    }
 
     return (
         <Tabs
@@ -127,140 +268,11 @@ const ProjectDeploymentDialogBasicStep = ({
             <TabsContent className="m-0 flex flex-col gap-4" value="new-deployment">
                 <Note
                     className="mt-4"
-                    content="Existing deployments already exists. This will start an additional deployment instance."
+                    content="Deployments already exists. This will start an additional deployment instance."
                     icon={<InfoIcon />}
                 />
 
-                {!projectDeployment?.id && (
-                    <FormField
-                        control={control}
-                        name="projectId"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Project</FormLabel>
-
-                                <FormControl>
-                                    <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                        onBlur={field.onBlur}
-                                        onChange={handleProjectSelectionChange}
-                                        projects={projects}
-                                        value={field.value}
-                                    />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                        shouldUnregister={false}
-                    />
-                )}
-
-                <FormField
-                    control={control}
-                    name="environmentId"
-                    render={() => (
-                        <FormItem className="space-x-2">
-                            <FormLabel>Environment</FormLabel>
-
-                            <FormControl>
-                                <EnvironmentBadge environmentId={currentEnvironmentId} />
-                            </FormControl>
-
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {!changeProjectVersion && (
-                    <FormField
-                        control={control}
-                        name="name"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-
-                                <FormControl>
-                                    <Input onChange={field.onChange} placeholder="My CRM Project" value={field.value} />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
-                )}
-
-                {currentProjectId && (!projectDeployment?.id || changeProjectVersion) && (
-                    <FormField
-                        control={control}
-                        name="projectVersion"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Version</FormLabel>
-
-                                <FormControl>
-                                    <ProjectDeploymentDialogBasicStepProjectVersionsSelect
-                                        onChange={(value) => handleProjectVersionChange(value, field.onChange)}
-                                        projectId={currentProjectId}
-                                        projectVersion={currentProjectVersion}
-                                    />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                        shouldUnregister={false}
-                    />
-                )}
-
-                {!changeProjectVersion && (
-                    <FormField
-                        control={control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Description</FormLabel>
-
-                                <FormControl>
-                                    <Textarea placeholder="Cute description of your project deployment" {...field} />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                )}
-
-                {!changeProjectVersion && (
-                    <FormField
-                        control={control}
-                        name="tags"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Tags</FormLabel>
-
-                                <ProjectDeploymentDialogBasicStepTagsSelect
-                                    field={field}
-                                    onCreateOption={(inputValue: string) =>
-                                        setValue('tags', [
-                                            ...(getValues().tags ?? []),
-                                            {
-                                                label: inputValue,
-                                                name: inputValue,
-                                                value: inputValue,
-                                            },
-                                        ] as never[])
-                                    }
-                                    projectDeployment={projectDeployment}
-                                />
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                )}
+                {newDeploymentForm}
             </TabsContent>
 
             <TabsContent className="m-0 flex flex-col gap-4" value="change-version">
