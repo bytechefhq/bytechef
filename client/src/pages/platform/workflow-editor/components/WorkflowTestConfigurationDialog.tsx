@@ -52,6 +52,7 @@ interface WorkflowTestConfigurationFormFieldProps {
     index: number;
     setComponentConnection: Dispatch<SetStateAction<ComponentConnection | undefined>>;
     setShowNewConnectionDialog: Dispatch<SetStateAction<boolean>>;
+    workflowNodeLabel?: string;
 }
 
 const WorkflowTestConfigurationFormField = ({
@@ -63,6 +64,7 @@ const WorkflowTestConfigurationFormField = ({
     index,
     setComponentConnection,
     setShowNewConnectionDialog,
+    workflowNodeLabel,
 }: WorkflowTestConfigurationFormFieldProps) => {
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: componentConnection.componentName,
@@ -97,7 +99,9 @@ const WorkflowTestConfigurationFormField = ({
                                     <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                                 )}
 
-                                <span className="ml-1">{componentDefinition?.title} Connection</span>
+                                <span className="ml-1">
+                                    {workflowNodeLabel || `${componentDefinition?.title} Connection`}
+                                </span>
 
                                 {groupedIndices ? (
                                     <span className="ml-0.5 text-xs text-content-neutral-secondary">
@@ -245,6 +249,20 @@ const WorkflowTestConfigurationDialog = ({
         },
     });
 
+    const workflowNodeLabelMap = new Map<string, string>();
+
+    for (const task of workflow?.tasks ?? []) {
+        if (task.label) {
+            workflowNodeLabelMap.set(task.name, task.label);
+        }
+    }
+
+    for (const trigger of workflow?.triggers ?? []) {
+        if (trigger.label) {
+            workflowNodeLabelMap.set(trigger.name, trigger.label);
+        }
+    }
+
     function saveWorkflowTestConfiguration(workflowTestConfiguration: WorkflowTestConfiguration) {
         workflowTestConfiguration = {
             ...workflowTestConfiguration,
@@ -362,6 +380,13 @@ const WorkflowTestConfigurationDialog = ({
                                                             key={`${connection.workflowNodeName}_${connection.key}`}
                                                             setComponentConnection={setComponentConnection}
                                                             setShowNewConnectionDialog={setShowNewConnectionDialog}
+                                                            workflowNodeLabel={
+                                                                groupedIndices
+                                                                    ? undefined
+                                                                    : workflowNodeLabelMap.get(
+                                                                          connection.workflowNodeName
+                                                                      )
+                                                            }
                                                         />
                                                     )
                                             )}
