@@ -79,6 +79,7 @@ import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldCh
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
+import isActionDefinitionFresh from './isActionDefinitionFresh';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
     {
@@ -1299,11 +1300,7 @@ export default function useWorkflowNodeDetailsPanel({
 
     // Fetch current action definition when operation changes
     useEffect(() => {
-        if (
-            currentActionDefinition?.name === currentOperationName &&
-            currentActionDefinition?.componentName === currentComponentDefinition?.name &&
-            currentActionDefinition?.componentVersion === currentComponentDefinition?.version
-        ) {
+        if (isActionDefinitionFresh(currentActionDefinition, currentComponentDefinition, currentOperationName)) {
             return;
         }
 
