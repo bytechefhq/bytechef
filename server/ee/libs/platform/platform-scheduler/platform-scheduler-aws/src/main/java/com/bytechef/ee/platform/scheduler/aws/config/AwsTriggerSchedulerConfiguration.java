@@ -33,7 +33,7 @@ import software.amazon.awssdk.services.scheduler.SchedulerClient;
  * @author Marko Kriskovic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "aws")
+@ConditionalOnProperty(prefix = "bytechef", name = "scheduler.provider", havingValue = "aws")
 @ConditionalOnEEVersion
 public class AwsTriggerSchedulerConfiguration {
 

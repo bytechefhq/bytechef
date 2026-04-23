@@ -88,9 +88,6 @@ public class ApplicationProperties {
     /** Help hub configuration */
     private HelpHub helpHub = new HelpHub();
 
-    /** Observability and logging configuration */
-    private Observability observability = new Observability();
-
     /** Email configuration */
     private Mail mail = new Mail();
 
@@ -99,6 +96,9 @@ public class ApplicationProperties {
 
     /** OAuth2 configuration */
     private Oauth2 oauth2 = new Oauth2();
+
+    /** Observability and logging configuration */
+    private Observability observability = new Observability();
 
     /** Public URL for the application */
     private String publicUrl;
@@ -111,6 +111,9 @@ public class ApplicationProperties {
 
     /** User sign-up configuration */
     private SignUp signUp = new SignUp();
+
+    /** Scheduler configuration */
+    private Scheduler scheduler = new Scheduler();
 
     /** Multi-tenancy configuration */
     private Tenant tenant = new Tenant();
@@ -188,10 +191,6 @@ public class ApplicationProperties {
         return helpHub;
     }
 
-    public Observability getObservability() {
-        return observability;
-    }
-
     public Mail getMail() {
         return mail;
     }
@@ -204,6 +203,10 @@ public class ApplicationProperties {
         return oauth2;
     }
 
+    public Observability getObservability() {
+        return observability;
+    }
+
     public String getPublicUrl() {
         return publicUrl;
     }
@@ -214,6 +217,10 @@ public class ApplicationProperties {
 
     public Security getSecurity() {
         return security;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     public SignUp getSignUp() {
@@ -304,10 +311,6 @@ public class ApplicationProperties {
         this.helpHub = helpHub;
     }
 
-    public void setObservability(Observability observability) {
-        this.observability = observability;
-    }
-
     public void setMail(Mail mail) {
         this.mail = mail;
     }
@@ -320,6 +323,10 @@ public class ApplicationProperties {
         this.oauth2 = oauth2;
     }
 
+    public void setObservability(Observability observability) {
+        this.observability = observability;
+    }
+
     public void setPublicUrl(String publicUrl) {
         this.publicUrl = publicUrl;
     }
@@ -330,6 +337,10 @@ public class ApplicationProperties {
 
     public void setSecurity(Security security) {
         this.security = security;
+    }
+
+    public void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
     }
 
     public void setSignUp(SignUp signUp) {
@@ -2199,23 +2210,12 @@ public class ApplicationProperties {
             /** Event subscription configuration */
             private Subscriptions subscriptions = new Subscriptions();
 
-            /** Scheduler configuration */
-            private Scheduler scheduler = new Scheduler();
-
             public Polling getPolling() {
                 return polling;
             }
 
             public void setPolling(Polling polling) {
                 this.polling = polling;
-            }
-
-            public Scheduler getScheduler() {
-                return scheduler;
-            }
-
-            public void setScheduler(Scheduler scheduler) {
-                this.scheduler = scheduler;
             }
 
             public Subscriptions getSubscriptions() {
@@ -2240,33 +2240,6 @@ public class ApplicationProperties {
 
                 public void setCheckPeriod(int checkPeriod) {
                     this.checkPeriod = checkPeriod;
-                }
-            }
-
-            /**
-             * Scheduler configuration for scheduled triggers.
-             */
-            public static class Scheduler {
-
-                /**
-                 * Available scheduler providers.
-                 */
-                public enum Provider {
-                    /** AWS EventBridge Scheduler */
-                    AWS,
-                    /** Quartz Scheduler */
-                    QUARTZ
-                }
-
-                /** Scheduler provider */
-                private Provider provider = Provider.QUARTZ;
-
-                public Provider getProvider() {
-                    return provider;
-                }
-
-                public void setProvider(Provider provider) {
-                    this.provider = provider;
                 }
             }
 
@@ -3089,6 +3062,33 @@ public class ApplicationProperties {
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
             }
+        }
+    }
+
+    /**
+     * Scheduler configuration for scheduled triggers.
+     */
+    public static class Scheduler {
+
+        /**
+         * Available scheduler providers.
+         */
+        public enum Provider {
+            /** AWS EventBridge Scheduler */
+            AWS,
+            /** Quartz Scheduler */
+            QUARTZ
+        }
+
+        /** Scheduler provider */
+        private Provider provider = Provider.QUARTZ;
+
+        public Provider getProvider() {
+            return provider;
+        }
+
+        public void setProvider(Provider provider) {
+            this.provider = provider;
         }
     }
 

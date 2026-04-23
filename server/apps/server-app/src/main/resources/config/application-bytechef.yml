@@ -63,9 +63,6 @@ bytechef:
       polling:
         # Trigger polling interval in minutes (default: 5)
         check-period: 5
-      scheduler:
-        # Trigger scheduler provider (aws(ee) | quartz) default: quartz
-        provider: quartz
   data-storage:
     # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc
@@ -116,6 +113,9 @@ bytechef:
   public-url:
   resources:
     web: file:///opt/bytechef/client/
+  scheduler:
+    # Trigger scheduler provider (aws(ee) | quartz) default: quartz
+    provider: quartz
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' https://*.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.command.ai https://*.commandbar.com https://*.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://*.commandbar.com https://cdn.jsdelivr.net https://*.command.ai https://unpkg.com; img-src 'self' https://*.command.ai data:; font-src 'self' data:; media-src 'self' https://*.command.ai; connect-src 'self' https://*.command.ai https://*.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';"
     social-login:

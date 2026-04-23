@@ -25,8 +25,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(
-    prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "quartz", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "bytechef", name = "scheduler.provider", havingValue = "quartz", matchIfMissing = true)
 @ConditionalOnEEVersion
 public class MultiTenantQuartzTriggerSchedulerConfiguration implements SchedulerFactoryBeanCustomizer {
 
