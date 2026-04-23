@@ -31,7 +31,7 @@ import {
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
-import {CircleQuestionMarkIcon, SquareFunctionIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, SquareFunctionIcon, XIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
@@ -101,6 +101,7 @@ const Property = ({
         handleFromAiClick,
         handleFromAiToggle,
         handleInputChange,
+        handleInputClear,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
         handleMentionInputValueChange,
@@ -763,6 +764,19 @@ const Property = ({
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
                             title={type}
+                            trailingAction={
+                                // Chrome's <input type="time"> has no native clear button.
+                                controlType === 'TIME' && inputValue ? (
+                                    <button
+                                        aria-label="Clear time"
+                                        className="flex items-center px-2 text-muted-foreground hover:text-foreground"
+                                        onClick={handleInputClear}
+                                        type="button"
+                                    >
+                                        <XIcon className="size-4" />
+                                    </button>
+                                ) : undefined
+                            }
                             type={hidden ? 'hidden' : getInputHTMLType(controlType)}
                             value={inputValue}
                         />
