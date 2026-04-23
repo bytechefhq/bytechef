@@ -24,6 +24,7 @@ import java.util.Optional;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public interface Authorization {
 
@@ -139,59 +140,69 @@ public interface Authorization {
         /**
          *
          */
-        API_KEY,
+        API_KEY(false),
 
         /**
          *
          */
-        BASIC_AUTH,
+        BASIC_AUTH(false),
 
         /**
          *
          */
-        BEARER_TOKEN,
+        BEARER_TOKEN(false),
 
         /**
          * Custom authorization type
          */
-        CUSTOM,
+        CUSTOM(false),
 
         /**
          *
          */
-        DIGEST_AUTH,
+        DIGEST_AUTH(false),
 
         /**
          *
          */
-        OAUTH2_AUTHORIZATION_CODE,
+        OAUTH2_AUTHORIZATION_CODE(true),
 
         /**
          *
          */
-        OAUTH2_AUTHORIZATION_CODE_PKCE,
+        OAUTH2_AUTHORIZATION_CODE_PKCE(true),
 
         /**
          *
          */
-        OAUTH2_CLIENT_CREDENTIALS,
+        OAUTH2_CLIENT_CREDENTIALS(false),
 
         /**
          *
          */
-        OAUTH2_IMPLICIT_CODE,
+        OAUTH2_IMPLICIT_CODE(false),
 
         /**
          *
          */
-        OAUTH2_RESOURCE_OWNER_PASSWORD;
+        OAUTH2_RESOURCE_OWNER_PASSWORD(false);
+
+        private final boolean hasRefreshToken;
+
+        public boolean hasRefreshToken() {
+            return hasRefreshToken;
+        }
 
         /**
          *
-         * @return
+         * @return the lowercased name of enum
          */
         public String getName() {
             return name().toLowerCase();
+        }
+
+        private AuthorizationType(boolean hasRefreshToken) {
+            this.hasRefreshToken = hasRefreshToken;
         }
 
     }
