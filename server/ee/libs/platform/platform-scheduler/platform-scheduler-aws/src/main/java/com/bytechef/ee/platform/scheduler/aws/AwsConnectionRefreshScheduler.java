@@ -27,6 +27,7 @@ import software.amazon.awssdk.services.scheduler.model.Target;
  * @version ee
  *
  * @author Nikolina Spehar
+ * @author Igor Beslic
  */
 public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler {
 
@@ -55,40 +56,34 @@ public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler
 
             log.info("Canceling connection refresh for connection: {}, tenant: {}", connectionId, tenantId);
         } catch (RuntimeException e) {
+            log.error("Unable to cancel dynamic webhook trigger");
+
             if (log.isDebugEnabled()) {
-                log.debug("Dynamic Webhook Trigger Refresh not defined");
+                log.debug("Dynamic Webhook Trigger Refresh not defined", e);
             }
         }
     }
 
     @Override
     public void scheduleConnectionRefresh(Long connectionId, Instant expiry, String tenantId) {
-        String scheduleName = CONNECTION_REFRESH + tenantId + connectionId;
+        String scheduleName = getScheduleName(connectionId, tenantId);
         String clientToken = tenantId + connectionId;
 
-        Instant now = Instant.now();
-
-        Duration between = Duration.between(now, expiry);
-
-        long secondsUntilExpiry = between.getSeconds();
-
-        long minutesUntilExpiry = secondsUntilExpiry / 60;
-
-        long refreshMinutes = Math.max(1, minutesUntilExpiry - 5);
-
-        String scheduleExpression = "rate(" + refreshMinutes + " minutes)";
+        String scheduleExpression = getTokenRefreshScheduleExpression(expiry);
 
         log.info(
-            "Scheduling connection refresh for connection: {}, tenant: {}, expiry time: {}, refresh time: {}, " +
-                "schedule expression: {}, SQS ARN: {}, role ARN: {}",
-            connectionId, tenantId, expiry, refreshMinutes, scheduleExpression,
-            sqsArn + ":" + SCHEDULER_CONNECTION_REFRESH_QUEUE, roleArn);
+            "Schedule configuration for connectionId: {}, tenantId: {}, expiry time: {}, " +
+                "schedule expression: {}, SQS ARN: [{}:{}], role ARN: {}",
+            connectionId, tenantId, expiry, scheduleExpression, sqsArn, SCHEDULER_CONNECTION_REFRESH_QUEUE, roleArn);
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
             .arn(sqsArn + ":" + SCHEDULER_CONNECTION_REFRESH_QUEUE)
             .input(tenantId + AwsTriggerSchedulerConstants.SPLITTER + connectionId)
             .build();
+
+        Instant schedulingStartDate = Instant.now()
+            .plus(Duration.ofMinutes(1));
 
         try {
             schedulerClient.createSchedule(request -> request.clientToken(clientToken)
@@ -97,11 +92,15 @@ public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler
                 .scheduleExpression(scheduleExpression)
                 .target(sqsTarget)
                 .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-                .startDate(now.plus(Duration.ofMinutes(1))));
+                .startDate(schedulingStartDate));
 
-            log.info("Schedule created successfully.");
+            log.info("Schedule created successfully");
         } catch (ConflictException e) {
-            log.info("Schedule already exists, updating...");
+            log.warn("Schedule already exists, it will be updated");
+
+            if (log.isDebugEnabled()) {
+                log.debug("Problem details", e);
+            }
 
             schedulerClient.updateSchedule(request -> request.clientToken(clientToken)
                 .groupName(CONNECTION_REFRESH)
@@ -109,9 +108,22 @@ public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler
                 .scheduleExpression(scheduleExpression)
                 .target(sqsTarget)
                 .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-                .startDate(now.plus(Duration.ofMinutes(1))));
+                .startDate(schedulingStartDate));
 
             log.info("Schedule updated successfully.");
         }
     }
+
+    private static String getScheduleName(Long connectionId, String tenantId) {
+        return CONNECTION_REFRESH + "_" + tenantId + "_" + connectionId;
+    }
+
+    private String getTokenRefreshScheduleExpression(Instant tokenExpiry) {
+        Duration tokenValidityDuration = Duration.between(Instant.now(), tokenExpiry);
+
+        return "rate(" + Math.max(1, ((tokenValidityDuration.getSeconds() / 60) - MINUTES_BEFORE_TOKEN_EXPIRES))
+            + " minutes)";
+    }
+
+    private static final int MINUTES_BEFORE_TOKEN_EXPIRES = 5;
 }
