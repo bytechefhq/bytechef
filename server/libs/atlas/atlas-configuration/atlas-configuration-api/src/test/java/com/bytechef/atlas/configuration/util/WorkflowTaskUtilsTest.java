@@ -143,6 +143,28 @@ class WorkflowTaskUtilsTest {
     }
 
     @Test
+    void testNonTaskListWithNameAndTypeKeysIsIgnored() {
+        // A parameter value that's List<Map> whose maps carry BOTH `name` and `type`
+        // must not be mistaken for tasks if the `type` value isn't a valid workflow node
+        // type (e.g., PostgreSQL column definitions use {"name": "col", "type": "STRING"}).
+        WorkflowTask task = new WorkflowTask(Map.of(
+            "name", "postgresql_1",
+            "type", "postgresql/v1/insert",
+            "parameters", Map.of(
+                "schema", "public",
+                "columns", List.of(
+                    Map.of("type", "STRING", "name", "ime"),
+                    Map.of("type", "NUMBER", "name", "age")))));
+
+        Set<String> names = WorkflowTaskUtils.getTasks(List.of(task), null)
+            .stream()
+            .map(WorkflowTask::getName)
+            .collect(Collectors.toSet());
+
+        assertEquals(Set.of("postgresql_1"), names);
+    }
+
+    @Test
     void testFlattenLoopIterateeStartingWithTaskWithoutParameters() {
         WorkflowTask loop = new WorkflowTask(Map.of(
             "name", "loop_1",
