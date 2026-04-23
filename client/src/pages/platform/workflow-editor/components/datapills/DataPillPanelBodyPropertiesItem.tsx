@@ -42,9 +42,10 @@ const DataPillPanelBodyPropertiesItem = ({
     operation,
     sampleOutput,
 }: DataPillPanelBodyPropertiesItemProps) => {
-    const {componentDefinitions, workflowNodes} = useWorkflowDataStore(
+    const {componentDefinitions, workflow, workflowNodes} = useWorkflowDataStore(
         useShallow((state) => ({
             componentDefinitions: state.componentDefinitions,
+            workflow: state.workflow,
             workflowNodes: state.workflowNodes,
         }))
     );
@@ -77,6 +78,10 @@ const DataPillPanelBodyPropertiesItem = ({
         title = operation.taskDispatcherDefinition.title;
     }
 
+    const workflowNodeLabel =
+        workflow?.tasks?.find((task) => task.name === workflowNodeName)?.label ||
+        workflow?.triggers?.find((trigger) => trigger.name === workflowNodeName)?.label;
+
     const currentWorkflowNode = workflowNodes.find(
         (workflowNode) => workflowNode.workflowNodeName === workflowNodeName
     );
@@ -107,7 +112,7 @@ const DataPillPanelBodyPropertiesItem = ({
                     )}
 
                     <h3 className="flex flex-col items-start text-sm">
-                        {title}
+                        {workflowNodeLabel || title}
 
                         <span className="truncate text-xs text-gray-400">({workflowNodeName})</span>
                     </h3>
