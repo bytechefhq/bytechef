@@ -54,8 +54,7 @@ public class WorkflowTaskUtils {
                             returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
                         }
 
-                        if (firstItem instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.NAME) &&
-                            map.containsKey(WorkflowConstants.TYPE)) {
+                        if (firstItem instanceof Map<?, ?> map && isWorkflowTaskMap(map)) {
 
                             List<WorkflowTask> curWorkflowTasks = curList.stream()
                                 .map(item -> new WorkflowTask((Map<String, ?>) item))
@@ -75,8 +74,7 @@ public class WorkflowTaskUtils {
                             }
                             // Fork/join support
                         } else if (firstItem instanceof List<?> list && !list.isEmpty() &&
-                            list.getFirst() instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.NAME) &&
-                            map.containsKey(WorkflowConstants.TYPE)) {
+                            list.getFirst() instanceof Map<?, ?> map && isWorkflowTaskMap(map)) {
 
                             for (Object curItem : curList) {
                                 List<?> curSubList = (List<?>) curItem;
@@ -90,8 +88,7 @@ public class WorkflowTaskUtils {
                         }
                     }
                     // Each support
-                } else if (entry.getValue() instanceof Map<?, ?> curMap &&
-                    curMap.containsKey(WorkflowConstants.NAME) && curMap.containsKey(WorkflowConstants.TYPE)) {
+                } else if (entry.getValue() instanceof Map<?, ?> curMap && isWorkflowTaskMap(curMap)) {
 
                     returnedWorkflowTasks.addAll(
                         getTasks(List.of(new WorkflowTask((Map<String, ?>) curMap)), lastWorkflowNodeName));
@@ -122,6 +119,17 @@ public class WorkflowTaskUtils {
         }
 
         return resultWorkflowTasks;
+    }
+
+    private static boolean isWorkflowTaskMap(Map<?, ?> map) {
+        if (!map.containsKey(WorkflowConstants.NAME) || !map.containsKey(WorkflowConstants.TYPE)) {
+            return false;
+        }
+
+        // Workflow task types always follow the format: componentName/vVersion[/operation].
+        // This distinguishes real tasks from user-defined data structures that happen to have
+        // name/type keys (e.g., PostgreSQL column definitions like {"name": "ime", "type": "STRING"}).
+        return map.get(WorkflowConstants.TYPE) instanceof String type && type.contains("/");
     }
 
     private static List<WorkflowTask> getPrevious(List<WorkflowTask> workflowTasks, String workflowTaskName) {
