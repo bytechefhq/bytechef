@@ -766,7 +766,7 @@ const Property = ({
                             title={type}
                             trailingAction={
                                 // Chrome's <input type="time"> has no native clear button.
-                                controlType === 'TIME' && inputValue ? (
+                                controlType === 'TIME' && inputValue && !hidden ? (
                                     <button
                                         aria-label="Clear time"
                                         className="flex items-center px-2 text-muted-foreground hover:text-foreground"
