@@ -65,16 +65,17 @@ public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler
     }
 
     @Override
-    public void scheduleConnectionRefresh(Long connectionId, Instant expiry, String tenantId) {
+    public void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime, String tenantId) {
         String scheduleName = getScheduleName(connectionId, tenantId);
         String clientToken = tenantId + connectionId;
 
-        String scheduleExpression = getTokenRefreshScheduleExpression(expiry);
+        String scheduleExpression = getTokenRefreshScheduleExpression(tokenExpirationTime);
 
         log.info(
             "Schedule configuration for connectionId: {}, tenantId: {}, expiry time: {}, " +
                 "schedule expression: {}, SQS ARN: [{}:{}], role ARN: {}",
-            connectionId, tenantId, expiry, scheduleExpression, sqsArn, SCHEDULER_CONNECTION_REFRESH_QUEUE, roleArn);
+            connectionId, tenantId, tokenExpirationTime, scheduleExpression, sqsArn, SCHEDULER_CONNECTION_REFRESH_QUEUE,
+            roleArn);
 
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
@@ -118,8 +119,15 @@ public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler
         return CONNECTION_REFRESH + "_" + tenantId + "_" + connectionId;
     }
 
-    private String getTokenRefreshScheduleExpression(Instant tokenExpiry) {
-        Duration tokenValidityDuration = Duration.between(Instant.now(), tokenExpiry);
+    /**
+     * Returns aws schedule expression that fires {@link #MINUTES_BEFORE_TOKEN_EXPIRES} minutes before time given by
+     * #tokenExpirationTime argument
+     *
+     * @param tokenExpirationTime the expected time of token expiry
+     * @return
+     */
+    private String getTokenRefreshScheduleExpression(Instant tokenExpirationTime) {
+        Duration tokenValidityDuration = Duration.between(Instant.now(), tokenExpirationTime);
 
         return "rate(" + Math.max(1, ((tokenValidityDuration.getSeconds() / 60) - MINUTES_BEFORE_TOKEN_EXPIRES))
             + " minutes)";
