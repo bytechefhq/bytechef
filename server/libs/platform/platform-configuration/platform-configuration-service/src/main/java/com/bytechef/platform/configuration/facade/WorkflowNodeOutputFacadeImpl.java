@@ -60,6 +60,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.expression.EvaluationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -508,7 +509,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     @SuppressWarnings("unchecked")
     private OutputResponse getWorkflowTaskDynamicOutputResponse(
         String workflowId, WorkflowTask workflowTask, long environmentId,
-        Map<String, Map<String, ?>> sampleOutputsCache) {
+        Map<String, Map<String, ?>> sampleOutputsCache) throws EvaluationException {
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
@@ -526,8 +527,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(
             workflowId, workflowTask.getName(), environmentId, sampleOutputsCache);
 
-        Map<String, ?> inputParameters = workflowTask.evaluateParameters(
-            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+        Map<String, ?> inputParameters = null;
+        try {
+            inputParameters = workflowTask.evaluateParameters(
+                MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+        } catch (RuntimeException e) {
+            throw new EvaluationException("Couldn't evaluate expression with sample output", e);
+        }
 
         List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
             workflowTestConfigurationService
