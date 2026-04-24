@@ -504,5 +504,61 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
                 await expect(firstArrayItemTextbox).toContainText(newValue);
             });
         });
+
+        // Regression for the stale-node-data bug: useLayout skips re-runs on
+        // parameter-only changes, so nodes[i].data.parameters stayed frozen at
+        // the first layout. Clicking another node and coming back seeded the
+        // details panel from stale data and the just-added item disappeared
+        // until the next full page reload.
+        test('should keep edits visible after opening another node and returning to var_1', async () => {
+            const newValue = 'still here after node switch';
+
+            await test.step('Add a new array item and fill it', async () => {
+                await addArrayItemViaPopover({
+                    arrayProperty: workflowPage.arrayProperty,
+                    page: authenticatedPage,
+                });
+
+                const initialCount = SAMPLE_VAR_ARRAY?.length ?? 0;
+
+                const newItemTextbox = workflowPage.arrayPropertyItemTextboxAt(initialCount);
+
+                await replaceMentionsInputValue({
+                    input: newItemTextbox,
+                    page: authenticatedPage,
+                    value: newValue,
+                });
+
+                await authenticatedPage.waitForTimeout(WorkflowPage.LONG_DEBOUNCE_MS);
+            });
+
+            await test.step('Open another node (propertyTesting_1), then return to var_1', async () => {
+                const otherNode = authenticatedPage.getByLabel('propertyTesting_1 node');
+
+                await clickAndExpectToBeVisible({
+                    target: authenticatedPage.getByLabel('propertyTesting_1 component configuration panel'),
+                    trigger: otherNode,
+                });
+
+                await clickAndExpectToBeVisible({
+                    target: workflowPage.firstTaskComponentConfigurationPanel,
+                    trigger: workflowPage.firstNode,
+                });
+
+                await openPropertiesTab(workflowPage.firstTaskComponentConfigurationPanel);
+            });
+
+            await test.step('Newly added item value must still be rendered (no stale node data)', async () => {
+                const initialCount = SAMPLE_VAR_ARRAY?.length ?? 0;
+
+                const arrayItems = workflowPage.arrayPropertyItems;
+
+                await expect(arrayItems).toHaveCount(initialCount + 1);
+
+                const newItemTextbox = workflowPage.arrayPropertyItemTextboxAt(initialCount);
+
+                await expect(newItemTextbox).toContainText(newValue);
+            });
+        });
     });
 });
