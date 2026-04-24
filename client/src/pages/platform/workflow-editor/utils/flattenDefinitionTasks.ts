@@ -71,5 +71,11 @@ function extractNestedTasks(parameters: Record<string, unknown>): Array<Workflow
 }
 
 function isWorkflowTask(value: unknown): value is WorkflowTask {
-    return value !== null && typeof value === 'object' && 'name' in value && 'type' in value;
+    if (value === null || typeof value !== 'object' || !('name' in value) || !('type' in value)) {
+        return false;
+    }
+
+    const {name, type} = value as {name: unknown; type: unknown};
+
+    return typeof name === 'string' && typeof type === 'string' && type.includes('/');
 }

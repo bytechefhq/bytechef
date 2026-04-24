@@ -124,4 +124,20 @@ describe('flattenDefinitionTasks', () => {
         expect(result).toHaveLength(1);
         expect(result[0].name).toBe('task_1');
     });
+
+    it('should not treat parameter objects with name/type fields as tasks when type is not a task type', () => {
+        const postgresqlInsert = task('postgresql_1', 'postgresql/v1/insert', {
+            columns: [
+                {name: 'name', type: 'STRING'},
+                {name: 'count', type: 'INTEGER'},
+            ],
+            schema: 'public',
+            table: 'item',
+        });
+
+        const result = flattenDefinitionTasks([postgresqlInsert]);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].name).toBe('postgresql_1');
+    });
 });
