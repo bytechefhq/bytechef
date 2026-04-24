@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.copilot.config;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.anthropic.client.AnthropicClient;
+import com.anthropic.client.AnthropicClientAsync;
 import com.bytechef.ai.mcp.tool.automation.impl.ClusterElementTools;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
@@ -55,6 +56,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -123,10 +125,12 @@ public class CopilotConfiguration {
     }
 
     @Bean
+    @Primary
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    ChatModel anthropicChatModel(AnthropicClient anthropicClient) {
+    ChatModel copilotAnthropicChatModel(AnthropicClient anthropicClient, AnthropicClientAsync anthropicClientAsync) {
         AnthropicChatModel delegate = AnthropicChatModel.builder()
             .anthropicClient(anthropicClient)
+            .anthropicClientAsync(anthropicClientAsync)
             .options(
                 AnthropicChatOptions.builder()
                     .model(anthropicChatModel)
