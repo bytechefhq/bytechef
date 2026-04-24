@@ -3,52 +3,52 @@ import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
 interface LayoutDirectionStateI {
-    currentWorkflowId: string;
-    directionsByWorkflow: Record<string, LayoutDirectionType>;
+    currentWorkflowUuid: string;
+    directionsByWorkflowUuid: Record<string, LayoutDirectionType>;
     layoutDirection: LayoutDirectionType;
+    setCurrentWorkflowUuid: (workflowUuid: string) => void;
     setLayoutDirection: (layoutDirection: LayoutDirectionType) => void;
-    setWorkflowId: (workflowId: string) => void;
 }
 
 const useLayoutDirectionStore = create<LayoutDirectionStateI>()(
     devtools(
         persist(
             (set, get) => ({
-                currentWorkflowId: '',
-                directionsByWorkflow: {},
+                currentWorkflowUuid: '',
+                directionsByWorkflowUuid: {},
                 layoutDirection: DEFAULT_LAYOUT_DIRECTION,
 
-                setLayoutDirection: (layoutDirection) =>
-                    set((state) => ({
-                        directionsByWorkflow: {
-                            ...state.directionsByWorkflow,
-                            [state.currentWorkflowId]: layoutDirection,
-                        },
-                        layoutDirection,
-                    })),
-
-                setWorkflowId: (workflowId) => {
-                    if (workflowId === get().currentWorkflowId) {
+                setCurrentWorkflowUuid: (workflowUuid) => {
+                    if (workflowUuid === get().currentWorkflowUuid) {
                         return;
                     }
 
                     set((state) => ({
-                        currentWorkflowId: workflowId,
-                        layoutDirection: state.directionsByWorkflow[workflowId] ?? DEFAULT_LAYOUT_DIRECTION,
+                        currentWorkflowUuid: workflowUuid,
+                        layoutDirection: state.directionsByWorkflowUuid[workflowUuid] ?? DEFAULT_LAYOUT_DIRECTION,
                     }));
                 },
+
+                setLayoutDirection: (layoutDirection) =>
+                    set((state) => ({
+                        directionsByWorkflowUuid: {
+                            ...state.directionsByWorkflowUuid,
+                            [state.currentWorkflowUuid]: layoutDirection,
+                        },
+                        layoutDirection,
+                    })),
             }),
             {
                 migrate: (persisted, version) => {
-                    if (version === 0) {
-                        return {directionsByWorkflow: {}};
+                    if (version < 2) {
+                        return {directionsByWorkflowUuid: {}};
                     }
 
-                    return persisted as {directionsByWorkflow: Record<string, LayoutDirectionType>};
+                    return persisted as {directionsByWorkflowUuid: Record<string, LayoutDirectionType>};
                 },
                 name: 'bytechef.layout-direction',
-                partialize: (state) => ({directionsByWorkflow: state.directionsByWorkflow}),
-                version: 1,
+                partialize: (state) => ({directionsByWorkflowUuid: state.directionsByWorkflowUuid}),
+                version: 2,
             }
         )
     )
