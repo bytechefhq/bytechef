@@ -178,8 +178,8 @@ public class GoogleSheetsUtils {
             boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
             if (isFirstRowHeader) {
-                List<ModifiableValueProperty<?, ?>> list =
-                    createPropertiesBasedOnHeader(inputParameters, connectionParameters);
+                List<ModifiableValueProperty<?, ?>> list = createPropertiesBasedOnHeader(
+                    inputParameters, connectionParameters);
 
                 ModifiableObjectProperty updatedRow = object(VALUES)
                     .label("Values")
@@ -193,6 +193,7 @@ public class GoogleSheetsUtils {
                         .label("Rows")
                         .items(updatedRow)
                         .required(true);
+
                     return List.of(rows);
                 }
             } else {
