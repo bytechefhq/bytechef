@@ -47,6 +47,8 @@ public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade 
 
         if (!authorizationType.hasRefreshToken()) {
             log.debug("Connection authorization type does not support refresh token");
+
+            return;
         }
 
         try {
