@@ -129,8 +129,8 @@ public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler
     private String getTokenRefreshScheduleExpression(Instant tokenExpirationTime) {
         Duration tokenValidityDuration = Duration.between(Instant.now(), tokenExpirationTime);
 
-        return "rate(" + Math.max(1, ((tokenValidityDuration.getSeconds() / 60) - MINUTES_BEFORE_TOKEN_EXPIRES))
-            + " minutes)";
+        return "rate(" + Math.max(1, (tokenValidityDuration.getSeconds() / 60) - MINUTES_BEFORE_TOKEN_EXPIRES) +
+            " minutes)";
     }
 
     private static final int MINUTES_BEFORE_TOKEN_EXPIRES = 5;
