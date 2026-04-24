@@ -52,6 +52,7 @@ interface ProjectDeploymentDialogProps {
     projectDeployment?: ProjectDeployment;
     projectDeployments?: ProjectDeployment[];
     projectDeploymentsLoading?: boolean;
+    showTabs?: boolean;
     triggerNode?: ReactNode;
 }
 
@@ -63,6 +64,7 @@ const ProjectDeploymentDialog = ({
     projectDeployment,
     projectDeployments,
     projectDeploymentsLoading,
+    showTabs,
     triggerNode,
 }: ProjectDeploymentDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
@@ -199,6 +201,7 @@ const ProjectDeploymentDialog = ({
                     projectDeployments={projectDeployments}
                     projectDeploymentsLoading={projectDeploymentsLoading}
                     setValue={setValue}
+                    showTabs={showTabs}
                 />
             ),
             name: 'Basic',
@@ -414,7 +417,8 @@ const ProjectDeploymentDialog = ({
                                         disabled={
                                             basicStepTab === 'change-version' &&
                                             !projectDeploymentsLoading &&
-                                            (projectDeployments?.length ?? 0) === 0
+                                            (projectDeployments?.length ?? 0) === 0 &&
+                                            showTabs
                                         }
                                         label="Next"
                                         onClick={handleSubmit(handleNextClick)}
