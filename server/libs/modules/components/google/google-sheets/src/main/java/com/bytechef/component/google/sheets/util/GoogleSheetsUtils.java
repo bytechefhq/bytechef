@@ -175,6 +175,10 @@ public class GoogleSheetsUtils {
     public static PropertiesFunction createPropertiesForNewRows(boolean insertOneRow) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
+            if (inputParameters.getString(SPREADSHEET_ID) == null || inputParameters.getString(SHEET_NAME) == null) {
+                return List.of();
+            }
+
             boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
             if (isFirstRowHeader) {
