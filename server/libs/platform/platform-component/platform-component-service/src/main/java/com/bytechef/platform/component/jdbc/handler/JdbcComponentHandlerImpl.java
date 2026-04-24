@@ -473,6 +473,10 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext actionContext) {
 
+        if (!inputParameters.containsPath(COLUMNS)) {
+            return List.of();
+        }
+
         List<Column> columns = inputParameters.getRequiredList(COLUMNS, Column.class);
         List<ValueProperty<?>> properties = new ArrayList<>();
 
