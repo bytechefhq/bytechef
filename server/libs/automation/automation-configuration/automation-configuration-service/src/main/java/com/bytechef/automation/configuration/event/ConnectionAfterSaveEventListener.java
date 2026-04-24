@@ -44,7 +44,7 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
         Connection connection = afterSaveEvent.getEntity();
 
         if (!connection.isCredentialsStatusUpdated()
-            || (connection.getCredentialStatus() != Connection.CredentialStatus.INVALID)) {
+            || (connection.getCredentialStatus() == Connection.CredentialStatus.INVALID)) {
             return;
         }
 
