@@ -87,6 +87,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                     filterWorkflowUuids={mcpWorkflowUuids}
                     onClose={handleOnProjectDeploymentDialogClose}
                     projectDeployment={projectDeployment}
+                    redirectOnSubmit={false}
                 />
             )}
         </div>

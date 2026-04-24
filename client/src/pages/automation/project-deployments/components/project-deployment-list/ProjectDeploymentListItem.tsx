@@ -230,6 +230,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                 <ProjectDeploymentDialog
                     onClose={() => setShowEditDialog(false)}
                     projectDeployment={projectDeployment}
+                    redirectOnSubmit={false}
                 />
             )}
 
@@ -238,6 +239,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                     changeProjectVersion={true}
                     onClose={() => setShowChangeProjectVersionDialog(false)}
                     projectDeployment={projectDeployment}
+                    redirectOnSubmit={false}
                 />
             )}
         </>

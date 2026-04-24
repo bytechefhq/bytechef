@@ -223,6 +223,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                     filterWorkflowUuids={endpointWorkflowUuids}
                     onClose={handleOnProjectDeploymentDialogClose}
                     projectDeployment={projectDeployment}
+                    redirectOnSubmit={false}
                 />
             )}
         </>

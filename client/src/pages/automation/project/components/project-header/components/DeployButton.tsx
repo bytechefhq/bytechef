@@ -53,6 +53,7 @@ const DeployButton = ({project}: {project: Project}) => {
             }}
             projectDeployments={projectDeploymentsQuery.data}
             projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+            redirectOnSubmit={false}
             triggerNode={
                 <Button
                     className="ml-2"
