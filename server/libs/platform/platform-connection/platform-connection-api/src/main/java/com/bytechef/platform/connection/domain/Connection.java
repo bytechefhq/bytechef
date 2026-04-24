@@ -35,6 +35,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -89,6 +90,9 @@ public final class Connection {
 
     @Column
     private String name;
+
+    @Transient
+    private boolean credentialStatusUpdated;
 
     @Column("parameters")
     private EncryptedMapWrapper parameters;
@@ -255,8 +259,16 @@ public final class Connection {
         this.id = id;
     }
 
+    public boolean isCredentialsStatusUpdated() {
+        return credentialStatusUpdated;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setCredentialsStatusUpdated() {
+        this.credentialStatusUpdated = true;
     }
 
     public void setParameters(Map<String, ?> parameters) {
