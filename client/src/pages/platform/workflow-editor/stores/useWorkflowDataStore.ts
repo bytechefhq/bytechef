@@ -12,6 +12,7 @@ import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 export type WorkflowDataType = {
     actionNames?: Array<string>;
     nodeNames: Array<string>;
+    workflowUuid?: string;
 };
 interface WorkflowDataStateI {
     workflowNodes: Array<WorkflowNodeType>;
