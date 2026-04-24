@@ -550,7 +550,7 @@ const useWorkflowEditorCanvas = ({
         taskDispatcherDefinitions,
     });
 
-    const workflowUuid = (workflow as Workflow & {workflowUuid?: string}).workflowUuid;
+    const workflowUuid = workflow.workflowUuid;
 
     useEffect(() => {
         if (workflowUuid) {

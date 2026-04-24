@@ -13,7 +13,6 @@ import ProjectDeploymentDialogBasicStepTagsSelect from '@/pages/automation/proje
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
-import {toEnvironmentName} from '@/shared/constants';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -73,8 +72,8 @@ const ProjectDeploymentDialogBasicStep = ({
         }
 
         return environmentsData.environments
-            .filter((environment) => environment?.id != null)
-            .map((environment) => ({id: environment!.id!, label: toEnvironmentName(+environment!.id!)}));
+            .filter((environment) => environment?.id != null && environment.name != null)
+            .map((environment) => ({id: environment!.id!, label: environment!.name!}));
     }, [environmentsData?.environments]);
 
     const handleDeploymentSelectChange = (value: string) => {
