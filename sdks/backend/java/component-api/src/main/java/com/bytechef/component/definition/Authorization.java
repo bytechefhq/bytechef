@@ -201,7 +201,7 @@ public interface Authorization {
             return name().toLowerCase();
         }
 
-        private AuthorizationType(boolean hasRefreshToken) {
+        AuthorizationType(boolean hasRefreshToken) {
             this.hasRefreshToken = hasRefreshToken;
         }
 
