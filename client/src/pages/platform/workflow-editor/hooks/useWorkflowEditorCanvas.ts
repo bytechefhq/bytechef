@@ -80,10 +80,10 @@ const useWorkflowEditorCanvas = ({
             setNodes: state.setNodes,
         }))
     );
-    const {layoutDirection, setWorkflowId} = useLayoutDirectionStore(
+    const {layoutDirection, setCurrentWorkflowUuid} = useLayoutDirectionStore(
         useShallow((state) => ({
             layoutDirection: state.layoutDirection,
-            setWorkflowId: state.setWorkflowId,
+            setCurrentWorkflowUuid: state.setCurrentWorkflowUuid,
         }))
     );
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
@@ -554,7 +554,7 @@ const useWorkflowEditorCanvas = ({
 
     useEffect(() => {
         if (workflowUuid) {
-            setWorkflowId(workflowUuid);
+            setCurrentWorkflowUuid(workflowUuid);
         }
 
         setViewport(

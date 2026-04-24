@@ -7,8 +7,8 @@ describe('useLayoutDirectionStore', () => {
     beforeEach(() => {
         // Reset to a clean state by clearing the Zustand store entirely
         useLayoutDirectionStore.setState({
-            currentWorkflowId: '',
-            directionsByWorkflow: {},
+            currentWorkflowUuid: '',
+            directionsByWorkflowUuid: {},
             layoutDirection: 'TB',
         });
     });
@@ -23,7 +23,7 @@ describe('useLayoutDirectionStore', () => {
         const {result} = renderHook(() => useLayoutDirectionStore());
 
         act(() => {
-            result.current.setWorkflowId('workflow-1');
+            result.current.setCurrentWorkflowUuid('workflow-1');
         });
 
         act(() => {
@@ -31,7 +31,7 @@ describe('useLayoutDirectionStore', () => {
         });
 
         expect(result.current.layoutDirection).toBe('LR');
-        expect(result.current.directionsByWorkflow['workflow-1']).toBe('LR');
+        expect(result.current.directionsByWorkflowUuid['workflow-1']).toBe('LR');
     });
 
     it('should restore saved direction when switching to a workflow', () => {
@@ -39,7 +39,7 @@ describe('useLayoutDirectionStore', () => {
 
         // Set workflow-1 to LR
         act(() => {
-            result.current.setWorkflowId('workflow-1');
+            result.current.setCurrentWorkflowUuid('workflow-1');
         });
 
         act(() => {
@@ -48,43 +48,43 @@ describe('useLayoutDirectionStore', () => {
 
         // Switch to workflow-2 (should default to TB)
         act(() => {
-            result.current.setWorkflowId('workflow-2');
+            result.current.setCurrentWorkflowUuid('workflow-2');
         });
 
         expect(result.current.layoutDirection).toBe('TB');
 
         // Switch back to workflow-1 (should restore LR)
         act(() => {
-            result.current.setWorkflowId('workflow-1');
+            result.current.setCurrentWorkflowUuid('workflow-1');
         });
 
         expect(result.current.layoutDirection).toBe('LR');
     });
 
-    it('should default to TB for unknown workflow IDs', () => {
+    it('should default to TB for unknown workflow UUIDs', () => {
         const {result} = renderHook(() => useLayoutDirectionStore());
 
         act(() => {
-            result.current.setWorkflowId('unknown-workflow');
+            result.current.setCurrentWorkflowUuid('unknown-workflow');
         });
 
         expect(result.current.layoutDirection).toBe('TB');
     });
 
-    it('should not update state when setting the same workflow ID', () => {
+    it('should not update state when setting the same workflow UUID', () => {
         const {result} = renderHook(() => useLayoutDirectionStore());
 
         act(() => {
-            result.current.setWorkflowId('workflow-1');
+            result.current.setCurrentWorkflowUuid('workflow-1');
         });
 
         act(() => {
             result.current.setLayoutDirection('LR');
         });
 
-        // Setting the same ID should be a no-op
+        // Setting the same UUID should be a no-op
         act(() => {
-            result.current.setWorkflowId('workflow-1');
+            result.current.setCurrentWorkflowUuid('workflow-1');
         });
 
         expect(result.current.layoutDirection).toBe('LR');
@@ -94,7 +94,7 @@ describe('useLayoutDirectionStore', () => {
         const {result} = renderHook(() => useLayoutDirectionStore());
 
         act(() => {
-            result.current.setWorkflowId('workflow-1');
+            result.current.setCurrentWorkflowUuid('workflow-1');
         });
 
         act(() => {
@@ -102,22 +102,22 @@ describe('useLayoutDirectionStore', () => {
         });
 
         act(() => {
-            result.current.setWorkflowId('workflow-2');
+            result.current.setCurrentWorkflowUuid('workflow-2');
         });
 
         act(() => {
             result.current.setLayoutDirection('TB');
         });
 
-        expect(result.current.directionsByWorkflow['workflow-1']).toBe('LR');
-        expect(result.current.directionsByWorkflow['workflow-2']).toBe('TB');
+        expect(result.current.directionsByWorkflowUuid['workflow-1']).toBe('LR');
+        expect(result.current.directionsByWorkflowUuid['workflow-2']).toBe('TB');
     });
 
     it('should toggle layout direction', () => {
         const {result} = renderHook(() => useLayoutDirectionStore());
 
         act(() => {
-            result.current.setWorkflowId('workflow-1');
+            result.current.setCurrentWorkflowUuid('workflow-1');
         });
 
         expect(result.current.layoutDirection).toBe('TB');
