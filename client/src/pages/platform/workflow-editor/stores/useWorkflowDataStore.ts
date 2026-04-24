@@ -57,7 +57,8 @@ interface WorkflowDataStateI {
     updateWorkflowNodeParameters: (
         workflowNodeName: string,
         parameters: Record<string, object>,
-        version?: number
+        version?: number,
+        metadata?: Record<string, unknown>
     ) => void;
 }
 
@@ -65,7 +66,8 @@ function updateClusterElementParameters(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clusterElements: Record<string, any>,
     workflowNodeName: string,
-    parameters: Record<string, object>
+    parameters: Record<string, object>,
+    metadata?: Record<string, unknown>
 ): boolean {
     for (const elementValue of Object.values(clusterElements)) {
         if (!elementValue) {
@@ -78,11 +80,15 @@ function updateClusterElementParameters(
             if (element.name === workflowNodeName) {
                 element.parameters = parameters;
 
+                if (metadata !== undefined) {
+                    element.metadata = metadata;
+                }
+
                 return true;
             }
 
             if (element.clusterElements) {
-                if (updateClusterElementParameters(element.clusterElements, workflowNodeName, parameters)) {
+                if (updateClusterElementParameters(element.clusterElements, workflowNodeName, parameters, metadata)) {
                     return true;
                 }
             }
@@ -96,17 +102,22 @@ function updateTaskParametersInTasks(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tasks: any[],
     workflowNodeName: string,
-    parameters: Record<string, object>
+    parameters: Record<string, object>,
+    metadata?: Record<string, unknown>
 ): boolean {
     for (const task of tasks) {
         if (task.name === workflowNodeName) {
             task.parameters = parameters;
 
+            if (metadata !== undefined) {
+                task.metadata = metadata;
+            }
+
             return true;
         }
 
         if (task.clusterElements) {
-            if (updateClusterElementParameters(task.clusterElements, workflowNodeName, parameters)) {
+            if (updateClusterElementParameters(task.clusterElements, workflowNodeName, parameters, metadata)) {
                 return true;
             }
         }
@@ -115,7 +126,7 @@ function updateTaskParametersInTasks(
             let found = false;
 
             forEachNestedTaskGroup(task.parameters as Record<string, unknown>, (subtasks) => {
-                if (!found && updateTaskParametersInTasks(subtasks, workflowNodeName, parameters)) {
+                if (!found && updateTaskParametersInTasks(subtasks, workflowNodeName, parameters, metadata)) {
                     found = true;
                 }
             });
@@ -201,7 +212,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             workflow: {
                 nodeNames: ['trigger_1'],
             },
-            updateWorkflowNodeParameters: (workflowNodeName, parameters, version) =>
+            updateWorkflowNodeParameters: (workflowNodeName, parameters, version, metadata) =>
                 set((state) => {
                     const workflow = state.workflow;
 
@@ -224,25 +235,51 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                             if (trigger.name === workflowNodeName) {
                                 trigger.parameters = parameters;
 
+                                if (metadata !== undefined) {
+                                    trigger.metadata = metadata;
+                                }
+
                                 break;
                             }
                         }
                     }
 
                     if (definition.tasks) {
-                        updateTaskParametersInTasks(definition.tasks, workflowNodeName, parameters);
+                        updateTaskParametersInTasks(definition.tasks, workflowNodeName, parameters, metadata);
                     }
 
                     const updatedTriggers = workflow.triggers?.map((trigger) =>
-                        trigger.name === workflowNodeName ? {...trigger, parameters} : trigger
+                        trigger.name === workflowNodeName
+                            ? {...trigger, parameters, ...(metadata !== undefined ? {metadata} : {})}
+                            : trigger
                     );
 
                     const updatedTasks = workflow.tasks?.map((task) =>
-                        task.name === workflowNodeName ? {...task, parameters} : task
+                        task.name === workflowNodeName
+                            ? {...task, parameters, ...(metadata !== undefined ? {metadata} : {})}
+                            : task
+                    );
+
+                    // Keep React Flow node data in sync. useLayout skips re-runs on parameter-only
+                    // changes (structural fingerprint), so without this patch nodes[i].data.parameters
+                    // stays frozen at the first layout. Clicking a node later then seeds the details
+                    // panel from stale data and the user loses recent edits until the next refresh.
+                    const updatedNodes = state.nodes.map((node) =>
+                        node.id === workflowNodeName
+                            ? {
+                                  ...node,
+                                  data: {
+                                      ...node.data,
+                                      parameters,
+                                      ...(metadata !== undefined ? {metadata} : {}),
+                                  },
+                              }
+                            : node
                     );
 
                     return {
                         ...state,
+                        nodes: updatedNodes,
                         workflow: {
                             ...workflow,
                             definition: JSON.stringify(definition, null, SPACE),
