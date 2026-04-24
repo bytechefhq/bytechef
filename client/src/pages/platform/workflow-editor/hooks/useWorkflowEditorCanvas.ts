@@ -550,9 +550,11 @@ const useWorkflowEditorCanvas = ({
         taskDispatcherDefinitions,
     });
 
+    const workflowUuid = (workflow as Workflow & {workflowUuid?: string}).workflowUuid;
+
     useEffect(() => {
-        if (workflow.id) {
-            setWorkflowId(String(workflow.id));
+        if (workflowUuid) {
+            setWorkflowId(workflowUuid);
         }
 
         setViewport(
@@ -566,7 +568,7 @@ const useWorkflowEditorCanvas = ({
             }
         );
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.id]);
+    }, [workflowUuid]);
 
     return {
         edgeTypes,
