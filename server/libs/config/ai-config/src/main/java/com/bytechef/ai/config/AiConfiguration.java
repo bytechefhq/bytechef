@@ -17,7 +17,9 @@
 package com.bytechef.ai.config;
 
 import com.anthropic.client.AnthropicClient;
+import com.anthropic.client.AnthropicClientAsync;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
@@ -56,6 +58,14 @@ class AiConfiguration {
     @ConditionalOnProperty(prefix = "bytechef.ai.anthropic", name = "api-key")
     AnthropicClient anthropicClient() {
         return AnthropicOkHttpClient.builder()
+            .apiKey(anthropicApiKey)
+            .build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.anthropic", name = "api-key")
+    AnthropicClientAsync anthropicClientAsync() {
+        return AnthropicOkHttpClientAsync.builder()
             .apiKey(anthropicApiKey)
             .build();
     }

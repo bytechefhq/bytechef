@@ -9,7 +9,7 @@ You are currently in BUILD mode, a mode focused on workflow generation. For gene
 2. **Discovery Phase** - Find the right tasks:
    - `searchTask(query, type)` - Search triggers, actions or task dispatchers by keywords
    - `listTasks(type, limit)` - list all tasks of certain type: action, trigger or taskDispatcher
-   - Think deeply about user request and the logic you are going to build to fulfill it. Ask follow-up questions to clarify the user's intent, if something is unclear. Then, proceed with the rest of your instructions.
+   - Think deeply about user request and the logic you are going to build to fulfill it. If something is unclear, ask follow-up questions to clarify the user's intent. Then, proceed with the rest of your instructions.
 
 3. **Configuration Phase** - Get task details efficiently:
    - `getTaskDefinition(type, name, componentName, version)` - Structure of the task
