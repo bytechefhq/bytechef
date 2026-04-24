@@ -30,6 +30,7 @@ interface ProjectDialogBasicStepProps {
     projectDeployments?: ProjectDeployment[];
     projectDeploymentsLoading?: boolean;
     setValue: UseFormSetValue<ProjectDeployment>;
+    showTabs?: boolean;
 }
 
 const ProjectDeploymentDialogBasicStep = ({
@@ -41,6 +42,7 @@ const ProjectDeploymentDialogBasicStep = ({
     projectDeployments,
     projectDeploymentsLoading,
     setValue,
+    showTabs,
 }: ProjectDialogBasicStepProps) => {
     const [selectedDeploymentId, setSelectedDeploymentId] = useState<string | undefined>();
     const [currentProjectId, setCurrentProjectId] = useState(getValues('projectId'));
@@ -100,8 +102,6 @@ const ProjectDeploymentDialogBasicStep = ({
     };
 
     const hasDeployments = (projectDeployments?.length ?? 0) > 0;
-    const shouldShowTabs =
-        changeProjectVersion || projectDeployment?.id != null || projectDeployment?.projectId != null;
 
     const newDeploymentForm = (
         <>
@@ -238,7 +238,7 @@ const ProjectDeploymentDialogBasicStep = ({
         </>
     );
 
-    if (!shouldShowTabs) {
+    if (!showTabs) {
         return <div className="flex flex-col gap-4">{newDeploymentForm}</div>;
     }
 

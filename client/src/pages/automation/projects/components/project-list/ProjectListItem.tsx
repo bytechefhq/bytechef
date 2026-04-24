@@ -399,6 +399,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             }}
                                             projectDeployments={projectDeploymentsQuery.data}
                                             projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+                                            showTabs
                                             triggerNode={
                                                 <Button
                                                     className="hover:bg-surface-neutral-primary-hover"
