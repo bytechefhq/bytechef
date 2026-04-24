@@ -13,17 +13,20 @@ import ProjectDeploymentDialogBasicStepTagsSelect from '@/pages/automation/proje
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import {toEnvironmentName} from '@/shared/constants';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
+import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {InfoIcon, LayersIcon, PlusIcon, RefreshCwIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectDialogBasicStepProps {
     changeProjectVersion: boolean;
     control: Control<ProjectDeployment>;
+    environmentEditable?: boolean;
     getValues: UseFormGetValues<ProjectDeployment>;
     handleTabChange: (tab: 'new-deployment' | 'change-version') => void;
     projectDeployment: ProjectDeployment | undefined;
@@ -36,6 +39,7 @@ interface ProjectDialogBasicStepProps {
 const ProjectDeploymentDialogBasicStep = ({
     changeProjectVersion,
     control,
+    environmentEditable = false,
     getValues,
     handleTabChange,
     projectDeployment,
@@ -57,9 +61,21 @@ const ProjectDeploymentDialogBasicStep = ({
         includeAllFields: false,
     });
 
+    const {data: environmentsData} = useEnvironmentsQuery(undefined, {enabled: environmentEditable});
+
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
     const currentProjectName = projects?.find((project) => project.id === currentProjectId)?.name;
+
+    const environmentOptions = useMemo(() => {
+        if (!environmentsData?.environments) {
+            return [];
+        }
+
+        return environmentsData.environments
+            .filter((environment) => environment?.id != null)
+            .map((environment) => ({id: environment!.id!, label: toEnvironmentName(+environment!.id!)}));
+    }, [environmentsData?.environments]);
 
     const handleDeploymentSelectChange = (value: string) => {
         setSelectedDeploymentId(value);
@@ -133,12 +149,31 @@ const ProjectDeploymentDialogBasicStep = ({
             <FormField
                 control={control}
                 name="environmentId"
-                render={() => (
-                    <FormItem className="space-x-2">
+                render={({field}) => (
+                    <FormItem className={environmentEditable ? undefined : 'space-x-2'}>
                         <FormLabel>Environment</FormLabel>
 
                         <FormControl>
-                            <EnvironmentBadge environmentId={currentEnvironmentId} />
+                            {environmentEditable ? (
+                                <Select
+                                    onValueChange={(value) => field.onChange(+value)}
+                                    value={(field.value ?? currentEnvironmentId).toString()}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select environment" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        {environmentOptions.map((option) => (
+                                            <SelectItem key={option.id} value={option.id}>
+                                                {option.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <EnvironmentBadge environmentId={field.value ?? currentEnvironmentId} />
+                            )}
                         </FormControl>
 
                         <FormMessage />

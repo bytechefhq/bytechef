@@ -392,6 +392,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         </Badge>
 
                                         <ProjectDeploymentDialog
+                                            environmentEditable={true}
                                             onOpenChange={setIsProjectDeploymentDialogOpen}
                                             projectDeployment={{
                                                 name: project.name,

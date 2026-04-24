@@ -46,6 +46,7 @@ import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
 
 interface ProjectDeploymentDialogProps {
     changeProjectVersion?: boolean;
+    environmentEditable?: boolean;
     filterWorkflowUuids?: string[];
     onClose?: () => void;
     onOpenChange?: (isOpen: boolean) => void;
@@ -58,6 +59,7 @@ interface ProjectDeploymentDialogProps {
 
 const ProjectDeploymentDialog = ({
     changeProjectVersion = false,
+    environmentEditable = false,
     filterWorkflowUuids,
     onClose,
     onOpenChange,
@@ -88,6 +90,7 @@ const ProjectDeploymentDialog = ({
         defaultValues: {
             description: projectDeployment?.description || undefined,
             enabled: projectDeployment?.enabled || false,
+            environmentId: projectDeployment?.environmentId ?? currentEnvironmentId,
             name: projectDeployment?.name || undefined,
             projectDeploymentWorkflows: [],
             projectId: projectDeployment?.projectId || undefined,
@@ -195,6 +198,7 @@ const ProjectDeploymentDialog = ({
                 <ProjectDeploymentDialogBasicStep
                     changeProjectVersion={changeProjectVersion}
                     control={control}
+                    environmentEditable={environmentEditable}
                     getValues={getValues}
                     handleTabChange={setBasicStepTab}
                     projectDeployment={projectDeployment}
@@ -264,7 +268,7 @@ const ProjectDeploymentDialog = ({
         } else {
             createProjectDeploymentMutation.mutate({
                 ...formData,
-                environmentId: currentEnvironmentId,
+                environmentId: formData.environmentId ?? currentEnvironmentId,
                 projectDeploymentWorkflows: formData.projectDeploymentWorkflows?.map((projectDeploymentWorkflow) => {
                     return {
                         ...projectDeploymentWorkflow,
