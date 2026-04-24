@@ -36,7 +36,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon} from 'lucide-react';
 import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -53,6 +53,7 @@ interface ProjectDeploymentDialogProps {
     projectDeployment?: ProjectDeployment;
     projectDeployments?: ProjectDeployment[];
     projectDeploymentsLoading?: boolean;
+    redirectOnSubmit?: boolean;
     showTabs?: boolean;
     triggerNode?: ReactNode;
 }
@@ -66,6 +67,7 @@ const ProjectDeploymentDialog = ({
     projectDeployment,
     projectDeployments,
     projectDeploymentsLoading,
+    redirectOnSubmit = true,
     showTabs,
     triggerNode,
 }: ProjectDeploymentDialogProps) => {
@@ -145,7 +147,6 @@ const ProjectDeploymentDialog = ({
     const queryClient = useQueryClient();
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     const onSuccess = () => {
         if (!projectDeployment?.id) {
@@ -171,11 +172,7 @@ const ProjectDeploymentDialog = ({
         closeDialog();
         setActiveStepIndex(0);
 
-        if (
-            !location.pathname.includes('deployments') &&
-            !location.pathname.includes('api-platform') &&
-            !location.pathname.includes('mcp')
-        ) {
+        if (redirectOnSubmit) {
             navigate('/automation/deployments');
         }
     };

@@ -133,6 +133,7 @@ const ProjectDeployments = () => {
                                             environmentId: currentEnvironmentId,
                                         } as ProjectDeployment
                                     }
+                                    redirectOnSubmit={false}
                                     triggerNode={<Button label="New Deployment" />}
                                 />
                             </div>
@@ -254,6 +255,7 @@ const ProjectDeployments = () => {
                                         environmentId: currentEnvironmentId,
                                     } as ProjectDeployment
                                 }
+                                redirectOnSubmit={false}
                                 triggerNode={<Button>Create Deployment</Button>}
                             />
                         }
