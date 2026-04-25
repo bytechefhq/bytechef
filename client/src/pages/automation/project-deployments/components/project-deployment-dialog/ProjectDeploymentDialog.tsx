@@ -77,10 +77,16 @@ const ProjectDeploymentDialog = ({
     );
     const [connectionsGrouped, setConnectionsGrouped] = useState(false);
     const [isOpen, setIsOpen] = useState(!triggerNode);
+    const [selectedExistingDeployment, setSelectedExistingDeployment] = useState<ProjectDeployment | undefined>();
+
+    const effectiveProjectDeployment = selectedExistingDeployment ?? projectDeployment;
+    const effectiveChangeProjectVersion = changeProjectVersion || !!selectedExistingDeployment;
 
     const initializedProjectKeyRef = useRef<string>('');
+    const tabInitDoneRef = useRef(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const setCurrentEnvironmentId = useEnvironmentStore((state) => state.setCurrentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const [resetWorkflowsEnabledStore, setWorkflowEnabled, workflowEnabledMap] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled, workflowEnabledMap}) => [reset, setWorkflowEnabled, workflowEnabledMap])
@@ -149,7 +155,7 @@ const ProjectDeploymentDialog = ({
     const navigate = useNavigate();
 
     const onSuccess = () => {
-        if (!projectDeployment?.id) {
+        if (!effectiveProjectDeployment?.id) {
             captureProjectDeploymentCreated();
         }
 
@@ -163,17 +169,26 @@ const ProjectDeploymentDialog = ({
             queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId!}),
         });
 
-        if (projectDeployment?.projectId) {
+        if (effectiveProjectDeployment?.projectId) {
             queryClient.invalidateQueries({
-                queryKey: [...ProjectKeys.projects, projectDeployment?.projectId],
+                queryKey: [...ProjectKeys.projects, effectiveProjectDeployment.projectId],
             });
         }
+
+        const submittedEnvironmentId = getValues().environmentId;
+        const submittedProjectId = getValues().projectId;
 
         closeDialog();
         setActiveStepIndex(0);
 
         if (redirectOnSubmit) {
-            navigate('/automation/deployments');
+            if (submittedEnvironmentId != null) {
+                setCurrentEnvironmentId(submittedEnvironmentId);
+            }
+
+            const search = submittedProjectId != null ? `?projectId=${submittedProjectId}` : '';
+
+            navigate(`/automation/deployments${search}`);
         }
     };
 
@@ -189,16 +204,67 @@ const ProjectDeploymentDialog = ({
 
     const isSaveDisabled = !hasEnabledWorkflows || isDeploymentPending;
 
+    const handleBasicStepTabChange = (tab: 'new-deployment' | 'change-version') => {
+        tabInitDoneRef.current = true;
+
+        setBasicStepTab(tab);
+
+        if (tab === 'new-deployment' && selectedExistingDeployment) {
+            setSelectedExistingDeployment(undefined);
+
+            reset({
+                description: projectDeployment?.description || undefined,
+                enabled: projectDeployment?.enabled || false,
+                environmentId: projectDeployment?.environmentId ?? currentEnvironmentId,
+                name: projectDeployment?.name || undefined,
+                projectDeploymentWorkflows: [],
+                projectId: projectDeployment?.projectId || undefined,
+                projectVersion: projectDeployment?.projectVersion || undefined,
+                tags:
+                    projectDeployment?.tags?.map((tag) => ({
+                        ...tag,
+                        label: tag.name,
+                    })) || [],
+            });
+
+            initializedProjectKeyRef.current = '';
+        }
+    };
+
+    const handleExistingDeploymentSelect = (deployment: ProjectDeployment) => {
+        setSelectedExistingDeployment(deployment);
+
+        reset({
+            ...form.getValues(),
+            description: deployment.description,
+            enabled: deployment.enabled ?? false,
+            environmentId: deployment.environmentId,
+            name: deployment.name,
+            projectDeploymentWorkflows: [],
+            projectId: deployment.projectId,
+            projectVersion: deployment.projectVersion,
+            tags:
+                deployment.tags?.map((tag) => ({
+                    ...tag,
+                    label: tag.name,
+                })) ?? [],
+        });
+
+        initializedProjectKeyRef.current = '';
+    };
+
     const projectDeploymentDialogSteps = [
         {
             content: (
                 <ProjectDeploymentDialogBasicStep
-                    changeProjectVersion={changeProjectVersion}
+                    basicStepTab={basicStepTab}
+                    changeProjectVersion={effectiveChangeProjectVersion}
                     control={control}
                     environmentEditable={environmentEditable}
                     getValues={getValues}
-                    handleTabChange={setBasicStepTab}
-                    projectDeployment={projectDeployment}
+                    handleTabChange={handleBasicStepTabChange}
+                    onDeploymentSelect={handleExistingDeploymentSelect}
+                    projectDeployment={effectiveProjectDeployment}
                     projectDeployments={projectDeployments}
                     projectDeploymentsLoading={projectDeploymentsLoading}
                     setValue={setValue}
@@ -231,6 +297,12 @@ const ProjectDeploymentDialog = ({
 
             initializedProjectKeyRef.current = '';
 
+            tabInitDoneRef.current = false;
+
+            setSelectedExistingDeployment(undefined);
+
+            setBasicStepTab(changeProjectVersion ? 'change-version' : 'new-deployment');
+
             if (onClose) {
                 onClose();
             }
@@ -248,9 +320,9 @@ const ProjectDeploymentDialog = ({
             return;
         }
 
-        if (projectDeployment?.id) {
+        if (effectiveProjectDeployment?.id) {
             updateProjectDeploymentMutation.mutate({
-                ...projectDeployment,
+                ...effectiveProjectDeployment,
                 ...formData,
                 projectDeploymentWorkflows: formData.projectDeploymentWorkflows?.map((projectDeploymentWorkflow) => {
                     return {
@@ -295,7 +367,7 @@ const ProjectDeploymentDialog = ({
         initializedProjectKeyRef.current = projectKey;
 
         const projectDeploymentWorkflows: ProjectDeploymentWorkflow[] = workflows.map((workflow) => {
-            const projectDeploymentWorkflow = projectDeployment?.projectDeploymentWorkflows?.find(
+            const projectDeploymentWorkflow = effectiveProjectDeployment?.projectDeploymentWorkflows?.find(
                 (projectDeploymentWorkflow) => projectDeploymentWorkflow.workflowUuid === workflow.workflowUuid
             );
 
@@ -334,6 +406,34 @@ const ProjectDeploymentDialog = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getValues().projectId, getValues().projectVersion, workflows]);
 
+    useEffect(() => {
+        if (!isOpen) {
+            tabInitDoneRef.current = false;
+
+            return;
+        }
+
+        if (tabInitDoneRef.current) {
+            return;
+        }
+
+        if (changeProjectVersion) {
+            tabInitDoneRef.current = true;
+
+            setBasicStepTab('change-version');
+
+            return;
+        }
+
+        if (projectDeploymentsLoading || projectDeployments === undefined) {
+            return;
+        }
+
+        tabInitDoneRef.current = true;
+
+        setBasicStepTab(projectDeployments.length > 0 ? 'change-version' : 'new-deployment');
+    }, [isOpen, projectDeploymentsLoading, projectDeployments, changeProjectVersion]);
+
     return (
         <Dialog
             onOpenChange={(isOpen) => {
@@ -360,16 +460,16 @@ const ProjectDeploymentDialog = ({
                     <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 p-6">
                         <div className="flex w-full flex-col space-y-1">
                             <DialogTitle>
-                                {changeProjectVersion
+                                {effectiveChangeProjectVersion
                                     ? 'Change Project Version'
-                                    : `${projectDeployment?.id ? 'Edit' : 'New'} Deployment ${!projectDeployment?.id ? '-' : ''} ${
-                                          !projectDeployment?.id
+                                    : `${effectiveProjectDeployment?.id ? 'Edit' : 'New'} Deployment ${!effectiveProjectDeployment?.id ? '-' : ''} ${
+                                          !effectiveProjectDeployment?.id
                                               ? projectDeploymentDialogSteps[activeStepIndex].name
                                               : ''
                                       }`}
                             </DialogTitle>
 
-                            {!projectDeployment?.id && (
+                            {!effectiveProjectDeployment?.id && !effectiveChangeProjectVersion && (
                                 <nav aria-label="Progress">
                                     <ol className="space-y-4 md:flex md:space-y-0" role="list">
                                         {projectDeploymentDialogSteps.map((step, index) => (
@@ -413,7 +513,7 @@ const ProjectDeploymentDialog = ({
                                     <Button label="Cancel" variant="outline" />
                                 </DialogClose>
 
-                                {(!projectDeployment?.id || changeProjectVersion) && (
+                                {(!effectiveProjectDeployment?.id || effectiveChangeProjectVersion) && (
                                     <Button
                                         disabled={
                                             basicStepTab === 'change-version' &&
@@ -428,7 +528,8 @@ const ProjectDeploymentDialog = ({
                             </>
                         )}
 
-                        {(activeStepIndex === 1 || (projectDeployment?.id && !changeProjectVersion)) && (
+                        {(activeStepIndex === 1 ||
+                            (effectiveProjectDeployment?.id && !effectiveChangeProjectVersion)) && (
                             <>
                                 {activeStepIndex === 1 && hasVisibleConnections && (
                                     <div className="mr-auto flex items-center gap-2">
