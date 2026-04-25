@@ -23,11 +23,13 @@ import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectDialogBasicStepProps {
+    basicStepTab: 'new-deployment' | 'change-version';
     changeProjectVersion: boolean;
     control: Control<ProjectDeployment>;
     environmentEditable?: boolean;
     getValues: UseFormGetValues<ProjectDeployment>;
     handleTabChange: (tab: 'new-deployment' | 'change-version') => void;
+    onDeploymentSelect?: (deployment: ProjectDeployment) => void;
     projectDeployment: ProjectDeployment | undefined;
     projectDeployments?: ProjectDeployment[];
     projectDeploymentsLoading?: boolean;
@@ -36,11 +38,13 @@ interface ProjectDialogBasicStepProps {
 }
 
 const ProjectDeploymentDialogBasicStep = ({
+    basicStepTab,
     changeProjectVersion,
     control,
     environmentEditable = false,
     getValues,
     handleTabChange,
+    onDeploymentSelect,
     projectDeployment,
     projectDeployments,
     projectDeploymentsLoading,
@@ -81,9 +85,17 @@ const ProjectDeploymentDialogBasicStep = ({
 
         const selectedDeployment = projectDeployments?.find((deployment) => deployment.id?.toString() === value);
 
-        if (selectedDeployment?.projectVersion != null) {
+        if (!selectedDeployment) {
+            return;
+        }
+
+        if (selectedDeployment.projectVersion != null) {
             setValue('projectVersion', selectedDeployment.projectVersion);
             setCurrentProjectVersion(selectedDeployment.projectVersion);
+        }
+
+        if (onDeploymentSelect) {
+            onDeploymentSelect(selectedDeployment);
         }
     };
 
@@ -278,12 +290,12 @@ const ProjectDeploymentDialogBasicStep = ({
 
     return (
         <Tabs
-            defaultValue={projectDeployments?.length ? 'change-version' : 'new-deployment'}
             onValueChange={(value) => {
                 const normalizedValue = value as 'new-deployment' | 'change-version';
 
                 handleTabChange(normalizedValue);
             }}
+            value={basicStepTab}
         >
             <TabsList>
                 <TabsTrigger className="gap-2 px-3 py-1" value="new-deployment">
