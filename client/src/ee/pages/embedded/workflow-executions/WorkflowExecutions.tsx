@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList';
@@ -5,6 +6,7 @@ import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
 import WorkflowExecutionsFilterTitle from '@/ee/pages/embedded/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
@@ -32,14 +34,18 @@ import {
 } from '@/shared/middleware/automation/workflow/execution';
 import {ConnectedUserProject} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ActivityIcon} from 'lucide-react';
+import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 import EmbeddedWorkflowExecutionsTable from './components/EmbeddedWorkflowExecutionsTable';
 import EmbeddedWorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
 
+const ANY_FILTER_OPTION = {label: 'Any', value: ''};
+
 const jobStatusOptions = [
+    ANY_FILTER_OPTION,
     {
         label: GetWorkflowExecutionsPageJobStatusEnum.Started,
         value: GetWorkflowExecutionsPageJobStatusEnum.Started,
@@ -133,19 +139,25 @@ export const WorkflowExecutions = () => {
 
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false}, filtersInteracted);
 
-    const {connectedUserProjects, workflowExecutionPage, workflowExecutionsError, workflowExecutionsIsLoading} =
-        useWorkflowExecutions(filterAutomations, {
-            environmentId: currentEnvironmentId,
-            id: currentWorkspaceId!,
-            integrationId: filterIntegrationId,
-            integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
-            jobEndDate: filterEndDate,
-            jobStartDate: filterStartDate,
-            jobStatus: filterStatus,
-            pageNumber: filterPageNumber,
-            projectId: filterProjectId,
-            workflowId: filterWorkflowId,
-        });
+    const {
+        connectedUserProjects,
+        refetchWorkflowExecutions,
+        workflowExecutionPage,
+        workflowExecutionsError,
+        workflowExecutionsIsFetching,
+        workflowExecutionsIsLoading,
+    } = useWorkflowExecutions(filterAutomations, {
+        environmentId: currentEnvironmentId,
+        id: currentWorkspaceId!,
+        integrationId: filterIntegrationId,
+        integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
+        jobEndDate: filterEndDate,
+        jobStartDate: filterStartDate,
+        jobStatus: filterStatus,
+        pageNumber: filterPageNumber,
+        projectId: filterProjectId,
+        workflowId: filterWorkflowId,
+    });
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
@@ -227,7 +239,7 @@ export const WorkflowExecutions = () => {
     const handleIntegrationChange = (item?: ComboBoxItemType) => {
         let integrationId;
 
-        if (item) {
+        if (item?.value) {
             integrationId = Number(item.value);
         }
 
@@ -249,7 +261,7 @@ export const WorkflowExecutions = () => {
     const handleIntegrationInstanceConfigurationChange = (item?: ComboBoxItemType) => {
         let integrationInstanceConfigurationId;
 
-        if (item) {
+        if (item?.value) {
             integrationInstanceConfigurationId = Number(item.value);
         }
 
@@ -307,7 +319,7 @@ export const WorkflowExecutions = () => {
     const handleStatusChange = (item?: ComboBoxItemType) => {
         let status;
 
-        if (item) {
+        if (item?.value) {
             status = item.value as GetWorkflowExecutionsPageJobStatusEnum;
         }
 
@@ -329,7 +341,7 @@ export const WorkflowExecutions = () => {
     const handleProjectChange = (item?: ComboBoxItemType) => {
         let projectId;
 
-        if (item) {
+        if (item?.value) {
             projectId = Number(item.value);
         }
 
@@ -351,7 +363,7 @@ export const WorkflowExecutions = () => {
     const handleWorkflowChange = (item?: ComboBoxItemType) => {
         let workflowId;
 
-        if (item) {
+        if (item?.value) {
             workflowId = item.value;
         }
 
@@ -405,18 +417,39 @@ export const WorkflowExecutions = () => {
                 )
             }
             header={
-                workflowExecutions &&
-                workflowExecutions.length > 0 && (
-                    <Header
-                        centerTitle
-                        position="main"
-                        title={
+                <Header
+                    centerTitle
+                    position="main"
+                    right={
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    aria-label="Refresh workflow executions"
+                                    disabled={workflowExecutionsIsFetching}
+                                    icon={
+                                        <RefreshCwIcon
+                                            className={twMerge(workflowExecutionsIsFetching && 'animate-spin')}
+                                        />
+                                    }
+                                    onClick={() => refetchWorkflowExecutions()}
+                                    size="icon"
+                                    variant="outline"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>Refresh</TooltipContent>
+                        </Tooltip>
+                    }
+                    title={
+                        workflowExecutions && workflowExecutions.length > 0 ? (
                             <WorkflowExecutionsFilterTitle
                                 filterData={{environment: currentEnvironmentId, status: filterStatus}}
                             />
-                        }
-                    />
-                )
+                        ) : (
+                            ''
+                        )
+                    }
+                />
             }
             leftSidebarBody={
                 <div className="space-y-4 px-4">
@@ -460,14 +493,13 @@ export const WorkflowExecutions = () => {
 
                             <ComboBox
                                 emptyMessage={!integrations ? 'Loading...' : 'No item found.'}
-                                items={
-                                    integrations?.length
-                                        ? integrations?.map((integration) => ({
-                                              label: <IntegrationLabel integration={integration} />,
-                                              value: integration.id,
-                                          }))
-                                        : []
-                                }
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...(integrations?.map((integration) => ({
+                                        label: <IntegrationLabel integration={integration} />,
+                                        value: integration.id,
+                                    })) ?? []),
+                                ]}
                                 onChange={handleIntegrationChange}
                                 onOpen={() => setFiltersInteracted(true)}
                                 value={filterIntegrationId}
@@ -481,32 +513,28 @@ export const WorkflowExecutions = () => {
 
                             <ComboBox
                                 emptyMessage={!integrationInstanceConfigurations ? 'Loading...' : 'No item found.'}
-                                items={
-                                    integrationInstanceConfigurations?.length
-                                        ? integrationInstanceConfigurations?.map(
-                                              (integrationInstanceConfiguration) => ({
-                                                  label: (
-                                                      <span className="flex items-center">
-                                                          <span className="mr-1">
-                                                              {
-                                                                  (
-                                                                      integrationInstanceConfiguration.integration as Integration
-                                                                  )?.componentName
-                                                              }
-                                                          </span>
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...(integrationInstanceConfigurations?.map((integrationInstanceConfiguration) => ({
+                                        label: (
+                                            <span className="flex items-center">
+                                                <span className="mr-1">
+                                                    {
+                                                        (integrationInstanceConfiguration.integration as Integration)
+                                                            ?.componentName
+                                                    }
+                                                </span>
 
-                                                          <span className="text-xs text-gray-500">
-                                                              {integrationInstanceConfiguration?.tags
-                                                                  ?.map((tag) => tag.name)
-                                                                  .join(', ')}
-                                                          </span>
-                                                      </span>
-                                                  ),
-                                                  value: integrationInstanceConfiguration.id,
-                                              })
-                                          )
-                                        : []
-                                }
+                                                <span className="text-xs text-gray-500">
+                                                    {integrationInstanceConfiguration?.tags
+                                                        ?.map((tag) => tag.name)
+                                                        .join(', ')}
+                                                </span>
+                                            </span>
+                                        ),
+                                        value: integrationInstanceConfiguration.id,
+                                    })) ?? []),
+                                ]}
                                 onChange={handleIntegrationInstanceConfigurationChange}
                                 onOpen={() => setFiltersInteracted(true)}
                                 value={filterIntegrationInstanceConfigurationId}
@@ -519,14 +547,13 @@ export const WorkflowExecutions = () => {
                             <Label>Connected Users</Label>
 
                             <ComboBox
-                                items={
-                                    connectedUserProjects?.length
-                                        ? connectedUserProjects?.map((connectedUserProject) => ({
-                                              label: <ConnectedUserLabel project={connectedUserProject} />,
-                                              value: +connectedUserProject.projectId,
-                                          }))
-                                        : []
-                                }
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...(connectedUserProjects?.map((connectedUserProject) => ({
+                                        label: <ConnectedUserLabel project={connectedUserProject} />,
+                                        value: +connectedUserProject.projectId,
+                                    })) ?? []),
+                                ]}
                                 onChange={handleProjectChange}
                                 value={filterProjectId}
                             />
@@ -538,14 +565,13 @@ export const WorkflowExecutions = () => {
                             <Label>Workflow</Label>
 
                             <ComboBox
-                                items={
-                                    workflows?.length
-                                        ? workflows?.map((workflow) => ({
-                                              label: workflow.label || 'undefined label',
-                                              value: workflow.id,
-                                          }))
-                                        : []
-                                }
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...(workflows?.map((workflow) => ({
+                                        label: workflow.label || 'undefined label',
+                                        value: workflow.id,
+                                    })) ?? []),
+                                ]}
                                 maxHeight
                                 name="workflow"
                                 onChange={handleWorkflowChange}
