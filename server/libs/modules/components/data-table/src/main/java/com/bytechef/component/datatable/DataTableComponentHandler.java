@@ -18,6 +18,7 @@ package com.bytechef.component.datatable;
 
 import static com.bytechef.component.datatable.constant.DataTableConstants.DATA_TABLE;
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.automation.data.table.configuration.service.DataTableService;
 import com.bytechef.automation.data.table.configuration.service.DataTableWebhookService;
@@ -32,6 +33,7 @@ import com.bytechef.component.datatable.action.DataTableUpdateRecordAction;
 import com.bytechef.component.datatable.trigger.DataTableRecordCreatedTrigger;
 import com.bytechef.component.datatable.trigger.DataTableRecordDeletedTrigger;
 import com.bytechef.component.datatable.trigger.DataTableRecordUpdatedTrigger;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
@@ -66,25 +68,45 @@ public class DataTableComponentHandler implements ComponentHandler {
             DataTableService dataTableService, DataTableRowService dataTableRowService,
             DataTableWebhookService dataTableWebhookService) {
 
-            super(component(DATA_TABLE)
+            super(buildDefinition(dataTableService, dataTableRowService, dataTableWebhookService));
+        }
+
+        private static ComponentDefinition buildDefinition(
+            DataTableService dataTableService, DataTableRowService dataTableRowService,
+            DataTableWebhookService dataTableWebhookService) {
+
+            ActionDefinition createRecordsAction = DataTableCreateRecordsAction.of(
+                dataTableService, dataTableRowService);
+            ActionDefinition deleteRecordsAction = DataTableDeleteRecordsAction.of(
+                dataTableService, dataTableRowService);
+            ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(dataTableService, dataTableRowService);
+            ActionDefinition getRecordAction = DataTableGetRecordAction.of(dataTableService, dataTableRowService);
+            ActionDefinition findRecordsAction = DataTableFindRecordsAction.of(dataTableService, dataTableRowService);
+            ActionDefinition clearTableAction = DataTableClearTableAction.of(dataTableService, dataTableRowService);
+
+            return component(DATA_TABLE)
                 .title("Data Table")
                 .description("Work with ByteChef Data Tables and react to row changes.")
                 .icon("path:assets/data-table.svg")
                 .categories(ComponentCategory.HELPERS)
                 .actions(
-                    DataTableCreateRecordsAction.of(dataTableService, dataTableRowService),
-                    DataTableDeleteRecordsAction.of(dataTableService, dataTableRowService),
-                    DataTableUpdateRecordAction.of(dataTableService, dataTableRowService),
-                    DataTableGetRecordAction.of(dataTableService, dataTableRowService),
-                    DataTableFindRecordsAction.of(dataTableService, dataTableRowService),
-                    DataTableClearTableAction.of(dataTableService, dataTableRowService))
+                    createRecordsAction,
+                    deleteRecordsAction,
+                    updateRecordAction,
+                    getRecordAction,
+                    findRecordsAction,
+                    clearTableAction)
+                .clusterElements(
+                    tool(createRecordsAction),
+                    tool(deleteRecordsAction),
+                    tool(updateRecordAction),
+                    tool(getRecordAction),
+                    tool(findRecordsAction),
+                    tool(clearTableAction))
                 .triggers(
-                    DataTableRecordCreatedTrigger.of(
-                        dataTableRowService, dataTableService, dataTableWebhookService),
-                    DataTableRecordUpdatedTrigger.of(
-                        dataTableRowService, dataTableService, dataTableWebhookService),
-                    DataTableRecordDeletedTrigger.of(
-                        dataTableRowService, dataTableService, dataTableWebhookService)));
+                    DataTableRecordCreatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService),
+                    DataTableRecordUpdatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService),
+                    DataTableRecordDeletedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService));
         }
     }
 }
