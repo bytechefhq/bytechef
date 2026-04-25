@@ -1,9 +1,11 @@
+import Button from '@/components/Button/Button';
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowExecutionsFilterTitle from '@/pages/automation/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
@@ -24,14 +26,18 @@ import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/pr
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ActivityIcon} from 'lucide-react';
+import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 import WorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
 
+const ANY_FILTER_OPTION = {label: 'Any', value: ''};
+
 const jobStatusOptions = [
+    ANY_FILTER_OPTION,
     {
         label: GetWorkflowExecutionsPageJobStatusEnum.Started,
         value: GetWorkflowExecutionsPageJobStatusEnum.Started,
@@ -117,7 +123,9 @@ export const WorkflowExecutions = () => {
     const {
         data: workflowExecutionPage,
         error: workflowExecutionsError,
+        isFetching: workflowExecutionsIsFetching,
         isLoading: workflowExecutionsIsLoading,
+        refetch: refetchWorkflowExecutions,
     } = useGetWorkspaceProjectWorkflowExecutionsQuery({
         environmentId: currentEnvironmentId,
         id: currentWorkspaceId!,
@@ -202,7 +210,7 @@ export const WorkflowExecutions = () => {
     const handleProjectChange = (item?: ComboBoxItemType) => {
         let projectId;
 
-        if (item) {
+        if (item?.value) {
             projectId = Number(item.value);
         }
 
@@ -222,7 +230,7 @@ export const WorkflowExecutions = () => {
     const handleProjectDeploymentChange = (item?: ComboBoxItemType) => {
         let projectDeploymentId;
 
-        if (item) {
+        if (item?.value) {
             projectDeploymentId = Number(item.value);
         }
 
@@ -242,7 +250,7 @@ export const WorkflowExecutions = () => {
     const handleStatusChange = (item?: ComboBoxItemType) => {
         let status;
 
-        if (item) {
+        if (item?.value) {
             status = item.value as GetWorkflowExecutionsPageJobStatusEnum;
         }
 
@@ -280,7 +288,7 @@ export const WorkflowExecutions = () => {
     const handleWorkflowChange = (item?: ComboBoxItemType) => {
         let workflowId;
 
-        if (item) {
+        if (item?.value) {
             workflowId = item.value;
         }
 
@@ -325,7 +333,30 @@ export const WorkflowExecutions = () => {
                 <Header
                     centerTitle
                     position="main"
-                    right={<EnvironmentSelect />}
+                    right={
+                        <div className="flex items-center gap-2">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Refresh workflow executions"
+                                        disabled={workflowExecutionsIsFetching}
+                                        icon={
+                                            <RefreshCwIcon
+                                                className={twMerge(workflowExecutionsIsFetching && 'animate-spin')}
+                                            />
+                                        }
+                                        onClick={() => refetchWorkflowExecutions()}
+                                        size="icon"
+                                        variant="outline"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Refresh</TooltipContent>
+                            </Tooltip>
+
+                            <EnvironmentSelect />
+                        </div>
+                    }
                     title={
                         workflowExecutionPage?.content && workflowExecutionPage.content.length > 0 ? (
                             <WorkflowExecutionsFilterTitle
@@ -362,14 +393,13 @@ export const WorkflowExecutions = () => {
 
                         <ComboBox
                             emptyMessage={!projects ? 'Loading...' : 'No item found.'}
-                            items={
-                                projects?.length
-                                    ? projects?.map((project) => ({
-                                          label: <ProjectLabel project={project} />,
-                                          value: project.id,
-                                      }))
-                                    : []
-                            }
+                            items={[
+                                ANY_FILTER_OPTION,
+                                ...(projects?.map((project) => ({
+                                    label: <ProjectLabel project={project} />,
+                                    value: project.id,
+                                })) ?? []),
+                            ]}
                             onChange={handleProjectChange}
                             onOpen={() => setFiltersInteracted(true)}
                             value={filterProjectId}
@@ -381,24 +411,23 @@ export const WorkflowExecutions = () => {
 
                         <ComboBox
                             emptyMessage={!projectDeployments ? 'Loading...' : 'No item found.'}
-                            items={
-                                projectDeployments?.length
-                                    ? projectDeployments?.map((projectDeployment) => ({
-                                          label: (
-                                              <span className="flex items-center">
-                                                  <span className="mr-1">
-                                                      {projectDeployment.name} V{projectDeployment.projectVersion}
-                                                  </span>
+                            items={[
+                                ANY_FILTER_OPTION,
+                                ...(projectDeployments?.map((projectDeployment) => ({
+                                    label: (
+                                        <span className="flex items-center">
+                                            <span className="mr-1">
+                                                {projectDeployment.name} V{projectDeployment.projectVersion}
+                                            </span>
 
-                                                  <span className="text-xs text-gray-500">
-                                                      {projectDeployment?.tags?.map((tag) => tag.name).join(', ')}
-                                                  </span>
-                                              </span>
-                                          ),
-                                          value: projectDeployment.id,
-                                      }))
-                                    : []
-                            }
+                                            <span className="text-xs text-gray-500">
+                                                {projectDeployment?.tags?.map((tag) => tag.name).join(', ')}
+                                            </span>
+                                        </span>
+                                    ),
+                                    value: projectDeployment.id,
+                                })) ?? []),
+                            ]}
                             onChange={handleProjectDeploymentChange}
                             onOpen={() => setFiltersInteracted(true)}
                             value={filterProjectDeploymentId}
@@ -409,14 +438,13 @@ export const WorkflowExecutions = () => {
                         <Label>Workflow</Label>
 
                         <ComboBox
-                            items={
-                                workflows?.length
-                                    ? workflows?.map((workflow) => ({
-                                          label: workflow.label || 'undefined label',
-                                          value: workflow.id,
-                                      }))
-                                    : []
-                            }
+                            items={[
+                                ANY_FILTER_OPTION,
+                                ...(workflows?.map((workflow) => ({
+                                    label: workflow.label || 'undefined label',
+                                    value: workflow.id,
+                                })) ?? []),
+                            ]}
                             onChange={handleWorkflowChange}
                             value={filterWorkflowId}
                         />
