@@ -18,8 +18,8 @@ package com.bytechef.component.approval.task.cluster;
 
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 
+import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.service.ApprovalTaskService;
-import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -37,13 +37,22 @@ public class ApprovalTaskApprovalChannel {
             .type(APPROVAL_CHANNELS)
             .object(
                 () -> (inputParameters, connectionParameters, formUrl, context) -> perform(
-                    inputParameters, connectionParameters, formUrl, context, approvalTaskService));
+                    inputParameters, formUrl, approvalTaskService));
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, String formUrl,
-        ClusterElementContext context, ApprovalTaskService approvalTaskService) {
+    private static Object perform(Parameters inputParameters, String formUrl, ApprovalTaskService approvalTaskService) {
+        String jobResumeId = formUrl.substring(formUrl.lastIndexOf('/') + 1);
+
+        ApprovalTask approvalTask = ApprovalTask.builder()
+            .name(inputParameters.getString("formTitle"))
+            .description(inputParameters.getString("formDescription"))
+            .jobResumeId(jobResumeId)
+            .status(ApprovalTask.Status.OPEN)
+            .priority(ApprovalTask.Priority.MEDIUM)
+            .build();
+
+        approvalTaskService.create(approvalTask);
 
         return null;
     }
