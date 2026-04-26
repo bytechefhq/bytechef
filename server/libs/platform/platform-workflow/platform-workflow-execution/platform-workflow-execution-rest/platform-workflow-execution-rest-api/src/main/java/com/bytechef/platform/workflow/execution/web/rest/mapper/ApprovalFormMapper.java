@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.web.rest.mapper;
+package com.bytechef.platform.workflow.execution.web.rest.mapper;
 
-import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
-import com.bytechef.automation.configuration.web.rest.model.ApproveFormModel;
 import com.bytechef.platform.configuration.web.rest.model.FieldOptionModel;
-import com.bytechef.platform.configuration.web.rest.model.TriggerFormInputModel;
+import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformWorkflowExecutionMapperSpringConfig;
+import com.bytechef.platform.workflow.execution.web.rest.model.ApprovalFormInputModel;
+import com.bytechef.platform.workflow.execution.web.rest.model.ApprovalFormModel;
 import java.util.List;
 import java.util.Map;
 import org.mapstruct.Mapper;
@@ -28,15 +28,15 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationConfigurationMapperSpringConfig.class)
-public interface ApproveFormMapper extends Converter<Map<String, Object>, ApproveFormModel> {
+@Mapper(config = PlatformWorkflowExecutionMapperSpringConfig.class)
+public interface ApprovalFormMapper extends Converter<Map<String, Object>, ApprovalFormModel> {
 
     @Override
-    ApproveFormModel convert(Map<String, Object> approveForm);
+    ApprovalFormModel convert(Map<String, Object> approvalForm);
 
     FieldOptionModel convertToFieldOptionModel(Map<String, Object> fieldOption);
 
-    TriggerFormInputModel convertToTriggerFormInputModel(Map<String, Object> triggerFormInput);
+    ApprovalFormInputModel convertToApprovalFormInputModel(Map<String, Object> triggerFormInput);
 
     default String mapToString(Object value) {
         return value == null ? null : String.valueOf(value);
@@ -70,11 +70,11 @@ public interface ApproveFormMapper extends Converter<Map<String, Object>, Approv
     }
 
     @SuppressWarnings("unchecked")
-    default List<TriggerFormInputModel> mapToTriggerFormInputModelList(Object value) {
+    default List<ApprovalFormInputModel> mapToApprovalFormInputModelList(Object value) {
         if (value instanceof List<?> list) {
             return list.stream()
                 .filter(item -> item instanceof Map)
-                .map(item -> convertToTriggerFormInputModel((Map<String, Object>) item))
+                .map(item -> convertToApprovalFormInputModel((Map<String, Object>) item))
                 .toList();
         }
 

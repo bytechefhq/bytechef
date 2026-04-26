@@ -24,10 +24,10 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ApproveFormAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
+public class ApprovalFormAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
 
     @Override
     public List<String> getApiPermitAllRequestMatcherPaths() {
-        return List.of("/api/automation/internal/approve-form/**");
+        return List.of("/api/automation/internal/approval-form/**");
     }
 }

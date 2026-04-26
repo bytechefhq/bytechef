@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.facade;
+package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -30,29 +32,34 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class ApproveFormFacadeImpl implements ApproveFormFacade {
+public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
-    public ApproveFormFacadeImpl(JobService jobService, TaskExecutionService taskExecutionService) {
+    public ApprovalFormFacadeImpl(JobService jobService, TaskExecutionService taskExecutionService) {
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
     }
 
     @Override
-    public Map<String, ?> getApproveForm(long jobId) {
-        Job job = jobService.getJob(jobId);
+    public Map<String, ?> getApprovalForm(String id) {
+        JobResumeId jobResumeId = JobResumeId.parse(id);
 
-        if (job.getStatus() != Job.Status.STOPPED) {
-            throw new IllegalStateException(
-                "Approval form is no longer available; job " + jobId + " is " + job.getStatus());
-        }
+        return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
+            Job job = jobService.getJob(jobResumeId.getJobId());
 
-        TaskExecution taskExecution = taskExecutionService.fetchLastJobTaskExecution(job.getId())
-            .orElseThrow(() -> new IllegalStateException("No task execution found for job " + jobId));
+            if (job.getStatus() != Job.Status.STOPPED) {
+                throw new IllegalStateException(
+                    "Approval form is no longer available; job " + jobResumeId.getJobId() + " is " + job.getStatus());
+            }
 
-        return taskExecution.getParameters();
+            TaskExecution taskExecution = taskExecutionService.fetchLastJobTaskExecution(job.getId())
+                .orElseThrow(
+                    () -> new IllegalStateException("No task execution found for job " + jobResumeId.getJobId()));
+
+            return taskExecution.getParameters();
+        });
     }
 }

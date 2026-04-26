@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.facade;
+package com.bytechef.platform.workflow.execution.facade;
 
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface ApproveFormFacade {
+public interface ApprovalFormFacade {
 
-    Map<String, ?> getApproveForm(long jobId);
+    Map<String, ?> getApprovalForm(String id);
 }

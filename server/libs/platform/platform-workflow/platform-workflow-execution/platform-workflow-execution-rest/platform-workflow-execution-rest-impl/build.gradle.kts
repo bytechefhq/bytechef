@@ -20,6 +20,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
         mapOf(
             "ComponentConnection" to "com.bytechef.platform.configuration.web.rest.model.ComponentConnection",
             "ComponentDefinitionBasic" to "com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel",
+            "FieldOption" to "com.bytechef.platform.configuration.web.rest.model.FieldOptionModel",
             "Page" to "org.springframework.data.domain.Page",
             "WorkflowConnection" to "com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel",
             "WorkflowTask" to "com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel",
@@ -44,6 +45,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-api"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
