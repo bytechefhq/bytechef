@@ -21,6 +21,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
 import org.springframework.data.relational.core.conversion.AggregateChange;
 import org.springframework.data.relational.core.conversion.DbAction;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
@@ -28,8 +29,6 @@ import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.Identifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 /**
  * @author Marko Kriskovic
@@ -69,14 +68,15 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
                 case DbAction.InsertRoot<?> a ->
                     connectionLifecycleFacade.scheduleConnectionRefresh(
                         connection.getId(), connection.getParameters(), authorizationType, tenantId);
-                case DbAction.UpdateRoot<?> a-> {
+                case DbAction.UpdateRoot<?> a -> {
                     if (connection.isCredentialsStatusUpdated()
                         && (connection.getCredentialStatus() != Connection.CredentialStatus.INVALID)) {
                         connectionLifecycleFacade.scheduleConnectionRefresh(
                             connection.getId(), connection.getParameters(), authorizationType, tenantId);
                     }
                 }
-                default -> {}
+                default -> {
+                }
             }
         });
     }
