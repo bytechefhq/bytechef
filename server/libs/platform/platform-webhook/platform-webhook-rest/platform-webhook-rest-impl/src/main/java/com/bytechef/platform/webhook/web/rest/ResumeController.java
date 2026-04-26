@@ -18,6 +18,7 @@ package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +40,8 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ResumeController extends AbstractResumeController {
 
-    public ResumeController(JobFacade jobFacade) {
-        super(jobFacade);
+    public ResumeController(JobFacade jobFacade, JobService jobService) {
+        super(jobFacade, jobService);
     }
 
     /**

@@ -16,13 +16,16 @@
 
 package com.bytechef.platform.webhook.web.rest;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -37,10 +40,12 @@ abstract class AbstractResumeController {
     private static final Logger logger = LoggerFactory.getLogger(AbstractResumeController.class);
 
     protected final JobFacade jobFacade;
+    protected final JobService jobService;
 
     @SuppressFBWarnings("EI")
-    protected AbstractResumeController(JobFacade jobFacade) {
+    protected AbstractResumeController(JobFacade jobFacade, JobService jobService) {
         this.jobFacade = jobFacade;
+        this.jobService = jobService;
     }
 
     @SuppressFBWarnings("CRLF_INJECTION_LOGS")
@@ -57,6 +62,15 @@ abstract class AbstractResumeController {
         }
 
         return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
+            Job job = jobService.getJob(jobResumeId.getJobId());
+
+            if (job.getStatus() != Job.Status.STOPPED) {
+                logger.warn("Cannot resume job {}; status is {}", jobResumeId.getJobId(), job.getStatus());
+
+                return ResponseEntity.status(HttpStatus.GONE)
+                    .build();
+            }
+
             jobFacade.resumeJob(jobResumeId.getJobId(), data);
 
             return ResponseEntity.noContent()
