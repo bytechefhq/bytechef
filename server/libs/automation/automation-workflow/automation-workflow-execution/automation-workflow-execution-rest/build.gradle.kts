@@ -23,6 +23,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "ComponentDefinitionBasic" to "com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasic",
             "Environment" to "com.bytechef.automation.configuration.web.rest.model.EnvironmentModel",
             "ExecutionError" to "com.bytechef.platform.workflow.execution.web.rest.model.ExecutionErrorModel",
+            "FieldOption" to "com.bytechef.platform.configuration.web.rest.model.FieldOptionModel",
             "Job" to "com.bytechef.platform.workflow.execution.web.rest.model.JobModel",
             "JobBasic" to "com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel",
             "Page" to "org.springframework.data.domain.Page",
@@ -73,11 +74,15 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-api"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
     implementation(project(":server:libs:core:rest:rest-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-api"))
 
     testImplementation("org.springframework:spring-webflux")
