@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.web.rest;
+package com.bytechef.platform.workflow.execution.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.configuration.facade.ApproveFormFacade;
-import com.bytechef.automation.configuration.web.rest.model.ApproveFormModel;
-import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.facade.ApprovalFormFacade;
+import com.bytechef.platform.workflow.execution.web.rest.model.ApprovalFormModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.core.convert.ConversionService;
@@ -32,38 +31,32 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.platform.workflow.execution.web.rest.ApprovalFormApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnCoordinator
-public class ApproveFormApiController implements ApproveFormApi {
+public class ApprovalFormApiController implements ApprovalFormApi {
 
-    private final ApproveFormFacade approveFormFacade;
+    private final ApprovalFormFacade approvalFormFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ApproveFormApiController(ApproveFormFacade approveFormFacade, ConversionService conversionService) {
-        this.approveFormFacade = approveFormFacade;
+    public ApprovalFormApiController(ApprovalFormFacade approvalFormFacade, ConversionService conversionService) {
+        this.approvalFormFacade = approvalFormFacade;
         this.conversionService = conversionService;
     }
 
     @Override
-    public ResponseEntity<ApproveFormModel> getApproveForm(String id) {
-        JobResumeId jobResumeId;
-
-        try {
-            jobResumeId = JobResumeId.parse(id);
-        } catch (Exception exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, exception);
-        }
-
+    public ResponseEntity<ApprovalFormModel> getApprovalForm(String id) {
         Map<String, ?> parameters;
 
         try {
-            parameters = approveFormFacade.getApproveForm(jobResumeId.getJobId());
+            parameters = approvalFormFacade.getApprovalForm(id);
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, exception);
         } catch (Exception exception) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Approval form is no longer available.", exception);
         }
 
-        return ResponseEntity.ok(conversionService.convert(parameters, ApproveFormModel.class));
+        return ResponseEntity.ok(conversionService.convert(parameters, ApprovalFormModel.class));
     }
 }

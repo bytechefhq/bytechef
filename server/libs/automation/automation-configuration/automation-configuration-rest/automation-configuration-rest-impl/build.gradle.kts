@@ -18,9 +18,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/../automation-configuration-rest-api/generated")
     schemaMappings.set(
         mapOf(
-            "FieldOption" to "com.bytechef.platform.configuration.web.rest.model.FieldOptionModel",
             "Page" to "org.springframework.data.domain.Page",
-            "TriggerFormInput" to "com.bytechef.platform.configuration.web.rest.model.TriggerFormInputModel",
             "WorkflowConnection" to "com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel",
             "WorkflowFormat" to "com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel",
             "WorkflowInput" to "WorkflowInputModel",
