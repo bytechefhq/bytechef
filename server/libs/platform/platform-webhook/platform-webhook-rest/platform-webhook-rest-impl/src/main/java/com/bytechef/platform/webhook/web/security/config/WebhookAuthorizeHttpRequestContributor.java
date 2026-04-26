@@ -28,6 +28,7 @@ public class WebhookAuthorizeHttpRequestContributor implements AuthorizeHttpRequ
 
     @Override
     public List<String> getPermitAllRequestMatcherPaths() {
-        return List.of("/approvals/**", "/callback", "/file-entries/**", "/oauth.html", "/webhooks/**");
+        return List.of(
+            "/approvals/**", "/callback", "/file-entries/**", "/job/resume/**", "/oauth.html", "/webhooks/**");
     }
 }

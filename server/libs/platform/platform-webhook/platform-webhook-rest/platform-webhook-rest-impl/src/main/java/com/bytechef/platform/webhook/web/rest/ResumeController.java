@@ -28,28 +28,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * API-key-protected controller for suspended-job resume callbacks from trusted external services (e.g. the target of a
- * wait-on-webhook action). Authentication is enforced by the EE {@code PlatformApiKeySecurityConfigurer}, which
- * requires a {@code Bearer} token on paths matching {@code /api/platform/v[0-9]+/.+}.
+ * Public controller for anonymous suspended-job resume webhook callbacks. Authentication is provided by the
+ * cryptographically signed token embedded in the path, so the endpoint lives outside the {@code /api/**} namespace —
+ * alongside other anonymous webhook-style callbacks — and is permitted in the Order-4 filter chain where CSRF is
+ * disabled by convention.
  *
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/v1")
 @ConditionalOnCoordinator
-public class ResumeApiController extends AbstractResumeController {
+public class ResumeController extends AbstractResumeController {
 
-    public ResumeApiController(JobFacade jobFacade) {
+    public ResumeController(JobFacade jobFacade) {
         super(jobFacade);
     }
 
     /**
-     * Resumes a suspended job via API-key-authenticated callback. CSRF is already disabled for this path by
-     * {@code PlatformApiKeySecurityConfigurer.registerCsrfOverride}.
+     * Resumes a suspended job via anonymous webhook callback (typically submitted by the approval form in the SPA).
+     *
+     * <p>
+     * <b>Security Note:</b> CSRF protection is not required for this endpoint. Resume callbacks may come from external
+     * sources (e.g., email links) that cannot include CSRF tokens. Security is maintained through cryptographic resume
+     * tokens that are verified before processing.
      */
     @SuppressFBWarnings(
         value = "SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING",
-        justification = "CSRF disabled for authenticated API callbacks")
+        justification = "CSRF disabled for external resume callbacks")
     @RequestMapping(method = {
         RequestMethod.GET, RequestMethod.POST
     }, value = "/job/resume/{id}")

@@ -276,7 +276,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         this.jobResumeId = jobResumeId.toString();
 
-        return publicUrl + "/api/job/resume/" + this.jobResumeId;
+        return publicUrl + "/job/resume/" + this.jobResumeId;
     }
 
     @Override
