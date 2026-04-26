@@ -2,12 +2,18 @@ import {useCreateApprovalTaskMutation, useUsersQuery} from '@/shared/middleware/
 import {useCallback, useMemo, useState} from 'react';
 
 import {useApprovalTasksStore} from '../../stores/useApprovalTasksStore';
-import {getAvailableAssignees} from '../../utils/approval-task-utils';
+import {
+    getAssigneeNameById,
+    getAvailableAssigneeOptions,
+    toServerPriority,
+    toServerStatus,
+} from '../../utils/approval-task-utils';
 
-import type {ApprovalTaskI, NewApprovalTaskFormI} from '../../types/types';
+import type {ApprovalTaskI, AssigneeOptionI, NewApprovalTaskFormI} from '../../types/types';
 
 const INITIAL_FORM_STATE: NewApprovalTaskFormI = {
     assignee: '',
+    assigneeId: '',
     dependencies: [],
     description: '',
     dueDate: '',
@@ -22,9 +28,10 @@ const getCurrentDate = (): string => {
 };
 
 export interface UseApprovalTaskCreateDialogReturnI {
-    availableAssignees: string[];
+    availableAssigneeOptions: AssigneeOptionI[];
     errors: Partial<NewApprovalTaskFormI>;
     form: NewApprovalTaskFormI;
+    handleAssigneeChange: (assigneeId: string) => void;
     handleCloseDialog: () => void;
     handleFormChange: (field: keyof NewApprovalTaskFormI, value: string | string[]) => void;
     handleOpenChange: (open: boolean) => void;
@@ -42,7 +49,7 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
 
     const {data: usersData} = useUsersQuery();
 
-    const availableAssignees = useMemo(() => getAvailableAssignees(usersData?.users?.content), [usersData]);
+    const availableAssigneeOptions = useMemo(() => getAvailableAssigneeOptions(usersData?.users?.content), [usersData]);
 
     const createApprovalTaskMutation = useCreateApprovalTaskMutation({
         onError: (error) => {
@@ -86,6 +93,28 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
         });
     }, []);
 
+    const handleAssigneeChange = useCallback(
+        (assigneeId: string) => {
+            const assigneeName = getAssigneeNameById(assigneeId, usersData?.users?.content);
+
+            setForm((previousForm) => ({
+                ...previousForm,
+                assignee: assigneeName,
+                assigneeId,
+            }));
+
+            setErrors((previousErrors) => {
+                const updatedErrors = {...previousErrors};
+
+                delete updatedErrors.assignee;
+                delete updatedErrors.assigneeId;
+
+                return updatedErrors;
+            });
+        },
+        [usersData]
+    );
+
     const isFormValid = useCallback((): boolean => {
         const validationErrors: Partial<NewApprovalTaskFormI> = {};
 
@@ -97,7 +126,7 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
             validationErrors.description = 'Description is required';
         }
 
-        if (!form.assignee.trim()) {
+        if (!form.assigneeId) {
             validationErrors.assignee = 'Assignee is required';
         }
 
@@ -110,6 +139,7 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
         if (isFormValid()) {
             const newApprovalTask: ApprovalTaskI = {
                 assignee: form.assignee,
+                assigneeId: form.assigneeId,
                 attachments: [],
                 comments: [],
                 createdAt: getCurrentDate(),
@@ -125,8 +155,11 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
 
             createApprovalTaskMutation.mutate({
                 approvalTask: {
+                    assigneeId: form.assigneeId || null,
                     description: form.description,
                     name: form.title,
+                    priority: toServerPriority(form.priority),
+                    status: toServerStatus(form.status),
                 },
             });
 
@@ -135,9 +168,10 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
     }, [form, isFormValid, addApprovalTask, createApprovalTaskMutation, handleCloseDialog]);
 
     return {
-        availableAssignees,
+        availableAssigneeOptions,
         errors,
         form,
+        handleAssigneeChange,
         handleCloseDialog,
         handleFormChange,
         handleOpenChange,

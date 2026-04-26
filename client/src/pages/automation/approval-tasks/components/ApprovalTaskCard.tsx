@@ -37,12 +37,12 @@ export default function ApprovalTaskCard({approvalTask, isSelected, onSelect, on
     return (
         <div
             className={twMerge(
-                'cursor-pointer rounded-lg border p-3 transition-colors hover:bg-muted/50',
+                'w-full min-w-0 cursor-pointer overflow-hidden rounded-lg border p-3 transition-colors hover:bg-muted/50',
                 isSelected ? 'border-primary bg-muted' : 'border-border bg-background'
             )}
             onClick={onSelect}
         >
-            <div className="flex w-full items-start gap-3">
+            <div className="flex w-full min-w-0 items-start gap-3">
                 <div
                     className="mt-0.5 shrink-0 cursor-pointer rounded-full p-1 transition-colors hover:bg-muted"
                     onClick={onStatusToggle}
@@ -52,7 +52,7 @@ export default function ApprovalTaskCard({approvalTask, isSelected, onSelect, on
                 </div>
 
                 <div className="min-w-0 flex-1 overflow-hidden">
-                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <div className="mb-1 flex min-w-0 items-center gap-2">
                         <h3 className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
                             {highlightedTitle}
                         </h3>

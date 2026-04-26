@@ -1,59 +1,58 @@
 import {useUpdateApprovalTaskMutation, useUsersQuery} from '@/shared/middleware/graphql';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useApprovalTasksStore} from '../../stores/useApprovalTasksStore';
-import {ApprovalTaskI} from '../../types/types';
-import {formatDate, getAvailableAssignees, getPriorityColor, getStatusIcon} from '../../utils/approval-task-utils';
+import {ApprovalTaskI, AssigneeOptionI} from '../../types/types';
+import {
+    formatDate,
+    getAssigneeNameById,
+    getAvailableAssigneeOptions,
+    getPriorityColor,
+    getStatusIcon,
+    toServerPriority,
+    toServerStatus,
+} from '../../utils/approval-task-utils';
 
 import type {ReactNode} from 'react';
 
 export interface UseApprovalTaskDetailReturnI {
-    allApprovalTasks: ApprovalTaskI[];
-    availableAssignees: string[];
-    createdAtFormatted: string;
-    displayApprovalTask: ApprovalTaskI | null;
-    handleCancel: () => void;
-    handleEdit: () => void;
-    handleFieldChange: (field: keyof ApprovalTaskI, value: string | string[]) => void;
-    handleSave: () => void;
-    isEditing: boolean;
-    priorityColor: string;
     approvalTask: ApprovalTaskI | null;
+    availableAssigneeOptions: AssigneeOptionI[];
+    createdAtFormatted: string;
+    handleAssigneeChange: (assigneeId: string) => void;
+    handleDueDateChange: (dueDate: Date | undefined) => void;
+    handlePriorityChange: (priority: ApprovalTaskI['priority']) => void;
+    handleStatusChange: (status: ApprovalTaskI['status']) => void;
+    priorityColor: string;
     statusIcon: ReactNode;
 }
 
 export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editingApprovalTask, setEditingApprovalTask] = useState<ApprovalTaskI | null>(null);
-
-    const {approvalTasks, selectedApprovalTask, updateApprovalTask} = useApprovalTasksStore(
+    const {selectedApprovalTask, storeUpdateApprovalTask} = useApprovalTasksStore(
         useShallow((state) => ({
-            approvalTasks: state.approvalTasks,
             selectedApprovalTask: state.getSelectedApprovalTask(),
-            updateApprovalTask: state.updateApprovalTask,
+            storeUpdateApprovalTask: state.updateApprovalTask,
         }))
     );
 
     const {data: usersData} = useUsersQuery();
 
-    const availableAssignees = useMemo(() => getAvailableAssignees(usersData?.users?.content), [usersData]);
-
-    const displayApprovalTask = isEditing ? editingApprovalTask : selectedApprovalTask;
+    const availableAssigneeOptions = useMemo(() => getAvailableAssigneeOptions(usersData?.users?.content), [usersData]);
 
     const createdAtFormatted = useMemo(
-        () => (displayApprovalTask ? formatDate(displayApprovalTask.createdAt) : ''),
-        [displayApprovalTask]
+        () => (selectedApprovalTask ? formatDate(selectedApprovalTask.createdAt) : ''),
+        [selectedApprovalTask]
     );
 
     const priorityColor = useMemo(
-        () => (displayApprovalTask ? getPriorityColor(displayApprovalTask.priority) : ''),
-        [displayApprovalTask]
+        () => (selectedApprovalTask ? getPriorityColor(selectedApprovalTask.priority) : ''),
+        [selectedApprovalTask]
     );
 
     const statusIcon = useMemo(
-        () => (displayApprovalTask ? getStatusIcon(displayApprovalTask.status) : null),
-        [displayApprovalTask]
+        () => (selectedApprovalTask ? getStatusIcon(selectedApprovalTask.status) : null),
+        [selectedApprovalTask]
     );
 
     const updateApprovalTaskMutation = useUpdateApprovalTaskMutation({
@@ -62,60 +61,89 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
         },
     });
 
-    const handleEditApprovalTask = useCallback(() => {
-        if (selectedApprovalTask) {
-            setEditingApprovalTask({...selectedApprovalTask});
-            setIsEditing(true);
-        }
-    }, [selectedApprovalTask]);
+    const persistApprovalTask = useCallback(
+        (next: ApprovalTaskI) => {
+            storeUpdateApprovalTask(next);
 
-    const handleSaveApprovalTask = useCallback(() => {
-        if (editingApprovalTask) {
-            updateApprovalTask(editingApprovalTask);
-
-            updateApprovalTaskMutation.mutate({
-                approvalTask: {
-                    description: editingApprovalTask.description,
-                    id: editingApprovalTask.id,
-                    name: editingApprovalTask.title,
-                    version: editingApprovalTask.version,
+            updateApprovalTaskMutation.mutate(
+                {
+                    approvalTask: {
+                        assigneeId: next.assigneeId,
+                        description: next.description,
+                        dueDate: next.dueDate ?? null,
+                        id: next.id,
+                        name: next.title,
+                        priority: toServerPriority(next.priority),
+                        status: toServerStatus(next.status),
+                        version: next.version,
+                    },
                 },
-            });
+                {
+                    onSuccess: (data) => {
+                        storeUpdateApprovalTask({
+                            ...next,
+                            version: data.updateApprovalTask?.version ?? next.version,
+                        });
+                    },
+                }
+            );
+        },
+        [storeUpdateApprovalTask, updateApprovalTaskMutation]
+    );
 
-            setIsEditing(false);
-            setEditingApprovalTask(null);
-        }
-    }, [editingApprovalTask, updateApprovalTask, updateApprovalTaskMutation]);
-
-    const handleCancelEdit = useCallback(() => {
-        setIsEditing(false);
-        setEditingApprovalTask(null);
-    }, []);
-
-    const handleApprovalTaskFieldChange = useCallback((field: keyof ApprovalTaskI, value: string | string[]) => {
-        setEditingApprovalTask((prevApprovalTask) => {
-            if (prevApprovalTask) {
-                return {
-                    ...prevApprovalTask,
-                    [field]: value,
-                };
+    const handleStatusChange = useCallback(
+        (status: ApprovalTaskI['status']) => {
+            if (selectedApprovalTask) {
+                persistApprovalTask({...selectedApprovalTask, status});
             }
+        },
+        [selectedApprovalTask, persistApprovalTask]
+    );
 
-            return prevApprovalTask;
-        });
-    }, []);
+    const handlePriorityChange = useCallback(
+        (priority: ApprovalTaskI['priority']) => {
+            if (selectedApprovalTask) {
+                persistApprovalTask({...selectedApprovalTask, priority});
+            }
+        },
+        [selectedApprovalTask, persistApprovalTask]
+    );
+
+    const handleAssigneeChange = useCallback(
+        (assigneeId: string) => {
+            if (selectedApprovalTask) {
+                const assigneeName = getAssigneeNameById(assigneeId, usersData?.users?.content);
+
+                persistApprovalTask({
+                    ...selectedApprovalTask,
+                    assignee: assigneeName,
+                    assigneeId,
+                });
+            }
+        },
+        [selectedApprovalTask, usersData, persistApprovalTask]
+    );
+
+    const handleDueDateChange = useCallback(
+        (dueDate: Date | undefined) => {
+            if (selectedApprovalTask) {
+                persistApprovalTask({
+                    ...selectedApprovalTask,
+                    dueDate: dueDate ? dueDate.toISOString() : undefined,
+                });
+            }
+        },
+        [selectedApprovalTask, persistApprovalTask]
+    );
 
     return {
-        allApprovalTasks: approvalTasks,
         approvalTask: selectedApprovalTask,
-        availableAssignees,
+        availableAssigneeOptions,
         createdAtFormatted,
-        displayApprovalTask,
-        handleCancel: handleCancelEdit,
-        handleEdit: handleEditApprovalTask,
-        handleFieldChange: handleApprovalTaskFieldChange,
-        handleSave: handleSaveApprovalTask,
-        isEditing,
+        handleAssigneeChange,
+        handleDueDateChange,
+        handlePriorityChange,
+        handleStatusChange,
         priorityColor,
         statusIcon,
     };

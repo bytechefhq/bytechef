@@ -1,38 +1,28 @@
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
-import {Input} from '@/components/ui/input';
+import DatePicker from '@/components/DatePicker/DatePicker';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Textarea} from '@/components/ui/textarea';
-import {
-    AlertTriangleIcon,
-    CheckCircle2Icon,
-    CircleIcon,
-    ClockIcon,
-    EditIcon,
-    SaveIcon,
-    UserIcon,
-    XCircleIcon,
-} from 'lucide-react';
+import ApprovalForm from '@/shared/components/approval-form/ApprovalForm';
+import {CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
 
-import {isApprovalTaskOverdue} from '../utils/approval-task-utils';
-import ApprovalTaskComments from './ApprovalTaskComments';
 import {useApprovalTaskDetail} from './hooks/useApprovalTaskDetail';
+
+import type {ApprovalTaskI} from '../types/types';
 
 export default function ApprovalTaskDetail() {
     const {
         approvalTask,
-        availableAssignees,
+        availableAssigneeOptions,
         createdAtFormatted,
-        displayApprovalTask,
-        handleCancel,
-        handleEdit,
-        handleFieldChange,
-        handleSave,
-        isEditing,
+        handleAssigneeChange,
+        handleDueDateChange,
+        handlePriorityChange,
+        handleStatusChange,
         priorityColor,
         statusIcon,
     } = useApprovalTaskDetail();
+
+    const isCompleted = approvalTask?.status === 'completed';
 
     if (!approvalTask) {
         return (
@@ -48,112 +38,52 @@ export default function ApprovalTaskDetail() {
         );
     }
 
-    if (!displayApprovalTask) {
-        return null;
-    }
-
     return (
         <div className="h-full overflow-y-auto p-6">
             <div className="mb-6">
-                <div className="mb-4 flex items-start justify-between gap-4">
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
-                        {isEditing ? (
-                            <Input
-                                className="flex-1 text-lg font-semibold"
-                                onChange={(event) => handleFieldChange('title', event.target.value)}
-                                value={displayApprovalTask.title}
-                            />
-                        ) : (
-                            <h1 className="text-xl font-semibold text-foreground">{displayApprovalTask.title}</h1>
-                        )}
-                    </div>
-
-                    <div className="flex shrink-0 items-center gap-2">
-                        {isEditing && (
-                            <Select
-                                onValueChange={(value) => handleFieldChange('priority', value)}
-                                value={displayApprovalTask.priority}
-                            >
-                                <SelectTrigger className="w-32">
-                                    <SelectValue />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                    <SelectItem value="high">High</SelectItem>
-
-                                    <SelectItem value="medium">Medium</SelectItem>
-
-                                    <SelectItem value="low">Low</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        )}
-
-                        {!isEditing && isApprovalTaskOverdue(displayApprovalTask) && (
-                            <Badge
-                                className="text-red-600"
-                                icon={<AlertTriangleIcon className="size-3" />}
-                                label="Overdue"
-                                styleType="destructive-outline"
-                            />
-                        )}
-
-                        {isEditing ? (
-                            <>
-                                <Button icon={<SaveIcon className="size-4" />} onClick={handleSave} size="sm">
-                                    Save
-                                </Button>
-
-                                <Button
-                                    icon={<XCircleIcon className="size-4" />}
-                                    onClick={handleCancel}
-                                    size="sm"
-                                    variant="outline"
-                                >
-                                    Cancel
-                                </Button>
-                            </>
-                        ) : (
-                            <Button
-                                icon={<EditIcon className="size-4" />}
-                                onClick={handleEdit}
-                                size="sm"
-                                variant="outline"
-                            >
-                                Edit
-                            </Button>
-                        )}
-                    </div>
-                </div>
+                <h1 className="text-xl font-semibold text-foreground">{approvalTask.title}</h1>
             </div>
 
-            <fieldset className="mb-6 border-0">
-                <span className="mb-2 block text-sm font-medium text-foreground">Description</span>
+            <div className="flex gap-6">
+                <div className="min-w-0 max-w-lg flex-1">
+                    <fieldset className="mb-6 border-0">
+                        <span className="mb-2 block text-sm font-medium text-foreground">Description</span>
 
-                {isEditing ? (
-                    <Textarea
-                        className="min-h-[100px]"
-                        onChange={(event) => handleFieldChange('description', event.target.value)}
-                        placeholder="Add a description..."
-                        value={displayApprovalTask.description}
-                    />
-                ) : (
-                    <p className="text-sm text-muted-foreground">
-                        {displayApprovalTask.description || 'No description provided'}
-                    </p>
-                )}
-            </fieldset>
+                        <p className="text-sm text-muted-foreground">
+                            {approvalTask.description || 'No description provided'}
+                        </p>
+                    </fieldset>
 
-            <div className="mb-6 grid w-8/12 grid-cols-2">
-                <fieldset className="border-0">
-                    <Label className="mb-2 block text-sm font-medium text-foreground">Status</Label>
+                    {approvalTask.status === 'completed' ? (
+                        <p className="text-lg font-medium text-foreground">This approval task has been completed.</p>
+                    ) : approvalTask.jobResumeId ? (
+                        <ApprovalForm
+                            id={approvalTask.jobResumeId}
+                            onSubmitted={() => handleStatusChange('completed')}
+                            showHeader={false}
+                        />
+                    ) : (
+                        <p className="text-sm text-muted-foreground">No approval form available for this task.</p>
+                    )}
+                </div>
 
-                    {isEditing ? (
+                <div className="ml-auto flex w-1/4 flex-col gap-4">
+                    <fieldset className="border-0">
+                        <Label className="mb-2 block text-sm font-medium text-foreground">Status</Label>
+
                         <Select
-                            onValueChange={(value) => handleFieldChange('status', value)}
-                            value={displayApprovalTask.status}
+                            disabled={isCompleted}
+                            onValueChange={(value) => handleStatusChange(value as ApprovalTaskI['status'])}
+                            value={approvalTask.status}
                         >
                             <SelectTrigger>
-                                <SelectValue />
+                                <SelectValue>
+                                    <div className="flex items-center gap-2">
+                                        {statusIcon}
+
+                                        <span className="capitalize">{approvalTask.status.replace('-', ' ')}</span>
+                                    </div>
+                                </SelectValue>
                             </SelectTrigger>
 
                             <SelectContent>
@@ -170,78 +100,97 @@ export default function ApprovalTaskDetail() {
                                         In Progress
                                     </div>
                                 </SelectItem>
-
-                                <SelectItem value="completed">
-                                    <div className="flex items-center gap-2">
-                                        <CheckCircle2Icon className="size-4 text-green-500" />
-                                        Completed
-                                    </div>
-                                </SelectItem>
                             </SelectContent>
                         </Select>
-                    ) : (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            {statusIcon}
+                    </fieldset>
 
-                            <span className="capitalize">{displayApprovalTask.status.replace('-', ' ')}</span>
-                        </div>
-                    )}
-                </fieldset>
+                    <fieldset className="border-0">
+                        <Label className="mb-2 block text-sm font-medium text-foreground">Priority</Label>
 
-                <div>
-                    <span className="mb-2 block text-sm font-medium text-foreground">Created</span>
-
-                    <p className="text-sm text-muted-foreground">{createdAtFormatted}</p>
-                </div>
-
-                <fieldset className="border-0">
-                    <Label className="mb-2 block text-sm font-medium text-foreground">Assignee</Label>
-
-                    {isEditing ? (
                         <Select
-                            onValueChange={(value) => handleFieldChange('assignee', value)}
-                            value={displayApprovalTask.assignee}
+                            disabled={isCompleted}
+                            onValueChange={(value) => handlePriorityChange(value as ApprovalTaskI['priority'])}
+                            value={approvalTask.priority}
                         >
                             <SelectTrigger>
-                                <SelectValue />
+                                <SelectValue>
+                                    <Badge
+                                        className={priorityColor}
+                                        label={approvalTask.priority}
+                                        styleType="outline-outline"
+                                    />
+                                </SelectValue>
                             </SelectTrigger>
 
                             <SelectContent>
-                                {availableAssignees.map((assignee) => (
-                                    <SelectItem key={assignee} value={assignee}>
+                                <SelectItem value="high">High</SelectItem>
+
+                                <SelectItem value="medium">Medium</SelectItem>
+
+                                <SelectItem value="low">Low</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </fieldset>
+
+                    <fieldset className="border-0">
+                        <Label className="mb-2 block text-sm font-medium text-foreground">Assignee</Label>
+
+                        <Select
+                            disabled={isCompleted}
+                            onValueChange={handleAssigneeChange}
+                            value={approvalTask.assigneeId ?? ''}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select an assignee">
+                                    <div className="flex items-center gap-2">
+                                        <UserIcon className="size-4" />
+
+                                        {approvalTask.assignee}
+                                    </div>
+                                </SelectValue>
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {availableAssigneeOptions.map((assigneeOption) => (
+                                    <SelectItem key={assigneeOption.id} value={assigneeOption.id}>
                                         <div className="flex items-center gap-2">
                                             <UserIcon className="size-4" />
 
-                                            {assignee}
+                                            {assigneeOption.name}
                                         </div>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                    ) : (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <UserIcon className="size-4" />
+                    </fieldset>
 
-                            {displayApprovalTask.assignee}
-                        </div>
-                    )}
-                </fieldset>
+                    <fieldset className="border-0">
+                        <Label className="mb-2 block text-sm font-medium text-foreground">Due Date</Label>
 
-                {!isEditing && (
+                        {isCompleted ? (
+                            <p className="text-sm text-muted-foreground">
+                                {approvalTask.dueDate
+                                    ? new Date(approvalTask.dueDate).toLocaleDateString('en-US', {
+                                          day: 'numeric',
+                                          month: 'short',
+                                          year: 'numeric',
+                                      })
+                                    : 'No due date'}
+                            </p>
+                        ) : (
+                            <DatePicker
+                                onChange={handleDueDateChange}
+                                value={approvalTask.dueDate ? new Date(approvalTask.dueDate) : undefined}
+                            />
+                        )}
+                    </fieldset>
+
                     <div>
-                        <span className="mb-2 block text-sm font-medium text-foreground">Priority</span>
+                        <span className="mb-2 block text-sm font-medium text-foreground">Created</span>
 
-                        <Badge
-                            className={priorityColor}
-                            label={displayApprovalTask.priority}
-                            styleType="outline-outline"
-                        />
+                        <p className="text-sm text-muted-foreground">{createdAtFormatted}</p>
                     </div>
-                )}
-            </div>
-
-            <div className="mb-6">
-                <ApprovalTaskComments comments={displayApprovalTask.comments} />
+                </div>
             </div>
         </div>
     );

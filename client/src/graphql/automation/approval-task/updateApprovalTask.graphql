@@ -1,8 +1,12 @@
 mutation updateApprovalTask($approvalTask: ApprovalTaskInput!) {
     updateApprovalTask(approvalTask: $approvalTask) {
+        assigneeId
         description
+        dueDate
         id
         name
+        priority
+        status
         version
     }
 }

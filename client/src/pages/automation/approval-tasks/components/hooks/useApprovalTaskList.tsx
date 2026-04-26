@@ -1,8 +1,9 @@
+import {useUpdateApprovalTaskMutation} from '@/shared/middleware/graphql';
 import {MouseEvent, useCallback, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useApprovalTasksStore} from '../../stores/useApprovalTasksStore';
-import {getHeaderText, sortApprovalTasks} from '../../utils/approval-task-utils';
+import {getHeaderText, sortApprovalTasks, toServerPriority, toServerStatus} from '../../utils/approval-task-utils';
 
 import type {ApprovalTaskI, SortDirectionType, SortOptionType} from '../../types/types';
 
@@ -19,31 +20,48 @@ export interface UseApprovalTaskListReturnI {
     totalApprovalTaskCount: number;
 }
 
+const cycleStatus = (status: ApprovalTaskI['status']): ApprovalTaskI['status'] => {
+    switch (status) {
+        case 'open':
+            return 'in-progress';
+        case 'in-progress':
+            return 'open';
+        default:
+            return 'open';
+    }
+};
+
 export function useApprovalTaskList(): UseApprovalTaskListReturnI {
-    const [sortBy, setSortBy] = useState<SortOptionType>('created');
-    const [sortDirection, setSortDirection] = useState<SortDirectionType>('desc');
+    const [sortBy, setSortBy] = useState<SortOptionType>('dueDate');
+    const [sortDirection, setSortDirection] = useState<SortDirectionType>('asc');
 
     const {
         approvalTasks,
-        cycleApprovalTaskStatus,
         filters,
         hasActiveFilters,
         resetFilters,
         searchQuery,
         setSearchQuery,
         setSelectedApprovalTaskId,
+        updateApprovalTaskInStore,
     } = useApprovalTasksStore(
         useShallow((state) => ({
             approvalTasks: state.approvalTasks,
-            cycleApprovalTaskStatus: state.cycleApprovalTaskStatus,
             filters: state.filters,
             hasActiveFilters: state.hasActiveFilters(),
             resetFilters: state.resetFilters,
             searchQuery: state.searchQuery,
             setSearchQuery: state.setSearchQuery,
             setSelectedApprovalTaskId: state.setSelectedApprovalTaskId,
+            updateApprovalTaskInStore: state.updateApprovalTask,
         }))
     );
+
+    const updateApprovalTaskMutation = useUpdateApprovalTaskMutation({
+        onError: (error) => {
+            console.error('Error updating approval task:', error);
+        },
+    });
 
     const filteredApprovalTasks = useMemo(() => {
         const filtered = approvalTasks.filter((approvalTask) => {
@@ -97,9 +115,39 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
         (approvalTaskId: string, event: MouseEvent) => {
             event.stopPropagation();
 
-            cycleApprovalTaskStatus(approvalTaskId);
+            const target = approvalTasks.find((approvalTask) => approvalTask.id === approvalTaskId);
+
+            if (!target) {
+                return;
+            }
+
+            const next: ApprovalTaskI = {...target, status: cycleStatus(target.status)};
+
+            updateApprovalTaskInStore(next);
+
+            updateApprovalTaskMutation.mutate(
+                {
+                    approvalTask: {
+                        assigneeId: next.assigneeId,
+                        description: next.description,
+                        id: next.id,
+                        name: next.title,
+                        priority: toServerPriority(next.priority),
+                        status: toServerStatus(next.status),
+                        version: next.version,
+                    },
+                },
+                {
+                    onSuccess: (data) => {
+                        updateApprovalTaskInStore({
+                            ...next,
+                            version: data.updateApprovalTask?.version ?? next.version,
+                        });
+                    },
+                }
+            );
         },
-        [cycleApprovalTaskStatus]
+        [approvalTasks, updateApprovalTaskInStore, updateApprovalTaskMutation]
     );
 
     return {

@@ -7,7 +7,13 @@ import type {ReactNode} from 'react';
 
 import type {ApprovalTaskAttachmentI, ApprovalTaskCommentI, ApprovalTaskI, FiltersI} from '../types/types';
 
-const DEFAULT_FILTERS: FiltersI = {
+const INITIAL_FILTERS: FiltersI = {
+    assignee: 'all',
+    priority: 'all',
+    status: 'open',
+};
+
+const CLEARED_FILTERS: FiltersI = {
     assignee: 'all',
     priority: 'all',
     status: 'all',
@@ -106,7 +112,7 @@ export const useApprovalTasksStore = create<ApprovalTasksStateI>()(
                 }));
             },
 
-            filters: DEFAULT_FILTERS,
+            filters: INITIAL_FILTERS,
 
             getFormattedDueDate: (approvalTask: ApprovalTaskI) =>
                 approvalTask.dueDate ? formatDate(approvalTask.dueDate) : null,
@@ -167,7 +173,7 @@ export const useApprovalTasksStore = create<ApprovalTasksStateI>()(
             },
 
             resetFilters: () => {
-                set(() => ({filters: DEFAULT_FILTERS}));
+                set(() => ({filters: CLEARED_FILTERS}));
             },
 
             searchQuery: '',

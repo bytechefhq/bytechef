@@ -22,6 +22,7 @@ export interface ApprovalTaskAttachmentI {
 
 export interface ApprovalTaskI {
     assignee: string;
+    assigneeId?: string | null;
     attachments: ApprovalTaskAttachmentI[];
     comments: ApprovalTaskCommentI[];
     createdAt: string;
@@ -29,6 +30,7 @@ export interface ApprovalTaskI {
     description: string;
     dueDate?: string;
     id?: string;
+    jobResumeId?: string | null;
     priority: 'high' | 'medium' | 'low';
     status: 'open' | 'in-progress' | 'completed';
     title: string;
@@ -72,7 +74,13 @@ export interface NewApprovalTaskFormI {
     status: 'open' | 'in-progress' | 'completed';
     priority: 'high' | 'medium' | 'low';
     assignee: string;
+    assigneeId?: string;
     dueDate: string;
     dependencies: string[];
     templateId?: string;
+}
+
+export interface AssigneeOptionI {
+    id: string;
+    name: string;
 }
