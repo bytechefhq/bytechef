@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.web.rest.mapper;
+package com.bytechef.automation.workflow.execution.web.rest.mapper;
 
-import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
-import com.bytechef.automation.configuration.web.rest.model.TriggerFormModel;
+import com.bytechef.automation.workflow.execution.web.rest.mapper.config.AutomationWorkflowExecutionMapperSpringConfig;
+import com.bytechef.automation.workflow.execution.web.rest.model.TriggerFormInputModel;
+import com.bytechef.automation.workflow.execution.web.rest.model.TriggerFormModel;
 import com.bytechef.platform.configuration.web.rest.model.FieldOptionModel;
-import com.bytechef.platform.configuration.web.rest.model.TriggerFormInputModel;
 import java.util.List;
 import java.util.Map;
 import org.mapstruct.Mapper;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+@Mapper(config = AutomationWorkflowExecutionMapperSpringConfig.class)
 public interface TriggerFormMapper extends Converter<Map<String, Object>, TriggerFormModel> {
 
     @Override
