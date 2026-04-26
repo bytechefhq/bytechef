@@ -28,6 +28,22 @@ export const AUTHORITIES = {
     USER: 'ROLE_USER',
 };
 
+export enum FieldType {
+    CHECKBOX = 1,
+    DATE_PICKER = 2,
+    DATETIME_PICKER = 3,
+    FILE_INPUT = 4,
+    TEXTAREA = 5,
+    INPUT = 6,
+    SELECT = 7,
+    EMAIL_INPUT = 8,
+    NUMBER_INPUT = 9,
+    PASSWORD_INPUT = 10,
+    RADIO = 11,
+    CUSTOM_HTML = 12,
+    HIDDEN_FIELD = 13,
+}
+
 export const VALUE_PROPERTY_CONTROL_TYPES = {
     ARRAY: 'ARRAY_BUILDER',
     BOOLEAN: 'SELECT',

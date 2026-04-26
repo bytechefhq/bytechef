@@ -1,16 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
-import {CheckboxFieldRenderer} from '@/shared/components/form/CheckboxFieldRenderer';
-import {CustomHTMLFieldRenderer} from '@/shared/components/form/CustomHTMLFieldRenderer';
-import {DateTimeFieldRenderer} from '@/shared/components/form/DateTimeFieldRenderer';
-import {FileInputFieldRenderer} from '@/shared/components/form/FileInputFieldRenderer';
-import {HiddenFieldRenderer} from '@/shared/components/form/HiddenFieldRenderer';
-import {InputFieldRenderer} from '@/shared/components/form/InputFieldRenderer';
-import {RadioFieldRenderer} from '@/shared/components/form/RadioFieldRenderer';
-import {SelectFieldRenderer} from '@/shared/components/form/SelectFieldRenderer';
-import {TextAreaFieldRenderer} from '@/shared/components/form/TextAreaFieldRenderer';
-import {FieldType, PRODUCTION_ENVIRONMENT} from '@/shared/constants';
-import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
+import {renderFormField} from '@/shared/components/form/renderFormField';
+import {PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import React from 'react';
 
 import useTriggerForm from './hooks/useTriggerForm';
@@ -74,37 +65,6 @@ export default function TriggerForm() {
         );
     }
 
-    const renderField = (name: string, formInput: Partial<TriggerFormInput>) => {
-        const {fieldType} = formInput;
-
-        switch (fieldType) {
-            case FieldType.HIDDEN_FIELD:
-                return <HiddenFieldRenderer form={form} formInput={formInput} name={name} />;
-            case FieldType.INPUT:
-            case FieldType.EMAIL_INPUT:
-            case FieldType.NUMBER_INPUT:
-            case FieldType.PASSWORD_INPUT:
-                return <InputFieldRenderer form={form} formInput={formInput} name={name} />;
-            case FieldType.TEXTAREA:
-                return <TextAreaFieldRenderer form={form} formInput={formInput} name={name} />;
-            case FieldType.SELECT:
-                return <SelectFieldRenderer form={form} formInput={formInput} name={name} />;
-            case FieldType.RADIO:
-                return <RadioFieldRenderer form={form} formInput={formInput} name={name} />;
-            case FieldType.CHECKBOX:
-                return <CheckboxFieldRenderer form={form} formInput={formInput} name={name} />;
-            case FieldType.DATE_PICKER:
-            case FieldType.DATETIME_PICKER:
-                return <DateTimeFieldRenderer form={form} formInput={formInput} name={name} />;
-            case FieldType.FILE_INPUT:
-                return <FileInputFieldRenderer form={form} formInput={formInput} name={name} />;
-            case FieldType.CUSTOM_HTML:
-                return <CustomHTMLFieldRenderer formInput={formInput} />;
-            default:
-                return <InputFieldRenderer form={form} formInput={formInput} name={name} />;
-        }
-    };
-
     return (
         <div className="h-full overflow-auto">
             {+(environmentId ?? PRODUCTION_ENVIRONMENT) !== PRODUCTION_ENVIRONMENT && (
@@ -134,7 +94,7 @@ export default function TriggerForm() {
                             uiDefinition.inputs.map((formInput, idx) => {
                                 const name = formInput.fieldName || `field_${idx}`;
 
-                                return <div key={name}>{renderField(name, formInput)}</div>;
+                                return <div key={name}>{renderFormField(form, formInput, name)}</div>;
                             })
                         ) : (
                             <span className="text-sm text-muted-foreground">No inputs defined.</span>
