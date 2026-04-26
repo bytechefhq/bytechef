@@ -69,8 +69,8 @@ public class GoogleMailApprovalChannel {
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, String formUrl,
-        ClusterElementContext context) throws IOException, MessagingException {
+        Parameters inputParameters, Parameters connectionParameters, String formUrl, ClusterElementContext context)
+        throws IOException, MessagingException {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 

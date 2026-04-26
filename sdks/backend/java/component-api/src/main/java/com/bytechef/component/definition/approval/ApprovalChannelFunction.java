@@ -30,6 +30,6 @@ public interface ApprovalChannelFunction {
         new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Channels", true, false);
 
     Object apply(
-        Parameters inputParameters, Parameters connectionParameters, String formUrl,
-        ClusterElementContext context) throws Exception;
+        Parameters inputParameters, Parameters connectionParameters, String formUrl, ClusterElementContext context)
+        throws Exception;
 }
