@@ -19,17 +19,19 @@ package com.bytechef.component.script.cluster.tool.definition;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.script.engine.PolyglotEngine;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractClusterElementDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public class ScriptToolDefinition
     extends AbstractClusterElementDefinitionWrapper<ScriptToolDefinition>
-    implements ToolFunction {
+    implements MultipleConnectionsToolFunction {
 
     private final String languageId;
     private final PolyglotEngine polyglotEngine;
@@ -44,7 +46,11 @@ public class ScriptToolDefinition
     }
 
     @Override
-    public Object apply(Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
-        return polyglotEngine.execute(languageId, inputParameters, null, (ClusterElementContextAware) context);
+    public Object apply(
+        Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+        Map<String, ComponentConnection> componentConnections, ClusterElementContext context) {
+
+        return polyglotEngine.execute(
+            languageId, inputParameters, componentConnections, (ClusterElementContextAware) context);
     }
 }
