@@ -33,6 +33,8 @@ public interface ApprovalTaskService {
 
     Optional<ApprovalTask> fetchApprovalTask(String name);
 
+    Optional<ApprovalTask> fetchApprovalTaskByJobResumeId(String jobResumeId);
+
     ApprovalTask getApprovalTask(long id);
 
     List<ApprovalTask> getApprovalTasks();

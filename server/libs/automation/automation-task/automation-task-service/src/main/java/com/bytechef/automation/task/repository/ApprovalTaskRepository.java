@@ -27,5 +27,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ApprovalTaskRepository extends CrudRepository<ApprovalTask, Long> {
 
+    Optional<ApprovalTask> findByJobResumeId(String jobResumeId);
+
     Optional<ApprovalTask> findByNameIgnoreCase(String name);
 }

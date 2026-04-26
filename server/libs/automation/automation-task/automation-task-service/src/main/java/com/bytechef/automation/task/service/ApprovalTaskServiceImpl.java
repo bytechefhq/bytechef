@@ -66,6 +66,12 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ApprovalTask> fetchApprovalTaskByJobResumeId(String jobResumeId) {
+        return approvalTaskRepository.findByJobResumeId(jobResumeId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ApprovalTask getApprovalTask(long id) {
         return OptionalUtils.get(approvalTaskRepository.findById(id));
     }
@@ -92,6 +98,10 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
 
         curApprovalTask.setDescription(approvalTask.getDescription());
         curApprovalTask.setName(approvalTask.getName());
+        curApprovalTask.setStatus(approvalTask.getStatus());
+        curApprovalTask.setPriority(approvalTask.getPriority());
+        curApprovalTask.setAssigneeId(approvalTask.getAssigneeId());
+        curApprovalTask.setDueDate(approvalTask.getDueDate());
         curApprovalTask.setVersion(approvalTask.getVersion());
 
         return approvalTaskRepository.save(curApprovalTask);

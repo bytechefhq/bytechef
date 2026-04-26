@@ -34,30 +34,53 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table
 public final class ApprovalTask {
 
-    @CreatedBy
-    @Column("created_by")
-    private String createdBy;
+    public enum Status {
+        OPEN, IN_PROGRESS, COMPLETED
+    }
 
-    @Column("created_date")
-    @CreatedDate
-    private Instant createdDate;
-
-    @Column
-    private String description;
+    public enum Priority {
+        HIGH, MEDIUM, LOW
+    }
 
     @Id
     private Long id;
 
-    @Column("last_modified_by")
-    @LastModifiedBy
-    private String lastModifiedBy;
-
-    @Column("last_modified_date")
-    @LastModifiedDate
-    private Instant lastModifiedDate;
-
     @Column
     private String name;
+
+    @Column
+    private String description;
+
+    @Column("job_resume_id")
+    private String jobResumeId;
+
+    @Column
+    private int status;
+
+    @Column
+    private int priority;
+
+    @Column("assignee_id")
+    private Long assigneeId;
+
+    @Column("due_date")
+    private Instant dueDate;
+
+    @CreatedBy
+    @Column("created_by")
+    private String createdBy;
+
+    @CreatedDate
+    @Column("created_date")
+    private Instant createdDate;
+
+    @LastModifiedBy
+    @Column("last_modified_by")
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column("last_modified_date")
+    private Instant lastModifiedDate;
 
     @Version
     private int version;
@@ -66,10 +89,18 @@ public final class ApprovalTask {
     }
 
     @PersistenceCreator
-    public ApprovalTask(String description, Long id, String name, int version) {
-        this.description = description;
+    public ApprovalTask(
+        Long id, String name, String description, String jobResumeId, int status, int priority, Long assigneeId,
+        Instant dueDate, int version) {
+
         this.id = id;
         this.name = name;
+        this.description = description;
+        this.jobResumeId = jobResumeId;
+        this.status = status;
+        this.priority = priority;
+        this.assigneeId = assigneeId;
+        this.dueDate = dueDate;
         this.version = version;
     }
 
@@ -97,20 +128,44 @@ public final class ApprovalTask {
         return getClass().hashCode();
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public Long getId() {
+        return id;
     }
 
-    public Instant getCreatedDate() {
-        return createdDate;
+    public String getName() {
+        return name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public Long getId() {
-        return id;
+    public String getJobResumeId() {
+        return jobResumeId;
+    }
+
+    public Status getStatus() {
+        return Status.values()[status];
+    }
+
+    public Priority getPriority() {
+        return Priority.values()[priority];
+    }
+
+    public Long getAssigneeId() {
+        return assigneeId;
+    }
+
+    public Instant getDueDate() {
+        return dueDate;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
     }
 
     public String getLastModifiedBy() {
@@ -121,16 +176,8 @@ public final class ApprovalTask {
         return lastModifiedDate;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public int getVersion() {
         return version;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public void setId(Long id) {
@@ -141,6 +188,30 @@ public final class ApprovalTask {
         this.name = name;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setJobResumeId(String jobResumeId) {
+        this.jobResumeId = jobResumeId;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status == null ? Status.OPEN.ordinal() : status.ordinal();
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority == null ? Priority.MEDIUM.ordinal() : priority.ordinal();
+    }
+
+    public void setAssigneeId(Long assigneeId) {
+        this.assigneeId = assigneeId;
+    }
+
+    public void setDueDate(Instant dueDate) {
+        this.dueDate = dueDate;
+    }
+
     public void setVersion(int version) {
         this.version = version;
     }
@@ -148,13 +219,18 @@ public final class ApprovalTask {
     @Override
     public String toString() {
         return "ApprovalTask{" +
-            "createdBy='" + createdBy + '\'' +
-            ", createdDate=" + createdDate +
+            "id=" + id +
+            ", name='" + name + '\'' +
             ", description='" + description + '\'' +
-            ", id=" + id +
+            ", jobResumeId='" + jobResumeId + '\'' +
+            ", status=" + status +
+            ", priority=" + priority +
+            ", assigneeId=" + assigneeId +
+            ", dueDate=" + dueDate +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
-            ", name='" + name + '\'' +
             ", version=" + version +
             '}';
     }
@@ -164,18 +240,17 @@ public final class ApprovalTask {
      */
     public static class Builder {
 
-        private String description;
         private Long id;
         private String name;
+        private String description;
+        private String jobResumeId;
+        private Status status;
+        private Priority priority;
+        private Long assigneeId;
+        private Instant dueDate;
         private int version;
 
         private Builder() {
-        }
-
-        public Builder description(String description) {
-            this.description = description;
-
-            return this;
         }
 
         public Builder id(Long id) {
@@ -190,6 +265,42 @@ public final class ApprovalTask {
             return this;
         }
 
+        public Builder description(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        public Builder jobResumeId(String jobResumeId) {
+            this.jobResumeId = jobResumeId;
+
+            return this;
+        }
+
+        public Builder status(Status status) {
+            this.status = status;
+
+            return this;
+        }
+
+        public Builder priority(Priority priority) {
+            this.priority = priority;
+
+            return this;
+        }
+
+        public Builder assigneeId(Long assigneeId) {
+            this.assigneeId = assigneeId;
+
+            return this;
+        }
+
+        public Builder dueDate(Instant dueDate) {
+            this.dueDate = dueDate;
+
+            return this;
+        }
+
         public Builder version(int version) {
             this.version = version;
 
@@ -199,9 +310,14 @@ public final class ApprovalTask {
         public ApprovalTask build() {
             ApprovalTask approvalTask = new ApprovalTask();
 
-            approvalTask.description = this.description;
             approvalTask.id = this.id;
             approvalTask.name = this.name;
+            approvalTask.description = this.description;
+            approvalTask.jobResumeId = jobResumeId;
+            approvalTask.status = status == null ? Status.OPEN.ordinal() : status.ordinal();
+            approvalTask.priority = priority == null ? Priority.MEDIUM.ordinal() : priority.ordinal();
+            approvalTask.assigneeId = assigneeId;
+            approvalTask.dueDate = dueDate;
             approvalTask.version = this.version;
 
             return approvalTask;
