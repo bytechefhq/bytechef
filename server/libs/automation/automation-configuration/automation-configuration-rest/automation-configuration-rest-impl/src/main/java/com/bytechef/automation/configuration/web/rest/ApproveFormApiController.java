@@ -16,16 +16,11 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.facade.ApproveFormFacade;
 import com.bytechef.automation.configuration.web.rest.model.ApproveFormModel;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
@@ -42,17 +37,13 @@ import org.springframework.web.server.ResponseStatusException;
 @ConditionalOnCoordinator
 public class ApproveFormApiController implements ApproveFormApi {
 
+    private final ApproveFormFacade approveFormFacade;
     private final ConversionService conversionService;
-    private final JobService jobService;
-    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ApproveFormApiController(
-        ConversionService conversionService, JobService jobService, WorkflowService workflowService) {
-
+    public ApproveFormApiController(ApproveFormFacade approveFormFacade, ConversionService conversionService) {
+        this.approveFormFacade = approveFormFacade;
         this.conversionService = conversionService;
-        this.jobService = jobService;
-        this.workflowService = workflowService;
     }
 
     @Override
@@ -65,27 +56,13 @@ public class ApproveFormApiController implements ApproveFormApi {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, exception);
         }
 
-        Job job;
+        Map<String, ?> parameters;
 
         try {
-            job = jobService.getJob(jobResumeId.getJobId());
+            parameters = approveFormFacade.getApproveForm(jobResumeId.getJobId());
         } catch (Exception exception) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Approval form is no longer available.", exception);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Approval form is no longer available.", exception);
         }
-
-        Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
-
-        int currentTask = job.getCurrentTask();
-        List<WorkflowTask> workflowTasks = workflow.getTasks();
-
-        if (currentTask < 0 || currentTask >= workflowTasks.size()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Approval form is no longer available.");
-        }
-
-        WorkflowTask workflowTask = workflowTasks.get(currentTask);
-
-        Map<String, ?> parameters = workflowTask.getParameters();
 
         return ResponseEntity.ok(conversionService.convert(parameters, ApproveFormModel.class));
     }
