@@ -26,6 +26,7 @@ import com.bytechef.component.slack.action.SlackAddReactionAction;
 import com.bytechef.component.slack.action.SlackSendApprovalMessageAction;
 import com.bytechef.component.slack.action.SlackSendChannelMessageAction;
 import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
+import com.bytechef.component.slack.cluster.SlackApprovalChannel;
 import com.bytechef.component.slack.connection.SlackConnection;
 import com.bytechef.component.slack.trigger.SlackAnyEventTrigger;
 import com.google.auto.service.AutoService;
@@ -50,6 +51,7 @@ public final class SlackComponentHandler implements ComponentHandler {
             SlackSendChannelMessageAction.ACTION_DEFINITION,
             SlackSendDirectMessageAction.ACTION_DEFINITION)
         .clusterElements(
+            SlackApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
             tool(SlackAddReactionAction.ACTION_DEFINITION),
             tool(SlackSendApprovalMessageAction.ACTION_DEFINITION),
             tool(SlackSendChannelMessageAction.ACTION_DEFINITION),

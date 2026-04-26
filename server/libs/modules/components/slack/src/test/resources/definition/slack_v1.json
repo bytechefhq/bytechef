@@ -2496,6 +2496,47 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "slack",
+    "description": "Sends an approval request message via Slack.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Channel, private group, or IM channel to send the approval request to.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Channel",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "channel",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Slack",
+    "type": {
+      "name": "APPROVAL_CHANNELS",
+      "key": "approvalChannels",
+      "label": "Channels",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "name": "addReaction",
     "description": "Adds a reaction to a message.",
     "element": { },
