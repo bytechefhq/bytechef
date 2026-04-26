@@ -11,4 +11,5 @@ export const useGetApproveFormQuery = (id: string, enabled?: boolean) =>
         enabled: enabled === undefined ? !!id : enabled && !!id,
         queryFn: () => new ApproveFormApi().getApproveForm({id}),
         queryKey: ApproveFormKeys.approveForm(id),
+        retry: false,
     });

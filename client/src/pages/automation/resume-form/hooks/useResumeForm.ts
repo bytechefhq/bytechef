@@ -5,7 +5,7 @@ import {useParams} from 'react-router-dom';
 
 import {FieldType} from '../../trigger-form/TriggerForm';
 
-export default function useApproveForm() {
+export default function useResumeForm() {
     const {id} = useParams<{id: string}>();
 
     const [submitting, setSubmitting] = useState(false);
@@ -45,10 +45,10 @@ export default function useApproveForm() {
         try {
             const body = JSON.stringify({
                 ...values,
-                approve: approveValue,
+                approved: approveValue,
             });
 
-            const approveFormSubmitRequest = await fetch(`/api/platform/v1/api/job/resume/${id}`, {
+            const approveFormSubmitRequest = await fetch(`/job/resume/${id}`, {
                 body,
                 headers: {'Content-Type': 'application/json'},
                 method: 'POST',
