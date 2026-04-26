@@ -16,15 +16,20 @@
 
 package com.bytechef.automation.configuration.event;
 
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.data.relational.core.conversion.AggregateChange;
+import org.springframework.data.relational.core.conversion.DbAction;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.Identifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * @author Marko Kriskovic
@@ -43,15 +48,37 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
     protected void onAfterSave(AfterSaveEvent<Connection> afterSaveEvent) {
         Connection connection = afterSaveEvent.getEntity();
 
-        if (!connection.isCredentialsStatusUpdated()
-            || (connection.getCredentialStatus() == Connection.CredentialStatus.INVALID)) {
+        Authorization.AuthorizationType authorizationType = connection.getAuthorizationType();
+
+        if (Objects.isNull(authorizationType) || !authorizationType.hasRefreshToken()) {
             return;
         }
 
+        AggregateChange<Connection> aggregateChange = afterSaveEvent.getAggregateChange();
         String tenantId = TenantContext.getCurrentTenantId();
 
-        connectionLifecycleFacade.scheduleConnectionRefresh(
-            connection.getId(), connection.getParameters(), connection.getAuthorizationType(), tenantId);
+        aggregateChange.forEachAction(dbAction -> {
+            if ((dbAction instanceof DbAction.InsertRoot<?>) || (dbAction instanceof DbAction.Insert<?>)) {
+                connectionLifecycleFacade.scheduleConnectionRefresh(
+                    connection.getId(), connection.getParameters(), authorizationType, tenantId);
+            }
+            switch (dbAction) {
+                case DbAction.Insert<?> a ->
+                    connectionLifecycleFacade.scheduleConnectionRefresh(
+                        connection.getId(), connection.getParameters(), authorizationType, tenantId);
+                case DbAction.InsertRoot<?> a ->
+                    connectionLifecycleFacade.scheduleConnectionRefresh(
+                        connection.getId(), connection.getParameters(), authorizationType, tenantId);
+                case DbAction.UpdateRoot<?> a-> {
+                    if (connection.isCredentialsStatusUpdated()
+                        && (connection.getCredentialStatus() != Connection.CredentialStatus.INVALID)) {
+                        connectionLifecycleFacade.scheduleConnectionRefresh(
+                            connection.getId(), connection.getParameters(), authorizationType, tenantId);
+                    }
+                }
+                default -> {}
+            }
+        });
     }
 
     @Override
