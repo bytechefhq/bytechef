@@ -44,6 +44,11 @@ public class RemoteApprovalTaskServiceClient implements ApprovalTaskService {
     }
 
     @Override
+    public Optional<ApprovalTask> fetchApprovalTaskByJobResumeId(String jobResumeId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ApprovalTask getApprovalTask(long id) {
         throw new UnsupportedOperationException();
     }

@@ -18,8 +18,11 @@ package com.bytechef.automation.task.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.task.domain.ApprovalTask;
+import com.bytechef.automation.task.domain.ApprovalTask.Priority;
+import com.bytechef.automation.task.domain.ApprovalTask.Status;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -77,10 +80,16 @@ public class ApprovalTaskGraphQlController {
             .id(approvalTaskInput.id())
             .name(approvalTaskInput.name())
             .description(approvalTaskInput.description())
+            .status(approvalTaskInput.status())
+            .priority(approvalTaskInput.priority())
+            .assigneeId(approvalTaskInput.assigneeId())
+            .dueDate(approvalTaskInput.dueDate() == null ? null : Instant.parse(approvalTaskInput.dueDate()))
             .version(approvalTaskInput.version() == null ? 0 : approvalTaskInput.version())
             .build();
     }
 
-    public record ApprovalTaskInput(Long id, String name, String description, Integer version) {
+    public record ApprovalTaskInput(
+        Long id, String name, String description, Status status, Priority priority, Long assigneeId, String dueDate,
+        Integer version) {
     }
 }
