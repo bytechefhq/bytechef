@@ -58,6 +58,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.approval.util.FieldType;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
@@ -285,11 +286,13 @@ public class ApprovalRequestApprovalAction {
                     approvalChannel.getComponentName(), approvalChannel.getComponentVersion(),
                     approvalChannel.getClusterElementName());
 
-                ComponentConnection componentConnection =
-                    componentConnections.get(approvalChannel.getWorkflowNodeName());
+                ComponentConnection componentConnection = componentConnections.get(
+                    approvalChannel.getWorkflowNodeName());
 
                 approvalChannelFunction.apply(
-                    ParametersFactory.create(approvalChannel.getParameters()),
+                    ParametersFactory.create(
+                        MapUtils.concat(
+                            new HashMap<>(inputParameters.toMap()), new HashMap<>(approvalChannel.getParameters()))),
                     ParametersFactory.create(componentConnection), formUrl,
                     actionContextAware.toClusterElementContext(
                         approvalChannel.getComponentName(), approvalChannel.getComponentVersion(),
