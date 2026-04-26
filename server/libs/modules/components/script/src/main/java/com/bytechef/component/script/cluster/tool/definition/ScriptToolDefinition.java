@@ -44,9 +44,7 @@ public class ScriptToolDefinition
     }
 
     @Override
-    public Object apply(Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context)
-        throws Exception {
-
+    public Object apply(Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
         return polyglotEngine.execute(languageId, inputParameters, null, (ClusterElementContextAware) context);
     }
 }
