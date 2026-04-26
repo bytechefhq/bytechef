@@ -50,7 +50,7 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
 
         Authorization.AuthorizationType authorizationType = connection.getAuthorizationType();
 
-        if (Objects.isNull(authorizationType) || !authorizationType.hasRefreshToken()) {
+        if (Objects.isNull(authorizationType) || !authorizationType.requiresTokenRefresh()) {
             return;
         }
 

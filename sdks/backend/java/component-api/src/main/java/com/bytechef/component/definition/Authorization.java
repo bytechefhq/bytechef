@@ -187,10 +187,10 @@ public interface Authorization {
          */
         OAUTH2_RESOURCE_OWNER_PASSWORD(false);
 
-        private final boolean hasRefreshToken;
+        private final boolean requiresTokenRefresh;
 
-        public boolean hasRefreshToken() {
-            return hasRefreshToken;
+        public boolean requiresTokenRefresh() {
+            return requiresTokenRefresh;
         }
 
         /**
@@ -201,8 +201,8 @@ public interface Authorization {
             return name().toLowerCase();
         }
 
-        AuthorizationType(boolean hasRefreshToken) {
-            this.hasRefreshToken = hasRefreshToken;
+        AuthorizationType(boolean requiresTokenRefresh) {
+            this.requiresTokenRefresh = requiresTokenRefresh;
         }
 
     }
