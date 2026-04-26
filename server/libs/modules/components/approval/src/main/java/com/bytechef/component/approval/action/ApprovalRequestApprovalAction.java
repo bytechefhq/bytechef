@@ -22,9 +22,6 @@ import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_L
 import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_NAME;
 import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_OPTIONS;
 import static com.bytechef.component.approval.constant.ApprovalConstants.FIELD_TYPE;
-import static com.bytechef.component.approval.constant.ApprovalConstants.FORM_DESCRIPTION;
-import static com.bytechef.component.approval.constant.ApprovalConstants.FORM_TITLE;
-import static com.bytechef.component.approval.constant.ApprovalConstants.INPUTS;
 import static com.bytechef.component.approval.constant.ApprovalConstants.MAX_SELECTION;
 import static com.bytechef.component.approval.constant.ApprovalConstants.MIN_SELECTION;
 import static com.bytechef.component.approval.constant.ApprovalConstants.MULTIPLE_CHOICE;
@@ -57,6 +54,9 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_DESCRIPTION;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_TITLE;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.INPUTS;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.approval.util.FieldType;

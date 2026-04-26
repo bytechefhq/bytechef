@@ -19,6 +19,9 @@ package com.bytechef.component.google.mail.cluster;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_DESCRIPTION;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_TITLE;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.INPUTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
@@ -28,6 +31,7 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
@@ -42,6 +46,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.codec.binary.Base64;
 
@@ -84,12 +89,44 @@ public class GoogleMailApprovalChannel {
             InternetAddress.parse(String.join(",", toAddresses)));
         mimeMessage.setSubject(subject, StandardCharsets.UTF_8.name());
 
+        List<Map<String, ?>> inputs = inputParameters.getList(INPUTS, new TypeReference<>() {}, List.of());
+
+        String body;
+
+        if (inputs.isEmpty()) {
+            String formTitle = inputParameters.getString(FORM_TITLE);
+            String formDescription = inputParameters.getString(FORM_DESCRIPTION);
+
+            StringBuilder builder = new StringBuilder();
+
+            if (formTitle != null && !formTitle.isBlank()) {
+                builder.append("<h2>")
+                    .append(formTitle)
+                    .append("</h2>");
+            }
+
+            if (formDescription != null && !formDescription.isBlank()) {
+                builder.append("<p>")
+                    .append(formDescription)
+                    .append("</p>");
+            }
+
+            builder.append("<p><a href=\"")
+                .append(formUrl)
+                .append("?approved=true\">Approve</a> | ")
+                .append("<a href=\"")
+                .append(formUrl)
+                .append("?approved=false\">Discard</a></p>");
+
+            body = builder.toString();
+        } else {
+            body = "<p>You have a new approval request. Please review and respond using the link below:</p>" +
+                "<p><a href=\"" + formUrl + "\">Open Approval Form</a></p>";
+        }
+
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
 
-        mimeBodyPart.setText(
-            "<p>You have a new approval request. Please review and respond using the link below:</p>" +
-                "<p><a href=\"" + formUrl + "\">Open Approval Form</a></p>",
-            StandardCharsets.UTF_8.name(), "html");
+        mimeBodyPart.setText(body, StandardCharsets.UTF_8.name(), "html");
 
         MimeMultipart multipart = new MimeMultipart();
 

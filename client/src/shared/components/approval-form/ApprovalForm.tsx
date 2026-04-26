@@ -3,6 +3,8 @@ import {Form} from '@/components/ui/form';
 import {renderFormField} from '@/shared/components/form/renderFormField';
 import {PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import useApprovalForm from '@/shared/hooks/useApprovalForm';
+import {useEffect, useRef} from 'react';
+import {useSearchParams} from 'react-router-dom';
 
 interface ApprovalFormPropsI {
     id: string | undefined;
@@ -13,6 +15,42 @@ interface ApprovalFormPropsI {
 export default function ApprovalForm({id, onSubmitted, showHeader = true}: ApprovalFormPropsI) {
     const {approved, definition, error, form, handleSubmit, loading, submitError, submitted, submitting, uiDefinition} =
         useApprovalForm(id, {onSubmitted});
+
+    const [searchParams] = useSearchParams();
+    const approvedParam = searchParams.get('approved');
+    const autoApproved = approvedParam === 'true' ? true : approvedParam === 'false' ? false : null;
+    const autoSubmittedRef = useRef(false);
+
+    useEffect(() => {
+        if (autoApproved !== null && !autoSubmittedRef.current) {
+            autoSubmittedRef.current = true;
+
+            void handleSubmit({}, autoApproved);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [autoApproved]);
+
+    if (submitError) {
+        return (
+            <div className="p-6">
+                <span className="text-sm text-destructive">{submitError}</span>
+            </div>
+        );
+    }
+
+    if (autoApproved !== null) {
+        const resolvedApproved = approved ?? autoApproved;
+
+        return (
+            <div className="p-6 text-center">
+                <h2 className="text-lg font-semibold tracking-tight">{resolvedApproved ? 'Approved' : 'Discarded'}</h2>
+
+                <p className="mt-2 text-sm text-muted-foreground">
+                    {resolvedApproved ? 'Your approval has been submitted.' : 'The request has been discarded.'}
+                </p>
+            </div>
+        );
+    }
 
     if (loading) {
         return <div className="p-6 text-center text-sm text-muted-foreground">Loading form...</div>;
@@ -27,14 +65,6 @@ export default function ApprovalForm({id, onSubmitted, showHeader = true}: Appro
                     This approval form is no longer available. It may have already been submitted, expired, or the link
                     is invalid.
                 </p>
-            </div>
-        );
-    }
-
-    if (submitError) {
-        return (
-            <div className="p-6">
-                <span className="text-sm text-destructive">{submitError}</span>
             </div>
         );
     }

@@ -18,6 +18,9 @@ package com.bytechef.component.slack.cluster;
 
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_DESCRIPTION;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_TITLE;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.INPUTS;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static com.bytechef.component.slack.constant.SlackConstants.TYPE;
@@ -28,6 +31,7 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.component.slack.util.SlackUtils;
 import java.util.List;
@@ -56,19 +60,63 @@ public class SlackApprovalChannel {
         Parameters inputParameters, Parameters connectionParameters, String formUrl, ClusterElementContext context) {
 
         String channel = inputParameters.getRequiredString(CHANNEL);
-        String text = "You have a new approval request. Please review and respond using the link below.";
+
+        List<Map<String, ?>> inputs = inputParameters.getList(INPUTS, new TypeReference<>() {}, List.of());
+
+        String text;
+        List<Map<String, Object>> elements;
+
+        if (inputs.isEmpty()) {
+            text = buildSummaryText(inputParameters);
+            elements = List.of(
+                Map.of(
+                    TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Approve"),
+                    "style", "primary", "url", formUrl + "?approved=true"),
+                Map.of(
+                    TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Discard"),
+                    "style", "danger", "url", formUrl + "?approved=false"));
+        } else {
+            text = "You have a new approval request. Please review and respond using the link below.";
+            elements = List.of(
+                Map.of(
+                    TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Open Approval Form"),
+                    "style", "primary", "url", formUrl));
+        }
 
         List<Map<String, Object>> blocks = List.of(
             Map.of(
                 TYPE, "section", TEXT,
                 Map.of(TYPE, "mrkdwn", TEXT, text)),
             Map.of(
-                TYPE, "actions", "block_id", "actions", "elements",
-                List.of(
-                    Map.of(
-                        TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Open Approval Form"),
-                        "style", "primary", "url", formUrl))));
+                TYPE, "actions", "block_id", "actions", "elements", elements));
 
         return sendMessage(channel, text, null, blocks, context);
+    }
+
+    private static String buildSummaryText(Parameters inputParameters) {
+        String formTitle = inputParameters.getString(FORM_TITLE);
+        String formDescription = inputParameters.getString(FORM_DESCRIPTION);
+
+        StringBuilder builder = new StringBuilder();
+
+        if (formTitle != null && !formTitle.isBlank()) {
+            builder.append("*")
+                .append(formTitle)
+                .append("*");
+        }
+
+        if (formDescription != null && !formDescription.isBlank()) {
+            if (!builder.isEmpty()) {
+                builder.append("\n");
+            }
+
+            builder.append(formDescription);
+        }
+
+        if (builder.isEmpty()) {
+            return "You have a new approval request.";
+        }
+
+        return builder.toString();
     }
 }
