@@ -18,13 +18,12 @@ package com.bytechef.component.approval;
 
 import static com.bytechef.component.approval.constant.ApprovalConstants.APPROVAL;
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.approval.action.ApprovalRequestApprovalAction;
+import com.bytechef.component.approval.cluster.tool.ApprovalRequestApprovalTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ApprovalComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -39,17 +38,14 @@ public class ApprovalComponentHandler implements ComponentHandler {
     private final ApprovalComponentDefinition componentDefinition;
 
     public ApprovalComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
-        ComponentDsl.ModifiableActionDefinition modifiableActionDefinition = ApprovalRequestApprovalAction.of(
-            clusterElementDefinitionService);
-
         this.componentDefinition = new ApprovalComponentDefinitionImpl(
             component(APPROVAL)
                 .title("Approval")
                 .description("Approval component for manual intervention in workflows.")
                 .icon("path:assets/approval.svg")
                 .categories(ComponentCategory.HELPERS)
-                .actions(modifiableActionDefinition)
-                .clusterElements(tool(modifiableActionDefinition)));
+                .actions(ApprovalRequestApprovalAction.of(clusterElementDefinitionService))
+                .clusterElements(ApprovalRequestApprovalTool.of(clusterElementDefinitionService)));
     }
 
     @Override
