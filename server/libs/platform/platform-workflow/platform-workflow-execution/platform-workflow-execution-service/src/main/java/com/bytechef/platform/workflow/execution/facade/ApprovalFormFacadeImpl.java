@@ -23,6 +23,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
+
+    private static final String ENVIRONMENT_ID_METADATA_KEY = "environmentId";
 
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
@@ -59,7 +62,16 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
                 .orElseThrow(
                     () -> new IllegalStateException("No task execution found for job " + jobResumeId.getJobId()));
 
-            return taskExecution.getParameters();
+            Map<String, Object> result = new HashMap<>(taskExecution.getParameters());
+
+            Object environmentId = taskExecution.getMetadata()
+                .get(ENVIRONMENT_ID_METADATA_KEY);
+
+            if (environmentId != null) {
+                result.put(ENVIRONMENT_ID_METADATA_KEY, environmentId);
+            }
+
+            return result;
         });
     }
 }
