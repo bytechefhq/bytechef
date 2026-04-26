@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
-import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,14 +33,14 @@ public class RemoteConnectionLifecycleFacadeClient implements ConnectionLifecycl
 
     @Override
     public void scheduleConnectionRefresh(
-        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId) {
+        Long connectionId, Map<String, ?> parameters, String tenantId) {
 
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(CONNECTION_LIFECYCLE_FACADE + "/schedule-connection-refresh")
                 .build(),
-            new ScheduleConnectionRefreshRequest(connectionId, parameters, authorizationType, tenantId));
+            new ScheduleConnectionRefreshRequest(connectionId, parameters, tenantId));
     }
 
     @Override
@@ -58,7 +57,7 @@ public class RemoteConnectionLifecycleFacadeClient implements ConnectionLifecycl
 
     @SuppressFBWarnings("EI")
     private record ScheduleConnectionRefreshRequest(
-        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId) {
+        Long connectionId, Map<String, ?> parameters, String tenantId) {
     }
 
     private record DeleteScheduledConnectionRefreshRequest(

@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.workflow.execution.facade;
 
-import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -43,13 +42,7 @@ public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade 
 
     @Override
     public void scheduleConnectionRefresh(
-        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId) {
-
-        if (!authorizationType.hasRefreshToken()) {
-            log.debug("Connection authorization type does not support refresh token");
-
-            return;
-        }
+        Long connectionId, Map<String, ?> parameters, String tenantId) {
 
         try {
             Integer expiresIn = (Integer) parameters.get("expires_in");

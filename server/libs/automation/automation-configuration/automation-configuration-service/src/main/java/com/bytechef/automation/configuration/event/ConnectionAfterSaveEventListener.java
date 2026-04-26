@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author Marko Kriskovic
+ * @author Igor Beslic
  */
 @Component
 public class ConnectionAfterSaveEventListener extends AbstractRelationalEventListener<Connection> {
@@ -59,20 +60,20 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
         aggregateChange.forEachAction(dbAction -> {
             if ((dbAction instanceof DbAction.InsertRoot<?>) || (dbAction instanceof DbAction.Insert<?>)) {
                 connectionLifecycleFacade.scheduleConnectionRefresh(
-                    connection.getId(), connection.getParameters(), authorizationType, tenantId);
+                    connection.getId(), connection.getParameters(), tenantId);
             }
             switch (dbAction) {
                 case DbAction.Insert<?> a ->
                     connectionLifecycleFacade.scheduleConnectionRefresh(
-                        connection.getId(), connection.getParameters(), authorizationType, tenantId);
+                        connection.getId(), connection.getParameters(), tenantId);
                 case DbAction.InsertRoot<?> a ->
                     connectionLifecycleFacade.scheduleConnectionRefresh(
-                        connection.getId(), connection.getParameters(), authorizationType, tenantId);
+                        connection.getId(), connection.getParameters(), tenantId);
                 case DbAction.UpdateRoot<?> a -> {
                     if (connection.isCredentialsStatusUpdated()
                         && (connection.getCredentialStatus() != Connection.CredentialStatus.INVALID)) {
                         connectionLifecycleFacade.scheduleConnectionRefresh(
-                            connection.getId(), connection.getParameters(), authorizationType, tenantId);
+                            connection.getId(), connection.getParameters(), tenantId);
                     }
                 }
                 default -> {
