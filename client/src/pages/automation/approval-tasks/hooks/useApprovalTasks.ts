@@ -8,9 +8,18 @@ import {useCallback, useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/shallow';
 
 import {useApprovalTasksStore} from '../stores/useApprovalTasksStore';
-import {getAvailableAssignees, getCurrentTimestamp} from '../utils/approval-task-utils';
+import {
+    getAssigneeNameById,
+    getAvailableAssigneeOptions,
+    getAvailableAssignees,
+    getCurrentTimestamp,
+    toClientPriority,
+    toClientStatus,
+    toServerPriority,
+    toServerStatus,
+} from '../utils/approval-task-utils';
 
-import type {ApprovalTaskAttachmentI, ApprovalTaskCommentI, ApprovalTaskI} from '../types/types';
+import type {ApprovalTaskAttachmentI, ApprovalTaskCommentI, ApprovalTaskI, AssigneeOptionI} from '../types/types';
 
 export interface UseApprovalTasksReturnI {
     addAttachmentToApprovalTask: (
@@ -19,6 +28,7 @@ export interface UseApprovalTasksReturnI {
     ) => void;
     addCommentToApprovalTask: (approvalTaskId: string, comment: Omit<ApprovalTaskCommentI, 'id' | 'timestamp'>) => void;
     availableAssignees: string[];
+    availableAssigneeOptions: AssigneeOptionI[];
     removeAttachmentFromApprovalTask: (approvalTaskId: string, attachmentId: string) => void;
     approvalTasks: ApprovalTaskI[];
     selectedApprovalTaskId: string | null;
@@ -58,23 +68,26 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
     });
 
     const availableAssignees = useMemo(() => getAvailableAssignees(usersData?.users?.content), [usersData]);
+    const availableAssigneeOptions = useMemo(() => getAvailableAssigneeOptions(usersData?.users?.content), [usersData]);
 
     const mapApiApprovalTaskToUiApprovalTask = useCallback(
         (apiApprovalTask: ApprovalTask): ApprovalTaskI => ({
-            assignee: apiApprovalTask.createdBy || 'Unassigned',
+            assignee: getAssigneeNameById(apiApprovalTask.assigneeId, usersData?.users?.content),
+            assigneeId: apiApprovalTask.assigneeId,
             attachments: [],
             comments: [],
             createdAt: apiApprovalTask.createdDate || new Date().toISOString(),
             dependencies: [],
             description: apiApprovalTask.description || '',
-            dueDate: undefined,
+            dueDate: apiApprovalTask.dueDate ?? undefined,
             id: apiApprovalTask.id,
-            priority: 'medium',
-            status: 'open',
+            jobResumeId: apiApprovalTask.jobResumeId,
+            priority: toClientPriority(apiApprovalTask.priority),
+            status: toClientStatus(apiApprovalTask.status),
             title: apiApprovalTask.name,
             version: apiApprovalTask.version,
         }),
-        []
+        [usersData]
     );
 
     useEffect(() => {
@@ -109,16 +122,28 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
 
     const updateApprovalTask = useCallback(
         (updatedApprovalTask: ApprovalTaskI) => {
-            storeUpdateApprovalTask(updatedApprovalTask);
-
-            updateApprovalTaskMutation.mutate({
-                approvalTask: {
-                    description: updatedApprovalTask.description,
-                    id: updatedApprovalTask.id,
-                    name: updatedApprovalTask.title,
-                    version: updatedApprovalTask.version,
+            updateApprovalTaskMutation.mutate(
+                {
+                    approvalTask: {
+                        assigneeId: updatedApprovalTask.assigneeId,
+                        description: updatedApprovalTask.description,
+                        dueDate: updatedApprovalTask.dueDate ?? null,
+                        id: updatedApprovalTask.id,
+                        name: updatedApprovalTask.title,
+                        priority: toServerPriority(updatedApprovalTask.priority),
+                        status: toServerStatus(updatedApprovalTask.status),
+                        version: updatedApprovalTask.version,
+                    },
                 },
-            });
+                {
+                    onSuccess: (data) => {
+                        storeUpdateApprovalTask({
+                            ...updatedApprovalTask,
+                            version: data.updateApprovalTask?.version ?? updatedApprovalTask.version,
+                        });
+                    },
+                }
+            );
         },
         [storeUpdateApprovalTask, updateApprovalTaskMutation]
     );
@@ -160,6 +185,7 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
         addAttachmentToApprovalTask,
         addCommentToApprovalTask,
         approvalTasks,
+        availableAssigneeOptions,
         availableAssignees,
         removeAttachmentFromApprovalTask,
         selectedApprovalTaskId,
