@@ -31,6 +31,7 @@ import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -41,6 +42,7 @@ public class JsonFileAssert {
 
     private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
         .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+        .configure(SerializationFeature.INDENT_OUTPUT, true)
 //        .changeDefaultVisibility(vc -> vc.with(JsonAutoDetect.Visibility.PUBLIC_ONLY))
         .build();
 
