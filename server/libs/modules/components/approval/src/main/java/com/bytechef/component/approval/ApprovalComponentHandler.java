@@ -20,11 +20,12 @@ import static com.bytechef.component.approval.constant.ApprovalConstants.APPROVA
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.approval.action.RequestApprovalAction;
+import com.bytechef.component.approval.action.ApprovalRequestApprovalAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ApprovalComponentDefinition;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,14 +36,14 @@ public class ApprovalComponentHandler implements ComponentHandler {
 
     private final ApprovalComponentDefinition componentDefinition;
 
-    public ApprovalComponentHandler() {
+    public ApprovalComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new ApprovalComponentDefinitionImpl(
             component(APPROVAL)
                 .title("Approval")
                 .description("Approval component for manual intervention in workflows.")
                 .icon("path:assets/approval.svg")
                 .categories(ComponentCategory.HELPERS)
-                .actions(RequestApprovalAction.ACTION_DEFINITION));
+                .actions(ApprovalRequestApprovalAction.of(clusterElementDefinitionService)));
     }
 
     @Override

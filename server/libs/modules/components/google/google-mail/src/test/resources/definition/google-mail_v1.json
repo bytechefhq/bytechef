@@ -3556,7 +3556,7 @@
     "type": {
       "name": "APPROVAL_CHANNELS",
       "key": "approvalChannels",
-      "label": "Approval Channels",
+      "label": "Channels",
       "multipleElements": true,
       "required": false
     },

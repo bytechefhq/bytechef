@@ -16,6 +16,9 @@
 
 package com.bytechef.component.approval;
 
+import static org.mockito.Mockito.mock;
+
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +29,8 @@ class ApprovalComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/approval.json", new ApprovalComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/approval.json",
+            new ApprovalComponentHandler(mock(ClusterElementDefinitionService.class)).getDefinition());
     }
 }

@@ -27,7 +27,7 @@ import com.bytechef.component.definition.Parameters;
 public interface ApprovalChannelFunction {
 
     ClusterElementType APPROVAL_CHANNELS =
-        new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Approval Channels", true, false);
+        new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Channels", true, false);
 
     Object apply(
         Parameters inputParameters, Parameters connectionParameters, String formUrl,
