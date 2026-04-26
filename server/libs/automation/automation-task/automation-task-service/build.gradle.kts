@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.data:spring-data-commons")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))

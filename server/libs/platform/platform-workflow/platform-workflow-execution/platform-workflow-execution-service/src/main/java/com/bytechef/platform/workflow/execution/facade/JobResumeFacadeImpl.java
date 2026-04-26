@@ -20,11 +20,13 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,11 +39,15 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(JobResumeFacadeImpl.class);
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final JobFacade jobFacade;
     private final JobService jobService;
 
     @SuppressFBWarnings("EI")
-    public JobResumeFacadeImpl(JobFacade jobFacade, JobService jobService) {
+    public JobResumeFacadeImpl(
+        ApplicationEventPublisher applicationEventPublisher, JobFacade jobFacade, JobService jobService) {
+
+        this.applicationEventPublisher = applicationEventPublisher;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
     }
@@ -69,6 +75,8 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
             }
 
             jobFacade.resumeJob(jobResumeId.getJobId(), data);
+
+            applicationEventPublisher.publishEvent(new JobResumedEvent(id));
 
             return JobResumeOutcome.OK;
         });
