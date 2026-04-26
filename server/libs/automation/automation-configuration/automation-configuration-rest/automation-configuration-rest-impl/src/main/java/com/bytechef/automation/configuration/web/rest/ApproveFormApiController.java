@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.web.rest.model.ApproveFormModel;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
@@ -64,12 +65,25 @@ public class ApproveFormApiController implements ApproveFormApi {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, exception);
         }
 
-        Job job = jobService.getJob(jobResumeId.getJobId());
+        Job job;
+
+        try {
+            job = jobService.getJob(jobResumeId.getJobId());
+        } catch (Exception exception) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Approval form is no longer available.", exception);
+        }
 
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        WorkflowTask workflowTask = workflow.getTasks()
-            .get(job.getCurrentTask());
+        int currentTask = job.getCurrentTask();
+        List<WorkflowTask> workflowTasks = workflow.getTasks();
+
+        if (currentTask < 0 || currentTask >= workflowTasks.size()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Approval form is no longer available.");
+        }
+
+        WorkflowTask workflowTask = workflowTasks.get(currentTask);
 
         Map<String, ?> parameters = workflowTask.getParameters();
 
