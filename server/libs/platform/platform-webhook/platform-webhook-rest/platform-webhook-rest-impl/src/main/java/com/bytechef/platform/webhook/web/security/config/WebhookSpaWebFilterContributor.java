@@ -27,6 +27,6 @@ import org.springframework.stereotype.Component;
 public class WebhookSpaWebFilterContributor implements SpaWebFilterContributor {
     @Override
     public List<String> getNonSpaPathPrefixes() {
-        return List.of("/approvals", "/callback", "/file-entries", "/oauth", "/webhooks");
+        return List.of("/approvals", "/callback", "/file-entries", "/job/resume", "/oauth", "/webhooks");
     }
 }
