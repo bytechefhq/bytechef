@@ -19,7 +19,6 @@ package com.bytechef.platform.workflow.execution.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
-import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import java.time.Instant;
 import java.util.Map;
@@ -68,7 +67,7 @@ public class ConnectionLifecycleFacadeTest {
         Instant beforeCall = Instant.now();
 
         connectionLifecycleFacade.scheduleConnectionRefresh(
-            connectionId, parameters, AuthorizationType.OAUTH2_AUTHORIZATION_CODE, tenantId);
+            connectionId, parameters, tenantId);
 
         Instant afterCall = Instant.now();
 
