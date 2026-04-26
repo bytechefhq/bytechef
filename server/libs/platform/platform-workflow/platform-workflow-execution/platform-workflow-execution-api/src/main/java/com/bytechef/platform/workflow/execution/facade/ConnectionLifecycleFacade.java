@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.workflow.execution.facade;
 
-import com.bytechef.component.definition.Authorization.AuthorizationType;
 import java.util.Map;
 
 /**
@@ -25,7 +24,7 @@ import java.util.Map;
 public interface ConnectionLifecycleFacade {
 
     void scheduleConnectionRefresh(
-        Long connectionId, Map<String, ?> parameters, AuthorizationType authorizationType, String tenantId);
+        Long connectionId, Map<String, ?> parameters, String tenantId);
 
     void deleteScheduledConnectionRefresh(Long connectionId, String tenantId);
 }
