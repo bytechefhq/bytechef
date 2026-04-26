@@ -95,4 +95,17 @@ public interface ApprovalFormMapper extends Converter<Map<String, Object>, Appro
         throw new IllegalArgumentException("Unsupported type for integer conversion: " + value.getClass()
             .getName());
     }
+
+    default Long mapToLong(Object value) {
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+
+        if (value instanceof String string) {
+            return Long.parseLong(string);
+        }
+
+        throw new IllegalArgumentException("Unsupported type for long conversion: " + value.getClass()
+            .getName());
+    }
 }
