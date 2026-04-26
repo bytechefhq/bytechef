@@ -10,7 +10,7 @@ import {RadioFieldRenderer} from '@/shared/components/form/RadioFieldRenderer';
 import {SelectFieldRenderer} from '@/shared/components/form/SelectFieldRenderer';
 import {TextAreaFieldRenderer} from '@/shared/components/form/TextAreaFieldRenderer';
 import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {FieldType} from '../trigger-form/TriggerForm';
 import useResumeForm from './hooks/useResumeForm';
@@ -19,20 +19,30 @@ export default function ResumeForm() {
     const {approved, definition, error, form, handleSubmit, loading, submitError, submitted, submitting, uiDefinition} =
         useResumeForm();
 
+    useEffect(() => {
+        const formTitle = uiDefinition?.title;
+
+        document.title = formTitle ? `ByteChef - ${formTitle}` : 'ByteChef';
+
+        return () => {
+            document.title = 'ByteChef';
+        };
+    }, [uiDefinition?.title]);
+
     if (loading) {
         return (
-            <div className="h-full overflow-auto">
-                <div className="mx-auto w-full max-w-2xl p-6 text-center text-sm text-muted-foreground">
+            <div className="flex h-full overflow-auto">
+                <div className="m-auto w-full max-w-2xl p-6 text-center text-sm text-muted-foreground">
                     Loading form...
                 </div>
             </div>
         );
     }
 
-    if (error) {
+    if (error || !uiDefinition || !definition) {
         return (
-            <div className="h-full overflow-auto">
-                <div className="mx-auto w-full max-w-2xl p-6 text-center">
+            <div className="flex h-full overflow-auto">
+                <div className="m-auto w-full max-w-2xl p-6 text-center">
                     <h1 className="text-2xl font-semibold tracking-tight">Form no longer available</h1>
 
                     <p className="mt-2 text-sm text-muted-foreground">
@@ -62,21 +72,6 @@ export default function ResumeForm() {
 
                     <p className="mt-2 text-sm text-muted-foreground">
                         {approved ? 'Your approval has been submitted.' : 'The request has been discarded.'}
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!uiDefinition || !definition) {
-        return (
-            <div className="h-full overflow-auto">
-                <div className="mx-auto w-full max-w-2xl p-6 text-center">
-                    <h1 className="text-2xl font-semibold tracking-tight">Form no longer available</h1>
-
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        This approval form is no longer available. It may have already been submitted, expired, or the
-                        link is invalid.
                     </p>
                 </div>
             </div>
