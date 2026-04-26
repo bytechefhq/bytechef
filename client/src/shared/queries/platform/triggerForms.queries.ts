@@ -1,4 +1,4 @@
-import {TriggerForm, TriggerFormApi} from '@/shared/middleware/automation/configuration';
+import {TriggerForm, TriggerFormApi} from '@/shared/middleware/automation/workflow/execution';
 import {useQuery} from '@tanstack/react-query';
 
 export const TriggerFormKeys = {

@@ -1,9 +1,9 @@
-import {TriggerForm as TriggerFormType} from '@/shared/middleware/automation/configuration';
+import {FieldType} from '@/shared/constants';
+import {TriggerForm as TriggerFormType} from '@/shared/middleware/automation/workflow/execution';
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {createTestQueryClientWrapper} from '../../../../shared/util/test-utils';
-import {FieldType} from '../TriggerForm';
 import useTriggerForm from '../hooks/useTriggerForm';
 
 const mockWorkflowExecutionId = 'test-execution-id';
@@ -20,7 +20,7 @@ const {mockGetTriggerForm} = vi.hoisted(() => ({
     mockGetTriggerForm: vi.fn(),
 }));
 
-vi.mock('@/shared/middleware/automation/configuration', async (importOriginal) => {
+vi.mock('@/shared/middleware/automation/workflow/execution', async (importOriginal) => {
     const actual = (await importOriginal()) as Record<string, unknown>;
 
     return {
@@ -182,7 +182,8 @@ describe('useTriggerForm', () => {
             await result.current.handleSubmit({textField: 'hello'});
         });
 
-        expect(result.current.submitted).toBe(true);
+        await waitFor(() => expect(result.current.submitted).toBe(true));
+
         expect(result.current.submitting).toBe(false);
         expect(global.fetch).toHaveBeenCalledWith(
             `/webhooks/${mockWorkflowExecutionId}`,
@@ -220,7 +221,8 @@ describe('useTriggerForm', () => {
             await result.current.handleSubmit({fileField: testFile});
         });
 
-        expect(result.current.submitted).toBe(true);
+        await waitFor(() => expect(result.current.submitted).toBe(true));
+
         expect(global.fetch).toHaveBeenCalledWith(
             `/webhooks/${mockWorkflowExecutionId}`,
             expect.objectContaining({
@@ -245,8 +247,9 @@ describe('useTriggerForm', () => {
             await result.current.handleSubmit({textField: 'value'});
         });
 
+        await waitFor(() => expect(result.current.submitError).toBe('Submission failed: Internal Server Error'));
+
         expect(result.current.submitted).toBe(false);
-        expect(result.current.submitError).toBe('Submission failed: Internal Server Error');
     });
 
     it('should set submitError when fetch throws', async () => {
@@ -261,8 +264,9 @@ describe('useTriggerForm', () => {
             await result.current.handleSubmit({textField: 'value'});
         });
 
+        await waitFor(() => expect(result.current.submitError).toBe('Network failure'));
+
         expect(result.current.submitted).toBe(false);
-        expect(result.current.submitError).toBe('Network failure');
     });
 
     it('should handle FormData with array values', async () => {
