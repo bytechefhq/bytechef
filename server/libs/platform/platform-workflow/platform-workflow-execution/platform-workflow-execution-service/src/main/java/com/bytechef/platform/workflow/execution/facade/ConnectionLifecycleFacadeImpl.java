@@ -44,15 +44,20 @@ public class ConnectionLifecycleFacadeImpl implements ConnectionLifecycleFacade 
     public void scheduleConnectionRefresh(
         Long connectionId, Map<String, ?> parameters, String tenantId) {
 
+        if (!parameters.containsKey("expires_in")) {
+            log.warn("Unable to schedule connection refresh without expires_in connection parameter");
+
+            return;
+        }
+
         try {
             Integer expiresIn = (Integer) parameters.get("expires_in");
 
             Instant expiry = Instant.now()
                 .plusSeconds(expiresIn);
 
-            if (expiry != null) {
-                connectionRefreshScheduler.scheduleConnectionRefresh(connectionId, expiry, tenantId);
-            }
+            connectionRefreshScheduler.scheduleConnectionRefresh(connectionId, expiry, tenantId);
+
         } catch (Exception e) {
             log.error("Unable to schedule connection refresh");
 
