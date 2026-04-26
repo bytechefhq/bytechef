@@ -9,27 +9,11 @@ import {InputFieldRenderer} from '@/shared/components/form/InputFieldRenderer';
 import {RadioFieldRenderer} from '@/shared/components/form/RadioFieldRenderer';
 import {SelectFieldRenderer} from '@/shared/components/form/SelectFieldRenderer';
 import {TextAreaFieldRenderer} from '@/shared/components/form/TextAreaFieldRenderer';
-import {PRODUCTION_ENVIRONMENT} from '@/shared/constants';
-import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
+import {FieldType, PRODUCTION_ENVIRONMENT} from '@/shared/constants';
+import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import React from 'react';
 
 import useTriggerForm from './hooks/useTriggerForm';
-
-export enum FieldType {
-    CHECKBOX = 1,
-    DATE_PICKER = 2,
-    DATETIME_PICKER = 3,
-    FILE_INPUT = 4,
-    TEXTAREA = 5,
-    INPUT = 6,
-    SELECT = 7,
-    EMAIL_INPUT = 8,
-    NUMBER_INPUT = 9,
-    PASSWORD_INPUT = 10,
-    RADIO = 11,
-    CUSTOM_HTML = 12,
-    HIDDEN_FIELD = 13,
-}
 
 export default function TriggerForm() {
     const {

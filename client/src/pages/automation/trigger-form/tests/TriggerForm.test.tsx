@@ -1,8 +1,9 @@
-import {TriggerForm as TriggerFormType} from '@/shared/middleware/automation/configuration';
+import {FieldType} from '@/shared/constants';
+import {TriggerForm as TriggerFormType} from '@/shared/middleware/automation/workflow/execution';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {fireEvent, render, screen, waitFor} from '../../../../shared/util/test-utils';
-import TriggerForm, {FieldType} from '../TriggerForm';
+import TriggerForm from '../TriggerForm';
 
 const mockWorkflowExecutionId = 'test-id';
 const mockEnvironmentId = '0';
@@ -18,7 +19,7 @@ const {mockGetTriggerForm} = vi.hoisted(() => ({
     mockGetTriggerForm: vi.fn(),
 }));
 
-vi.mock('@/shared/middleware/automation/configuration', async (importOriginal) => {
+vi.mock('@/shared/middleware/automation/workflow/execution', async (importOriginal) => {
     const actual = (await importOriginal()) as Record<string, unknown>;
 
     return {
