@@ -1,7 +1,9 @@
-import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
-import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import {UseFormReturn} from 'react-hook-form';
+
+import {FormLabelWithDescription} from './FormLabelWithDescription';
 
 interface TextAreaFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
@@ -20,9 +22,7 @@ export const TextAreaFieldRenderer = ({form, formInput, name}: TextAreaFieldRend
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabel>{label}</FormLabel>
-
-                    {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
+                    <FormLabelWithDescription description={fieldDescription} label={label} />
 
                     <FormControl>
                         <Textarea

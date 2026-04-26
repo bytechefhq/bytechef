@@ -1,6 +1,8 @@
-import {FormControl, FormDescription, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
+import {FormControl, FormItem, FormMessage} from '@/components/ui/form';
+import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import {Controller, UseFormReturn} from 'react-hook-form';
+
+import {FormLabelWithDescription} from './FormLabelWithDescription';
 
 interface FileInputFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
@@ -19,9 +21,7 @@ export const FileInputFieldRenderer = ({form, formInput, name}: FileInputFieldRe
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabel>{label}</FormLabel>
-
-                    {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
+                    <FormLabelWithDescription description={fieldDescription} label={label} />
 
                     <FormControl>
                         <div>

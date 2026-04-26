@@ -60,7 +60,7 @@ describe('CheckboxFieldRenderer', () => {
             {wrapper}
         );
 
-        expect(screen.getByText('This is a helpful description')).toBeInTheDocument();
+        expect(screen.getByLabelText('Field description')).toBeInTheDocument();
     });
 
     it('should not render field description when not provided', () => {
@@ -68,7 +68,7 @@ describe('CheckboxFieldRenderer', () => {
 
         render(<CheckboxFieldRenderer form={form} formInput={{fieldLabel: 'Checkbox'}} name="checkbox" />, {wrapper});
 
-        expect(screen.queryByText('This is a helpful description')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Field description')).not.toBeInTheDocument();
     });
 
     it('should render checkbox input', () => {

@@ -1,4 +1,4 @@
-import {FieldType} from '@/pages/automation/trigger-form/TriggerForm';
+import {FieldType} from '@/shared/constants';
 import {render, screen} from '@/shared/util/test-utils';
 import {describe, expect, it, vi} from 'vitest';
 
@@ -85,7 +85,7 @@ describe('DateTimeFieldRenderer', () => {
             {wrapper}
         );
 
-        expect(screen.getByText('Select the event date')).toBeInTheDocument();
+        expect(screen.getByLabelText('Field description')).toBeInTheDocument();
     });
 
     it('should not render field description when not provided', () => {
@@ -100,7 +100,7 @@ describe('DateTimeFieldRenderer', () => {
             {wrapper}
         );
 
-        expect(screen.queryByText('Select the event date')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Field description')).not.toBeInTheDocument();
     });
 
     it('should render DatePicker for DATE_PICKER fieldType', () => {

@@ -45,7 +45,7 @@ describe('FileInputFieldRenderer', () => {
             {wrapper}
         );
 
-        expect(screen.getByText('Please upload a PDF document')).toBeInTheDocument();
+        expect(screen.getByLabelText('Field description')).toBeInTheDocument();
     });
 
     it('should not render field description when not provided', () => {
@@ -53,7 +53,7 @@ describe('FileInputFieldRenderer', () => {
 
         render(<FileInputFieldRenderer form={form} formInput={{fieldLabel: 'Document'}} name="document" />, {wrapper});
 
-        expect(screen.queryByText('Please upload a PDF document')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Field description')).not.toBeInTheDocument();
     });
 
     it('should render file input element', () => {

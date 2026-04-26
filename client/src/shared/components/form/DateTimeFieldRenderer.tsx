@@ -1,9 +1,11 @@
 import DatePicker from '@/components/DatePicker/DatePicker';
 import DateTimePicker from '@/components/DateTimePicker/DateTimePicker';
-import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {FieldType} from '@/pages/automation/trigger-form/TriggerForm';
-import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
+import {FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
+import {FieldType} from '@/shared/constants';
+import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import {UseFormReturn} from 'react-hook-form';
+
+import {FormLabelWithDescription} from './FormLabelWithDescription';
 
 interface DateTimeFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
@@ -22,9 +24,7 @@ export const DateTimeFieldRenderer = ({form, formInput, name}: DateTimeFieldRend
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabel>{label}</FormLabel>
-
-                    {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
+                    <FormLabelWithDescription description={fieldDescription} label={label} />
 
                     <FormControl>
                         {fieldType === FieldType.DATE_PICKER ? (

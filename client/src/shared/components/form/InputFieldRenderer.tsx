@@ -1,8 +1,10 @@
-import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {FieldType} from '@/pages/automation/trigger-form/TriggerForm';
-import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
+import {FieldType} from '@/shared/constants';
+import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import {UseFormReturn} from 'react-hook-form';
+
+import {FormLabelWithDescription} from './FormLabelWithDescription';
 
 const getInputTypeFromFieldType = (fieldType?: number): string => {
     if (fieldType === undefined) {
@@ -36,9 +38,7 @@ export const InputFieldRenderer = ({form, formInput, name}: InputFieldRendererPr
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabel>{label}</FormLabel>
-
-                    {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
+                    <FormLabelWithDescription description={fieldDescription} label={label} />
 
                     <FormControl>
                         <Input

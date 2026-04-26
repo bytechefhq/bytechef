@@ -1,7 +1,9 @@
 import {Checkbox} from '@/components/ui/checkbox';
-import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
+import {FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
+import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import {UseFormReturn} from 'react-hook-form';
+
+import {FormLabelWithDescription} from './FormLabelWithDescription';
 
 interface CheckboxFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
@@ -20,14 +22,12 @@ export const CheckboxFieldRenderer = ({form, formInput, name}: CheckboxFieldRend
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
                     <div className="flex items-center space-x-2">
                         <FormControl>
                             <Checkbox checked={!!field.value} onCheckedChange={field.onChange} />
                         </FormControl>
 
-                        <FormLabel className="font-normal">{placeholder || label}</FormLabel>
+                        <FormLabelWithDescription description={fieldDescription} label={placeholder || label} />
                     </div>
 
                     <FormMessage />

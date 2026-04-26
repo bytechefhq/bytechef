@@ -45,7 +45,7 @@ describe('TextAreaFieldRenderer', () => {
             {wrapper}
         );
 
-        expect(screen.getByText('Enter a detailed description')).toBeInTheDocument();
+        expect(screen.getByLabelText('Field description')).toBeInTheDocument();
     });
 
     it('should not render field description when not provided', () => {
@@ -55,7 +55,7 @@ describe('TextAreaFieldRenderer', () => {
             wrapper,
         });
 
-        expect(screen.queryByText('Enter a detailed description')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Field description')).not.toBeInTheDocument();
     });
 
     it('should render textarea element', () => {
