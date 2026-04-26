@@ -29,6 +29,23 @@ public interface ApprovalChannelFunction {
     ClusterElementType APPROVAL_CHANNELS =
         new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Channels", true, false);
 
+    /**
+     * Key under which the calling approval action publishes the form description.
+     */
+    String FORM_DESCRIPTION = "formDescription";
+
+    /**
+     * Key under which the calling approval action publishes the form title.
+     */
+    String FORM_TITLE = "formTitle";
+
+    /**
+     * Key under which the calling approval action publishes its form-input definitions. Channels can consult this list
+     * to decide between rendering a single "open form" link (when the form has fields the user must fill in) and a pair
+     * of one-click Approve/Discard actions (when the list is empty).
+     */
+    String INPUTS = "inputs";
+
     Object apply(
         Parameters inputParameters, Parameters connectionParameters, String formUrl, ClusterElementContext context)
         throws Exception;

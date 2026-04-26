@@ -31,9 +31,6 @@ public final class ApprovalConstants {
     public static final String FIELD_NAME = "fieldName";
     public static final String FIELD_OPTIONS = "fieldOptions";
     public static final String FIELD_TYPE = "fieldType";
-    public static final String FORM_DESCRIPTION = "formDescription";
-    public static final String FORM_TITLE = "formTitle";
-    public static final String INPUTS = "inputs";
     public static final String MAX_SELECTION = "maxSelection";
     public static final String MIN_SELECTION = "minSelection";
     public static final String MULTIPLE_CHOICE = "multipleChoice";
