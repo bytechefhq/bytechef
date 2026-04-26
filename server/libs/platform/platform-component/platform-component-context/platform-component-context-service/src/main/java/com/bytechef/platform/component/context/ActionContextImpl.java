@@ -339,6 +339,11 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
+    public boolean isEditorEnvironment() {
+        return editorEnvironment;
+    }
+
+    @Override
     public ClusterElementContext toClusterElementContext(
         String componentName, int componentVersion, String clusterElementName,
         @Nullable ComponentConnection componentConnection) {
