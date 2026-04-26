@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.PlatformType;
@@ -47,6 +46,14 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
      */
     @Nullable
     Long getEnvironmentId();
+
+    /**
+     * Indicates whether the action is executing in an editor environment (e.g. the workflow editor test run backed by
+     * {@code JobSyncExecutor}), as opposed to a production workflow run.
+     *
+     * @return {@code true} when running in the editor, {@code false} otherwise
+     */
+    boolean isEditorEnvironment();
 
     /**
      * Retrieves the suspend state if the action called {@link ActionContext#suspend(Suspend)} during execution.
