@@ -1,19 +1,19 @@
-import {useGetApproveFormQuery} from '@/shared/queries/platform/approveForms.queries';
+import {FieldType, PRODUCTION_ENVIRONMENT, toEnvironmentName} from '@/shared/constants';
+import {useResumeJobMutation} from '@/shared/mutations/platform/resumeJobs.mutations';
+import {useGetApprovalFormQuery} from '@/shared/queries/platform/approvalForms.queries';
 import {useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {useParams} from 'react-router-dom';
 
-import {FieldType} from '../../trigger-form/TriggerForm';
+interface UseApprovalFormOptionsI {
+    onSubmitted?: (approved: boolean) => void;
+}
 
-export default function useResumeForm() {
-    const {id} = useParams<{id: string}>();
-
-    const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+export default function useApprovalForm(id: string | undefined, options?: UseApprovalFormOptionsI) {
     const [approved, setApproved] = useState<boolean | null>(null);
-    const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const {data: definition, error, isLoading: loading} = useGetApproveFormQuery(id ?? '');
+    const {data: definition, error, isLoading: loading} = useGetApprovalFormQuery(id ?? '');
+
+    const resumeJobMutation = useResumeJobMutation();
 
     const form = useForm<Record<string, unknown>>({
         defaultValues: {},
@@ -25,10 +25,12 @@ export default function useResumeForm() {
             return null;
         }
 
-        const {formDescription, formTitle, inputs} = definition;
+        const {environmentId, formDescription, formTitle, inputs} = definition;
 
         return {
             description: formDescription || '',
+            environmentId: environmentId ?? null,
+            environmentName: environmentId == null ? null : toEnvironmentName(environmentId ?? PRODUCTION_ENVIRONMENT),
             inputs: inputs || [],
             title: formTitle || 'Approval Request',
         };
@@ -39,31 +41,14 @@ export default function useResumeForm() {
             return;
         }
 
-        setSubmitting(true);
-        setSubmitError(null);
-
         try {
-            const body = JSON.stringify({
-                ...values,
-                approved: approveValue,
-            });
-
-            const approveFormSubmitRequest = await fetch(`/job/resume/${id}`, {
-                body,
-                headers: {'Content-Type': 'application/json'},
-                method: 'POST',
-            });
-
-            if (!approveFormSubmitRequest.ok) {
-                throw new Error(`Submission failed: ${approveFormSubmitRequest.statusText}`);
-            }
+            await resumeJobMutation.mutateAsync({approved: approveValue, data: values, id});
 
             setApproved(approveValue);
-            setSubmitted(true);
-        } catch (submitError) {
-            setSubmitError(submitError instanceof Error ? submitError.message : 'Failed to submit form');
-        } finally {
-            setSubmitting(false);
+
+            options?.onSubmitted?.(approveValue);
+        } catch {
+            // error surfaced via resumeJobMutation.error
         }
     };
 
@@ -96,9 +81,9 @@ export default function useResumeForm() {
         form,
         handleSubmit,
         loading,
-        submitError,
-        submitted,
-        submitting,
+        submitError: resumeJobMutation.error?.message ?? null,
+        submitted: resumeJobMutation.isSuccess,
+        submitting: resumeJobMutation.isPending,
         uiDefinition,
     };
 }
