@@ -1,12 +1,17 @@
 query approvalTask($id: ID!) {
     approvalTask(id: $id) {
+        assigneeId
         createdBy
         createdDate
         description
+        dueDate
         id
+        jobResumeId
         lastModifiedBy
         lastModifiedDate
         name
+        priority
+        status
         version
     }
 }

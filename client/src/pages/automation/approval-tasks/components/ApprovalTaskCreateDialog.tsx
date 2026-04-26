@@ -16,7 +16,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
-import {CheckCircle2Icon, CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
+import {CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 import {useApprovalTaskCreateDialog} from './hooks/useApprovalTaskCreateDialog';
@@ -27,9 +27,10 @@ interface ApprovalTaskCreateDialogProps {
 
 export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDialogProps) {
     const {
-        availableAssignees,
+        availableAssigneeOptions,
         errors,
         form,
+        handleAssigneeChange,
         handleCloseDialog,
         handleFormChange,
         handleOpenChange,
@@ -112,13 +113,6 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                                             In Progress
                                         </span>
                                     </SelectItem>
-
-                                    <SelectItem value="completed">
-                                        <span className="flex items-center gap-2">
-                                            <CheckCircle2Icon className="size-3 text-green-600" />
-                                            Completed
-                                        </span>
-                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </fieldset>
@@ -170,21 +164,18 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                                 <RequiredMark />
                             </Label>
 
-                            <Select
-                                onValueChange={(value) => handleFormChange('assignee', value)}
-                                value={form.assignee}
-                            >
+                            <Select onValueChange={handleAssigneeChange} value={form.assigneeId ?? ''}>
                                 <SelectTrigger className={errors.assignee ? 'border-red-500' : ''}>
                                     <SelectValue placeholder="Select an assignee" />
                                 </SelectTrigger>
 
                                 <SelectContent>
-                                    {availableAssignees.map((assignee) => (
-                                        <SelectItem key={assignee} value={assignee}>
+                                    {availableAssigneeOptions.map((assigneeOption) => (
+                                        <SelectItem key={assigneeOption.id} value={assigneeOption.id}>
                                             <span className="flex items-center gap-2">
                                                 <UserIcon className="size-3 text-muted-foreground" />
 
-                                                {assignee}
+                                                {assigneeOption.name}
                                             </span>
                                         </SelectItem>
                                     ))}

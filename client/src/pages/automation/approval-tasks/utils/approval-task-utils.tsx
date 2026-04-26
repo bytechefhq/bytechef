@@ -1,8 +1,9 @@
+import {ApprovalTaskPriority, ApprovalTaskStatus} from '@/shared/middleware/graphql';
 import {CheckCircle2Icon, CircleIcon, ClockIcon} from 'lucide-react';
 
 import type {ReactNode} from 'react';
 
-import type {ApprovalTaskI, SortDirectionType, SortOptionType} from '../types/types';
+import type {ApprovalTaskI, AssigneeOptionI, SortDirectionType, SortOptionType} from '../types/types';
 
 const PRIORITY_ORDER: Record<string, number> = {high: 3, low: 1, medium: 2};
 const STATUS_ORDER: Record<string, number> = {completed: 3, 'in-progress': 2, open: 1};
@@ -15,9 +16,18 @@ interface UserWithDisplayInfoI {
     activated?: boolean | null;
     email?: string | null;
     firstName?: string | null;
+    id?: string | number | null;
     lastName?: string | null;
     login?: string | null;
 }
+
+const buildAssigneeName = (user: UserWithDisplayInfoI): string => {
+    if (user.firstName && user.lastName) {
+        return `${user.firstName} ${user.lastName}`;
+    }
+
+    return user.login || user.email || '';
+};
 
 export const getAvailableAssignees = (users: Array<UserWithDisplayInfoI | null> | undefined): string[] => {
     if (!users) {
@@ -26,14 +36,37 @@ export const getAvailableAssignees = (users: Array<UserWithDisplayInfoI | null> 
 
     return users
         .filter((user): user is UserWithDisplayInfoI => user !== null && user?.activated === true)
-        .map((user) => {
-            if (user.firstName && user.lastName) {
-                return `${user.firstName} ${user.lastName}`;
-            }
-
-            return user.login || user.email || '';
-        })
+        .map((user) => buildAssigneeName(user))
         .filter((name) => name !== '');
+};
+
+export const getAvailableAssigneeOptions = (
+    users: Array<UserWithDisplayInfoI | null> | undefined
+): AssigneeOptionI[] => {
+    if (!users) {
+        return [];
+    }
+
+    return users
+        .filter((user): user is UserWithDisplayInfoI => user !== null && user?.activated === true && user?.id != null)
+        .map((user) => ({
+            id: String(user.id),
+            name: buildAssigneeName(user),
+        }))
+        .filter((option) => option.name !== '');
+};
+
+export const getAssigneeNameById = (
+    assigneeId: string | null | undefined,
+    users: Array<UserWithDisplayInfoI | null> | undefined
+): string => {
+    if (!assigneeId || !users) {
+        return 'Unassigned';
+    }
+
+    const matched = users.find((user) => user != null && user.id != null && String(user.id) === assigneeId);
+
+    return matched ? buildAssigneeName(matched) || 'Unassigned' : 'Unassigned';
 };
 
 export const formatDate = (dateString: string): string => {
@@ -108,6 +141,54 @@ export const getStatusLabel = (status: string): string => {
 
 export const getPriorityLabel = (priority: string): string => {
     return priority.charAt(0).toUpperCase() + priority.slice(1);
+};
+
+export const toClientStatus = (status: ApprovalTaskStatus | null | undefined): ApprovalTaskI['status'] => {
+    switch (status) {
+        case ApprovalTaskStatus.InProgress:
+            return 'in-progress';
+        case ApprovalTaskStatus.Completed:
+            return 'completed';
+        case ApprovalTaskStatus.Open:
+        default:
+            return 'open';
+    }
+};
+
+export const toServerStatus = (status: ApprovalTaskI['status']): ApprovalTaskStatus => {
+    switch (status) {
+        case 'in-progress':
+            return ApprovalTaskStatus.InProgress;
+        case 'completed':
+            return ApprovalTaskStatus.Completed;
+        case 'open':
+        default:
+            return ApprovalTaskStatus.Open;
+    }
+};
+
+export const toClientPriority = (priority: ApprovalTaskPriority | null | undefined): ApprovalTaskI['priority'] => {
+    switch (priority) {
+        case ApprovalTaskPriority.High:
+            return 'high';
+        case ApprovalTaskPriority.Low:
+            return 'low';
+        case ApprovalTaskPriority.Medium:
+        default:
+            return 'medium';
+    }
+};
+
+export const toServerPriority = (priority: ApprovalTaskI['priority']): ApprovalTaskPriority => {
+    switch (priority) {
+        case 'high':
+            return ApprovalTaskPriority.High;
+        case 'low':
+            return ApprovalTaskPriority.Low;
+        case 'medium':
+        default:
+            return ApprovalTaskPriority.Medium;
+    }
 };
 
 export const highlightText = (text: string, query: string): ReactNode => {

@@ -1,12 +1,10 @@
 import Button from '@/components/Button/Button';
-import {ScrollArea} from '@/components/ui/scroll-area';
-import {ListFilterIcon, PlusIcon} from 'lucide-react';
+import {ListFilterIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useApprovalTasksStore} from '../stores/useApprovalTasksStore';
 import ApprovalTaskActiveFilterBadges from './ApprovalTaskActiveFilterBadges';
 import ApprovalTaskCard from './ApprovalTaskCard';
-import ApprovalTaskCreateDialog from './ApprovalTaskCreateDialog';
 import ApprovalTaskFilters from './ApprovalTaskFilters';
 import ApprovalTaskSearch from './ApprovalTaskSearch';
 import ApprovalTaskSortMenu from './ApprovalTaskSortMenu';
@@ -48,18 +46,6 @@ export default function ApprovalTaskList() {
                         />
 
                         <ApprovalTaskFilters />
-
-                        <ApprovalTaskCreateDialog
-                            trigger={
-                                <Button
-                                    aria-label="Create new approval task"
-                                    className="size-6 shrink-0"
-                                    icon={<PlusIcon className="size-4" />}
-                                    size="icon"
-                                    variant="default"
-                                />
-                            }
-                        />
                     </div>
                 </div>
 
@@ -68,8 +54,8 @@ export default function ApprovalTaskList() {
                 <ApprovalTaskSearch />
             </div>
 
-            <ScrollArea className="flex-1">
-                <div className="space-y-2 p-4">
+            <div className="min-w-0 flex-1 overflow-y-auto">
+                <div className="min-w-0 space-y-2 p-4">
                     {filteredApprovalTasks.length > 0 ? (
                         filteredApprovalTasks.map((approvalTask) => (
                             <ApprovalTaskCard
@@ -103,7 +89,7 @@ export default function ApprovalTaskList() {
                         </div>
                     )}
                 </div>
-            </ScrollArea>
+            </div>
 
             <div className="flex shrink-0 items-center justify-between border-t border-border bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
                 <span>
