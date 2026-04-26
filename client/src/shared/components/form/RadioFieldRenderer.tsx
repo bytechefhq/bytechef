@@ -1,8 +1,10 @@
-import {FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
-import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import {UseFormReturn} from 'react-hook-form';
+
+import {FormLabelWithDescription} from './FormLabelWithDescription';
 
 interface RadioFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
@@ -22,9 +24,7 @@ export const RadioFieldRenderer = ({form, formInput, name}: RadioFieldRendererPr
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabel>{label}</FormLabel>
-
-                    {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
+                    <FormLabelWithDescription description={fieldDescription} label={label} />
 
                     <div className="flex flex-col gap-2">
                         <RadioGroup

@@ -1,4 +1,4 @@
-import {FieldType} from '@/pages/automation/trigger-form/TriggerForm';
+import {FieldType} from '@/shared/constants';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import {describe, expect, it} from 'vitest';
 
@@ -42,7 +42,7 @@ describe('InputFieldRenderer', () => {
             {wrapper}
         );
 
-        expect(screen.getByText('Enter your full name')).toBeInTheDocument();
+        expect(screen.getByLabelText('Field description')).toBeInTheDocument();
     });
 
     it('should not render field description when not provided', () => {
@@ -50,7 +50,7 @@ describe('InputFieldRenderer', () => {
 
         render(<InputFieldRenderer form={form} formInput={{fieldLabel: 'Name'}} name="name" />, {wrapper});
 
-        expect(screen.queryByText('Enter your full name')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Field description')).not.toBeInTheDocument();
     });
 
     it('should render text input by default', () => {

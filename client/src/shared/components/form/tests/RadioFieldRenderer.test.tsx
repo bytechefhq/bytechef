@@ -67,7 +67,7 @@ describe('RadioFieldRenderer', () => {
             {wrapper}
         );
 
-        expect(screen.getByText('Choose your preferred option')).toBeInTheDocument();
+        expect(screen.getByLabelText('Field description')).toBeInTheDocument();
     });
 
     it('should not render field description when not provided', () => {
@@ -82,7 +82,7 @@ describe('RadioFieldRenderer', () => {
             {wrapper}
         );
 
-        expect(screen.queryByText('Choose your preferred option')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Field description')).not.toBeInTheDocument();
     });
 
     it('should render all radio options', () => {

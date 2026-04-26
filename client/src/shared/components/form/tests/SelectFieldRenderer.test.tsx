@@ -68,7 +68,7 @@ describe('SelectFieldRenderer', () => {
                 {wrapper}
             );
 
-            expect(screen.getByText('Select your favorite color')).toBeInTheDocument();
+            expect(screen.getByLabelText('Field description')).toBeInTheDocument();
         });
 
         it('should render select trigger with default placeholder', () => {

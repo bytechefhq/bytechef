@@ -1,8 +1,10 @@
 import {Checkbox} from '@/components/ui/checkbox';
-import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
+import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import {UseFormReturn} from 'react-hook-form';
+
+import {FormLabelWithDescription} from './FormLabelWithDescription';
 
 interface SelectFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
@@ -33,9 +35,7 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
                 name={name}
                 render={({field}) => (
                     <FormItem className="space-y-2">
-                        <FormLabel>{label}</FormLabel>
-
-                        {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
+                        <FormLabelWithDescription description={fieldDescription} label={label} />
 
                         <div className="flex flex-col gap-2">
                             {options.map((option) => (
@@ -99,9 +99,7 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabel>{label}</FormLabel>
-
-                    {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
+                    <FormLabelWithDescription description={fieldDescription} label={label} />
 
                     <Select
                         onValueChange={field.onChange}
