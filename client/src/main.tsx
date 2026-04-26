@@ -34,6 +34,7 @@ const publicRoutes = [
     '/register',
     '/password-reset',
     '/password-reset/finish',
+    '/resume',
     '/verify-email',
 ];
 

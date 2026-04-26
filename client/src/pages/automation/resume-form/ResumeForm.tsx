@@ -13,11 +13,11 @@ import {TriggerFormInput} from '@/shared/middleware/automation/configuration';
 import React from 'react';
 
 import {FieldType} from '../trigger-form/TriggerForm';
-import useApproveForm from './hooks/useApproveForm';
+import useResumeForm from './hooks/useResumeForm';
 
-export default function ApproveForm() {
+export default function ResumeForm() {
     const {approved, definition, error, form, handleSubmit, loading, submitError, submitted, submitting, uiDefinition} =
-        useApproveForm();
+        useResumeForm();
 
     if (loading) {
         return (
@@ -29,13 +29,26 @@ export default function ApproveForm() {
         );
     }
 
-    if (error || submitError) {
+    if (error) {
+        return (
+            <div className="h-full overflow-auto">
+                <div className="mx-auto w-full max-w-2xl p-6 text-center">
+                    <h1 className="text-2xl font-semibold tracking-tight">Form no longer available</h1>
+
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        This approval form is no longer available. It may have already been submitted, expired, or the
+                        link is invalid.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (submitError) {
         return (
             <div className="h-full overflow-auto">
                 <div className="p-6">
-                    <span className="text-sm text-destructive">
-                        {error ? (error.message ? error.message : 'Failed to load approval form') : submitError}
-                    </span>
+                    <span className="text-sm text-destructive">{submitError}</span>
                 </div>
             </div>
         );
@@ -58,9 +71,14 @@ export default function ApproveForm() {
     if (!uiDefinition || !definition) {
         return (
             <div className="h-full overflow-auto">
-                <span className="mx-auto w-full max-w-2xl p-6 text-center text-sm text-muted-foreground">
-                    No definition found.
-                </span>
+                <div className="mx-auto w-full max-w-2xl p-6 text-center">
+                    <h1 className="text-2xl font-semibold tracking-tight">Form no longer available</h1>
+
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        This approval form is no longer available. It may have already been submitted, expired, or the
+                        link is invalid.
+                    </p>
+                </div>
             </div>
         );
     }
