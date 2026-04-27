@@ -78,9 +78,9 @@ const DataPillPanelBodyPropertiesItem = ({
         title = operation.taskDispatcherDefinition.title;
     }
 
-    const workflowNodeLabel =
-        workflow?.tasks?.find((task) => task.name === workflowNodeName)?.label ||
-        workflow?.triggers?.find((trigger) => trigger.name === workflowNodeName)?.label;
+    const workflowNodeLabel = [...(workflow?.tasks ?? []), ...(workflow?.triggers ?? [])].find(
+        (operation) => operation.name === workflowNodeName
+    )?.label;
 
     const currentWorkflowNode = workflowNodes.find(
         (workflowNode) => workflowNode.workflowNodeName === workflowNodeName
