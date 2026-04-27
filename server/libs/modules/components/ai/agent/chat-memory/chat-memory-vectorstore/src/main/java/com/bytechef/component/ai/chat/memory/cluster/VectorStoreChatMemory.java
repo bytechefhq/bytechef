@@ -33,6 +33,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import java.util.Map;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor.Builder;
 
@@ -97,7 +98,8 @@ public class VectorStoreChatMemory {
                     ParametersFactory.create(componentConnectionConnectionParameters),
                     ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
             .defaultTopK(
-                inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
+                inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20))
+            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200);
 
         return new ChatMemoryFunction.Result(builder.build(), null);
     }
