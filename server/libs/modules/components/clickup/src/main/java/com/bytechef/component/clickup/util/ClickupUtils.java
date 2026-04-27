@@ -52,6 +52,7 @@ public class ClickupUtils extends AbstractClickupUtils {
 
         List<Option<String>> options = new ArrayList<>();
         String folderId = inputParameters.getString(FOLDER_ID);
+
         if (folderId != null) {
             options.addAll(getListsWithinFolder(context, folderId));
         }
@@ -62,7 +63,6 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     private static List<Option<String>> getListsWithinFolder(Context context, String folderId) {
-
         return getOptions(fetchDataFromHttpEndpoint("/folder/" + folderId + "/list", context), "lists");
     }
 
@@ -140,7 +140,6 @@ public class ClickupUtils extends AbstractClickupUtils {
 
     public static void unsubscribeWebhook(TriggerContext context, String webhookId) {
         context.http(http -> http.delete("/webhook/" + webhookId))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
 
