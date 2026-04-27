@@ -449,7 +449,7 @@ const ConnectionDialog = ({
 
                     {errors?.length > 0 && <Errors errors={errors} />}
 
-                    <div className="flex max-h-dialog-height flex-col space-y-4 overflow-y-auto px-6">
+                    <div className="flex max-h-dialog-height min-w-0 flex-col space-y-4 overflow-y-auto px-6">
                         {connection?.id && currentType === PlatformType.EMBEDDED && (
                             <FormField
                                 control={control}
@@ -729,7 +729,7 @@ const ConnectionDialog = ({
                     </div>
 
                     {connection?.id && connectionDefinition && (
-                        <div className="px-6 pt-4">
+                        <div className="min-w-0 px-6 pt-4">
                             <ConnectionParameters
                                 authorizationParameters={connection.authorizationParameters}
                                 authorizationType={connection.authorizationType}
