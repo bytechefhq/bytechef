@@ -88,6 +88,13 @@ null
   "type" : "webhook/v1/autoRespondWithHTTP200"
 }
 ```
+#### Webhook Trigger Execution Modes
+
+Use the **static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Any request sent to this endpoint will immediately receive an **HTTP 200 OK** response, ensuring the workflow is triggered without validating the incoming request.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/db326975-06b1-4c41-880e-484eb14bd33d?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
 
 
 
@@ -121,6 +128,13 @@ null
   "type" : "webhook/v1/validateAndRespond"
 }
 ```
+#### Webhook Trigger Execution Modes
+
+Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Incoming requests are first validated by checking the CSRF token sent in the `X-Csrf-Token` HTTP header. If validation succeeds, the workflow is executed and the sender receives an **HTTP 200 OK** response.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/86347f45-900a-4bca-8763-5f3982305010?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
 
 
 
@@ -156,6 +170,13 @@ null
   "type" : "webhook/v1/awaitWorkflowAndRespond"
 }
 ```
+#### Webhook Trigger Execution Modes
+
+Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Incoming requests are first validated by checking the CSRF token sent in the `X-Csrf-Token HTTP header`. After successful validation, the workflow starts executing, but the HTTP response is delayed until the [**Webhook/Response to Webhook Request**](/reference/components/webhook_v1#response-to-webhook-request) component is reached. In that component, users can define the exact response body, status code, and output returned to the sender.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/60d86013-a975-4e96-a7ac-7a7bccb982d7?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
 
 
 
