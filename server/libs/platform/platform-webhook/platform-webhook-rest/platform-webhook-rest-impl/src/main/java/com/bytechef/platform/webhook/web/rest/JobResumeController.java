@@ -17,10 +17,11 @@
 package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,10 +39,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnCoordinator
-public class ResumeController extends AbstractResumeController {
+public class JobResumeController {
 
-    public ResumeController(JobFacade jobFacade, JobService jobService) {
-        super(jobFacade, jobService);
+    private final JobResumeFacade jobResumeFacade;
+
+    @SuppressFBWarnings("EI")
+    public JobResumeController(JobResumeFacade jobResumeFacade) {
+        this.jobResumeFacade = jobResumeFacade;
     }
 
     /**
@@ -61,6 +65,15 @@ public class ResumeController extends AbstractResumeController {
     public ResponseEntity<Void> resume(
         @PathVariable String id, @RequestBody(required = false) Map<String, Object> data) {
 
-        return doResume(id, data);
+        JobResumeOutcome outcome = jobResumeFacade.resumeJob(id, data);
+
+        return switch (outcome) {
+            case OK -> ResponseEntity.noContent()
+                .build();
+            case INVALID_ID -> ResponseEntity.badRequest()
+                .build();
+            case GONE -> ResponseEntity.status(HttpStatus.GONE)
+                .build();
+        };
     }
 }

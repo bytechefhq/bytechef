@@ -95,11 +95,9 @@ public class WaitOnWebHookCallAction {
         String serviceUrl = continueParameters.getString(SERVICE_URL);
 
         if (serviceUrl != null && resumeUrl != null) {
-            String apiResumeUrl = resumeUrl.replace("/job/resume/", "/api/platform/v1/job/resume/");
-
             context.http(
                 http -> http.post(serviceUrl)
-                    .body(Body.of(Map.of("resumeUrl", apiResumeUrl)))
+                    .body(Body.of(Map.of("resumeUrl", resumeUrl)))
                     .configuration(Http.disableAuthorization(true))
                     .execute());
         }
