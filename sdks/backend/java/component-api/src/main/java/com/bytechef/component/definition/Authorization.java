@@ -659,7 +659,7 @@ public interface Authorization {
      * @param accessToken
      * @param expiresIn
      */
-    record RefreshTokenResponse(String accessToken, String refreshToken, Long expiresIn) {
+    record RefreshTokenResponse(String accessToken, String refreshToken, Integer expiresIn) {
     }
 
     /**

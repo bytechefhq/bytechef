@@ -653,7 +653,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     (String) responseMap.get(Authorization.ACCESS_TOKEN),
                     (String) responseMap.get(Authorization.REFRESH_TOKEN),
                     responseMap.containsKey(Authorization.EXPIRES_IN)
-                        ? Long.valueOf((Integer) responseMap.get(Authorization.EXPIRES_IN)) : null);
+                        ? (Integer) responseMap.get(Authorization.EXPIRES_IN) : null);
             }
         };
     }

@@ -164,7 +164,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public Long executeConnectionRefresh(Long connectionId) {
+    public Integer executeConnectionRefresh(Long connectionId) {
         Connection connection = connectionService.getConnection(connectionId);
 
         ComponentConnection componentConnection = new ComponentConnection(
@@ -179,7 +179,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         logger.info("Scheduled refresh of connection parameters for connection with connectionId: {}", connectionId);
 
-        return (Long) parameters.get("expires_in");
+        return (Integer) parameters.get("expires_in");
     }
 
     @Override

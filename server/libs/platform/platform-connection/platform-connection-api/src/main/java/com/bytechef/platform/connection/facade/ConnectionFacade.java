@@ -30,7 +30,7 @@ public interface ConnectionFacade {
 
     void delete(Long id);
 
-    Long executeConnectionRefresh(Long connectionId);
+    Integer executeConnectionRefresh(Long connectionId);
 
     ConnectionDTO getConnection(Long id);
 
