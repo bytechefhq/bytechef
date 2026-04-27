@@ -10,7 +10,30 @@ tags:
     description: "The Platform Workflow Job API"
   - name: "trigger-execution"
     description: "The Platform Workflow Trigger Execution Internal API"
+  - name: "approval-form"
+    description: "The Platform Approval Form Internal API"
 paths:
+  /approval-form/{id}:
+    get:
+      description: "Get an approval form."
+      summary: "Get an approval form"
+      tags:
+        - "approval-form"
+      operationId: "getApprovalForm"
+      parameters:
+        - name: "id"
+          description: "The id of an approval form."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalForm"
   /jobs:
     get:
       description: "Get a page of jobs."
@@ -167,6 +190,54 @@ paths:
                 $ref: "#/components/schemas/TriggerExecution"
 components:
   schemas:
+    ApprovalForm:
+      type: "object"
+      properties:
+        environmentId:
+          type: "integer"
+          format: "int64"
+        formDescription:
+          type: "string"
+        formTitle:
+          type: "string"
+        inputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ApprovalFormInput"
+    FieldOption:
+      type: "object"
+      properties:
+        label:
+          type: "string"
+        value:
+          type: "string"
+    ApprovalFormInput:
+      type: "object"
+      properties:
+        defaultValue:
+          type: "string"
+        fieldDescription:
+          type: "string"
+        fieldLabel:
+          type: "string"
+        fieldName:
+          type: "string"
+        fieldOptions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/FieldOption"
+        fieldType:
+          type: "integer"
+        maxSelection:
+          type: "integer"
+        minSelection:
+          type: "integer"
+        multipleChoice:
+          type: "boolean"
+        placeholder:
+          type: "string"
+        required:
+          type: "boolean"
     ExecutionError:
       description: "Contains information about an error that happened during execution."
       type: "object"

@@ -8,7 +8,30 @@ servers:
 tags:
   - name: "workflow-execution"
     description: "The Automation Workflow Execution Internal API"
+  - name: "trigger-form"
+    description: "The Automation Trigger Form Internal API"
 paths:
+  /trigger-form/{id}:
+    get:
+      description: "Get a trigger form."
+      summary: "Get a trigger form"
+      tags:
+        - "trigger-form"
+      operationId: "getTriggerForm"
+      parameters:
+        - name: "id"
+          description: "The id of a trigger form."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriggerForm"
   /workspaces/{id}/workflow-executions:
     get:
       description: "Get project workflow executions."
@@ -149,6 +172,63 @@ components:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
         workflow:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
+    TriggerForm:
+      type: "object"
+      properties:
+        buttonLabel:
+          type: "string"
+        customFormStyling:
+          type: "string"
+        formDescription:
+          type: "string"
+        formPath:
+          type: "string"
+        formTitle:
+          type: "string"
+        appendAttribution:
+          type: "boolean"
+        ignoreBots:
+          type: "boolean"
+        useWorkflowTimezone:
+          type: "boolean"
+        inputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TriggerFormInput"
+    FieldOption:
+      type: "object"
+      properties:
+        label:
+          type: "string"
+        value:
+          type: "string"
+    TriggerFormInput:
+      type: "object"
+      properties:
+        defaultValue:
+          type: "string"
+        fieldDescription:
+          type: "string"
+        fieldLabel:
+          type: "string"
+        fieldName:
+          type: "string"
+        fieldOptions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/FieldOption"
+        fieldType:
+          type: "integer"
+        maxSelection:
+          type: "integer"
+        minSelection:
+          type: "integer"
+        multipleChoice:
+          type: "boolean"
+        placeholder:
+          type: "string"
+        required:
+          type: "boolean"
     WorkflowExecutionBasic:
       description: "Contains information about execution of a Integration workflow."
       type: "object"
