@@ -5,7 +5,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import {ComponentConnection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
+import {ComponentConnection, Connection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {
@@ -16,7 +16,7 @@ import {
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PlusIcon} from 'lucide-react';
-import {Control, UseFormSetValue} from 'react-hook-form';
+import {Control, UseFormSetValue, useWatch} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
 type ConnectionGroupingType = {
@@ -44,6 +44,8 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const deploymentEnvironmentId = useWatch({control, name: 'environmentId'}) ?? currentEnvironmentId;
+
     const {data: componentDefinition, isPending: isComponentDefinitionPending} = useGetComponentDefinitionQuery({
         componentName: componentConnection.componentName,
         componentVersion: componentConnection.componentVersion,
@@ -55,7 +57,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
         {
             componentName: componentConnection.componentName,
             connectionVersion: componentDefinition?.connection?.version,
-            environmentId: currentEnvironmentId,
+            environmentId: deploymentEnvironmentId,
             id: currentWorkspaceId!,
         },
         !!componentDefinition
@@ -122,6 +124,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                                     <ConnectionDialog
                                         componentDefinition={componentDefinition}
                                         componentDefinitions={componentDefinitions!}
+                                        connection={{environmentId: deploymentEnvironmentId} as Connection}
                                         connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                         connectionsQueryKey={ConnectionKeys.connections}
                                         onClose={() => {}}
