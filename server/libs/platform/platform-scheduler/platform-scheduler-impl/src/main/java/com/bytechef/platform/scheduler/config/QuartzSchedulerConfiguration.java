@@ -46,9 +46,9 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 @EnableConfigurationProperties(QuartzProperties.class)
 @ConditionalOnProperty(
     prefix = "bytechef", name = "scheduler.provider", havingValue = "quartz", matchIfMissing = true)
-public class QuartzTriggerSchedulerConfiguration {
+public class QuartzSchedulerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuartzTriggerSchedulerConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuartzSchedulerConfiguration.class);
 
     @Bean
     JobFactory jobFactory() {
