@@ -42,8 +42,8 @@ public class ActionContextAdapater implements ActionContext {
     }
 
     @Override
-    public <R> R convert(ContextFunction<Convert, R> convertFunction) {
-        return context.convert(convertFunction);
+    public <R> R converter(ContextFunction<Converter, R> converterFunction) {
+        return context.converter(converterFunction);
     }
 
     @Override

@@ -39,11 +39,11 @@ import org.jspecify.annotations.Nullable;
 public interface Context {
 
     /**
-     * @param convertFunction
+     * @param converterFunction
      * @param <R>
      * @return
      */
-    <R> R convert(ContextFunction<Convert, R> convertFunction);
+    <R> R converter(ContextFunction<Converter, R> converterFunction);
 
     /**
      *
@@ -113,6 +113,8 @@ public interface Context {
      */
     <R> R xml(ContextFunction<Xml, R> xmlFunction);
 
+    <R> R escape(ContextFunction<Xml, R> escapeFunction);
+
     /**
      *
      * @param <T>
@@ -137,7 +139,7 @@ public interface Context {
     /**
      *
      */
-    interface Convert {
+    interface Converter {
 
         /**
          *

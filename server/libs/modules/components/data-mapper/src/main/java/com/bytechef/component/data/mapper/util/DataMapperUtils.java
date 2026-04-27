@@ -61,15 +61,15 @@ public class DataMapperUtils {
     }
 
     public static boolean canConvert(Context context, Object mappingFrom, Class<?> type) {
-        return context.convert(convert -> convert.canConvert(mappingFrom, type));
+        return context.converter(convert -> convert.canConvert(mappingFrom, type));
     }
 
     public static Object convertTo(Context context, Object mappingTo, Class<?> type) {
-        return context.convert(convert -> convert.value(mappingTo, type));
+        return context.converter(convert -> convert.value(mappingTo, type));
     }
 
     public static Object convertFrom(Context context, Object mappingFrom, Class<?> type) {
-        return context.convert(convert -> convert.value(mappingFrom, type));
+        return context.converter(convert -> convert.value(mappingFrom, type));
     }
 
     public static String getDisplayCondition(ValueType valueType) {

@@ -60,7 +60,7 @@ import org.slf4j.helpers.MessageFormatter;
  */
 class ContextImpl implements Context {
 
-    private final Convert convert;
+    private final Converter converter;
     private final Encoder encoder;
     private final File file;
     private final Http http;
@@ -89,7 +89,7 @@ class ContextImpl implements Context {
         boolean editorEnvironment, HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
         @Nullable LogFileStorageWriter logFileStorageWriter) {
 
-        this.convert = new ConvertImpl();
+        this.converter = new ConverterImpl();
         this.editorEnvironment = editorEnvironment;
         this.encoder = new EncoderImpl();
         this.file = new FileImpl(tempFileStorage);
@@ -103,9 +103,9 @@ class ContextImpl implements Context {
     }
 
     @Override
-    public <R> R convert(ContextFunction<Convert, R> convertFunction) {
+    public <R> R converter(ContextFunction<Converter, R> converterFunction) {
         try {
-            return convertFunction.apply(convert);
+            return converterFunction.apply(converter);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -352,7 +352,7 @@ class ContextImpl implements Context {
         }
     }
 
-    private record ConvertImpl() implements Convert {
+    private record ConverterImpl() implements Converter {
 
         @Override
         public boolean canConvert(Object fromValue, Class<?> toValueType) {

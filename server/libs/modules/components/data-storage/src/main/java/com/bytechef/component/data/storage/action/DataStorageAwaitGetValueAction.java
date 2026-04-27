@@ -165,9 +165,9 @@ public class DataStorageAwaitGetValueAction {
 
         if (optional.isEmpty()) {
             if (inputParameters.containsKey(DEFAULT_VALUE) &&
-                context.convert(convert -> convert.canConvert(inputParameters.get(DEFAULT_VALUE), type))) {
+                context.converter(convert -> convert.canConvert(inputParameters.get(DEFAULT_VALUE), type))) {
 
-                return context.convert(convert -> convert.value(inputParameters.get(DEFAULT_VALUE), type));
+                return context.converter(convert -> convert.value(inputParameters.get(DEFAULT_VALUE), type));
             }
 
             return inputParameters.getString(DEFAULT_VALUE);
@@ -175,8 +175,8 @@ public class DataStorageAwaitGetValueAction {
 
         Optional<Object> finalOptional = optional;
 
-        if (context.convert(convert -> convert.canConvert(finalOptional.get(), type))) {
-            return context.convert(convert -> convert.value(finalOptional.get(), type));
+        if (context.converter(convert -> convert.canConvert(finalOptional.get(), type))) {
+            return context.converter(convert -> convert.value(finalOptional.get(), type));
         }
 
         return optional.get();
