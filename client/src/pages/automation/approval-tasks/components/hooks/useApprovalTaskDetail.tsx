@@ -1,4 +1,5 @@
 import {useUpdateApprovalTaskMutation, useUsersQuery} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -20,6 +21,7 @@ export interface UseApprovalTaskDetailReturnI {
     approvalTask: ApprovalTaskI | null;
     availableAssigneeOptions: AssigneeOptionI[];
     createdAtFormatted: string;
+    handleApprovalSubmitted: () => void;
     handleAssigneeChange: (assigneeId: string) => void;
     handleDueDateChange: (dueDate: Date | undefined) => void;
     handlePriorityChange: (priority: ApprovalTaskI['priority']) => void;
@@ -55,14 +57,14 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
         [selectedApprovalTask]
     );
 
-    const updateApprovalTaskMutation = useUpdateApprovalTaskMutation({
-        onError: (error) => {
-            console.error('Error updating approval task:', error);
-        },
-    });
+    const queryClient = useQueryClient();
+
+    const updateApprovalTaskMutation = useUpdateApprovalTaskMutation();
 
     const persistApprovalTask = useCallback(
         (next: ApprovalTaskI) => {
+            const previous = selectedApprovalTask;
+
             storeUpdateApprovalTask(next);
 
             updateApprovalTaskMutation.mutate(
@@ -79,6 +81,13 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
                     },
                 },
                 {
+                    onError: () => {
+                        if (previous) {
+                            storeUpdateApprovalTask(previous);
+                        }
+
+                        queryClient.invalidateQueries({queryKey: ['approvalTasks']});
+                    },
                     onSuccess: (data) => {
                         storeUpdateApprovalTask({
                             ...next,
@@ -88,7 +97,7 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
                 }
             );
         },
-        [storeUpdateApprovalTask, updateApprovalTaskMutation]
+        [queryClient, selectedApprovalTask, storeUpdateApprovalTask, updateApprovalTaskMutation]
     );
 
     const handleStatusChange = useCallback(
@@ -136,10 +145,15 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
         [selectedApprovalTask, persistApprovalTask]
     );
 
+    const handleApprovalSubmitted = useCallback(() => {
+        void queryClient.invalidateQueries({queryKey: ['approvalTasks']});
+    }, [queryClient]);
+
     return {
         approvalTask: selectedApprovalTask,
         availableAssigneeOptions,
         createdAtFormatted,
+        handleApprovalSubmitted,
         handleAssigneeChange,
         handleDueDateChange,
         handlePriorityChange,

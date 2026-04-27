@@ -14,6 +14,7 @@ export default function ApprovalTaskDetail() {
         approvalTask,
         availableAssigneeOptions,
         createdAtFormatted,
+        handleApprovalSubmitted,
         handleAssigneeChange,
         handleDueDateChange,
         handlePriorityChange,
@@ -59,7 +60,7 @@ export default function ApprovalTaskDetail() {
                     ) : approvalTask.jobResumeId ? (
                         <ApprovalForm
                             id={approvalTask.jobResumeId}
-                            onSubmitted={() => handleStatusChange('completed')}
+                            onSubmitted={handleApprovalSubmitted}
                             showHeader={false}
                         />
                     ) : (
