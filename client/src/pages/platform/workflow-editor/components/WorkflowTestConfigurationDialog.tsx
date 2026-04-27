@@ -249,19 +249,20 @@ const WorkflowTestConfigurationDialog = ({
         },
     });
 
-    const workflowNodeLabelMap = new Map<string, string>();
+    const workflowNodeLabelMap = useMemo(() => {
+        if (connectionsGrouped) return new Map<string, string>();
 
-    for (const task of workflow?.tasks ?? []) {
-        if (task.label) {
-            workflowNodeLabelMap.set(task.name, task.label);
-        }
-    }
+        const map = new Map<string, string>();
 
-    for (const trigger of workflow?.triggers ?? []) {
-        if (trigger.label) {
-            workflowNodeLabelMap.set(trigger.name, trigger.label);
+        for (const task of workflow?.tasks ?? []) {
+            if (task.label) map.set(task.name, task.label);
         }
-    }
+        for (const trigger of workflow?.triggers ?? []) {
+            if (trigger.label) map.set(trigger.name, trigger.label);
+        }
+
+        return map;
+    }, [connectionsGrouped, workflow?.tasks, workflow?.triggers]);
 
     function saveWorkflowTestConfiguration(workflowTestConfiguration: WorkflowTestConfiguration) {
         workflowTestConfiguration = {
