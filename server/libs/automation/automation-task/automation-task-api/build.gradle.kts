@@ -1,5 +1,6 @@
 dependencies {
     api(project(":server:libs:core:commons:commons-util"))
+    api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     api(project(":server:libs:platform:platform-tag:platform-tag-api"))
 
     implementation("org.apache.commons:commons-lang3")
