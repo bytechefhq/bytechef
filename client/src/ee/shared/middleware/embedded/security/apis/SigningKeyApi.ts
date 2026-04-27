@@ -52,10 +52,9 @@ export interface UpdateSigningKeyRequest {
 export class SigningKeyApi extends runtime.BaseAPI {
 
     /**
-     * Create a new Signing key.
-     * Create a new Signing key
+     * Creates request options for createSigningKey without sending the request
      */
-    async createSigningKeyRaw(requestParameters: CreateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateSigningKey200Response>> {
+    async createSigningKeyRequestOpts(requestParameters: CreateSigningKeyRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['signingKey'] == null) {
             throw new runtime.RequiredError(
                 'signingKey',
@@ -72,13 +71,22 @@ export class SigningKeyApi extends runtime.BaseAPI {
 
         let urlPath = `/signing-keys`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: SigningKeyToJSON(requestParameters['signingKey']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new Signing key.
+     * Create a new Signing key
+     */
+    async createSigningKeyRaw(requestParameters: CreateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateSigningKey200Response>> {
+        const requestOptions = await this.createSigningKeyRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CreateSigningKey200ResponseFromJSON(jsonValue));
     }
@@ -93,10 +101,9 @@ export class SigningKeyApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete an Signing key.
-     * Delete an Signing key
+     * Creates request options for deleteSigningKey without sending the request
      */
-    async deleteSigningKeyRaw(requestParameters: DeleteSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteSigningKeyRequestOpts(requestParameters: DeleteSigningKeyRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -112,12 +119,21 @@ export class SigningKeyApi extends runtime.BaseAPI {
         let urlPath = `/signing-keys/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete an Signing key.
+     * Delete an Signing key
+     */
+    async deleteSigningKeyRaw(requestParameters: DeleteSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteSigningKeyRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -131,10 +147,9 @@ export class SigningKeyApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an Signing key by id.
-     * Get an Signing key by id
+     * Creates request options for getSigningKey without sending the request
      */
-    async getSigningKeyRaw(requestParameters: GetSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SigningKey>> {
+    async getSigningKeyRequestOpts(requestParameters: GetSigningKeyRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -150,12 +165,21 @@ export class SigningKeyApi extends runtime.BaseAPI {
         let urlPath = `/signing-keys/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an Signing key by id.
+     * Get an Signing key by id
+     */
+    async getSigningKeyRaw(requestParameters: GetSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SigningKey>> {
+        const requestOptions = await this.getSigningKeyRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => SigningKeyFromJSON(jsonValue));
     }
@@ -170,10 +194,9 @@ export class SigningKeyApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get Signing keys.
-     * Get Signing keys
+     * Creates request options for getSigningKeys without sending the request
      */
-    async getSigningKeysRaw(requestParameters: GetSigningKeysRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SigningKey>>> {
+    async getSigningKeysRequestOpts(requestParameters: GetSigningKeysRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['environmentId'] == null) {
             throw new runtime.RequiredError(
                 'environmentId',
@@ -192,12 +215,21 @@ export class SigningKeyApi extends runtime.BaseAPI {
 
         let urlPath = `/signing-keys`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get Signing keys.
+     * Get Signing keys
+     */
+    async getSigningKeysRaw(requestParameters: GetSigningKeysRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<SigningKey>>> {
+        const requestOptions = await this.getSigningKeysRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(SigningKeyFromJSON));
     }
@@ -212,10 +244,9 @@ export class SigningKeyApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing Signing key.
-     * Update an existing Signing key
+     * Creates request options for updateSigningKey without sending the request
      */
-    async updateSigningKeyRaw(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateSigningKeyRequestOpts(requestParameters: UpdateSigningKeyRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -240,13 +271,22 @@ export class SigningKeyApi extends runtime.BaseAPI {
         let urlPath = `/signing-keys/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: SigningKeyToJSON(requestParameters['signingKey']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing Signing key.
+     * Update an existing Signing key
+     */
+    async updateSigningKeyRaw(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateSigningKeyRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

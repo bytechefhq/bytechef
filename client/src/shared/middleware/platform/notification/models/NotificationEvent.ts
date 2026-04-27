@@ -27,7 +27,7 @@ export interface NotificationEvent {
     readonly id: number;
     /**
      * 
-     * @type {string}
+     * @type {NotificationEventTypeEnum}
      * @memberof NotificationEvent
      */
     type?: NotificationEventTypeEnum;

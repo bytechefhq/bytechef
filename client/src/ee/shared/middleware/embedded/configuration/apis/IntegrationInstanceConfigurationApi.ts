@@ -80,10 +80,9 @@ export interface UpdateIntegrationInstanceConfigurationWorkflowRequest {
 export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
 
     /**
-     * Create a new integration instance configuration.
-     * Create a new integration instance configuration
+     * Creates request options for createIntegrationInstanceConfiguration without sending the request
      */
-    async createIntegrationInstanceConfigurationRaw(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createIntegrationInstanceConfigurationRequestOpts(requestParameters: CreateIntegrationInstanceConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['integrationInstanceConfiguration'] == null) {
             throw new runtime.RequiredError(
                 'integrationInstanceConfiguration',
@@ -100,13 +99,22 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
 
         let urlPath = `/integration-instance-configurations`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: IntegrationInstanceConfigurationToJSON(requestParameters['integrationInstanceConfiguration']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new integration instance configuration.
+     * Create a new integration instance configuration
+     */
+    async createIntegrationInstanceConfigurationRaw(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createIntegrationInstanceConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -125,10 +133,9 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a request for running a new job.
-     * Create a request for running a new job
+     * Creates request options for createIntegrationInstanceConfigurationWorkflowJob without sending the request
      */
-    async createIntegrationInstanceConfigurationWorkflowJobRaw(requestParameters: CreateIntegrationInstanceConfigurationWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateIntegrationInstanceConfigurationWorkflowJob200Response>> {
+    async createIntegrationInstanceConfigurationWorkflowJobRequestOpts(requestParameters: CreateIntegrationInstanceConfigurationWorkflowJobRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -152,12 +159,21 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a request for running a new job.
+     * Create a request for running a new job
+     */
+    async createIntegrationInstanceConfigurationWorkflowJobRaw(requestParameters: CreateIntegrationInstanceConfigurationWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateIntegrationInstanceConfigurationWorkflowJob200Response>> {
+        const requestOptions = await this.createIntegrationInstanceConfigurationWorkflowJobRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CreateIntegrationInstanceConfigurationWorkflowJob200ResponseFromJSON(jsonValue));
     }
@@ -172,10 +188,9 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete an integration instance configuration.
-     * Delete an integration instance configuration
+     * Creates request options for deleteIntegrationInstanceConfiguration without sending the request
      */
-    async deleteIntegrationInstanceConfigurationRaw(requestParameters: DeleteIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteIntegrationInstanceConfigurationRequestOpts(requestParameters: DeleteIntegrationInstanceConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -191,12 +206,21 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
         let urlPath = `/integration-instance-configurations/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete an integration instance configuration.
+     * Delete an integration instance configuration
+     */
+    async deleteIntegrationInstanceConfigurationRaw(requestParameters: DeleteIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteIntegrationInstanceConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -210,10 +234,9 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Enable/disable an integration instance configuration.
-     * Enable/disable an integration instance configuration
+     * Creates request options for enableIntegrationInstanceConfiguration without sending the request
      */
-    async enableIntegrationInstanceConfigurationRaw(requestParameters: EnableIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableIntegrationInstanceConfigurationRequestOpts(requestParameters: EnableIntegrationInstanceConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -237,12 +260,21 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Enable/disable an integration instance configuration.
+     * Enable/disable an integration instance configuration
+     */
+    async enableIntegrationInstanceConfigurationRaw(requestParameters: EnableIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.enableIntegrationInstanceConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -256,10 +288,9 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Enable/disable a workflow of an integration instance configuration.
-     * Enable/disable a workflow of an integration instance configuration
+     * Creates request options for enableIntegrationInstanceConfigurationWorkflow without sending the request
      */
-    async enableIntegrationInstanceConfigurationWorkflowRaw(requestParameters: EnableIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableIntegrationInstanceConfigurationWorkflowRequestOpts(requestParameters: EnableIntegrationInstanceConfigurationWorkflowRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -291,12 +322,21 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
         urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Enable/disable a workflow of an integration instance configuration.
+     * Enable/disable a workflow of an integration instance configuration
+     */
+    async enableIntegrationInstanceConfigurationWorkflowRaw(requestParameters: EnableIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.enableIntegrationInstanceConfigurationWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -310,10 +350,9 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an integration instance configuration by id.
-     * Get an integration instance configuration by id
+     * Creates request options for getIntegrationInstanceConfiguration without sending the request
      */
-    async getIntegrationInstanceConfigurationRaw(requestParameters: GetIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfiguration>> {
+    async getIntegrationInstanceConfigurationRequestOpts(requestParameters: GetIntegrationInstanceConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -329,12 +368,21 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
         let urlPath = `/integration-instance-configurations/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an integration instance configuration by id.
+     * Get an integration instance configuration by id
+     */
+    async getIntegrationInstanceConfigurationRaw(requestParameters: GetIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfiguration>> {
+        const requestOptions = await this.getIntegrationInstanceConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationFromJSON(jsonValue));
     }
@@ -349,10 +397,9 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get integration instance configurations.
-     * Get integration instance configurations
+     * Creates request options for getIntegrationInstanceConfigurations without sending the request
      */
-    async getIntegrationInstanceConfigurationsRaw(requestParameters: GetIntegrationInstanceConfigurationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationInstanceConfiguration>>> {
+    async getIntegrationInstanceConfigurationsRequestOpts(requestParameters: GetIntegrationInstanceConfigurationsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['environmentId'] != null) {
@@ -376,12 +423,21 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
 
         let urlPath = `/integration-instance-configurations`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get integration instance configurations.
+     * Get integration instance configurations
+     */
+    async getIntegrationInstanceConfigurationsRaw(requestParameters: GetIntegrationInstanceConfigurationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationInstanceConfiguration>>> {
+        const requestOptions = await this.getIntegrationInstanceConfigurationsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(IntegrationInstanceConfigurationFromJSON));
     }
@@ -396,10 +452,9 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing integration instance configuration.
-     * Update an existing integration instance configuration
+     * Creates request options for updateIntegrationInstanceConfiguration without sending the request
      */
-    async updateIntegrationInstanceConfigurationRaw(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateIntegrationInstanceConfigurationRequestOpts(requestParameters: UpdateIntegrationInstanceConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -424,13 +479,22 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
         let urlPath = `/integration-instance-configurations/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: IntegrationInstanceConfigurationToJSON(requestParameters['integrationInstanceConfiguration']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing integration instance configuration.
+     * Update an existing integration instance configuration
+     */
+    async updateIntegrationInstanceConfigurationRaw(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateIntegrationInstanceConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -444,10 +508,9 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing integration instance configuration workflow.
-     * Update an existing integration instance configuration workflow
+     * Creates request options for updateIntegrationInstanceConfigurationWorkflow without sending the request
      */
-    async updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateIntegrationInstanceConfigurationWorkflowRequestOpts(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -480,13 +543,22 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: IntegrationInstanceConfigurationWorkflowToJSON(requestParameters['integrationInstanceConfigurationWorkflow']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing integration instance configuration workflow.
+     * Update an existing integration instance configuration workflow
+     */
+    async updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateIntegrationInstanceConfigurationWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

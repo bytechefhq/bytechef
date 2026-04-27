@@ -57,7 +57,6 @@ export * from './TaskProperty';
 export * from './TimeProperty';
 export * from './TriggerDefinition';
 export * from './TriggerDefinitionBasic';
-export * from './TriggerFormInput';
 export * from './TriggerType';
 export * from './UnifiedApiCategory';
 export * from './UpdateClusterElementParameterRequest';

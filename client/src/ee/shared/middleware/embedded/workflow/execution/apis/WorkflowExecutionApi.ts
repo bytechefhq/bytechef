@@ -46,10 +46,9 @@ export interface GetWorkflowExecutionsPageRequest {
 export class WorkflowExecutionApi extends runtime.BaseAPI {
 
     /**
-     * Get workflow execution by id.
-     * Get workflow executions by id
+     * Creates request options for getWorkflowExecution without sending the request
      */
-    async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecution>> {
+    async getWorkflowExecutionRequestOpts(requestParameters: GetWorkflowExecutionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -65,12 +64,21 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
         let urlPath = `/workflow-executions/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get workflow execution by id.
+     * Get workflow executions by id
+     */
+    async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecution>> {
+        const requestOptions = await this.getWorkflowExecutionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowExecutionFromJSON(jsonValue));
     }
@@ -85,10 +93,9 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get Integration workflow executions.
-     * Get Integration workflow executions
+     * Creates request options for getWorkflowExecutionsPage without sending the request
      */
-    async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
+    async getWorkflowExecutionsPageRequestOpts(requestParameters: GetWorkflowExecutionsPageRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['environmentId'] != null) {
@@ -128,12 +135,21 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
         let urlPath = `/workflow-executions`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get Integration workflow executions.
+     * Get Integration workflow executions
+     */
+    async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
+        const requestOptions = await this.getWorkflowExecutionsPageRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PageFromJSON(jsonValue));
     }

@@ -36,10 +36,9 @@ export interface UpdateIntegrationInstanceConfigurationTagsRequest {
 export class IntegrationInstanceConfigurationTagApi extends runtime.BaseAPI {
 
     /**
-     * Get integration instance configuration tags.
-     * Get integration instance configuration tags
+     * Creates request options for getIntegrationInstanceConfigurationTags without sending the request
      */
-    async getIntegrationInstanceConfigurationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+    async getIntegrationInstanceConfigurationTagsRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -47,12 +46,21 @@ export class IntegrationInstanceConfigurationTagApi extends runtime.BaseAPI {
 
         let urlPath = `/integration-instance-configurations/tags`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get integration instance configuration tags.
+     * Get integration instance configuration tags
+     */
+    async getIntegrationInstanceConfigurationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+        const requestOptions = await this.getIntegrationInstanceConfigurationTagsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagFromJSON));
     }
@@ -67,10 +75,9 @@ export class IntegrationInstanceConfigurationTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Updates tags of an existing integration instance configuration.
-     * Updates tags of an existing integration instance configuration
+     * Creates request options for updateIntegrationInstanceConfigurationTags without sending the request
      */
-    async updateIntegrationInstanceConfigurationTagsRaw(requestParameters: UpdateIntegrationInstanceConfigurationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateIntegrationInstanceConfigurationTagsRequestOpts(requestParameters: UpdateIntegrationInstanceConfigurationTagsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -95,13 +102,22 @@ export class IntegrationInstanceConfigurationTagApi extends runtime.BaseAPI {
         let urlPath = `/integration-instance-configurations/{id}/tags`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: UpdateTagsRequestToJSON(requestParameters['updateTagsRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Updates tags of an existing integration instance configuration.
+     * Updates tags of an existing integration instance configuration
+     */
+    async updateIntegrationInstanceConfigurationTagsRaw(requestParameters: UpdateIntegrationInstanceConfigurationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateIntegrationInstanceConfigurationTagsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

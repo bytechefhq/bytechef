@@ -52,10 +52,9 @@ export interface UpdateApiCollectionRequest {
 export class ApiCollectionApi extends runtime.BaseAPI {
 
     /**
-     * Create a new API collection.
-     * Create a new API collection
+     * Creates request options for createApiCollection without sending the request
      */
-    async createApiCollectionRaw(requestParameters: CreateApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiCollection>> {
+    async createApiCollectionRequestOpts(requestParameters: CreateApiCollectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['apiCollection'] == null) {
             throw new runtime.RequiredError(
                 'apiCollection',
@@ -72,13 +71,22 @@ export class ApiCollectionApi extends runtime.BaseAPI {
 
         let urlPath = `/api-collections`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ApiCollectionToJSON(requestParameters['apiCollection']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new API collection.
+     * Create a new API collection
+     */
+    async createApiCollectionRaw(requestParameters: CreateApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiCollection>> {
+        const requestOptions = await this.createApiCollectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ApiCollectionFromJSON(jsonValue));
     }
@@ -93,10 +101,9 @@ export class ApiCollectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete an API collection.
-     * Delete an API collection
+     * Creates request options for deleteApiCollection without sending the request
      */
-    async deleteApiCollectionRaw(requestParameters: DeleteApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteApiCollectionRequestOpts(requestParameters: DeleteApiCollectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -112,12 +119,21 @@ export class ApiCollectionApi extends runtime.BaseAPI {
         let urlPath = `/api-collections/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete an API collection.
+     * Delete an API collection
+     */
+    async deleteApiCollectionRaw(requestParameters: DeleteApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteApiCollectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -131,10 +147,9 @@ export class ApiCollectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an API collection by id.
-     * Get an API collection by id
+     * Creates request options for getApiCollection without sending the request
      */
-    async getApiCollectionRaw(requestParameters: GetApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiCollection>> {
+    async getApiCollectionRequestOpts(requestParameters: GetApiCollectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -150,12 +165,21 @@ export class ApiCollectionApi extends runtime.BaseAPI {
         let urlPath = `/api-collections/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an API collection by id.
+     * Get an API collection by id
+     */
+    async getApiCollectionRaw(requestParameters: GetApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiCollection>> {
+        const requestOptions = await this.getApiCollectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ApiCollectionFromJSON(jsonValue));
     }
@@ -170,10 +194,9 @@ export class ApiCollectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all workspace API collections.
-     * Get all workspace API collections
+     * Creates request options for getWorkspaceApiCollections without sending the request
      */
-    async getWorkspaceApiCollectionsRaw(requestParameters: GetWorkspaceApiCollectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiCollection>>> {
+    async getWorkspaceApiCollectionsRequestOpts(requestParameters: GetWorkspaceApiCollectionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -201,12 +224,21 @@ export class ApiCollectionApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}/api-collections`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all workspace API collections.
+     * Get all workspace API collections
+     */
+    async getWorkspaceApiCollectionsRaw(requestParameters: GetWorkspaceApiCollectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiCollection>>> {
+        const requestOptions = await this.getWorkspaceApiCollectionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ApiCollectionFromJSON));
     }
@@ -221,10 +253,9 @@ export class ApiCollectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing API collection.
-     * Update an existing API collection
+     * Creates request options for updateApiCollection without sending the request
      */
-    async updateApiCollectionRaw(requestParameters: UpdateApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiCollection>> {
+    async updateApiCollectionRequestOpts(requestParameters: UpdateApiCollectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -249,13 +280,22 @@ export class ApiCollectionApi extends runtime.BaseAPI {
         let urlPath = `/api-collections/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: ApiCollectionToJSON(requestParameters['apiCollection']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing API collection.
+     * Update an existing API collection
+     */
+    async updateApiCollectionRaw(requestParameters: UpdateApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiCollection>> {
+        const requestOptions = await this.updateApiCollectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ApiCollectionFromJSON(jsonValue));
     }

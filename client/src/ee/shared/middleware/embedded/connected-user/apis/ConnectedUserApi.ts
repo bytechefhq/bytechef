@@ -57,10 +57,9 @@ export interface GetConnectedUsersRequest {
 export class ConnectedUserApi extends runtime.BaseAPI {
 
     /**
-     * Delete a connected user.
-     * Delete a connected user
+     * Creates request options for deleteConnectedUser without sending the request
      */
-    async deleteConnectedUserRaw(requestParameters: DeleteConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteConnectedUserRequestOpts(requestParameters: DeleteConnectedUserRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -76,12 +75,21 @@ export class ConnectedUserApi extends runtime.BaseAPI {
         let urlPath = `/connected-users/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete a connected user.
+     * Delete a connected user
+     */
+    async deleteConnectedUserRaw(requestParameters: DeleteConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteConnectedUserRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -95,10 +103,9 @@ export class ConnectedUserApi extends runtime.BaseAPI {
     }
 
     /**
-     * Enable/disable a connected user.
-     * Enable/disable a connected user
+     * Creates request options for enableConnectedUser without sending the request
      */
-    async enableConnectedUserRaw(requestParameters: EnableConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableConnectedUserRequestOpts(requestParameters: EnableConnectedUserRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -122,12 +129,21 @@ export class ConnectedUserApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Enable/disable a connected user.
+     * Enable/disable a connected user
+     */
+    async enableConnectedUserRaw(requestParameters: EnableConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.enableConnectedUserRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -141,10 +157,9 @@ export class ConnectedUserApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a connected user.
-     * Get a connected user
+     * Creates request options for getConnectedUser without sending the request
      */
-    async getConnectedUserRaw(requestParameters: GetConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUser>> {
+    async getConnectedUserRequestOpts(requestParameters: GetConnectedUserRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -160,12 +175,21 @@ export class ConnectedUserApi extends runtime.BaseAPI {
         let urlPath = `/connected-users/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a connected user.
+     * Get a connected user
+     */
+    async getConnectedUserRaw(requestParameters: GetConnectedUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUser>> {
+        const requestOptions = await this.getConnectedUserRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConnectedUserFromJSON(jsonValue));
     }
@@ -180,10 +204,9 @@ export class ConnectedUserApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all connected users.
-     * Get all connected users
+     * Creates request options for getConnectedUsers without sending the request
      */
-    async getConnectedUsersRaw(requestParameters: GetConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
+    async getConnectedUsersRequestOpts(requestParameters: GetConnectedUsersRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['environmentId'] != null) {
@@ -219,12 +242,21 @@ export class ConnectedUserApi extends runtime.BaseAPI {
 
         let urlPath = `/connected-users`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all connected users.
+     * Get all connected users
+     */
+    async getConnectedUsersRaw(requestParameters: GetConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
+        const requestOptions = await this.getConnectedUsersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PageFromJSON(jsonValue));
     }

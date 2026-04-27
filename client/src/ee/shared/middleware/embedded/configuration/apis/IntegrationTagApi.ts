@@ -36,10 +36,9 @@ export interface UpdateIntegrationTagsRequest {
 export class IntegrationTagApi extends runtime.BaseAPI {
 
     /**
-     * Get integration tags.
-     * Get integration tags
+     * Creates request options for getIntegrationTags without sending the request
      */
-    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+    async getIntegrationTagsRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -47,12 +46,21 @@ export class IntegrationTagApi extends runtime.BaseAPI {
 
         let urlPath = `/integrations/tags`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get integration tags.
+     * Get integration tags
+     */
+    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+        const requestOptions = await this.getIntegrationTagsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagFromJSON));
     }
@@ -67,10 +75,9 @@ export class IntegrationTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Updates tags of an existing integration.
-     * Updates tags of an existing integration
+     * Creates request options for updateIntegrationTags without sending the request
      */
-    async updateIntegrationTagsRaw(requestParameters: UpdateIntegrationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateIntegrationTagsRequestOpts(requestParameters: UpdateIntegrationTagsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -95,13 +102,22 @@ export class IntegrationTagApi extends runtime.BaseAPI {
         let urlPath = `/integrations/{id}/tags`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: UpdateTagsRequestToJSON(requestParameters['updateTagsRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Updates tags of an existing integration.
+     * Updates tags of an existing integration
+     */
+    async updateIntegrationTagsRaw(requestParameters: UpdateIntegrationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateIntegrationTagsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

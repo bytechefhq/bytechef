@@ -48,10 +48,9 @@ export interface UpdateApiClientRequest {
 export class ApiClientApi extends runtime.BaseAPI {
 
     /**
-     * Create a new API client.
-     * Create a new API client
+     * Creates request options for createApiClient without sending the request
      */
-    async createApiClientRaw(requestParameters: CreateApiClientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateApiClient200Response>> {
+    async createApiClientRequestOpts(requestParameters: CreateApiClientRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['apiClient'] == null) {
             throw new runtime.RequiredError(
                 'apiClient',
@@ -68,13 +67,22 @@ export class ApiClientApi extends runtime.BaseAPI {
 
         let urlPath = `/api-clients`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ApiClientToJSON(requestParameters['apiClient']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new API client.
+     * Create a new API client
+     */
+    async createApiClientRaw(requestParameters: CreateApiClientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateApiClient200Response>> {
+        const requestOptions = await this.createApiClientRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CreateApiClient200ResponseFromJSON(jsonValue));
     }
@@ -89,10 +97,9 @@ export class ApiClientApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete an API client.
-     * Delete an API client
+     * Creates request options for deleteApiClient without sending the request
      */
-    async deleteApiClientRaw(requestParameters: DeleteApiClientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteApiClientRequestOpts(requestParameters: DeleteApiClientRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -108,12 +115,21 @@ export class ApiClientApi extends runtime.BaseAPI {
         let urlPath = `/api-client/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete an API client.
+     * Delete an API client
+     */
+    async deleteApiClientRaw(requestParameters: DeleteApiClientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteApiClientRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -127,10 +143,9 @@ export class ApiClientApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an API client by id.
-     * Get an API client by id
+     * Creates request options for getApiClient without sending the request
      */
-    async getApiClientRaw(requestParameters: GetApiClientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiClient>> {
+    async getApiClientRequestOpts(requestParameters: GetApiClientRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -146,12 +161,21 @@ export class ApiClientApi extends runtime.BaseAPI {
         let urlPath = `/api-client/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an API client by id.
+     * Get an API client by id
+     */
+    async getApiClientRaw(requestParameters: GetApiClientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiClient>> {
+        const requestOptions = await this.getApiClientRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ApiClientFromJSON(jsonValue));
     }
@@ -166,10 +190,9 @@ export class ApiClientApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get API clients.
-     * Get API clients
+     * Creates request options for getApiClients without sending the request
      */
-    async getApiClientsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiClient>>> {
+    async getApiClientsRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -177,12 +200,21 @@ export class ApiClientApi extends runtime.BaseAPI {
 
         let urlPath = `/api-clients`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get API clients.
+     * Get API clients
+     */
+    async getApiClientsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiClient>>> {
+        const requestOptions = await this.getApiClientsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ApiClientFromJSON));
     }
@@ -197,10 +229,9 @@ export class ApiClientApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing API client.
-     * Update an existing API client
+     * Creates request options for updateApiClient without sending the request
      */
-    async updateApiClientRaw(requestParameters: UpdateApiClientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateApiClientRequestOpts(requestParameters: UpdateApiClientRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -225,13 +256,22 @@ export class ApiClientApi extends runtime.BaseAPI {
         let urlPath = `/api-client/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: ApiClientToJSON(requestParameters['apiClient']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing API client.
+     * Update an existing API client
+     */
+    async updateApiClientRaw(requestParameters: UpdateApiClientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateApiClientRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

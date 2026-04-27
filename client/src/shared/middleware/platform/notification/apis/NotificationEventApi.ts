@@ -28,10 +28,9 @@ import {
 export class NotificationEventApi extends runtime.BaseAPI {
 
     /**
-     * Get a list of possible notification events
-     * Get a list of possible notification events
+     * Creates request options for getNotificationEvents without sending the request
      */
-    async getNotificationEventsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<NotificationEvent>>> {
+    async getNotificationEventsRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -39,12 +38,21 @@ export class NotificationEventApi extends runtime.BaseAPI {
 
         let urlPath = `/notifications/events`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a list of possible notification events
+     * Get a list of possible notification events
+     */
+    async getNotificationEventsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<NotificationEvent>>> {
+        const requestOptions = await this.getNotificationEventsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(NotificationEventFromJSON));
     }

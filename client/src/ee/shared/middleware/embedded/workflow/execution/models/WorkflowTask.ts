@@ -64,6 +64,12 @@ export interface WorkflowTask {
      */
     label?: string;
     /**
+     * The maximum number of times a task may retry.
+     * @type {number}
+     * @memberof WorkflowTask
+     */
+    maxRetries?: number;
+    /**
      * Key-value map of metadata.
      * @type {{ [key: string]: any; }}
      * @memberof WorkflowTask
@@ -138,6 +144,7 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'description': json['description'] == null ? undefined : json['description'],
         'finalize': json['finalize'] == null ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskFromJSON)),
         'label': json['label'] == null ? undefined : json['label'],
+        'maxRetries': json['maxRetries'] == null ? undefined : json['maxRetries'],
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'name': json['name'],
         'node': json['node'] == null ? undefined : json['node'],
@@ -163,6 +170,7 @@ export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'clusterRoot'
         'description': value['description'],
         'finalize': value['finalize'] == null ? undefined : ((value['finalize'] as Array<any>).map(WorkflowTaskToJSON)),
         'label': value['label'],
+        'maxRetries': value['maxRetries'],
         'metadata': value['metadata'],
         'name': value['name'],
         'node': value['node'],

@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './ComponentConnection';
 export * from './ExecutionError';
+export * from './FieldOption';
 export * from './Job';
 export * from './JobBasic';
 export * from './Page';
@@ -10,6 +11,8 @@ export * from './ProjectDeploymentBasic';
 export * from './ProjectStatus';
 export * from './TaskExecution';
 export * from './TriggerExecution';
+export * from './TriggerForm';
+export * from './TriggerFormInput';
 export * from './Webhook';
 export * from './WebhookRetry';
 export * from './WorkflowBasic';

@@ -45,10 +45,9 @@ export interface UpdateAppEventRequest {
 export class AppEventApi extends runtime.BaseAPI {
 
     /**
-     * Create a new app event.
-     * Create a new app event
+     * Creates request options for createAppEvent without sending the request
      */
-    async createAppEventRaw(requestParameters: CreateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createAppEventRequestOpts(requestParameters: CreateAppEventRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['appEvent'] == null) {
             throw new runtime.RequiredError(
                 'appEvent',
@@ -65,13 +64,22 @@ export class AppEventApi extends runtime.BaseAPI {
 
         let urlPath = `/app-events`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: AppEventToJSON(requestParameters['appEvent']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new app event.
+     * Create a new app event
+     */
+    async createAppEventRaw(requestParameters: CreateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createAppEventRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -90,10 +98,9 @@ export class AppEventApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete an app event.
-     * Delete an app event
+     * Creates request options for deleteAppEvent without sending the request
      */
-    async deleteAppEventRaw(requestParameters: DeleteAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteAppEventRequestOpts(requestParameters: DeleteAppEventRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -109,12 +116,21 @@ export class AppEventApi extends runtime.BaseAPI {
         let urlPath = `/app-events/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete an app event.
+     * Delete an app event
+     */
+    async deleteAppEventRaw(requestParameters: DeleteAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteAppEventRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -128,10 +144,9 @@ export class AppEventApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an app event by id.
-     * Get an app event by id
+     * Creates request options for getAppEvent without sending the request
      */
-    async getAppEventRaw(requestParameters: GetAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AppEvent>> {
+    async getAppEventRequestOpts(requestParameters: GetAppEventRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -147,12 +162,21 @@ export class AppEventApi extends runtime.BaseAPI {
         let urlPath = `/app-events/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an app event by id.
+     * Get an app event by id
+     */
+    async getAppEventRaw(requestParameters: GetAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AppEvent>> {
+        const requestOptions = await this.getAppEventRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AppEventFromJSON(jsonValue));
     }
@@ -167,10 +191,9 @@ export class AppEventApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get app events.
-     * Get app events
+     * Creates request options for getAppEvents without sending the request
      */
-    async getAppEventsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AppEvent>>> {
+    async getAppEventsRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -178,12 +201,21 @@ export class AppEventApi extends runtime.BaseAPI {
 
         let urlPath = `/app-events`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get app events.
+     * Get app events
+     */
+    async getAppEventsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AppEvent>>> {
+        const requestOptions = await this.getAppEventsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AppEventFromJSON));
     }
@@ -198,10 +230,9 @@ export class AppEventApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing app event.
-     * Update an existing app event
+     * Creates request options for updateAppEvent without sending the request
      */
-    async updateAppEventRaw(requestParameters: UpdateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateAppEventRequestOpts(requestParameters: UpdateAppEventRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -226,13 +257,22 @@ export class AppEventApi extends runtime.BaseAPI {
         let urlPath = `/app-events/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: AppEventToJSON(requestParameters['appEvent']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing app event.
+     * Update an existing app event
+     */
+    async updateAppEventRaw(requestParameters: UpdateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateAppEventRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

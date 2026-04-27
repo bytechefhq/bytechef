@@ -45,10 +45,9 @@ export interface UpdateWorkspaceRequest {
 export class WorkspaceApi extends runtime.BaseAPI {
 
     /**
-     * Create a workspace event.
-     * Create a new workspace
+     * Creates request options for createWorkspace without sending the request
      */
-    async createWorkspaceRaw(requestParameters: CreateWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workspace>> {
+    async createWorkspaceRequestOpts(requestParameters: CreateWorkspaceRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['workspace'] == null) {
             throw new runtime.RequiredError(
                 'workspace',
@@ -65,13 +64,22 @@ export class WorkspaceApi extends runtime.BaseAPI {
 
         let urlPath = `/workspaces`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: WorkspaceToJSON(requestParameters['workspace']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a workspace event.
+     * Create a new workspace
+     */
+    async createWorkspaceRaw(requestParameters: CreateWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workspace>> {
+        const requestOptions = await this.createWorkspaceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkspaceFromJSON(jsonValue));
     }
@@ -86,10 +94,9 @@ export class WorkspaceApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete a workspace.
-     * Delete a workspace
+     * Creates request options for deleteWorkspace without sending the request
      */
-    async deleteWorkspaceRaw(requestParameters: DeleteWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteWorkspaceRequestOpts(requestParameters: DeleteWorkspaceRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -105,12 +112,21 @@ export class WorkspaceApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete a workspace.
+     * Delete a workspace
+     */
+    async deleteWorkspaceRaw(requestParameters: DeleteWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteWorkspaceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -124,10 +140,9 @@ export class WorkspaceApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a workspace by id.
-     * Get a workspace by id
+     * Creates request options for getWorkspace without sending the request
      */
-    async getWorkspaceRaw(requestParameters: GetWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workspace>> {
+    async getWorkspaceRequestOpts(requestParameters: GetWorkspaceRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -143,12 +158,21 @@ export class WorkspaceApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a workspace by id.
+     * Get a workspace by id
+     */
+    async getWorkspaceRaw(requestParameters: GetWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workspace>> {
+        const requestOptions = await this.getWorkspaceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkspaceFromJSON(jsonValue));
     }
@@ -163,10 +187,9 @@ export class WorkspaceApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get workspaces.
-     * Get workspaces
+     * Creates request options for getWorkspaces without sending the request
      */
-    async getWorkspacesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Workspace>>> {
+    async getWorkspacesRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -174,12 +197,21 @@ export class WorkspaceApi extends runtime.BaseAPI {
 
         let urlPath = `/workspaces`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get workspaces.
+     * Get workspaces
+     */
+    async getWorkspacesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Workspace>>> {
+        const requestOptions = await this.getWorkspacesRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkspaceFromJSON));
     }
@@ -194,10 +226,9 @@ export class WorkspaceApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing workspace.
-     * Update an existing workspace
+     * Creates request options for updateWorkspace without sending the request
      */
-    async updateWorkspaceRaw(requestParameters: UpdateWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workspace>> {
+    async updateWorkspaceRequestOpts(requestParameters: UpdateWorkspaceRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -222,13 +253,22 @@ export class WorkspaceApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: WorkspaceToJSON(requestParameters['workspace']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing workspace.
+     * Update an existing workspace
+     */
+    async updateWorkspaceRaw(requestParameters: UpdateWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workspace>> {
+        const requestOptions = await this.updateWorkspaceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkspaceFromJSON(jsonValue));
     }
