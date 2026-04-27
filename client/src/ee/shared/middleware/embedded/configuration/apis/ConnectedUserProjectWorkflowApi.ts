@@ -51,10 +51,9 @@ export interface PublishConnectedUserProjectWorkflowOperationRequest {
 export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
 
     /**
-     * Enable/disable a connected user project workflow.
-     * Enable/disable a connected user project workflow
+     * Creates request options for enableConnectedUserProjectWorkflow without sending the request
      */
-    async enableConnectedUserProjectWorkflowRaw(requestParameters: EnableConnectedUserProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableConnectedUserProjectWorkflowRequestOpts(requestParameters: EnableConnectedUserProjectWorkflowRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['workflowUuid'] == null) {
             throw new runtime.RequiredError(
                 'workflowUuid',
@@ -82,12 +81,21 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
         urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Enable/disable a connected user project workflow.
+     * Enable/disable a connected user project workflow
+     */
+    async enableConnectedUserProjectWorkflowRaw(requestParameters: EnableConnectedUserProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.enableConnectedUserProjectWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -101,10 +109,9 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get connected user project workflow.
-     * Get connected user project workflow.
+     * Creates request options for getConnectedUserProjectWorkflow without sending the request
      */
-    async getConnectedUserProjectWorkflowRaw(requestParameters: GetConnectedUserProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUserProjectWorkflow>> {
+    async getConnectedUserProjectWorkflowRequestOpts(requestParameters: GetConnectedUserProjectWorkflowRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['workflowUuid'] == null) {
             throw new runtime.RequiredError(
                 'workflowUuid',
@@ -124,12 +131,21 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
         let urlPath = `/connected-user-project-workflows/{workflowUuid}`;
         urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get connected user project workflow.
+     * Get connected user project workflow.
+     */
+    async getConnectedUserProjectWorkflowRaw(requestParameters: GetConnectedUserProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUserProjectWorkflow>> {
+        const requestOptions = await this.getConnectedUserProjectWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConnectedUserProjectWorkflowFromJSON(jsonValue));
     }
@@ -144,10 +160,9 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
     }
 
     /**
-     * Publishes existing connected user project workflow.
-     * Publishes existing connected user project workflow
+     * Creates request options for publishConnectedUserProjectWorkflow without sending the request
      */
-    async publishConnectedUserProjectWorkflowRaw(requestParameters: PublishConnectedUserProjectWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async publishConnectedUserProjectWorkflowRequestOpts(requestParameters: PublishConnectedUserProjectWorkflowOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['workflowUuid'] == null) {
             throw new runtime.RequiredError(
                 'workflowUuid',
@@ -176,13 +191,22 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
         let urlPath = `/connected-user-project-workflows/{workflowUuid}/publish`;
         urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: PublishConnectedUserProjectWorkflowRequestToJSON(requestParameters['publishConnectedUserProjectWorkflowRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Publishes existing connected user project workflow.
+     * Publishes existing connected user project workflow
+     */
+    async publishConnectedUserProjectWorkflowRaw(requestParameters: PublishConnectedUserProjectWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.publishConnectedUserProjectWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

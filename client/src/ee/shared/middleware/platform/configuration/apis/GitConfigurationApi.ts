@@ -37,10 +37,9 @@ export interface UpdateGitConfigurationRequest {
 export class GitConfigurationApi extends runtime.BaseAPI {
 
     /**
-     * Get git configuration of a workspace.
-     * Get git configuration of a workspace.
+     * Creates request options for getGitConfiguration without sending the request
      */
-    async getGitConfigurationRaw(requestParameters: GetGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GitConfiguration>> {
+    async getGitConfigurationRequestOpts(requestParameters: GetGitConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -56,12 +55,21 @@ export class GitConfigurationApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}/git-configuration`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get git configuration of a workspace.
+     * Get git configuration of a workspace.
+     */
+    async getGitConfigurationRaw(requestParameters: GetGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GitConfiguration>> {
+        const requestOptions = await this.getGitConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GitConfigurationFromJSON(jsonValue));
     }
@@ -76,10 +84,9 @@ export class GitConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update git configuration.
-     * Update git configuration.
+     * Creates request options for updateGitConfiguration without sending the request
      */
-    async updateGitConfigurationRaw(requestParameters: UpdateGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateGitConfigurationRequestOpts(requestParameters: UpdateGitConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -104,13 +111,22 @@ export class GitConfigurationApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}/git-configuration`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: GitConfigurationToJSON(requestParameters['gitConfiguration']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update git configuration.
+     * Update git configuration.
+     */
+    async updateGitConfigurationRaw(requestParameters: UpdateGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateGitConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

@@ -79,7 +79,6 @@ docs/TimeProperty.md
 docs/TriggerDefinition.md
 docs/TriggerDefinitionApi.md
 docs/TriggerDefinitionBasic.md
-docs/TriggerFormInput.md
 docs/TriggerType.md
 docs/UnifiedApiCategory.md
 docs/UpdateClusterElementParameterRequest.md
@@ -161,7 +160,6 @@ models/TaskProperty.ts
 models/TimeProperty.ts
 models/TriggerDefinition.ts
 models/TriggerDefinitionBasic.ts
-models/TriggerFormInput.ts
 models/TriggerType.ts
 models/UnifiedApiCategory.ts
 models/UpdateClusterElementParameterRequest.ts

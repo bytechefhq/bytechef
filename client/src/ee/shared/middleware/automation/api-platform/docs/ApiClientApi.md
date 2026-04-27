@@ -1,6 +1,6 @@
 # ApiClientApi
 
-All URIs are relative to *http://localhost/api/automation/api-platform/internal*
+All URIs are relative to */api/automation/api-platform/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|

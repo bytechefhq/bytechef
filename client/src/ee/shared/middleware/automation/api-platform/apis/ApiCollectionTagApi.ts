@@ -36,10 +36,9 @@ export interface UpdateApiCollectionTagsRequest {
 export class ApiCollectionTagApi extends runtime.BaseAPI {
 
     /**
-     * Get API collection tags.
-     * Get API collection tags
+     * Creates request options for getApiCollectionTags without sending the request
      */
-    async getApiCollectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+    async getApiCollectionTagsRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -47,12 +46,21 @@ export class ApiCollectionTagApi extends runtime.BaseAPI {
 
         let urlPath = `/api-collections/tags`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get API collection tags.
+     * Get API collection tags
+     */
+    async getApiCollectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+        const requestOptions = await this.getApiCollectionTagsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagFromJSON));
     }
@@ -67,10 +75,9 @@ export class ApiCollectionTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Updates tags of an existing API collection.
-     * Updates tags of an existing API collection
+     * Creates request options for updateApiCollectionTags without sending the request
      */
-    async updateApiCollectionTagsRaw(requestParameters: UpdateApiCollectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateApiCollectionTagsRequestOpts(requestParameters: UpdateApiCollectionTagsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -95,13 +102,22 @@ export class ApiCollectionTagApi extends runtime.BaseAPI {
         let urlPath = `/api-collections/{id}/tags`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: UpdateTagsRequestToJSON(requestParameters['updateTagsRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Updates tags of an existing API collection.
+     * Updates tags of an existing API collection
+     */
+    async updateApiCollectionTagsRaw(requestParameters: UpdateApiCollectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateApiCollectionTagsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

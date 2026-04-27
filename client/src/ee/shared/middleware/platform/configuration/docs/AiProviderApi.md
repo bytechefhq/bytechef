@@ -13,7 +13,7 @@ All URIs are relative to */api/platform/internal*
 
 ## deleteAiProvider
 
-> deleteAiProvider(id)
+> deleteAiProvider(id, environment)
 
 Delete an AI provider
 
@@ -35,6 +35,8 @@ async function example() {
   const body = {
     // number | The id of an AI provider.
     id: 56,
+    // number | The environment of an AI provider.
+    environment: 56,
   } satisfies DeleteAiProviderRequest;
 
   try {
@@ -55,6 +57,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of an AI provider. | [Defaults to `undefined`] |
+| **environment** | `number` | The environment of an AI provider. | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -80,7 +83,7 @@ No authorization required
 
 ## enableAiProvider
 
-> enableAiProvider(id, enable)
+> enableAiProvider(id, enable, environment)
 
 e
 
@@ -104,6 +107,8 @@ async function example() {
     id: 56,
     // boolean | The enable status of an AI provider.
     enable: true,
+    // number | The environment of an AI provider.
+    environment: 56,
   } satisfies EnableAiProviderRequest;
 
   try {
@@ -125,6 +130,7 @@ example().catch(console.error);
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of an AI provider. | [Defaults to `undefined`] |
 | **enable** | `boolean` | The enable status of an AI provider. | [Defaults to `undefined`] |
+| **environment** | `number` | The environment of an AI provider. | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -150,7 +156,7 @@ No authorization required
 
 ## getAiProviders
 
-> Array&lt;AiProvider&gt; getAiProviders()
+> Array&lt;AiProvider&gt; getAiProviders(environment)
 
 Get AI providers
 
@@ -169,8 +175,13 @@ async function example() {
   console.log("🚀 Testing  SDK...");
   const api = new AiProviderApi();
 
+  const body = {
+    // number | The environment of an AI provider.
+    environment: 56,
+  } satisfies GetAiProvidersRequest;
+
   try {
-    const data = await api.getAiProviders();
+    const data = await api.getAiProviders(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -183,7 +194,10 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **environment** | `number` | The environment of an AI provider. | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -209,7 +223,7 @@ No authorization required
 
 ## updateAiProvider
 
-> updateAiProvider(id, updateAiProviderRequest)
+> updateAiProvider(id, environment, updateAiProviderRequest)
 
 Update an existing AI provider
 
@@ -231,6 +245,8 @@ async function example() {
   const body = {
     // number | The id of an AI provider.
     id: 56,
+    // number | The environment of an AI provider.
+    environment: 56,
     // UpdateAiProviderRequest
     updateAiProviderRequest: ...,
   } satisfies UpdateAiProviderOperationRequest;
@@ -253,6 +269,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of an AI provider. | [Defaults to `undefined`] |
+| **environment** | `number` | The environment of an AI provider. | [Defaults to `undefined`] |
 | **updateAiProviderRequest** | [UpdateAiProviderRequest](UpdateAiProviderRequest.md) |  | |
 
 ### Return type

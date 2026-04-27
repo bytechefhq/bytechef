@@ -26,14 +26,14 @@ import {
 } from '../models/index';
 
 export interface DeleteAiProviderRequest {
-    environment: number;
     id: number;
+    environment: number;
 }
 
 export interface EnableAiProviderRequest {
+    id: number;
     enable: boolean;
     environment: number;
-    id: number;
 }
 
 export interface GetAiProvidersRequest {
@@ -41,8 +41,8 @@ export interface GetAiProvidersRequest {
 }
 
 export interface UpdateAiProviderOperationRequest {
-    environment: number;
     id: number;
+    environment: number;
     updateAiProviderRequest: UpdateAiProviderRequest;
 }
 
@@ -52,10 +52,9 @@ export interface UpdateAiProviderOperationRequest {
 export class AiProviderApi extends runtime.BaseAPI {
 
     /**
-     * Delete an AI provider.
-     * Delete an AI provider
+     * Creates request options for deleteAiProvider without sending the request
      */
-    async deleteAiProviderRaw(requestParameters: DeleteAiProviderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteAiProviderRequestOpts(requestParameters: DeleteAiProviderRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -82,12 +81,21 @@ export class AiProviderApi extends runtime.BaseAPI {
         let urlPath = `/ai-providers/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete an AI provider.
+     * Delete an AI provider
+     */
+    async deleteAiProviderRaw(requestParameters: DeleteAiProviderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteAiProviderRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -101,10 +109,9 @@ export class AiProviderApi extends runtime.BaseAPI {
     }
 
     /**
-     * Enable/disable an AI provider.
-     * e
+     * Creates request options for enableAiProvider without sending the request
      */
-    async enableAiProviderRaw(requestParameters: EnableAiProviderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableAiProviderRequestOpts(requestParameters: EnableAiProviderRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -139,12 +146,21 @@ export class AiProviderApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
         urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Enable/disable an AI provider.
+     * e
+     */
+    async enableAiProviderRaw(requestParameters: EnableAiProviderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.enableAiProviderRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -158,10 +174,9 @@ export class AiProviderApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get AI providers.
-     * Get AI providers
+     * Creates request options for getAiProviders without sending the request
      */
-    async getAiProvidersRaw(requestParameters: GetAiProvidersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AiProvider>>> {
+    async getAiProvidersRequestOpts(requestParameters: GetAiProvidersRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['environment'] == null) {
             throw new runtime.RequiredError(
                 'environment',
@@ -180,12 +195,21 @@ export class AiProviderApi extends runtime.BaseAPI {
 
         let urlPath = `/ai-providers`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get AI providers.
+     * Get AI providers
+     */
+    async getAiProvidersRaw(requestParameters: GetAiProvidersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AiProvider>>> {
+        const requestOptions = await this.getAiProvidersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AiProviderFromJSON));
     }
@@ -200,10 +224,9 @@ export class AiProviderApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing AI provider.
-     * Update an existing AI provider
+     * Creates request options for updateAiProvider without sending the request
      */
-    async updateAiProviderRaw(requestParameters: UpdateAiProviderOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateAiProviderRequestOpts(requestParameters: UpdateAiProviderOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -211,17 +234,17 @@ export class AiProviderApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['updateAiProviderRequest'] == null) {
-            throw new runtime.RequiredError(
-                'updateAiProviderRequest',
-                'Required parameter "updateAiProviderRequest" was null or undefined when calling updateAiProvider().'
-            );
-        }
-
         if (requestParameters['environment'] == null) {
             throw new runtime.RequiredError(
                 'environment',
                 'Required parameter "environment" was null or undefined when calling updateAiProvider().'
+            );
+        }
+
+        if (requestParameters['updateAiProviderRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateAiProviderRequest',
+                'Required parameter "updateAiProviderRequest" was null or undefined when calling updateAiProvider().'
             );
         }
 
@@ -239,13 +262,22 @@ export class AiProviderApi extends runtime.BaseAPI {
         let urlPath = `/ai-providers/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
             body: UpdateAiProviderRequestToJSON(requestParameters['updateAiProviderRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing AI provider.
+     * Update an existing AI provider
+     */
+    async updateAiProviderRaw(requestParameters: UpdateAiProviderOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateAiProviderRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

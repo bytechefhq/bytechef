@@ -65,7 +65,7 @@ export interface Notification {
     name: string;
     /**
      * Type of the notification
-     * @type {string}
+     * @type {NotificationTypeEnum}
      * @memberof Notification
      */
     type: NotificationTypeEnum;

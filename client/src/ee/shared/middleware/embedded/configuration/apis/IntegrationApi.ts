@@ -79,10 +79,9 @@ export interface UpdateIntegrationRequest {
 export class IntegrationApi extends runtime.BaseAPI {
 
     /**
-     * Create a new integration.
-     * Create a new integration
+     * Creates request options for createIntegration without sending the request
      */
-    async createIntegrationRaw(requestParameters: CreateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createIntegrationRequestOpts(requestParameters: CreateIntegrationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['integration'] == null) {
             throw new runtime.RequiredError(
                 'integration',
@@ -99,13 +98,22 @@ export class IntegrationApi extends runtime.BaseAPI {
 
         let urlPath = `/integrations`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: IntegrationToJSON(requestParameters['integration']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new integration.
+     * Create a new integration
+     */
+    async createIntegrationRaw(requestParameters: CreateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createIntegrationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -124,10 +132,9 @@ export class IntegrationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create new workflow and adds it to an existing integration.
-     * Create new workflow and adds it to an existing integration
+     * Creates request options for createIntegrationWorkflow without sending the request
      */
-    async createIntegrationWorkflowRaw(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createIntegrationWorkflowRequestOpts(requestParameters: CreateIntegrationWorkflowRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -152,13 +159,22 @@ export class IntegrationApi extends runtime.BaseAPI {
         let urlPath = `/integrations/{id}/workflows`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: WorkflowToJSON(requestParameters['workflow']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create new workflow and adds it to an existing integration.
+     * Create new workflow and adds it to an existing integration
+     */
+    async createIntegrationWorkflowRaw(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createIntegrationWorkflowRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -177,10 +193,9 @@ export class IntegrationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete an integration.
-     * Delete an integration
+     * Creates request options for deleteIntegration without sending the request
      */
-    async deleteIntegrationRaw(requestParameters: DeleteIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteIntegrationRequestOpts(requestParameters: DeleteIntegrationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -196,12 +211,21 @@ export class IntegrationApi extends runtime.BaseAPI {
         let urlPath = `/integrations/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete an integration.
+     * Delete an integration
+     */
+    async deleteIntegrationRaw(requestParameters: DeleteIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteIntegrationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -215,10 +239,9 @@ export class IntegrationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an integration by id.
-     * Get an integration by id
+     * Creates request options for getIntegration without sending the request
      */
-    async getIntegrationRaw(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
+    async getIntegrationRequestOpts(requestParameters: GetIntegrationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -234,12 +257,21 @@ export class IntegrationApi extends runtime.BaseAPI {
         let urlPath = `/integrations/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get an integration by id.
+     * Get an integration by id
+     */
+    async getIntegrationRaw(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
+        const requestOptions = await this.getIntegrationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationFromJSON(jsonValue));
     }
@@ -254,10 +286,9 @@ export class IntegrationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a integration versions.
-     * Get a integration versions.
+     * Creates request options for getIntegrationVersions without sending the request
      */
-    async getIntegrationVersionsRaw(requestParameters: GetIntegrationVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationVersion>>> {
+    async getIntegrationVersionsRequestOpts(requestParameters: GetIntegrationVersionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -273,12 +304,21 @@ export class IntegrationApi extends runtime.BaseAPI {
         let urlPath = `/integrations/{id}/versions`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a integration versions.
+     * Get a integration versions.
+     */
+    async getIntegrationVersionsRaw(requestParameters: GetIntegrationVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationVersion>>> {
+        const requestOptions = await this.getIntegrationVersionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(IntegrationVersionFromJSON));
     }
@@ -293,10 +333,9 @@ export class IntegrationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get integrations.
-     * Get integrations
+     * Creates request options for getIntegrations without sending the request
      */
-    async getIntegrationsRaw(requestParameters: GetIntegrationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Integration>>> {
+    async getIntegrationsRequestOpts(requestParameters: GetIntegrationsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['categoryId'] != null) {
@@ -324,12 +363,21 @@ export class IntegrationApi extends runtime.BaseAPI {
 
         let urlPath = `/integrations`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get integrations.
+     * Get integrations
+     */
+    async getIntegrationsRaw(requestParameters: GetIntegrationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Integration>>> {
+        const requestOptions = await this.getIntegrationsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(IntegrationFromJSON));
     }
@@ -344,10 +392,9 @@ export class IntegrationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Publishes existing integration.
-     * Publishes existing integration.
+     * Creates request options for publishIntegration without sending the request
      */
-    async publishIntegrationRaw(requestParameters: PublishIntegrationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async publishIntegrationRequestOpts(requestParameters: PublishIntegrationOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -365,13 +412,22 @@ export class IntegrationApi extends runtime.BaseAPI {
         let urlPath = `/integrations/{id}/publish`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: PublishIntegrationRequestToJSON(requestParameters['publishIntegrationRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Publishes existing integration.
+     * Publishes existing integration.
+     */
+    async publishIntegrationRaw(requestParameters: PublishIntegrationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.publishIntegrationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -385,10 +441,9 @@ export class IntegrationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing integration.
-     * Update an existing integration
+     * Creates request options for updateIntegration without sending the request
      */
-    async updateIntegrationRaw(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateIntegrationRequestOpts(requestParameters: UpdateIntegrationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -413,13 +468,22 @@ export class IntegrationApi extends runtime.BaseAPI {
         let urlPath = `/integrations/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: IntegrationToJSON(requestParameters['integration']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing integration.
+     * Update an existing integration
+     */
+    async updateIntegrationRaw(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateIntegrationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

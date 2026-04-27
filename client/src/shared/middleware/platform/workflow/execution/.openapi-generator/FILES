@@ -1,8 +1,13 @@
+apis/ApprovalFormApi.ts
 apis/JobApi.ts
 apis/TriggerExecutionApi.ts
 apis/index.ts
+docs/ApprovalForm.md
+docs/ApprovalFormApi.md
+docs/ApprovalFormInput.md
 docs/ComponentConnection.md
 docs/ExecutionError.md
+docs/FieldOption.md
 docs/Job.md
 docs/JobApi.md
 docs/JobBasic.md
@@ -16,8 +21,11 @@ docs/WebhookRetry.md
 docs/WorkflowTask.md
 docs/WorkflowTrigger.md
 index.ts
+models/ApprovalForm.ts
+models/ApprovalFormInput.ts
 models/ComponentConnection.ts
 models/ExecutionError.ts
+models/FieldOption.ts
 models/Job.ts
 models/JobBasic.ts
 models/JobConnection.ts

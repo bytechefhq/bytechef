@@ -38,10 +38,9 @@ export interface StopWebhookTriggerTestRequest {
 export class WebhookTriggerTestApi extends runtime.BaseAPI {
 
     /**
-     * Test a webhook trigger.
-     * Test a webhook trigger
+     * Creates request options for startWebhookTriggerTest without sending the request
      */
-    async startWebhookTriggerTestRaw(requestParameters: StartWebhookTriggerTestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StartWebhookTriggerTest200Response>> {
+    async startWebhookTriggerTestRequestOpts(requestParameters: StartWebhookTriggerTestRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['workflowId'] == null) {
             throw new runtime.RequiredError(
                 'workflowId',
@@ -68,12 +67,21 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
         let urlPath = `/webhooks/{workflowId}/test/start`;
         urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Test a webhook trigger.
+     * Test a webhook trigger
+     */
+    async startWebhookTriggerTestRaw(requestParameters: StartWebhookTriggerTestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StartWebhookTriggerTest200Response>> {
+        const requestOptions = await this.startWebhookTriggerTestRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => StartWebhookTriggerTest200ResponseFromJSON(jsonValue));
     }
@@ -88,10 +96,9 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
     }
 
     /**
-     * Test a webhook trigger.
-     * Test a webhook trigger
+     * Creates request options for stopWebhookTriggerTest without sending the request
      */
-    async stopWebhookTriggerTestRaw(requestParameters: StopWebhookTriggerTestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async stopWebhookTriggerTestRequestOpts(requestParameters: StopWebhookTriggerTestRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['workflowId'] == null) {
             throw new runtime.RequiredError(
                 'workflowId',
@@ -118,12 +125,21 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
         let urlPath = `/webhooks/{workflowId}/test/stop`;
         urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Test a webhook trigger.
+     * Test a webhook trigger
+     */
+    async stopWebhookTriggerTestRaw(requestParameters: StopWebhookTriggerTestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.stopWebhookTriggerTestRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

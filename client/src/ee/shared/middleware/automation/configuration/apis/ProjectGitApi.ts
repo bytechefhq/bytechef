@@ -49,10 +49,9 @@ export interface UpdateProjectGitConfigurationRequest {
 export class ProjectGitApi extends runtime.BaseAPI {
 
     /**
-     * Get git configuration of a project.
-     * Get git configuration of a project .
+     * Creates request options for getProjectGitConfiguration without sending the request
      */
-    async getProjectGitConfigurationRaw(requestParameters: GetProjectGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectGitConfiguration>> {
+    async getProjectGitConfigurationRequestOpts(requestParameters: GetProjectGitConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -68,12 +67,21 @@ export class ProjectGitApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}/project-git-configuration`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get git configuration of a project.
+     * Get git configuration of a project .
+     */
+    async getProjectGitConfigurationRaw(requestParameters: GetProjectGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectGitConfiguration>> {
+        const requestOptions = await this.getProjectGitConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ProjectGitConfigurationFromJSON(jsonValue));
     }
@@ -88,10 +96,9 @@ export class ProjectGitApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get remote branches of a project git repository.
-     * Get remote branches of a project git repository.
+     * Creates request options for getProjectRemoteBranches without sending the request
      */
-    async getProjectRemoteBranchesRaw(requestParameters: GetProjectRemoteBranchesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+    async getProjectRemoteBranchesRequestOpts(requestParameters: GetProjectRemoteBranchesRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -107,12 +114,21 @@ export class ProjectGitApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}/git/remote-branches`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get remote branches of a project git repository.
+     * Get remote branches of a project git repository.
+     */
+    async getProjectRemoteBranchesRaw(requestParameters: GetProjectRemoteBranchesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        const requestOptions = await this.getProjectRemoteBranchesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -127,10 +143,9 @@ export class ProjectGitApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get project git configurations of a workspace.
-     * Get project git configurations of a workspace.
+     * Creates request options for getWorkspaceProjectGitConfigurations without sending the request
      */
-    async getWorkspaceProjectGitConfigurationsRaw(requestParameters: GetWorkspaceProjectGitConfigurationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectGitConfiguration>>> {
+    async getWorkspaceProjectGitConfigurationsRequestOpts(requestParameters: GetWorkspaceProjectGitConfigurationsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -146,12 +161,21 @@ export class ProjectGitApi extends runtime.BaseAPI {
         let urlPath = `/workspaces/{id}/project-git-configurations`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get project git configurations of a workspace.
+     * Get project git configurations of a workspace.
+     */
+    async getWorkspaceProjectGitConfigurationsRaw(requestParameters: GetWorkspaceProjectGitConfigurationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectGitConfiguration>>> {
+        const requestOptions = await this.getWorkspaceProjectGitConfigurationsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectGitConfigurationFromJSON));
     }
@@ -166,10 +190,9 @@ export class ProjectGitApi extends runtime.BaseAPI {
     }
 
     /**
-     * Pulls project from git repository.
-     * Pulls project from git repository.
+     * Creates request options for pullProjectFromGit without sending the request
      */
-    async pullProjectFromGitRaw(requestParameters: PullProjectFromGitRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async pullProjectFromGitRequestOpts(requestParameters: PullProjectFromGitRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -185,12 +208,21 @@ export class ProjectGitApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}/git/pull`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Pulls project from git repository.
+     * Pulls project from git repository.
+     */
+    async pullProjectFromGitRaw(requestParameters: PullProjectFromGitRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.pullProjectFromGitRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -204,10 +236,9 @@ export class ProjectGitApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update git configuration of an existing project.
-     * Update git configuration of an existing project.
+     * Creates request options for updateProjectGitConfiguration without sending the request
      */
-    async updateProjectGitConfigurationRaw(requestParameters: UpdateProjectGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateProjectGitConfigurationRequestOpts(requestParameters: UpdateProjectGitConfigurationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -232,13 +263,22 @@ export class ProjectGitApi extends runtime.BaseAPI {
         let urlPath = `/projects/{id}/project-git-configuration`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: ProjectGitConfigurationToJSON(requestParameters['projectGitConfiguration']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update git configuration of an existing project.
+     * Update git configuration of an existing project.
+     */
+    async updateProjectGitConfigurationRaw(requestParameters: UpdateProjectGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateProjectGitConfigurationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

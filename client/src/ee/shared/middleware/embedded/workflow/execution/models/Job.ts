@@ -133,7 +133,7 @@ export interface Job {
     readonly startDate: Date;
     /**
      * The job's status.
-     * @type {string}
+     * @type {JobStatusEnum}
      * @memberof Job
      */
     readonly status: JobStatusEnum;

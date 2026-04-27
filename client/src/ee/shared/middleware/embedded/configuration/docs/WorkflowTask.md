@@ -13,6 +13,7 @@ Name | Type
 `description` | string
 `finalize` | [Array&lt;WorkflowTask&gt;](WorkflowTask.md)
 `label` | string
+`maxRetries` | number
 `metadata` | { [key: string]: any; }
 `name` | string
 `node` | string
@@ -35,6 +36,7 @@ const example = {
   "description": null,
   "finalize": null,
   "label": null,
+  "maxRetries": null,
   "metadata": null,
   "name": null,
   "node": null,

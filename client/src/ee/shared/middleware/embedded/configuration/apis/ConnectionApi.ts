@@ -67,10 +67,9 @@ export interface UpdateConnectionOperationRequest {
 export class ConnectionApi extends runtime.BaseAPI {
 
     /**
-     * Create a new connection for the connected user\'s project workflow.
-     * Create a new connection for the connected user\'s project workflow
+     * Creates request options for createConnectedUserProjectWorkflowConnection without sending the request
      */
-    async createConnectedUserProjectWorkflowConnectionRaw(requestParameters: CreateConnectedUserProjectWorkflowConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createConnectedUserProjectWorkflowConnectionRequestOpts(requestParameters: CreateConnectedUserProjectWorkflowConnectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['connectedUserId'] == null) {
             throw new runtime.RequiredError(
                 'connectedUserId',
@@ -103,13 +102,22 @@ export class ConnectionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId'])));
         urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ConnectionToJSON(requestParameters['connection']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new connection for the connected user\'s project workflow.
+     * Create a new connection for the connected user\'s project workflow
+     */
+    async createConnectedUserProjectWorkflowConnectionRaw(requestParameters: CreateConnectedUserProjectWorkflowConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createConnectedUserProjectWorkflowConnectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -128,10 +136,9 @@ export class ConnectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a new connection.
-     * Create a new connection
+     * Creates request options for createConnection without sending the request
      */
-    async createConnectionRaw(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+    async createConnectionRequestOpts(requestParameters: CreateConnectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['connection'] == null) {
             throw new runtime.RequiredError(
                 'connection',
@@ -148,13 +155,22 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         let urlPath = `/connections`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ConnectionToJSON(requestParameters['connection']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Create a new connection.
+     * Create a new connection
+     */
+    async createConnectionRaw(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createConnectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
             return new runtime.JSONApiResponse<number>(response);
@@ -173,10 +189,9 @@ export class ConnectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete a connection.
-     * Delete a connection
+     * Creates request options for deleteConnection without sending the request
      */
-    async deleteConnectionRaw(requestParameters: DeleteConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteConnectionRequestOpts(requestParameters: DeleteConnectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -192,12 +207,21 @@ export class ConnectionApi extends runtime.BaseAPI {
         let urlPath = `/connections/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Delete a connection.
+     * Delete a connection
+     */
+    async deleteConnectionRaw(requestParameters: DeleteConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteConnectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -211,10 +235,9 @@ export class ConnectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all connected user\'s connections.
-     * Get all connected user\'s connections
+     * Creates request options for getConnectedUserConnections without sending the request
      */
-    async getConnectedUserConnectionsRaw(requestParameters: GetConnectedUserConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Connection>>> {
+    async getConnectedUserConnectionsRequestOpts(requestParameters: GetConnectedUserConnectionsRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['connectedUserId'] == null) {
             throw new runtime.RequiredError(
                 'connectedUserId',
@@ -242,12 +265,21 @@ export class ConnectionApi extends runtime.BaseAPI {
         urlPath = urlPath.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId'])));
         urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all connected user\'s connections.
+     * Get all connected user\'s connections
+     */
+    async getConnectedUserConnectionsRaw(requestParameters: GetConnectedUserConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Connection>>> {
+        const requestOptions = await this.getConnectedUserConnectionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionFromJSON));
     }
@@ -262,10 +294,9 @@ export class ConnectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a connection by id.
-     * Get a connection by id
+     * Creates request options for getConnection without sending the request
      */
-    async getConnectionRaw(requestParameters: GetConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Connection>> {
+    async getConnectionRequestOpts(requestParameters: GetConnectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -281,12 +312,21 @@ export class ConnectionApi extends runtime.BaseAPI {
         let urlPath = `/connections/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a connection by id.
+     * Get a connection by id
+     */
+    async getConnectionRaw(requestParameters: GetConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Connection>> {
+        const requestOptions = await this.getConnectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionFromJSON(jsonValue));
     }
@@ -301,10 +341,9 @@ export class ConnectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all connections.
-     * Get all connections
+     * Creates request options for getConnections without sending the request
      */
-    async getConnectionsRaw(requestParameters: GetConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Connection>>> {
+    async getConnectionsRequestOpts(requestParameters: GetConnectionsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['componentName'] != null) {
@@ -328,12 +367,21 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         let urlPath = `/connections`;
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get all connections.
+     * Get all connections
+     */
+    async getConnectionsRaw(requestParameters: GetConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Connection>>> {
+        const requestOptions = await this.getConnectionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionFromJSON));
     }
@@ -348,10 +396,9 @@ export class ConnectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Update an existing connection.
-     * Update an existing connection
+     * Creates request options for updateConnection without sending the request
      */
-    async updateConnectionRaw(requestParameters: UpdateConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateConnectionRequestOpts(requestParameters: UpdateConnectionOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -376,13 +423,22 @@ export class ConnectionApi extends runtime.BaseAPI {
         let urlPath = `/connections/{id}`;
         urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
 
-        const response = await this.request({
+        return {
             path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
             body: UpdateConnectionRequestToJSON(requestParameters['updateConnectionRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Update an existing connection.
+     * Update an existing connection
+     */
+    async updateConnectionRaw(requestParameters: UpdateConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateConnectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

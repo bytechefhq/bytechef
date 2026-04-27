@@ -81,7 +81,7 @@ export interface JobBasic {
     readonly startDate: Date;
     /**
      * The job's status.
-     * @type {string}
+     * @type {JobBasicStatusEnum}
      * @memberof JobBasic
      */
     readonly status: JobBasicStatusEnum;
