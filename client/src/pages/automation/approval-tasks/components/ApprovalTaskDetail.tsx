@@ -3,7 +3,7 @@ import DatePicker from '@/components/DatePicker/DatePicker';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ApprovalForm from '@/shared/components/approval-form/ApprovalForm';
-import {CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
+import {CheckCircle2Icon, CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
 
 import {useApprovalTaskDetail} from './hooks/useApprovalTaskDetail';
 
@@ -98,6 +98,13 @@ export default function ApprovalTaskDetail() {
                                     <div className="flex items-center gap-2">
                                         <ClockIcon className="size-4 text-blue-500" />
                                         In Progress
+                                    </div>
+                                </SelectItem>
+
+                                <SelectItem value="completed">
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle2Icon className="size-4 text-green-500" />
+                                        Completed
                                     </div>
                                 </SelectItem>
                             </SelectContent>
