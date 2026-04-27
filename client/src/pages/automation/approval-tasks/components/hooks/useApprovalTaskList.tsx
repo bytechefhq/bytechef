@@ -57,11 +57,7 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
         }))
     );
 
-    const updateApprovalTaskMutation = useUpdateApprovalTaskMutation({
-        onError: (error) => {
-            console.error('Error updating approval task:', error);
-        },
-    });
+    const updateApprovalTaskMutation = useUpdateApprovalTaskMutation();
 
     const filteredApprovalTasks = useMemo(() => {
         const filtered = approvalTasks.filter((approvalTask) => {
@@ -121,6 +117,7 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
                 return;
             }
 
+            const previous = target;
             const next: ApprovalTaskI = {...target, status: cycleStatus(target.status)};
 
             updateApprovalTaskInStore(next);
@@ -138,6 +135,9 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
                     },
                 },
                 {
+                    onError: () => {
+                        updateApprovalTaskInStore(previous);
+                    },
                     onSuccess: (data) => {
                         updateApprovalTaskInStore({
                             ...next,

@@ -9,10 +9,16 @@ import {useSearchParams} from 'react-router-dom';
 interface ApprovalFormPropsI {
     id: string | undefined;
     onSubmitted?: (approved: boolean) => void;
+    setDocumentTitle?: boolean;
     showHeader?: boolean;
 }
 
-export default function ApprovalForm({id, onSubmitted, showHeader = true}: ApprovalFormPropsI) {
+export default function ApprovalForm({
+    id,
+    onSubmitted,
+    setDocumentTitle = false,
+    showHeader = true,
+}: ApprovalFormPropsI) {
     const {approved, definition, error, form, handleSubmit, loading, submitError, submitted, submitting, uiDefinition} =
         useApprovalForm(id, {onSubmitted});
 
@@ -30,6 +36,20 @@ export default function ApprovalForm({id, onSubmitted, showHeader = true}: Appro
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autoApproved]);
 
+    useEffect(() => {
+        if (!setDocumentTitle) {
+            return;
+        }
+
+        const formTitle = uiDefinition?.title;
+
+        document.title = formTitle ? `ByteChef - ${formTitle}` : 'ByteChef';
+
+        return () => {
+            document.title = 'ByteChef';
+        };
+    }, [setDocumentTitle, uiDefinition?.title]);
+
     if (submitError) {
         return (
             <div className="p-6">
@@ -39,17 +59,23 @@ export default function ApprovalForm({id, onSubmitted, showHeader = true}: Appro
     }
 
     if (autoApproved !== null) {
-        const resolvedApproved = approved ?? autoApproved;
+        if (submitted) {
+            const resolvedApproved = approved ?? autoApproved;
 
-        return (
-            <div className="p-6 text-center">
-                <h2 className="text-lg font-semibold tracking-tight">{resolvedApproved ? 'Approved' : 'Discarded'}</h2>
+            return (
+                <div className="p-6 text-center">
+                    <h2 className="text-lg font-semibold tracking-tight">
+                        {resolvedApproved ? 'Approved' : 'Discarded'}
+                    </h2>
 
-                <p className="mt-2 text-sm text-muted-foreground">
-                    {resolvedApproved ? 'Your approval has been submitted.' : 'The request has been discarded.'}
-                </p>
-            </div>
-        );
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {resolvedApproved ? 'Your approval has been submitted.' : 'The request has been discarded.'}
+                    </p>
+                </div>
+            );
+        }
+
+        return <div className="p-6 text-center text-sm text-muted-foreground">Submitting...</div>;
     }
 
     if (loading) {
