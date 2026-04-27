@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {renderFormField} from '@/shared/components/form/renderFormField';
-import {PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import useApprovalForm from '@/shared/hooks/useApprovalForm';
 import {useEffect, useRef} from 'react';
 import {useSearchParams} from 'react-router-dom';
@@ -109,14 +108,6 @@ export default function ApprovalForm({
 
     return (
         <div className="w-full">
-            {uiDefinition.environmentId != null && uiDefinition.environmentId !== PRODUCTION_ENVIRONMENT && (
-                <div className="absolute space-x-1 p-3 uppercase">
-                    <span>Environment:</span>
-
-                    <span className="font-semibold">{uiDefinition.environmentName}</span>
-                </div>
-            )}
-
             {showHeader && (
                 <div className="mb-6">
                     <h2 className="text-lg font-semibold tracking-tight">{uiDefinition.title}</h2>
