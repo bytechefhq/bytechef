@@ -172,7 +172,7 @@ public class CsvFileReadUtils {
             } else {
                 String finalValueString = valueString;
 
-                value = context.convert(convert -> convert.string(finalValueString));
+                value = context.converter(convert -> convert.string(finalValueString));
             }
         }
 
