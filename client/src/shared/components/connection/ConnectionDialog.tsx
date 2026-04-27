@@ -125,6 +125,7 @@ const ConnectionDialog = ({
                     label: tag.name,
                 })) || [],
         },
+        mode: 'onTouched',
     });
 
     const {control, formState, getValues, handleSubmit, reset: formReset, setValue, watch} = form;
@@ -795,6 +796,7 @@ const ConnectionDialog = ({
                                 <>
                                     {wizardStep === 'configuration_step' && (
                                         <Button
+                                            disabled={!formState.isValid}
                                             label="Next"
                                             onClick={handleSubmit(() => {
                                                 setWizardStep('oauth_step');
@@ -829,7 +831,12 @@ const ConnectionDialog = ({
                             )}
 
                             {!showOAuth2Step && (
-                                <Button label="Save" onClick={handleSubmit(() => saveConnection())} type="submit" />
+                                <Button
+                                    disabled={!formState.isValid}
+                                    label="Save"
+                                    onClick={handleSubmit(() => saveConnection())}
+                                    type="submit"
+                                />
                             )}
                         </div>
                     </DialogFooter>
