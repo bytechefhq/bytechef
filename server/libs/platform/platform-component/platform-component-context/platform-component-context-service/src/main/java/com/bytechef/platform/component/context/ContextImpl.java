@@ -50,6 +50,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.FormattingTuple;
@@ -62,6 +63,7 @@ class ContextImpl implements Context {
 
     private final Converter converter;
     private final Encoder encoder;
+    private final Escaper escaper;
     private final File file;
     private final Http http;
     private final Json json;
@@ -92,6 +94,7 @@ class ContextImpl implements Context {
         this.converter = new ConverterImpl();
         this.editorEnvironment = editorEnvironment;
         this.encoder = new EncoderImpl();
+        this.escaper = new EscaperImpl();
         this.file = new FileImpl(tempFileStorage);
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, componentConnection, this, httpClientExecutor);
@@ -115,6 +118,15 @@ class ContextImpl implements Context {
     public <R> R encoder(ContextFunction<Encoder, R> encoderFunction) {
         try {
             return encoderFunction.apply(encoder);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <R> R escaper(ContextFunction<Escaper, R> escaperFunction) {
+        try {
+            return escaperFunction.apply(escaper);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -400,6 +412,14 @@ class ContextImpl implements Context {
         @Override
         public String base64UrlEncode(String value) {
             return EncodingUtils.urlEncode(value);
+        }
+    }
+
+    private record EscaperImpl() implements Escaper {
+
+        @Override
+        public String escapeHtml(String html) {
+            return StringEscapeUtils.escapeHtml4(html);
         }
     }
 

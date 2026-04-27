@@ -36,6 +36,7 @@ import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
@@ -72,7 +73,7 @@ public class GoogleMailApprovalChannel {
                     .required(true))
             .object(() -> GoogleMailApprovalChannel::perform);
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
+    @SuppressFBWarnings("POTENTIAL_XML_INJECTION")
     private static Object perform(
         Parameters inputParameters, Parameters connectionParameters, String formUrl, ClusterElementContext context)
         throws IOException, MessagingException {
@@ -80,13 +81,12 @@ public class GoogleMailApprovalChannel {
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         List<String> toAddresses = inputParameters.getRequiredList(TO, String.class);
-        String subject = inputParameters.getRequiredString(SUBJECT);
+        String subject = context.escaper(escaper -> escaper.escapeHtml(inputParameters.getRequiredString(SUBJECT)));
 
         MimeMessage mimeMessage = new MimeMessage(Session.getDefaultInstance(new Properties(), null));
 
         mimeMessage.setRecipients(
-            jakarta.mail.Message.RecipientType.TO,
-            InternetAddress.parse(String.join(",", toAddresses)));
+            jakarta.mail.Message.RecipientType.TO, InternetAddress.parse(String.join(",", toAddresses)));
         mimeMessage.setSubject(subject, StandardCharsets.UTF_8.name());
 
         List<Map<String, ?>> inputs = inputParameters.getList(INPUTS, new TypeReference<>() {}, List.of());
@@ -99,29 +99,33 @@ public class GoogleMailApprovalChannel {
 
             StringBuilder builder = new StringBuilder();
 
-            if (formTitle != null && !formTitle.isBlank()) {
+            String titleTrim = formTitle == null ? null : formTitle.trim();
+            if (titleTrim != null && !titleTrim.isBlank()) {
                 builder.append("<h2>")
-                    .append(formTitle)
+                    .append((String) context.escaper(escaper -> escaper.escapeHtml(titleTrim)))
                     .append("</h2>");
             }
 
-            if (formDescription != null && !formDescription.isBlank()) {
+            String descTrim = formDescription == null ? null : formDescription.trim();
+            if (descTrim != null && !descTrim.isBlank()) {
                 builder.append("<p>")
-                    .append(formDescription)
+                    .append((String) context.escaper(escaper -> escaper.escapeHtml(descTrim)))
                     .append("</p>");
             }
 
             builder.append("<p><a href=\"")
-                .append(formUrl)
-                .append("?approved=true\">Approve</a> | ")
+                .append((String) context.escaper(escaper -> escaper.escapeHtml(formUrl + "?approved=true")))
+                .append("\">Approve</a> | ")
                 .append("<a href=\"")
-                .append(formUrl)
-                .append("?approved=false\">Discard</a></p>");
+                .append((String) context.escaper(escaper -> escaper.escapeHtml(formUrl + "?approved=false")))
+                .append("\">Discard</a></p>");
 
             body = builder.toString();
         } else {
+            String safeUrl = context.escaper(escaper -> escaper.escapeHtml(formUrl == null ? "#" : formUrl));
+
             body = "<p>You have a new approval request. Please review and respond using the link below:</p>" +
-                "<p><a href=\"" + formUrl + "\">Open Approval Form</a></p>";
+                "<p><a href=\"" + safeUrl + "\">Open Approval Form</a></p>";
         }
 
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
