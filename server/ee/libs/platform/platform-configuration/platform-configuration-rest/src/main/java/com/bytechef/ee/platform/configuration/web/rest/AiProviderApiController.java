@@ -78,7 +78,7 @@ public class AiProviderApiController implements AiProviderApi {
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<Void> updateAiProvider(
-        Integer id, UpdateAiProviderRequestModel updateAiProviderRequestModel, Integer environment) {
+        Integer id, Integer environment, UpdateAiProviderRequestModel updateAiProviderRequestModel) {
 
         aiProviderFacade.updateAiProvider(id, updateAiProviderRequestModel.getApiKey(), environment);
 
