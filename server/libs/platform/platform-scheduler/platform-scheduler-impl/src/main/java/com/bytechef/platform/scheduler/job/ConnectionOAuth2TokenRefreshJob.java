@@ -30,6 +30,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,7 +52,7 @@ public class ConnectionOAuth2TokenRefreshJob implements Job {
         Long connectionId = jobDataMap.getLong("connectionId");
         String tenantId = jobDataMap.getString("tenantId");
 
-        Long expiresIn = TenantContext.callWithTenantId(
+        Integer expiresIn = TenantContext.callWithTenantId(
             tenantId, () -> connectionFacade.executeConnectionRefresh(connectionId));
 
         Scheduler scheduler = context.getScheduler();

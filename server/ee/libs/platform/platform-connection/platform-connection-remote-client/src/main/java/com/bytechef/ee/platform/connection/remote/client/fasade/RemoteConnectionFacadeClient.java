@@ -33,7 +33,7 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     }
 
     @Override
-    public Long executeConnectionRefresh(Long connectionId) {
+    public Integer executeConnectionRefresh(Long connectionId) {
         throw new UnsupportedOperationException();
     }
 

@@ -436,7 +436,7 @@ class TokenRefreshAspectIntTest {
     }
 
     private void setupSuccessfulRefresh() {
-        RefreshTokenResponse refreshResponse = new RefreshTokenResponse("new_access_token", "new_refresh_token", 3600L);
+        RefreshTokenResponse refreshResponse = new RefreshTokenResponse("new_access_token", "new_refresh_token", 3600);
 
         when(connectionDefinitionService.executeRefresh(
             anyString(), anyInt(), any(), any(), any(Context.class)))
