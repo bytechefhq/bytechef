@@ -202,6 +202,7 @@ export const WorkflowExecutions = () => {
 
     const handleAutomationChange = (automations: string) => {
         setFilterAutomations(Number(automations));
+        setFilterPageNumber(undefined);
 
         filter(
             Number(automations),
@@ -212,7 +213,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -222,6 +223,7 @@ export const WorkflowExecutions = () => {
             : undefined;
 
         setFilterEndDate(normalizedDate);
+        setFilterPageNumber(undefined);
 
         filter(
             filterAutomations,
@@ -232,7 +234,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -244,6 +246,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterIntegrationId(integrationId);
+        setFilterPageNumber(undefined);
 
         filter(
             filterAutomations,
@@ -254,7 +257,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -266,6 +269,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterIntegrationInstanceConfigurationId(integrationInstanceConfigurationId);
+        setFilterPageNumber(undefined);
 
         filter(
             filterAutomations,
@@ -276,7 +280,7 @@ export const WorkflowExecutions = () => {
             integrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -302,6 +306,7 @@ export const WorkflowExecutions = () => {
             : undefined;
 
         setFilterStartDate(normalizedDate);
+        setFilterPageNumber(undefined);
 
         filter(
             filterAutomations,
@@ -312,7 +317,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -324,6 +329,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterStatus(status);
+        setFilterPageNumber(undefined);
 
         filter(
             filterAutomations,
@@ -334,7 +340,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -346,6 +352,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterProjectId(projectId);
+        setFilterPageNumber(undefined);
 
         filter(
             filterAutomations,
@@ -356,7 +363,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             projectId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -368,6 +375,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterWorkflowId(workflowId);
+        setFilterPageNumber(undefined);
 
         filter(
             filterAutomations,
@@ -378,7 +386,7 @@ export const WorkflowExecutions = () => {
             filterIntegrationInstanceConfigurationId,
             filterProjectId,
             workflowId,
-            filterPageNumber
+            undefined
         );
     };
 
