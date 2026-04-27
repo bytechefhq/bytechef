@@ -68,6 +68,10 @@ public class MicrosoftSharePointUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext context) {
 
+        if (!inputParameters.containsKey(SITE_ID) || !inputParameters.containsKey(LIST_ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = context
             .http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
                 inputParameters.getRequiredString(LIST_ID) + "/columns"))
@@ -204,6 +208,10 @@ public class MicrosoftSharePointUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(SITE_ID)) {
+            return List.of();
+        }
+
         Map<String, ?> body = context.http(
             http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/root/children"))
             .queryParameter("$filter", "folder ne null")
@@ -217,6 +225,10 @@ public class MicrosoftSharePointUtils {
     public static List<Option<String>> getListIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(SITE_ID)) {
+            return List.of();
+        }
 
         Map<String, ?> body =
             context.http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))

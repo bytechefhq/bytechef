@@ -64,7 +64,7 @@ public class MondayCreateItemAction {
                 .label("Group ID")
                 .description("The item's group.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getGroupIdOptions)
-                .optionsLookupDependsOn(WORKSPACE_ID, BOARD_ID)
+                .optionsLookupDependsOn(BOARD_ID)
                 .required(false),
             string(ITEM_NAME)
                 .label("Item Name")
@@ -72,7 +72,7 @@ public class MondayCreateItemAction {
                 .required(true),
             dynamicProperties("columnValues")
                 .properties(MondayPropertiesUtils::createPropertiesForItem)
-                .propertiesLookupDependsOn(WORKSPACE_ID, BOARD_ID, GROUP_ID)
+                .propertiesLookupDependsOn(BOARD_ID)
                 .required(false))
         .output(
             outputSchema(

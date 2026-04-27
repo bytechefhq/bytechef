@@ -53,6 +53,10 @@ public class TodoistUtils extends AbstractTodoistUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey("project_id")) {
+            return List.of();
+        }
+
         return getOptions(context, "/sections", "name", "project_id", inputParameters.getString("project_id"));
     }
 

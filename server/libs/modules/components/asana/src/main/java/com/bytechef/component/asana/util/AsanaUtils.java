@@ -41,6 +41,10 @@ public class AsanaUtils extends AbstractAsanaUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (inputParameters.getFromPath("data." + WORKSPACE, String.class) == null) {
+            return List.of();
+        }
+
         return getPaginatedOptions(
             context, "/users", "workspace", inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class));
     }
@@ -52,8 +56,16 @@ public class AsanaUtils extends AbstractAsanaUtils {
         String workspace;
 
         if (context instanceof ActionContext) {
+            if (inputParameters.getFromPath("data." + WORKSPACE, String.class) == null) {
+                return List.of();
+            }
+
             workspace = inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class);
         } else {
+            if (!inputParameters.containsKey(WORKSPACE)) {
+                return List.of();
+            }
+
             workspace = inputParameters.getRequiredString(WORKSPACE);
         }
 
@@ -72,6 +84,10 @@ public class AsanaUtils extends AbstractAsanaUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (inputParameters.getFromPath("data." + WORKSPACE, String.class) == null) {
+            return List.of();
+        }
+
         return getPaginatedOptions(
             context,
             "/workspaces/" + inputParameters.getRequiredFromPath("data." + WORKSPACE, String.class) + "/teams");
@@ -87,6 +103,10 @@ public class AsanaUtils extends AbstractAsanaUtils {
     public static List<Option<String>> getTaskGidOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (inputParameters.getFromPath("data." + WORKSPACE, String.class) == null) {
+            return List.of();
+        }
 
         return getPaginatedOptions(
             context,

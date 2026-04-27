@@ -66,6 +66,10 @@ public class AmplitudeUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(PLATFORM)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
 
         String platform = inputParameters.getRequiredString(PLATFORM);

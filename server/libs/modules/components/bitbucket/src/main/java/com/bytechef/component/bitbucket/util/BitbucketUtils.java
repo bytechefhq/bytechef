@@ -98,6 +98,10 @@ public class BitbucketUtils extends AbstractBitbucketUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(WORKSPACE)) {
+            return List.of();
+        }
+
         return getPaginationValues(
             context, "/repositories/%s".formatted(inputParameters.getRequiredString(WORKSPACE)), NAME, SLUG);
     }
@@ -105,6 +109,10 @@ public class BitbucketUtils extends AbstractBitbucketUtils {
     public static List<Option<String>> getKeyOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(WORKSPACE)) {
+            return List.of();
+        }
 
         return getPaginationValues(
             context, "/workspaces/%s/projects".formatted(inputParameters.getRequiredString(WORKSPACE)), NAME, KEY);

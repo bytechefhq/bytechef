@@ -52,6 +52,10 @@ public class GoogleTasksUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(LIST_ID)) {
+            return List.of();
+        }
+
         String url = "/lists/%s/tasks"
             .formatted(inputParameters.getRequiredString(LIST_ID));
 

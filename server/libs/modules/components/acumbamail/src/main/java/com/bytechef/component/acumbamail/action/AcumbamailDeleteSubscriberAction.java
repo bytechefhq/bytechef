@@ -49,7 +49,6 @@ public class AcumbamailDeleteSubscriberAction {
                 .label("Email")
                 .description("Subscriber email address.")
                 .options((OptionsFunction<String>) AcumbamailUtils::getSubscriberOptions)
-                .optionsLookupDependsOn(LIST_ID)
                 .required(true))
         .perform(AcumbamailDeleteSubscriberAction::perform);
 

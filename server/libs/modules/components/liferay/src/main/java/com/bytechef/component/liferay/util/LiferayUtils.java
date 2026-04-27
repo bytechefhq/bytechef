@@ -111,6 +111,10 @@ public class LiferayUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(CONTEXT_NAME)) {
+            return List.of();
+        }
+
         List<Option<Long>> serviceOptions = new ArrayList<>();
         List<Object> services = getServices(context, inputParameters.getRequiredString(CONTEXT_NAME));
 

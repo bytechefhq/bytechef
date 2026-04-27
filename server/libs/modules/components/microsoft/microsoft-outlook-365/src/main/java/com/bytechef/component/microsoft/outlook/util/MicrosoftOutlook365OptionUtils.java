@@ -69,6 +69,10 @@ public class MicrosoftOutlook365OptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
+        if (!inputParameters.containsKey(CALENDAR)) {
+            return List.of();
+        }
+
         Map<String, Object> body = actionContext
             .http(http -> http.get("/me/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

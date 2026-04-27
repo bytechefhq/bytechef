@@ -50,7 +50,7 @@ public class NocoDbConstants {
         .label("Table ID")
         .description("ID of the table.")
         .options((OptionsFunction<String>) NocoDbUtils::getTableIdOptions)
-        .optionsLookupDependsOn(BASE_ID, WORKSPACE_ID)
+        .optionsLookupDependsOn(BASE_ID)
         .required(true);
 
     public static final ModifiableStringProperty WORKSPACE_ID_PROPERTY = string(WORKSPACE_ID)

@@ -48,6 +48,10 @@ public class AhaUtils extends AbstractAhaUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey("productId")) {
+            return List.of();
+        }
+
         Map<String, Object> body = context
             .http(http -> http.get("/products/%s/releases".formatted(inputParameters.getRequiredString("productId"))))
             .configuration(Http.responseType(Http.ResponseType.JSON))

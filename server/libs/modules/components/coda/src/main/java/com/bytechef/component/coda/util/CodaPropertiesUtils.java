@@ -51,6 +51,10 @@ public class CodaPropertiesUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext actionContext) {
 
+        if (!inputParameters.containsKey(DOC_ID) || !inputParameters.containsKey(TABLE_ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = actionContext
             .http(http -> http.get("/docs/%s/tables/%s/columns".formatted(
                 inputParameters.getRequiredString(DOC_ID), inputParameters.getRequiredString(TABLE_ID))))

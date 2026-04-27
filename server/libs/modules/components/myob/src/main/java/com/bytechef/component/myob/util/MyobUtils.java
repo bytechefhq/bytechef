@@ -64,6 +64,10 @@ public class MyobUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         ActionContext context) {
 
+        if (!inputParameters.containsKey(COMPANY_FILE)) {
+            return List.of();
+        }
+
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get(inputParameters.getRequiredString(COMPANY_FILE) + "/Contact/Customer"))
             .configuration(responseType(Http.ResponseType.JSON))
@@ -82,6 +86,10 @@ public class MyobUtils {
     public static List<Option<String>> getSupplierOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         ActionContext context) {
+
+        if (!inputParameters.containsKey(COMPANY_FILE)) {
+            return List.of();
+        }
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get(inputParameters.getRequiredString(COMPANY_FILE) + "/Contact/Supplier"))

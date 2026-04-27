@@ -71,7 +71,7 @@ public class RetableInsertRowAction {
                 .required(true),
             dynamicProperties(ROWS_IDS)
                 .properties(RetablePropertiesUtils::createPropertiesForRowValues)
-                .propertiesLookupDependsOn(PROJECT_ID)
+                .propertiesLookupDependsOn(RETABLE_ID)
                 .required(false))
         .output(
             outputSchema(

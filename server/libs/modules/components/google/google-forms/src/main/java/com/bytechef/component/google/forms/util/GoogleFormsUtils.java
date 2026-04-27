@@ -94,6 +94,10 @@ public class GoogleFormsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(FORM_ID)) {
+            return List.of();
+        }
+
         List<Option<String>> formResponses = new ArrayList<>();
         String nextToken = null;
         String formId = inputParameters.getRequiredString(FORM_ID);

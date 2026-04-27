@@ -44,6 +44,10 @@ public class AcceloUtils extends AbstractAcceloUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
+        if (!inputParameters.containsKey(AGAINST_TYPE)) {
+            return List.of();
+        }
+
         String againstType = inputParameters.getRequiredString(AGAINST_TYPE);
 
         if (Objects.equals("company", againstType)) {
