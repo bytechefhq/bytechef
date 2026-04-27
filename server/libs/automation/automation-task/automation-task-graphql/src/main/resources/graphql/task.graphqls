@@ -39,7 +39,7 @@ input ApprovalTaskInput {
 
 extend type Query {
     approvalTask(id: ID!): ApprovalTask
-    approvalTasks: [ApprovalTask]
+    approvalTasks(environmentId: Int): [ApprovalTask]
     approvalTasksByIds(ids: [ID!]!): [ApprovalTask]
 }
 

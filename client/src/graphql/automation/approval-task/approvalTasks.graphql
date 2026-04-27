@@ -1,5 +1,5 @@
-query approvalTasks {
-    approvalTasks {
+query approvalTasks($environmentId: Int) {
+    approvalTasks(environmentId: $environmentId) {
         assigneeId
         createdBy
         createdDate
