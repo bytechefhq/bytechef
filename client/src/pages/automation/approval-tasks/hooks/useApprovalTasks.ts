@@ -4,6 +4,7 @@ import {
     useUpdateApprovalTaskMutation,
     useUsersQuery,
 } from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useCallback, useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/shallow';
 
@@ -58,7 +59,9 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
         }))
     );
 
-    const {data: approvalTasksData} = useApprovalTasksQuery();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const {data: approvalTasksData} = useApprovalTasksQuery({environmentId: currentEnvironmentId});
     const {data: usersData} = useUsersQuery();
 
     const updateApprovalTaskMutation = useUpdateApprovalTaskMutation({
