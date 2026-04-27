@@ -82,8 +82,8 @@ public class ActionContextAdapater implements ActionContext {
     }
 
     @Override
-    public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeContextFunction) {
-        return context.mimeType(mimeTypeContextFunction);
+    public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeFunction) {
+        return context.mimeType(mimeTypeFunction);
     }
 
     @Override

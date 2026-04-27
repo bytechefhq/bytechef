@@ -162,9 +162,9 @@ class ContextImpl implements Context {
     }
 
     @Override
-    public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeContextFunction) {
+    public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeFunction) {
         try {
-            return mimeTypeContextFunction.apply(mimeType);
+            return mimeTypeFunction.apply(mimeType);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
