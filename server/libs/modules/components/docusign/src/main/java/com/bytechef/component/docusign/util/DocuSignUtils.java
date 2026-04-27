@@ -50,6 +50,10 @@ public class DocuSignUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(ENVELOPE_ID)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
 
         Map<String, Object> response = context.http(
@@ -97,6 +101,10 @@ public class DocuSignUtils {
     public static List<Option<String>> getEnvelopeIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (inputParameters.get(FROM_DATE) == null) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 

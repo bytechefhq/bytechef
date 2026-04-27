@@ -84,7 +84,6 @@ paths:
             x-dynamic-options: true
             x-dynamic-options-dependency:
               - "collectionId"
-              - "siteId"
       responses:
         200:
           description: "Successful operation"

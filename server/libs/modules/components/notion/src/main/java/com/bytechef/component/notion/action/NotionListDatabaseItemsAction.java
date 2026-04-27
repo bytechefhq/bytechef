@@ -50,6 +50,7 @@ public class NotionListDatabaseItemsAction {
                 .label("Sort By")
                 .description("Property to sort the items by.")
                 .options((OptionsFunction<String>) NotionUtils::getDatabasePropertyOptions)
+                .optionsLookupDependsOn(ID)
                 .required(true),
             string(DIRECTION)
                 .label("Sort Direction")

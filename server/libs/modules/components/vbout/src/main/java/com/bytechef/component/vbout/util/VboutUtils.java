@@ -43,6 +43,10 @@ public class VboutUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(CHANNEL)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
 
         Map<String, Map<String, ?>> body = context.http(http -> http.get("/socialMedia/Channels"))

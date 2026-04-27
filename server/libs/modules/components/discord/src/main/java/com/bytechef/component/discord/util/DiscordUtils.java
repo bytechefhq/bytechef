@@ -42,6 +42,10 @@ public class DiscordUtils extends AbstractDiscordUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(GUILD_ID)) {
+            return List.of();
+        }
+
         List<Map<String, Object>> body = context.http(http -> http
             .get("/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/channels"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -74,6 +78,10 @@ public class DiscordUtils extends AbstractDiscordUtils {
     public static List<Option<String>> getGuildMemberIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
+
+        if (!inputParameters.containsKey(GUILD_ID)) {
+            return List.of();
+        }
 
         List<Map<String, ?>> body = context.http(http -> http
             .get("/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/members"))

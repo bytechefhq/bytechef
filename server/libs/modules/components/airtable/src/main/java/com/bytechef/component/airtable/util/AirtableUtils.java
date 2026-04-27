@@ -178,6 +178,10 @@ public class AirtableUtils extends AbstractAirtableUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         Context context) {
 
+        if (!inputParameters.containsKey(BASE_ID) || !inputParameters.containsKey(TABLE_ID)) {
+            return List.of();
+        }
+
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
         String url = "/meta/bases/%s/tables".formatted(
@@ -256,6 +260,10 @@ public class AirtableUtils extends AbstractAirtableUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(BASE_ID) || !inputParameters.containsKey(TABLE_ID)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
 
         List<Object> records = getAllRecords(
@@ -273,6 +281,10 @@ public class AirtableUtils extends AbstractAirtableUtils {
     public static List<Option<String>> getTableIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(BASE_ID)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 

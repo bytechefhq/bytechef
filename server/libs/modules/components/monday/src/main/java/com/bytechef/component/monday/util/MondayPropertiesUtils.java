@@ -73,6 +73,10 @@ public class MondayPropertiesUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) {
 
+        if (!inputParameters.containsKey(BOARD_ID)) {
+            return List.of();
+        }
+
         List<?> boardColumns = getBoardColumns(inputParameters.getRequiredString(BOARD_ID), context);
 
         return new ArrayList<>(boardColumns.stream()

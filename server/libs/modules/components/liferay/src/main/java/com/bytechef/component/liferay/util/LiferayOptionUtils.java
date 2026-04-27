@@ -73,6 +73,10 @@ public class LiferayOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(APPLICATION)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
 
         Map<String, ?> body = context

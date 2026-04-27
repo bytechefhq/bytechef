@@ -42,6 +42,10 @@ public class CodaUtils extends AbstractCodaUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(DOC_ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = context
             .http(http -> http.get("/docs/" + inputParameters.getRequiredString(DOC_ID) + "/tables"))
             .configuration(responseType(ResponseType.JSON))
@@ -68,6 +72,10 @@ public class CodaUtils extends AbstractCodaUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(DOC_ID) || !inputParameters.containsKey(TABLE_ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = context
             .http(
                 http -> http.get("/docs/%s/tables/%s/rows".formatted(
@@ -82,6 +90,10 @@ public class CodaUtils extends AbstractCodaUtils {
     public static List<Option<String>> getColumnOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(DOC_ID) || !inputParameters.containsKey(TABLE_ID)) {
+            return List.of();
+        }
 
         Map<String, Object> body = context
             .http(
