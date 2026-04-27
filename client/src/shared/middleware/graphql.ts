@@ -2634,6 +2634,11 @@ export type QueryApprovalTaskArgs = {
 };
 
 
+export type QueryApprovalTasksArgs = {
+  environmentId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryApprovalTasksByIdsArgs = {
   ids: Array<Scalars['ID']['input']>;
 };
@@ -3732,7 +3737,9 @@ export type ApprovalTaskQueryVariables = Exact<{
 
 export type ApprovalTaskQuery = { __typename?: 'Query', approvalTask?: { __typename?: 'ApprovalTask', assigneeId?: string | null, createdBy?: string | null, createdDate?: string | null, description?: string | null, dueDate?: string | null, id: string, jobResumeId?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus, version: number } | null };
 
-export type ApprovalTasksQueryVariables = Exact<{ [key: string]: never; }>;
+export type ApprovalTasksQueryVariables = Exact<{
+  environmentId?: InputMaybe<Scalars['Int']['input']>;
+}>;
 
 
 export type ApprovalTasksQuery = { __typename?: 'Query', approvalTasks?: Array<{ __typename?: 'ApprovalTask', assigneeId?: string | null, createdBy?: string | null, createdDate?: string | null, description?: string | null, dueDate?: string | null, id: string, jobResumeId?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus, version: number } | null> | null };
@@ -6056,8 +6063,8 @@ export const useApprovalTaskQuery = <
     )};
 
 export const ApprovalTasksDocument = new TypedDocumentString(`
-    query approvalTasks {
-  approvalTasks {
+    query approvalTasks($environmentId: Int) {
+  approvalTasks(environmentId: $environmentId) {
     assigneeId
     createdBy
     createdDate
