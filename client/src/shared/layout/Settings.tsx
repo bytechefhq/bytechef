@@ -57,6 +57,9 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'identity-providers') {
             return isFeatureFlagEnabled('ff-1040');
+
+        if (navItem.href === 'billing') {
+            return isFeatureFlagEnabled('ff-513');
         }
 
         return true;
