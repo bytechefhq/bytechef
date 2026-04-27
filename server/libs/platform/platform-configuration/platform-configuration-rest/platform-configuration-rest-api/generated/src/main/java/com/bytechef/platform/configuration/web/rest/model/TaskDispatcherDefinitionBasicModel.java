@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class TaskDispatcherDefinitionBasicModel {
 
   private @Nullable String description;
@@ -75,6 +75,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -95,6 +96,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -115,6 +117,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -135,6 +138,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return outputDefined;
   }
 
+  @JsonProperty("outputDefined")
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
   }
@@ -155,6 +159,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return outputFunctionDefined;
   }
 
+  @JsonProperty("outputFunctionDefined")
   public void setOutputFunctionDefined(@Nullable Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
   }
@@ -175,6 +180,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return outputSchemaDefined;
   }
 
+  @JsonProperty("outputSchemaDefined")
   public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
@@ -195,6 +201,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return resources;
   }
 
+  @JsonProperty("resources")
   public void setResources(@Nullable ResourcesModel resources) {
     this.resources = resources;
   }
@@ -215,6 +222,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -235,6 +243,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return variablePropertiesDefined;
   }
 
+  @JsonProperty("variablePropertiesDefined")
   public void setVariablePropertiesDefined(@Nullable Boolean variablePropertiesDefined) {
     this.variablePropertiesDefined = variablePropertiesDefined;
   }
@@ -255,6 +264,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return version;
   }
 
+  @JsonProperty("version")
   public void setVersion(Integer version) {
     this.version = version;
   }
@@ -308,10 +318,7 @@ public class TaskDispatcherDefinitionBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

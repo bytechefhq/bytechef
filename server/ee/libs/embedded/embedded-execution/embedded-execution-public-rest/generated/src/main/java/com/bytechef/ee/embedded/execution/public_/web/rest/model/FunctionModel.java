@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Function", description = "A function property type.")
 @JsonTypeName("Function")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.390850+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.894591+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class FunctionModel {
 
   private String name;
@@ -60,6 +60,7 @@ public class FunctionModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -80,6 +81,7 @@ public class FunctionModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(String description) {
     this.description = description;
   }
@@ -100,6 +102,7 @@ public class FunctionModel {
     return parameters;
   }
 
+  @JsonProperty("parameters")
   public void setParameters(String parameters) {
     this.parameters = parameters;
   }
@@ -138,11 +141,8 @@ public class FunctionModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

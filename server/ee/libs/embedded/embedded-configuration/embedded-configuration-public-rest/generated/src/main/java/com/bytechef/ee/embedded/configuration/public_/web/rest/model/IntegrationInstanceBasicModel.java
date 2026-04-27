@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceBasic", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationInstanceBasicModel {
 
   private @Nullable Long id;
@@ -60,6 +60,7 @@ public class IntegrationInstanceBasicModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -80,6 +81,7 @@ public class IntegrationInstanceBasicModel {
     return credentialStatus;
   }
 
+  @JsonProperty("credentialStatus")
   public void setCredentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
@@ -100,6 +102,7 @@ public class IntegrationInstanceBasicModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
   }
@@ -139,10 +142,7 @@ public class IntegrationInstanceBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

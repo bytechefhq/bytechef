@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollectionEndpoint", description = "An API collection endpoint.")
 @JsonTypeName("ApiCollectionEndpoint")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.404697+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.917929+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ApiCollectionEndpointModel {
 
   private @Nullable Long apiCollectionId;
@@ -90,6 +90,7 @@ public class ApiCollectionEndpointModel {
     return apiCollectionId;
   }
 
+  @JsonProperty("apiCollectionId")
   public void setApiCollectionId(@Nullable Long apiCollectionId) {
     this.apiCollectionId = apiCollectionId;
   }
@@ -110,6 +111,7 @@ public class ApiCollectionEndpointModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -130,6 +132,7 @@ public class ApiCollectionEndpointModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -150,6 +153,7 @@ public class ApiCollectionEndpointModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
   }
@@ -170,6 +174,7 @@ public class ApiCollectionEndpointModel {
     return httpMethod;
   }
 
+  @JsonProperty("httpMethod")
   public void setHttpMethod(HttpMethodModel httpMethod) {
     this.httpMethod = httpMethod;
   }
@@ -190,6 +195,7 @@ public class ApiCollectionEndpointModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -210,6 +216,7 @@ public class ApiCollectionEndpointModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(@Nullable String name) {
     this.name = name;
   }
@@ -230,6 +237,7 @@ public class ApiCollectionEndpointModel {
     return lastExecutionDate;
   }
 
+  @JsonProperty("lastExecutionDate")
   public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
@@ -250,6 +258,7 @@ public class ApiCollectionEndpointModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -270,6 +279,7 @@ public class ApiCollectionEndpointModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -290,6 +300,7 @@ public class ApiCollectionEndpointModel {
     return path;
   }
 
+  @JsonProperty("path")
   public void setPath(String path) {
     this.path = path;
   }
@@ -310,6 +321,7 @@ public class ApiCollectionEndpointModel {
     return projectDeploymentWorkflowId;
   }
 
+  @JsonProperty("projectDeploymentWorkflowId")
   public void setProjectDeploymentWorkflowId(@Nullable Long projectDeploymentWorkflowId) {
     this.projectDeploymentWorkflowId = projectDeploymentWorkflowId;
   }
@@ -330,6 +342,7 @@ public class ApiCollectionEndpointModel {
     return workflowUuid;
   }
 
+  @JsonProperty("workflowUuid")
   public void setWorkflowUuid(String workflowUuid) {
     this.workflowUuid = workflowUuid;
   }
@@ -350,6 +363,7 @@ public class ApiCollectionEndpointModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -410,11 +424,8 @@ public class ApiCollectionEndpointModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

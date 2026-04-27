@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ConnectionDefinitionModel {
 
   private Boolean authorizationRequired = true;
@@ -79,6 +79,7 @@ public class ConnectionDefinitionModel {
     return authorizationRequired;
   }
 
+  @JsonProperty("authorizationRequired")
   public void setAuthorizationRequired(Boolean authorizationRequired) {
     this.authorizationRequired = authorizationRequired;
   }
@@ -107,6 +108,7 @@ public class ConnectionDefinitionModel {
     return authorizations;
   }
 
+  @JsonProperty("authorizations")
   public void setAuthorizations(List<@Valid AuthorizationModel> authorizations) {
     this.authorizations = authorizations;
   }
@@ -127,6 +129,7 @@ public class ConnectionDefinitionModel {
     return baseUri;
   }
 
+  @JsonProperty("baseUri")
   public void setBaseUri(@Nullable String baseUri) {
     this.baseUri = baseUri;
   }
@@ -147,6 +150,7 @@ public class ConnectionDefinitionModel {
     return componentDescription;
   }
 
+  @JsonProperty("componentDescription")
   public void setComponentDescription(@Nullable String componentDescription) {
     this.componentDescription = componentDescription;
   }
@@ -167,6 +171,7 @@ public class ConnectionDefinitionModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -187,6 +192,7 @@ public class ConnectionDefinitionModel {
     return help;
   }
 
+  @JsonProperty("help")
   public void setHelp(@Nullable ConnectionDefinitionHelpModel help) {
     this.help = help;
   }
@@ -215,6 +221,7 @@ public class ConnectionDefinitionModel {
     return properties;
   }
 
+  @JsonProperty("properties")
   public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
   }
@@ -235,6 +242,7 @@ public class ConnectionDefinitionModel {
     return componentTitle;
   }
 
+  @JsonProperty("componentTitle")
   public void setComponentTitle(@Nullable String componentTitle) {
     this.componentTitle = componentTitle;
   }
@@ -255,6 +263,7 @@ public class ConnectionDefinitionModel {
     return version;
   }
 
+  @JsonProperty("version")
   public void setVersion(Integer version) {
     this.version = version;
   }
@@ -306,10 +315,7 @@ public class ConnectionDefinitionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

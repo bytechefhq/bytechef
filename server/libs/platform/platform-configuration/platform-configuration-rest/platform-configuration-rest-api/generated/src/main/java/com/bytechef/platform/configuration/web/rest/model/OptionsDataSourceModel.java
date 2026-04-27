@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "OptionsDataSource", description = "Defines function that should dynamically load options for the property.")
 @JsonTypeName("OptionsDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class OptionsDataSourceModel {
 
   @Valid
@@ -55,6 +55,7 @@ public class OptionsDataSourceModel {
     return optionsLookupDependsOn;
   }
 
+  @JsonProperty("optionsLookupDependsOn")
   public void setOptionsLookupDependsOn(List<String> optionsLookupDependsOn) {
     this.optionsLookupDependsOn = optionsLookupDependsOn;
   }
@@ -90,10 +91,7 @@ public class OptionsDataSourceModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

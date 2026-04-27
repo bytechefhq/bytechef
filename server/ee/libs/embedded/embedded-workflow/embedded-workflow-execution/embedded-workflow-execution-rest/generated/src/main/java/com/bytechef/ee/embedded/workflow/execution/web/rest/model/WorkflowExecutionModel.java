@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.374089+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.239389+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowExecutionModel {
 
   private Long id;
@@ -71,6 +71,7 @@ public class WorkflowExecutionModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(Long id) {
     this.id = id;
   }
@@ -91,6 +92,7 @@ public class WorkflowExecutionModel {
     return integration;
   }
 
+  @JsonProperty("integration")
   public void setIntegration(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationBasicModel integration) {
     this.integration = integration;
   }
@@ -111,6 +113,7 @@ public class WorkflowExecutionModel {
     return integrationInstanceConfiguration;
   }
 
+  @JsonProperty("integrationInstanceConfiguration")
   public void setIntegrationInstanceConfiguration(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration) {
     this.integrationInstanceConfiguration = integrationInstanceConfiguration;
   }
@@ -131,6 +134,7 @@ public class WorkflowExecutionModel {
     return integrationInstance;
   }
 
+  @JsonProperty("integrationInstance")
   public void setIntegrationInstance(com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance) {
     this.integrationInstance = integrationInstance;
   }
@@ -151,6 +155,7 @@ public class WorkflowExecutionModel {
     return job;
   }
 
+  @JsonProperty("job")
   public void setJob(com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
     this.job = job;
   }
@@ -171,6 +176,7 @@ public class WorkflowExecutionModel {
     return triggerExecution;
   }
 
+  @JsonProperty("triggerExecution")
   public void setTriggerExecution(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
   }
@@ -191,6 +197,7 @@ public class WorkflowExecutionModel {
     return workflow;
   }
 
+  @JsonProperty("workflow")
   public void setWorkflow(com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.workflow = workflow;
   }
@@ -237,11 +244,8 @@ public class WorkflowExecutionModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

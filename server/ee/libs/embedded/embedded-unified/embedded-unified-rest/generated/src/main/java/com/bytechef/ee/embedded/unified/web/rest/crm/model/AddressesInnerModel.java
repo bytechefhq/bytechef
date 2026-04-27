@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("addresses_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.707409+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.846934+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class AddressesInnerModel {
 
   /**
@@ -113,6 +113,7 @@ public class AddressesInnerModel {
     return addressType;
   }
 
+  @JsonProperty("addressType")
   public void setAddressType(AddressTypeEnum addressType) {
     this.addressType = addressType;
   }
@@ -133,6 +134,7 @@ public class AddressesInnerModel {
     return city;
   }
 
+  @JsonProperty("city")
   public void setCity(JsonNullable<String> city) {
     this.city = city;
   }
@@ -153,6 +155,7 @@ public class AddressesInnerModel {
     return country;
   }
 
+  @JsonProperty("country")
   public void setCountry(JsonNullable<String> country) {
     this.country = country;
   }
@@ -173,6 +176,7 @@ public class AddressesInnerModel {
     return postalCode;
   }
 
+  @JsonProperty("postalCode")
   public void setPostalCode(JsonNullable<String> postalCode) {
     this.postalCode = postalCode;
   }
@@ -193,6 +197,7 @@ public class AddressesInnerModel {
     return state;
   }
 
+  @JsonProperty("state")
   public void setState(JsonNullable<String> state) {
     this.state = state;
   }
@@ -213,6 +218,7 @@ public class AddressesInnerModel {
     return street1;
   }
 
+  @JsonProperty("street1")
   public void setStreet1(JsonNullable<String> street1) {
     this.street1 = street1;
   }
@@ -233,6 +239,7 @@ public class AddressesInnerModel {
     return street2;
   }
 
+  @JsonProperty("street2")
   public void setStreet2(JsonNullable<String> street2) {
     this.street2 = street2;
   }
@@ -279,11 +286,8 @@ public class AddressesInnerModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

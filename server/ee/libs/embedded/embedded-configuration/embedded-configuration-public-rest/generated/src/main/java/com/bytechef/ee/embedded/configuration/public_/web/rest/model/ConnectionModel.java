@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ConnectionModel {
 
   private Long id;
@@ -61,6 +61,7 @@ public class ConnectionModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(Long id) {
     this.id = id;
   }
@@ -81,6 +82,7 @@ public class ConnectionModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -101,6 +103,7 @@ public class ConnectionModel {
     return environment;
   }
 
+  @JsonProperty("environment")
   public void setEnvironment(@Nullable EnvironmentModel environment) {
     this.environment = environment;
   }
@@ -140,10 +143,7 @@ public class ConnectionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

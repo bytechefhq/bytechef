@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "OutputResponse", description = "The output response")
 @JsonTypeName("OutputResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class OutputResponseModel {
 
   private @Nullable PropertyModel outputSchema;
@@ -48,6 +48,7 @@ public class OutputResponseModel {
     return outputSchema;
   }
 
+  @JsonProperty("outputSchema")
   public void setOutputSchema(@Nullable PropertyModel outputSchema) {
     this.outputSchema = outputSchema;
   }
@@ -68,6 +69,7 @@ public class OutputResponseModel {
     return placeholder;
   }
 
+  @JsonProperty("placeholder")
   public void setPlaceholder(@Nullable Object placeholder) {
     this.placeholder = placeholder;
   }
@@ -88,6 +90,7 @@ public class OutputResponseModel {
     return sampleOutput;
   }
 
+  @JsonProperty("sampleOutput")
   public void setSampleOutput(@Nullable Object sampleOutput) {
     this.sampleOutput = sampleOutput;
   }
@@ -127,10 +130,7 @@ public class OutputResponseModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

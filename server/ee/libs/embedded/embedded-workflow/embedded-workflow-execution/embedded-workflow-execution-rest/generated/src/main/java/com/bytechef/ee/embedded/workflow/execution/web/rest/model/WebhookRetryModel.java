@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.374089+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.239389+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WebhookRetryModel {
 
   private @Nullable Integer initialInterval;
@@ -48,6 +48,7 @@ public class WebhookRetryModel {
     return initialInterval;
   }
 
+  @JsonProperty("initialInterval")
   public void setInitialInterval(@Nullable Integer initialInterval) {
     this.initialInterval = initialInterval;
   }
@@ -68,6 +69,7 @@ public class WebhookRetryModel {
     return maxInterval;
   }
 
+  @JsonProperty("maxInterval")
   public void setMaxInterval(@Nullable Integer maxInterval) {
     this.maxInterval = maxInterval;
   }
@@ -88,6 +90,7 @@ public class WebhookRetryModel {
     return maxAttempts;
   }
 
+  @JsonProperty("maxAttempts")
   public void setMaxAttempts(@Nullable Integer maxAttempts) {
     this.maxAttempts = maxAttempts;
   }
@@ -108,6 +111,7 @@ public class WebhookRetryModel {
     return multiplier;
   }
 
+  @JsonProperty("multiplier")
   public void setMultiplier(@Nullable Integer multiplier) {
     this.multiplier = multiplier;
   }
@@ -148,11 +152,8 @@ public class WebhookRetryModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

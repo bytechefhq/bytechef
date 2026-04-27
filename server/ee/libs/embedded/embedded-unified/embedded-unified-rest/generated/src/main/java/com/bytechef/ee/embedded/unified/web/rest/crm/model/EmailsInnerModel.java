@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("emails_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.707409+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.846934+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class EmailsInnerModel {
 
   private String emailAddress;
@@ -94,6 +94,7 @@ public class EmailsInnerModel {
     return emailAddress;
   }
 
+  @JsonProperty("emailAddress")
   public void setEmailAddress(String emailAddress) {
     this.emailAddress = emailAddress;
   }
@@ -114,6 +115,7 @@ public class EmailsInnerModel {
     return emailAddressType;
   }
 
+  @JsonProperty("emailAddressType")
   public void setEmailAddressType(EmailAddressTypeEnum emailAddressType) {
     this.emailAddressType = emailAddressType;
   }
@@ -150,11 +152,8 @@ public class EmailsInnerModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

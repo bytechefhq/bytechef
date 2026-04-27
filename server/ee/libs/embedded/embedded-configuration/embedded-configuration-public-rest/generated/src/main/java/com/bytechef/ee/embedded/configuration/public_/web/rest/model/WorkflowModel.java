@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowModel {
 
   private @Nullable String description;
@@ -49,6 +49,7 @@ public class WorkflowModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -69,6 +70,7 @@ public class WorkflowModel {
     return definition;
   }
 
+  @JsonProperty("definition")
   public void setDefinition(@Nullable String definition) {
     this.definition = definition;
   }
@@ -89,6 +91,7 @@ public class WorkflowModel {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -109,6 +112,7 @@ public class WorkflowModel {
     return workflowUuid;
   }
 
+  @JsonProperty("workflowUuid")
   public void setWorkflowUuid(@Nullable String workflowUuid) {
     this.workflowUuid = workflowUuid;
   }
@@ -150,10 +154,7 @@ public class WorkflowModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

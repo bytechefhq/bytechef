@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectDeploymentWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.674883+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.095260+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ProjectDeploymentWorkflowModel {
 
   private @Nullable String createdBy;
@@ -82,6 +82,7 @@ public class ProjectDeploymentWorkflowModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -102,6 +103,7 @@ public class ProjectDeploymentWorkflowModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -130,6 +132,7 @@ public class ProjectDeploymentWorkflowModel {
     return inputs;
   }
 
+  @JsonProperty("inputs")
   public void setInputs(Map<String, Object> inputs) {
     this.inputs = inputs;
   }
@@ -158,6 +161,7 @@ public class ProjectDeploymentWorkflowModel {
     return connections;
   }
 
+  @JsonProperty("connections")
   public void setConnections(List<@Valid ProjectDeploymentWorkflowConnectionModel> connections) {
     this.connections = connections;
   }
@@ -178,6 +182,7 @@ public class ProjectDeploymentWorkflowModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
@@ -198,6 +203,7 @@ public class ProjectDeploymentWorkflowModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -218,6 +224,7 @@ public class ProjectDeploymentWorkflowModel {
     return lastExecutionDate;
   }
 
+  @JsonProperty("lastExecutionDate")
   public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
@@ -238,6 +245,7 @@ public class ProjectDeploymentWorkflowModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -258,6 +266,7 @@ public class ProjectDeploymentWorkflowModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -278,6 +287,7 @@ public class ProjectDeploymentWorkflowModel {
     return projectDeploymentId;
   }
 
+  @JsonProperty("projectDeploymentId")
   public void setProjectDeploymentId(@Nullable Long projectDeploymentId) {
     this.projectDeploymentId = projectDeploymentId;
   }
@@ -298,6 +308,7 @@ public class ProjectDeploymentWorkflowModel {
     return staticWebhookUrl;
   }
 
+  @JsonProperty("staticWebhookUrl")
   public void setStaticWebhookUrl(@Nullable String staticWebhookUrl) {
     this.staticWebhookUrl = staticWebhookUrl;
   }
@@ -318,6 +329,7 @@ public class ProjectDeploymentWorkflowModel {
     return workflowId;
   }
 
+  @JsonProperty("workflowId")
   public void setWorkflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
   }
@@ -338,6 +350,7 @@ public class ProjectDeploymentWorkflowModel {
     return workflowUuid;
   }
 
+  @JsonProperty("workflowUuid")
   public void setWorkflowUuid(@Nullable String workflowUuid) {
     this.workflowUuid = workflowUuid;
   }
@@ -358,6 +371,7 @@ public class ProjectDeploymentWorkflowModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -419,10 +433,7 @@ public class ProjectDeploymentWorkflowModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

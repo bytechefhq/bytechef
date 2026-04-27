@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Tool")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.390850+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.894591+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ToolModel {
 
   private FunctionModel function;
@@ -57,6 +57,7 @@ public class ToolModel {
     return function;
   }
 
+  @JsonProperty("function")
   public void setFunction(FunctionModel function) {
     this.function = function;
   }
@@ -77,6 +78,7 @@ public class ToolModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(String type) {
     this.type = type;
   }
@@ -113,11 +115,8 @@ public class ToolModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

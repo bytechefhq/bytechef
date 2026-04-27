@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("deleteClusterElementParameter_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class DeleteClusterElementParameter200ResponseModel {
 
   @Valid
@@ -67,6 +67,7 @@ public class DeleteClusterElementParameter200ResponseModel {
     return metadata;
   }
 
+  @JsonProperty("metadata")
   public void setMetadata(Map<String, Object> metadata) {
     this.metadata = metadata;
   }
@@ -95,6 +96,7 @@ public class DeleteClusterElementParameter200ResponseModel {
     return parameters;
   }
 
+  @JsonProperty("parameters")
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
@@ -123,6 +125,7 @@ public class DeleteClusterElementParameter200ResponseModel {
     return displayConditions;
   }
 
+  @JsonProperty("displayConditions")
   public void setDisplayConditions(Map<String, Boolean> displayConditions) {
     this.displayConditions = displayConditions;
   }
@@ -151,6 +154,7 @@ public class DeleteClusterElementParameter200ResponseModel {
     return missingRequiredProperties;
   }
 
+  @JsonProperty("missingRequiredProperties")
   public void setMissingRequiredProperties(List<String> missingRequiredProperties) {
     this.missingRequiredProperties = missingRequiredProperties;
   }
@@ -171,6 +175,7 @@ public class DeleteClusterElementParameter200ResponseModel {
     return version;
   }
 
+  @JsonProperty("version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -214,10 +219,7 @@ public class DeleteClusterElementParameter200ResponseModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

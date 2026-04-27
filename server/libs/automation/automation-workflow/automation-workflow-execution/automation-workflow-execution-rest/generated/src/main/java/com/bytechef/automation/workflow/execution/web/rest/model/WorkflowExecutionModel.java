@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.617347+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.074513+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowExecutionModel {
 
   private Long id;
@@ -68,6 +68,7 @@ public class WorkflowExecutionModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(Long id) {
     this.id = id;
   }
@@ -88,6 +89,7 @@ public class WorkflowExecutionModel {
     return job;
   }
 
+  @JsonProperty("job")
   public void setJob(com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
     this.job = job;
   }
@@ -108,6 +110,7 @@ public class WorkflowExecutionModel {
     return project;
   }
 
+  @JsonProperty("project")
   public void setProject(com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
     this.project = project;
   }
@@ -128,6 +131,7 @@ public class WorkflowExecutionModel {
     return projectDeployment;
   }
 
+  @JsonProperty("projectDeployment")
   public void setProjectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
     this.projectDeployment = projectDeployment;
   }
@@ -148,6 +152,7 @@ public class WorkflowExecutionModel {
     return triggerExecution;
   }
 
+  @JsonProperty("triggerExecution")
   public void setTriggerExecution(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
   }
@@ -168,6 +173,7 @@ public class WorkflowExecutionModel {
     return workflow;
   }
 
+  @JsonProperty("workflow")
   public void setWorkflow(com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.workflow = workflow;
   }
@@ -213,10 +219,7 @@ public class WorkflowExecutionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationVersion", description = "The integration version.")
 @JsonTypeName("IntegrationVersion")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationVersionModel {
 
   private @Nullable String description;
@@ -54,6 +54,7 @@ public class IntegrationVersionModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -74,6 +75,7 @@ public class IntegrationVersionModel {
     return publishedDate;
   }
 
+  @JsonProperty("publishedDate")
   public void setPublishedDate(@Nullable OffsetDateTime publishedDate) {
     this.publishedDate = publishedDate;
   }
@@ -94,6 +96,7 @@ public class IntegrationVersionModel {
     return version;
   }
 
+  @JsonProperty("version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -114,6 +117,7 @@ public class IntegrationVersionModel {
     return status;
   }
 
+  @JsonProperty("status")
   public void setStatus(@Nullable IntegrationStatusModel status) {
     this.status = status;
   }
@@ -154,11 +158,8 @@ public class IntegrationVersionModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

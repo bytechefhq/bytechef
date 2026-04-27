@@ -36,7 +36,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateTimeProperty", description = "A date-time property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class DateTimePropertyModel extends ValuePropertyModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -77,6 +77,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
     return defaultValue;
   }
 
+  @JsonProperty("defaultValue")
   public void setDefaultValue(@Nullable OffsetDateTime defaultValue) {
     this.defaultValue = defaultValue;
   }
@@ -97,6 +98,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
     return exampleValue;
   }
 
+  @JsonProperty("exampleValue")
   public void setExampleValue(@Nullable OffsetDateTime exampleValue) {
     this.exampleValue = exampleValue;
   }
@@ -125,6 +127,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
     return options;
   }
 
+  @JsonProperty("options")
   public void setOptions(List<@Valid OptionModel> options) {
     this.options = options;
   }
@@ -145,6 +148,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
     return optionsDataSource;
   }
 
+  @JsonProperty("optionsDataSource")
   public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
@@ -243,10 +247,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

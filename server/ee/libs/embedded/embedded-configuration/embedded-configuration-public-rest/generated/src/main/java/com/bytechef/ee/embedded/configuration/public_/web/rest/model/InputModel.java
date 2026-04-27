@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class InputModel {
 
   private @Nullable String label;
@@ -62,6 +62,7 @@ public class InputModel {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -82,6 +83,7 @@ public class InputModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -102,6 +104,7 @@ public class InputModel {
     return required;
   }
 
+  @JsonProperty("required")
   public void setRequired(Boolean required) {
     this.required = required;
   }
@@ -122,6 +125,7 @@ public class InputModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(InputTypeModel type) {
     this.type = type;
   }
@@ -163,10 +167,7 @@ public class InputModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Resources", description = "A set of available resources.")
 @JsonTypeName("Resources")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ResourcesModel {
 
   private @Nullable String documentationUrl;
@@ -43,6 +43,7 @@ public class ResourcesModel {
     return documentationUrl;
   }
 
+  @JsonProperty("documentationUrl")
   public void setDocumentationUrl(@Nullable String documentationUrl) {
     this.documentationUrl = documentationUrl;
   }
@@ -78,10 +79,7 @@ public class ResourcesModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

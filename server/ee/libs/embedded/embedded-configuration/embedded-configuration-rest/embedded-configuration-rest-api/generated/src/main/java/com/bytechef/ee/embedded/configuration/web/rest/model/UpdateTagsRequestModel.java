@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateTagsRequest", description = "The request object that contains the array of tags.")
 @JsonTypeName("UpdateTagsRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class UpdateTagsRequestModel {
 
   @Valid
@@ -56,6 +56,7 @@ public class UpdateTagsRequestModel {
     return tags;
   }
 
+  @JsonProperty("tags")
   public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
@@ -90,11 +91,8 @@ public class UpdateTagsRequestModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("contact")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.707409+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.846934+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ContactModel {
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
@@ -106,6 +106,7 @@ public class ContactModel {
     return accountId;
   }
 
+  @JsonProperty("accountId")
   public void setAccountId(JsonNullable<String> accountId) {
     this.accountId = accountId;
   }
@@ -126,6 +127,7 @@ public class ContactModel {
     return ownerId;
   }
 
+  @JsonProperty("ownerId")
   public void setOwnerId(JsonNullable<String> ownerId) {
     this.ownerId = ownerId;
   }
@@ -154,6 +156,7 @@ public class ContactModel {
     return addresses;
   }
 
+  @JsonProperty("addresses")
   public void setAddresses(List<@Valid AddressesInnerModel> addresses) {
     this.addresses = addresses;
   }
@@ -182,6 +185,7 @@ public class ContactModel {
     return emails;
   }
 
+  @JsonProperty("emails")
   public void setEmails(List<@Valid EmailsInnerModel> emails) {
     this.emails = emails;
   }
@@ -202,6 +206,7 @@ public class ContactModel {
     return firstName;
   }
 
+  @JsonProperty("firstName")
   public void setFirstName(JsonNullable<String> firstName) {
     this.firstName = firstName;
   }
@@ -222,6 +227,7 @@ public class ContactModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(String id) {
     this.id = id;
   }
@@ -242,6 +248,7 @@ public class ContactModel {
     return lastActivityDate;
   }
 
+  @JsonProperty("lastActivityDate")
   public void setLastActivityDate(JsonNullable<OffsetDateTime> lastActivityDate) {
     this.lastActivityDate = lastActivityDate;
   }
@@ -262,6 +269,7 @@ public class ContactModel {
     return lastName;
   }
 
+  @JsonProperty("lastName")
   public void setLastName(JsonNullable<String> lastName) {
     this.lastName = lastName;
   }
@@ -290,6 +298,7 @@ public class ContactModel {
     return phones;
   }
 
+  @JsonProperty("phones")
   public void setPhones(List<@Valid PhonesInnerModel> phones) {
     this.phones = phones;
   }
@@ -310,6 +319,7 @@ public class ContactModel {
     return lifecycleStage;
   }
 
+  @JsonProperty("lifecycleStage")
   public void setLifecycleStage(JsonNullable<LifecycleStageModel> lifecycleStage) {
     this.lifecycleStage = lifecycleStage;
   }
@@ -330,6 +340,7 @@ public class ContactModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(JsonNullable<OffsetDateTime> createdDate) {
     this.createdDate = createdDate;
   }
@@ -350,6 +361,7 @@ public class ContactModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -378,6 +390,7 @@ public class ContactModel {
     return rawData;
   }
 
+  @JsonProperty("rawData")
   public void setRawData(Map<String, Object> rawData) {
     this.rawData = rawData;
   }
@@ -436,11 +449,8 @@ public class ContactModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

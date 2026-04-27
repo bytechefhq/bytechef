@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinitionBasic", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ActionDefinitionBasicModel {
 
   private String componentName;
@@ -79,6 +79,7 @@ public class ActionDefinitionBasicModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -99,6 +100,7 @@ public class ActionDefinitionBasicModel {
     return componentVersion;
   }
 
+  @JsonProperty("componentVersion")
   public void setComponentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
   }
@@ -119,6 +121,7 @@ public class ActionDefinitionBasicModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -139,6 +142,7 @@ public class ActionDefinitionBasicModel {
     return help;
   }
 
+  @JsonProperty("help")
   public void setHelp(@Nullable HelpModel help) {
     this.help = help;
   }
@@ -159,6 +163,7 @@ public class ActionDefinitionBasicModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -179,6 +184,7 @@ public class ActionDefinitionBasicModel {
     return outputDefined;
   }
 
+  @JsonProperty("outputDefined")
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
   }
@@ -199,6 +205,7 @@ public class ActionDefinitionBasicModel {
     return outputFunctionDefined;
   }
 
+  @JsonProperty("outputFunctionDefined")
   public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
   }
@@ -219,6 +226,7 @@ public class ActionDefinitionBasicModel {
     return outputSchemaDefined;
   }
 
+  @JsonProperty("outputSchemaDefined")
   public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
@@ -239,6 +247,7 @@ public class ActionDefinitionBasicModel {
     return resumePerformFunctionDefined;
   }
 
+  @JsonProperty("resumePerformFunctionDefined")
   public void setResumePerformFunctionDefined(@Nullable Boolean resumePerformFunctionDefined) {
     this.resumePerformFunctionDefined = resumePerformFunctionDefined;
   }
@@ -259,6 +268,7 @@ public class ActionDefinitionBasicModel {
     return sseStreamResponse;
   }
 
+  @JsonProperty("sseStreamResponse")
   public void setSseStreamResponse(@Nullable Boolean sseStreamResponse) {
     this.sseStreamResponse = sseStreamResponse;
   }
@@ -279,6 +289,7 @@ public class ActionDefinitionBasicModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -334,10 +345,7 @@ public class ActionDefinitionBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

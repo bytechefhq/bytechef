@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Option", description = "Defines valid property value.")
 @JsonTypeName("Option")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class OptionModel {
 
   private @Nullable String description;
@@ -50,6 +50,7 @@ public class OptionModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -70,6 +71,7 @@ public class OptionModel {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -140,10 +142,7 @@ public class OptionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

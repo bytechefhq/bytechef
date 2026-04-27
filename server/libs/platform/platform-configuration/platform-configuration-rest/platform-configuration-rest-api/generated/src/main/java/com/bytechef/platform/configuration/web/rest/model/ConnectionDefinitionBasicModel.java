@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ConnectionDefinitionBasicModel {
 
   private @Nullable String componentDescription;
@@ -61,6 +61,7 @@ public class ConnectionDefinitionBasicModel {
     return componentDescription;
   }
 
+  @JsonProperty("componentDescription")
   public void setComponentDescription(@Nullable String componentDescription) {
     this.componentDescription = componentDescription;
   }
@@ -81,6 +82,7 @@ public class ConnectionDefinitionBasicModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -101,6 +103,7 @@ public class ConnectionDefinitionBasicModel {
     return componentTitle;
   }
 
+  @JsonProperty("componentTitle")
   public void setComponentTitle(@Nullable String componentTitle) {
     this.componentTitle = componentTitle;
   }
@@ -121,6 +124,7 @@ public class ConnectionDefinitionBasicModel {
     return version;
   }
 
+  @JsonProperty("version")
   public void setVersion(Integer version) {
     this.version = version;
   }
@@ -162,10 +166,7 @@ public class ConnectionDefinitionBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

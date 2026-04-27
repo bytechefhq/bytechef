@@ -48,7 +48,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class PropertyModel {
 
   private Boolean advancedOption = false;
@@ -94,6 +94,7 @@ public class PropertyModel {
     return advancedOption;
   }
 
+  @JsonProperty("advancedOption")
   public void setAdvancedOption(Boolean advancedOption) {
     this.advancedOption = advancedOption;
   }
@@ -114,6 +115,7 @@ public class PropertyModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -134,6 +136,7 @@ public class PropertyModel {
     return displayCondition;
   }
 
+  @JsonProperty("displayCondition")
   public void setDisplayCondition(@Nullable String displayCondition) {
     this.displayCondition = displayCondition;
   }
@@ -154,6 +157,7 @@ public class PropertyModel {
     return expressionEnabled;
   }
 
+  @JsonProperty("expressionEnabled")
   public void setExpressionEnabled(Boolean expressionEnabled) {
     this.expressionEnabled = expressionEnabled;
   }
@@ -174,6 +178,7 @@ public class PropertyModel {
     return hidden;
   }
 
+  @JsonProperty("hidden")
   public void setHidden(Boolean hidden) {
     this.hidden = hidden;
   }
@@ -194,6 +199,7 @@ public class PropertyModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(@Nullable String name) {
     this.name = name;
   }
@@ -214,6 +220,7 @@ public class PropertyModel {
     return required;
   }
 
+  @JsonProperty("required")
   public void setRequired(Boolean required) {
     this.required = required;
   }
@@ -234,6 +241,7 @@ public class PropertyModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(PropertyTypeModel type) {
     this.type = type;
   }
@@ -283,10 +291,7 @@ public class PropertyModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

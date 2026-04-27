@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationInstanceModel {
 
   private @Nullable Long id;
@@ -74,6 +74,7 @@ public class IntegrationInstanceModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -94,6 +95,7 @@ public class IntegrationInstanceModel {
     return credentialStatus;
   }
 
+  @JsonProperty("credentialStatus")
   public void setCredentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
@@ -114,6 +116,7 @@ public class IntegrationInstanceModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
   }
@@ -142,6 +145,7 @@ public class IntegrationInstanceModel {
     return mcpTools;
   }
 
+  @JsonProperty("mcpTools")
   public void setMcpTools(List<@Valid McpIntegrationInstanceToolModel> mcpTools) {
     this.mcpTools = mcpTools;
   }
@@ -170,6 +174,7 @@ public class IntegrationInstanceModel {
     return mcpWorkflows;
   }
 
+  @JsonProperty("mcpWorkflows")
   public void setMcpWorkflows(List<@Valid IntegrationInstanceWorkflowModel> mcpWorkflows) {
     this.mcpWorkflows = mcpWorkflows;
   }
@@ -198,6 +203,7 @@ public class IntegrationInstanceModel {
     return workflows;
   }
 
+  @JsonProperty("workflows")
   public void setWorkflows(List<@Valid IntegrationInstanceWorkflowModel> workflows) {
     this.workflows = workflows;
   }
@@ -243,10 +249,7 @@ public class IntegrationInstanceModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

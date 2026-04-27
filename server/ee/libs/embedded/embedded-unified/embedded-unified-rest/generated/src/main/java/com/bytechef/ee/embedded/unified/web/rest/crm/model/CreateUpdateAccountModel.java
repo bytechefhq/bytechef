@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("create_update_account")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.707409+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.846934+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class CreateUpdateAccountModel {
 
   private JsonNullable<String> description = JsonNullable.<String>undefined();
@@ -211,6 +211,7 @@ public class CreateUpdateAccountModel {
     return addresses;
   }
 
+  @JsonProperty("addresses")
   public void setAddresses(List<@Valid AddressesInnerModel> addresses) {
     this.addresses = addresses;
   }
@@ -239,6 +240,7 @@ public class CreateUpdateAccountModel {
     return emails;
   }
 
+  @JsonProperty("emails")
   public void setEmails(List<@Valid EmailsInnerModel> emails) {
     this.emails = emails;
   }
@@ -267,6 +269,7 @@ public class CreateUpdateAccountModel {
     return phones;
   }
 
+  @JsonProperty("phones")
   public void setPhones(List<@Valid PhonesInnerModel> phones) {
     this.phones = phones;
   }
@@ -335,6 +338,7 @@ public class CreateUpdateAccountModel {
     return customFields;
   }
 
+  @JsonProperty("customFields")
   public void setCustomFields(Map<String, Object> customFields) {
     this.customFields = customFields;
   }
@@ -402,11 +406,8 @@ public class CreateUpdateAccountModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

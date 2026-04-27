@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowModel implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private @Nullable String createdBy;
@@ -142,6 +142,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -162,6 +163,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -182,6 +184,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return connectionsCount;
   }
 
+  @JsonProperty("connectionsCount")
   public void setConnectionsCount(@Nullable Integer connectionsCount) {
     this.connectionsCount = connectionsCount;
   }
@@ -202,6 +205,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return definition;
   }
 
+  @JsonProperty("definition")
   public void setDefinition(@Nullable String definition) {
     this.definition = definition;
   }
@@ -222,6 +226,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -242,6 +247,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return format;
   }
 
+  @JsonProperty("format")
   public void setFormat(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format) {
     this.format = format;
   }
@@ -262,6 +268,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable String id) {
     this.id = id;
   }
@@ -290,6 +297,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return inputs;
   }
 
+  @JsonProperty("inputs")
   public void setInputs(List<@Valid WorkflowInputModel> inputs) {
     this.inputs = inputs;
   }
@@ -310,6 +318,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return inputsCount;
   }
 
+  @JsonProperty("inputsCount")
   public void setInputsCount(@Nullable Integer inputsCount) {
     this.inputsCount = inputsCount;
   }
@@ -330,6 +339,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -350,6 +360,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -370,6 +381,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -398,6 +410,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return outputs;
   }
 
+  @JsonProperty("outputs")
   public void setOutputs(List<@Valid WorkflowOutputModel> outputs) {
     this.outputs = outputs;
   }
@@ -418,6 +431,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return sourceType;
   }
 
+  @JsonProperty("sourceType")
   public void setSourceType(@Nullable SourceTypeEnum sourceType) {
     this.sourceType = sourceType;
   }
@@ -438,6 +452,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return maxRetries;
   }
 
+  @JsonProperty("maxRetries")
   public void setMaxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
   }
@@ -466,6 +481,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return workflowTaskComponentNames;
   }
 
+  @JsonProperty("workflowTaskComponentNames")
   public void setWorkflowTaskComponentNames(List<String> workflowTaskComponentNames) {
     this.workflowTaskComponentNames = workflowTaskComponentNames;
   }
@@ -494,6 +510,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return workflowTriggerComponentNames;
   }
 
+  @JsonProperty("workflowTriggerComponentNames")
   public void setWorkflowTriggerComponentNames(List<String> workflowTriggerComponentNames) {
     this.workflowTriggerComponentNames = workflowTriggerComponentNames;
   }
@@ -522,6 +539,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return tasks;
   }
 
+  @JsonProperty("tasks")
   public void setTasks(List<@Valid WorkflowTaskModel> tasks) {
     this.tasks = tasks;
   }
@@ -550,6 +568,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return triggers;
   }
 
+  @JsonProperty("triggers")
   public void setTriggers(List<@Valid WorkflowTriggerModel> triggers) {
     this.triggers = triggers;
   }
@@ -570,6 +589,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -590,6 +610,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return integrationWorkflowId;
   }
 
+  @JsonProperty("integrationWorkflowId")
   public void setIntegrationWorkflowId(@Nullable Long integrationWorkflowId) {
     this.integrationWorkflowId = integrationWorkflowId;
   }
@@ -610,6 +631,7 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     return workflowUuid;
   }
 
+  @JsonProperty("workflowUuid")
   public void setWorkflowUuid(@Nullable String workflowUuid) {
     this.workflowUuid = workflowUuid;
   }
@@ -686,11 +708,8 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

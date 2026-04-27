@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "A workflow data for particular integration instance.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationInstanceWorkflowModel {
 
   private @Nullable Boolean enabled;
@@ -50,6 +50,7 @@ public class IntegrationInstanceWorkflowModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
@@ -78,6 +79,7 @@ public class IntegrationInstanceWorkflowModel {
     return inputs;
   }
 
+  @JsonProperty("inputs")
   public void setInputs(Map<String, Object> inputs) {
     this.inputs = inputs;
   }
@@ -98,6 +100,7 @@ public class IntegrationInstanceWorkflowModel {
     return workflowUuid;
   }
 
+  @JsonProperty("workflowUuid")
   public void setWorkflowUuid(@Nullable String workflowUuid) {
     this.workflowUuid = workflowUuid;
   }
@@ -137,10 +140,7 @@ public class IntegrationInstanceWorkflowModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

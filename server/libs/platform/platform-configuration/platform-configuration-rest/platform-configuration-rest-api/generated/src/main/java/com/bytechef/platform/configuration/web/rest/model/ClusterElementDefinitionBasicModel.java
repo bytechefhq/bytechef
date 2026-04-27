@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementDefinitionBasic", description = "A cluster element basic definition.")
 @JsonTypeName("ClusterElementDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ClusterElementDefinitionBasicModel {
 
   private String componentName;
@@ -79,6 +79,7 @@ public class ClusterElementDefinitionBasicModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -99,6 +100,7 @@ public class ClusterElementDefinitionBasicModel {
     return componentVersion;
   }
 
+  @JsonProperty("componentVersion")
   public void setComponentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
   }
@@ -119,6 +121,7 @@ public class ClusterElementDefinitionBasicModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -139,6 +142,7 @@ public class ClusterElementDefinitionBasicModel {
     return help;
   }
 
+  @JsonProperty("help")
   public void setHelp(@Nullable HelpModel help) {
     this.help = help;
   }
@@ -159,6 +163,7 @@ public class ClusterElementDefinitionBasicModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -179,6 +184,7 @@ public class ClusterElementDefinitionBasicModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -199,6 +205,7 @@ public class ClusterElementDefinitionBasicModel {
     return outputDefined;
   }
 
+  @JsonProperty("outputDefined")
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
   }
@@ -219,6 +226,7 @@ public class ClusterElementDefinitionBasicModel {
     return outputFunctionDefined;
   }
 
+  @JsonProperty("outputFunctionDefined")
   public void setOutputFunctionDefined(@Nullable Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
   }
@@ -239,6 +247,7 @@ public class ClusterElementDefinitionBasicModel {
     return outputSchemaDefined;
   }
 
+  @JsonProperty("outputSchemaDefined")
   public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
@@ -259,6 +268,7 @@ public class ClusterElementDefinitionBasicModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -279,6 +289,7 @@ public class ClusterElementDefinitionBasicModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(String type) {
     this.type = type;
   }
@@ -334,10 +345,7 @@ public class ClusterElementDefinitionBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowNodeOutputModel {
 
   private @Nullable ActionDefinitionBasicModel actionDefinition;
@@ -73,6 +73,7 @@ public class WorkflowNodeOutputModel {
     return actionDefinition;
   }
 
+  @JsonProperty("actionDefinition")
   public void setActionDefinition(@Nullable ActionDefinitionBasicModel actionDefinition) {
     this.actionDefinition = actionDefinition;
   }
@@ -93,6 +94,7 @@ public class WorkflowNodeOutputModel {
     return clusterElementDefinition;
   }
 
+  @JsonProperty("clusterElementDefinition")
   public void setClusterElementDefinition(@Nullable ClusterElementDefinitionBasicModel clusterElementDefinition) {
     this.clusterElementDefinition = clusterElementDefinition;
   }
@@ -113,6 +115,7 @@ public class WorkflowNodeOutputModel {
     return outputResponse;
   }
 
+  @JsonProperty("outputResponse")
   public void setOutputResponse(@Nullable OutputResponseModel outputResponse) {
     this.outputResponse = outputResponse;
   }
@@ -133,6 +136,7 @@ public class WorkflowNodeOutputModel {
     return taskDispatcherDefinition;
   }
 
+  @JsonProperty("taskDispatcherDefinition")
   public void setTaskDispatcherDefinition(@Nullable TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
     this.taskDispatcherDefinition = taskDispatcherDefinition;
   }
@@ -153,6 +157,7 @@ public class WorkflowNodeOutputModel {
     return testOutputResponse;
   }
 
+  @JsonProperty("testOutputResponse")
   public void setTestOutputResponse(Boolean testOutputResponse) {
     this.testOutputResponse = testOutputResponse;
   }
@@ -173,6 +178,7 @@ public class WorkflowNodeOutputModel {
     return triggerDefinition;
   }
 
+  @JsonProperty("triggerDefinition")
   public void setTriggerDefinition(@Nullable TriggerDefinitionBasicModel triggerDefinition) {
     this.triggerDefinition = triggerDefinition;
   }
@@ -193,6 +199,7 @@ public class WorkflowNodeOutputModel {
     return variableOutputResponse;
   }
 
+  @JsonProperty("variableOutputResponse")
   public void setVariableOutputResponse(@Nullable OutputResponseModel variableOutputResponse) {
     this.variableOutputResponse = variableOutputResponse;
   }
@@ -213,6 +220,7 @@ public class WorkflowNodeOutputModel {
     return workflowNodeName;
   }
 
+  @JsonProperty("workflowNodeName")
   public void setWorkflowNodeName(String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
   }
@@ -262,10 +270,7 @@ public class WorkflowNodeOutputModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

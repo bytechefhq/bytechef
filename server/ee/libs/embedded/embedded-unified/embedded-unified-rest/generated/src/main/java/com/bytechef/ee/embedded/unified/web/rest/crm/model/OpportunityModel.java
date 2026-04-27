@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("opportunity")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.707409+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.846934+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class OpportunityModel {
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
@@ -116,6 +116,7 @@ public class OpportunityModel {
     return amount;
   }
 
+  @JsonProperty("amount")
   public void setAmount(JsonNullable<Integer> amount) {
     this.amount = amount;
   }
@@ -156,6 +157,7 @@ public class OpportunityModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(JsonNullable<String> description) {
     this.description = description;
   }
@@ -176,6 +178,7 @@ public class OpportunityModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(String id) {
     this.id = id;
   }
@@ -196,6 +199,7 @@ public class OpportunityModel {
     return lastActivityDate;
   }
 
+  @JsonProperty("lastActivityDate")
   public void setLastActivityDate(JsonNullable<OffsetDateTime> lastActivityDate) {
     this.lastActivityDate = lastActivityDate;
   }
@@ -216,6 +220,7 @@ public class OpportunityModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(JsonNullable<String> name) {
     this.name = name;
   }
@@ -236,6 +241,7 @@ public class OpportunityModel {
     return ownerId;
   }
 
+  @JsonProperty("ownerId")
   public void setOwnerId(JsonNullable<String> ownerId) {
     this.ownerId = ownerId;
   }
@@ -256,6 +262,7 @@ public class OpportunityModel {
     return pipeline;
   }
 
+  @JsonProperty("pipeline")
   public void setPipeline(JsonNullable<String> pipeline) {
     this.pipeline = pipeline;
   }
@@ -276,6 +283,7 @@ public class OpportunityModel {
     return stage;
   }
 
+  @JsonProperty("stage")
   public void setStage(JsonNullable<String> stage) {
     this.stage = stage;
   }
@@ -296,6 +304,7 @@ public class OpportunityModel {
     return status;
   }
 
+  @JsonProperty("status")
   public void setStatus(JsonNullable<String> status) {
     this.status = status;
   }
@@ -316,6 +325,7 @@ public class OpportunityModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(JsonNullable<OffsetDateTime> createdDate) {
     this.createdDate = createdDate;
   }
@@ -336,6 +346,7 @@ public class OpportunityModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -405,11 +416,8 @@ public class OpportunityModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

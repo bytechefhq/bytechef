@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workspace", description = "A workspace.")
 @JsonTypeName("Workspace")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.674883+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.095260+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkspaceModel {
 
   private @Nullable String createdBy;
@@ -72,6 +72,7 @@ public class WorkspaceModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -92,6 +93,7 @@ public class WorkspaceModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -112,6 +114,7 @@ public class WorkspaceModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -132,6 +135,7 @@ public class WorkspaceModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -152,6 +156,7 @@ public class WorkspaceModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -172,6 +177,7 @@ public class WorkspaceModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -192,6 +198,7 @@ public class WorkspaceModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -212,6 +219,7 @@ public class WorkspaceModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -261,10 +269,7 @@ public class WorkspaceModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

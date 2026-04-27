@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic_1", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic_1")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.374089+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.239389+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowBasic1Model {
 
   private @Nullable String createdBy;
@@ -61,6 +61,7 @@ public class WorkflowBasic1Model {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -81,6 +82,7 @@ public class WorkflowBasic1Model {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -101,6 +103,7 @@ public class WorkflowBasic1Model {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -121,6 +124,7 @@ public class WorkflowBasic1Model {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable String id) {
     this.id = id;
   }
@@ -141,6 +145,7 @@ public class WorkflowBasic1Model {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -161,6 +166,7 @@ public class WorkflowBasic1Model {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -181,6 +187,7 @@ public class WorkflowBasic1Model {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -201,6 +208,7 @@ public class WorkflowBasic1Model {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -249,11 +257,8 @@ public class WorkflowBasic1Model {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

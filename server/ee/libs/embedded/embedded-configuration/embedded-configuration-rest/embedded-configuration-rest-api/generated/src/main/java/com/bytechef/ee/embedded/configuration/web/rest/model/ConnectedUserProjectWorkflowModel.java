@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable Long connectedUserId;
@@ -49,6 +49,7 @@ public class ConnectedUserProjectWorkflowModel {
     return connectedUserId;
   }
 
+  @JsonProperty("connectedUserId")
   public void setConnectedUserId(@Nullable Long connectedUserId) {
     this.connectedUserId = connectedUserId;
   }
@@ -69,6 +70,7 @@ public class ConnectedUserProjectWorkflowModel {
     return projectId;
   }
 
+  @JsonProperty("projectId")
   public void setProjectId(@Nullable Long projectId) {
     this.projectId = projectId;
   }
@@ -89,6 +91,7 @@ public class ConnectedUserProjectWorkflowModel {
     return workflowVersion;
   }
 
+  @JsonProperty("workflowVersion")
   public void setWorkflowVersion(@Nullable Integer workflowVersion) {
     this.workflowVersion = workflowVersion;
   }
@@ -109,6 +112,7 @@ public class ConnectedUserProjectWorkflowModel {
     return workflow;
   }
 
+  @JsonProperty("workflow")
   public void setWorkflow(@Nullable WorkflowModel workflow) {
     this.workflow = workflow;
   }
@@ -149,11 +153,8 @@ public class ConnectedUserProjectWorkflowModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

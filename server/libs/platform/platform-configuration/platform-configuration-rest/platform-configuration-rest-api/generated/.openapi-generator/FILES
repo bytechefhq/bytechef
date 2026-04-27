@@ -73,7 +73,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskPropertyMod
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerFormInputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UnifiedApiCategoryModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateClusterElementParameterRequestModel.java

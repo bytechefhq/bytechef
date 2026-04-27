@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class TriggerDefinitionModel {
 
   private @Nullable String componentName;
@@ -87,6 +87,7 @@ public class TriggerDefinitionModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(@Nullable String componentName) {
     this.componentName = componentName;
   }
@@ -107,6 +108,7 @@ public class TriggerDefinitionModel {
     return componentVersion;
   }
 
+  @JsonProperty("componentVersion")
   public void setComponentVersion(@Nullable Integer componentVersion) {
     this.componentVersion = componentVersion;
   }
@@ -127,6 +129,7 @@ public class TriggerDefinitionModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -147,6 +150,7 @@ public class TriggerDefinitionModel {
     return help;
   }
 
+  @JsonProperty("help")
   public void setHelp(@Nullable HelpModel help) {
     this.help = help;
   }
@@ -167,6 +171,7 @@ public class TriggerDefinitionModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -187,6 +192,7 @@ public class TriggerDefinitionModel {
     return outputDefined;
   }
 
+  @JsonProperty("outputDefined")
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
   }
@@ -207,6 +213,7 @@ public class TriggerDefinitionModel {
     return outputFunctionDefined;
   }
 
+  @JsonProperty("outputFunctionDefined")
   public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
   }
@@ -227,6 +234,7 @@ public class TriggerDefinitionModel {
     return outputSchemaDefined;
   }
 
+  @JsonProperty("outputSchemaDefined")
   public void setOutputSchemaDefined(@Nullable Boolean outputSchemaDefined) {
     this.outputSchemaDefined = outputSchemaDefined;
   }
@@ -255,6 +263,7 @@ public class TriggerDefinitionModel {
     return properties;
   }
 
+  @JsonProperty("properties")
   public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
   }
@@ -275,6 +284,7 @@ public class TriggerDefinitionModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -295,6 +305,7 @@ public class TriggerDefinitionModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(TriggerTypeModel type) {
     this.type = type;
   }
@@ -315,6 +326,7 @@ public class TriggerDefinitionModel {
     return workflowNodeDescriptionDefined;
   }
 
+  @JsonProperty("workflowNodeDescriptionDefined")
   public void setWorkflowNodeDescriptionDefined(@Nullable Boolean workflowNodeDescriptionDefined) {
     this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
   }
@@ -372,10 +384,7 @@ public class TriggerDefinitionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

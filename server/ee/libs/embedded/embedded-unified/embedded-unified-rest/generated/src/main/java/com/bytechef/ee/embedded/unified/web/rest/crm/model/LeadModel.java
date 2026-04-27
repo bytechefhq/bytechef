@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("lead")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.707409+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.846934+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class LeadModel {
 
   @Valid
@@ -117,6 +117,7 @@ public class LeadModel {
     return addresses;
   }
 
+  @JsonProperty("addresses")
   public void setAddresses(List<@Valid AddressesInnerModel> addresses) {
     this.addresses = addresses;
   }
@@ -137,6 +138,7 @@ public class LeadModel {
     return company;
   }
 
+  @JsonProperty("company")
   public void setCompany(JsonNullable<String> company) {
     this.company = company;
   }
@@ -157,6 +159,7 @@ public class LeadModel {
     return convertedAccountId;
   }
 
+  @JsonProperty("convertedAccountId")
   public void setConvertedAccountId(JsonNullable<String> convertedAccountId) {
     this.convertedAccountId = convertedAccountId;
   }
@@ -177,6 +180,7 @@ public class LeadModel {
     return convertedAccount;
   }
 
+  @JsonProperty("convertedAccount")
   public void setConvertedAccount(@Nullable AccountModel convertedAccount) {
     this.convertedAccount = convertedAccount;
   }
@@ -197,6 +201,7 @@ public class LeadModel {
     return convertedContactId;
   }
 
+  @JsonProperty("convertedContactId")
   public void setConvertedContactId(JsonNullable<String> convertedContactId) {
     this.convertedContactId = convertedContactId;
   }
@@ -217,6 +222,7 @@ public class LeadModel {
     return convertedContact;
   }
 
+  @JsonProperty("convertedContact")
   public void setConvertedContact(@Nullable ContactModel convertedContact) {
     this.convertedContact = convertedContact;
   }
@@ -245,6 +251,7 @@ public class LeadModel {
     return emails;
   }
 
+  @JsonProperty("emails")
   public void setEmails(List<@Valid EmailsInnerModel> emails) {
     this.emails = emails;
   }
@@ -285,6 +292,7 @@ public class LeadModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(String id) {
     this.id = id;
   }
@@ -325,6 +333,7 @@ public class LeadModel {
     return leadSource;
   }
 
+  @JsonProperty("leadSource")
   public void setLeadSource(JsonNullable<String> leadSource) {
     this.leadSource = leadSource;
   }
@@ -345,6 +354,7 @@ public class LeadModel {
     return ownerId;
   }
 
+  @JsonProperty("ownerId")
   public void setOwnerId(JsonNullable<String> ownerId) {
     this.ownerId = ownerId;
   }
@@ -373,6 +383,7 @@ public class LeadModel {
     return phones;
   }
 
+  @JsonProperty("phones")
   public void setPhones(List<@Valid PhonesInnerModel> phones) {
     this.phones = phones;
   }
@@ -393,6 +404,7 @@ public class LeadModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(JsonNullable<String> title) {
     this.title = title;
   }
@@ -413,6 +425,7 @@ public class LeadModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(JsonNullable<OffsetDateTime> createdDate) {
     this.createdDate = createdDate;
   }
@@ -433,6 +446,7 @@ public class LeadModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -508,11 +522,8 @@ public class LeadModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

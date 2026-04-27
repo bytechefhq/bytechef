@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.404697+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.917929+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ApiCollectionModel {
 
   private @Nullable Integer collectionVersion;
@@ -108,6 +108,7 @@ public class ApiCollectionModel {
     return collectionVersion;
   }
 
+  @JsonProperty("collectionVersion")
   public void setCollectionVersion(@Nullable Integer collectionVersion) {
     this.collectionVersion = collectionVersion;
   }
@@ -128,6 +129,7 @@ public class ApiCollectionModel {
     return contextPath;
   }
 
+  @JsonProperty("contextPath")
   public void setContextPath(String contextPath) {
     this.contextPath = contextPath;
   }
@@ -148,6 +150,7 @@ public class ApiCollectionModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -168,6 +171,7 @@ public class ApiCollectionModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -188,6 +192,7 @@ public class ApiCollectionModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -208,6 +213,7 @@ public class ApiCollectionModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
   }
@@ -236,6 +242,7 @@ public class ApiCollectionModel {
     return endpoints;
   }
 
+  @JsonProperty("endpoints")
   public void setEndpoints(List<@Valid ApiCollectionEndpointModel> endpoints) {
     this.endpoints = endpoints;
   }
@@ -256,6 +263,7 @@ public class ApiCollectionModel {
     return environmentId;
   }
 
+  @JsonProperty("environmentId")
   public void setEnvironmentId(@Nullable Long environmentId) {
     this.environmentId = environmentId;
   }
@@ -276,6 +284,7 @@ public class ApiCollectionModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -296,6 +305,7 @@ public class ApiCollectionModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -316,6 +326,7 @@ public class ApiCollectionModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -336,6 +347,7 @@ public class ApiCollectionModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -356,6 +368,7 @@ public class ApiCollectionModel {
     return projectId;
   }
 
+  @JsonProperty("projectId")
   public void setProjectId(Long projectId) {
     this.projectId = projectId;
   }
@@ -376,6 +389,7 @@ public class ApiCollectionModel {
     return project;
   }
 
+  @JsonProperty("project")
   public void setProject(@Nullable com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
     this.project = project;
   }
@@ -396,6 +410,7 @@ public class ApiCollectionModel {
     return projectDeploymentId;
   }
 
+  @JsonProperty("projectDeploymentId")
   public void setProjectDeploymentId(@Nullable Long projectDeploymentId) {
     this.projectDeploymentId = projectDeploymentId;
   }
@@ -416,6 +431,7 @@ public class ApiCollectionModel {
     return projectDeployment;
   }
 
+  @JsonProperty("projectDeployment")
   public void setProjectDeployment(@Nullable com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
     this.projectDeployment = projectDeployment;
   }
@@ -436,6 +452,7 @@ public class ApiCollectionModel {
     return projectVersion;
   }
 
+  @JsonProperty("projectVersion")
   public void setProjectVersion(Integer projectVersion) {
     this.projectVersion = projectVersion;
   }
@@ -464,6 +481,7 @@ public class ApiCollectionModel {
     return tags;
   }
 
+  @JsonProperty("tags")
   public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
@@ -484,6 +502,7 @@ public class ApiCollectionModel {
     return workspaceId;
   }
 
+  @JsonProperty("workspaceId")
   public void setWorkspaceId(Long workspaceId) {
     this.workspaceId = workspaceId;
   }
@@ -504,6 +523,7 @@ public class ApiCollectionModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -576,11 +596,8 @@ public class ApiCollectionModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ComponentDefinitionBasicModel {
 
   private @Nullable Integer actionsCount;
@@ -79,6 +79,7 @@ public class ComponentDefinitionBasicModel {
     return actionsCount;
   }
 
+  @JsonProperty("actionsCount")
   public void setActionsCount(@Nullable Integer actionsCount) {
     this.actionsCount = actionsCount;
   }
@@ -107,6 +108,7 @@ public class ComponentDefinitionBasicModel {
     return clusterElementsCount;
   }
 
+  @JsonProperty("clusterElementsCount")
   public void setClusterElementsCount(Map<String, Integer> clusterElementsCount) {
     this.clusterElementsCount = clusterElementsCount;
   }
@@ -135,6 +137,7 @@ public class ComponentDefinitionBasicModel {
     return componentCategories;
   }
 
+  @JsonProperty("componentCategories")
   public void setComponentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
     this.componentCategories = componentCategories;
   }
@@ -155,6 +158,7 @@ public class ComponentDefinitionBasicModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -175,6 +179,7 @@ public class ComponentDefinitionBasicModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -195,6 +200,7 @@ public class ComponentDefinitionBasicModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -215,6 +221,7 @@ public class ComponentDefinitionBasicModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -235,6 +242,7 @@ public class ComponentDefinitionBasicModel {
     return triggersCount;
   }
 
+  @JsonProperty("triggersCount")
   public void setTriggersCount(@Nullable Integer triggersCount) {
     this.triggersCount = triggersCount;
   }
@@ -255,6 +263,7 @@ public class ComponentDefinitionBasicModel {
     return version;
   }
 
+  @JsonProperty("version")
   public void setVersion(Integer version) {
     this.version = version;
   }
@@ -306,10 +315,7 @@ public class ComponentDefinitionBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

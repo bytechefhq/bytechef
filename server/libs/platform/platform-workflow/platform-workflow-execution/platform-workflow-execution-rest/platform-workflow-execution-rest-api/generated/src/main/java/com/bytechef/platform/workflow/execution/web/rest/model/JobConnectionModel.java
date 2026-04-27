@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobConnection", description = "The connection used in a particular task.")
 @JsonTypeName("JobConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.584140+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.371326+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class JobConnectionModel {
 
   private @Nullable Long id;
@@ -47,6 +47,7 @@ public class JobConnectionModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -67,6 +68,7 @@ public class JobConnectionModel {
     return key;
   }
 
+  @JsonProperty("key")
   public void setKey(@Nullable String key) {
     this.key = key;
   }
@@ -87,6 +89,7 @@ public class JobConnectionModel {
     return taskName;
   }
 
+  @JsonProperty("taskName")
   public void setTaskName(@Nullable String taskName) {
     this.taskName = taskName;
   }
@@ -126,10 +129,7 @@ public class JobConnectionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

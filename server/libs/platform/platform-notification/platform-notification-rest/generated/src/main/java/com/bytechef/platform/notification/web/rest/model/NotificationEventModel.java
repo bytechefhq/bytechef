@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NotificationEvent", description = "A notification event definition.")
 @JsonTypeName("NotificationEvent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.369979+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.883658+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class NotificationEventModel {
 
   private Long id;
@@ -100,6 +100,7 @@ public class NotificationEventModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(Long id) {
     this.id = id;
   }
@@ -120,6 +121,7 @@ public class NotificationEventModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(@Nullable TypeEnum type) {
     this.type = type;
   }
@@ -156,11 +158,8 @@ public class NotificationEventModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AppEvent", description = "An app event.")
 @JsonTypeName("AppEvent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class AppEventModel {
 
   private @Nullable String createdBy;
@@ -73,6 +73,7 @@ public class AppEventModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -93,6 +94,7 @@ public class AppEventModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -113,6 +115,7 @@ public class AppEventModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -133,6 +136,7 @@ public class AppEventModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -153,6 +157,7 @@ public class AppEventModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -173,6 +178,7 @@ public class AppEventModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -193,6 +199,7 @@ public class AppEventModel {
     return schema;
   }
 
+  @JsonProperty("schema")
   public void setSchema(String schema) {
     this.schema = schema;
   }
@@ -213,6 +220,7 @@ public class AppEventModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -261,11 +269,8 @@ public class AppEventModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

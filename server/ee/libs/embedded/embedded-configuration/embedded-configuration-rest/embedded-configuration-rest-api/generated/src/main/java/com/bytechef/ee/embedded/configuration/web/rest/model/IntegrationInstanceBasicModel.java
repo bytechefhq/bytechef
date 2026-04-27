@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceBasic", description = "Contains configurations and connections required for the execution of integration workflows for a connected user.")
 @JsonTypeName("IntegrationInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationInstanceBasicModel {
 
   private Long connectionId;
@@ -79,6 +79,7 @@ public class IntegrationInstanceBasicModel {
     return connectionId;
   }
 
+  @JsonProperty("connectionId")
   public void setConnectionId(Long connectionId) {
     this.connectionId = connectionId;
   }
@@ -99,6 +100,7 @@ public class IntegrationInstanceBasicModel {
     return connectedUserId;
   }
 
+  @JsonProperty("connectedUserId")
   public void setConnectedUserId(@Nullable Long connectedUserId) {
     this.connectedUserId = connectedUserId;
   }
@@ -119,6 +121,7 @@ public class IntegrationInstanceBasicModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -139,6 +142,7 @@ public class IntegrationInstanceBasicModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -159,6 +163,7 @@ public class IntegrationInstanceBasicModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
@@ -179,6 +184,7 @@ public class IntegrationInstanceBasicModel {
     return environmentId;
   }
 
+  @JsonProperty("environmentId")
   public void setEnvironmentId(@Nullable Long environmentId) {
     this.environmentId = environmentId;
   }
@@ -199,6 +205,7 @@ public class IntegrationInstanceBasicModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -219,6 +226,7 @@ public class IntegrationInstanceBasicModel {
     return lastExecutionDate;
   }
 
+  @JsonProperty("lastExecutionDate")
   public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
@@ -239,6 +247,7 @@ public class IntegrationInstanceBasicModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -259,6 +268,7 @@ public class IntegrationInstanceBasicModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -279,6 +289,7 @@ public class IntegrationInstanceBasicModel {
     return integrationInstanceConfigurationId;
   }
 
+  @JsonProperty("integrationInstanceConfigurationId")
   public void setIntegrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
     this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
   }
@@ -333,11 +344,8 @@ public class IntegrationInstanceBasicModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.584140+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.371326+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class JobModel {
 
   private @Nullable String createdBy;
@@ -153,6 +153,7 @@ public class JobModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -173,6 +174,7 @@ public class JobModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -193,6 +195,7 @@ public class JobModel {
     return currentTask;
   }
 
+  @JsonProperty("currentTask")
   public void setCurrentTask(@Nullable Integer currentTask) {
     this.currentTask = currentTask;
   }
@@ -213,6 +216,7 @@ public class JobModel {
     return endDate;
   }
 
+  @JsonProperty("endDate")
   public void setEndDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
   }
@@ -233,6 +237,7 @@ public class JobModel {
     return error;
   }
 
+  @JsonProperty("error")
   public void setError(@Nullable ExecutionErrorModel error) {
     this.error = error;
   }
@@ -253,6 +258,7 @@ public class JobModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable String id) {
     this.id = id;
   }
@@ -281,6 +287,7 @@ public class JobModel {
     return inputs;
   }
 
+  @JsonProperty("inputs")
   public void setInputs(Map<String, Object> inputs) {
     this.inputs = inputs;
   }
@@ -301,6 +308,7 @@ public class JobModel {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -321,6 +329,7 @@ public class JobModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -341,6 +350,7 @@ public class JobModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -369,6 +379,7 @@ public class JobModel {
     return metadata;
   }
 
+  @JsonProperty("metadata")
   public void setMetadata(Map<String, Object> metadata) {
     this.metadata = metadata;
   }
@@ -397,6 +408,7 @@ public class JobModel {
     return outputs;
   }
 
+  @JsonProperty("outputs")
   public void setOutputs(Map<String, Object> outputs) {
     this.outputs = outputs;
   }
@@ -417,6 +429,7 @@ public class JobModel {
     return parentTaskExecutionId;
   }
 
+  @JsonProperty("parentTaskExecutionId")
   public void setParentTaskExecutionId(@Nullable Long parentTaskExecutionId) {
     this.parentTaskExecutionId = parentTaskExecutionId;
   }
@@ -437,6 +450,7 @@ public class JobModel {
     return priority;
   }
 
+  @JsonProperty("priority")
   public void setPriority(Integer priority) {
     this.priority = priority;
   }
@@ -457,6 +471,7 @@ public class JobModel {
     return startDate;
   }
 
+  @JsonProperty("startDate")
   public void setStartDate(OffsetDateTime startDate) {
     this.startDate = startDate;
   }
@@ -477,6 +492,7 @@ public class JobModel {
     return status;
   }
 
+  @JsonProperty("status")
   public void setStatus(StatusEnum status) {
     this.status = status;
   }
@@ -505,6 +521,7 @@ public class JobModel {
     return taskExecutions;
   }
 
+  @JsonProperty("taskExecutions")
   public void setTaskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
   }
@@ -533,6 +550,7 @@ public class JobModel {
     return webhooks;
   }
 
+  @JsonProperty("webhooks")
   public void setWebhooks(List<@Valid WebhookModel> webhooks) {
     this.webhooks = webhooks;
   }
@@ -553,6 +571,7 @@ public class JobModel {
     return workflowId;
   }
 
+  @JsonProperty("workflowId")
   public void setWorkflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
   }
@@ -624,10 +643,7 @@ public class JobModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 
