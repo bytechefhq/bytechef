@@ -34,7 +34,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon} from 'lucide-react';
-import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
+import {ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -78,12 +78,12 @@ const ProjectDeploymentDialog = ({
     const [connectionsGrouped, setConnectionsGrouped] = useState(false);
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [selectedExistingDeployment, setSelectedExistingDeployment] = useState<ProjectDeployment | undefined>();
+    const [tabInitialized, setTabInitialized] = useState(false);
 
     const effectiveProjectDeployment = selectedExistingDeployment ?? projectDeployment;
     const effectiveChangeProjectVersion = changeProjectVersion || !!selectedExistingDeployment;
 
     const initializedProjectKeyRef = useRef<string>('');
-    const tabInitDoneRef = useRef(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCurrentEnvironmentId = useEnvironmentStore((state) => state.setCurrentEnvironmentId);
@@ -205,7 +205,7 @@ const ProjectDeploymentDialog = ({
     const isSaveDisabled = !hasEnabledWorkflows || isDeploymentPending;
 
     const handleBasicStepTabChange = (tab: 'new-deployment' | 'change-version') => {
-        tabInitDoneRef.current = true;
+        setTabInitialized(true);
 
         setBasicStepTab(tab);
 
@@ -255,22 +255,23 @@ const ProjectDeploymentDialog = ({
 
     const projectDeploymentDialogSteps = [
         {
-            content: (
-                <ProjectDeploymentDialogBasicStep
-                    basicStepTab={basicStepTab}
-                    changeProjectVersion={effectiveChangeProjectVersion}
-                    control={control}
-                    environmentEditable={environmentEditable}
-                    getValues={getValues}
-                    handleTabChange={handleBasicStepTabChange}
-                    onDeploymentSelect={handleExistingDeploymentSelect}
-                    projectDeployment={effectiveProjectDeployment}
-                    projectDeployments={projectDeployments}
-                    projectDeploymentsLoading={projectDeploymentsLoading}
-                    setValue={setValue}
-                    showTabs={showTabs}
-                />
-            ),
+            content:
+                showTabs && !tabInitialized ? null : (
+                    <ProjectDeploymentDialogBasicStep
+                        basicStepTab={basicStepTab}
+                        changeProjectVersion={effectiveChangeProjectVersion}
+                        control={control}
+                        environmentEditable={environmentEditable}
+                        getValues={getValues}
+                        handleTabChange={handleBasicStepTabChange}
+                        onDeploymentSelect={handleExistingDeploymentSelect}
+                        projectDeployment={effectiveProjectDeployment}
+                        projectDeployments={projectDeployments}
+                        projectDeploymentsLoading={projectDeploymentsLoading}
+                        setValue={setValue}
+                        showTabs={showTabs}
+                    />
+                ),
             name: 'Basic',
         },
         {
@@ -297,7 +298,7 @@ const ProjectDeploymentDialog = ({
 
             initializedProjectKeyRef.current = '';
 
-            tabInitDoneRef.current = false;
+            setTabInitialized(false);
 
             setSelectedExistingDeployment(undefined);
 
@@ -406,21 +407,21 @@ const ProjectDeploymentDialog = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getValues().projectId, getValues().projectVersion, workflows]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!isOpen) {
-            tabInitDoneRef.current = false;
+            setTabInitialized(false);
 
             return;
         }
 
-        if (tabInitDoneRef.current) {
+        if (tabInitialized) {
             return;
         }
 
         if (changeProjectVersion) {
-            tabInitDoneRef.current = true;
-
             setBasicStepTab('change-version');
+
+            setTabInitialized(true);
 
             return;
         }
@@ -429,10 +430,10 @@ const ProjectDeploymentDialog = ({
             return;
         }
 
-        tabInitDoneRef.current = true;
-
         setBasicStepTab(projectDeployments.length > 0 ? 'change-version' : 'new-deployment');
-    }, [isOpen, projectDeploymentsLoading, projectDeployments, changeProjectVersion]);
+
+        setTabInitialized(true);
+    }, [isOpen, projectDeploymentsLoading, projectDeployments, changeProjectVersion, tabInitialized]);
 
     return (
         <Dialog

@@ -13,6 +13,7 @@ import ProjectDeploymentDialogBasicStepTagsSelect from '@/pages/automation/proje
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import {toEnvironmentName} from '@/shared/constants';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -357,7 +358,7 @@ const ProjectDeploymentDialogBasicStep = ({
                                                             }
                                                             value={deployment.id?.toString() ?? ''}
                                                         >
-                                                            {`${deployment.name ?? `Deployment ${deployment.id}`} - V${deployment.projectVersion}`}
+                                                            {`${deployment.name ?? `Deployment ${deployment.id}`} - V${deployment.projectVersion} - ${deployment.environmentId != null ? toEnvironmentName(deployment.environmentId) : ''}`}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
