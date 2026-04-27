@@ -103,6 +103,12 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
         }
     }, [approvalTasksData, mapApiApprovalTaskToUiApprovalTask]);
 
+    useEffect(() => {
+        return () => {
+            useApprovalTasksStore.getState().setSelectedApprovalTaskId(null);
+        };
+    }, []);
+
     const selectedApprovalTaskObject =
         approvalTasks.find((approvalTask) => approvalTask.id === selectedApprovalTaskId) || null;
 
