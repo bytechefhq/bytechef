@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.webhook.web.rest;
+package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -25,31 +25,30 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Shared logic for parsing a {@link JobResumeId} and resuming the corresponding suspended job within the matching
- * tenant context. Subclasses provide the request mapping that exposes this operation to a specific transport (anonymous
- * webhook callback vs. API-key-protected endpoint).
- *
  * @author Ivica Cardic
  */
-abstract class AbstractResumeController {
+@Service
+@Transactional
+public class JobResumeFacadeImpl implements JobResumeFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractResumeController.class);
+    private static final Logger logger = LoggerFactory.getLogger(JobResumeFacadeImpl.class);
 
-    protected final JobFacade jobFacade;
-    protected final JobService jobService;
+    private final JobFacade jobFacade;
+    private final JobService jobService;
 
     @SuppressFBWarnings("EI")
-    protected AbstractResumeController(JobFacade jobFacade, JobService jobService) {
+    public JobResumeFacadeImpl(JobFacade jobFacade, JobService jobService) {
         this.jobFacade = jobFacade;
         this.jobService = jobService;
     }
 
+    @Override
     @SuppressFBWarnings("CRLF_INJECTION_LOGS")
-    protected ResponseEntity<Void> doResume(String id, Map<String, Object> data) {
+    public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
         JobResumeId jobResumeId;
 
         try {
@@ -57,8 +56,7 @@ abstract class AbstractResumeController {
         } catch (IllegalArgumentException illegalArgumentException) {
             logger.warn("Invalid resume id: {}", id.replaceAll("[\\r\\n]", ""));
 
-            return ResponseEntity.badRequest()
-                .build();
+            return JobResumeOutcome.INVALID_ID;
         }
 
         return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
@@ -67,14 +65,12 @@ abstract class AbstractResumeController {
             if (job.getStatus() != Job.Status.STOPPED) {
                 logger.warn("Cannot resume job {}; status is {}", jobResumeId.getJobId(), job.getStatus());
 
-                return ResponseEntity.status(HttpStatus.GONE)
-                    .build();
+                return JobResumeOutcome.GONE;
             }
 
             jobFacade.resumeJob(jobResumeId.getJobId(), data);
 
-            return ResponseEntity.noContent()
-                .build();
+            return JobResumeOutcome.OK;
         });
     }
 }
