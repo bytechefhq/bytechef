@@ -31,6 +31,7 @@ com-google-auto-service-auto-service-annotations = { module = "com.google.auto.s
 com-googlecode-owasp-java-html-sanitizer = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1"
 com-oracle-database-jdbc-ojdbc11 = "com.oracle.database.jdbc:ojdbc11:23.26.1.0.0"
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
+commons-text = "org.apache.commons:commons-text:1.15.0"
 commons-validator = "commons-validator:commons-validator:1.10.1"
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.48"
 io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.40"

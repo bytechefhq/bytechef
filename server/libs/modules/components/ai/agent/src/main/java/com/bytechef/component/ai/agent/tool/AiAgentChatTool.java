@@ -79,6 +79,7 @@ public class AiAgentChatTool {
     }
 
     private static class ActionContextAdapter implements ActionContext {
+
         private final ClusterElementContext context;
 
         public ActionContextAdapter(ClusterElementContext context) {
@@ -108,6 +109,11 @@ public class AiAgentChatTool {
         @Override
         public <R> R encoder(ContextFunction<Encoder, R> encoderFunction) {
             return context.encoder(encoderFunction);
+        }
+
+        @Override
+        public <R> R escaper(ContextFunction<Escaper, R> escaperFunction) {
+            return context.escaper(escaperFunction);
         }
 
         @Override

@@ -1,6 +1,7 @@
 dependencies {
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
+    implementation(libs.commons.text)
     implementation("org.springframework:spring-context")
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-jackson")
@@ -15,7 +16,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
-    testImplementation("org.springframework.boot:spring-boot-jackson")
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:test:test-support"))
     testImplementation(libs.org.wiremock.wiremock)

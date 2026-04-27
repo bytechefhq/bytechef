@@ -54,6 +54,14 @@ public interface Context {
     <R> R encoder(ContextFunction<Encoder, R> encoderFunction);
 
     /**
+     *
+     * @param escaperFunction
+     * @return
+     * @param <R>
+     */
+    <R> R escaper(ContextFunction<Escaper, R> escaperFunction);
+
+    /**
      * @param fileFunction
      * @param <R>
      * @return
@@ -112,8 +120,6 @@ public interface Context {
      * @param <R>
      */
     <R> R xml(ContextFunction<Xml, R> xmlFunction);
-
-    <R> R escape(ContextFunction<Xml, R> escapeFunction);
 
     /**
      *
@@ -217,6 +223,19 @@ public interface Context {
          */
         String base64UrlEncode(String value);
 
+    }
+
+    /**
+     *
+     */
+    interface Escaper {
+
+        /**
+         *
+         * @param html
+         * @return
+         */
+        String escapeHtml(String html);
     }
 
     /**

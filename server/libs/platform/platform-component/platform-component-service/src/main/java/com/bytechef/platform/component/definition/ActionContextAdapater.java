@@ -57,6 +57,11 @@ public class ActionContextAdapater implements ActionContext {
     }
 
     @Override
+    public <R> R escaper(ContextFunction<Escaper, R> escaperFunction) {
+        return context.escaper(escaperFunction);
+    }
+
+    @Override
     public <R> R file(ContextFunction<File, R> fileFunction) {
         return context.file(fileFunction);
     }
