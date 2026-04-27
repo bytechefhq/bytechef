@@ -118,6 +118,10 @@ public class NotionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         Context context) {
 
+        if (!inputParameters.containsKey(ID)) {
+            return List.of();
+        }
+
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
         String databaseId = inputParameters.getRequiredString(ID);
 
@@ -216,6 +220,10 @@ public class NotionUtils {
     public static List<Option<String>> getDatabasePropertyOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(ID)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 

@@ -60,7 +60,7 @@ public class MondayGetBoardValuesAction {
                 .description("Select specific columns to return values for. If empty, all columns will be returned.")
                 .items(string())
                 .options((OptionsFunction<String>) MondayOptionUtils::getColumnIdOptions)
-                .optionsLookupDependsOn(WORKSPACE_ID, BOARD_ID)
+                .optionsLookupDependsOn(BOARD_ID)
                 .required(false))
         .output()
         .perform(MondayGetBoardValuesAction::perform);

@@ -289,6 +289,10 @@ public class GoogleCalendarUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(CALENDAR_ID)) {
+            return List.of();
+        }
+
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
         List<Event> events = getAllCalendarEvents(calendar, inputParameters.getRequiredString(CALENDAR_ID));
 

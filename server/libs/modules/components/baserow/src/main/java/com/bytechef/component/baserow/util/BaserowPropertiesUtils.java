@@ -53,6 +53,10 @@ public class BaserowPropertiesUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) {
 
+        if (!inputParameters.containsKey(TABLE_ID)) {
+            return List.of();
+        }
+
         List<Map<String, ?>> tableFields = BaserowUtils.getTableFields(
             context, inputParameters.getRequiredString(TABLE_ID));
 

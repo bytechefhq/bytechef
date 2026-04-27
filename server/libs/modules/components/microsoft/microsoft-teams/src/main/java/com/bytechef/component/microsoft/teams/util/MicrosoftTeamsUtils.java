@@ -126,6 +126,10 @@ public class MicrosoftTeamsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(TEAM_ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = context.http(http -> http.get(
             "/teams/" + inputParameters.getRequiredString(TEAM_ID) + "/channels"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

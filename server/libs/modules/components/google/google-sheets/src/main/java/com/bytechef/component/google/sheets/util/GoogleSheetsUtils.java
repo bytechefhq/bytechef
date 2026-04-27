@@ -96,6 +96,14 @@ public class GoogleSheetsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext actionContext) {
 
+        if (!inputParameters.containsKey(SPREADSHEET_ID) ||
+            !inputParameters.containsKey(SHEET_NAME) ||
+            !inputParameters.containsKey(UPDATE_WHOLE_ROW) ||
+            !inputParameters.containsKey(IS_THE_FIRST_ROW_HEADER)) {
+
+            return List.of();
+        }
+
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
         boolean updateWholeRow = inputParameters.getRequiredBoolean(UPDATE_WHOLE_ROW);
 
@@ -175,7 +183,10 @@ public class GoogleSheetsUtils {
     public static PropertiesFunction createPropertiesForNewRows(boolean insertOneRow) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
-            if (inputParameters.getString(SPREADSHEET_ID) == null || inputParameters.getString(SHEET_NAME) == null) {
+            if (!inputParameters.containsKey(SPREADSHEET_ID) ||
+                !inputParameters.containsKey(SHEET_NAME) ||
+                !inputParameters.containsKey(IS_THE_FIRST_ROW_HEADER)) {
+
                 return List.of();
             }
 
@@ -318,6 +329,10 @@ public class GoogleSheetsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
+        if (!inputParameters.containsKey(SPREADSHEET_ID)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
 
         List<Sheet> sheets = getSheets(inputParameters, connectionParameters);
@@ -334,6 +349,10 @@ public class GoogleSheetsUtils {
     public static List<Option<String>> getSheetNameOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(SPREADSHEET_ID)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 

@@ -51,6 +51,10 @@ public class NiftyUtils extends AbstractNiftyUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(PROJECT)) {
+            return List.of();
+        }
+
         return getAllOptions(
             context, "/taskgroups", "items",
             "project_id", inputParameters.getRequiredString(PROJECT), "archived", "false");

@@ -122,6 +122,10 @@ public class AITableUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) {
 
+        if (!inputParameters.containsKey(DATASHEET_ID)) {
+            return List.of();
+        }
+
         List<FieldTypeInfo> datasheetFields = createDatasheetFields(inputParameters, context);
 
         List<ValueProperty<?>> list = new ArrayList<>();
@@ -265,6 +269,10 @@ public class AITableUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
+        if (!inputParameters.containsKey(SPACE_ID)) {
+            return List.of();
+        }
+
         String spaceId = inputParameters.getRequiredString(SPACE_ID);
 
         Map<String, Object> body = context.http(http -> http.get("/spaces/" + spaceId + "/nodes"))
@@ -289,6 +297,10 @@ public class AITableUtils {
     public static List<Option<String>> getFieldNamesOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
+
+        if (!inputParameters.containsKey(DATASHEET_ID)) {
+            return List.of();
+        }
 
         String datasheetId = inputParameters.getRequiredString(DATASHEET_ID);
 

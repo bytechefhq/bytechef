@@ -49,6 +49,10 @@ public class AiImageUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
+        if (!inputParameters.containsKey(PROVIDER)) {
+            return List.of();
+        }
+
         Provider provider = Provider.valueOf(inputParameters.getRequiredString(PROVIDER));
 
         return switch (provider) {

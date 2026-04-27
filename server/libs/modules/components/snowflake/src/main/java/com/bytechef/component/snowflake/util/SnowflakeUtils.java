@@ -93,6 +93,10 @@ public class SnowflakeUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(DATABASE)) {
+            return List.of();
+        }
+
         List<Map<String, Object>> result = context
             .http(http -> http.get("/databases/%s/schemas".formatted(inputParameters.getRequiredString(DATABASE))))
             .configuration(responseType(ResponseType.JSON))
@@ -134,6 +138,10 @@ public class SnowflakeUtils {
     public static List<Option<String>> getTableNameOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(DATABASE) || !inputParameters.containsKey(SCHEMA)) {
+            return List.of();
+        }
 
         List<Map<String, Object>> result = context
             .http(http -> http.get(

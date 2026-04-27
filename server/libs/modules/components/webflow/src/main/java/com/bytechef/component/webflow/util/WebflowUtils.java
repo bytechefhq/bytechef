@@ -44,6 +44,10 @@ public class WebflowUtils extends AbstractWebflowUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(COLLECTION_ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = context
             .http(http -> http.get("/collections/" + inputParameters.getRequiredString(COLLECTION_ID) + "/items"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -67,6 +71,10 @@ public class WebflowUtils extends AbstractWebflowUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(SITE_ID)) {
+            return List.of();
+        }
+
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/collections"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -85,6 +93,10 @@ public class WebflowUtils extends AbstractWebflowUtils {
     public static List<Option<String>> getOrderIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(SITE_ID)) {
+            return List.of();
+        }
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/orders"))

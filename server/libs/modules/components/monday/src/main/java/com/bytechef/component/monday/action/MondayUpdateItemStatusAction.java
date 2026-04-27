@@ -64,13 +64,13 @@ public class MondayUpdateItemStatusAction {
                 .label("Column ID")
                 .description("Column ID.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getColumnStatusIdOptions)
-                .optionsLookupDependsOn(WORKSPACE_ID, BOARD_ID)
+                .optionsLookupDependsOn(BOARD_ID)
                 .required(true),
             string(ITEM_ID)
                 .label("Item ID")
                 .description("ID of the item to update.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getBoardItemsOptions)
-                .optionsLookupDependsOn(BOARD_ID, WORKSPACE_ID)
+                .optionsLookupDependsOn(BOARD_ID)
                 .required(true),
             string(STATUS)
                 .label("Status")

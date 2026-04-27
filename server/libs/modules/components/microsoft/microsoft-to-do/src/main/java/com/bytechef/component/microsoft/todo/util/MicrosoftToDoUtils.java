@@ -42,6 +42,10 @@ public class MicrosoftToDoUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(TASK_LIST_ID)) {
+            return List.of();
+        }
+
         Map<String, ?> body = context
             .http(http -> http.get(
                 "/me/todo/lists/%s/tasks".formatted(inputParameters.getRequiredString(TASK_LIST_ID))))

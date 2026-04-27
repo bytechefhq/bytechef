@@ -51,6 +51,10 @@ public class JiraOptionsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(PROJECT)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
 
         String nextPageToken = null;
@@ -84,6 +88,10 @@ public class JiraOptionsUtils {
     public static List<Option<String>> getIssueTypesIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(PROJECT)) {
+            return List.of();
+        }
 
         List<Object> body = context
             .http(http -> http.get("/issuetype/project"))
@@ -148,6 +156,10 @@ public class JiraOptionsUtils {
     public static List<Option<String>> getStatusIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(ISSUE_ID)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 

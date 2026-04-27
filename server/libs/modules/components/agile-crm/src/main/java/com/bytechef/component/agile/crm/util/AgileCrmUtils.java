@@ -45,6 +45,10 @@ public class AgileCrmUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(PIPELINE_ID)) {
+            return List.of();
+        }
+
         List<Map<String, Object>> tracks = getTrackList(context);
 
         String milestones = tracks.stream()

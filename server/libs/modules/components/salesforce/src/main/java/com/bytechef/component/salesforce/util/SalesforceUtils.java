@@ -87,6 +87,10 @@ public class SalesforceUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext actionContext) {
 
+        if (!inputParameters.containsKey(OBJECT)) {
+            return List.of();
+        }
+
         List<ValueProperty<?>> list = new ArrayList<>();
 
         String object = inputParameters.getRequiredString(OBJECT);
@@ -232,6 +236,10 @@ public class SalesforceUtils {
     public static List<Option<String>> getRecordIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext actionContext) {
+
+        if (!inputParameters.containsKey(OBJECT)) {
+            return List.of();
+        }
 
         String query = "SELECT Id FROM " + validateSoqlIdentifier(inputParameters.getRequiredString(OBJECT));
 
