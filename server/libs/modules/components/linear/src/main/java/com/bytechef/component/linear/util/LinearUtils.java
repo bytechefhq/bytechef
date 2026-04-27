@@ -220,9 +220,7 @@ public class LinearUtils {
             .getBody(new TypeReference<>() {});
     }
 
-    public static Object executeIssueTriggerQuery(
-        String requiredAction, WebhookBody body, TriggerContext context) {
-
+    public static Object executeIssueTriggerQuery(String requiredAction, WebhookBody body) {
         Map<String, Object> content = body.getContent(new TypeReference<>() {});
         String action = (String) content.get("action");
 

@@ -135,8 +135,8 @@ public class AirtableUtils extends AbstractAirtableUtils {
 
         List<FieldDefinition> fieldDefinitions = new ArrayList<>();
 
-        String baseId = inputParameters.getRequiredString("baseId");
-        String tableId = inputParameters.getRequiredString("tableId");
+        String baseId = inputParameters.getRequiredString(BASE_ID);
+        String tableId = inputParameters.getRequiredString(TABLE_ID);
         String url = "/meta/bases/%s/tables".formatted(baseId);
 
         Http.Response response = context.http(http -> http.get(url))

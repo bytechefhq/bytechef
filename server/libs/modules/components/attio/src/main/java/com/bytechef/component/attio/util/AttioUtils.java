@@ -373,6 +373,8 @@ public class AttioUtils {
 
     public static ModifiableValueProperty<?, ?> getDealRecord(boolean isNewRecord) {
         return object(DEALS)
+            .displayCondition("%s == '%s'".formatted(RECORD_TYPE, DEALS))
+            .required(true)
             .properties(
                 string("name")
                     .label("Deal Name")
@@ -410,6 +412,8 @@ public class AttioUtils {
 
     public static ModifiableValueProperty<?, ?> getUserRecord(boolean isNewRecord) {
         return object(USERS)
+            .displayCondition("%s == '%s'".formatted(RECORD_TYPE, USERS))
+            .required(true)
             .properties(
                 string("person")
                     .label("Person")
@@ -437,6 +441,8 @@ public class AttioUtils {
 
     public static ModifiableValueProperty<?, ?> getWorkspaceRecord(boolean isNewRecord) {
         return object(WORKSPACES)
+            .displayCondition("%s == '%s'".formatted(RECORD_TYPE, WORKSPACES))
+            .required(true)
             .properties(
                 string("workspace_id")
                     .label("Workspace ID")

@@ -74,6 +74,6 @@ public class LinearUpdatedIssueTrigger {
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
-        return executeIssueTriggerQuery("update", body, context);
+        return executeIssueTriggerQuery("update", body);
     }
 }

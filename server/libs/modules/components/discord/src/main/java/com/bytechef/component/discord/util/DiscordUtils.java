@@ -83,8 +83,8 @@ public class DiscordUtils extends AbstractDiscordUtils {
             return List.of();
         }
 
-        List<Map<String, ?>> body = context.http(http -> http
-            .get("/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/members"))
+        List<Map<String, ?>> body = context.http(
+            http -> http.get("/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/members"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .queryParameter("limit", "1000")
             .execute()
