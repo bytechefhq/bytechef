@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260427120000-1" author="Ivica Cardic">
+        <addColumn tableName="approval_task">
+            <column name="environment" type="INT"/>
+        </addColumn>
+
+        <update tableName="approval_task">
+            <column name="environment" valueNumeric="0"/>
+        </update>
+
+        <addNotNullConstraint tableName="approval_task" columnName="environment" columnDataType="INT"/>
+
+        <createIndex tableName="approval_task" indexName="idx_approval_task_environment">
+            <column name="environment"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
