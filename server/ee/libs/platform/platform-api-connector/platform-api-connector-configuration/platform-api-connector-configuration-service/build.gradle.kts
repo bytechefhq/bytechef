@@ -1,6 +1,6 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation("org.jsoup:jsoup:1.18.1")
+    implementation(libs.org.jsoup)
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.yaml:snakeyaml")
