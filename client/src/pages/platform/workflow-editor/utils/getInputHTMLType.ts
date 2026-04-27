@@ -10,6 +10,8 @@ export default function getInputHTMLType(controlType: string | undefined) {
             return 'datetime-local';
         case 'EMAIL':
             return 'email';
+        case 'INTEGER':
+            return 'number';
         case 'NUMBER':
             return 'text';
         case 'PASSWORD':
