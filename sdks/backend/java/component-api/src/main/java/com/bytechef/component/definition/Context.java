@@ -91,11 +91,11 @@ public interface Context {
 
     /**
      *
-     * @param mimeTypeContextFunction
+     * @param mimeTypeFunction
      * @return
      * @param <R>
      */
-    <R> R mimeType(ContextFunction<MimeType, R> mimeTypeContextFunction);
+    <R> R mimeType(ContextFunction<MimeType, R> mimeTypeFunction);
 
     /**
      *
