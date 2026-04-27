@@ -44,6 +44,7 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
         this.connectionLifecycleFacade = connectionLifecycleFacade;
     }
 
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     @Override
     protected void onAfterSave(AfterSaveEvent<Connection> afterSaveEvent) {
         Connection connection = afterSaveEvent.getEntity();
@@ -58,10 +59,6 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
         String tenantId = TenantContext.getCurrentTenantId();
 
         aggregateChange.forEachAction(dbAction -> {
-            if ((dbAction instanceof DbAction.InsertRoot<?>) || (dbAction instanceof DbAction.Insert<?>)) {
-                connectionLifecycleFacade.scheduleConnectionRefresh(
-                    connection.getId(), connection.getParameters(), tenantId);
-            }
             switch (dbAction) {
                 case DbAction.Insert<?> a ->
                     connectionLifecycleFacade.scheduleConnectionRefresh(
@@ -70,10 +67,18 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
                     connectionLifecycleFacade.scheduleConnectionRefresh(
                         connection.getId(), connection.getParameters(), tenantId);
                 case DbAction.UpdateRoot<?> a -> {
-                    if (connection.isCredentialsStatusUpdated()
-                        && (connection.getCredentialStatus() != Connection.CredentialStatus.INVALID)) {
-                        connectionLifecycleFacade.scheduleConnectionRefresh(
-                            connection.getId(), connection.getParameters(), tenantId);
+                    if (connection.isCredentialsStatusUpdated()) {
+                        return;
+                    }
+
+                    switch (connection.getCredentialStatus()) {
+                        case Connection.CredentialStatus.VALID ->
+                            connectionLifecycleFacade.scheduleConnectionRefresh(
+                                connection.getId(), connection.getParameters(), tenantId);
+                        case Connection.CredentialStatus.INVALID ->
+                            connectionLifecycleFacade.deleteScheduledConnectionRefresh(connection.getId(), tenantId);
+                        default -> {
+                        }
                     }
                 }
                 default -> {
