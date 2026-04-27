@@ -44,6 +44,15 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
         this.connectionLifecycleFacade = connectionLifecycleFacade;
     }
 
+    /**
+     * Checks weather connection requires refresh token flow. If method requires refresh token it will schedule token
+     * refresh for newly inserted only if credentialsStatus is @Connection.CredentialStatus.VALID. For updated
+     * connections if credentialStatus attribute was changed it schedules token refresh where new value credentialStatus
+     * is #Connection.CredentialStatus.VALID and deletes existing scheduled refresh token routine if
+     * #Connection.CredentialStatus.INVALID.
+     *
+     * @param afterSaveEvent will never be {@literal null}.
+     */
     @SuppressWarnings("PMD.UnusedLocalVariable")
     @Override
     protected void onAfterSave(AfterSaveEvent<Connection> afterSaveEvent) {
@@ -58,12 +67,14 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
         AggregateChange<Connection> aggregateChange = afterSaveEvent.getAggregateChange();
         String tenantId = TenantContext.getCurrentTenantId();
 
+        Connection.CredentialStatus credentialStatus = connection.getCredentialStatus();
+
         aggregateChange.forEachAction(dbAction -> {
             switch (dbAction) {
-                case DbAction.Insert<?> a ->
+                case DbAction.Insert<?> a when credentialStatus == Connection.CredentialStatus.VALID ->
                     connectionLifecycleFacade.scheduleConnectionRefresh(
                         connection.getId(), connection.getParameters(), tenantId);
-                case DbAction.InsertRoot<?> a ->
+                case DbAction.InsertRoot<?> a when credentialStatus == Connection.CredentialStatus.VALID ->
                     connectionLifecycleFacade.scheduleConnectionRefresh(
                         connection.getId(), connection.getParameters(), tenantId);
                 case DbAction.UpdateRoot<?> a -> {
@@ -71,7 +82,7 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
                         return;
                     }
 
-                    switch (connection.getCredentialStatus()) {
+                    switch (credentialStatus) {
                         case Connection.CredentialStatus.VALID ->
                             connectionLifecycleFacade.scheduleConnectionRefresh(
                                 connection.getId(), connection.getParameters(), tenantId);
