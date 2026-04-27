@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,10 +42,11 @@ public class AiAgentComponentHandler implements ComponentHandler {
     private final AiAgentComponentDefinition componentDefinition;
 
     public AiAgentComponentHandler(
-        ClusterElementDefinitionService clusterElementDefinitionService, AiAgentToolFacade aiAgentToolFacade) {
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager) {
 
         final ActionDefinition aiAgentChatActionDefinition =
-            AiAgentChatAction.of(clusterElementDefinitionService, aiAgentToolFacade);
+            AiAgentChatAction.of(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
@@ -54,7 +56,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
                     aiAgentChatActionDefinition,
-                    AiAgentStreamChatAction.of(clusterElementDefinitionService, aiAgentToolFacade))
+                    AiAgentStreamChatAction.of(clusterElementDefinitionService, aiAgentToolFacade, toolCallingManager))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));
     }
 

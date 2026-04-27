@@ -68,12 +68,15 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -91,12 +94,15 @@ public abstract class AbstractAiAgentChatAction {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final AiAgentToolFacade aiAgentToolFacade;
+    private final ToolCallingManager toolCallingManager;
 
     protected AbstractAiAgentChatAction(
-        ClusterElementDefinitionService clusterElementDefinitionService, AiAgentToolFacade aiAgentToolFacade) {
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager) {
 
-        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.aiAgentToolFacade = aiAgentToolFacade;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.toolCallingManager = toolCallingManager;
     }
 
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
@@ -340,8 +346,25 @@ public abstract class AbstractAiAgentChatAction {
             }
         }
 
-        chatMemoryResult.map(ChatMemoryFunction.Result::advisor)
-            .ifPresent(advisors::add);
+        // tool call
+
+        ToolCallAdvisor.Builder<?> toolCallAdvisorBuilder = ToolCallAdvisor.builder()
+            .toolCallingManager(toolCallingManager)
+            .advisorOrder(BaseAdvisor.HIGHEST_PRECEDENCE + 300);
+
+        // memory
+
+        Advisor chatMemoryAdvisor = chatMemoryResult
+            .map(ChatMemoryFunction.Result::advisor)
+            .orElse(null);
+
+        if (chatMemoryAdvisor != null) {
+            advisors.add(chatMemoryAdvisor);
+
+            toolCallAdvisorBuilder.disableInternalConversationHistory();
+        }
+
+        advisors.add(toolCallAdvisorBuilder.build());
 
         clusterElementMap.fetchClusterElement(RAG)
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
