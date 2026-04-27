@@ -17,6 +17,8 @@
 package com.bytechef.platform.scheduler.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
+import com.bytechef.platform.scheduler.QuartzConnectionRefreshScheduler;
 import com.bytechef.platform.scheduler.QuartzTriggerScheduler;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import org.quartz.Scheduler;
@@ -53,6 +55,11 @@ public class QuartzSchedulerConfiguration {
     @Bean
     JobFactory jobFactory() {
         return new AutowiringSpringBeanJobFactory();
+    }
+
+    @Bean
+    ConnectionRefreshScheduler quartzConnectionRefreshScheduler(@Lazy Scheduler scheduler) {
+        return new QuartzConnectionRefreshScheduler(scheduler);
     }
 
     @Bean

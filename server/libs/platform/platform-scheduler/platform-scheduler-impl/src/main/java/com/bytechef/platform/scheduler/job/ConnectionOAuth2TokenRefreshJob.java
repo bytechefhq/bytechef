@@ -18,7 +18,6 @@ package com.bytechef.platform.scheduler.job;
 
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.tenant.TenantContext;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -39,12 +38,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConnectionOAuth2TokenRefreshJob implements Job {
 
-    private final ConnectionFacade connectionFacade;
-
-    @SuppressFBWarnings("EI")
-    public ConnectionOAuth2TokenRefreshJob(ConnectionFacade connectionFacade) {
-        this.connectionFacade = connectionFacade;
-    }
+    private ConnectionFacade connectionFacade;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -74,5 +68,10 @@ public class ConnectionOAuth2TokenRefreshJob implements Job {
         } catch (SchedulerException e) {
             throw new JobExecutionException(e);
         }
+    }
+
+    @Autowired
+    public void setConnectionFacade(ConnectionFacade connectionFacade) {
+        this.connectionFacade = connectionFacade;
     }
 }
