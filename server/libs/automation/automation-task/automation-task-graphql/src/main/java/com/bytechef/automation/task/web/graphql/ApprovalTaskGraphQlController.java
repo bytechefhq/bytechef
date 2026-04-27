@@ -61,8 +61,8 @@ public class ApprovalTaskGraphQlController {
     }
 
     @QueryMapping
-    public List<ApprovalTask> approvalTasks() {
-        return approvalTaskService.getApprovalTasks();
+    public List<ApprovalTask> approvalTasks(@Argument Integer environmentId) {
+        return approvalTaskService.getApprovalTasks(environmentId);
     }
 
     @QueryMapping

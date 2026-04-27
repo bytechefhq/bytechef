@@ -19,7 +19,7 @@ package com.bytechef.component.approval.task.cluster;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
-import com.bytechef.automation.task.service.ApprovalTaskService;
+import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -30,18 +30,18 @@ import com.bytechef.component.definition.approval.ApprovalChannelFunction;
  */
 public class ApprovalTaskApprovalChannel {
 
-    public static ClusterElementDefinition<ApprovalChannelFunction> of(ApprovalTaskService approvalTaskService) {
+    public static ClusterElementDefinition<ApprovalChannelFunction> of(ApprovalTaskFacade approvalTaskFacade) {
         return ComponentDsl.<ApprovalChannelFunction>clusterElement("approvalTask")
             .title("Approval Task")
             .description("Sends an approval request via the Approval Task channel.")
             .type(APPROVAL_CHANNELS)
             .object(
                 () -> (inputParameters, connectionParameters, formUrl, context) -> perform(
-                    inputParameters, formUrl, approvalTaskService));
+                    inputParameters, formUrl, approvalTaskFacade));
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static Object perform(Parameters inputParameters, String formUrl, ApprovalTaskService approvalTaskService) {
+    private static Object perform(Parameters inputParameters, String formUrl, ApprovalTaskFacade approvalTaskFacade) {
         String jobResumeId = formUrl.substring(formUrl.lastIndexOf('/') + 1);
 
         ApprovalTask approvalTask = ApprovalTask.builder()
@@ -52,7 +52,7 @@ public class ApprovalTaskApprovalChannel {
             .priority(ApprovalTask.Priority.MEDIUM)
             .build();
 
-        approvalTaskService.create(approvalTask);
+        approvalTaskFacade.createApprovalTask(approvalTask);
 
         return null;
     }

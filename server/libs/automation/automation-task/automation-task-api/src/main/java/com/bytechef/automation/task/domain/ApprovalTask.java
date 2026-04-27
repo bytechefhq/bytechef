@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.task.domain;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -55,6 +56,9 @@ public final class ApprovalTask {
     private String jobResumeId;
 
     @Column
+    private int environment;
+
+    @Column
     private int status;
 
     @Column
@@ -90,13 +94,14 @@ public final class ApprovalTask {
 
     @PersistenceCreator
     public ApprovalTask(
-        Long id, String name, String description, String jobResumeId, int status, int priority, Long assigneeId,
-        Instant dueDate, int version) {
+        Long id, String name, String description, String jobResumeId, int environment, int status, int priority,
+        Long assigneeId, Instant dueDate, int version) {
 
         this.id = id;
         this.name = name;
         this.description = description;
         this.jobResumeId = jobResumeId;
+        this.environment = environment;
         this.status = status;
         this.priority = priority;
         this.assigneeId = assigneeId;
@@ -142,6 +147,20 @@ public final class ApprovalTask {
 
     public String getJobResumeId() {
         return jobResumeId;
+    }
+
+    public Environment getEnvironment() {
+        Environment[] environments = Environment.values();
+
+        if (environment < 0 || environment >= environments.length) {
+            throw new IllegalStateException("Invalid environment value: " + environment);
+        }
+
+        return environments[environment];
+    }
+
+    public long getEnvironmentId() {
+        return environment;
     }
 
     public Status getStatus() {
@@ -196,6 +215,12 @@ public final class ApprovalTask {
         this.jobResumeId = jobResumeId;
     }
 
+    public void setEnvironment(Environment environment) {
+        if (environment != null) {
+            this.environment = environment.ordinal();
+        }
+    }
+
     public void setStatus(Status status) {
         this.status = status == null ? Status.OPEN.ordinal() : status.ordinal();
     }
@@ -223,6 +248,7 @@ public final class ApprovalTask {
             ", name='" + name + '\'' +
             ", description='" + description + '\'' +
             ", jobResumeId='" + jobResumeId + '\'' +
+            ", environment=" + environment +
             ", status=" + status +
             ", priority=" + priority +
             ", assigneeId=" + assigneeId +
@@ -244,6 +270,7 @@ public final class ApprovalTask {
         private String name;
         private String description;
         private String jobResumeId;
+        private Environment environment;
         private Status status;
         private Priority priority;
         private Long assigneeId;
@@ -273,6 +300,12 @@ public final class ApprovalTask {
 
         public Builder jobResumeId(String jobResumeId) {
             this.jobResumeId = jobResumeId;
+
+            return this;
+        }
+
+        public Builder environment(Environment environment) {
+            this.environment = environment;
 
             return this;
         }
@@ -314,6 +347,7 @@ public final class ApprovalTask {
             approvalTask.name = this.name;
             approvalTask.description = this.description;
             approvalTask.jobResumeId = jobResumeId;
+            approvalTask.environment = environment == null ? 0 : environment.ordinal();
             approvalTask.status = status == null ? Status.OPEN.ordinal() : status.ordinal();
             approvalTask.priority = priority == null ? Priority.MEDIUM.ordinal() : priority.ordinal();
             approvalTask.assigneeId = assigneeId;

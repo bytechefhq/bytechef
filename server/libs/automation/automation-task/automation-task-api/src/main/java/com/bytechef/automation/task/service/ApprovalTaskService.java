@@ -39,6 +39,8 @@ public interface ApprovalTaskService {
 
     List<ApprovalTask> getApprovalTasks();
 
+    List<ApprovalTask> getApprovalTasks(Integer environmentId);
+
     List<ApprovalTask> getApprovalTasks(List<Long> ids);
 
     ApprovalTask update(ApprovalTask approvalTask);

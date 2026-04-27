@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.task.repository;
+package com.bytechef.automation.task.facade;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 /**
+ * Facade for cross-service approval task operations that span the task module and other domain services.
+ *
  * @author Ivica Cardic
  */
-@Repository
-public interface ApprovalTaskRepository extends CrudRepository<ApprovalTask, Long> {
+public interface ApprovalTaskFacade {
 
-    List<ApprovalTask> findAllByEnvironment(int environment);
-
-    Optional<ApprovalTask> findByJobResumeId(String jobResumeId);
-
-    Optional<ApprovalTask> findByNameIgnoreCase(String name);
+    /**
+     * Creates an approval task, deriving its {@code environment} from the deployment that owns the task's resume job
+     * (job → principal job → project deployment → environment). Falls back to {@code DEVELOPMENT} when the chain cannot
+     * be resolved.
+     *
+     * @param approvalTask the approval task to create; {@code jobResumeId} must be set
+     * @return the persisted approval task
+     */
+    ApprovalTask createApprovalTask(ApprovalTask approvalTask);
 }

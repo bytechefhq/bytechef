@@ -19,7 +19,7 @@ package com.bytechef.component.approval.task;
 import static com.bytechef.component.approval.task.constant.ApprovalTaskConstants.APPROVAL_TASK;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
-import com.bytechef.automation.task.service.ApprovalTaskService;
+import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.approval.task.action.ApproveAction;
 import com.bytechef.component.approval.task.cluster.ApprovalTaskApprovalChannel;
@@ -35,14 +35,14 @@ public class ApprovalTaskComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
 
-    public ApprovalTaskComponentHandler(ApprovalTaskService approvalTaskService) {
+    public ApprovalTaskComponentHandler(ApprovalTaskFacade approvalTaskFacade) {
         this.componentDefinition = component(APPROVAL_TASK)
             .title("Approval Task")
             .description("Approval Task component for manual approval workflows.")
             .icon("path:assets/approval-task.svg")
             .categories(ComponentCategory.HELPERS)
             .actions(ApproveAction.ACTION_DEFINITION)
-            .clusterElements(ApprovalTaskApprovalChannel.of(approvalTaskService));
+            .clusterElements(ApprovalTaskApprovalChannel.of(approvalTaskFacade));
     }
 
     @Override

@@ -84,6 +84,16 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ApprovalTask> getApprovalTasks(Integer environmentId) {
+        if (environmentId == null) {
+            return getApprovalTasks();
+        }
+
+        return approvalTaskRepository.findAllByEnvironment(environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ApprovalTask> getApprovalTasks(List<Long> ids) {
         return CollectionUtils.toList(approvalTaskRepository.findAllById(ids));
     }
