@@ -59,6 +59,11 @@ public class RemoteApprovalTaskServiceClient implements ApprovalTaskService {
     }
 
     @Override
+    public List<ApprovalTask> getApprovalTasks(Integer environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ApprovalTask> getApprovalTasks(List<Long> ids) {
         throw new UnsupportedOperationException();
     }
