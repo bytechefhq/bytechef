@@ -16,17 +16,12 @@
 
 package com.bytechef.component.attio.action;
 
-import static com.bytechef.component.attio.constant.AttioConstants.COMPANIES;
 import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.DATA;
-import static com.bytechef.component.attio.constant.AttioConstants.DEALS;
-import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
 import static com.bytechef.component.attio.constant.AttioConstants.PERSON_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_ID;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
-import static com.bytechef.component.attio.constant.AttioConstants.USERS;
 import static com.bytechef.component.attio.constant.AttioConstants.VALUES;
-import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
 import static com.bytechef.component.attio.util.AttioUtils.getDealRecord;
 import static com.bytechef.component.attio.util.AttioUtils.getRecordValues;
 import static com.bytechef.component.attio.util.AttioUtils.getUserRecord;
@@ -65,21 +60,11 @@ public class AttioUpdateRecordAction {
                 .optionsLookupDependsOn(RECORD_TYPE)
                 .options(AttioUtils.getTargetRecordIdOptions(RECORD_TYPE))
                 .required(true),
-            PERSON_RECORD
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, PEOPLE))
-                .required(true),
-            COMPANY_RECORD
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, COMPANIES))
-                .required(true),
-            getUserRecord(false)
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, USERS))
-                .required(true),
-            getDealRecord(false)
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, DEALS))
-                .required(true),
-            getWorkspaceRecord(false)
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, WORKSPACES))
-                .required(true))
+            PERSON_RECORD,
+            COMPANY_RECORD,
+            getUserRecord(false),
+            getDealRecord(false),
+            getWorkspaceRecord(false))
         .output()
         .perform(AttioUpdateRecordAction::perform);
 

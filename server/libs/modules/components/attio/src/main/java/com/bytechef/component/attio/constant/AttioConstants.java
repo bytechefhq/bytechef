@@ -76,6 +76,8 @@ public class AttioConstants {
 
     public static final ModifiableValueProperty<?, ?> COMPANY_RECORD = object(COMPANIES)
         .label("Company")
+        .displayCondition("%s == '%s'".formatted(RECORD_TYPE, COMPANIES))
+        .required(true)
         .properties(
             string("domains")
                 .label("Domain")
@@ -145,6 +147,8 @@ public class AttioConstants {
 
     public static final ModifiableValueProperty<?, ?> PERSON_RECORD = object(PEOPLE)
         .label("Person")
+        .displayCondition("%s == '%s'".formatted(RECORD_TYPE, PEOPLE))
+        .required(true)
         .properties(
             string("first_name")
                 .label("First Name")
