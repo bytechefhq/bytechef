@@ -1,5 +1,6 @@
 import {useUpdateApprovalTaskMutation} from '@/shared/middleware/graphql';
-import {MouseEvent, useCallback, useMemo, useState} from 'react';
+import {useQueryClient} from '@tanstack/react-query';
+import {MouseEvent, useCallback, useEffect, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useApprovalTasksStore} from '../../stores/useApprovalTasksStore';
@@ -41,6 +42,7 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
         hasActiveFilters,
         resetFilters,
         searchQuery,
+        selectedApprovalTaskId,
         setSearchQuery,
         setSelectedApprovalTaskId,
         updateApprovalTaskInStore,
@@ -51,11 +53,14 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
             hasActiveFilters: state.hasActiveFilters(),
             resetFilters: state.resetFilters,
             searchQuery: state.searchQuery,
+            selectedApprovalTaskId: state.selectedApprovalTaskId,
             setSearchQuery: state.setSearchQuery,
             setSelectedApprovalTaskId: state.setSelectedApprovalTaskId,
             updateApprovalTaskInStore: state.updateApprovalTask,
         }))
     );
+
+    const queryClient = useQueryClient();
 
     const updateApprovalTaskMutation = useUpdateApprovalTaskMutation();
 
@@ -137,6 +142,8 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
                 {
                     onError: () => {
                         updateApprovalTaskInStore(previous);
+
+                        queryClient.invalidateQueries({queryKey: ['approvalTasks']});
                     },
                     onSuccess: (data) => {
                         updateApprovalTaskInStore({
@@ -147,8 +154,17 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
                 }
             );
         },
-        [approvalTasks, updateApprovalTaskInStore, updateApprovalTaskMutation]
+        [approvalTasks, queryClient, updateApprovalTaskInStore, updateApprovalTaskMutation]
     );
+
+    useEffect(() => {
+        if (
+            selectedApprovalTaskId &&
+            !filteredApprovalTasks.some((approvalTask) => approvalTask.id === selectedApprovalTaskId)
+        ) {
+            setSelectedApprovalTaskId(null);
+        }
+    }, [filteredApprovalTasks, selectedApprovalTaskId, setSelectedApprovalTaskId]);
 
     return {
         emptyStateMessage,
