@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowTaskModel {
 
   private Boolean clusterRoot = false;
@@ -96,6 +96,7 @@ public class WorkflowTaskModel {
     return clusterRoot;
   }
 
+  @JsonProperty("clusterRoot")
   public void setClusterRoot(Boolean clusterRoot) {
     this.clusterRoot = clusterRoot;
   }
@@ -124,6 +125,7 @@ public class WorkflowTaskModel {
     return clusterElements;
   }
 
+  @JsonProperty("clusterElements")
   public void setClusterElements(Map<String, Object> clusterElements) {
     this.clusterElements = clusterElements;
   }
@@ -152,6 +154,7 @@ public class WorkflowTaskModel {
     return connections;
   }
 
+  @JsonProperty("connections")
   public void setConnections(List<@Valid ComponentConnectionModel> connections) {
     this.connections = connections;
   }
@@ -172,6 +175,7 @@ public class WorkflowTaskModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -200,6 +204,7 @@ public class WorkflowTaskModel {
     return finalize;
   }
 
+  @JsonProperty("finalize")
   public void setFinalize(List<@Valid WorkflowTaskModel> finalize) {
     this.finalize = finalize;
   }
@@ -220,6 +225,7 @@ public class WorkflowTaskModel {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -240,6 +246,7 @@ public class WorkflowTaskModel {
     return maxRetries;
   }
 
+  @JsonProperty("maxRetries")
   public void setMaxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
   }
@@ -268,6 +275,7 @@ public class WorkflowTaskModel {
     return metadata;
   }
 
+  @JsonProperty("metadata")
   public void setMetadata(Map<String, Object> metadata) {
     this.metadata = metadata;
   }
@@ -288,6 +296,7 @@ public class WorkflowTaskModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -308,6 +317,7 @@ public class WorkflowTaskModel {
     return node;
   }
 
+  @JsonProperty("node")
   public void setNode(@Nullable String node) {
     this.node = node;
   }
@@ -336,6 +346,7 @@ public class WorkflowTaskModel {
     return parameters;
   }
 
+  @JsonProperty("parameters")
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
@@ -364,6 +375,7 @@ public class WorkflowTaskModel {
     return post;
   }
 
+  @JsonProperty("post")
   public void setPost(List<@Valid WorkflowTaskModel> post) {
     this.post = post;
   }
@@ -392,6 +404,7 @@ public class WorkflowTaskModel {
     return pre;
   }
 
+  @JsonProperty("pre")
   public void setPre(List<@Valid WorkflowTaskModel> pre) {
     this.pre = pre;
   }
@@ -412,6 +425,7 @@ public class WorkflowTaskModel {
     return timeout;
   }
 
+  @JsonProperty("timeout")
   public void setTimeout(@Nullable String timeout) {
     this.timeout = timeout;
   }
@@ -432,6 +446,7 @@ public class WorkflowTaskModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(String type) {
     this.type = type;
   }
@@ -495,10 +510,7 @@ public class WorkflowTaskModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

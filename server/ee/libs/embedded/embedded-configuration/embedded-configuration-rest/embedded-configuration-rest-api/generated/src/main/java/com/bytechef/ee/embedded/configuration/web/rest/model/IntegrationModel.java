@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationModel {
 
   private String componentName;
@@ -101,6 +101,7 @@ public class IntegrationModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -121,6 +122,7 @@ public class IntegrationModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -141,6 +143,7 @@ public class IntegrationModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -161,6 +164,7 @@ public class IntegrationModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -181,6 +185,7 @@ public class IntegrationModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -201,6 +206,7 @@ public class IntegrationModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -221,6 +227,7 @@ public class IntegrationModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -241,6 +248,7 @@ public class IntegrationModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -261,6 +269,7 @@ public class IntegrationModel {
     return lastPublishedDate;
   }
 
+  @JsonProperty("lastPublishedDate")
   public void setLastPublishedDate(@Nullable OffsetDateTime lastPublishedDate) {
     this.lastPublishedDate = lastPublishedDate;
   }
@@ -281,6 +290,7 @@ public class IntegrationModel {
     return lastStatus;
   }
 
+  @JsonProperty("lastStatus")
   public void setLastStatus(@Nullable IntegrationStatusModel lastStatus) {
     this.lastStatus = lastStatus;
   }
@@ -301,6 +311,7 @@ public class IntegrationModel {
     return lastIntegrationVersion;
   }
 
+  @JsonProperty("lastIntegrationVersion")
   public void setLastIntegrationVersion(@Nullable Integer lastIntegrationVersion) {
     this.lastIntegrationVersion = lastIntegrationVersion;
   }
@@ -321,6 +332,7 @@ public class IntegrationModel {
     return multipleInstances;
   }
 
+  @JsonProperty("multipleInstances")
   public void setMultipleInstances(Boolean multipleInstances) {
     this.multipleInstances = multipleInstances;
   }
@@ -341,6 +353,7 @@ public class IntegrationModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(@Nullable String name) {
     this.name = name;
   }
@@ -361,6 +374,7 @@ public class IntegrationModel {
     return category;
   }
 
+  @JsonProperty("category")
   public void setCategory(@Nullable CategoryModel category) {
     this.category = category;
   }
@@ -389,6 +403,7 @@ public class IntegrationModel {
     return integrationWorkflowIds;
   }
 
+  @JsonProperty("integrationWorkflowIds")
   public void setIntegrationWorkflowIds(List<Long> integrationWorkflowIds) {
     this.integrationWorkflowIds = integrationWorkflowIds;
   }
@@ -417,6 +432,7 @@ public class IntegrationModel {
     return tags;
   }
 
+  @JsonProperty("tags")
   public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
@@ -437,6 +453,7 @@ public class IntegrationModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -503,11 +520,8 @@ public class IntegrationModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

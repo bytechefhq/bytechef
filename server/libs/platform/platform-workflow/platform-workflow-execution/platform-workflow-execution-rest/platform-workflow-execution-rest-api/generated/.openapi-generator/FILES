@@ -1,8 +1,11 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/ApiUtil.java
+src/main/java/com/bytechef/platform/workflow/execution/web/rest/ApprovalFormApi.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/JobApi.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/TriggerExecutionApi.java
+src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/ApprovalFormInputModel.java
+src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/ApprovalFormModel.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/ExecutionErrorModel.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/JobBasicModel.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/JobConnectionModel.java

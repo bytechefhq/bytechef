@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestExecution", description = "Contains information about test execution of a workflow.")
 @JsonTypeName("WorkflowTestExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.583998+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.897759+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowTestExecutionModel {
 
   private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
@@ -45,6 +45,7 @@ public class WorkflowTestExecutionModel {
     return job;
   }
 
+  @JsonProperty("job")
   public void setJob(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
     this.job = job;
   }
@@ -65,6 +66,7 @@ public class WorkflowTestExecutionModel {
     return triggerExecution;
   }
 
+  @JsonProperty("triggerExecution")
   public void setTriggerExecution(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
   }
@@ -102,10 +104,7 @@ public class WorkflowTestExecutionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

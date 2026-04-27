@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class NumberPropertyModel extends ValuePropertyModel {
 
   private @Nullable Double defaultValue;
@@ -83,6 +83,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return defaultValue;
   }
 
+  @JsonProperty("defaultValue")
   public void setDefaultValue(@Nullable Double defaultValue) {
     this.defaultValue = defaultValue;
   }
@@ -103,6 +104,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return exampleValue;
   }
 
+  @JsonProperty("exampleValue")
   public void setExampleValue(@Nullable Double exampleValue) {
     this.exampleValue = exampleValue;
   }
@@ -123,6 +125,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return maxNumberPrecision;
   }
 
+  @JsonProperty("maxNumberPrecision")
   public void setMaxNumberPrecision(@Nullable Integer maxNumberPrecision) {
     this.maxNumberPrecision = maxNumberPrecision;
   }
@@ -143,6 +146,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return maxValue;
   }
 
+  @JsonProperty("maxValue")
   public void setMaxValue(@Nullable Double maxValue) {
     this.maxValue = maxValue;
   }
@@ -163,6 +167,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return minNumberPrecision;
   }
 
+  @JsonProperty("minNumberPrecision")
   public void setMinNumberPrecision(@Nullable Integer minNumberPrecision) {
     this.minNumberPrecision = minNumberPrecision;
   }
@@ -183,6 +188,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return minValue;
   }
 
+  @JsonProperty("minValue")
   public void setMinValue(@Nullable Double minValue) {
     this.minValue = minValue;
   }
@@ -203,6 +209,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return numberPrecision;
   }
 
+  @JsonProperty("numberPrecision")
   public void setNumberPrecision(@Nullable Integer numberPrecision) {
     this.numberPrecision = numberPrecision;
   }
@@ -231,6 +238,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return options;
   }
 
+  @JsonProperty("options")
   public void setOptions(List<@Valid OptionModel> options) {
     this.options = options;
   }
@@ -251,6 +259,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
     return optionsDataSource;
   }
 
+  @JsonProperty("optionsDataSource")
   public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
@@ -359,10 +368,7 @@ public class NumberPropertyModel extends ValuePropertyModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private @Nullable String header;
@@ -63,6 +63,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
     return header;
   }
 
+  @JsonProperty("header")
   public void setHeader(@Nullable String header) {
     this.header = header;
   }
@@ -83,6 +84,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
     return propertiesDataSource;
   }
 
+  @JsonProperty("propertiesDataSource")
   public void setPropertiesDataSource(@Nullable PropertiesDataSourceModel propertiesDataSource) {
     this.propertiesDataSource = propertiesDataSource;
   }
@@ -162,10 +164,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

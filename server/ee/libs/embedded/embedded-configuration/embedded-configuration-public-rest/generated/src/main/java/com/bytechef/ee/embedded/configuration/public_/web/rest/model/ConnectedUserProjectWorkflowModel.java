@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable String description;
@@ -53,6 +53,7 @@ public class ConnectedUserProjectWorkflowModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -73,6 +74,7 @@ public class ConnectedUserProjectWorkflowModel {
     return definition;
   }
 
+  @JsonProperty("definition")
   public void setDefinition(@Nullable String definition) {
     this.definition = definition;
   }
@@ -93,6 +95,7 @@ public class ConnectedUserProjectWorkflowModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
@@ -113,6 +116,7 @@ public class ConnectedUserProjectWorkflowModel {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -133,6 +137,7 @@ public class ConnectedUserProjectWorkflowModel {
     return workflowUuid;
   }
 
+  @JsonProperty("workflowUuid")
   public void setWorkflowUuid(@Nullable String workflowUuid) {
     this.workflowUuid = workflowUuid;
   }
@@ -153,6 +158,7 @@ public class ConnectedUserProjectWorkflowModel {
     return workflowVersion;
   }
 
+  @JsonProperty("workflowVersion")
   public void setWorkflowVersion(@Nullable Integer workflowVersion) {
     this.workflowVersion = workflowVersion;
   }
@@ -198,10 +204,7 @@ public class ConnectedUserProjectWorkflowModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

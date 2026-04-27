@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowTestConfigurationModel {
 
   @Valid
@@ -90,6 +90,7 @@ public class WorkflowTestConfigurationModel {
     return connections;
   }
 
+  @JsonProperty("connections")
   public void setConnections(List<@Valid WorkflowTestConfigurationConnectionModel> connections) {
     this.connections = connections;
   }
@@ -110,6 +111,7 @@ public class WorkflowTestConfigurationModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -130,6 +132,7 @@ public class WorkflowTestConfigurationModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -150,6 +153,7 @@ public class WorkflowTestConfigurationModel {
     return environmentId;
   }
 
+  @JsonProperty("environmentId")
   public void setEnvironmentId(Long environmentId) {
     this.environmentId = environmentId;
   }
@@ -178,6 +182,7 @@ public class WorkflowTestConfigurationModel {
     return inputs;
   }
 
+  @JsonProperty("inputs")
   public void setInputs(Map<String, String> inputs) {
     this.inputs = inputs;
   }
@@ -198,6 +203,7 @@ public class WorkflowTestConfigurationModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -218,6 +224,7 @@ public class WorkflowTestConfigurationModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -238,6 +245,7 @@ public class WorkflowTestConfigurationModel {
     return workflowId;
   }
 
+  @JsonProperty("workflowId")
   public void setWorkflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
   }
@@ -258,6 +266,7 @@ public class WorkflowTestConfigurationModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -309,10 +318,7 @@ public class WorkflowTestConfigurationModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

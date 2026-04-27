@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectGitConfiguration", description = "The git configuration.")
 @JsonTypeName("ProjectGitConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.373213+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.883829+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ProjectGitConfigurationModel {
 
   private Long projectId;
@@ -74,6 +74,7 @@ public class ProjectGitConfigurationModel {
     return projectId;
   }
 
+  @JsonProperty("projectId")
   public void setProjectId(Long projectId) {
     this.projectId = projectId;
   }
@@ -94,6 +95,7 @@ public class ProjectGitConfigurationModel {
     return branch;
   }
 
+  @JsonProperty("branch")
   public void setBranch(String branch) {
     this.branch = branch;
   }
@@ -114,6 +116,7 @@ public class ProjectGitConfigurationModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
   }
@@ -134,6 +137,7 @@ public class ProjectGitConfigurationModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -154,6 +158,7 @@ public class ProjectGitConfigurationModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -174,6 +179,7 @@ public class ProjectGitConfigurationModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -194,6 +200,7 @@ public class ProjectGitConfigurationModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -214,6 +221,7 @@ public class ProjectGitConfigurationModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -262,11 +270,8 @@ public class ProjectGitConfigurationModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

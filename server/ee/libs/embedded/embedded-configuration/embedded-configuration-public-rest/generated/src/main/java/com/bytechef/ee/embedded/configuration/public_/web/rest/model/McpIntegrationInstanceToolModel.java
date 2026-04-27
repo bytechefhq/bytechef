@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "McpIntegrationInstanceTool", description = "Contains user configurations for the execution of a particular MCP tool.")
 @JsonTypeName("McpIntegrationInstanceTool")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class McpIntegrationInstanceToolModel {
 
   private Boolean enabled;
@@ -57,6 +57,7 @@ public class McpIntegrationInstanceToolModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
   }
@@ -77,6 +78,7 @@ public class McpIntegrationInstanceToolModel {
     return mcpToolId;
   }
 
+  @JsonProperty("mcpToolId")
   public void setMcpToolId(Long mcpToolId) {
     this.mcpToolId = mcpToolId;
   }
@@ -114,10 +116,7 @@ public class McpIntegrationInstanceToolModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegerProperty", description = "An integer property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegerPropertyModel extends ValuePropertyModel {
 
   private @Nullable Long defaultValue;
@@ -77,6 +77,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     return defaultValue;
   }
 
+  @JsonProperty("defaultValue")
   public void setDefaultValue(@Nullable Long defaultValue) {
     this.defaultValue = defaultValue;
   }
@@ -97,6 +98,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     return exampleValue;
   }
 
+  @JsonProperty("exampleValue")
   public void setExampleValue(@Nullable Long exampleValue) {
     this.exampleValue = exampleValue;
   }
@@ -117,6 +119,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     return maxValue;
   }
 
+  @JsonProperty("maxValue")
   public void setMaxValue(@Nullable Long maxValue) {
     this.maxValue = maxValue;
   }
@@ -137,6 +140,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     return minValue;
   }
 
+  @JsonProperty("minValue")
   public void setMinValue(@Nullable Long minValue) {
     this.minValue = minValue;
   }
@@ -165,6 +169,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     return options;
   }
 
+  @JsonProperty("options")
   public void setOptions(List<@Valid OptionModel> options) {
     this.options = options;
   }
@@ -185,6 +190,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     return optionsDataSource;
   }
 
+  @JsonProperty("optionsDataSource")
   public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
@@ -287,10 +293,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

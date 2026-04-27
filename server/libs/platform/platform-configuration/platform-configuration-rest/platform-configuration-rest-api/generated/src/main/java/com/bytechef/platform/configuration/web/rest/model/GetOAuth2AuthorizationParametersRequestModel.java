@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "getOAuth2AuthorizationParameters_request", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("getOAuth2AuthorizationParameters_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class GetOAuth2AuthorizationParametersRequestModel {
 
   private AuthorizationTypeModel authorizationType;
@@ -67,6 +67,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     return authorizationType;
   }
 
+  @JsonProperty("authorizationType")
   public void setAuthorizationType(AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
@@ -87,6 +88,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -107,6 +109,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     return connectionVersion;
   }
 
+  @JsonProperty("connectionVersion")
   public void setConnectionVersion(@Nullable Integer connectionVersion) {
     this.connectionVersion = connectionVersion;
   }
@@ -135,6 +138,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     return parameters;
   }
 
+  @JsonProperty("parameters")
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
@@ -176,10 +180,7 @@ public class GetOAuth2AuthorizationParametersRequestModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

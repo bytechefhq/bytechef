@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration for a particular service represented by component.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationBasicModel {
 
   private String componentName;
@@ -75,6 +75,7 @@ public class IntegrationBasicModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -95,6 +96,7 @@ public class IntegrationBasicModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -115,6 +117,7 @@ public class IntegrationBasicModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(String icon) {
     this.icon = icon;
   }
@@ -135,6 +138,7 @@ public class IntegrationBasicModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -163,6 +167,7 @@ public class IntegrationBasicModel {
     return integrationInstances;
   }
 
+  @JsonProperty("integrationInstances")
   public void setIntegrationInstances(List<@Valid IntegrationInstanceModel> integrationInstances) {
     this.integrationInstances = integrationInstances;
   }
@@ -183,6 +188,7 @@ public class IntegrationBasicModel {
     return integrationVersion;
   }
 
+  @JsonProperty("integrationVersion")
   public void setIntegrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
   }
@@ -203,6 +209,7 @@ public class IntegrationBasicModel {
     return multipleInstances;
   }
 
+  @JsonProperty("multipleInstances")
   public void setMultipleInstances(Boolean multipleInstances) {
     this.multipleInstances = multipleInstances;
   }
@@ -223,6 +230,7 @@ public class IntegrationBasicModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(@Nullable String name) {
     this.name = name;
   }
@@ -272,10 +280,7 @@ public class IntegrationBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -36,7 +36,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -124,6 +124,7 @@ public class ComponentDefinitionModel {
     return actionClusterElementTypes;
   }
 
+  @JsonProperty("actionClusterElementTypes")
   public void setActionClusterElementTypes(Map<String, List<String>> actionClusterElementTypes) {
     this.actionClusterElementTypes = actionClusterElementTypes;
   }
@@ -152,6 +153,7 @@ public class ComponentDefinitionModel {
     return actions;
   }
 
+  @JsonProperty("actions")
   public void setActions(List<@Valid ActionDefinitionBasicModel> actions) {
     this.actions = actions;
   }
@@ -172,6 +174,7 @@ public class ComponentDefinitionModel {
     return clusterElement;
   }
 
+  @JsonProperty("clusterElement")
   public void setClusterElement(Boolean clusterElement) {
     this.clusterElement = clusterElement;
   }
@@ -200,6 +203,7 @@ public class ComponentDefinitionModel {
     return clusterElementClusterElementTypes;
   }
 
+  @JsonProperty("clusterElementClusterElementTypes")
   public void setClusterElementClusterElementTypes(Map<String, List<String>> clusterElementClusterElementTypes) {
     this.clusterElementClusterElementTypes = clusterElementClusterElementTypes;
   }
@@ -228,6 +232,7 @@ public class ComponentDefinitionModel {
     return clusterElements;
   }
 
+  @JsonProperty("clusterElements")
   public void setClusterElements(List<@Valid ClusterElementDefinitionBasicModel> clusterElements) {
     this.clusterElements = clusterElements;
   }
@@ -256,6 +261,7 @@ public class ComponentDefinitionModel {
     return clusterElementTypes;
   }
 
+  @JsonProperty("clusterElementTypes")
   public void setClusterElementTypes(List<@Valid ClusterElementTypeModel> clusterElementTypes) {
     this.clusterElementTypes = clusterElementTypes;
   }
@@ -276,6 +282,7 @@ public class ComponentDefinitionModel {
     return clusterRoot;
   }
 
+  @JsonProperty("clusterRoot")
   public void setClusterRoot(Boolean clusterRoot) {
     this.clusterRoot = clusterRoot;
   }
@@ -304,6 +311,7 @@ public class ComponentDefinitionModel {
     return componentCategories;
   }
 
+  @JsonProperty("componentCategories")
   public void setComponentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
     this.componentCategories = componentCategories;
   }
@@ -324,6 +332,7 @@ public class ComponentDefinitionModel {
     return connection;
   }
 
+  @JsonProperty("connection")
   public void setConnection(@Nullable ConnectionDefinitionBasicModel connection) {
     this.connection = connection;
   }
@@ -344,6 +353,7 @@ public class ComponentDefinitionModel {
     return connectionRequired;
   }
 
+  @JsonProperty("connectionRequired")
   public void setConnectionRequired(Boolean connectionRequired) {
     this.connectionRequired = connectionRequired;
   }
@@ -364,6 +374,7 @@ public class ComponentDefinitionModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -384,6 +395,7 @@ public class ComponentDefinitionModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -404,6 +416,7 @@ public class ComponentDefinitionModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -424,6 +437,7 @@ public class ComponentDefinitionModel {
     return resources;
   }
 
+  @JsonProperty("resources")
   public void setResources(@Nullable ResourcesModel resources) {
     this.resources = resources;
   }
@@ -452,6 +466,7 @@ public class ComponentDefinitionModel {
     return tags;
   }
 
+  @JsonProperty("tags")
   public void setTags(List<String> tags) {
     this.tags = tags;
   }
@@ -472,6 +487,7 @@ public class ComponentDefinitionModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -500,6 +516,7 @@ public class ComponentDefinitionModel {
     return triggers;
   }
 
+  @JsonProperty("triggers")
   public void setTriggers(List<@Valid TriggerDefinitionBasicModel> triggers) {
     this.triggers = triggers;
   }
@@ -520,6 +537,7 @@ public class ComponentDefinitionModel {
     return unifiedApiCategory;
   }
 
+  @JsonProperty("unifiedApiCategory")
   public void setUnifiedApiCategory(@Nullable UnifiedApiCategoryModel unifiedApiCategory) {
     this.unifiedApiCategory = unifiedApiCategory;
   }
@@ -540,6 +558,7 @@ public class ComponentDefinitionModel {
     return version;
   }
 
+  @JsonProperty("version")
   public void setVersion(Integer version) {
     this.version = version;
   }
@@ -611,10 +630,7 @@ public class ComponentDefinitionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

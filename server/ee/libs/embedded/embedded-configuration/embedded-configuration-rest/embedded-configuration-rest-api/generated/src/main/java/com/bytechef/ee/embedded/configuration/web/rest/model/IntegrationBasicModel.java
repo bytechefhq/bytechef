@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationBasicModel {
 
   private String componentName;
@@ -86,6 +86,7 @@ public class IntegrationBasicModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -106,6 +107,7 @@ public class IntegrationBasicModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -126,6 +128,7 @@ public class IntegrationBasicModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -146,6 +149,7 @@ public class IntegrationBasicModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -166,6 +170,7 @@ public class IntegrationBasicModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -186,6 +191,7 @@ public class IntegrationBasicModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -206,6 +212,7 @@ public class IntegrationBasicModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -226,6 +233,7 @@ public class IntegrationBasicModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -246,6 +254,7 @@ public class IntegrationBasicModel {
     return lastPublishedDate;
   }
 
+  @JsonProperty("lastPublishedDate")
   public void setLastPublishedDate(@Nullable OffsetDateTime lastPublishedDate) {
     this.lastPublishedDate = lastPublishedDate;
   }
@@ -266,6 +275,7 @@ public class IntegrationBasicModel {
     return lastStatus;
   }
 
+  @JsonProperty("lastStatus")
   public void setLastStatus(@Nullable IntegrationStatusModel lastStatus) {
     this.lastStatus = lastStatus;
   }
@@ -286,6 +296,7 @@ public class IntegrationBasicModel {
     return lastIntegrationVersion;
   }
 
+  @JsonProperty("lastIntegrationVersion")
   public void setLastIntegrationVersion(@Nullable Integer lastIntegrationVersion) {
     this.lastIntegrationVersion = lastIntegrationVersion;
   }
@@ -306,6 +317,7 @@ public class IntegrationBasicModel {
     return multipleInstances;
   }
 
+  @JsonProperty("multipleInstances")
   public void setMultipleInstances(Boolean multipleInstances) {
     this.multipleInstances = multipleInstances;
   }
@@ -326,6 +338,7 @@ public class IntegrationBasicModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(@Nullable String name) {
     this.name = name;
   }
@@ -384,11 +397,8 @@ public class IntegrationBasicModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

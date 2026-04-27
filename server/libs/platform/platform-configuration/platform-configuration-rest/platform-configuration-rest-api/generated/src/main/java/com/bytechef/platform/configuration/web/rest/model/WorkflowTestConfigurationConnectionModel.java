@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfigurationConnection", description = "The connection used in a particular action task or trigger.")
 @JsonTypeName("WorkflowTestConfigurationConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowTestConfigurationConnectionModel {
 
   private Long connectionId;
@@ -60,6 +60,7 @@ public class WorkflowTestConfigurationConnectionModel {
     return connectionId;
   }
 
+  @JsonProperty("connectionId")
   public void setConnectionId(Long connectionId) {
     this.connectionId = connectionId;
   }
@@ -80,6 +81,7 @@ public class WorkflowTestConfigurationConnectionModel {
     return workflowConnectionKey;
   }
 
+  @JsonProperty("workflowConnectionKey")
   public void setWorkflowConnectionKey(String workflowConnectionKey) {
     this.workflowConnectionKey = workflowConnectionKey;
   }
@@ -100,6 +102,7 @@ public class WorkflowTestConfigurationConnectionModel {
     return workflowNodeName;
   }
 
+  @JsonProperty("workflowNodeName")
   public void setWorkflowNodeName(String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
   }
@@ -139,10 +142,7 @@ public class WorkflowTestConfigurationConnectionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeployment", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectDeployment")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.674883+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.095260+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ProjectDeploymentModel {
 
   private @Nullable String createdBy;
@@ -96,6 +96,7 @@ public class ProjectDeploymentModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -116,6 +117,7 @@ public class ProjectDeploymentModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -136,6 +138,7 @@ public class ProjectDeploymentModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -156,6 +159,7 @@ public class ProjectDeploymentModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
@@ -176,6 +180,7 @@ public class ProjectDeploymentModel {
     return environmentId;
   }
 
+  @JsonProperty("environmentId")
   public void setEnvironmentId(@Nullable Long environmentId) {
     this.environmentId = environmentId;
   }
@@ -196,6 +201,7 @@ public class ProjectDeploymentModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -216,6 +222,7 @@ public class ProjectDeploymentModel {
     return lastExecutionDate;
   }
 
+  @JsonProperty("lastExecutionDate")
   public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
@@ -236,6 +243,7 @@ public class ProjectDeploymentModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -256,6 +264,7 @@ public class ProjectDeploymentModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -276,6 +285,7 @@ public class ProjectDeploymentModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -296,6 +306,7 @@ public class ProjectDeploymentModel {
     return projectId;
   }
 
+  @JsonProperty("projectId")
   public void setProjectId(@Nullable Long projectId) {
     this.projectId = projectId;
   }
@@ -316,6 +327,7 @@ public class ProjectDeploymentModel {
     return projectVersion;
   }
 
+  @JsonProperty("projectVersion")
   public void setProjectVersion(@Nullable Integer projectVersion) {
     this.projectVersion = projectVersion;
   }
@@ -336,6 +348,7 @@ public class ProjectDeploymentModel {
     return project;
   }
 
+  @JsonProperty("project")
   public void setProject(@Nullable Object project) {
     this.project = project;
   }
@@ -364,6 +377,7 @@ public class ProjectDeploymentModel {
     return projectDeploymentWorkflows;
   }
 
+  @JsonProperty("projectDeploymentWorkflows")
   public void setProjectDeploymentWorkflows(List<@Valid ProjectDeploymentWorkflowModel> projectDeploymentWorkflows) {
     this.projectDeploymentWorkflows = projectDeploymentWorkflows;
   }
@@ -392,6 +406,7 @@ public class ProjectDeploymentModel {
     return tags;
   }
 
+  @JsonProperty("tags")
   public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
@@ -412,6 +427,7 @@ public class ProjectDeploymentModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -477,10 +493,7 @@ public class ProjectDeploymentModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

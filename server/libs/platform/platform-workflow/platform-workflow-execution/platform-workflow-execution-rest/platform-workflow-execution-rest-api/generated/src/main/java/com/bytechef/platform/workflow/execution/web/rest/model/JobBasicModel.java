@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.584140+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.371326+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class JobBasicModel {
 
   private @Nullable String createdBy;
@@ -129,6 +129,7 @@ public class JobBasicModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -149,6 +150,7 @@ public class JobBasicModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -169,6 +171,7 @@ public class JobBasicModel {
     return endDate;
   }
 
+  @JsonProperty("endDate")
   public void setEndDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
   }
@@ -189,6 +192,7 @@ public class JobBasicModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable String id) {
     this.id = id;
   }
@@ -209,6 +213,7 @@ public class JobBasicModel {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -229,6 +234,7 @@ public class JobBasicModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -249,6 +255,7 @@ public class JobBasicModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -277,6 +284,7 @@ public class JobBasicModel {
     return metadata;
   }
 
+  @JsonProperty("metadata")
   public void setMetadata(Map<String, Object> metadata) {
     this.metadata = metadata;
   }
@@ -297,6 +305,7 @@ public class JobBasicModel {
     return priority;
   }
 
+  @JsonProperty("priority")
   public void setPriority(Integer priority) {
     this.priority = priority;
   }
@@ -317,6 +326,7 @@ public class JobBasicModel {
     return startDate;
   }
 
+  @JsonProperty("startDate")
   public void setStartDate(OffsetDateTime startDate) {
     this.startDate = startDate;
   }
@@ -337,6 +347,7 @@ public class JobBasicModel {
     return status;
   }
 
+  @JsonProperty("status")
   public void setStatus(StatusEnum status) {
     this.status = status;
   }
@@ -357,6 +368,7 @@ public class JobBasicModel {
     return workflowId;
   }
 
+  @JsonProperty("workflowId")
   public void setWorkflowId(@Nullable String workflowId) {
     this.workflowId = workflowId;
   }
@@ -414,10 +426,7 @@ public class JobBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

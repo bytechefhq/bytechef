@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AiProvider", description = "An AI provider.")
 @JsonTypeName("AiProvider")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.379479+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.893261+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class AiProviderModel {
 
   private @Nullable Integer id;
@@ -62,6 +62,7 @@ public class AiProviderModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Integer id) {
     this.id = id;
   }
@@ -82,6 +83,7 @@ public class AiProviderModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -102,6 +104,7 @@ public class AiProviderModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -122,6 +125,7 @@ public class AiProviderModel {
     return apiKey;
   }
 
+  @JsonProperty("apiKey")
   public void setApiKey(@Nullable String apiKey) {
     this.apiKey = apiKey;
   }
@@ -142,6 +146,7 @@ public class AiProviderModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
@@ -184,11 +189,8 @@ public class AiProviderModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

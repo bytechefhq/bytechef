@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("phones_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.707409+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.846934+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class PhonesInnerModel {
 
   private JsonNullable<String> phoneNumber = JsonNullable.<String>undefined();
@@ -96,6 +96,7 @@ public class PhonesInnerModel {
     return phoneNumber;
   }
 
+  @JsonProperty("phoneNumber")
   public void setPhoneNumber(JsonNullable<String> phoneNumber) {
     this.phoneNumber = phoneNumber;
   }
@@ -116,6 +117,7 @@ public class PhonesInnerModel {
     return phoneNumberType;
   }
 
+  @JsonProperty("phoneNumberType")
   public void setPhoneNumberType(PhoneNumberTypeEnum phoneNumberType) {
     this.phoneNumberType = phoneNumberType;
   }
@@ -152,11 +154,8 @@ public class PhonesInnerModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

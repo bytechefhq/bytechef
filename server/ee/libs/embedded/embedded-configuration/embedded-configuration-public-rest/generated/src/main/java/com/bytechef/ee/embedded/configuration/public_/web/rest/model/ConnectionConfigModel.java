@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionConfig", description = "The connection configuration")
 @JsonTypeName("ConnectionConfig")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ConnectionConfigModel {
 
   private @Nullable AuthorizationTypeModel authorizationType;
@@ -55,6 +55,7 @@ public class ConnectionConfigModel {
     return authorizationType;
   }
 
+  @JsonProperty("authorizationType")
   public void setAuthorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
@@ -83,6 +84,7 @@ public class ConnectionConfigModel {
     return inputs;
   }
 
+  @JsonProperty("inputs")
   public void setInputs(List<@Valid InputModel> inputs) {
     this.inputs = inputs;
   }
@@ -103,6 +105,7 @@ public class ConnectionConfigModel {
     return oauth2;
   }
 
+  @JsonProperty("oauth2")
   public void setOauth2(@Nullable OAuth2Model oauth2) {
     this.oauth2 = oauth2;
   }
@@ -142,10 +145,7 @@ public class ConnectionConfigModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

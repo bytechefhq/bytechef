@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerExecution", description = "Adds execution semantics to a trigger.")
 @JsonTypeName("TriggerExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.584140+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.371326+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class TriggerExecutionModel {
 
   private @Nullable Boolean batch;
@@ -152,6 +152,7 @@ public class TriggerExecutionModel {
     return batch;
   }
 
+  @JsonProperty("batch")
   public void setBatch(@Nullable Boolean batch) {
     this.batch = batch;
   }
@@ -172,6 +173,7 @@ public class TriggerExecutionModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -192,6 +194,7 @@ public class TriggerExecutionModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -212,6 +215,7 @@ public class TriggerExecutionModel {
     return endDate;
   }
 
+  @JsonProperty("endDate")
   public void setEndDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
   }
@@ -232,6 +236,7 @@ public class TriggerExecutionModel {
     return error;
   }
 
+  @JsonProperty("error")
   public void setError(@Nullable ExecutionErrorModel error) {
     this.error = error;
   }
@@ -252,6 +257,7 @@ public class TriggerExecutionModel {
     return executionTime;
   }
 
+  @JsonProperty("executionTime")
   public void setExecutionTime(@Nullable Long executionTime) {
     this.executionTime = executionTime;
   }
@@ -272,6 +278,7 @@ public class TriggerExecutionModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -292,6 +299,7 @@ public class TriggerExecutionModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable String id) {
     this.id = id;
   }
@@ -320,6 +328,7 @@ public class TriggerExecutionModel {
     return input;
   }
 
+  @JsonProperty("input")
   public void setInput(Map<String, Object> input) {
     this.input = input;
   }
@@ -340,6 +349,7 @@ public class TriggerExecutionModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -360,6 +370,7 @@ public class TriggerExecutionModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -380,6 +391,7 @@ public class TriggerExecutionModel {
     return maxRetries;
   }
 
+  @JsonProperty("maxRetries")
   public void setMaxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
   }
@@ -400,6 +412,7 @@ public class TriggerExecutionModel {
     return output;
   }
 
+  @JsonProperty("output")
   public void setOutput(@Nullable Object output) {
     this.output = output;
   }
@@ -420,6 +433,7 @@ public class TriggerExecutionModel {
     return priority;
   }
 
+  @JsonProperty("priority")
   public void setPriority(Integer priority) {
     this.priority = priority;
   }
@@ -440,6 +454,7 @@ public class TriggerExecutionModel {
     return retryAttempts;
   }
 
+  @JsonProperty("retryAttempts")
   public void setRetryAttempts(@Nullable Integer retryAttempts) {
     this.retryAttempts = retryAttempts;
   }
@@ -460,6 +475,7 @@ public class TriggerExecutionModel {
     return retryDelay;
   }
 
+  @JsonProperty("retryDelay")
   public void setRetryDelay(@Nullable String retryDelay) {
     this.retryDelay = retryDelay;
   }
@@ -480,6 +496,7 @@ public class TriggerExecutionModel {
     return retryDelayFactor;
   }
 
+  @JsonProperty("retryDelayFactor")
   public void setRetryDelayFactor(@Nullable Integer retryDelayFactor) {
     this.retryDelayFactor = retryDelayFactor;
   }
@@ -500,6 +517,7 @@ public class TriggerExecutionModel {
     return retryDelayMillis;
   }
 
+  @JsonProperty("retryDelayMillis")
   public void setRetryDelayMillis(@Nullable Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
   }
@@ -520,6 +538,7 @@ public class TriggerExecutionModel {
     return startDate;
   }
 
+  @JsonProperty("startDate")
   public void setStartDate(OffsetDateTime startDate) {
     this.startDate = startDate;
   }
@@ -540,6 +559,7 @@ public class TriggerExecutionModel {
     return status;
   }
 
+  @JsonProperty("status")
   public void setStatus(StatusEnum status) {
     this.status = status;
   }
@@ -560,6 +580,7 @@ public class TriggerExecutionModel {
     return workflowTrigger;
   }
 
+  @JsonProperty("workflowTrigger")
   public void setWorkflowTrigger(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel workflowTrigger) {
     this.workflowTrigger = workflowTrigger;
   }
@@ -580,6 +601,7 @@ public class TriggerExecutionModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -600,6 +622,7 @@ public class TriggerExecutionModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(@Nullable String type) {
     this.type = type;
   }
@@ -679,10 +702,7 @@ public class TriggerExecutionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.584140+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.371326+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -168,6 +168,7 @@ public class TaskExecutionModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -188,6 +189,7 @@ public class TaskExecutionModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -208,6 +210,7 @@ public class TaskExecutionModel {
     return endDate;
   }
 
+  @JsonProperty("endDate")
   public void setEndDate(@Nullable OffsetDateTime endDate) {
     this.endDate = endDate;
   }
@@ -228,6 +231,7 @@ public class TaskExecutionModel {
     return error;
   }
 
+  @JsonProperty("error")
   public void setError(@Nullable ExecutionErrorModel error) {
     this.error = error;
   }
@@ -248,6 +252,7 @@ public class TaskExecutionModel {
     return executionTime;
   }
 
+  @JsonProperty("executionTime")
   public void setExecutionTime(@Nullable Long executionTime) {
     this.executionTime = executionTime;
   }
@@ -268,6 +273,7 @@ public class TaskExecutionModel {
     return icon;
   }
 
+  @JsonProperty("icon")
   public void setIcon(@Nullable String icon) {
     this.icon = icon;
   }
@@ -288,6 +294,7 @@ public class TaskExecutionModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable String id) {
     this.id = id;
   }
@@ -316,6 +323,7 @@ public class TaskExecutionModel {
     return input;
   }
 
+  @JsonProperty("input")
   public void setInput(Map<String, Object> input) {
     this.input = input;
   }
@@ -336,6 +344,7 @@ public class TaskExecutionModel {
     return jobId;
   }
 
+  @JsonProperty("jobId")
   public void setJobId(String jobId) {
     this.jobId = jobId;
   }
@@ -356,6 +365,7 @@ public class TaskExecutionModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -376,6 +386,7 @@ public class TaskExecutionModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -396,6 +407,7 @@ public class TaskExecutionModel {
     return maxRetries;
   }
 
+  @JsonProperty("maxRetries")
   public void setMaxRetries(@Nullable Integer maxRetries) {
     this.maxRetries = maxRetries;
   }
@@ -416,6 +428,7 @@ public class TaskExecutionModel {
     return output;
   }
 
+  @JsonProperty("output")
   public void setOutput(@Nullable Object output) {
     this.output = output;
   }
@@ -436,6 +449,7 @@ public class TaskExecutionModel {
     return parentId;
   }
 
+  @JsonProperty("parentId")
   public void setParentId(@Nullable String parentId) {
     this.parentId = parentId;
   }
@@ -456,6 +470,7 @@ public class TaskExecutionModel {
     return priority;
   }
 
+  @JsonProperty("priority")
   public void setPriority(Integer priority) {
     this.priority = priority;
   }
@@ -476,6 +491,7 @@ public class TaskExecutionModel {
     return progress;
   }
 
+  @JsonProperty("progress")
   public void setProgress(@Nullable Integer progress) {
     this.progress = progress;
   }
@@ -496,6 +512,7 @@ public class TaskExecutionModel {
     return retryAttempts;
   }
 
+  @JsonProperty("retryAttempts")
   public void setRetryAttempts(@Nullable Integer retryAttempts) {
     this.retryAttempts = retryAttempts;
   }
@@ -516,6 +533,7 @@ public class TaskExecutionModel {
     return retryDelay;
   }
 
+  @JsonProperty("retryDelay")
   public void setRetryDelay(@Nullable String retryDelay) {
     this.retryDelay = retryDelay;
   }
@@ -536,6 +554,7 @@ public class TaskExecutionModel {
     return retryDelayFactor;
   }
 
+  @JsonProperty("retryDelayFactor")
   public void setRetryDelayFactor(@Nullable Integer retryDelayFactor) {
     this.retryDelayFactor = retryDelayFactor;
   }
@@ -556,6 +575,7 @@ public class TaskExecutionModel {
     return startDate;
   }
 
+  @JsonProperty("startDate")
   public void setStartDate(OffsetDateTime startDate) {
     this.startDate = startDate;
   }
@@ -576,6 +596,7 @@ public class TaskExecutionModel {
     return status;
   }
 
+  @JsonProperty("status")
   public void setStatus(StatusEnum status) {
     this.status = status;
   }
@@ -596,6 +617,7 @@ public class TaskExecutionModel {
     return taskNumber;
   }
 
+  @JsonProperty("taskNumber")
   public void setTaskNumber(@Nullable Integer taskNumber) {
     this.taskNumber = taskNumber;
   }
@@ -616,6 +638,7 @@ public class TaskExecutionModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -636,6 +659,7 @@ public class TaskExecutionModel {
     return retryDelayMillis;
   }
 
+  @JsonProperty("retryDelayMillis")
   public void setRetryDelayMillis(@Nullable Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
   }
@@ -656,6 +680,7 @@ public class TaskExecutionModel {
     return workflowTask;
   }
 
+  @JsonProperty("workflowTask")
   public void setWorkflowTask(@Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
     this.workflowTask = workflowTask;
   }
@@ -676,6 +701,7 @@ public class TaskExecutionModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(@Nullable String type) {
     this.type = type;
   }
@@ -704,6 +730,7 @@ public class TaskExecutionModel {
     return children;
   }
 
+  @JsonProperty("children")
   public void setChildren(List<@Valid TaskExecutionModel> children) {
     this.children = children;
   }
@@ -732,6 +759,7 @@ public class TaskExecutionModel {
     return iterations;
   }
 
+  @JsonProperty("iterations")
   public void setIterations(List<List<@Valid TaskExecutionModel>> iterations) {
     this.iterations = iterations;
   }
@@ -821,10 +849,7 @@ public class TaskExecutionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

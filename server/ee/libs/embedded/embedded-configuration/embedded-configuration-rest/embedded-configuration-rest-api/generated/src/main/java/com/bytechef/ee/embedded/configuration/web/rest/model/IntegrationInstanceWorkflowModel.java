@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationInstanceWorkflowModel {
 
   private @Nullable String createdBy;
@@ -79,6 +79,7 @@ public class IntegrationInstanceWorkflowModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -99,6 +100,7 @@ public class IntegrationInstanceWorkflowModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -127,6 +129,7 @@ public class IntegrationInstanceWorkflowModel {
     return inputs;
   }
 
+  @JsonProperty("inputs")
   public void setInputs(Map<String, Object> inputs) {
     this.inputs = inputs;
   }
@@ -147,6 +150,7 @@ public class IntegrationInstanceWorkflowModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
   }
@@ -167,6 +171,7 @@ public class IntegrationInstanceWorkflowModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -187,6 +192,7 @@ public class IntegrationInstanceWorkflowModel {
     return integrationInstanceConfigurationWorkflowId;
   }
 
+  @JsonProperty("integrationInstanceConfigurationWorkflowId")
   public void setIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId) {
     this.integrationInstanceConfigurationWorkflowId = integrationInstanceConfigurationWorkflowId;
   }
@@ -207,6 +213,7 @@ public class IntegrationInstanceWorkflowModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -227,6 +234,7 @@ public class IntegrationInstanceWorkflowModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -247,6 +255,7 @@ public class IntegrationInstanceWorkflowModel {
     return workflowId;
   }
 
+  @JsonProperty("workflowId")
   public void setWorkflowId(String workflowId) {
     this.workflowId = workflowId;
   }
@@ -297,11 +306,8 @@ public class IntegrationInstanceWorkflowModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

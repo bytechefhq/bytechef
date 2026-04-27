@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationInstanceConfigurationModel {
 
   private @Nullable String createdBy;
@@ -109,6 +109,7 @@ public class IntegrationInstanceConfigurationModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -129,6 +130,7 @@ public class IntegrationInstanceConfigurationModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -149,6 +151,7 @@ public class IntegrationInstanceConfigurationModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -169,6 +172,7 @@ public class IntegrationInstanceConfigurationModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
@@ -189,6 +193,7 @@ public class IntegrationInstanceConfigurationModel {
     return environmentId;
   }
 
+  @JsonProperty("environmentId")
   public void setEnvironmentId(@Nullable Long environmentId) {
     this.environmentId = environmentId;
   }
@@ -209,6 +214,7 @@ public class IntegrationInstanceConfigurationModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -229,6 +235,7 @@ public class IntegrationInstanceConfigurationModel {
     return integrationId;
   }
 
+  @JsonProperty("integrationId")
   public void setIntegrationId(@Nullable Long integrationId) {
     this.integrationId = integrationId;
   }
@@ -249,6 +256,7 @@ public class IntegrationInstanceConfigurationModel {
     return integrationVersion;
   }
 
+  @JsonProperty("integrationVersion")
   public void setIntegrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
   }
@@ -269,6 +277,7 @@ public class IntegrationInstanceConfigurationModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -289,6 +298,7 @@ public class IntegrationInstanceConfigurationModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -309,6 +319,7 @@ public class IntegrationInstanceConfigurationModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -329,6 +340,7 @@ public class IntegrationInstanceConfigurationModel {
     return authorizationType;
   }
 
+  @JsonProperty("authorizationType")
   public void setAuthorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
@@ -357,6 +369,7 @@ public class IntegrationInstanceConfigurationModel {
     return connectionAuthorizationParameters;
   }
 
+  @JsonProperty("connectionAuthorizationParameters")
   public void setConnectionAuthorizationParameters(Map<String, Object> connectionAuthorizationParameters) {
     this.connectionAuthorizationParameters = connectionAuthorizationParameters;
   }
@@ -385,6 +398,7 @@ public class IntegrationInstanceConfigurationModel {
     return connectionConnectionParameters;
   }
 
+  @JsonProperty("connectionConnectionParameters")
   public void setConnectionConnectionParameters(Map<String, Object> connectionConnectionParameters) {
     this.connectionConnectionParameters = connectionConnectionParameters;
   }
@@ -413,6 +427,7 @@ public class IntegrationInstanceConfigurationModel {
     return connectionParameters;
   }
 
+  @JsonProperty("connectionParameters")
   public void setConnectionParameters(Map<String, Object> connectionParameters) {
     this.connectionParameters = connectionParameters;
   }
@@ -433,6 +448,7 @@ public class IntegrationInstanceConfigurationModel {
     return integration;
   }
 
+  @JsonProperty("integration")
   public void setIntegration(@Nullable IntegrationBasicModel integration) {
     this.integration = integration;
   }
@@ -461,6 +477,7 @@ public class IntegrationInstanceConfigurationModel {
     return integrationInstanceConfigurationWorkflows;
   }
 
+  @JsonProperty("integrationInstanceConfigurationWorkflows")
   public void setIntegrationInstanceConfigurationWorkflows(List<@Valid IntegrationInstanceConfigurationWorkflowModel> integrationInstanceConfigurationWorkflows) {
     this.integrationInstanceConfigurationWorkflows = integrationInstanceConfigurationWorkflows;
   }
@@ -489,6 +506,7 @@ public class IntegrationInstanceConfigurationModel {
     return tags;
   }
 
+  @JsonProperty("tags")
   public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
@@ -509,6 +527,7 @@ public class IntegrationInstanceConfigurationModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -579,11 +598,8 @@ public class IntegrationInstanceConfigurationModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

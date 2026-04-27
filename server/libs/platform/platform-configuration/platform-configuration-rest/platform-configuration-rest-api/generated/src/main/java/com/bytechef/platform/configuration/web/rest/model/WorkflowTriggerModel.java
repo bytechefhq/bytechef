@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowTriggerModel {
 
   @Valid
@@ -86,6 +86,7 @@ public class WorkflowTriggerModel {
     return connections;
   }
 
+  @JsonProperty("connections")
   public void setConnections(List<@Valid ComponentConnectionModel> connections) {
     this.connections = connections;
   }
@@ -106,6 +107,7 @@ public class WorkflowTriggerModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -126,6 +128,7 @@ public class WorkflowTriggerModel {
     return label;
   }
 
+  @JsonProperty("label")
   public void setLabel(@Nullable String label) {
     this.label = label;
   }
@@ -154,6 +157,7 @@ public class WorkflowTriggerModel {
     return metadata;
   }
 
+  @JsonProperty("metadata")
   public void setMetadata(Map<String, Object> metadata) {
     this.metadata = metadata;
   }
@@ -174,6 +178,7 @@ public class WorkflowTriggerModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -202,6 +207,7 @@ public class WorkflowTriggerModel {
     return parameters;
   }
 
+  @JsonProperty("parameters")
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
@@ -222,6 +228,7 @@ public class WorkflowTriggerModel {
     return timeout;
   }
 
+  @JsonProperty("timeout")
   public void setTimeout(@Nullable String timeout) {
     this.timeout = timeout;
   }
@@ -242,6 +249,7 @@ public class WorkflowTriggerModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(String type) {
     this.type = type;
   }
@@ -291,10 +299,7 @@ public class WorkflowTriggerModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

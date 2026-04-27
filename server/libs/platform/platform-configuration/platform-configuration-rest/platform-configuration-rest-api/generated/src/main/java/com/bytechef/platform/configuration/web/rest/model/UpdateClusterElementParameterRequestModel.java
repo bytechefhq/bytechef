@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateClusterElementParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class UpdateClusterElementParameterRequestModel {
 
   private Boolean fromAiInMetadata = false;
@@ -62,6 +62,7 @@ public class UpdateClusterElementParameterRequestModel {
     return fromAiInMetadata;
   }
 
+  @JsonProperty("fromAiInMetadata")
   public void setFromAiInMetadata(Boolean fromAiInMetadata) {
     this.fromAiInMetadata = fromAiInMetadata;
   }
@@ -82,6 +83,7 @@ public class UpdateClusterElementParameterRequestModel {
     return includeInMetadata;
   }
 
+  @JsonProperty("includeInMetadata")
   public void setIncludeInMetadata(Boolean includeInMetadata) {
     this.includeInMetadata = includeInMetadata;
   }
@@ -102,6 +104,7 @@ public class UpdateClusterElementParameterRequestModel {
     return path;
   }
 
+  @JsonProperty("path")
   public void setPath(String path) {
     this.path = path;
   }
@@ -122,6 +125,7 @@ public class UpdateClusterElementParameterRequestModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(String type) {
     this.type = type;
   }
@@ -142,6 +146,7 @@ public class UpdateClusterElementParameterRequestModel {
     return value;
   }
 
+  @JsonProperty("value")
   public void setValue(@Nullable Object value) {
     this.value = value;
   }
@@ -185,10 +190,7 @@ public class UpdateClusterElementParameterRequestModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

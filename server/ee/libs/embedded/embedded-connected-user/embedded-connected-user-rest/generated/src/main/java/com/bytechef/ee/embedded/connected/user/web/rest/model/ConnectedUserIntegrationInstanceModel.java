@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.433771+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.922555+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable String componentName;
@@ -58,6 +58,7 @@ public class ConnectedUserIntegrationInstanceModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(@Nullable String componentName) {
     this.componentName = componentName;
   }
@@ -78,6 +79,7 @@ public class ConnectedUserIntegrationInstanceModel {
     return enabled;
   }
 
+  @JsonProperty("enabled")
   public void setEnabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
   }
@@ -98,6 +100,7 @@ public class ConnectedUserIntegrationInstanceModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -118,6 +121,7 @@ public class ConnectedUserIntegrationInstanceModel {
     return integrationId;
   }
 
+  @JsonProperty("integrationId")
   public void setIntegrationId(@Nullable Long integrationId) {
     this.integrationId = integrationId;
   }
@@ -138,6 +142,7 @@ public class ConnectedUserIntegrationInstanceModel {
     return integrationInstanceConfigurationId;
   }
 
+  @JsonProperty("integrationInstanceConfigurationId")
   public void setIntegrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
     this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
   }
@@ -158,6 +163,7 @@ public class ConnectedUserIntegrationInstanceModel {
     return integrationVersion;
   }
 
+  @JsonProperty("integrationVersion")
   public void setIntegrationVersion(@Nullable Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
   }
@@ -178,6 +184,7 @@ public class ConnectedUserIntegrationInstanceModel {
     return connectionId;
   }
 
+  @JsonProperty("connectionId")
   public void setConnectionId(@Nullable Long connectionId) {
     this.connectionId = connectionId;
   }
@@ -198,6 +205,7 @@ public class ConnectedUserIntegrationInstanceModel {
     return credentialStatus;
   }
 
+  @JsonProperty("credentialStatus")
   public void setCredentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
@@ -246,11 +254,8 @@ public class ConnectedUserIntegrationInstanceModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

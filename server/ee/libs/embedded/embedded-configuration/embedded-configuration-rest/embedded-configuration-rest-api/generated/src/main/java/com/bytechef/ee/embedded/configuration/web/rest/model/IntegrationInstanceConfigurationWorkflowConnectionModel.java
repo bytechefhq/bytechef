@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationWorkflowConnection", description = "The connection used in a particular task or trigger.")
 @JsonTypeName("IntegrationInstanceConfigurationWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationInstanceConfigurationWorkflowConnectionModel {
 
   private @Nullable Long connectionId;
@@ -47,6 +47,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
     return connectionId;
   }
 
+  @JsonProperty("connectionId")
   public void setConnectionId(@Nullable Long connectionId) {
     this.connectionId = connectionId;
   }
@@ -67,6 +68,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
     return workflowConnectionKey;
   }
 
+  @JsonProperty("workflowConnectionKey")
   public void setWorkflowConnectionKey(@Nullable String workflowConnectionKey) {
     this.workflowConnectionKey = workflowConnectionKey;
   }
@@ -87,6 +89,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
     return workflowNodeName;
   }
 
+  @JsonProperty("workflowNodeName")
   public void setWorkflowNodeName(@Nullable String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
   }
@@ -125,11 +128,8 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

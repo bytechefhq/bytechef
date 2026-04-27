@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "PropertiesDataSource", description = "Defines function that should load properties.")
 @JsonTypeName("PropertiesDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class PropertiesDataSourceModel {
 
   @Valid
@@ -55,6 +55,7 @@ public class PropertiesDataSourceModel {
     return propertiesLookupDependsOn;
   }
 
+  @JsonProperty("propertiesLookupDependsOn")
   public void setPropertiesLookupDependsOn(List<String> propertiesLookupDependsOn) {
     this.propertiesLookupDependsOn = propertiesLookupDependsOn;
   }
@@ -90,10 +91,7 @@ public class PropertiesDataSourceModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

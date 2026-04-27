@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "connection_base", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("connection_base")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.328650+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.083482+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ConnectionBaseModel {
 
   private @Nullable Boolean active;
@@ -108,6 +108,7 @@ public class ConnectionBaseModel {
     return active;
   }
 
+  @JsonProperty("active")
   public void setActive(@Nullable Boolean active) {
     this.active = active;
   }
@@ -128,6 +129,7 @@ public class ConnectionBaseModel {
     return authorizationType;
   }
 
+  @JsonProperty("authorizationType")
   public void setAuthorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
   }
@@ -156,6 +158,7 @@ public class ConnectionBaseModel {
     return authorizationParameters;
   }
 
+  @JsonProperty("authorizationParameters")
   public void setAuthorizationParameters(Map<String, Object> authorizationParameters) {
     this.authorizationParameters = authorizationParameters;
   }
@@ -176,6 +179,7 @@ public class ConnectionBaseModel {
     return baseUri;
   }
 
+  @JsonProperty("baseUri")
   public void setBaseUri(@Nullable String baseUri) {
     this.baseUri = baseUri;
   }
@@ -196,6 +200,7 @@ public class ConnectionBaseModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -224,6 +229,7 @@ public class ConnectionBaseModel {
     return connectionParameters;
   }
 
+  @JsonProperty("connectionParameters")
   public void setConnectionParameters(Map<String, Object> connectionParameters) {
     this.connectionParameters = connectionParameters;
   }
@@ -244,6 +250,7 @@ public class ConnectionBaseModel {
     return connectionVersion;
   }
 
+  @JsonProperty("connectionVersion")
   public void setConnectionVersion(Integer connectionVersion) {
     this.connectionVersion = connectionVersion;
   }
@@ -264,6 +271,7 @@ public class ConnectionBaseModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -284,6 +292,7 @@ public class ConnectionBaseModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -304,6 +313,7 @@ public class ConnectionBaseModel {
     return credentialStatus;
   }
 
+  @JsonProperty("credentialStatus")
   public void setCredentialStatus(@Nullable CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
   }
@@ -324,6 +334,7 @@ public class ConnectionBaseModel {
     return environmentId;
   }
 
+  @JsonProperty("environmentId")
   public void setEnvironmentId(@Nullable Long environmentId) {
     this.environmentId = environmentId;
   }
@@ -344,6 +355,7 @@ public class ConnectionBaseModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -364,6 +376,7 @@ public class ConnectionBaseModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -384,6 +397,7 @@ public class ConnectionBaseModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -404,6 +418,7 @@ public class ConnectionBaseModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -432,6 +447,7 @@ public class ConnectionBaseModel {
     return parameters;
   }
 
+  @JsonProperty("parameters")
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
@@ -460,6 +476,7 @@ public class ConnectionBaseModel {
     return tags;
   }
 
+  @JsonProperty("tags")
   public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
@@ -480,6 +497,7 @@ public class ConnectionBaseModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -548,11 +566,8 @@ public class ConnectionBaseModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

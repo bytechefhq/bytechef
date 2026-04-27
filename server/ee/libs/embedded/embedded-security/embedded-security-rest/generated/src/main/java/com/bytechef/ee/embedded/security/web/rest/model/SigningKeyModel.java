@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "SigningKey", description = "Contains generated public key used for signing JWT tokens.")
 @JsonTypeName("SigningKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.376196+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.893801+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class SigningKeyModel {
 
   private @Nullable String createdBy;
@@ -76,6 +76,7 @@ public class SigningKeyModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -96,6 +97,7 @@ public class SigningKeyModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -116,6 +118,7 @@ public class SigningKeyModel {
     return environmentId;
   }
 
+  @JsonProperty("environmentId")
   public void setEnvironmentId(@Nullable Long environmentId) {
     this.environmentId = environmentId;
   }
@@ -136,6 +139,7 @@ public class SigningKeyModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -156,6 +160,7 @@ public class SigningKeyModel {
     return keyId;
   }
 
+  @JsonProperty("keyId")
   public void setKeyId(String keyId) {
     this.keyId = keyId;
   }
@@ -176,6 +181,7 @@ public class SigningKeyModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -196,6 +202,7 @@ public class SigningKeyModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -216,6 +223,7 @@ public class SigningKeyModel {
     return lastUsedDate;
   }
 
+  @JsonProperty("lastUsedDate")
   public void setLastUsedDate(@Nullable OffsetDateTime lastUsedDate) {
     this.lastUsedDate = lastUsedDate;
   }
@@ -236,6 +244,7 @@ public class SigningKeyModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -286,11 +295,8 @@ public class SigningKeyModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

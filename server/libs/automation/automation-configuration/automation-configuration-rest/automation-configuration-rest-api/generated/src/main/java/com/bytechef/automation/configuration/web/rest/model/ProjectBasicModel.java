@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectBasic", description = "A group of workflows that make one logical project.")
 @JsonTypeName("ProjectBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.674883+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.095260+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ProjectBasicModel {
 
   private @Nullable String createdBy;
@@ -81,6 +81,7 @@ public class ProjectBasicModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -101,6 +102,7 @@ public class ProjectBasicModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -121,6 +123,7 @@ public class ProjectBasicModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
   }
@@ -141,6 +144,7 @@ public class ProjectBasicModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -161,6 +165,7 @@ public class ProjectBasicModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -181,6 +186,7 @@ public class ProjectBasicModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -201,6 +207,7 @@ public class ProjectBasicModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -221,6 +228,7 @@ public class ProjectBasicModel {
     return lastPublishedDate;
   }
 
+  @JsonProperty("lastPublishedDate")
   public void setLastPublishedDate(@Nullable OffsetDateTime lastPublishedDate) {
     this.lastPublishedDate = lastPublishedDate;
   }
@@ -241,6 +249,7 @@ public class ProjectBasicModel {
     return lastStatus;
   }
 
+  @JsonProperty("lastStatus")
   public void setLastStatus(@Nullable ProjectStatusModel lastStatus) {
     this.lastStatus = lastStatus;
   }
@@ -261,6 +270,7 @@ public class ProjectBasicModel {
     return lastProjectVersion;
   }
 
+  @JsonProperty("lastProjectVersion")
   public void setLastProjectVersion(@Nullable Integer lastProjectVersion) {
     this.lastProjectVersion = lastProjectVersion;
   }
@@ -281,6 +291,7 @@ public class ProjectBasicModel {
     return uuid;
   }
 
+  @JsonProperty("uuid")
   public void setUuid(@Nullable String uuid) {
     this.uuid = uuid;
   }
@@ -336,10 +347,7 @@ public class ProjectBasicModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

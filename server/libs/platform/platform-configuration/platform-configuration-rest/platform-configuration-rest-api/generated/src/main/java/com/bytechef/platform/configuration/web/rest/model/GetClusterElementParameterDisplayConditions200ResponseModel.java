@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("getClusterElementParameterDisplayConditions_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class GetClusterElementParameterDisplayConditions200ResponseModel {
 
   @Valid
@@ -59,6 +59,7 @@ public class GetClusterElementParameterDisplayConditions200ResponseModel {
     return displayConditions;
   }
 
+  @JsonProperty("displayConditions")
   public void setDisplayConditions(Map<String, Boolean> displayConditions) {
     this.displayConditions = displayConditions;
   }
@@ -87,6 +88,7 @@ public class GetClusterElementParameterDisplayConditions200ResponseModel {
     return missingRequiredProperties;
   }
 
+  @JsonProperty("missingRequiredProperties")
   public void setMissingRequiredProperties(List<String> missingRequiredProperties) {
     this.missingRequiredProperties = missingRequiredProperties;
   }
@@ -124,10 +126,7 @@ public class GetClusterElementParameterDisplayConditions200ResponseModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

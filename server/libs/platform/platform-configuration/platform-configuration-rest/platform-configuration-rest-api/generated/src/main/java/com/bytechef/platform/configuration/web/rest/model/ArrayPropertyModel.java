@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ArrayProperty", description = "An array property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:47:01.607579+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -93,6 +93,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return defaultValue;
   }
 
+  @JsonProperty("defaultValue")
   public void setDefaultValue(List<Object> defaultValue) {
     this.defaultValue = defaultValue;
   }
@@ -121,6 +122,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return exampleValue;
   }
 
+  @JsonProperty("exampleValue")
   public void setExampleValue(List<Object> exampleValue) {
     this.exampleValue = exampleValue;
   }
@@ -149,6 +151,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return items;
   }
 
+  @JsonProperty("items")
   public void setItems(List<@Valid PropertyModel> items) {
     this.items = items;
   }
@@ -169,6 +172,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return maxItems;
   }
 
+  @JsonProperty("maxItems")
   public void setMaxItems(@Nullable Long maxItems) {
     this.maxItems = maxItems;
   }
@@ -189,6 +193,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return minItems;
   }
 
+  @JsonProperty("minItems")
   public void setMinItems(@Nullable Long minItems) {
     this.minItems = minItems;
   }
@@ -209,6 +214,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return multipleValues;
   }
 
+  @JsonProperty("multipleValues")
   public void setMultipleValues(@Nullable Boolean multipleValues) {
     this.multipleValues = multipleValues;
   }
@@ -237,6 +243,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return options;
   }
 
+  @JsonProperty("options")
   public void setOptions(List<@Valid OptionModel> options) {
     this.options = options;
   }
@@ -257,6 +264,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return optionsDataSource;
   }
 
+  @JsonProperty("optionsDataSource")
   public void setOptionsDataSource(@Nullable OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
@@ -363,10 +371,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

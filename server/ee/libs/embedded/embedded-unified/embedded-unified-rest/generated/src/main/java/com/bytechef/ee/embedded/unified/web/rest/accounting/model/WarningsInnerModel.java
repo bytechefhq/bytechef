@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("warnings_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.766054+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.014747+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WarningsInnerModel {
 
   private @Nullable String detail;
@@ -46,6 +46,7 @@ public class WarningsInnerModel {
     return detail;
   }
 
+  @JsonProperty("detail")
   public void setDetail(@Nullable String detail) {
     this.detail = detail;
   }
@@ -66,6 +67,7 @@ public class WarningsInnerModel {
     return problemType;
   }
 
+  @JsonProperty("problem_type")
   public void setProblemType(@Nullable String problemType) {
     this.problemType = problemType;
   }
@@ -86,6 +88,7 @@ public class WarningsInnerModel {
     return title;
   }
 
+  @JsonProperty("title")
   public void setTitle(@Nullable String title) {
     this.title = title;
   }
@@ -124,11 +127,8 @@ public class WarningsInnerModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

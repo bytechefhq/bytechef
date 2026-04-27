@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ComponentConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.674883+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.095260+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ComponentConnectionModel {
 
   private String componentName;
@@ -65,6 +65,7 @@ public class ComponentConnectionModel {
     return componentName;
   }
 
+  @JsonProperty("componentName")
   public void setComponentName(String componentName) {
     this.componentName = componentName;
   }
@@ -85,6 +86,7 @@ public class ComponentConnectionModel {
     return componentVersion;
   }
 
+  @JsonProperty("componentVersion")
   public void setComponentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
   }
@@ -105,6 +107,7 @@ public class ComponentConnectionModel {
     return key;
   }
 
+  @JsonProperty("key")
   public void setKey(String key) {
     this.key = key;
   }
@@ -125,6 +128,7 @@ public class ComponentConnectionModel {
     return required;
   }
 
+  @JsonProperty("required")
   public void setRequired(Boolean required) {
     this.required = required;
   }
@@ -145,6 +149,7 @@ public class ComponentConnectionModel {
     return workflowNodeName;
   }
 
+  @JsonProperty("workflowNodeName")
   public void setWorkflowNodeName(String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
   }
@@ -188,10 +193,7 @@ public class ComponentConnectionModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

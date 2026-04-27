@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("account")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:37:00.707409+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.846934+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class AccountModel {
 
   @Valid
@@ -127,6 +127,7 @@ public class AccountModel {
     return addresses;
   }
 
+  @JsonProperty("addresses")
   public void setAddresses(List<@Valid AddressesInnerModel> addresses) {
     this.addresses = addresses;
   }
@@ -147,6 +148,7 @@ public class AccountModel {
     return description;
   }
 
+  @JsonProperty("description")
   public void setDescription(JsonNullable<String> description) {
     this.description = description;
   }
@@ -175,6 +177,7 @@ public class AccountModel {
     return emails;
   }
 
+  @JsonProperty("emails")
   public void setEmails(List<@Valid EmailsInnerModel> emails) {
     this.emails = emails;
   }
@@ -195,6 +198,7 @@ public class AccountModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(String id) {
     this.id = id;
   }
@@ -215,6 +219,7 @@ public class AccountModel {
     return industry;
   }
 
+  @JsonProperty("industry")
   public void setIndustry(JsonNullable<String> industry) {
     this.industry = industry;
   }
@@ -235,6 +240,7 @@ public class AccountModel {
     return lastActivityDate;
   }
 
+  @JsonProperty("lastActivityDate")
   public void setLastActivityDate(JsonNullable<OffsetDateTime> lastActivityDate) {
     this.lastActivityDate = lastActivityDate;
   }
@@ -255,6 +261,7 @@ public class AccountModel {
     return lifecycleStage;
   }
 
+  @JsonProperty("lifecycleStage")
   public void setLifecycleStage(JsonNullable<LifecycleStageModel> lifecycleStage) {
     this.lifecycleStage = lifecycleStage;
   }
@@ -275,6 +282,7 @@ public class AccountModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(JsonNullable<String> name) {
     this.name = name;
   }
@@ -295,6 +303,7 @@ public class AccountModel {
     return numberOfEmployees;
   }
 
+  @JsonProperty("numberOfEmployees")
   public void setNumberOfEmployees(JsonNullable<Integer> numberOfEmployees) {
     this.numberOfEmployees = numberOfEmployees;
   }
@@ -315,6 +324,7 @@ public class AccountModel {
     return ownerId;
   }
 
+  @JsonProperty("ownerId")
   public void setOwnerId(JsonNullable<String> ownerId) {
     this.ownerId = ownerId;
   }
@@ -343,6 +353,7 @@ public class AccountModel {
     return phones;
   }
 
+  @JsonProperty("phones")
   public void setPhones(List<@Valid PhonesInnerModel> phones) {
     this.phones = phones;
   }
@@ -363,6 +374,7 @@ public class AccountModel {
     return website;
   }
 
+  @JsonProperty("website")
   public void setWebsite(JsonNullable<String> website) {
     this.website = website;
   }
@@ -391,6 +403,7 @@ public class AccountModel {
     return customFields;
   }
 
+  @JsonProperty("customFields")
   public void setCustomFields(Map<String, Object> customFields) {
     this.customFields = customFields;
   }
@@ -451,6 +464,7 @@ public class AccountModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(JsonNullable<OffsetDateTime> createdDate) {
     this.createdDate = createdDate;
   }
@@ -471,6 +485,7 @@ public class AccountModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -548,11 +563,8 @@ public class AccountModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

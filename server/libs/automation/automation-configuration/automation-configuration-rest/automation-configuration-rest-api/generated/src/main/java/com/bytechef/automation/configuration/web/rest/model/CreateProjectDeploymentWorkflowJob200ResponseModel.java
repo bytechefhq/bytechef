@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createProjectDeploymentWorkflowJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-10T15:49:41.674883+02:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.095260+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class CreateProjectDeploymentWorkflowJob200ResponseModel {
 
   private @Nullable Long jobId;
@@ -42,6 +42,7 @@ public class CreateProjectDeploymentWorkflowJob200ResponseModel {
     return jobId;
   }
 
+  @JsonProperty("jobId")
   public void setJobId(@Nullable Long jobId) {
     this.jobId = jobId;
   }
@@ -77,10 +78,7 @@ public class CreateProjectDeploymentWorkflowJob200ResponseModel {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

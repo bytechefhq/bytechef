@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-03-13T17:17:09.715729+01:00[Europe/Zagreb]", comments = "Generator version: 7.20.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.919530+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class OAuth2Model {
 
   private @Nullable String authorizationUrl;
@@ -54,6 +54,7 @@ public class OAuth2Model {
     return authorizationUrl;
   }
 
+  @JsonProperty("authorizationUrl")
   public void setAuthorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
   }
@@ -82,6 +83,7 @@ public class OAuth2Model {
     return extraQueryParameters;
   }
 
+  @JsonProperty("extraQueryParameters")
   public void setExtraQueryParameters(Map<String, String> extraQueryParameters) {
     this.extraQueryParameters = extraQueryParameters;
   }
@@ -102,6 +104,7 @@ public class OAuth2Model {
     return clientId;
   }
 
+  @JsonProperty("clientId")
   public void setClientId(@Nullable String clientId) {
     this.clientId = clientId;
   }
@@ -122,6 +125,7 @@ public class OAuth2Model {
     return redirectUri;
   }
 
+  @JsonProperty("redirectUri")
   public void setRedirectUri(@Nullable String redirectUri) {
     this.redirectUri = redirectUri;
   }
@@ -150,6 +154,7 @@ public class OAuth2Model {
     return scopes;
   }
 
+  @JsonProperty("scopes")
   public void setScopes(Map<String, String> scopes) {
     this.scopes = scopes;
   }
@@ -193,10 +198,7 @@ public class OAuth2Model {
    * (except the first line).
    */
   private String toIndentedString(@Nullable Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 

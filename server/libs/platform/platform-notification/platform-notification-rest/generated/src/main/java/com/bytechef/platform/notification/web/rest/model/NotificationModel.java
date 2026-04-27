@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Notification", description = "A Notification definition.")
 @JsonTypeName("Notification")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-23T12:36:59.369979+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.883658+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class NotificationModel {
 
   private @Nullable Long id;
@@ -125,6 +125,7 @@ public class NotificationModel {
     return id;
   }
 
+  @JsonProperty("id")
   public void setId(@Nullable Long id) {
     this.id = id;
   }
@@ -145,6 +146,7 @@ public class NotificationModel {
     return createdBy;
   }
 
+  @JsonProperty("createdBy")
   public void setCreatedBy(@Nullable String createdBy) {
     this.createdBy = createdBy;
   }
@@ -165,6 +167,7 @@ public class NotificationModel {
     return createdDate;
   }
 
+  @JsonProperty("createdDate")
   public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
@@ -185,6 +188,7 @@ public class NotificationModel {
     return lastModifiedBy;
   }
 
+  @JsonProperty("lastModifiedBy")
   public void setLastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
   }
@@ -205,6 +209,7 @@ public class NotificationModel {
     return lastModifiedDate;
   }
 
+  @JsonProperty("lastModifiedDate")
   public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
@@ -225,6 +230,7 @@ public class NotificationModel {
     return name;
   }
 
+  @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
   }
@@ -245,6 +251,7 @@ public class NotificationModel {
     return type;
   }
 
+  @JsonProperty("type")
   public void setType(TypeEnum type) {
     this.type = type;
   }
@@ -273,6 +280,7 @@ public class NotificationModel {
     return settings;
   }
 
+  @JsonProperty("settings")
   public void setSettings(Map<String, Object> settings) {
     this.settings = settings;
   }
@@ -301,6 +309,7 @@ public class NotificationModel {
     return notificationEvents;
   }
 
+  @JsonProperty("notificationEvents")
   public void setNotificationEvents(List<@Valid NotificationEventModel> notificationEvents) {
     this.notificationEvents = notificationEvents;
   }
@@ -329,6 +338,7 @@ public class NotificationModel {
     return notificationEventIds;
   }
 
+  @JsonProperty("notificationEventIds")
   public void setNotificationEventIds(List<Long> notificationEventIds) {
     this.notificationEventIds = notificationEventIds;
   }
@@ -349,6 +359,7 @@ public class NotificationModel {
     return version;
   }
 
+  @JsonProperty("__version")
   public void setVersion(@Nullable Integer version) {
     this.version = version;
   }
@@ -403,11 +414,8 @@ public class NotificationModel {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+  private String toIndentedString(@Nullable Object o) {
+    return o == null ? "null" : o.toString().replace("\n", "\n    ");
   }
 }
 
