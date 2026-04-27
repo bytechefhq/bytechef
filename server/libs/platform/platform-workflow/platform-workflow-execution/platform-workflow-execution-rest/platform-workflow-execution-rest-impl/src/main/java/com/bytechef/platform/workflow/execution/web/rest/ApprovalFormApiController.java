@@ -32,7 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
  * @author Ivica Cardic
  */
 @RestController("com.bytechef.platform.workflow.execution.web.rest.ApprovalFormApiController")
-@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
 public class ApprovalFormApiController implements ApprovalFormApi {
 
