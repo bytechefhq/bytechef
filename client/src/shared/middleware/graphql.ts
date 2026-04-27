@@ -290,22 +290,43 @@ export type ApiKey = {
 
 export type ApprovalTask = {
   __typename?: 'ApprovalTask';
+  assigneeId?: Maybe<Scalars['ID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  dueDate?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  jobResumeId?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  priority: ApprovalTaskPriority;
+  status: ApprovalTaskStatus;
   version: Scalars['Int']['output'];
 };
 
 export type ApprovalTaskInput = {
+  assigneeId?: InputMaybe<Scalars['ID']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
+  priority?: InputMaybe<ApprovalTaskPriority>;
+  status?: InputMaybe<ApprovalTaskStatus>;
   version?: InputMaybe<Scalars['Int']['input']>;
 };
+
+export enum ApprovalTaskPriority {
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
+
+export enum ApprovalTaskStatus {
+  Completed = 'COMPLETED',
+  InProgress = 'IN_PROGRESS',
+  Open = 'OPEN'
+}
 
 export type ArrayProperty = Property & {
   __typename?: 'ArrayProperty';
@@ -3709,19 +3730,19 @@ export type ApprovalTaskQueryVariables = Exact<{
 }>;
 
 
-export type ApprovalTaskQuery = { __typename?: 'Query', approvalTask?: { __typename?: 'ApprovalTask', createdBy?: string | null, createdDate?: string | null, description?: string | null, id: string, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, version: number } | null };
+export type ApprovalTaskQuery = { __typename?: 'Query', approvalTask?: { __typename?: 'ApprovalTask', assigneeId?: string | null, createdBy?: string | null, createdDate?: string | null, description?: string | null, dueDate?: string | null, id: string, jobResumeId?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus, version: number } | null };
 
 export type ApprovalTasksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ApprovalTasksQuery = { __typename?: 'Query', approvalTasks?: Array<{ __typename?: 'ApprovalTask', createdBy?: string | null, createdDate?: string | null, description?: string | null, id: string, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, version: number } | null> | null };
+export type ApprovalTasksQuery = { __typename?: 'Query', approvalTasks?: Array<{ __typename?: 'ApprovalTask', assigneeId?: string | null, createdBy?: string | null, createdDate?: string | null, description?: string | null, dueDate?: string | null, id: string, jobResumeId?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus, version: number } | null> | null };
 
 export type CreateApprovalTaskMutationVariables = Exact<{
   approvalTask: ApprovalTaskInput;
 }>;
 
 
-export type CreateApprovalTaskMutation = { __typename?: 'Mutation', createApprovalTask?: { __typename?: 'ApprovalTask', description?: string | null, id: string, name: string } | null };
+export type CreateApprovalTaskMutation = { __typename?: 'Mutation', createApprovalTask?: { __typename?: 'ApprovalTask', assigneeId?: string | null, description?: string | null, id: string, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus } | null };
 
 export type DeleteApprovalTaskMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3735,7 +3756,7 @@ export type UpdateApprovalTaskMutationVariables = Exact<{
 }>;
 
 
-export type UpdateApprovalTaskMutation = { __typename?: 'Mutation', updateApprovalTask?: { __typename?: 'ApprovalTask', description?: string | null, id: string, name: string, version: number } | null };
+export type UpdateApprovalTaskMutation = { __typename?: 'Mutation', updateApprovalTask?: { __typename?: 'ApprovalTask', assigneeId?: string | null, description?: string | null, dueDate?: string | null, id: string, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus, version: number } | null };
 
 export type CreateMcpProjectMutationVariables = Exact<{
   input: CreateMcpProjectInput;
@@ -6001,13 +6022,18 @@ export const useUpdateAiAgentSkillMutation = <
 export const ApprovalTaskDocument = new TypedDocumentString(`
     query approvalTask($id: ID!) {
   approvalTask(id: $id) {
+    assigneeId
     createdBy
     createdDate
     description
+    dueDate
     id
+    jobResumeId
     lastModifiedBy
     lastModifiedDate
     name
+    priority
+    status
     version
   }
 }
@@ -6032,13 +6058,18 @@ export const useApprovalTaskQuery = <
 export const ApprovalTasksDocument = new TypedDocumentString(`
     query approvalTasks {
   approvalTasks {
+    assigneeId
     createdBy
     createdDate
     description
+    dueDate
     id
+    jobResumeId
     lastModifiedBy
     lastModifiedDate
     name
+    priority
+    status
     version
   }
 }
@@ -6063,9 +6094,12 @@ export const useApprovalTasksQuery = <
 export const CreateApprovalTaskDocument = new TypedDocumentString(`
     mutation createApprovalTask($approvalTask: ApprovalTaskInput!) {
   createApprovalTask(approvalTask: $approvalTask) {
+    assigneeId
     description
     id
     name
+    priority
+    status
   }
 }
     `);
@@ -6105,9 +6139,13 @@ export const useDeleteApprovalTaskMutation = <
 export const UpdateApprovalTaskDocument = new TypedDocumentString(`
     mutation updateApprovalTask($approvalTask: ApprovalTaskInput!) {
   updateApprovalTask(approvalTask: $approvalTask) {
+    assigneeId
     description
+    dueDate
     id
     name
+    priority
+    status
     version
   }
 }
