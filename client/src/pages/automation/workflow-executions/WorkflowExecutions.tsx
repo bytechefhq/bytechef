@@ -181,6 +181,7 @@ export const WorkflowExecutions = () => {
             : undefined;
 
         setFilterEndDate(normalizedDate);
+        setFilterPageNumber(undefined);
 
         filter(
             filterStatus,
@@ -189,7 +190,7 @@ export const WorkflowExecutions = () => {
             filterProjectId,
             filterProjectDeploymentId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -215,6 +216,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterProjectId(projectId);
+        setFilterPageNumber(undefined);
 
         filter(
             filterStatus,
@@ -223,7 +225,7 @@ export const WorkflowExecutions = () => {
             projectId,
             filterProjectDeploymentId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -235,6 +237,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterProjectDeploymentId(projectDeploymentId);
+        setFilterPageNumber(undefined);
 
         filter(
             filterStatus,
@@ -243,7 +246,7 @@ export const WorkflowExecutions = () => {
             filterProjectId,
             projectDeploymentId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -255,6 +258,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterStatus(status);
+        setFilterPageNumber(undefined);
 
         filter(
             status,
@@ -263,7 +267,7 @@ export const WorkflowExecutions = () => {
             filterProjectId,
             filterProjectDeploymentId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -273,6 +277,7 @@ export const WorkflowExecutions = () => {
             : undefined;
 
         setFilterStartDate(normalizedDate);
+        setFilterPageNumber(undefined);
 
         filter(
             filterStatus,
@@ -281,7 +286,7 @@ export const WorkflowExecutions = () => {
             filterProjectId,
             filterProjectDeploymentId,
             filterWorkflowId,
-            filterPageNumber
+            undefined
         );
     };
 
@@ -293,6 +298,7 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterWorkflowId(workflowId);
+        setFilterPageNumber(undefined);
 
         filter(
             filterStatus,
@@ -301,7 +307,7 @@ export const WorkflowExecutions = () => {
             filterProjectId,
             filterProjectDeploymentId,
             workflowId,
-            filterPageNumber
+            undefined
         );
     };
 
