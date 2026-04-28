@@ -17,10 +17,12 @@
 package com.bytechef.platform.scheduler.job;
 
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.scheduler.util.QuartzConnectionRefreshUtils;
 import com.bytechef.tenant.TenantContext;
-import java.time.Duration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Date;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -28,7 +30,6 @@ import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,19 +59,19 @@ public class ConnectionOAuth2TokenRefreshJob implements Job {
 
             Trigger trigger = context.getTrigger();
 
-            scheduler.rescheduleJob(
+            Trigger newTrigger = QuartzConnectionRefreshUtils.buildRefreshTrigger(
                 trigger.getKey(),
-                TriggerBuilder.newTrigger()
-                    .withIdentity(trigger.getKey())
-                    .withDescription("Connection OAuth2 token refresh for " + connectionId)
-                    .startAt(Date.from(nextTriggerTime.minus(Duration.ofMinutes(5))))
-                    .build());
+                connectionId,
+                nextTriggerTime);
+
+            scheduler.rescheduleJob(trigger.getKey(), newTrigger);
         } catch (SchedulerException e) {
             throw new JobExecutionException(e);
         }
     }
 
     @Autowired
+    @SuppressFBWarnings("EI")
     public void setConnectionFacade(ConnectionFacade connectionFacade) {
         this.connectionFacade = connectionFacade;
     }

@@ -16,19 +16,18 @@
 
 package com.bytechef.platform.scheduler;
 
+import static com.bytechef.platform.scheduler.constant.QuartzConnectionRefreshConstant.CONNECTION_OAUTH_2_TOKEN_REFRESH;
+
 import com.bytechef.platform.scheduler.job.ConnectionOAuth2TokenRefreshJob;
+import com.bytechef.platform.scheduler.util.QuartzConnectionRefreshUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +36,6 @@ import org.slf4j.LoggerFactory;
  * @author Igor Beslic
  */
 public class QuartzConnectionRefreshScheduler implements ConnectionRefreshScheduler {
-
-    private static final String CONNECTION_OAUTH_2_TOKEN_REFRESH = "ConnectionOauth2TokenRefresh";
 
     private final Scheduler scheduler;
 
@@ -57,23 +54,22 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
     @Override
     public void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime, String tenantId) {
         JobDetail jobDetail = JobBuilder.newJob(ConnectionOAuth2TokenRefreshJob.class)
-            .withIdentity(JobKey.jobKey(tenantId + connectionId, CONNECTION_OAUTH_2_TOKEN_REFRESH))
+            .withIdentity(QuartzConnectionRefreshUtils.buildJobKey(connectionId, tenantId))
             .usingJobData("connectionId", connectionId)
             .usingJobData("tenantId", tenantId)
             .build();
 
-        Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(TriggerKey.triggerKey(tenantId + connectionId, CONNECTION_OAUTH_2_TOKEN_REFRESH))
-            .withDescription("Connection OAuth2 token refresh for " + connectionId)
-            .startAt(Date.from(tokenExpirationTime.minus(Duration.ofMinutes(5))))
-            .build();
+        Trigger trigger = QuartzConnectionRefreshUtils.buildRefreshTrigger(
+            QuartzConnectionRefreshUtils.buildTriggerKey(connectionId, tenantId),
+            connectionId,
+            tokenExpirationTime);
 
         schedule(jobDetail, trigger);
     }
 
     private void deleteJob(Long connectionId, String tenantId) {
         try {
-            JobKey jobKey = JobKey.jobKey(tenantId + connectionId, CONNECTION_OAUTH_2_TOKEN_REFRESH);
+            JobKey jobKey = QuartzConnectionRefreshUtils.buildJobKey(connectionId, tenantId);
 
             if (scheduler.checkExists(jobKey) && scheduler.deleteJob(jobKey)) {
                 log.trace(
