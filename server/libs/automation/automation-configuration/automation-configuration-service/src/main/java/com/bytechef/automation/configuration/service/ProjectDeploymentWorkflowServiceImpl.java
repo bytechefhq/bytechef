@@ -62,25 +62,19 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
 
     @Override
     public void deleteProjectDeploymentWorkflowConnection(long connectionId) {
-        List<Long> workflowIds = projectDeploymentWorkflowRepository.findAllIdsByConnectionId(connectionId);
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowRepository.findAllByProjectDeploymentWorkflowConnectionId(connectionId);
 
-        for (Long workflowId : workflowIds) {
-            ProjectDeploymentWorkflow workflow = projectDeploymentWorkflowRepository.findById(workflowId)
-                .orElse(null);
-
-            if (workflow == null) {
-                continue;
-            }
-
-            List<ProjectDeploymentWorkflowConnection> filteredConnections = workflow.getConnections()
+        projectDeploymentWorkflows.forEach(projectDeploymentWorkflow -> {
+            List<ProjectDeploymentWorkflowConnection> filteredConnections = projectDeploymentWorkflow.getConnections()
                 .stream()
                 .filter(connection -> !Objects.equals(connection.getConnectionId(), connectionId))
                 .toList();
 
-            workflow.setConnections(filteredConnections);
+            projectDeploymentWorkflow.setConnections(filteredConnections);
 
-            projectDeploymentWorkflowRepository.save(workflow);
-        }
+            projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
+        });
     }
 
     public void disableProjectDeploymentWorkflowByConnectionId(long connectionId) {
