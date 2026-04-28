@@ -8,41 +8,13 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT, STAGING_ENVIRONMENT} from '@/shared/constants';
+import {ENVIRONMENT_CONFIGS, type EnvironmentConfigI} from '@/shared/constants/environmentConfigs';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {BoxIcon, CheckIcon, ChevronDownIcon, FlaskConicalIcon, type LucideIcon, WrenchIcon} from 'lucide-react';
+import {CheckIcon, ChevronDownIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
-
-interface EnvironmentConfigI {
-    description: string;
-    icon: LucideIcon;
-    label: string;
-    styleType: 'primary-outline' | 'secondary-outline' | 'warning-outline';
-}
-
-const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
-    [DEVELOPMENT_ENVIRONMENT]: {
-        description: 'Features are unstable, experimental, and may change or break frequently.',
-        icon: WrenchIcon,
-        label: 'DEVELOPMENT',
-        styleType: 'secondary-outline',
-    },
-    [PRODUCTION_ENVIRONMENT]: {
-        description: 'Live environment used by real users. Optimized for performance with strict safeguards.',
-        icon: BoxIcon,
-        label: 'PRODUCTION',
-        styleType: 'primary-outline',
-    },
-    [STAGING_ENVIRONMENT]: {
-        description: 'Used for final testing, QA, and validation before release.',
-        icon: FlaskConicalIcon,
-        label: 'STAGING',
-        styleType: 'warning-outline',
-    },
-};
 
 interface EnvironmentOptionI {
     config: EnvironmentConfigI;

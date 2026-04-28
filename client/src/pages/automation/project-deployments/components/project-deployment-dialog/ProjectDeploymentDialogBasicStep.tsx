@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import {Note} from '@/components/Note';
 import ReadOnlyInput from '@/components/ReadOnlyInput/ReadOnlyInput';
 import {Empty} from '@/components/ui/empty';
@@ -13,7 +14,7 @@ import ProjectDeploymentDialogBasicStepTagsSelect from '@/pages/automation/proje
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
-import {toEnvironmentName} from '@/shared/constants';
+import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -350,17 +351,40 @@ const ProjectDeploymentDialogBasicStep = ({
                                                 </SelectTrigger>
 
                                                 <SelectContent className="w-full">
-                                                    {projectDeployments.map((deployment) => (
-                                                        <SelectItem
-                                                            key={
-                                                                deployment.id?.toString() ??
-                                                                `${deployment.name ?? 'deployment'}-${deployment.projectVersion}`
-                                                            }
-                                                            value={deployment.id?.toString() ?? ''}
-                                                        >
-                                                            {`${deployment.name ?? `Deployment ${deployment.id}`} - V${deployment.projectVersion} - ${deployment.environmentId != null ? toEnvironmentName(deployment.environmentId) : ''}`}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {projectDeployments.map((deployment) => {
+                                                        const environmentConfig =
+                                                            deployment.environmentId != null
+                                                                ? ENVIRONMENT_CONFIGS[deployment.environmentId]
+                                                                : undefined;
+                                                        const EnvironmentIcon = environmentConfig?.icon;
+
+                                                        return (
+                                                            <SelectItem
+                                                                key={
+                                                                    deployment.id?.toString() ??
+                                                                    `${deployment.name ?? 'deployment'}-${deployment.projectVersion}`
+                                                                }
+                                                                value={deployment.id?.toString() ?? ''}
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <span>
+                                                                        {`${deployment.name ?? `Deployment ${deployment.id}`} - V${deployment.projectVersion}`}
+                                                                    </span>
+
+                                                                    {environmentConfig && EnvironmentIcon && (
+                                                                        <Badge
+                                                                            icon={
+                                                                                <EnvironmentIcon className="size-3" />
+                                                                            }
+                                                                            label={environmentConfig.label}
+                                                                            styleType={environmentConfig.styleType}
+                                                                            weight="semibold"
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            </SelectItem>
+                                                        );
+                                                    })}
                                                 </SelectContent>
                                             </Select>
                                         )}
