@@ -81,7 +81,6 @@ const ProjectDeployments = () => {
     const {
         data: projectDeployments,
         error: projectDeploymentsError,
-        isFetching: projectDeploymentsIsFetching,
         isLoading: projectDeploymentsIsLoading,
     } = useGetWorkspaceProjectDeploymentsQuery({
         environmentId: currentEnvironmentId,
@@ -244,7 +243,7 @@ const ProjectDeployments = () => {
                                     )
                             )}
 
-                            {projectDeploymentsIsFetching && projectDeployments && projectDeployments.length > 0 && (
+                            {projectDeploymentsIsLoading && projectDeployments && projectDeployments.length > 0 && (
                                 <ProjectDeploymentsSkeleton />
                             )}
 
