@@ -65,14 +65,15 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
                 header: 'Start date',
             }),
             columnHelper.accessor((row) => row.job, {
-                cell: (info) => (
-                    <>
-                        {info.getValue()?.endDate &&
-                            `${info.getValue()?.endDate?.toLocaleDateString()} ${info
-                                .getValue()
-                                ?.endDate?.toLocaleTimeString()}`}
-                    </>
-                ),
+                cell: (info) => {
+                    const {endDate} = info.getValue();
+
+                    if (!endDate) {
+                        return <></>;
+                    }
+
+                    return <>{`${endDate.toLocaleDateString()} ${endDate.toLocaleTimeString()}`}</>;
+                },
                 header: 'End date',
             }),
             columnHelper.accessor((row) => row.job, {
