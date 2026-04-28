@@ -195,8 +195,10 @@ const Property = ({
             key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
         >
             {control &&
-                (propertiesDataSource?.propertiesLookupDependsOn?.length ||
-                    optionsDataSource?.optionsLookupDependsOn?.length) && (
+                !!(
+                    propertiesDataSource?.propertiesLookupDependsOn?.length ||
+                    optionsDataSource?.optionsLookupDependsOn?.length
+                ) && (
                     <FormLookupValuesWatcher
                         arrayIndex={arrayIndex}
                         control={control}
