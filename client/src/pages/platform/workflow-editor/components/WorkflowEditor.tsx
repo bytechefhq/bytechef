@@ -78,7 +78,7 @@ const WorkflowEditor = ({
                 nodeTypes={nodeTypes}
                 nodes={nodes}
                 nodesConnectable={false}
-                nodesDraggable
+                nodesDraggable={!readOnlyWorkflow}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 onEdgesChange={onEdgesChange}
@@ -99,20 +99,28 @@ const WorkflowEditor = ({
                     fitViewOptions={{duration: 500, minZoom: 0.2}}
                     showInteractive={false}
                 >
-                    <ControlButton
-                        onClick={() => setLayoutDirection(layoutDirection === 'TB' ? 'LR' : 'TB')}
-                        title={layoutDirection === 'TB' ? 'Switch to horizontal layout' : 'Switch to vertical layout'}
-                    >
-                        {layoutDirection === 'TB' ? (
-                            <ArrowRightIcon className="size-3" />
-                        ) : (
-                            <ArrowDownIcon className="size-3" />
-                        )}
-                    </ControlButton>
+                    {!readOnlyWorkflow && (
+                        <>
+                            <ControlButton
+                                onClick={() => setLayoutDirection(layoutDirection === 'TB' ? 'LR' : 'TB')}
+                                title={
+                                    layoutDirection === 'TB'
+                                        ? 'Switch to horizontal layout'
+                                        : 'Switch to vertical layout'
+                                }
+                            >
+                                {layoutDirection === 'TB' ? (
+                                    <ArrowRightIcon className="size-3" />
+                                ) : (
+                                    <ArrowDownIcon className="size-3" />
+                                )}
+                            </ControlButton>
 
-                    <ControlButton onClick={handleResetLayout} title="Reset layout">
-                        <BrushCleaningIcon className="size-3" />
-                    </ControlButton>
+                            <ControlButton onClick={handleResetLayout} title="Reset layout">
+                                <BrushCleaningIcon className="size-3" />
+                            </ControlButton>
+                        </>
+                    )}
                 </Controls>
             </ReactFlow>
         </div>
