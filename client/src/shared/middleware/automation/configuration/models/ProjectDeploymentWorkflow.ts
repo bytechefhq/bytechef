@@ -70,6 +70,12 @@ export interface ProjectDeploymentWorkflow {
      */
     lastExecutionDate?: Date;
     /**
+     * The last execution status of a project deployment.
+     * @type {ProjectDeploymentWorkflowLastExecutionStatusEnum}
+     * @memberof ProjectDeploymentWorkflow
+     */
+    lastExecutionStatus?: ProjectDeploymentWorkflowLastExecutionStatusEnum;
+    /**
      * The last modified by.
      * @type {string}
      * @memberof ProjectDeploymentWorkflow
@@ -113,6 +119,20 @@ export interface ProjectDeploymentWorkflow {
     version?: number;
 }
 
+
+/**
+ * @export
+ */
+export const ProjectDeploymentWorkflowLastExecutionStatusEnum = {
+    Created: 'CREATED',
+    Started: 'STARTED',
+    Completed: 'COMPLETED',
+    Failed: 'FAILED',
+    Stopped: 'STOPPED'
+} as const;
+export type ProjectDeploymentWorkflowLastExecutionStatusEnum = typeof ProjectDeploymentWorkflowLastExecutionStatusEnum[keyof typeof ProjectDeploymentWorkflowLastExecutionStatusEnum];
+
+
 /**
  * Check if a given object implements the ProjectDeploymentWorkflow interface.
  */
@@ -137,6 +157,7 @@ export function ProjectDeploymentWorkflowFromJSONTyped(json: any, ignoreDiscrimi
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastExecutionStatus': json['lastExecutionStatus'] == null ? undefined : json['lastExecutionStatus'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'projectDeploymentId': json['projectDeploymentId'] == null ? undefined : json['projectDeploymentId'],
@@ -162,6 +183,7 @@ export function ProjectDeploymentWorkflowToJSONTyped(value?: Omit<ProjectDeploym
         'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(ProjectDeploymentWorkflowConnectionToJSON)),
         'enabled': value['enabled'],
         'lastExecutionDate': value['lastExecutionDate'] == null ? value['lastExecutionDate'] : value['lastExecutionDate'].toISOString(),
+        'lastExecutionStatus': value['lastExecutionStatus'],
         'projectDeploymentId': value['projectDeploymentId'],
         'staticWebhookUrl': value['staticWebhookUrl'],
         'workflowId': value['workflowId'],
