@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateConnectionRequest", description = "Contains all connection parameters that can be updated.")
 @JsonTypeName("UpdateConnectionRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.095260+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-28T12:44:14.962329259+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class UpdateConnectionRequestModel {
 
   private String name;

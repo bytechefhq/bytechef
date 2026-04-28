@@ -6,6 +6,7 @@ import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentWor
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectDeploymentWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.095260+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-28T12:44:14.962329259+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ProjectDeploymentWorkflowModel {
 
   private @Nullable String createdBy;
@@ -50,6 +51,49 @@ public class ProjectDeploymentWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastExecutionDate;
+
+  /**
+   * The last execution status of a project deployment.
+   */
+  public enum LastExecutionStatusEnum {
+    CREATED("CREATED"),
+    
+    STARTED("STARTED"),
+    
+    COMPLETED("COMPLETED"),
+    
+    FAILED("FAILED"),
+    
+    STOPPED("STOPPED");
+
+    private final String value;
+
+    LastExecutionStatusEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static LastExecutionStatusEnum fromValue(String value) {
+      for (LastExecutionStatusEnum b : LastExecutionStatusEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable LastExecutionStatusEnum lastExecutionStatus;
 
   private @Nullable String lastModifiedBy;
 
@@ -229,6 +273,27 @@ public class ProjectDeploymentWorkflowModel {
     this.lastExecutionDate = lastExecutionDate;
   }
 
+  public ProjectDeploymentWorkflowModel lastExecutionStatus(@Nullable LastExecutionStatusEnum lastExecutionStatus) {
+    this.lastExecutionStatus = lastExecutionStatus;
+    return this;
+  }
+
+  /**
+   * The last execution status of a project deployment.
+   * @return lastExecutionStatus
+   */
+  
+  @Schema(name = "lastExecutionStatus", description = "The last execution status of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastExecutionStatus")
+  public @Nullable LastExecutionStatusEnum getLastExecutionStatus() {
+    return lastExecutionStatus;
+  }
+
+  @JsonProperty("lastExecutionStatus")
+  public void setLastExecutionStatus(@Nullable LastExecutionStatusEnum lastExecutionStatus) {
+    this.lastExecutionStatus = lastExecutionStatus;
+  }
+
   public ProjectDeploymentWorkflowModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
@@ -392,6 +457,7 @@ public class ProjectDeploymentWorkflowModel {
         Objects.equals(this.enabled, projectDeploymentWorkflow.enabled) &&
         Objects.equals(this.id, projectDeploymentWorkflow.id) &&
         Objects.equals(this.lastExecutionDate, projectDeploymentWorkflow.lastExecutionDate) &&
+        Objects.equals(this.lastExecutionStatus, projectDeploymentWorkflow.lastExecutionStatus) &&
         Objects.equals(this.lastModifiedBy, projectDeploymentWorkflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, projectDeploymentWorkflow.lastModifiedDate) &&
         Objects.equals(this.projectDeploymentId, projectDeploymentWorkflow.projectDeploymentId) &&
@@ -403,7 +469,7 @@ public class ProjectDeploymentWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectDeploymentId, staticWebhookUrl, workflowId, workflowUuid, version);
+    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastExecutionStatus, lastModifiedBy, lastModifiedDate, projectDeploymentId, staticWebhookUrl, workflowId, workflowUuid, version);
   }
 
   @Override
@@ -417,6 +483,7 @@ public class ProjectDeploymentWorkflowModel {
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
+    sb.append("    lastExecutionStatus: ").append(toIndentedString(lastExecutionStatus)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    projectDeploymentId: ").append(toIndentedString(projectDeploymentId)).append("\n");
