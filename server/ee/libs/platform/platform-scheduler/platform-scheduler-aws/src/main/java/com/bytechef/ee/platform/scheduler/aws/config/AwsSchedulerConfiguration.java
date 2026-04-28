@@ -9,12 +9,15 @@ package com.bytechef.ee.platform.scheduler.aws.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.scheduler.aws.AwsConnectionRefreshScheduler;
 import com.bytechef.ee.platform.scheduler.aws.AwsTriggerScheduler;
+import com.bytechef.ee.platform.scheduler.aws.listener.ConnectionRefreshListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.DynamicWebhookTriggerRefreshListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.PollingTriggerListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.ScheduleTriggerListener;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import org.slf4j.Logger;
@@ -51,6 +54,21 @@ public class AwsSchedulerConfiguration {
     }
 
     @Bean
+    AwsConnectionRefreshScheduler awsConnectionRefreshScheduler(
+        AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
+
+        ApplicationProperties.Cloud.Aws aws = applicationProperties.getCloud()
+            .getAws();
+
+        SchedulerClient schedulerClient = SchedulerClient.builder()
+            .credentialsProvider(awsCredentialsProvider)
+            .region(awsRegionProvider.getRegion())
+            .build();
+
+        return new AwsConnectionRefreshScheduler(aws, schedulerClient);
+    }
+
+    @Bean
     AwsTriggerScheduler awsTriggerScheduler(
         AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
 
@@ -67,6 +85,11 @@ public class AwsSchedulerConfiguration {
             .build();
 
         return new AwsTriggerScheduler(aws, polling, schedulerClient);
+    }
+
+    @Bean
+    ConnectionRefreshListener connectionRefreshListener(ConnectionFacade connectionFacade) {
+        return new ConnectionRefreshListener(connectionFacade);
     }
 
     @Bean
