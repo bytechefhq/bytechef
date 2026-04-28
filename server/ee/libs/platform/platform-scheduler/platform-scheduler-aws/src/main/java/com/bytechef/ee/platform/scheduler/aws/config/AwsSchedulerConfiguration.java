@@ -31,19 +31,20 @@ import software.amazon.awssdk.services.scheduler.SchedulerClient;
  * @version ee
  *
  * @author Marko Kriskovic
+ * @author Nikolina Spehar
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "scheduler.provider", havingValue = "aws")
 @ConditionalOnEEVersion
-public class AwsTriggerSchedulerConfiguration {
+public class AwsSchedulerConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(AwsTriggerSchedulerConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(AwsSchedulerConfiguration.class);
 
     private final ApplicationProperties applicationProperties;
 
-    AwsTriggerSchedulerConfiguration(ApplicationProperties applicationProperties) {
+    AwsSchedulerConfiguration(ApplicationProperties applicationProperties) {
         if (log.isInfoEnabled()) {
-            log.info("Trigger scheduler provider type enabled: aws");
+            log.info("Scheduler provider type enabled: aws");
         }
 
         this.applicationProperties = applicationProperties;
