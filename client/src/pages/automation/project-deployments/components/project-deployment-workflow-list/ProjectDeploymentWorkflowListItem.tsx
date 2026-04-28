@@ -155,7 +155,8 @@ const ProjectDeploymentWorkflowListItem = ({
 
                 <div className="flex items-center gap-x-6">
                     <div className="min-w-[36px]">
-                        {(!workflow.triggers?.length || workflow.triggers?.[0]?.type.includes('manual')) && (
+                        {(!workflow.triggers?.length ||
+                            workflow.triggers?.some((trigger) => trigger.type.includes('manual'))) && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
