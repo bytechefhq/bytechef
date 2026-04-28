@@ -62,7 +62,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
                                 ?.startDate?.toLocaleTimeString()}`}
                     </>
                 ),
-                header: 'Execution date',
+                header: 'Start date',
             }),
             columnHelper.accessor((row) => row.job, {
                 cell: (info) => (
