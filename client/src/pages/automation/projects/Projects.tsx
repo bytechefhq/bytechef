@@ -20,7 +20,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
-import {useRef} from 'react';
+import {useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
@@ -33,6 +33,8 @@ export enum Type {
 }
 
 const Projects = () => {
+    const [newlyCreatedProjectId, setNewlyCreatedProjectId] = useState<number | undefined>();
+
     const application = useApplicationInfoStore((state) => state.application);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -111,6 +113,7 @@ const Projects = () => {
                             ff_2482 ? (
                                 <ButtonGroup>
                                     <ProjectDialog
+                                        onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
                                         project={undefined}
                                         triggerNode={
                                             <Button
@@ -146,6 +149,7 @@ const Projects = () => {
                                 </ButtonGroup>
                             ) : (
                                 <ProjectDialog
+                                    onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
                                     project={undefined}
                                     triggerNode={<Button aria-label="Create Project" label="New Project" />}
                                 />
@@ -167,6 +171,7 @@ const Projects = () => {
                     <ProjectList
                         componentDefinitions={componentDefinitions}
                         isRefetchingProjects={isRefetchingProjects}
+                        newlyCreatedProjectId={newlyCreatedProjectId}
                         projectGitConfigurations={projectGitConfigurations ?? []}
                         projects={projects}
                         tags={tags}
@@ -178,6 +183,7 @@ const Projects = () => {
                             ff_2482 ? (
                                 <ButtonGroup className="mx-auto">
                                     <ProjectDialog
+                                        onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
                                         project={undefined}
                                         triggerNode={<Button aria-label="Create Project" label="Create Project" />}
                                     />
