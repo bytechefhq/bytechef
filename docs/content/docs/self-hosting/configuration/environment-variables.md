@@ -228,6 +228,12 @@ System administrator is used for accessing protected data reachable through /act
 |---|---|---|
 | `BYTECHEF_TENANT_MODE` | Tenant mode (MULTI, SINGLE) | `SINGLE` |
 
+## Upgrade Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_UPGRADE_ENABLED` | Run database upgrades (Liquibase migrations) at startup. Disable on read-only replicas or when only a designated instance should apply schema changes in a multi-instance deployment. | `true` |
+
 ## Webhook URL Configuration
 
 | Environment Variable | Description | Default Value |
