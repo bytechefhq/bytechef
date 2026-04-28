@@ -50,6 +50,7 @@ interface ProjectDeploymentDialogProps {
     filterWorkflowUuids?: string[];
     onClose?: () => void;
     onOpenChange?: (isOpen: boolean) => void;
+    onSuccess?: (deploymentId: number) => void;
     projectDeployment?: ProjectDeployment;
     projectDeployments?: ProjectDeployment[];
     projectDeploymentsLoading?: boolean;
@@ -64,6 +65,7 @@ const ProjectDeploymentDialog = ({
     filterWorkflowUuids,
     onClose,
     onOpenChange,
+    onSuccess,
     projectDeployment,
     projectDeployments,
     projectDeploymentsLoading,
@@ -154,7 +156,7 @@ const ProjectDeploymentDialog = ({
 
     const navigate = useNavigate();
 
-    const onSuccess = () => {
+    const onSuccessHandler = (deploymentId: number | void) => {
         if (!effectiveProjectDeployment?.id) {
             captureProjectDeploymentCreated();
         }
@@ -178,6 +180,10 @@ const ProjectDeploymentDialog = ({
         const submittedEnvironmentId = getValues().environmentId;
         const submittedProjectId = getValues().projectId;
 
+        if (onSuccess && deploymentId) {
+            onSuccess(deploymentId);
+        }
+
         closeDialog();
         setActiveStepIndex(0);
 
@@ -193,11 +199,11 @@ const ProjectDeploymentDialog = ({
     };
 
     const createProjectDeploymentMutation = useCreateProjectDeploymentMutation({
-        onSuccess,
+        onSuccess: (deploymentId) => onSuccessHandler(deploymentId),
     });
 
     const updateProjectDeploymentMutation = useUpdateProjectDeploymentMutation({
-        onSuccess,
+        onSuccess: () => onSuccessHandler(),
     });
 
     const isDeploymentPending = createProjectDeploymentMutation.isPending || updateProjectDeploymentMutation.isPending;

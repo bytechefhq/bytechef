@@ -18,6 +18,7 @@ import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Layers3Icon, TagIcon} from 'lucide-react';
+import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ProjectDeploymentDialog from './components/project-deployment-dialog/ProjectDeploymentDialog';
@@ -51,6 +52,8 @@ const ProjectDeploymentsSkeleton = () => (
 );
 
 const ProjectDeployments = () => {
+    const [newlyCreatedDeploymentId, setNewlyCreatedDeploymentId] = useState<number | undefined>();
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -128,6 +131,7 @@ const ProjectDeployments = () => {
                                 <EnvironmentSelect />
 
                                 <ProjectDeploymentDialog
+                                    onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
                                     projectDeployment={
                                         {
                                             environmentId: currentEnvironmentId,
@@ -229,6 +233,7 @@ const ProjectDeployments = () => {
                                         <ProjectDeploymentList
                                             componentDefinitions={componentDefinitions}
                                             key={projectId}
+                                            newlyCreatedDeploymentId={newlyCreatedDeploymentId}
                                             project={
                                                 projects.find((currentProject) => currentProject.id === projectId)!
                                             }
@@ -250,6 +255,7 @@ const ProjectDeployments = () => {
                     <EmptyList
                         button={
                             <ProjectDeploymentDialog
+                                onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
                                 projectDeployment={
                                     {
                                         environmentId: currentEnvironmentId,
