@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.event;
 
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -38,10 +39,15 @@ import org.springframework.stereotype.Component;
 public class ConnectionAfterSaveEventListener extends AbstractRelationalEventListener<Connection> {
 
     private final ConnectionLifecycleFacade connectionLifecycleFacade;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionAfterSaveEventListener(ConnectionLifecycleFacade connectionLifecycleFacade) {
+    public ConnectionAfterSaveEventListener(
+        ConnectionLifecycleFacade connectionLifecycleFacade,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+
         this.connectionLifecycleFacade = connectionLifecycleFacade;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
     /**
@@ -49,7 +55,8 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
      * refresh for newly inserted only if credentialsStatus is @Connection.CredentialStatus.VALID. For updated
      * connections if credentialStatus attribute was changed it schedules token refresh where new value credentialStatus
      * is #Connection.CredentialStatus.VALID and deletes existing scheduled refresh token routine if
-     * #Connection.CredentialStatus.INVALID.
+     * #Connection.CredentialStatus.INVALID. In addition, all deployed and enabled workflows that use connection with
+     * INVALID status will be disabled.
      *
      * @param afterSaveEvent will never be {@literal null}.
      */
@@ -86,8 +93,12 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
                         case Connection.CredentialStatus.VALID ->
                             connectionLifecycleFacade.scheduleConnectionRefresh(
                                 connection.getId(), connection.getParameters(), tenantId);
-                        case Connection.CredentialStatus.INVALID ->
+                        case Connection.CredentialStatus.INVALID -> {
                             connectionLifecycleFacade.deleteScheduledConnectionRefresh(connection.getId(), tenantId);
+
+                            projectDeploymentWorkflowService.disableProjectDeploymentWorkflowByConnectionId(
+                                connection.getId());
+                        }
                         default -> {
                         }
                     }
