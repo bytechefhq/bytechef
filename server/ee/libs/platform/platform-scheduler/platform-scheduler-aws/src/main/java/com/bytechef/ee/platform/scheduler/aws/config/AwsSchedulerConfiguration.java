@@ -46,9 +46,7 @@ public class AwsSchedulerConfiguration {
     private final ApplicationProperties applicationProperties;
 
     AwsSchedulerConfiguration(ApplicationProperties applicationProperties) {
-        if (log.isInfoEnabled()) {
-            log.info("Scheduler provider type enabled: aws");
-        }
+        log.info("Scheduler provider type enabled: aws");
 
         this.applicationProperties = applicationProperties;
     }
