@@ -330,10 +330,11 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             </Button>
                                         </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end">
+                                        <DropdownMenuContent align="end" className="p-0">
                                             {ff_1041 && (
                                                 <DropdownMenuItem
                                                     aria-label="Create Workflow from Template"
+                                                    className="dropdown-menu-item"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
 
@@ -346,6 +347,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                             <DropdownMenuItem
                                                 aria-label="Import Workflow"
+                                                className="dropdown-menu-item"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
 
