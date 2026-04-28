@@ -27,11 +27,12 @@ import {useForm} from 'react-hook-form';
 
 interface ProjectDialogProps {
     onClose?: (project?: Project) => void;
+    onSuccess?: (projectId: number | void) => void;
     project?: Project;
     triggerNode?: ReactNode;
 }
 
-const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
+const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -65,7 +66,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
     const queryClient = useQueryClient();
 
-    const onSuccess = (projectId: number | void) => {
+    const onSuccessHandler = (projectId: number | void) => {
         captureProjectCreated();
 
         if (!projectId && project) {
@@ -86,12 +87,16 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
             queryKey: ProjectTagKeys.projectTags,
         });
 
+        if (onSuccess) {
+            onSuccess(projectId);
+        }
+
         closeDialog(project);
     };
 
-    const createProjectMutation = useCreateProjectMutation({onSuccess});
+    const createProjectMutation = useCreateProjectMutation({onSuccess: onSuccessHandler});
 
-    const updateProjectMutation = useUpdateProjectMutation({onSuccess});
+    const updateProjectMutation = useUpdateProjectMutation({onSuccess: onSuccessHandler});
 
     const tagNames = project?.tags?.map((tag) => tag.name);
 

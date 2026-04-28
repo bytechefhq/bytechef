@@ -156,6 +156,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
             }
 
             toast('Workflow is imported.');
+
+            if (workflowsCollapsibleTriggerRef.current?.getAttribute('data-state') === 'closed') {
+                workflowsCollapsibleTriggerRef.current.click();
+            }
         },
     });
 
