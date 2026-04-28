@@ -21,8 +21,6 @@ import com.bytechef.platform.scheduler.util.QuartzConnectionRefreshUtils;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
