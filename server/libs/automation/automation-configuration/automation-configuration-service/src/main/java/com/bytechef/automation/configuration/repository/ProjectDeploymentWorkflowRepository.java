@@ -45,9 +45,9 @@ public interface ProjectDeploymentWorkflowRepository extends ListCrudRepository<
         findByProjectDeploymentIdAndWorkflowId(long projectDeploymentId, String workflowId);
 
     @Query("""
-            SELECT project_deployment_workflow_connection.connection_id FROM project_deployment_workflow_connection
+            SELECT COUNT(*) connectionCount FROM project_deployment_workflow_connection
             WHERE connection_id = :connectionId
         """)
-    List<Long> findProjectDeploymentWorkflowConnectionIdsByConnectionId(@Param("connectionId") long connectionId);
+    Long countByConnectionId(@Param("connectionId") long connectionId);
 
 }

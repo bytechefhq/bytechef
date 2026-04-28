@@ -159,9 +159,7 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
     @Override
     @Transactional(readOnly = true)
     public boolean isConnectionUsed(long connectionId) {
-        return !projectDeploymentWorkflowRepository
-            .findProjectDeploymentWorkflowConnectionIdsByConnectionId(connectionId)
-            .isEmpty();
+        return (projectDeploymentWorkflowRepository.countByConnectionId(connectionId) > 0);
     }
 
     @Override
