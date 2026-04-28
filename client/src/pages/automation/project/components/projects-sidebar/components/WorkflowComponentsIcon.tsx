@@ -35,7 +35,9 @@ const WorkflowComponentsIcon = ({
                     )}
                 </TooltipTrigger>
 
-                <TooltipContent side="top">{componentDefinition?.title || name}</TooltipContent>
+                <TooltipContent className="capitalize" side="top">
+                    {componentDefinition?.title || name}
+                </TooltipContent>
             </Tooltip>
         </div>
     );
