@@ -172,9 +172,10 @@ const ProjectWorkflowList = ({
                                                 </Button>
                                             </DropdownMenuTrigger>
 
-                                            <DropdownMenuContent align="end">
+                                            <DropdownMenuContent align="end" className="p-0">
                                                 {ff_1041 && (
                                                     <DropdownMenuItem
+                                                        className="dropdown-menu-item"
                                                         onClick={(event) => {
                                                             event.stopPropagation();
 
@@ -186,6 +187,7 @@ const ProjectWorkflowList = ({
                                                 )}
 
                                                 <DropdownMenuItem
+                                                    className="dropdown-menu-item"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
 
