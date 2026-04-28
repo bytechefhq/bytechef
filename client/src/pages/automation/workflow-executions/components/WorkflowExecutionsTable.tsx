@@ -65,6 +65,17 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
                 header: 'Execution date',
             }),
             columnHelper.accessor((row) => row.job, {
+                cell: (info) => (
+                    <>
+                        {info.getValue()?.endDate &&
+                            `${info.getValue()?.endDate?.toLocaleDateString()} ${info
+                                .getValue()
+                                ?.endDate?.toLocaleTimeString()}`}
+                    </>
+                ),
+                header: 'End date',
+            }),
+            columnHelper.accessor((row) => row.job, {
                 cell: (info) => <WorkflowExecutionsDropdownMenu data={info} />,
                 header: 'Action',
             }),
