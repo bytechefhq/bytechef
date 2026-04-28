@@ -60,7 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ConnectionFacadeImpl implements ConnectionFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConnectionFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ConnectionFacadeImpl.class);
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
@@ -120,8 +120,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                             CLIENT_SECRET, predefinedParameters.get(CLIENT_SECRET)));
                 }
 
-                if (logger.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
-                    logger.warn(
+                if (log.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
+                    log.warn(
                         "OAuth2 authorization code connection for component {} does not contain refresh token",
                         connection.getComponentName());
                 }
@@ -177,7 +177,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         Map<String, ?> parameters = connection.getParameters();
 
-        logger.info("Executed connection refresh for connection with connectionId: {}", connectionId);
+        log.info("Executed connection refresh for connection with connectionId: {}", connectionId);
 
         return (Integer) parameters.get("expires_in");
     }
@@ -298,7 +298,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                         isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection,
                         filterTags(tags, connection));
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    log.error(e.getMessage());
 
                     return null;
                 }
@@ -354,8 +354,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             uri = connectionDefinitionService.executeBaseUri(componentName, componentConnection)
                 .orElse(null);
         } catch (IllegalStateException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug(e.getMessage());
             }
         }
 
