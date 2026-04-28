@@ -2,12 +2,14 @@ import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
 import {Project, ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {useCallback, useEffect, useState} from 'react';
 
 import ProjectDeploymentWorkflowList from '../project-deployment-workflow-list/ProjectDeploymentWorkflowList';
 import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
 interface ProjectDeploymentListProps {
     componentDefinitions?: ComponentDefinitionBasic[];
+    newlyCreatedDeploymentId?: number;
     project: Project;
     projectDeployments: ProjectDeployment[];
     tags: Tag[];
@@ -16,12 +18,34 @@ interface ProjectDeploymentListProps {
 
 const ProjectDeploymentList = ({
     componentDefinitions,
+    newlyCreatedDeploymentId,
     project,
     projectDeployments,
     tags,
     taskDispatcherDefinitions,
 }: ProjectDeploymentListProps) => {
+    const [openCollapsibles, setOpenCollapsibles] = useState<Set<number>>(new Set());
+
     const projectDeploymentMap = useProjectDeploymentsEnabledStore(({projectDeploymentMap}) => projectDeploymentMap);
+
+    const handleOpenChange = useCallback((open: boolean, projectDeploymentId: number) => {
+        setOpenCollapsibles((prev) => {
+            const projectDeploymentSet = new Set(prev);
+
+            if (open) {
+                projectDeploymentSet.add(projectDeploymentId);
+            } else {
+                projectDeploymentSet.delete(projectDeploymentId);
+            }
+            return projectDeploymentSet;
+        });
+    }, []);
+
+    useEffect(() => {
+        if (newlyCreatedDeploymentId) {
+            setOpenCollapsibles((prev) => new Set([...prev, newlyCreatedDeploymentId]));
+        }
+    }, [newlyCreatedDeploymentId]);
 
     return (
         <>
@@ -33,7 +57,12 @@ const ProjectDeploymentList = ({
                 }
 
                 return (
-                    <Collapsible className="group" key={projectDeployment.id}>
+                    <Collapsible
+                        className="group"
+                        key={projectDeployment.id}
+                        onOpenChange={(open) => handleOpenChange(open, projectDeployment.id!)}
+                        open={openCollapsibles.has(projectDeployment.id!)}
+                    >
                         <ProjectDeploymentListItem
                             key={projectDeployment.id}
                             projectDeployment={projectDeployment}
