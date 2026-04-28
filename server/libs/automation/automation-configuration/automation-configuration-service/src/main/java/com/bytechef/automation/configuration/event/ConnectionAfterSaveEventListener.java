@@ -78,7 +78,7 @@ public class ConnectionAfterSaveEventListener extends AbstractRelationalEventLis
                     connectionLifecycleFacade.scheduleConnectionRefresh(
                         connection.getId(), connection.getParameters(), tenantId);
                 case DbAction.UpdateRoot<?> a -> {
-                    if (connection.isCredentialsStatusUpdated()) {
+                    if (!connection.isCredentialsStatusUpdated()) {
                         return;
                     }
 
