@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Service
 @Transactional
@@ -80,6 +81,17 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
 
             projectDeploymentWorkflowRepository.save(workflow);
         }
+    }
+
+    public void disableProjectDeploymentWorkflowByConnectionId(long connectionId) {
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowRepository.findAllByProjectDeploymentWorkflowConnectionId(connectionId);
+
+        projectDeploymentWorkflows.forEach(projectDeploymentWorkflow -> {
+            projectDeploymentWorkflow.setEnabled(false);
+
+            projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
+        });
     }
 
     @Override

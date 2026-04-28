@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public interface ProjectDeploymentWorkflowService {
 
@@ -34,6 +35,8 @@ public interface ProjectDeploymentWorkflowService {
     void delete(long id);
 
     void deleteProjectDeploymentWorkflowConnection(long connectionId);
+
+    void disableProjectDeploymentWorkflowByConnectionId(long connectionId);
 
     @Transactional(readOnly = true)
     Optional<ProjectDeploymentWorkflow> fetchProjectDeploymentWorkflow(long projectDeploymentId, String workflowId);
