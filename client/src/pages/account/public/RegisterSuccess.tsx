@@ -54,7 +54,7 @@ const RegisterSuccess = () => {
 
                 {loading ? (
                     <div>
-                        <Button disabled icon={<LoadingIcon />} label="Start" size="lg" />
+                        <Button disabled icon={<LoadingIcon className="text-white" />} label="Start" size="lg" />
                     </div>
                 ) : (
                     <Link to="/login">
