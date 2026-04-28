@@ -31,7 +31,7 @@ const WorkflowComponentsIcon = ({
                             src={componentDefinition?.icon || taskDispatcherDefinition?.icon || ''}
                         />
                     ) : (
-                        <Skeleton className="size-4 rounded-full" />
+                        <Skeleton className="size-5 rounded-full" />
                     )}
                 </TooltipTrigger>
 
