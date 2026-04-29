@@ -3572,7 +3572,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "table" ]
+        "propertiesLookupDependsOn": [ "database", "schema", "table" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -4808,7 +4808,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "table" ]
+        "propertiesLookupDependsOn": [ "database", "schema", "table" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -8388,7 +8388,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "table" ]
+        "propertiesLookupDependsOn": [ "database", "schema", "table" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -9624,7 +9624,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "table" ]
+        "propertiesLookupDependsOn": [ "database", "schema", "table" ]
       },
       "expressionEnabled": null,
       "header": null,

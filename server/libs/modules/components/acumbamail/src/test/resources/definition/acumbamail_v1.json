@@ -138,7 +138,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "list_id" ]
+        "optionsLookupDependsOn": null
       },
       "placeholder": null,
       "regex": null,

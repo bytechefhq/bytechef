@@ -19,92 +19,84 @@ package com.bytechef.component.accelo.util;
 import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYPE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class AcceloUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(AGAINST_TYPE, "issue"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetAgainstIdOptions() {
-        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
-        List<Map<String, Object>> countries = new ArrayList<>();
-        Map<String, Object> companyMap = new LinkedHashMap<>();
+    void testGetAgainstIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        companyMap.put("title", "title");
-        companyMap.put("id", "id");
-
-        countries.add(companyMap);
-
-        map.put("response", countries);
-
-        when(mockedParameters.getRequiredString(AGAINST_TYPE))
-            .thenReturn("issue");
-        when(mockedContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("title", "id"));
+            .thenReturn(Map.of("response", List.of(Map.of("title", "title", "id", "id"))));
 
         assertEquals(
-            expectedOptions,
+            List.of(option("title", "id")),
             AcceloUtils.getAgainstIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("issues", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetCompanyIdOptions() {
-        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
-        List<Map<String, Object>> countries = new ArrayList<>();
-        Map<String, Object> companyMap = new LinkedHashMap<>();
+    void testGetCompanyIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        companyMap.put("name", "companyName");
-        companyMap.put("id", "companyId");
-
-        countries.add(companyMap);
-
-        map.put("response", countries);
-
-        when(mockedContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("companyName", "companyId"));
+            .thenReturn(Map.of("response", List.of(Map.of("name", "companyName", "id", "companyId"))));
 
         assertEquals(
-            expectedOptions,
+            List.of(option("companyName", "companyId")),
             AcceloUtils.getCompanyIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("companies", stringArgumentCaptor.getValue());
     }
 }
