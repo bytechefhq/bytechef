@@ -92,7 +92,7 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen}: M
                                 >
                                     <item.icon
                                         aria-hidden="true"
-                                        className="mr-4 size-6 text-gray-400 group-hover:text-gray-500"
+                                        className="mr-4 size-6 text-gray-400 group-hover:text-content-neutral-secondary"
                                     />
 
                                     {item.name}
@@ -105,7 +105,7 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen}: M
                 {edition === EditionType.EE && environmentsQuery?.environments && (
                     <div className="border-t border-gray-200 px-4 py-3">
                         <div className="flex items-center space-x-2 pb-2">
-                            <AudioLinesIcon className="size-5 text-gray-500" />
+                            <AudioLinesIcon className="size-5 text-content-neutral-secondary" />
 
                             <span className="text-sm font-semibold text-gray-700">Environment</span>
                         </div>

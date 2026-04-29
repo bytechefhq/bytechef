@@ -148,7 +148,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                                     }}
                                                     type="button"
                                                 >
-                                                    <XIcon className="size-4 text-gray-500" />
+                                                    <XIcon className="size-4 text-content-neutral-secondary" />
                                                 </button>
                                             )}
                                         </div>

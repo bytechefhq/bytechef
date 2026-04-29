@@ -84,7 +84,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                         <Switch checked={apiConnector.enabled ?? false} onCheckedChange={handleOnCheckedChange} />
 
                         <Tooltip>
-                            <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                 {lastModifiedDate ? (
                                     <span className="text-xs">
                                         {`Modified at ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
@@ -137,7 +137,9 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                         ))}
                     </ul>
                 ) : (
-                    <div className="border-t pt-4 text-center text-sm text-gray-500">No endpoints configured</div>
+                    <div className="border-t pt-4 text-center text-sm text-content-neutral-secondary">
+                        No endpoints configured
+                    </div>
                 )}
             </CollapsibleContent>
 

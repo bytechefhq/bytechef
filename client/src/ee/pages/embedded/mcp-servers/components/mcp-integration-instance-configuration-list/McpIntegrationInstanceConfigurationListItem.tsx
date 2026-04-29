@@ -44,7 +44,7 @@ const McpIntegrationInstanceConfigurationListItem = ({
                             {componentDefinition?.icon ? (
                                 <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                             ) : (
-                                <ComponentIcon className="size-4 flex-none text-gray-500" />
+                                <ComponentIcon className="size-4 flex-none text-content-neutral-secondary" />
                             )}
 
                             <span className="mr-2 text-base font-semibold">
@@ -72,7 +72,7 @@ const McpIntegrationInstanceConfigurationListItem = ({
 
                     <div className="flex min-w-52 flex-col items-end gap-y-4">
                         <Tooltip>
-                            <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                 {mcpIntegrationInstanceConfiguration.lastModifiedDate ? (
                                     <span className="text-xs">
                                         {`Modified at ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleDateString()} ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleTimeString()}`}

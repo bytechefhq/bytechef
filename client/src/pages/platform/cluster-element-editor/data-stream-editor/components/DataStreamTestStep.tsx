@@ -55,7 +55,7 @@ export default function DataStreamTestStep() {
             {!testing && outputSchema && (
                 <div>
                     <div className="mb-2 flex items-center justify-between">
-                        <h3 className="text-sm text-gray-500">Output Schema</h3>
+                        <h3 className="text-sm text-content-neutral-secondary">Output Schema</h3>
 
                         <Button
                             disabled={testing}

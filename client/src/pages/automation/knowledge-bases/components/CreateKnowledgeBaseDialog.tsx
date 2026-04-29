@@ -215,7 +215,7 @@ const CreateKnowledgeBaseDialog = ({trigger, workspaceId}: CreateKnowledgeBaseDi
                                                     className="rounded-full p-1 hover:bg-gray-200"
                                                     onClick={() => removeFile(idx)}
                                                 >
-                                                    <X className="h-4 w-4 text-gray-500" />
+                                                    <X className="h-4 w-4 text-content-neutral-secondary" />
                                                 </button>
                                             )}
                                         </div>

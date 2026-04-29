@@ -155,7 +155,7 @@ const UploadKnowledgeBaseDocumentDialog = ({knowledgeBaseId, trigger}: UploadKno
                                                 <Button
                                                     aria-label={`Remove ${selectedFile.file.name}`}
                                                     className="rounded-full hover:bg-gray-200"
-                                                    icon={<XIcon className="size-4 text-gray-500" />}
+                                                    icon={<XIcon className="size-4 text-content-neutral-secondary" />}
                                                     onClick={(event) => {
                                                         event.stopPropagation();
                                                         removeFile(selectedFileIndex);

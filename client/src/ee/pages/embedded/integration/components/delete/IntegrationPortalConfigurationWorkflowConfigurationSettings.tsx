@@ -31,7 +31,7 @@ const IntegrationPortalConfigurationWorkflowConfigurationSettings = () => {
                             <div className="min-w-0 flex-auto cursor-pointer">
                                 <span className="text-sm font-semibold leading-6 text-gray-900">{workflow.name}</span>
 
-                                <p className="mt-1 flex text-xs leading-5 text-gray-500">Text</p>
+                                <p className="mt-1 flex text-xs leading-5 text-content-neutral-secondary">Text</p>
                             </div>
 
                             <div className="flex shrink-0 items-center gap-x-4">

@@ -65,7 +65,7 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
 
                     <h3 className="text-sm font-semibold">Tests</h3>
 
-                    <p className="max-w-sm text-center text-xs text-gray-500">
+                    <p className="max-w-sm text-center text-xs text-content-neutral-secondary">
                         Create tests with scenarios to evaluate your agent.
                         <br />
                         Each test groups related scenarios that can be run together.

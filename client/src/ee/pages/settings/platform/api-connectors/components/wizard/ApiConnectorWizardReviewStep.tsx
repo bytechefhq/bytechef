@@ -60,7 +60,7 @@ const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps)
                                     <div>
                                         <p className="text-sm font-medium">{endpoint.operationId}</p>
 
-                                        <p className="text-xs text-gray-500">{endpoint.path}</p>
+                                        <p className="text-xs text-content-neutral-secondary">{endpoint.path}</p>
 
                                         {endpoint.summary && (
                                             <p className="text-xs text-gray-400">{endpoint.summary}</p>

@@ -67,7 +67,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
 
                             <span className="ml-1">{componentDefinition?.title} Connection</span>
 
-                            <span className="ml-0.5 text-xs text-gray-500">
+                            <span className="ml-0.5 text-xs text-content-neutral-secondary">
                                 {`(${componentConnection.workflowNodeName})`}
                             </span>
                         </FormLabel>
@@ -101,7 +101,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                                             <div className="flex items-center space-x-1">
                                                 <span>{connection.name}</span>
 
-                                                <span className="text-xs text-gray-500">
+                                                <span className="text-xs text-content-neutral-secondary">
                                                     {connection?.tags?.map((tag) => tag.name).join(', ')}
                                                 </span>
 
@@ -115,7 +115,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                         <FormDescription>
                             {`Choose connection for the ${componentDefinition?.title}`}
 
-                            <span className="text-xs text-gray-500">({componentConnection.key})</span>
+                            <span className="text-xs text-content-neutral-secondary">({componentConnection.key})</span>
 
                             {` component.`}
                         </FormDescription>

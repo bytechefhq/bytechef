@@ -137,7 +137,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </div>
 
                                 <Tooltip>
-                                    <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                                    <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                         {integrationInstance && integrationInstance.lastExecutionDate ? (
                                             <span className="text-xs">
                                                 {`Executed at ${integrationInstance.lastExecutionDate?.toLocaleDateString()} ${integrationInstance.lastExecutionDate?.toLocaleTimeString()}`}

@@ -18,7 +18,9 @@ const IntegrationLabel = ({
 
         <span className="mr-1">{integration.name}</span>
 
-        <span className="text-xs text-gray-500">{integration?.tags?.map((tag) => tag.name).join(', ')}</span>
+        <span className="text-xs text-content-neutral-secondary">
+            {integration?.tags?.map((tag) => tag.name).join(', ')}
+        </span>
     </div>
 );
 

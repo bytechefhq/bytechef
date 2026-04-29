@@ -272,7 +272,7 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
                                                                             src={configuration.integration.icon}
                                                                         />
                                                                     ) : (
-                                                                        <ComponentIcon className="size-4 flex-none text-gray-500" />
+                                                                        <ComponentIcon className="size-4 flex-none text-content-neutral-secondary" />
                                                                     )}
 
                                                                     <span>

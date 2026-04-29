@@ -295,7 +295,9 @@ const ClusterElementsCanvasDialog = ({
                                         <div className="text-lg font-semibold">{skillsHeaderInfo.title}</div>
 
                                         {skillsHeaderInfo.subtitle && (
-                                            <p className="text-sm text-gray-500">{skillsHeaderInfo.subtitle}</p>
+                                            <p className="text-sm text-content-neutral-secondary">
+                                                {skillsHeaderInfo.subtitle}
+                                            </p>
                                         )}
                                     </div>
 

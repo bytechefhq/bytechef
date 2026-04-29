@@ -71,7 +71,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
 
     return (
         <div className="mr-4 flex h-7 items-center justify-center gap-2">
-            <span className="text-xs text-gray-500">Tags:</span>
+            <span className="text-xs text-content-neutral-secondary">Tags:</span>
 
             {tags.slice(0, 3).map((tag) => (
                 <Tag key={tag.id} onDeleteTag={handleDeleteTag} tag={tag} />

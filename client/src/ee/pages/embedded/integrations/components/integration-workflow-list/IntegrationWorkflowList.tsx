@@ -70,7 +70,7 @@ const IntegrationWorkflowList = ({
             {workflows && workflows.length > 0 ? (
                 <>
                     <div className="mb-1 flex items-center justify-between">
-                        <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">
+                        <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-content-neutral-secondary">
                             Workflows
                         </h3>
                     </div>

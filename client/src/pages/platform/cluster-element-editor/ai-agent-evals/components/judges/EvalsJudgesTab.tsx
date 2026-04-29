@@ -61,7 +61,7 @@ const EvalsJudgesTab = ({workflowId, workflowNodeName}: EvalsJudgesTabProps) => 
 
                     <h3 className="text-sm font-semibold">Agent-level Judges</h3>
 
-                    <p className="max-w-sm text-center text-xs text-gray-500">
+                    <p className="max-w-sm text-center text-xs text-content-neutral-secondary">
                         Agent-level judges run on every scenario automatically.
                         <br />
                         For scenario-specific judges, add them directly in the Tests tab.

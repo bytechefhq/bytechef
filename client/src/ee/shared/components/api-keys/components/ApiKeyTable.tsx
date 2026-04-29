@@ -95,7 +95,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                         <TableRow className="border-b-border/50" key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
                                 <TableHead
-                                    className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                                    className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary"
                                     key={header.id}
                                 >
                                     {!header.isPlaceholder &&

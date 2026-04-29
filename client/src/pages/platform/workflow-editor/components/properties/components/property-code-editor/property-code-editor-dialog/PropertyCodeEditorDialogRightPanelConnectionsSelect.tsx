@@ -67,7 +67,7 @@ const PropertyCodeEditorDialogRightPanelConnectionsSelect = ({
                                 <div className="flex items-center">
                                     <span className="mr-1">{connection.name}</span>
 
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-content-neutral-secondary">
                                         {connection?.tags?.map((tag) => tag.name).join(', ')}
                                     </span>
 

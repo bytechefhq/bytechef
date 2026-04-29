@@ -78,7 +78,9 @@ const IntegrationLabel = ({integration}: {integration: Integration}) => (
     <div className="flex items-center">
         <span className="mr-1">{integration.componentName}</span>
 
-        <span className="text-xs text-gray-500">{integration?.tags?.map((tag) => tag.name).join(', ')}</span>
+        <span className="text-xs text-content-neutral-secondary">
+            {integration?.tags?.map((tag) => tag.name).join(', ')}
+        </span>
     </div>
 );
 
@@ -533,7 +535,7 @@ export const WorkflowExecutions = () => {
                                                     }
                                                 </span>
 
-                                                <span className="text-xs text-gray-500">
+                                                <span className="text-xs text-content-neutral-secondary">
                                                     {integrationInstanceConfiguration?.tags
                                                         ?.map((tag) => tag.name)
                                                         .join(', ')}

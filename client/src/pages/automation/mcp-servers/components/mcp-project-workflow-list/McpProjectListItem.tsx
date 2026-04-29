@@ -29,7 +29,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
                         <div className="flex w-full items-center gap-x-2">
-                            <WorkflowIcon className="size-4 flex-none text-gray-500" />
+                            <WorkflowIcon className="size-4 flex-none text-content-neutral-secondary" />
 
                             <span className="mr-2 text-base font-semibold">
                                 {mcpProject.project?.name || `Project ${mcpProject.projectDeploymentId}`}
@@ -55,7 +55,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
 
                     <div className="flex min-w-52 flex-col items-end gap-y-4">
                         <Tooltip>
-                            <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                 {mcpProject.lastModifiedDate ? (
                                     <span className="text-xs">
                                         {`Modified at ${new Date(mcpProject.lastModifiedDate).toLocaleDateString()} ${new Date(mcpProject.lastModifiedDate).toLocaleTimeString()}`}

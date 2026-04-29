@@ -90,7 +90,7 @@ export default function ApprovalTaskDetail() {
                             <SelectContent>
                                 <SelectItem value="open">
                                     <div className="flex items-center gap-2">
-                                        <CircleIcon className="size-4 text-gray-500" />
+                                        <CircleIcon className="size-4 text-content-neutral-secondary" />
                                         Open
                                     </div>
                                 </SelectItem>

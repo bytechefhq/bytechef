@@ -16,7 +16,7 @@ const EmptyList = ({button, className, icon, message, title}: EmptyListProps) =>
 
             <h3 className="mt-2 text-sm font-semibold">{title}</h3>
 
-            {message && <p className="mt-1 text-sm text-gray-500">{message}</p>}
+            {message && <p className="mt-1 text-sm text-content-neutral-secondary">{message}</p>}
 
             {button && <div className="mt-6">{button}</div>}
         </div>

@@ -20,7 +20,7 @@ const RunProgressIndicator = ({completedScenarios, totalScenarios}: RunProgressI
                 />
             </div>
 
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-content-neutral-secondary">
                 {completedScenarios} / {totalScenarios}
             </span>
         </div>

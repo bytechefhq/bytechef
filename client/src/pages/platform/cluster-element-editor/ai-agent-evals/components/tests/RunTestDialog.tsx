@@ -61,7 +61,7 @@ const RunTestDialog = ({onClose, test, workflowId, workflowNodeName}: RunTestDia
                 <fieldset className="flex flex-col gap-4 border-0 p-0">
                     {scenarios.length > 0 && (
                         <div className="flex flex-col gap-2">
-                            <div className="text-xs font-medium text-gray-500">Scenarios</div>
+                            <div className="text-xs font-medium text-content-neutral-secondary">Scenarios</div>
 
                             <div className="flex flex-col gap-1 rounded-md border border-border/50 p-2">
                                 {scenarios.map((scenario) => (
@@ -92,7 +92,7 @@ const RunTestDialog = ({onClose, test, workflowId, workflowNodeName}: RunTestDia
 
                     {judges.length > 0 && (
                         <div className="flex flex-col gap-2">
-                            <div className="text-xs font-medium text-gray-500">Global Judges</div>
+                            <div className="text-xs font-medium text-content-neutral-secondary">Global Judges</div>
 
                             <div className="flex flex-col gap-1 rounded-md border border-border/50 p-2">
                                 {judges.map((judge) => (

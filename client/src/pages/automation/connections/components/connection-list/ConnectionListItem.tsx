@@ -186,7 +186,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
                                 {connection.createdDate && (
                                     <Tooltip>
-                                        <TooltipTrigger className="flex items-center text-sm text-gray-500 sm:mt-0">
+                                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
                                             <span className="text-xs">
                                                 {`Created at ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
                                             </span>

@@ -48,7 +48,9 @@ const AiAgentSkillListItem = ({deleteSkill, onDownload, onRename, skill}: AiAgen
                         <div className="text-sm font-semibold">{skill.name}</div>
 
                         {skill.description && (
-                            <div className="line-clamp-1 text-xs text-gray-500">{skill.description}</div>
+                            <div className="line-clamp-1 text-xs text-content-neutral-secondary">
+                                {skill.description}
+                            </div>
                         )}
                     </div>
                 </div>
@@ -56,7 +58,7 @@ const AiAgentSkillListItem = ({deleteSkill, onDownload, onRename, skill}: AiAgen
                 <div className="flex items-center gap-4">
                     {skill.lastModifiedDate && (
                         <Tooltip>
-                            <TooltipTrigger className="text-xs text-gray-500">
+                            <TooltipTrigger className="text-xs text-content-neutral-secondary">
                                 {`Modified ${new Date(skill.lastModifiedDate).toLocaleDateString()}`}
                             </TooltipTrigger>
 

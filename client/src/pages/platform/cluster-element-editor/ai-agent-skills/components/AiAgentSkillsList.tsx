@@ -42,7 +42,7 @@ const AiAgentSkillsList = ({skills}: AiAgentSkillsListProps) => {
                         />
                     ))
                 ) : (
-                    <div className="flex items-center justify-center py-12 text-sm text-gray-500">
+                    <div className="flex items-center justify-center py-12 text-sm text-content-neutral-secondary">
                         No skills found matching your search.
                     </div>
                 )}

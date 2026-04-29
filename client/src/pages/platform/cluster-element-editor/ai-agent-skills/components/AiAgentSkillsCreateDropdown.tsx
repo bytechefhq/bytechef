@@ -29,7 +29,9 @@ const AiAgentSkillsCreateDropdown = () => {
                             Create With AI
                         </div>
 
-                        <span className="ml-6 text-xs text-gray-500">Let AI generate a skill for you.</span>
+                        <span className="ml-6 text-xs text-content-neutral-secondary">
+                            Let AI generate a skill for you.
+                        </span>
                     </DropdownMenuItem>
                 )}
 
@@ -42,7 +44,9 @@ const AiAgentSkillsCreateDropdown = () => {
                         Upload Files
                     </div>
 
-                    <span className="ml-6 text-xs text-gray-500">Upload a file to create a skill.</span>
+                    <span className="ml-6 text-xs text-content-neutral-secondary">
+                        Upload a file to create a skill.
+                    </span>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -54,7 +58,9 @@ const AiAgentSkillsCreateDropdown = () => {
                         Write Skill Instructions
                     </div>
 
-                    <span className="ml-6 text-xs text-gray-500">Enter a name and description for the skill.</span>
+                    <span className="ml-6 text-xs text-content-neutral-secondary">
+                        Enter a name and description for the skill.
+                    </span>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

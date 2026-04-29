@@ -20,7 +20,7 @@ const AiAgentSkills = () => {
 
     if (isError) {
         return (
-            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-sm text-gray-500">
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-sm text-content-neutral-secondary">
                 <AlertTriangleIcon className="size-6 text-red-400" />
 
                 <span>Failed to load skills. Please try again.</span>

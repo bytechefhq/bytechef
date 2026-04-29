@@ -78,7 +78,9 @@ const AiAgentJudgeVerdictList = ({verdicts}: AiAgentJudgeVerdictListProps) => {
                             </span>
                         </div>
 
-                        {verdict.explanation && <div className="mt-1 text-xs text-gray-500">{verdict.explanation}</div>}
+                        {verdict.explanation && (
+                            <div className="mt-1 text-xs text-content-neutral-secondary">{verdict.explanation}</div>
+                        )}
                     </div>
                 </div>
             ))}

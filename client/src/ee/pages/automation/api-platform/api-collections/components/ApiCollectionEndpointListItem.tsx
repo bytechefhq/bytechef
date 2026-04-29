@@ -163,7 +163,7 @@ const ApiCollectionEndpointListItem = ({
             <div className="flex items-center justify-end gap-x-6">
                 {apiCollectionEndpoint?.lastExecutionDate ? (
                     <Tooltip>
-                        <TooltipTrigger className="flex items-center justify-end text-sm text-gray-500">
+                        <TooltipTrigger className="flex items-center justify-end text-sm text-content-neutral-secondary">
                             <span className="text-xs">
                                 {`Executed at ${apiCollectionEndpoint.lastExecutionDate?.toLocaleDateString()} ${apiCollectionEndpoint.lastExecutionDate?.toLocaleTimeString()}`}
                             </span>

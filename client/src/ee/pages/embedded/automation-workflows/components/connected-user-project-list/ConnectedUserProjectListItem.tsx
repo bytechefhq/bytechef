@@ -47,7 +47,7 @@ const ConnectedUserProjectListItem = ({connectedUserProject}: ConnectedUserProje
                             <div className="flex items-center"></div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                     {lastExecutionDate ? (
                                         <span className="text-xs">
                                             {`Executed at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}

@@ -11,7 +11,7 @@ const AiAgentSkillsEmptyState = () => (
 
             <h2 className="text-xl font-semibold">Skills</h2>
 
-            <p className="max-w-md text-center text-sm text-gray-500">
+            <p className="max-w-md text-center text-sm text-content-neutral-secondary">
                 Teach your agents what they need to know. Skills package expert instructions, coding guidelines, and
                 process documentation into portable modules any agent can use.
             </p>
@@ -23,7 +23,9 @@ const AiAgentSkillsEmptyState = () => (
 
                 <h3 className="text-sm font-medium">Domain expertise</h3>
 
-                <p className="text-xs text-gray-500">Capture specialized knowledge your agents can apply on demand.</p>
+                <p className="text-xs text-content-neutral-secondary">
+                    Capture specialized knowledge your agents can apply on demand.
+                </p>
             </div>
 
             <div className="flex flex-col items-center gap-2 text-center">
@@ -31,7 +33,9 @@ const AiAgentSkillsEmptyState = () => (
 
                 <h3 className="text-sm font-medium">Plug and play</h3>
 
-                <p className="text-xs text-gray-500">Share a single skill across multiple agents with one click.</p>
+                <p className="text-xs text-content-neutral-secondary">
+                    Share a single skill across multiple agents with one click.
+                </p>
             </div>
 
             <div className="flex flex-col items-center gap-2 text-center">
@@ -39,7 +43,9 @@ const AiAgentSkillsEmptyState = () => (
 
                 <h3 className="text-sm font-medium">AI-powered creation</h3>
 
-                <p className="text-xs text-gray-500">Draft skills with AI, write your own, or upload existing files.</p>
+                <p className="text-xs text-content-neutral-secondary">
+                    Draft skills with AI, write your own, or upload existing files.
+                </p>
             </div>
         </div>
 

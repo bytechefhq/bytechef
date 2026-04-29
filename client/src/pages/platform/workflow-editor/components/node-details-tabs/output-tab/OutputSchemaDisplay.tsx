@@ -70,7 +70,7 @@ const OutputSchemaDisplay = ({
             {outputDefined && outputSchema && (
                 <>
                     <div className="mb-2 flex items-center justify-between">
-                        <h3 className="text-sm text-gray-500">Output Schema</h3>
+                        <h3 className="text-sm text-content-neutral-secondary">Output Schema</h3>
 
                         <ButtonGroup>
                             {!resumePerformFunctionDefined &&
@@ -178,7 +178,7 @@ const OutputSchemaDisplay = ({
             {variablePropertiesDefined && (
                 <>
                     <div className="my-3 flex items-center justify-between">
-                        <h3 className="text-sm text-gray-500">Item Schema</h3>
+                        <h3 className="text-sm text-content-neutral-secondary">Item Schema</h3>
                     </div>
 
                     {variableOutputSchema && (

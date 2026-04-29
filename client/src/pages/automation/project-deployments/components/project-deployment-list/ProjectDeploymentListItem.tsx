@@ -191,7 +191,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                     {projectDeployment.lastExecutionDate ? (
                                         <span className="text-xs">
                                             {`Executed at ${projectDeployment.lastExecutionDate?.toLocaleDateString()} ${projectDeployment.lastExecutionDate?.toLocaleTimeString()}`}

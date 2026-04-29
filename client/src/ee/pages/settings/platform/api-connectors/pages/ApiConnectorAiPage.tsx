@@ -31,7 +31,7 @@ const ApiConnectorAiPage = () => {
 
                     <p className="mt-4 text-sm text-gray-600">Generating OpenAPI specification...</p>
 
-                    <p className="mt-2 text-xs text-gray-500">This may take a minute</p>
+                    <p className="mt-2 text-xs text-content-neutral-secondary">This may take a minute</p>
                 </div>
             )}
 

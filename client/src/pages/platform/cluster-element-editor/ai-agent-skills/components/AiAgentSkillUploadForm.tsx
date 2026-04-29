@@ -62,7 +62,7 @@ const AiAgentSkillUploadForm = () => {
 
                                 <span className="flex-1 truncate text-sm">{file.name}</span>
 
-                                <span className="shrink-0 text-xs text-gray-500">
+                                <span className="shrink-0 text-xs text-content-neutral-secondary">
                                     {(file.size / 1024).toFixed(1)} KB
                                 </span>
 
