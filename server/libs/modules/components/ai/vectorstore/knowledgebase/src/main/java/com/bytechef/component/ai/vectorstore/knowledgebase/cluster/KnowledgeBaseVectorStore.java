@@ -33,7 +33,6 @@ import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
@@ -65,13 +64,12 @@ public final class KnowledgeBaseVectorStore {
         org.springframework.ai.vectorstore.VectorStore vectorStore,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage,
         KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagService knowledgeBaseTagService) {
 
         VectorStore kbVectorStore = createVectorStore(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseDocumentTagService,
-            knowledgeBaseFileStorage, knowledgeBaseService, vectorStore);
+            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+            knowledgeBaseService, vectorStore);
 
         return ComponentDsl.<VectorStoreFunction>clusterElement(VECTOR_STORE)
             .title("Knowledge Base VectorStore")
@@ -97,11 +95,8 @@ public final class KnowledgeBaseVectorStore {
                     inputParameters, ParametersFactory.create(connectionParameters), null));
     }
 
-    public static VectorStore createVectorStore(
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
-        org.springframework.ai.vectorstore.VectorStore vectorStore) {
-
-        return new VectorStoreImpl(null, null, knowledgeBaseDocumentTagService, null, null, vectorStore);
+    public static VectorStore createVectorStore(org.springframework.ai.vectorstore.VectorStore vectorStore) {
+        return new VectorStoreImpl(null, null, null, null, vectorStore);
     }
 
     public static VectorStore createVectorStore(
@@ -110,21 +105,10 @@ public final class KnowledgeBaseVectorStore {
         KnowledgeBaseService knowledgeBaseService, org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
         return new VectorStoreImpl(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, null, knowledgeBaseFileStorage,
+            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
             knowledgeBaseService, vectorStore);
     }
 
-    public static VectorStore createVectorStore(
-        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
-        org.springframework.ai.vectorstore.VectorStore vectorStore) {
-
-        return new VectorStoreImpl(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseDocumentTagService,
-            knowledgeBaseFileStorage, knowledgeBaseService, vectorStore);
-    }
 
     private static String deriveDocumentName(List<Document> documents) {
         if (!documents.isEmpty()) {
@@ -148,19 +132,16 @@ public final class KnowledgeBaseVectorStore {
         private final KnowledgeBaseService knowledgeBaseService;
         private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
         private final KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService;
-        private final KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService;
         private final KnowledgeBaseFileStorage knowledgeBaseFileStorage;
 
         public VectorStoreImpl(
             KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-            KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
             KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
             org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
             this.knowledgeBaseDocumentChunkService = knowledgeBaseDocumentChunkService;
             this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
-            this.knowledgeBaseDocumentTagService = knowledgeBaseDocumentTagService;
             this.knowledgeBaseFileStorage = knowledgeBaseFileStorage;
             this.knowledgeBaseService = knowledgeBaseService;
             this.vectorStore = vectorStore;
@@ -172,11 +153,8 @@ public final class KnowledgeBaseVectorStore {
 
             Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
             List<Long> tagIds = inputParameters.getList(TAG_IDS, Long.class);
-            List<Long> documentIds = tagIds == null || tagIds.isEmpty()
-                ? null
-                : knowledgeBaseDocumentTagService.getDocumentIdsByTagIds(knowledgeBaseId, tagIds);
 
-            return new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId, documentIds);
+            return new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId, tagIds);
         }
 
         @Override
@@ -263,12 +241,9 @@ public final class KnowledgeBaseVectorStore {
 
             Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
             List<Long> tagIds = inputParameters.getList(TAG_IDS, Long.class);
-            List<Long> documentIds = tagIds == null || tagIds.isEmpty()
-                ? null
-                : knowledgeBaseDocumentTagService.getDocumentIdsByTagIds(knowledgeBaseId, tagIds);
 
             org.springframework.ai.vectorstore.VectorStore wrappedVectorStore =
-                new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId, documentIds);
+                new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId, tagIds);
 
             return wrappedVectorStore.similaritySearch(inputParameters.getRequiredString(QUERY));
         }
