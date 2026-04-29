@@ -47,7 +47,6 @@ const ProjectDeploymentWorkflowListItem = ({
     workflowTaskDispatcherDefinitions,
 }: ProjectDeploymentWorkflowListItemProps) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
-
     const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -55,17 +54,19 @@ const ProjectDeploymentWorkflowListItem = ({
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    const {enabled, lastExecutionDate, lastExecutionStatus, staticWebhookUrl} = projectDeploymentWorkflow;
+
     const formTrigger =
         workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('form/')) !== -1;
 
-    const formTriggerPageUrl = getPageUrl('form', environmentId, projectDeploymentWorkflow.staticWebhookUrl);
+    const formTriggerPageUrl = getPageUrl('form', environmentId, staticWebhookUrl);
 
     const hostedChatTrigger =
         workflow.triggers &&
         workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1 &&
         (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
 
-    const hostedChatTriggerPageUrl = getPageUrl('chats', undefined, projectDeploymentWorkflow.staticWebhookUrl);
+    const hostedChatTriggerPageUrl = getPageUrl('chats', undefined, staticWebhookUrl);
 
     const enableProjectDeploymentWorkflowMutation = useEnableProjectDeploymentWorkflowMutation({
         onSuccess: () => {
@@ -120,12 +121,7 @@ const ProjectDeploymentWorkflowListItem = ({
     return (
         <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50">
             <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
-                <span
-                    className={twMerge(
-                        'w-80 text-sm font-semibold',
-                        !projectDeploymentWorkflow.enabled && 'text-muted-foreground'
-                    )}
-                >
+                <span className={twMerge('w-80 text-sm font-semibold', !enabled && 'text-muted-foreground')}>
                     {workflow.label}
                 </span>
 
@@ -141,9 +137,18 @@ const ProjectDeploymentWorkflowListItem = ({
             <div className="flex items-center gap-x-4">
                 {projectDeploymentWorkflow?.lastExecutionDate ? (
                     <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                        <TooltipTrigger
+                            className={twMerge(
+                                'flex items-center text-sm text-content-neutral-secondary',
+                                lastExecutionStatus === 'FAILED' && 'text-content-destructive-primary'
+                            )}
+                        >
+                            <span className="pr-1 text-xs capitalize">
+                                {lastExecutionStatus?.toLocaleLowerCase() || ''}
+                            </span>
+
                             <span className="text-xs">
-                                {`Executed at ${projectDeploymentWorkflow.lastExecutionDate?.toLocaleDateString()} ${projectDeploymentWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
+                                {`at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}
                             </span>
                         </TooltipTrigger>
 
@@ -160,7 +165,7 @@ const ProjectDeploymentWorkflowListItem = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        disabled={!projectDeploymentEnabled || !projectDeploymentWorkflow.enabled}
+                                        disabled={!projectDeploymentEnabled || !enabled}
                                         icon={<PlayIcon className="text-success" />}
                                         onClick={handleRunWorkflowClick}
                                         size="icon"
@@ -172,16 +177,15 @@ const ProjectDeploymentWorkflowListItem = ({
                             </Tooltip>
                         )}
 
-                        {!hostedChatTrigger && !formTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
+                        {!hostedChatTrigger && !formTrigger && staticWebhookUrl && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        disabled={!projectDeploymentWorkflow.enabled}
+                                        disabled={!enabled}
                                         icon={<ClipboardIcon />}
                                         onClick={() =>
                                             copyToClipboard(
-                                                projectDeploymentWorkflow.staticWebhookUrl! +
-                                                    (workflow.sseStreamResponse ? '/sse' : '')
+                                                staticWebhookUrl! + (workflow.sseStreamResponse ? '/sse' : '')
                                             )
                                         }
                                         size="icon"
@@ -193,11 +197,11 @@ const ProjectDeploymentWorkflowListItem = ({
                             </Tooltip>
                         )}
 
-                        {formTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
+                        {formTrigger && staticWebhookUrl && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        disabled={!projectDeploymentWorkflow.enabled}
+                                        disabled={!enabled}
                                         icon={<FormIcon />}
                                         onClick={() => navigate(formTriggerPageUrl)}
                                         size="icon"
@@ -209,11 +213,11 @@ const ProjectDeploymentWorkflowListItem = ({
                             </Tooltip>
                         )}
 
-                        {hostedChatTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
+                        {hostedChatTrigger && staticWebhookUrl && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        disabled={!projectDeploymentWorkflow.enabled}
+                                        disabled={!enabled}
                                         icon={<MessageCircleMoreIcon />}
                                         onClick={() => window.open(hostedChatTriggerPageUrl, '_self')}
                                         size="icon"
@@ -232,7 +236,7 @@ const ProjectDeploymentWorkflowListItem = ({
                         )}
 
                         <Switch
-                            checked={projectDeploymentWorkflow.enabled}
+                            checked={enabled}
                             className="mr-2"
                             disabled={enableProjectDeploymentWorkflowMutation.isPending}
                             onCheckedChange={(value) =>
