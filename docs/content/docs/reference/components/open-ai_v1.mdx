@@ -74,6 +74,9 @@ Name: ask
 | logitBias | Logit Bias | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Modify the likelihood of specified tokens appearing in the completion. | false |
 | stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | false |
 | user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
+| reasoning | Reasoning effort | STRING <details> <summary> Options </summary> <span>none</span>, <span>minimal</span>, <span>low</span>, <span>medium</span>, <span>high</span>, <span>xhigh</span> </details> | Constrains effort on reasoning. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response. For reasoning models for gpt-5 and o-series models only. | false |
+| verbosity | Verbosity | STRING <details> <summary> Options </summary> <span>low</span>, <span>medium</span>, <span>high</span> </details> | Adjusts response verbosity. Lower levels yield shorter answers. | false |
+| store | Store logs | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to store the logs for later retrieval. Logs are visible to your organization. | false |
 
 #### Example JSON Structure
 ```json
@@ -113,7 +116,10 @@ Name: ask
     "presencePenalty" : 0.0,
     "logitBias" : { },
     "stop" : [ "" ],
-    "user" : ""
+    "user" : "",
+    "reasoning" : "",
+    "verbosity" : "",
+    "store" : false
   },
   "type" : "openAi/v1/ask"
 }
@@ -153,6 +159,9 @@ Name: streamAsk
 | logitBias | Logit Bias | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Modify the likelihood of specified tokens appearing in the completion. | false |
 | stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | false |
 | user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
+| reasoning | Reasoning effort | STRING <details> <summary> Options </summary> <span>none</span>, <span>minimal</span>, <span>low</span>, <span>medium</span>, <span>high</span>, <span>xhigh</span> </details> | Constrains effort on reasoning. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response. For reasoning models for gpt-5 and o-series models only. | false |
+| verbosity | Verbosity | STRING <details> <summary> Options </summary> <span>low</span>, <span>medium</span>, <span>high</span> </details> | Adjusts response verbosity. Lower levels yield shorter answers. | false |
+| store | Store logs | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to store the logs for later retrieval. Logs are visible to your organization. | false |
 
 #### Example JSON Structure
 ```json
@@ -192,7 +201,10 @@ Name: streamAsk
     "presencePenalty" : 0.0,
     "logitBias" : { },
     "stop" : [ "" ],
-    "user" : ""
+    "user" : "",
+    "reasoning" : "",
+    "verbosity" : "",
+    "store" : false
   },
   "type" : "openAi/v1/streamAsk"
 }
