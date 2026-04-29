@@ -845,7 +845,13 @@ export default function useWorkflowNodeDetailsPanel({
 
         const dataPills = getDataPillsFromProperties(componentProperties, filteredNodeNames);
 
-        return dataPills.flat(Infinity);
+        const workflowInputDataPills: Array<DataPillType> = workflow.inputs?.map((input) => ({
+            id: input.name,
+            nodeName: input.name,
+            value: input.name,
+        })) || [];
+
+        return [...dataPills.flat(Infinity), ...workflowInputDataPills];
     }, [
         currentNode?.branchData,
         currentNode?.conditionData,
@@ -854,6 +860,7 @@ export default function useWorkflowNodeDetailsPanel({
         filterNodeNamesForCondition,
         filterNodeNamesForOnError,
         previousComponentDefinitions,
+        workflow.inputs,
         workflowNodeOutputs,
     ]);
 

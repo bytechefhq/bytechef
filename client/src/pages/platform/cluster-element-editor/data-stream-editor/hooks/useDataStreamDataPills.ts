@@ -4,7 +4,7 @@ import getDataPillsFromProperties from '@/pages/platform/workflow-editor/utils/g
 import getOutputSchemaFromWorkflowNodeOutput from '@/pages/platform/workflow-editor/utils/getOutputSchemaFromWorkflowNodeOutput';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ComponentPropertiesType} from '@/shared/types';
+import {ComponentPropertiesType, DataPillType} from '@/shared/types';
 import {useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/shallow';
 
@@ -76,8 +76,16 @@ export default function useDataStreamDataPills() {
             }
         );
 
-        return getDataPillsFromProperties(componentProperties, filteredNodeNames).flat(Infinity);
-    }, [componentDefinitions, taskDispatcherDefinitions, workflowNodeOutputs]);
+        const dataPills = getDataPillsFromProperties(componentProperties, filteredNodeNames).flat(Infinity);
+
+        const workflowInputDataPills = workflow.inputs?.map((input) => ({
+            id: input.name,
+            nodeName: input.name,
+            value: input.name,
+        })) || [];
+
+        return [...dataPills, ...workflowInputDataPills];
+    }, [componentDefinitions, taskDispatcherDefinitions, workflow.inputs, workflowNodeOutputs]);
 
     useEffect(() => {
         if (calculatedDataPills.length > 0) {
