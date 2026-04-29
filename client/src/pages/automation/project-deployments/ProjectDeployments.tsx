@@ -243,9 +243,11 @@ const ProjectDeployments = () => {
                                     )
                             )}
 
-                            {projectDeploymentsIsLoading && projectDeployments && projectDeployments.length > 0 && (
-                                <ProjectDeploymentsSkeleton />
-                            )}
+                            {projectDeploymentsIsLoading &&
+                                projectDeployments &&
+                                (projectDeployments as ProjectDeployment[]).length > 0 && (
+                                    <ProjectDeploymentsSkeleton />
+                                )}
 
                             <ReadOnlyWorkflowSheet />
                         </WorkflowReadOnlyProvider>
