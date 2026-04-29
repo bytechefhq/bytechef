@@ -46,8 +46,13 @@ public class ClickupUtils extends AbstractClickupUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(SPACE_ID)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
         String folderId = inputParameters.getString(FOLDER_ID);
+
         if (folderId != null) {
             options.addAll(getListsWithinFolder(context, folderId));
         }
@@ -58,7 +63,6 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     private static List<Option<String>> getListsWithinFolder(Context context, String folderId) {
-
         return getOptions(fetchDataFromHttpEndpoint("/folder/" + folderId + "/list", context), "lists");
     }
 
@@ -70,6 +74,10 @@ public class ClickupUtils extends AbstractClickupUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(SPACE_ID)) {
+            return List.of();
+        }
+
         return getOptions(
             fetchDataFromHttpEndpoint("/space/" + inputParameters.getRequiredString(SPACE_ID) + "/folder", context),
             "folders");
@@ -78,6 +86,10 @@ public class ClickupUtils extends AbstractClickupUtils {
     public static List<Option<String>> getSpaceIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(WORKSPACE_ID)) {
+            return List.of();
+        }
 
         return getOptions(
             fetchDataFromHttpEndpoint("/team/" + inputParameters.getRequiredString(WORKSPACE_ID) + "/space", context),
@@ -128,7 +140,6 @@ public class ClickupUtils extends AbstractClickupUtils {
 
     public static void unsubscribeWebhook(TriggerContext context, String webhookId) {
         context.http(http -> http.delete("/webhook/" + webhookId))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
 

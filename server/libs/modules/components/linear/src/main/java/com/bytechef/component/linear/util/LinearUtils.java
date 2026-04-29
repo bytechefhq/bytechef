@@ -92,6 +92,10 @@ public class LinearUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(TEAM_ID)) {
+            return List.of();
+        }
+
         String query = "{issues(filter: {team: {id: {eq: \"%s\" }}}){nodes{id title}}} "
             .formatted(inputParameters.getRequiredString(TEAM_ID));
 
@@ -216,9 +220,7 @@ public class LinearUtils {
             .getBody(new TypeReference<>() {});
     }
 
-    public static Object executeIssueTriggerQuery(
-        String requiredAction, WebhookBody body, TriggerContext context) {
-
+    public static Object executeIssueTriggerQuery(String requiredAction, WebhookBody body) {
         Map<String, Object> content = body.getContent(new TypeReference<>() {});
         String action = (String) content.get("action");
 

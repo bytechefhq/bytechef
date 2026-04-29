@@ -38,6 +38,7 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
@@ -52,10 +53,7 @@ import org.mockito.ArgumentCaptor;
 class TrelloUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("new", "abc"));
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -89,8 +87,8 @@ class TrelloUtilsTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedParameters.getRequiredString(ID_BOARD))
-            .thenReturn("boardId");
+        mockedParameters = MockParametersFactory.create(Map.of(ID_BOARD, "boardId"));
+
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
@@ -115,8 +113,8 @@ class TrelloUtilsTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedParameters.getRequiredString(ID_BOARD))
-            .thenReturn("boardId");
+        mockedParameters = MockParametersFactory.create(Map.of(ID_BOARD, "boardId"));
+
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))

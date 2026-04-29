@@ -23,8 +23,11 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATATYPE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.NAME;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
@@ -43,6 +46,12 @@ public class SnowflakePropertiesUtils {
     public static List<ValueProperty<?>> createPropertiesForColumn(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext context) {
+
+        if (!inputParameters.containsKey(DATABASE) ||
+            !inputParameters.containsKey(SCHEMA) ||
+            !inputParameters.containsKey(TABLE)) {
+            return List.of();
+        }
 
         List<Map<String, String>> columns = SnowflakeUtils.getTableColumns(inputParameters, context);
 

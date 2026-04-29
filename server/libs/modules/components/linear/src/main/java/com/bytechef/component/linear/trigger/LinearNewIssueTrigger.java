@@ -74,6 +74,6 @@ public class LinearNewIssueTrigger {
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
-        return executeIssueTriggerQuery("create", body, context);
+        return executeIssueTriggerQuery("create", body);
     }
 }

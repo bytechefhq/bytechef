@@ -43,6 +43,10 @@ public class GoogleSlidesUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         Context context) {
 
+        if (!inputParameters.containsKey(FILE_ID) || !inputParameters.containsKey(PLACEHOLDER_FORMAT)) {
+            return List.of();
+        }
+
         Map<String, ?> body = getSlide(context, inputParameters.getRequiredString(FILE_ID));
         String placeholderFormat = inputParameters.getRequiredString(PLACEHOLDER_FORMAT);
 

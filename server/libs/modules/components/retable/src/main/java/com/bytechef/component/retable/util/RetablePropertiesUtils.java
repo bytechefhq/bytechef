@@ -52,6 +52,10 @@ public class RetablePropertiesUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext actionContext) {
 
+        if (!inputParameters.containsKey(RETABLE_ID)) {
+            return List.of();
+        }
+
         Map<String, Map<String, Object>> body = actionContext
             .http(http -> http.get("/retable/" + inputParameters.getRequiredString(RETABLE_ID)))
             .configuration(responseType(ResponseType.JSON))

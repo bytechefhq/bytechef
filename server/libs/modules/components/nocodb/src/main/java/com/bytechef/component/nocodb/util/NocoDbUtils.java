@@ -58,6 +58,10 @@ public class NocoDbUtils {
     public static PropertiesFunction createPropertiesForRecord(boolean isNewRecord) {
         return (inputParameters, connectionParameters, dependencyPaths, context) -> {
 
+            if (!inputParameters.containsKey(TABLE_ID)) {
+                return List.of();
+            }
+
             Map<String, Object> body = context
                 .http(http -> http.get("/api/v2/meta/tables/" + inputParameters.getRequiredString(TABLE_ID)))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -147,6 +151,10 @@ public class NocoDbUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(WORKSPACE_ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = context
             .http(http -> http.get(
                 "/api/v2/meta/workspaces/" + inputParameters.getRequiredString(WORKSPACE_ID) + "/bases"))
@@ -160,6 +168,10 @@ public class NocoDbUtils {
     public static List<Option<String>> getFieldNameOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(TABLE_ID)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -185,6 +197,10 @@ public class NocoDbUtils {
     public static List<Option<String>> getTableIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(BASE_ID)) {
+            return List.of();
+        }
 
         Map<String, Object> body = context
             .http(http -> http.get("/api/v2/meta/bases/" + inputParameters.getRequiredString(BASE_ID) + "/tables"))

@@ -1223,7 +1223,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "workspace_id", "board_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1257,7 +1257,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "workspace_id", "board_id", "group_id" ]
+        "propertiesLookupDependsOn": [ "board_id" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -1351,7 +1351,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "board_id", "workspace_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1470,7 +1470,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "workspace_id", "board_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "required": false,
@@ -1734,7 +1734,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "workspace_id", "board_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1758,7 +1758,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "board_id", "workspace_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "regex": null,
@@ -2999,7 +2999,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "workspace_id", "board_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "regex": null,
@@ -3033,7 +3033,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "workspace_id", "board_id", "group_id" ]
+        "propertiesLookupDependsOn": [ "board_id" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -3124,7 +3124,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "board_id", "workspace_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "regex": null,
@@ -3240,7 +3240,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "workspace_id", "board_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "required": false,
@@ -3501,7 +3501,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "workspace_id", "board_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "regex": null,
@@ -3525,7 +3525,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "board_id", "workspace_id" ]
+        "optionsLookupDependsOn": [ "board_id" ]
       },
       "placeholder": null,
       "regex": null,

@@ -49,7 +49,6 @@ public class VboutUpdateContactAction {
             string(ID)
                 .label("Contact ID")
                 .description("The ID of the contact.")
-                .optionsLookupDependsOn(LIST_ID)
                 .options((OptionsFunction<String>) VboutUtils::getContactIdOptions)
                 .required(true),
             string(EMAIL)

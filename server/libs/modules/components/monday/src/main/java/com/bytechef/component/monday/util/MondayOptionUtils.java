@@ -51,6 +51,10 @@ public class MondayOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(WORKSPACE_ID)) {
+            return List.of();
+        }
+
         List<Map<String, ?>> boards = getBoardsByWorkspace(inputParameters.getRequiredString(WORKSPACE_ID), context);
 
         List<Option<String>> options = new ArrayList<>();
@@ -65,6 +69,10 @@ public class MondayOptionUtils {
     public static List<Option<String>> getBoardIdWithStatusOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(WORKSPACE_ID)) {
+            return List.of();
+        }
 
         List<Map<String, ?>> boards = getBoardsByWorkspace(inputParameters.getRequiredString(WORKSPACE_ID), context);
 
@@ -95,6 +103,10 @@ public class MondayOptionUtils {
     public static List<Option<String>> getBoardItemsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(BOARD_ID)) {
+            return List.of();
+        }
 
         List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
 
@@ -139,6 +151,10 @@ public class MondayOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(BOARD_ID)) {
+            return List.of();
+        }
+
         List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
 
         List<Option<String>> options = new ArrayList<>();
@@ -167,6 +183,10 @@ public class MondayOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(BOARD_ID)) {
+            return List.of();
+        }
+
         List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
 
         List<Option<String>> options = new ArrayList<>();
@@ -186,6 +206,10 @@ public class MondayOptionUtils {
     public static List<Option<String>> getStatusOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(BOARD_ID) || !inputParameters.containsKey(COLUMN_ID)) {
+            return List.of();
+        }
 
         List<Map<String, ?>> boards = getBoardsById(inputParameters.getRequiredString(BOARD_ID), context);
 

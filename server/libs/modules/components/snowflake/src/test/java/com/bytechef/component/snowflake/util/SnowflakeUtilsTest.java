@@ -23,94 +23,111 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.NAME;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class SnowflakeUtilsTest {
 
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
-    private final Response mockedResponse = mock(Response.class);
-    private final List<Map<String, Object>> reponseList = List.of(
+    private Parameters mockedParameters = mock(Parameters.class);
+    private final List<Map<String, Object>> responseList = List.of(
         Map.of("name", "test1"),
         Map.of("name", "test2"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void getDatabaseNameOptions() {
-        when(mockedContext.http(any()))
+    void getDatabaseNameOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(reponseList);
+            .thenReturn(responseList);
 
         List<Option<String>> result = SnowflakeUtils.getDatabaseNameOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        List<Option<String>> expected = List.of(
-            option("test1", "test1"),
-            option("test2", "test2"));
+        assertEquals(List.of(option("test1", "test1"), option("test2", "test2")), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertEquals(expected, result);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/databases", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void getSchemaNameOptions() {
-        when(mockedContext.http(any()))
+    void getSchemaNameOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters = MockParametersFactory.create(Map.of(DATABASE, "db"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(reponseList);
+            .thenReturn(responseList);
 
         List<Option<String>> result = SnowflakeUtils.getSchemaNameOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        List<Option<String>> expected = List.of(
-            option("test1", "test1"),
-            option("test2", "test2"));
+        assertEquals(List.of(option("test1", "test1"), option("test2", "test2")), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertEquals(expected, result);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/databases/db/schemas", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void getTableColumns() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(DATABASE, "db", SCHEMA, "schema", TABLE, "table"));
-        Map<String, Object> resposneMap = Map.of(
+    void getTableColumns(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters = MockParametersFactory.create(Map.of(DATABASE, "db", SCHEMA, "sc", TABLE, "tb"));
+
+        Map<String, Object> responseMap = Map.of(
             "columns", List.of(
                 Map.of(NAME, "col1", DATATYPE, "NUMBER"),
                 Map.of(NAME, "col2", DATATYPE, "NUMBER")));
 
-        when(mockedContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(resposneMap);
+            .thenReturn(responseMap);
 
         String result = SnowflakeUtils.getTableColumns(mockedParameters, mockedContext)
             .stream()
@@ -118,26 +135,38 @@ class SnowflakeUtilsTest {
             .collect(Collectors.joining(","));
 
         assertEquals("col1,col2", result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/databases/db/schemas/sc/tables/tb", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void getTableNameOptions() {
-        when(mockedContext.http(any()))
+    void getTableNameOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters = MockParametersFactory.create(Map.of(DATABASE, "db", SCHEMA, "sc"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(reponseList);
+            .thenReturn(responseList);
 
         List<Option<String>> result = SnowflakeUtils.getTableNameOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        List<Option<String>> expected = List.of(
-            option("test1", "test1"),
-            option("test2", "test2"));
+        assertEquals(List.of(option("test1", "test1"), option("test2", "test2")), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertEquals(expected, result);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/databases/db/schemas/sc/tables", stringArgumentCaptor.getValue());
     }
 }

@@ -144,8 +144,8 @@ class AsanaUtilsTest {
         Context mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        List<Option<String>> result =
-            AsanaUtils.getTeamOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        List<Option<String>> result = AsanaUtils.getTeamOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(expectedOptions, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());

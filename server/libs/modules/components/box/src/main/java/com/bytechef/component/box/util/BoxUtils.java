@@ -46,6 +46,10 @@ public class BoxUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
+        if (!inputParameters.containsKey(ID)) {
+            return List.of();
+        }
+
         int offset = 0;
         int totalCount;
 

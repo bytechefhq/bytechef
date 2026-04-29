@@ -24,56 +24,70 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.retable.constant.RetableConstants.COLUMN_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.PROJECT_ID;
+import static com.bytechef.component.retable.constant.RetableConstants.RETABLE_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class RetablePropetiesUtilsTest {
 
     private static final String TEST_ID = "testId";
     private static final String TEST_NAME = "testName";
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Executor mockedExecutor = mock(Executor.class);
-    private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testCreatePropertiesForRowValues() {
+    void testCreatePropertiesForRowValues(
+        ActionContext mockedActionContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(PROJECT_ID, "1", ROWS_IDS, Map.of("2", "test")));
+            Map.of(RETABLE_ID, "xy", PROJECT_ID, "1", ROWS_IDS, Map.of("2", "test")));
 
-        Map<String, Object> mockedResponseBody = Map.of("data", Map.of("columns", createItems()));
-
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedResponseBody);
+            .thenReturn(Map.of("data", Map.of("columns", createItems())));
 
         List<ValueProperty<?>> result = RetablePropertiesUtils.createPropertiesForRowValues(
             mockedParameters, mockedParameters, new HashMap<>(), mockedActionContext);
 
         assertEquals(getExpectedProperties(), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/retable/xy", stringArgumentCaptor.getValue());
     }
 
     private static List<Map<String, Object>> createItems() {

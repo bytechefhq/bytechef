@@ -71,8 +71,7 @@ class LinearRemovedIssueTriggerTest extends AbstractLinearTriggerTest {
     void testWebhookRequest() {
         linearUtilsMockedStatic.when(
             () -> LinearUtils.executeIssueTriggerQuery(
-                stringArgumentCaptor.capture(), webhookBodyArgumentCaptor.capture(),
-                triggerContextArgumentCaptor.capture()))
+                stringArgumentCaptor.capture(), webhookBodyArgumentCaptor.capture()))
             .thenReturn(Map.of(ID, "123"));
 
         Object result = LinearRemovedIssueTrigger.webhookRequest(
@@ -82,6 +81,5 @@ class LinearRemovedIssueTriggerTest extends AbstractLinearTriggerTest {
         assertEquals(Map.of(ID, "123"), result);
         assertEquals("remove", stringArgumentCaptor.getValue());
         assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
-        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 }

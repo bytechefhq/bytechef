@@ -531,7 +531,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "collectionId", "siteId" ]
+        "optionsLookupDependsOn": [ "collectionId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1056,7 +1056,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "collectionId", "siteId" ]
+        "optionsLookupDependsOn": [ "collectionId" ]
       },
       "placeholder": null,
       "regex": null,

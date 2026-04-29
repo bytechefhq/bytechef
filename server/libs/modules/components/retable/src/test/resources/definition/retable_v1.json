@@ -1184,7 +1184,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "project_id" ]
+        "propertiesLookupDependsOn": [ "retable_id" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -1436,7 +1436,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "project_id" ]
+        "propertiesLookupDependsOn": [ "retable_id" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -2628,7 +2628,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "project_id" ]
+        "propertiesLookupDependsOn": [ "retable_id" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -2880,7 +2880,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "project_id" ]
+        "propertiesLookupDependsOn": [ "retable_id" ]
       },
       "expressionEnabled": null,
       "header": null,

@@ -51,6 +51,10 @@ public class InfobipUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext actionContext) {
 
+        if (!inputParameters.containsKey(TEMPLATE_NAME) || !inputParameters.containsKey(FROM)) {
+            return List.of();
+        }
+
         List<ValueProperty<?>> properties = new ArrayList<>();
 
         for (Map<String, Object> map : getTemplates(inputParameters.getRequiredString(FROM), actionContext)) {
@@ -90,6 +94,10 @@ public class InfobipUtils {
     public static List<Option<String>> getTemplateOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(FROM)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 

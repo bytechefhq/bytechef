@@ -19,8 +19,11 @@ package com.bytechef.component.snowflake.util;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATATYPE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.NAME;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -40,7 +43,8 @@ import org.mockito.MockedStatic;
 class SnowflakePropertiesUtilsTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(DATABASE, "db", SCHEMA, "sc", TABLE, "tb"));
 
     @Test
     void createPropertiesForColumn() {

@@ -55,7 +55,7 @@ public class WebflowGetCollectionItemAction {
                 .description("Unique identifier for an item.")
                 .required(true)
                 .options((ActionDefinition.OptionsFunction<String>) WebflowUtils::getItemIdOptions)
-                .optionsLookupDependsOn("collectionId", "siteId")
+                .optionsLookupDependsOn("collectionId")
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))

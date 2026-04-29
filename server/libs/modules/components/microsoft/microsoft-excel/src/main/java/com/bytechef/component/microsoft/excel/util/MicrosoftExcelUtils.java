@@ -66,6 +66,13 @@ public class MicrosoftExcelUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext actionContext) {
 
+        if (!inputParameters.containsKey(IS_THE_FIRST_ROW_HEADER) ||
+            !inputParameters.containsKey(WORKBOOK_ID) ||
+            !inputParameters.containsKey(WORKSHEET_NAME)) {
+
+            return List.of();
+        }
+
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
         if (isFirstRowHeader) {
@@ -88,6 +95,14 @@ public class MicrosoftExcelUtils {
     public static List<Property.ValueProperty<?>> createPropertiesToUpdateRow(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext actionContext) {
+
+        if (!inputParameters.containsKey(IS_THE_FIRST_ROW_HEADER) ||
+            !inputParameters.containsKey(UPDATE_WHOLE_ROW) ||
+            !inputParameters.containsKey(WORKBOOK_ID) ||
+            !inputParameters.containsKey(WORKSHEET_NAME)) {
+
+            return List.of();
+        }
 
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
         boolean updateWholeRow = inputParameters.getRequiredBoolean(UPDATE_WHOLE_ROW);
@@ -308,6 +323,10 @@ public class MicrosoftExcelUtils {
     public static List<Option<String>> getWorksheetNameOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(WORKBOOK_ID)) {
+            return List.of();
+        }
 
         Map<String, Object> body = context
             .http(http -> http

@@ -65,6 +65,10 @@ public class RetableUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(WORKSPACE_ID)) {
+            return List.of();
+        }
+
         List<Option<String>> options = new ArrayList<>();
 
         Map<String, Map<String, ?>> body = context.http(
@@ -88,6 +92,10 @@ public class RetableUtils {
     public static List<Option<String>> getRetableIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(PROJECT_ID)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 
