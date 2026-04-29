@@ -1,3 +1,4 @@
+import {ButtonGroup} from '@/components/ui/button-group';
 import {Separator} from '@/components/ui/separator';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
@@ -116,12 +117,14 @@ const ProjectHeader = ({
                     workflowIsRunning={workflowIsRunning}
                 />
 
-                <PublishPopover
-                    isPending={publishProjectMutationIsPending}
-                    onPublishProjectSubmit={handlePublishProjectSubmit}
-                />
+                <ButtonGroup>
+                    <PublishPopover
+                        isPending={publishProjectMutationIsPending}
+                        onPublishProjectSubmit={handlePublishProjectSubmit}
+                    />
 
-                <DeployButton project={project} />
+                    <DeployButton project={project} />
+                </ButtonGroup>
             </div>
         </header>
     );

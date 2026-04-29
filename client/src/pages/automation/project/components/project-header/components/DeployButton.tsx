@@ -54,15 +54,7 @@ const DeployButton = ({project}: {project: Project}) => {
             projectDeployments={projectDeploymentsQuery.data}
             projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
             showTabs
-            triggerNode={
-                <Button
-                    className="ml-2"
-                    icon={<RocketIcon />}
-                    label="Deploy"
-                    onClick={handleDeployClick}
-                    variant="outline"
-                />
-            }
+            triggerNode={<Button icon={<RocketIcon />} label="Deploy" onClick={handleDeployClick} variant="outline" />}
         />
     );
 };
