@@ -49,9 +49,9 @@ public class KnowledgeBaseVectorStoreMetadataUpdater {
     }
 
     /**
-     * Updates tag metadata in the vector store for the given entry. Preserves all other existing metadata fields
-     * (e.g., {@code source}, {@code charset}) and avoids re-embedding the content. Stores both
-     * {@code tag_names: [list]} (human-readable) and {@code tag_names_NAME: true} boolean flags (used for filtering).
+     * Updates tag metadata in the vector store for the given entry. Preserves all other existing metadata fields (e.g.,
+     * {@code source}, {@code charset}) and avoids re-embedding the content. Stores both {@code tag_names: [list]}
+     * (human-readable) and {@code tag_names_NAME: true} boolean flags (used for filtering).
      *
      * @param vectorStoreId the vector store document ID
      * @param tagNames      the new tag names to set; an empty list removes all tag fields

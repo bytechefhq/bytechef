@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.knowledgebase.config;
 
-import com.bytechef.automation.knowledgebase.config.KnowledgeBaseVectorStoreMetadataUpdater;
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
