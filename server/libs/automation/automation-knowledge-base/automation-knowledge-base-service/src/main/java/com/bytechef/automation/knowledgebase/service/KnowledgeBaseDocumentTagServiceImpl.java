@@ -18,16 +18,13 @@ package com.bytechef.automation.knowledgebase.service;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.automation.knowledgebase.repository.KnowledgeBaseDocumentRepository;
-import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.SequencedSet;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -39,143 +36,88 @@ import org.springframework.stereotype.Service;
 public class KnowledgeBaseDocumentTagServiceImpl implements KnowledgeBaseDocumentTagService {
 
     private final KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository;
-    private final TagService tagService;
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseDocumentTagServiceImpl(
-        KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository, TagService tagService) {
-
+    public KnowledgeBaseDocumentTagServiceImpl(KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository) {
         this.knowledgeBaseDocumentRepository = knowledgeBaseDocumentRepository;
-        this.tagService = tagService;
     }
 
     @Override
-    public List<Tag> getAllTags() {
-        Set<Long> ids = new HashSet<>();
+    public List<String> getAllTagNames() {
+        SequencedSet<String> tagNames = new LinkedHashSet<>();
 
         for (KnowledgeBaseDocument document : knowledgeBaseDocumentRepository.findAll()) {
-            List<Long> tagIds = document.getTagIds();
+            List<String> documentTagNames = document.getTagNames();
 
-            if (tagIds != null) {
-                ids.addAll(tagIds);
+            if (documentTagNames != null) {
+                tagNames.addAll(documentTagNames);
             }
         }
 
-        if (ids.isEmpty()) {
-            return List.of();
-        }
-
-        return tagService.getTags(new ArrayList<>(ids));
+        return new ArrayList<>(tagNames);
     }
 
     @Override
-    public Map<Long, List<Tag>> getTagsByKnowledgeBaseDocumentId() {
-        Map<Long, List<Tag>> map = new HashMap<>();
+    public List<String> getTagNamesByKnowledgeBaseId(Long knowledgeBaseId) {
+        SequencedSet<String> tagNames = new LinkedHashSet<>();
+
+        for (KnowledgeBaseDocument document : knowledgeBaseDocumentRepository.findAllByKnowledgeBaseId(
+            knowledgeBaseId)) {
+
+            List<String> documentTagNames = document.getTagNames();
+
+            if (documentTagNames != null) {
+                tagNames.addAll(documentTagNames);
+            }
+        }
+
+        return new ArrayList<>(tagNames);
+    }
+
+    @Override
+    public Map<Long, List<String>> getTagNamesByKnowledgeBaseDocumentId() {
+        Map<Long, List<String>> map = new HashMap<>();
 
         List<KnowledgeBaseDocument> documents = new ArrayList<>();
 
         knowledgeBaseDocumentRepository.findAll()
             .forEach(documents::add);
 
-        Map<Long, List<Long>> tagIdsByDocumentId = documents.stream()
-            .collect(Collectors.toMap(
-                KnowledgeBaseDocument::getId,
-                document -> document.getTagIds() == null ? List.of() : document.getTagIds()));
+        for (KnowledgeBaseDocument document : documents) {
+            List<String> tagNames = document.getTagNames();
 
-        for (Map.Entry<Long, List<Long>> entry : tagIdsByDocumentId.entrySet()) {
-            List<Long> ids = entry.getValue();
-
-            map.put(entry.getKey(), ids == null || ids.isEmpty() ? List.of() : tagService.getTags(ids));
+            map.put(document.getId(), tagNames == null ? List.of() : tagNames);
         }
 
         return map;
     }
 
     @Override
-    public Map<String, List<Tag>> getTagsByKnowledgeBaseDocumentName() {
-        Map<String, List<Tag>> map = new HashMap<>();
+    public Map<String, List<String>> getTagNamesByKnowledgeBaseDocumentName() {
+        Map<String, List<String>> map = new HashMap<>();
 
         List<KnowledgeBaseDocument> documents = new ArrayList<>();
 
         knowledgeBaseDocumentRepository.findAll()
             .forEach(documents::add);
 
-        Map<String, List<Long>> idsByName = documents.stream()
-            .collect(Collectors.toMap(
-                KnowledgeBaseDocument::getName,
-                document -> document.getTagIds() == null ? List.of() : document.getTagIds()));
+        for (KnowledgeBaseDocument document : documents) {
+            List<String> tagNames = document.getTagNames();
 
-        for (Map.Entry<String, List<Long>> entry : idsByName.entrySet()) {
-            List<Long> ids = entry.getValue();
-
-            map.put(entry.getKey(), ids == null || ids.isEmpty() ? List.of() : tagService.getTags(ids));
+            map.put(document.getName(), tagNames == null ? List.of() : tagNames);
         }
 
         return map;
     }
 
     @Override
-    public List<Long> getDocumentIdsByTagIds(Long knowledgeBaseId, List<Long> tagIds) {
-        Set<Long> tagIdSet = new HashSet<>(tagIds);
-        List<Long> documentIds = new ArrayList<>();
-
-        List<KnowledgeBaseDocument> knowledgeBaseDocuments = knowledgeBaseDocumentRepository.findAllByKnowledgeBaseId(
-            knowledgeBaseId);
-
-        for (KnowledgeBaseDocument knowledgeBaseDocument : knowledgeBaseDocuments) {
-            List<Long> knowledgeBaseDocumentTagIds = knowledgeBaseDocument.getTagIds();
-
-            if (knowledgeBaseDocumentTagIds != null) {
-                for (Long tagId : knowledgeBaseDocumentTagIds) {
-                    if (tagIdSet.contains(tagId)) {
-                        documentIds.add(knowledgeBaseDocument.getId());
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        return documentIds;
-    }
-
-    @Override
-    public void updateTags(long knowledgeBaseDocumentId, List<Tag> tags) {
+    public void updateTagNames(long knowledgeBaseDocumentId, List<String> tagNames) {
         KnowledgeBaseDocument document = knowledgeBaseDocumentRepository.findById(knowledgeBaseDocumentId)
             .orElseThrow(
                 () -> new IllegalArgumentException(
                     "KnowledgeBaseDocument with id=" + knowledgeBaseDocumentId + " not found"));
 
-        List<Tag> resolvedTags;
-
-        if (tags == null || tags.isEmpty()) {
-            resolvedTags = List.of();
-        } else {
-            List<Tag> tagsToSave = tags.stream()
-                .filter(tag -> tag.getId() == null)
-                .toList();
-
-            if (!tagsToSave.isEmpty()) {
-                List<Tag> savedTags = tagService.save(tagsToSave);
-
-                List<Tag> tagsWithIds = new ArrayList<>(tags);
-                int index = 0;
-
-                for (int i = 0; i < tagsWithIds.size(); i++) {
-                    Tag tag = tagsWithIds.get(i);
-
-                    if (tag.getId() == null) {
-                        tagsWithIds.set(i, savedTags.get(index++));
-                    }
-                }
-
-                resolvedTags = tagsWithIds;
-            } else {
-                resolvedTags = tags;
-            }
-        }
-
-        document.setTags(resolvedTags);
+        document.setTagNames(tagNames == null ? List.of() : tagNames);
 
         knowledgeBaseDocumentRepository.save(document);
     }

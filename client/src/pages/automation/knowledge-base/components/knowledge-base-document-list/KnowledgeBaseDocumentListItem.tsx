@@ -3,13 +3,13 @@ import KnowledgeBaseDocumentListItemDropdownMenu from '@/pages/automation/knowle
 import useKnowledgeBaseDocumentListItem from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItem';
 import useKnowledgeBaseDocumentListItemTagList from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItemTagList';
 import TagList from '@/shared/components/TagList';
-import {KnowledgeBaseDocument, Tag} from '@/shared/middleware/graphql';
+import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
 import {ChevronDownIcon} from 'lucide-react';
 
 interface KnowledgeBaseDocumentListItemProps {
     document: KnowledgeBaseDocument;
-    remainingTags?: Tag[];
-    tags: Tag[];
+    remainingTags?: string[];
+    tags: string[];
 }
 
 const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: KnowledgeBaseDocumentListItemProps) => {
@@ -69,7 +69,7 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
                                 getRequest={(_id, newTags) => ({
                                     input: {
                                         knowledgeBaseDocumentId: document.id,
-                                        tags: newTags.map((tag) => ({id: tag.id, name: tag.name})),
+                                        tags: newTags.map((tag) => tag.name),
                                     },
                                 })}
                                 id={+document.id}

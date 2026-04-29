@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.config;
 
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_IDS;
+import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_NAMES;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,12 +51,12 @@ public class KnowledgeBaseVectorStoreMetadataUpdater {
     /**
      * Updates tag metadata in the vector store for the given entry. Preserves all other existing metadata fields
      * (e.g., {@code source}, {@code charset}) and avoids re-embedding the content. Stores both
-     * {@code tag_ids: [list]} (human-readable) and {@code tag_ids_ID: true} boolean flags (used for filtering).
+     * {@code tag_names: [list]} (human-readable) and {@code tag_names_NAME: true} boolean flags (used for filtering).
      *
      * @param vectorStoreId the vector store document ID
-     * @param tagIds        the new tag IDs to set; an empty list removes all tag fields
+     * @param tagNames      the new tag names to set; an empty list removes all tag fields
      */
-    public void updateTagIds(String vectorStoreId, List<Long> tagIds) {
+    public void updateTagNames(String vectorStoreId, List<String> tagNames) {
         List<String> rows = pgVectorJdbcTemplate.queryForList(
             "SELECT metadata::text FROM " + fullTableName + " WHERE id = ?::uuid",
             String.class, vectorStoreId);
@@ -69,23 +69,23 @@ public class KnowledgeBaseVectorStoreMetadataUpdater {
 
         Map<String, Object> metadata = objectMapper.readValue(rows.get(0), new TypeReference<>() {});
 
-        // preserve insertion order so tag_ids ends up at the tail
+        // preserve insertion order so tag_names ends up at the tail
         Map<String, Object> updatedMetadata = new LinkedHashMap<>();
 
         for (Map.Entry<String, Object> entry : metadata.entrySet()) {
             String key = entry.getKey();
 
             // drop existing tag entries so they can be rebuilt fresh
-            if (!key.startsWith(METADATA_TAG_IDS + "_") && !key.equals(METADATA_TAG_IDS)) {
+            if (!key.startsWith(METADATA_TAG_NAMES + "_") && !key.equals(METADATA_TAG_NAMES)) {
                 updatedMetadata.put(key, entry.getValue());
             }
         }
 
-        if (!tagIds.isEmpty()) {
-            updatedMetadata.put(METADATA_TAG_IDS, tagIds);
+        if (!tagNames.isEmpty()) {
+            updatedMetadata.put(METADATA_TAG_NAMES, tagNames);
 
-            for (Long tagId : tagIds) {
-                updatedMetadata.put(METADATA_TAG_IDS + "_" + tagId, true);
+            for (String tagName : tagNames) {
+                updatedMetadata.put(METADATA_TAG_NAMES + "_" + tagName, true);
             }
         }
 

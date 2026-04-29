@@ -18,10 +18,8 @@ package com.bytechef.automation.knowledgebase.web.graphql;
 
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
-import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -49,13 +47,13 @@ public class KnowledgeBaseDocumentTagGraphQlController {
     }
 
     @QueryMapping
-    public List<Tag> knowledgeBaseDocumentTags() {
-        return knowledgeBaseDocumentTagService.getAllTags();
+    public List<String> knowledgeBaseDocumentTags() {
+        return knowledgeBaseDocumentTagService.getAllTagNames();
     }
 
     @QueryMapping
     public List<KnowledgeBaseDocumentTagsEntry> knowledgeBaseDocumentTagsByDocument() {
-        return knowledgeBaseDocumentTagService.getTagsByKnowledgeBaseDocumentId()
+        return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseDocumentId()
             .entrySet()
             .stream()
             .map(entry -> new KnowledgeBaseDocumentTagsEntry(entry.getKey(), entry.getValue()))
@@ -64,33 +62,16 @@ public class KnowledgeBaseDocumentTagGraphQlController {
 
     @MutationMapping
     public boolean updateKnowledgeBaseDocumentTags(@Argument UpdateKnowledgeBaseDocumentTagsInput input) {
-        List<Tag> tags = input.tags() == null ? List.of() : input.tags()
-            .stream()
-            .map(tagInput -> {
-                Tag tag = new Tag();
+        List<String> tagNames = input.tags() == null ? List.of() : input.tags();
 
-                if (tagInput.id() != null) {
-                    tag.setId(tagInput.id());
-                }
-
-                tag.setName(tagInput.name());
-
-                return tag;
-            })
-            .collect(Collectors.toList());
-
-        knowledgeBaseDocumentTagService.updateTags(input.knowledgeBaseDocumentId(), tags);
-        knowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentTags(input.knowledgeBaseDocumentId(), tags);
+        knowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentTags(input.knowledgeBaseDocumentId(), tagNames);
 
         return true;
     }
 
-    public record KnowledgeBaseDocumentTagsEntry(Long knowledgeBaseDocumentId, List<Tag> tags) {
+    public record KnowledgeBaseDocumentTagsEntry(Long knowledgeBaseDocumentId, List<String> tags) {
     }
 
-    public record UpdateKnowledgeBaseDocumentTagsInput(Long knowledgeBaseDocumentId, List<TagInput> tags) {
-    }
-
-    public record TagInput(Long id, String name) {
+    public record UpdateKnowledgeBaseDocumentTagsInput(Long knowledgeBaseDocumentId, List<String> tags) {
     }
 }

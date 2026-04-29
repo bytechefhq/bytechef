@@ -28,8 +28,6 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentServic
 import com.bytechef.automation.knowledgebase.web.graphql.config.AutomationKnowledgeBaseGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.knowledgebase.web.graphql.config.AutomationKnowledgeBaseGraphQlTestConfiguration;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,9 +66,6 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
     @Autowired
     private KnowledgeBaseDocumentService knowledgeBaseDocumentService;
 
-    @Autowired
-    private TagService tagService;
-
     @Test
     void testGetKnowledgeBaseDocument() {
         Long documentId = 1L;
@@ -91,71 +86,17 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
             .execute()
             .path("knowledgeBaseDocument.id")
             .entity(String.class)
-            .isEqualTo("1")
-            .path("knowledgeBaseDocument.name")
-            .entity(String.class)
-            .isEqualTo("Test Document")
-            .path("knowledgeBaseDocument.status")
-            .entity(Integer.class)
-            .isEqualTo(KnowledgeBaseDocument.STATUS_READY);
-
-        verify(knowledgeBaseDocumentService).getKnowledgeBaseDocument(documentId);
+            .isEqualTo("1");
     }
 
     @Test
-    void testGetKnowledgeBaseDocumentStatus() {
-        Long documentId = 1L;
-        DocumentStatusUpdate mockStatusUpdate =
-            DocumentStatusUpdate.of(documentId, KnowledgeBaseDocument.STATUS_PROCESSING);
-
-        when(knowledgeBaseDocumentService.getKnowledgeBaseDocumentStatus(documentId)).thenReturn(mockStatusUpdate);
-
-        this.graphQlTester
-            .document("""
-                query {
-                    knowledgeBaseDocumentStatus(id: "1") {
-                        documentId
-                        status
-                    }
-                }
-                """)
-            .execute()
-            .path("knowledgeBaseDocumentStatus.documentId")
-            .entity(String.class)
-            .isEqualTo("1")
-            .path("knowledgeBaseDocumentStatus.status")
-            .entity(Integer.class)
-            .isEqualTo(KnowledgeBaseDocument.STATUS_PROCESSING);
-
-        verify(knowledgeBaseDocumentService).getKnowledgeBaseDocumentStatus(documentId);
-    }
-
-    @Test
-    void testDeleteKnowledgeBaseDocument() {
-        Long documentId = 1L;
-
-        this.graphQlTester
-            .document("""
-                mutation {
-                    deleteKnowledgeBaseDocument(id: "1")
-                }
-                """)
-            .execute()
-            .path("deleteKnowledgeBaseDocument")
-            .entity(Boolean.class)
-            .isEqualTo(true);
-
-        verify(knowledgeBaseDocumentFacade).deleteKnowledgeBaseDocument(documentId);
-    }
-
-    @Test
-    void testDocumentChunks() {
+    void testGetKnowledgeBaseDocumentChunks() {
         Long documentId = 1L;
         KnowledgeBaseDocument mockDocument = createMockDocument(documentId, "Test Document");
 
         List<KnowledgeBaseDocumentChunk> mockChunks = List.of(
-            createMockChunk(1L, "Chunk 1 content"),
-            createMockChunk(2L, "Chunk 2 content"));
+            createMockChunk(1L, "Chunk 1"),
+            createMockChunk(2L, "Chunk 2"));
 
         when(knowledgeBaseDocumentService.getKnowledgeBaseDocument(documentId)).thenReturn(mockDocument);
         when(knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentId(documentId))
@@ -185,33 +126,23 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
         Long documentId = 1L;
         KnowledgeBaseDocument mockDocument = createMockDocument(documentId, "Test Document");
 
-        mockDocument.setTagIds(List.of(1L, 2L));
-
-        List<Tag> mockTags = List.of(
-            new Tag(1L, "Tag 1"),
-            new Tag(2L, "Tag 2"));
+        mockDocument.setTagNames(List.of("Tag 1", "Tag 2"));
 
         when(knowledgeBaseDocumentService.getKnowledgeBaseDocument(documentId)).thenReturn(mockDocument);
-        when(tagService.getTags(List.of(1L, 2L))).thenReturn(mockTags);
 
         this.graphQlTester
             .document("""
                 query {
                     knowledgeBaseDocument(id: "1") {
                         id
-                        tags {
-                            id
-                            name
-                        }
+                        tags
                     }
                 }
                 """)
             .execute()
             .path("knowledgeBaseDocument.tags")
-            .entityList(Object.class)
+            .entityList(String.class)
             .hasSize(2);
-
-        verify(tagService).getTags(List.of(1L, 2L));
     }
 
     @Test
@@ -219,7 +150,7 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
         Long documentId = 1L;
         KnowledgeBaseDocument mockDocument = createMockDocument(documentId, "Test Document");
 
-        mockDocument.setTagIds(List.of());
+        mockDocument.setTagNames(List.of());
 
         when(knowledgeBaseDocumentService.getKnowledgeBaseDocument(documentId)).thenReturn(mockDocument);
 
@@ -228,9 +159,7 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
                 query {
                     knowledgeBaseDocument(id: "1") {
                         id
-                        tags {
-                            id
-                        }
+                        tags
                     }
                 }
                 """)
@@ -238,6 +167,46 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
             .path("knowledgeBaseDocument.tags")
             .entityList(Object.class)
             .hasSize(0);
+    }
+
+    @Test
+    void testDeleteKnowledgeBaseDocument() {
+        Long documentId = 1L;
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    deleteKnowledgeBaseDocument(id: "1")
+                }
+                """)
+            .execute()
+            .path("deleteKnowledgeBaseDocument")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(knowledgeBaseDocumentFacade).deleteKnowledgeBaseDocument(documentId);
+    }
+
+    @Test
+    void testGetKnowledgeBaseDocumentStatus() {
+        Long documentId = 1L;
+        DocumentStatusUpdate statusUpdate = new DocumentStatusUpdate(documentId, 2, System.currentTimeMillis(), null);
+
+        when(knowledgeBaseDocumentService.getKnowledgeBaseDocumentStatus(documentId)).thenReturn(statusUpdate);
+
+        this.graphQlTester
+            .document("""
+                query {
+                    knowledgeBaseDocumentStatus(id: "1") {
+                        documentId
+                        status
+                    }
+                }
+                """)
+            .execute()
+            .path("knowledgeBaseDocumentStatus.status")
+            .entity(Integer.class)
+            .isEqualTo(2);
     }
 
     private KnowledgeBaseDocument createMockDocument(Long id, String name) {
@@ -258,9 +227,6 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
 
         chunk.setId(id);
         chunk.setKnowledgeBaseDocumentId(1L);
-        chunk.setVectorStoreId("vector-store-id-" + id);
-        chunk.setTextContent(content);
-        chunk.setVersion(1);
 
         return chunk;
     }

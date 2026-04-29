@@ -25,7 +25,6 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkS
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.util.List;
@@ -122,12 +121,12 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     }
 
     @Override
-    public void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<Tag> tags) {
-        knowledgeBaseDocumentTagService.updateTags(knowledgeBaseDocumentId, tags);
+    public void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames) {
+        knowledgeBaseDocumentTagService.updateTagNames(knowledgeBaseDocumentId, tagNames);
 
         KnowledgeBaseDocument knowledgeBaseDocument =
             knowledgeBaseDocumentService.getKnowledgeBaseDocument(knowledgeBaseDocumentId);
-        List<Long> tagIds = knowledgeBaseDocument.getTagIds();
+        List<String> updatedTagNames = knowledgeBaseDocument.getTagNames();
 
         List<KnowledgeBaseDocumentChunk> chunks =
             knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentId(knowledgeBaseDocumentId);
@@ -139,7 +138,7 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
                 continue;
             }
 
-            knowledgeBaseVectorStoreMetadataUpdater.updateTagIds(vectorStoreId, tagIds);
+            knowledgeBaseVectorStoreMetadataUpdater.updateTagNames(vectorStoreId, updatedTagNames);
         }
     }
 }

@@ -19,6 +19,7 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.SIMILARITY_THRESHOLD;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_NAMES;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TOP_K;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -29,21 +30,16 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
-import com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
-import com.bytechef.platform.tag.domain.Tag;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -65,7 +61,8 @@ public final class KnowledgeBaseSearchAction {
     }
 
     public static ActionDefinition of(
-        VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagService knowledgeBaseTagService) {
+        VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService,
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
         return action(SEARCH)
             .title("Search Data")
@@ -83,12 +80,12 @@ public final class KnowledgeBaseSearchAction {
                     .description(
                         "The search query for semantic similarity search. Leave empty for tag-only search.")
                     .required(false),
-                array(KnowledgeBaseVectorStoreConstants.TAG_IDS)
+                array(TAG_NAMES)
                     .label("Tags")
                     .description(
                         "Filter results by tags. Documents with ANY of the selected tags will be returned (OR logic).")
-                    .items(integer())
-                    .options(getTagOptions(knowledgeBaseTagService))
+                    .items(string())
+                    .options(getTagOptions(knowledgeBaseDocumentTagService))
                     .required(false),
                 integer(TOP_K)
                     .label("Top K")
@@ -111,7 +108,7 @@ public final class KnowledgeBaseSearchAction {
     private static Object perform(Parameters inputParameters, VectorStore vectorStore) {
         Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
         String query = inputParameters.getString(QUERY);
-        List<Long> tagIds = inputParameters.getList(KnowledgeBaseVectorStoreConstants.TAG_IDS, Long.class);
+        List<String> tagNames = inputParameters.getList(TAG_NAMES, String.class);
         int topK = inputParameters.getInteger(TOP_K, 10);
         double similarityThreshold = inputParameters.getDouble(SIMILARITY_THRESHOLD, 0.0);
 
@@ -119,29 +116,29 @@ public final class KnowledgeBaseSearchAction {
             vectorStore, knowledgeBaseId);
 
         boolean hasQuery = query != null && !query.isBlank();
-        boolean hasTags = tagIds != null && !tagIds.isEmpty();
+        boolean hasTags = tagNames != null && !tagNames.isEmpty();
 
         if (!hasQuery && !hasTags) {
             return List.of();
         }
 
         if (!hasQuery) {
-            return searchByTagsOnly(wrappedVectorStore, tagIds, topK);
+            return searchByTagsOnly(wrappedVectorStore, tagNames, topK);
         }
 
         if (!hasTags) {
             return searchByVectorOnly(wrappedVectorStore, query, topK, similarityThreshold);
         }
 
-        return searchWithTagFilter(wrappedVectorStore, query, tagIds, topK, similarityThreshold);
+        return searchWithTagFilter(wrappedVectorStore, query, tagNames, topK, similarityThreshold);
     }
 
     /**
      * Tag-only search: retrieves documents that match any of the specified tags (OR logic). Uses a dummy query with tag
      * filtering since vector stores require a query.
      */
-    private static List<Document> searchByTagsOnly(VectorStore vectorStore, List<Long> tagIds, int topK) {
-        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagIds);
+    private static List<Document> searchByTagsOnly(VectorStore vectorStore, List<String> tagNames, int topK) {
+        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagNames);
 
         SearchRequest searchRequest = SearchRequest.builder()
             .query("")
@@ -172,9 +169,9 @@ public final class KnowledgeBaseSearchAction {
      * Combined search: filters by tags (OR logic), then performs semantic similarity search.
      */
     private static List<Document> searchWithTagFilter(
-        VectorStore vectorStore, String query, List<Long> tagIds, int topK, double similarityThreshold) {
+        VectorStore vectorStore, String query, List<String> tagNames, int topK, double similarityThreshold) {
 
-        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagIds);
+        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagNames);
 
         SearchRequest searchRequest = SearchRequest.builder()
             .query(query)
@@ -210,34 +207,25 @@ public final class KnowledgeBaseSearchAction {
         };
     }
 
-    private static ActionDefinition.OptionsFunction<Long> getTagOptions(KnowledgeBaseTagService knowledgeBaseTagService) {
+    private static ActionDefinition.OptionsFunction<String> getTagOptions(
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
+
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             Long knowledgeBaseId = inputParameters.getLong(KNOWLEDGE_BASE_ID);
 
-            List<Tag> tags;
+            List<String> tagNames;
 
             if (knowledgeBaseId == null) {
-                tags = knowledgeBaseTagService.getAllTags();
+                tagNames = knowledgeBaseDocumentTagService.getAllTagNames();
             } else {
-                tags = knowledgeBaseTagService.getDocumentTagsByKnowledgeBaseId(knowledgeBaseId);
+                tagNames = knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseId(knowledgeBaseId);
             }
 
-            Map<Long, Tag> unique = new LinkedHashMap<>();
+            List<Option<String>> options = new ArrayList<>();
 
-            for (Tag tag : tags) {
-                Long tagId = Objects.requireNonNull(tag.getId());
-
-                unique.putIfAbsent(tagId, tag);
-            }
-
-            List<Option<Long>> options = new ArrayList<>();
-
-            for (Tag tag : unique.values()) {
-                String tagName = tag.getName();
-
+            for (String tagName : tagNames) {
                 if (matchesSearchText(tagName, searchText)) {
-                    options.add(option(tagName, Objects.requireNonNull(tag.getId())
-                        .longValue()));
+                    options.add(option(tagName, tagName));
                 }
             }
 

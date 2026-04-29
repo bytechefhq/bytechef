@@ -1,7 +1,7 @@
 extend type Query {
     knowledgeBaseDocument(id: ID!): KnowledgeBaseDocument
     knowledgeBaseDocumentStatus(id: ID!): DocumentStatusUpdate
-    knowledgeBaseDocumentTags: [Tag!]
+    knowledgeBaseDocumentTags: [String!]
     knowledgeBaseDocumentTagsByDocument: [KnowledgeBaseDocumentTagsEntry!]
 }
 
@@ -16,7 +16,7 @@ type KnowledgeBaseDocument {
     document: FileEntry
     status: Int!
     chunks: [KnowledgeBaseDocumentChunk]
-    tags: [Tag!]
+    tags: [String!]
     createdDate: Long
 }
 
@@ -36,10 +36,10 @@ type DocumentStatusUpdate {
 
 input UpdateKnowledgeBaseDocumentTagsInput {
     knowledgeBaseDocumentId: ID!
-    tags: [TagInput!]
+    tags: [String!]
 }
 
 type KnowledgeBaseDocumentTagsEntry {
     knowledgeBaseDocumentId: ID!
-    tags: [Tag!]!
+    tags: [String!]!
 }

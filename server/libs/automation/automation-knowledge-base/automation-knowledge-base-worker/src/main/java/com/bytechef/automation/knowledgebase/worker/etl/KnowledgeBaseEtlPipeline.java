@@ -78,14 +78,14 @@ public class KnowledgeBaseEtlPipeline {
      * @param documentId      the knowledge base document ID
      * @param chunkId         the knowledge base document chunk ID
      * @param environmentId   the environment ordinal of the knowledge base
-     * @param tagIds          the tag IDs associated with the document
+     * @param tagNames        the tag names associated with the document
      * @return the vector store ID assigned to the document
      */
     public String writeChunkToVectorStore(
         Document document, Long knowledgeBaseId, Long documentId, Long chunkId, long environmentId,
-        List<Long> tagIds) {
+        List<String> tagNames) {
 
-        vectorStoreWriter.writeChunk(document, knowledgeBaseId, documentId, chunkId, environmentId, tagIds);
+        vectorStoreWriter.writeChunk(document, knowledgeBaseId, documentId, chunkId, environmentId, tagNames);
 
         return document.getId();
     }
@@ -98,14 +98,14 @@ public class KnowledgeBaseEtlPipeline {
      * @param documentId      the knowledge base document ID
      * @param chunkId         the knowledge base document chunk ID
      * @param environmentId   the environment ordinal of the knowledge base
-     * @param tagIds          the tag IDs associated with the document
+     * @param tagNames        the tag names associated with the document
      */
     public void processChunkUpdate(
         String content, Long knowledgeBaseId, Long documentId, Long chunkId, long environmentId,
-        List<Long> tagIds) {
+        List<String> tagNames) {
 
         Document document = new Document(content);
 
-        vectorStoreWriter.writeChunk(document, knowledgeBaseId, documentId, chunkId, environmentId, tagIds);
+        vectorStoreWriter.writeChunk(document, knowledgeBaseId, documentId, chunkId, environmentId, tagNames);
     }
 }

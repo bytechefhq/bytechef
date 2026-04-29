@@ -1119,7 +1119,7 @@ export type KnowledgeBaseDocument = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   status: Scalars['Int']['output'];
-  tags?: Maybe<Array<Tag>>;
+  tags?: Maybe<Array<Scalars['String']['output']>>;
 };
 
 export type KnowledgeBaseDocumentChunk = {
@@ -1147,7 +1147,7 @@ export type KnowledgeBaseDocumentSearchResult = SearchResult & {
 export type KnowledgeBaseDocumentTagsEntry = {
   __typename?: 'KnowledgeBaseDocumentTagsEntry';
   knowledgeBaseDocumentId: Scalars['ID']['output'];
-  tags: Array<Tag>;
+  tags: Array<Scalars['String']['output']>;
 };
 
 export type KnowledgeBaseInput = {
@@ -2477,7 +2477,7 @@ export type Query = {
   knowledgeBase?: Maybe<KnowledgeBase>;
   knowledgeBaseDocument?: Maybe<KnowledgeBaseDocument>;
   knowledgeBaseDocumentStatus?: Maybe<DocumentStatusUpdate>;
-  knowledgeBaseDocumentTags?: Maybe<Array<Tag>>;
+  knowledgeBaseDocumentTags?: Maybe<Array<Scalars['String']['output']>>;
   knowledgeBaseDocumentTagsByDocument?: Maybe<Array<KnowledgeBaseDocumentTagsEntry>>;
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
@@ -3367,7 +3367,7 @@ export type UpdateDataTableTagsInput = {
 
 export type UpdateKnowledgeBaseDocumentTagsInput = {
   knowledgeBaseDocumentId: Scalars['ID']['input'];
-  tags?: InputMaybe<Array<TagInput>>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type UpdateKnowledgeBaseTagsInput = {
@@ -4197,7 +4197,7 @@ export type KnowledgeBaseQueryVariables = Exact<{
 }>;
 
 
-export type KnowledgeBaseQuery = { __typename?: 'Query', knowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, documents?: Array<{ __typename?: 'KnowledgeBaseDocument', id: string, name: string, status: number, createdDate?: any | null, document?: { __typename?: 'FileEntry', name: string, extension?: string | null, mimeType?: string | null, url: string } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null, chunks?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null } | null> | null } | null> | null } | null };
+export type KnowledgeBaseQuery = { __typename?: 'Query', knowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, documents?: Array<{ __typename?: 'KnowledgeBaseDocument', id: string, name: string, status: number, tags?: Array<string> | null, createdDate?: any | null, document?: { __typename?: 'FileEntry', name: string, extension?: string | null, mimeType?: string | null, url: string } | null, chunks?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null } | null> | null } | null> | null } | null };
 
 export type KnowledgeBaseDocumentStatusQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -4209,12 +4209,12 @@ export type KnowledgeBaseDocumentStatusQuery = { __typename?: 'Query', knowledge
 export type KnowledgeBaseDocumentTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseDocumentTagsQuery = { __typename?: 'Query', knowledgeBaseDocumentTags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null };
+export type KnowledgeBaseDocumentTagsQuery = { __typename?: 'Query', knowledgeBaseDocumentTags?: Array<string> | null };
 
 export type KnowledgeBaseDocumentTagsByDocumentQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseDocumentTagsByDocumentQuery = { __typename?: 'Query', knowledgeBaseDocumentTagsByDocument?: Array<{ __typename?: 'KnowledgeBaseDocumentTagsEntry', knowledgeBaseDocumentId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> | null };
+export type KnowledgeBaseDocumentTagsByDocumentQuery = { __typename?: 'Query', knowledgeBaseDocumentTagsByDocument?: Array<{ __typename?: 'KnowledgeBaseDocumentTagsEntry', knowledgeBaseDocumentId: string, tags: Array<string> }> | null };
 
 export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -7655,10 +7655,7 @@ export const KnowledgeBaseDocument = new TypedDocumentString(`
         url
       }
       status
-      tags {
-        id
-        name
-      }
+      tags
       createdDate
       chunks {
         id
@@ -7718,10 +7715,7 @@ export const useKnowledgeBaseDocumentStatusQuery = <
 
 export const KnowledgeBaseDocumentTagsDocument = new TypedDocumentString(`
     query knowledgeBaseDocumentTags {
-  knowledgeBaseDocumentTags {
-    id
-    name
-  }
+  knowledgeBaseDocumentTags
 }
     `);
 
@@ -7745,10 +7739,7 @@ export const KnowledgeBaseDocumentTagsByDocumentDocument = new TypedDocumentStri
     query knowledgeBaseDocumentTagsByDocument {
   knowledgeBaseDocumentTagsByDocument {
     knowledgeBaseDocumentId
-    tags {
-      id
-      name
-    }
+    tags
   }
 }
     `);
