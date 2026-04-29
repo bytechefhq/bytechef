@@ -31,7 +31,7 @@ export default function AiAgentHeader({
             <div>
                 {title && <div className="text-lg font-semibold">{title}</div>}
 
-                {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+                {subtitle && <p className="text-sm text-content-neutral-secondary">{subtitle}</p>}
             </div>
 
             <div className="flex shrink-0 items-center gap-1">

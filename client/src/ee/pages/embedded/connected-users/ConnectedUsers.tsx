@@ -94,7 +94,9 @@ const IntegrationLabel = ({integration}: {integration: Integration}) => (
     <div className="flex items-center">
         <span className="mr-1">{integration.componentName}</span>
 
-        <span className="text-xs text-gray-500">{integration?.tags?.map((tag) => tag.name).join(', ')}</span>
+        <span className="text-xs text-content-neutral-secondary">
+            {integration?.tags?.map((tag) => tag.name).join(', ')}
+        </span>
     </div>
 );
 

@@ -87,7 +87,7 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
 
                                 <h3 className="mt-2 text-sm font-semibold">No defined components</h3>
 
-                                <p className="mt-1 text-sm text-gray-500">
+                                <p className="mt-1 text-sm text-content-neutral-secondary">
                                     You have not defined any component and its connection to use inside this script yet.
                                 </p>
 

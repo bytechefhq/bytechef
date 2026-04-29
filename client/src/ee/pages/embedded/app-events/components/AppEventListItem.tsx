@@ -61,7 +61,7 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
             <div className="flex justify-end gap-x-6">
                 {appEvent.createdDate && (
                     <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                             <span>
                                 {`${appEvent.createdDate?.toLocaleDateString()} ${appEvent.createdDate?.toLocaleTimeString()}`}
                             </span>

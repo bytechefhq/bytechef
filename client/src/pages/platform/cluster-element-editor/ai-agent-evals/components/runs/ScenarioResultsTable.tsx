@@ -31,14 +31,14 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
     const [transcriptResult, setTranscriptResult] = useState<ResultType | null>(null);
 
     if (results.length === 0) {
-        return <div className="py-6 text-center text-sm text-gray-500">No results yet</div>;
+        return <div className="py-6 text-center text-sm text-content-neutral-secondary">No results yet</div>;
     }
 
     return (
         <>
             <div className="rounded-lg border border-border/50">
                 <div className="border-b border-border/50 px-3 py-2">
-                    <div className="grid grid-cols-[24px_1fr_100px_80px_80px_90px_56px] items-center gap-2 text-xs font-medium text-gray-500">
+                    <div className="grid grid-cols-[24px_1fr_100px_80px_80px_90px_56px] items-center gap-2 text-xs font-medium text-content-neutral-secondary">
                         <div />
 
                         <div>Scenario</div>
@@ -116,11 +116,11 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                     )}
                                 </div>
 
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-content-neutral-secondary">
                                     {hasTokens ? `${inputTokens + outputTokens}` : '\u2014'}
                                 </div>
 
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-content-neutral-secondary">
                                     {result.verdicts.length > 0
                                         ? `${result.verdicts.filter((verdict) => verdict.passed).length}/${result.verdicts.length} passed`
                                         : '\u2014'}

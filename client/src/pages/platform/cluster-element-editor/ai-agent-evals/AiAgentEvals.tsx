@@ -24,7 +24,7 @@ const AiAgentEvals = () => {
                             'px-4 py-2.5 text-sm',
                             evalsTab === tab
                                 ? 'border-b-2 border-blue-500 font-semibold text-gray-900'
-                                : 'text-gray-500'
+                                : 'text-content-neutral-secondary'
                         )}
                         key={tab}
                         onClick={() => setEvalsTab(tab)}

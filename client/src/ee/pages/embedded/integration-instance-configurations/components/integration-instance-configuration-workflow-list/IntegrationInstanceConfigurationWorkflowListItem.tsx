@@ -129,7 +129,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                 <div className="flex items-center gap-x-6">
                     {integrationInstanceConfigurationWorkflow?.lastExecutionDate ? (
                         <Tooltip>
-                            <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                 <span className="text-xs">
                                     {`Executed at ${integrationInstanceConfigurationWorkflow.lastExecutionDate?.toLocaleDateString()} ${integrationInstanceConfigurationWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
                                 </span>

@@ -98,9 +98,9 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                 className="size-6 p-0"
                                 icon={
                                     isExpanded ? (
-                                        <ChevronDownIcon className="size-4 text-gray-500" />
+                                        <ChevronDownIcon className="size-4 text-content-neutral-secondary" />
                                     ) : (
-                                        <ChevronRightIcon className="size-4 text-gray-500" />
+                                        <ChevronRightIcon className="size-4 text-content-neutral-secondary" />
                                     )
                                 }
                                 size="icon"
@@ -148,7 +148,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                             />
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                     {customComponent.lastModifiedDate ? (
                                         <span className="text-xs">
                                             {`Modified at ${new Date(customComponent.lastModifiedDate).toLocaleDateString()} ${new Date(customComponent.lastModifiedDate).toLocaleTimeString()}`}
@@ -183,7 +183,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                 <CollapsibleContent>
                     <div className="ml-8 mt-4 border-t pt-4">
                         {isLoadingDefinition ? (
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <div className="flex items-center gap-2 text-sm text-content-neutral-secondary">
                                 <LoadingIcon className="size-4" />
                                 Loading component definition...
                             </div>
@@ -204,7 +204,9 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                                         {action.title || action.name}
                                                     </div>
 
-                                                    <div className="text-xs text-gray-500">{action.name}</div>
+                                                    <div className="text-xs text-content-neutral-secondary">
+                                                        {action.name}
+                                                    </div>
 
                                                     {action.description && (
                                                         <div className="mt-1 text-xs text-gray-600">
@@ -215,7 +217,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                             ))}
                                         </ul>
                                     ) : (
-                                        <p className="text-sm text-gray-500">No actions defined</p>
+                                        <p className="text-sm text-content-neutral-secondary">No actions defined</p>
                                     )}
                                 </div>
 
@@ -234,7 +236,9 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                                         {trigger.title || trigger.name}
                                                     </div>
 
-                                                    <div className="text-xs text-gray-500">{trigger.name}</div>
+                                                    <div className="text-xs text-content-neutral-secondary">
+                                                        {trigger.name}
+                                                    </div>
 
                                                     {trigger.description && (
                                                         <div className="mt-1 text-xs text-gray-600">
@@ -245,7 +249,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                             ))}
                                         </ul>
                                     ) : (
-                                        <p className="text-sm text-gray-500">No triggers defined</p>
+                                        <p className="text-sm text-content-neutral-secondary">No triggers defined</p>
                                     )}
                                 </div>
                             </div>

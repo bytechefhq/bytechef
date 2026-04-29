@@ -101,13 +101,15 @@ const AiAgentEvalTestCard = ({
                             <div className="text-sm font-semibold">{test.name}</div>
 
                             {test.description && (
-                                <div className="line-clamp-1 text-xs text-gray-500">{test.description}</div>
+                                <div className="line-clamp-1 text-xs text-content-neutral-secondary">
+                                    {test.description}
+                                </div>
                             )}
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-content-neutral-secondary">
                             {scenarios.length} {scenarios.length === 1 ? 'scenario' : 'scenarios'}
                         </span>
 
@@ -167,7 +169,9 @@ const AiAgentEvalTestCard = ({
                                 ))}
                             </div>
                         ) : (
-                            <div className="py-4 text-center text-sm text-gray-500">No scenarios yet</div>
+                            <div className="py-4 text-center text-sm text-content-neutral-secondary">
+                                No scenarios yet
+                            </div>
                         )}
 
                         <Button

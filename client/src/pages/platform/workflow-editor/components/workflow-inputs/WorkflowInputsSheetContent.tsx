@@ -66,7 +66,9 @@ const WorkflowInputsSheetContent = ({
 
                             <h2 className="text-sm font-semibold">No inputs</h2>
 
-                            <p className="text-sm text-gray-500">Get started by creating a new input.</p>
+                            <p className="text-sm text-content-neutral-secondary">
+                                Get started by creating a new input.
+                            </p>
 
                             <Button icon={<PlusIcon />} label="New Input" onClick={() => openEditDialog()} />
                         </div>

@@ -38,7 +38,7 @@ const AccountProfileMfa = () => {
         <div className="py-12">
             <h2 className="text-base font-semibold leading-7 text-gray-900">Two-Factor Authentication</h2>
 
-            <p className="mt-1 text-sm leading-6 text-gray-500">
+            <p className="mt-1 text-sm leading-6 text-content-neutral-secondary">
                 Add an extra layer of security to your account using an authenticator app.
             </p>
 

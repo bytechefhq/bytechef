@@ -18,7 +18,7 @@ const KnowledgeBaseDocumentChunkListItemHeader = ({
         <div className="flex items-center space-x-3">
             <Checkbox checked={isSelected} onCheckedChange={handleSelectionChange} />
 
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
+            <div className="flex items-center space-x-2 text-sm text-content-neutral-secondary">
                 <span className="font-medium">{documentName}</span>
 
                 <span>•</span>

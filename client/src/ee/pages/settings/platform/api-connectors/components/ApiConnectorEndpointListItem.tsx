@@ -38,14 +38,14 @@ const ApiConnectorEndpointListItem = ({
 
                     <div className="w-2/6 text-sm font-semibold">{apiConnectorEndpoint.name}</div>
 
-                    <div className="text-xs text-gray-500">{apiConnectorEndpoint.path}</div>
+                    <div className="text-xs text-content-neutral-secondary">{apiConnectorEndpoint.path}</div>
                 </div>
             </Button>
 
             <div className="flex items-center justify-end gap-x-6">
                 {lastExecutionDate ? (
                     <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                             <CalendarIcon aria-hidden="true" className="mr-0.5 size-3.5 shrink-0 text-gray-400" />
 
                             <span className="text-xs">

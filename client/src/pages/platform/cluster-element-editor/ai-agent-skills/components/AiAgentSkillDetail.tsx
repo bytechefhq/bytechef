@@ -164,7 +164,9 @@ const AiAgentSkillDetail = () => {
                 {selectedFilePath ? (
                     <>
                         <div className="flex shrink-0 items-center border-b border-b-border/50 py-2 pl-4 pr-0">
-                            <span className="flex-1 text-center text-sm text-gray-500">{selectedFilePath}</span>
+                            <span className="flex-1 text-center text-sm text-content-neutral-secondary">
+                                {selectedFilePath}
+                            </span>
 
                             <Button
                                 icon={<DownloadIcon className="size-4" />}

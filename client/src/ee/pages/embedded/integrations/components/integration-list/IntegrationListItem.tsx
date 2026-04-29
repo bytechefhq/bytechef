@@ -224,7 +224,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <div className="flex items-center text-sm text-gray-500 sm:mt-0">
+                                        <div className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
                                             {integration.lastPublishedDate ? (
                                                 <span className="text-xs">
                                                     {`Published at ${integration.lastPublishedDate?.toLocaleDateString()} ${integration.lastPublishedDate?.toLocaleTimeString()}`}

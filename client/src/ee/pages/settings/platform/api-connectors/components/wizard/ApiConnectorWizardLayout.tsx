@@ -76,7 +76,9 @@ const ApiConnectorWizardLayout = ({
                                         <span
                                             className={twMerge(
                                                 'text-xs font-medium',
-                                                index <= currentStep ? 'text-gray-900' : 'text-gray-500'
+                                                index <= currentStep
+                                                    ? 'text-gray-900'
+                                                    : 'text-content-neutral-secondary'
                                             )}
                                         >
                                             {step}

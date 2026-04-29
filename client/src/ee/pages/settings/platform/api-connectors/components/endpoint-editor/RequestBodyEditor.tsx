@@ -83,7 +83,9 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
                         {requestBody.required && <span className="text-xs text-red-500">Required</span>}
                     </div>
 
-                    {requestBody.description && <p className="mt-1 text-xs text-gray-500">{requestBody.description}</p>}
+                    {requestBody.description && (
+                        <p className="mt-1 text-xs text-content-neutral-secondary">{requestBody.description}</p>
+                    )}
                 </div>
             ) : (
                 <p className="text-xs text-muted-foreground">No request body defined.</p>

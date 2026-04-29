@@ -118,7 +118,9 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
 
                         <h3 className="mt-2 text-sm font-semibold">No outputs</h3>
 
-                        <p className="mt-1 text-sm text-gray-500">Get started by creating a new input.</p>
+                        <p className="mt-1 text-sm text-content-neutral-secondary">
+                            Get started by creating a new input.
+                        </p>
 
                         <div className="mt-6">
                             <WorkflowOutputsSheetDialog

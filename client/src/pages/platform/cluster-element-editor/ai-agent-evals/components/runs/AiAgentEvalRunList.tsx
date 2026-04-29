@@ -27,7 +27,7 @@ const AiAgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AiAgentEvalRunList
 
                 <h3 className="text-sm font-semibold">No runs yet</h3>
 
-                <p className="max-w-xs text-center text-xs text-gray-500">
+                <p className="max-w-xs text-center text-xs text-content-neutral-secondary">
                     Click &quot;Run Test&quot; to execute the selected test and see results here.
                 </p>
             </div>
@@ -37,7 +37,7 @@ const AiAgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AiAgentEvalRunList
     return (
         <div className="rounded-lg border border-border/50">
             <div className="border-b border-border/50 px-3 py-2">
-                <div className="grid grid-cols-[1fr_100px_180px_100px_160px] items-center gap-2 text-xs font-medium text-gray-500">
+                <div className="grid grid-cols-[1fr_100px_180px_100px_160px] items-center gap-2 text-xs font-medium text-content-neutral-secondary">
                     <div>Name</div>
 
                     <div>Status</div>
@@ -111,7 +111,9 @@ const AiAgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AiAgentEvalRunList
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500">{formatRunDate(run.createdDate)}</span>
+                                <span className="text-xs text-content-neutral-secondary">
+                                    {formatRunDate(run.createdDate)}
+                                </span>
 
                                 {isRunning && (
                                     <Button

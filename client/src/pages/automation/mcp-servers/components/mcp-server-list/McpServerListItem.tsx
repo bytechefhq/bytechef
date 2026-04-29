@@ -44,7 +44,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                         <div className="flex items-center justify-between">
                             <CollapsibleTrigger className="text-base font-semibold">
                                 <div className="flex items-center">
-                                    <ServerIcon className="mr-2 size-4 text-gray-500" />
+                                    <ServerIcon className="mr-2 size-4 text-content-neutral-secondary" />
 
                                     <span>{mcpServer.name}</span>
                                 </div>
@@ -106,7 +106,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                     {mcpServer.lastModifiedDate ? (
                                         <span className="text-xs">
                                             {`Modified at ${new Date(mcpServer.lastModifiedDate).toLocaleDateString()} ${new Date(mcpServer.lastModifiedDate).toLocaleTimeString()}`}

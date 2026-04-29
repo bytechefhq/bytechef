@@ -44,7 +44,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
         if (results.length === 0) {
             return (
                 <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
-                    <p className="text-gray-500">No results found for your query.</p>
+                    <p className="text-content-neutral-secondary">No results found for your query.</p>
                 </div>
             );
         }
@@ -55,7 +55,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
                 key={result.id}
             >
                 <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <div className="flex items-center space-x-2 text-sm text-content-neutral-secondary">
                         <span className="font-medium">Result {index + 1}</span>
 
                         <span>•</span>
@@ -130,7 +130,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
 
                 {searchQuery && (
                     <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-content-neutral-secondary">
                             Found {results.length} result{results.length !== 1 ? 's' : ''}
                         </p>
 

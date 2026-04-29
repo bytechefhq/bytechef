@@ -63,7 +63,7 @@ const ApiConnectorWizardEndpointsStep = () => {
                                 <div>
                                     <p className="text-sm font-medium">{endpoint.operationId}</p>
 
-                                    <p className="text-xs text-gray-500">{endpoint.path}</p>
+                                    <p className="text-xs text-content-neutral-secondary">{endpoint.path}</p>
 
                                     <div className="mt-1 flex gap-2 text-xs text-gray-400">
                                         {endpoint.parameters.length > 0 && (

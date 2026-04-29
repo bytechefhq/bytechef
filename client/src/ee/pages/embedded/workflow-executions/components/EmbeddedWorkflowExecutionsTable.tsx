@@ -88,7 +88,7 @@ const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) =>
                         <TableRow className="border-b-border/50" key={headerGroup.id}>
                             {headerGroup.headers.map((header, index) => (
                                 <TableHead
-                                    className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                                    className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary"
                                     key={`${headerGroup.id}_${header.id}_${index}`}
                                 >
                                     {!header.isPlaceholder &&

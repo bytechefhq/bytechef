@@ -19,9 +19,11 @@ const KnowledgeBaseInfoCard = ({knowledgeBase}: KnowledgeBaseInfoCardProps) => {
                 <KnowledgeBaseDropdownMenu knowledgeBase={knowledgeBase} />
             </div>
 
-            {knowledgeBase.description && <p className="mt-2 text-sm text-gray-500">{knowledgeBase.description}</p>}
+            {knowledgeBase.description && (
+                <p className="mt-2 text-sm text-content-neutral-secondary">{knowledgeBase.description}</p>
+            )}
 
-            <div className="mt-4 flex space-x-6 text-sm text-gray-500">
+            <div className="mt-4 flex space-x-6 text-sm text-content-neutral-secondary">
                 <div>
                     <span className="font-medium">Documents: </span>
 

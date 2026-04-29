@@ -26,25 +26,25 @@ const RunSummaryCards = ({summary}: RunSummaryCardsProps) => {
     return (
         <div className="grid grid-cols-6 gap-3">
             <div className="rounded-lg border border-border/50 px-3 py-3">
-                <div className="text-xs text-gray-500">Avg Score</div>
+                <div className="text-xs text-content-neutral-secondary">Avg Score</div>
 
                 <div className="mt-1 text-xl font-semibold">{scorePercent}%</div>
             </div>
 
             <div className="rounded-lg border border-border/50 px-3 py-3">
-                <div className="text-xs text-gray-500">Scenarios</div>
+                <div className="text-xs text-content-neutral-secondary">Scenarios</div>
 
                 <div className="mt-1 text-xl font-semibold">{summary.totalScenarios}</div>
             </div>
 
             <div className="rounded-lg border border-border/50 px-3 py-3">
-                <div className="text-xs text-gray-500">Passed</div>
+                <div className="text-xs text-content-neutral-secondary">Passed</div>
 
                 <div className="mt-1 text-xl font-semibold text-green-600">{summary.passedCount}</div>
             </div>
 
             <div className="rounded-lg border border-border/50 px-3 py-3">
-                <div className="text-xs text-gray-500">Failed</div>
+                <div className="text-xs text-content-neutral-secondary">Failed</div>
 
                 <div className="mt-1 text-xl font-semibold text-red-600">
                     {summary.failedCount + summary.errorCount}
@@ -52,7 +52,7 @@ const RunSummaryCards = ({summary}: RunSummaryCardsProps) => {
             </div>
 
             <div className="rounded-lg border border-border/50 px-3 py-3">
-                <div className="flex items-center gap-1 text-xs text-gray-500">
+                <div className="flex items-center gap-1 text-xs text-content-neutral-secondary">
                     Tokens
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -71,7 +71,7 @@ const RunSummaryCards = ({summary}: RunSummaryCardsProps) => {
             </div>
 
             <div className="rounded-lg border border-border/50 px-3 py-3">
-                <div className="flex items-center gap-1 text-xs text-gray-500">
+                <div className="flex items-center gap-1 text-xs text-content-neutral-secondary">
                     Agent Version
                     <Tooltip>
                         <TooltipTrigger asChild>

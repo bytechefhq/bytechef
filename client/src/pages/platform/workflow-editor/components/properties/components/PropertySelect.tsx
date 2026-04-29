@@ -126,7 +126,7 @@ const PropertySelect = ({
 
                                         {option.description && (
                                             <span
-                                                className="mt-1 line-clamp-2 w-full text-xs text-gray-500"
+                                                className="mt-1 line-clamp-2 w-full text-xs text-content-neutral-secondary"
                                                 title={option.description}
                                             >
                                                 {option.description}

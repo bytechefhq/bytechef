@@ -64,7 +64,9 @@ const ProjectLabel = ({project}: {project: Project}) => (
     <div className="flex items-center">
         <span className="mr-1">{project.name}</span>
 
-        <span className="text-xs text-gray-500">{project?.tags?.map((tag) => tag.name).join(', ')}</span>
+        <span className="text-xs text-content-neutral-secondary">
+            {project?.tags?.map((tag) => tag.name).join(', ')}
+        </span>
     </div>
 );
 
@@ -426,7 +428,7 @@ export const WorkflowExecutions = () => {
                                                 {projectDeployment.name} V{projectDeployment.projectVersion}
                                             </span>
 
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-content-neutral-secondary">
                                                 {projectDeployment?.tags?.map((tag) => tag.name).join(', ')}
                                             </span>
                                         </span>

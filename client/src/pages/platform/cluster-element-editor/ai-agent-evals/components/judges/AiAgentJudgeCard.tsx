@@ -139,7 +139,9 @@ const AiAgentJudgeCard = ({judge, onDelete, onEdit}: AiAgentJudgeCardProps) => {
                         </div>
 
                         {configSummary && (
-                            <div className="mt-0.5 line-clamp-1 text-xs text-gray-500">{configSummary}</div>
+                            <div className="mt-0.5 line-clamp-1 text-xs text-content-neutral-secondary">
+                                {configSummary}
+                            </div>
                         )}
                     </div>
                 </div>

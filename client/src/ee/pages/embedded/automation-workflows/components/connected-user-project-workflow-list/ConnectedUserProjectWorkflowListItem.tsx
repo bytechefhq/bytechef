@@ -19,7 +19,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                 <div className="ml-6 flex space-x-1"></div>
             </div>
 
-            <div className="flex items-center gap-x-4 text-gray-500">
+            <div className="flex items-center gap-x-4 text-content-neutral-secondary">
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Badge

@@ -33,7 +33,7 @@ const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
 
                 <h3 className="text-sm font-semibold">No tests yet</h3>
 
-                <p className="max-w-xs text-center text-xs text-gray-500">
+                <p className="max-w-xs text-center text-xs text-content-neutral-secondary">
                     Create a test in the Tests tab, then run it to see results here.
                 </p>
             </div>
@@ -50,7 +50,7 @@ const EvalsRunsTab = ({workflowId, workflowNodeName}: EvalsRunsTabProps) => {
 
     return (
         <div className="flex flex-1 flex-col gap-3 px-4">
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-content-neutral-secondary">
                 {runs.length} {runs.length === 1 ? 'run' : 'runs'}
             </div>
 

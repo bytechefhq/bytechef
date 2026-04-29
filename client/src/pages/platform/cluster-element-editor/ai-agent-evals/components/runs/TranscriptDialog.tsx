@@ -36,7 +36,7 @@ const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogPro
                     <div className="flex items-center justify-center py-8">
                         <Loader2Icon className="size-5 animate-spin text-gray-400" />
 
-                        <span className="ml-2 text-sm text-gray-500">Loading transcript...</span>
+                        <span className="ml-2 text-sm text-content-neutral-secondary">Loading transcript...</span>
                     </div>
                 )}
 
@@ -50,7 +50,7 @@ const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogPro
 
                 {!isLoading && !error && !transcriptData && (
                     <div className="rounded-md border border-border/50 bg-gray-50 px-4 py-3">
-                        <div className="text-sm text-gray-500">No transcript data available.</div>
+                        <div className="text-sm text-content-neutral-secondary">No transcript data available.</div>
                     </div>
                 )}
 
