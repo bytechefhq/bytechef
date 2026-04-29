@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.event;
+package com.bytechef.automation.connection.event;
 
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.component.definition.Authorization;
