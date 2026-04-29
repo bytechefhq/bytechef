@@ -17,6 +17,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
+    implementation(project(":server:libs:automation:automation-connection:automation-connection-service"))
     implementation(project(":server:libs:automation:automation-swagger"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
@@ -44,6 +45,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-swagger"))

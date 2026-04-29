@@ -79,6 +79,7 @@ include("server:libs:automation:automation-configuration:automation-configuratio
 include("server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-api")
 include("server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl")
 include("server:libs:automation:automation-configuration:automation-configuration-service")
+include("server:libs:automation:automation-connection:automation-connection-service")
 include("server:libs:automation:automation-data-table:automation-data-table-api")
 include("server:libs:automation:automation-data-table:automation-data-table-graphql")
 include("server:libs:automation:automation-data-table:automation-data-table-service")
