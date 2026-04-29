@@ -29,7 +29,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
 import com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants;
@@ -46,7 +45,7 @@ import java.util.Objects;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.Filter.Expression;
 
 /**
  * Search action for querying the internal knowledge base vector store. Supports three search modes:
@@ -64,8 +63,7 @@ public final class KnowledgeBaseSearchAction {
     }
 
     public static ActionDefinition of(
-        VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService, TagService tagService) {
+        VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService, TagService tagService) {
 
         return action(SEARCH)
             .title("Search Data")
@@ -105,14 +103,10 @@ public final class KnowledgeBaseSearchAction {
             .output()
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
-                    inputParameters, vectorStore, knowledgeBaseDocumentTagService));
+                    inputParameters, vectorStore));
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static Object perform(
-        Parameters inputParameters, VectorStore vectorStore,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
-
+    private static Object perform(Parameters inputParameters, VectorStore vectorStore) {
         Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
         String query = inputParameters.getString(QUERY);
         List<Long> tagIds = inputParameters.getList(KnowledgeBaseVectorStoreConstants.TAG_IDS, Long.class);
@@ -129,30 +123,24 @@ public final class KnowledgeBaseSearchAction {
             return List.of();
         }
 
-        List<Long> documentIds = hasTags
-            ? knowledgeBaseDocumentTagService.getDocumentIdsByTagIds(knowledgeBaseId, tagIds)
-            : List.of();
-
         if (!hasQuery) {
-            return searchByTagsOnly(wrappedVectorStore, documentIds, topK);
+            return searchByTagsOnly(wrappedVectorStore, tagIds, topK);
         }
 
         if (!hasTags) {
             return searchByVectorOnly(wrappedVectorStore, query, topK, similarityThreshold);
         }
 
-        return searchWithTagFilter(wrappedVectorStore, query, documentIds, topK, similarityThreshold);
+        return searchWithTagFilter(wrappedVectorStore, query, tagIds, topK, similarityThreshold);
     }
 
     /**
      * Tag-only search: retrieves documents that match any of the specified tags (OR logic). Uses a dummy query with tag
      * filtering since vector stores require a query.
      */
-    private static List<Document> searchByTagsOnly(VectorStore vectorStore, List<Long> documentIds, int topK) {
-        Filter.Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildDocumentIdFilter(documentIds);
+    private static List<Document> searchByTagsOnly(VectorStore vectorStore, List<Long> tagIds, int topK) {
+        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagIds);
 
-        // For tag-only search, we use an empty query but rely on the filter
-        // Note: The vector store will still compute embeddings, but filtering will narrow results
         SearchRequest searchRequest = SearchRequest.builder()
             .query("")
             .topK(topK)
@@ -182,9 +170,9 @@ public final class KnowledgeBaseSearchAction {
      * Combined search: filters by tags (OR logic), then performs semantic similarity search.
      */
     private static List<Document> searchWithTagFilter(
-        VectorStore vectorStore, String query, List<Long> documentIds, int topK, double similarityThreshold) {
+        VectorStore vectorStore, String query, List<Long> tagIds, int topK, double similarityThreshold) {
 
-        Filter.Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildDocumentIdFilter(documentIds);
+        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagIds);
 
         SearchRequest searchRequest = SearchRequest.builder()
             .query(query)

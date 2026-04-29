@@ -49,11 +49,12 @@ public class KnowledgeBaseVectorStoreMetadataUpdater {
     }
 
     /**
-     * Updates only the {@code tag_ids} field in the vector store metadata for the given entry. Preserves all other
-     * existing metadata fields (e.g., {@code source}, {@code charset}) and avoids re-embedding the content.
+     * Updates tag metadata in the vector store for the given entry. Preserves all other existing metadata fields
+     * (e.g., {@code source}, {@code charset}) and avoids re-embedding the content. Stores both
+     * {@code tag_ids: [list]} (human-readable) and {@code tag_ids_ID: true} boolean flags (used for filtering).
      *
      * @param vectorStoreId the vector store document ID
-     * @param tagIds        the new tag IDs to set; an empty list removes the field
+     * @param tagIds        the new tag IDs to set; an empty list removes all tag fields
      */
     public void updateTagIds(String vectorStoreId, List<Long> tagIds) {
         List<String> rows = pgVectorJdbcTemplate.queryForList(
@@ -74,7 +75,7 @@ public class KnowledgeBaseVectorStoreMetadataUpdater {
         for (Map.Entry<String, Object> entry : metadata.entrySet()) {
             String key = entry.getKey();
 
-            // drop old boolean-flag format (tag_ids_1055: true) and old array format
+            // drop existing tag entries so they can be rebuilt fresh
             if (!key.startsWith(METADATA_TAG_IDS + "_") && !key.equals(METADATA_TAG_IDS)) {
                 updatedMetadata.put(key, entry.getValue());
             }
@@ -82,6 +83,10 @@ public class KnowledgeBaseVectorStoreMetadataUpdater {
 
         if (!tagIds.isEmpty()) {
             updatedMetadata.put(METADATA_TAG_IDS, tagIds);
+
+            for (Long tagId : tagIds) {
+                updatedMetadata.put(METADATA_TAG_IDS + "_" + tagId, true);
+            }
         }
 
         pgVectorJdbcTemplate.update(

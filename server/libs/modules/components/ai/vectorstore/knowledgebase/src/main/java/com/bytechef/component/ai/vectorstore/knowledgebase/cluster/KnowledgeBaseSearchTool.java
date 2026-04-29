@@ -26,7 +26,6 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
@@ -44,10 +43,9 @@ public class KnowledgeBaseSearchTool {
 
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService, KnowledgeBaseService knowledgeBaseService,
-        KnowledgeBaseTagService knowledgeBaseTagService) {
+        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagService knowledgeBaseTagService) {
 
-        VectorStore kbVectorStore = createVectorStore(knowledgeBaseDocumentTagService, vectorStore);
+        VectorStore kbVectorStore = createVectorStore(vectorStore);
 
         return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("search")
             .title("Knowledge Base Search")
