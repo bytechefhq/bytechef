@@ -143,7 +143,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "listid" ]
+        "optionsLookupDependsOn": null
       },
       "placeholder": null,
       "regex": null,
@@ -1047,7 +1047,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "listid" ]
+        "optionsLookupDependsOn": null
       },
       "placeholder": null,
       "regex": null,

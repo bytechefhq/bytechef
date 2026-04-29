@@ -210,7 +210,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -446,7 +446,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -583,7 +583,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -743,7 +743,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1124,7 +1124,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1352,7 +1352,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1585,7 +1585,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1719,7 +1719,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -1876,7 +1876,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,
@@ -2254,7 +2254,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+        "optionsLookupDependsOn": [ "baseId" ]
       },
       "placeholder": null,
       "regex": null,

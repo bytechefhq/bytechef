@@ -17,147 +17,151 @@
 package com.bytechef.component.discord.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class DiscordUtilsTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Map<String, Object> mockedMap = Map.of("key", "value");
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetChannelIdOptions() {
-        List<Map<String, Object>> channels = new ArrayList<>();
-        Map<String, Object> channel = new LinkedHashMap<>();
+    void testGetChannelIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        channel.put("name", "name");
-        channel.put("id", "id");
+        mockedParameters = MockParametersFactory.create(Map.of(GUILD_ID, "id"));
 
-        channels.add(channel);
-
-        when(mockedContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(channels);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("name", "id"));
+            .thenReturn(List.of(Map.of("name", "name", "id", "id")));
 
         assertEquals(
-            expectedOptions,
+            List.of(option("name", "id")),
             DiscordUtils.getChannelIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/guilds/id/channels", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetDMChannel() {
-        when(mockedParameters.getRequired(RECIPIENT_ID))
-            .thenReturn("id");
+    void testGetDMChannel(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        mockedParameters = MockParametersFactory.create(Map.of(RECIPIENT_ID, "id"));
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedMap);
 
         Map<String, Object> result = DiscordUtils.getDMChannel(mockedParameters, mockedContext);
 
         assertEquals(mockedMap, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        Http.Body bodyMessage = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Map.of(RECIPIENT_ID, "id"), bodyMessage.getContent());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/users/@me/channels", stringArgumentCaptor.getValue());
+
+        assertEquals(Body.of(Map.of(RECIPIENT_ID, "id"), BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetGuildIdOptions() {
-        List<Map<String, Object>> guilds = new ArrayList<>();
-        Map<String, Object> guild = new LinkedHashMap<>();
+    void testGetGuildIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        guild.put("name", "name");
-        guild.put("id", "id");
-
-        guilds.add(guild);
-
-        when(mockedContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(guilds);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("name", "id"));
+            .thenReturn(List.of(Map.of("name", "name", "id", "id")));
 
         assertEquals(
-            expectedOptions,
+            List.of(option("name", "id")),
             DiscordUtils.getGuildIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/users/@me/guilds", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetGuildMemberIdOptions() {
-        List<Map<String, Object>> guildMembers = new ArrayList<>();
-        Map<String, Object> member = new LinkedHashMap<>();
-        Map<String, Object> user = new LinkedHashMap<>();
+    void testGetGuildMemberIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        user.put("username", "username");
-        user.put("id", "id");
+        mockedParameters = MockParametersFactory.create(Map.of(GUILD_ID, "id"));
 
-        guildMembers.add(member);
-
-        member.put("user", user);
-
-        when(mockedContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter("limit", "1000"))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(guildMembers);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("username", "id"));
+            .thenReturn(List.of(Map.of("user", Map.of("username", "username", "id", "id"))));
 
         assertEquals(
-            expectedOptions,
+            List.of(option("username", "id")),
             DiscordUtils.getGuildMemberIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(List.of("/guilds/id/members", "limit", "1000"), stringArgumentCaptor.getAllValues());
     }
 }
