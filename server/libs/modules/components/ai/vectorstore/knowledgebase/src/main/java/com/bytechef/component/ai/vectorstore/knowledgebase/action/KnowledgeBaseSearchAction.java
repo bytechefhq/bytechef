@@ -30,6 +30,7 @@ import static com.bytechef.platform.component.definition.VectorStoreComponentDef
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
 import com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants;
 import com.bytechef.component.definition.ActionDefinition;
@@ -37,10 +38,11 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.service.TagService;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -63,7 +65,7 @@ public final class KnowledgeBaseSearchAction {
     }
 
     public static ActionDefinition of(
-        VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService, TagService tagService) {
+        VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagService knowledgeBaseTagService) {
 
         return action(SEARCH)
             .title("Search Data")
@@ -86,7 +88,7 @@ public final class KnowledgeBaseSearchAction {
                     .description(
                         "Filter results by tags. Documents with ANY of the selected tags will be returned (OR logic).")
                     .items(integer())
-                    .options(getTagOptions(tagService))
+                    .options(getTagOptions(knowledgeBaseTagService))
                     .required(false),
                 integer(TOP_K)
                     .label("Top K")
@@ -208,25 +210,47 @@ public final class KnowledgeBaseSearchAction {
         };
     }
 
-    private static ActionDefinition.OptionsFunction<Long> getTagOptions(TagService tagService) {
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
-            List<Option<Long>> options = new ArrayList<>();
+    private static ActionDefinition.OptionsFunction<Long> getTagOptions(KnowledgeBaseTagService knowledgeBaseTagService) {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            Long knowledgeBaseId = inputParameters.getLong(KNOWLEDGE_BASE_ID);
 
-            List<Tag> tags = tagService.getTags();
+            List<Tag> tags;
+
+            if (knowledgeBaseId == null) {
+                tags = knowledgeBaseTagService.getAllTags();
+            } else {
+                tags = knowledgeBaseTagService.getDocumentTagsByKnowledgeBaseId(knowledgeBaseId);
+            }
+
+            Map<Long, Tag> unique = new LinkedHashMap<>();
 
             for (Tag tag : tags) {
+                Long tagId = Objects.requireNonNull(tag.getId());
+
+                unique.putIfAbsent(tagId, tag);
+            }
+
+            List<Option<Long>> options = new ArrayList<>();
+
+            for (Tag tag : unique.values()) {
                 String tagName = tag.getName();
 
-                String tagNameLowerCase = tagName.toLowerCase(Locale.ROOT);
-
-                if (searchText == null || tagNameLowerCase.contains(searchText.toLowerCase(Locale.ROOT))) {
-                    long tagId = Objects.requireNonNull(tag.getId());
-
-                    options.add(option(tagName, tagId));
+                if (matchesSearchText(tagName, searchText)) {
+                    options.add(option(tagName, Objects.requireNonNull(tag.getId())
+                        .longValue()));
                 }
             }
 
             return options;
         };
+    }
+
+    private static boolean matchesSearchText(String value, String searchText) {
+        if (searchText == null) {
+            return true;
+        }
+
+        return value.toLowerCase(Locale.ROOT)
+            .contains(searchText.toLowerCase(Locale.ROOT));
     }
 }

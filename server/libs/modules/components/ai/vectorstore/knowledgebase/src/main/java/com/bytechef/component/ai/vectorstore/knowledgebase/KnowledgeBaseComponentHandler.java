@@ -97,7 +97,7 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                         KnowledgeBaseLoadAction.of(
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
                             knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
-                        KnowledgeBaseSearchAction.of(vectorStore, knowledgeBaseService, tagService))
+                        KnowledgeBaseSearchAction.of(vectorStore, knowledgeBaseService, knowledgeBaseTagService))
                     .clusterElements(
                         KnowledgeBaseSearchTool.of(vectorStore, knowledgeBaseService, knowledgeBaseTagService),
                         KnowledgeBaseVectorStore.of(
