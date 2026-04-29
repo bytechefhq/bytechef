@@ -64,7 +64,7 @@ Name: createRecords
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workspaceId | Workspace ID | STRING | ID of the workspace. | false |
 | baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table. | true |
 | tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | null |
 
 #### Example JSON Structure
@@ -133,7 +133,7 @@ Name: deleteRecords
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workspaceId | Workspace ID | STRING | ID of the workspace. | false |
 | baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table. | true |
 | recordId | Records ID | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | ID of the records to delete. | true |
 
 #### Example JSON Structure
@@ -206,7 +206,7 @@ Name: getRecord
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workspaceId | Workspace ID | STRING | ID of the workspace. | false |
 | baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table. | true |
 | recordId | Record ID | STRING | ID of the record to retrieve. | true |
 | fields | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields to include in the response. By default, all the fields are included in the response. | false |
 
@@ -261,7 +261,7 @@ Name: searchRecords
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workspaceId | Workspace ID | STRING | ID of the workspace. | false |
 | baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table. | true |
 | fields | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields to include in the response. By default, all the fields are included in the response. | false |
 | sort | Sort By | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(order)&#125;] </details> | Fields by which you want to sort the records in your response. | false |
 | where | Where | STRING | Specific conditions for filtering records in your response. Multiple conditions can be combined using logical operators such as 'and' and 'or'. Each condition consists of three parts: a field name, a comparison operator, and a value. | false |
@@ -318,7 +318,7 @@ Name: updateRecords
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workspaceId | Workspace ID | STRING | ID of the workspace. | false |
 | baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table. | true |
 | tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | null |
 
 #### Example JSON Structure
@@ -381,6 +381,12 @@ To find the Record ID, click [here](/reference/components/nocodb_v1#how-to-find-
 
 
 
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
 <hr />
 

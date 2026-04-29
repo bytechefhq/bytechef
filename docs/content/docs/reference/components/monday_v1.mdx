@@ -258,9 +258,9 @@ Name: createItem
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where new item will be created. | true |
-| group_id | Group ID | STRING <details> <summary> Depends On </summary> workspace_id, board_id </details> | The item's group. | false |
+| group_id | Group ID | STRING <details> <summary> Depends On </summary> board_id </details> | The item's group. | false |
 | item_name | Item Name | STRING | The item's name. | true |
-| columnValues | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> workspace_id, board_id, group_id </details> |  | false |
+| columnValues | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> board_id </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -329,7 +329,7 @@ Name: deleteItem
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where the item is located. | false |
-| item_id | Item ID | STRING <details> <summary> Depends On </summary> board_id, workspace_id </details> | ID of the item to delete. | true |
+| item_id | Item ID | STRING <details> <summary> Depends On </summary> board_id </details> | ID of the item to delete. | true |
 
 #### Example JSON Structure
 ```json
@@ -423,8 +423,8 @@ Name: updateItemStatus
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | workspace_id | Workspace ID | STRING | ID of the workspace where the board is located. | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where the item is located. Returns only boards with defined status column. | true |
-| column_id | Column ID | STRING <details> <summary> Depends On </summary> workspace_id, board_id </details> | Column ID. | true |
-| item_id | Item ID | STRING <details> <summary> Depends On </summary> board_id, workspace_id </details> | ID of the item to update. | true |
+| column_id | Column ID | STRING <details> <summary> Depends On </summary> board_id </details> | Column ID. | true |
+| item_id | Item ID | STRING <details> <summary> Depends On </summary> board_id </details> | ID of the item to update. | true |
 | status | Status | STRING <details> <summary> Depends On </summary> board_id, column_id </details> | The status label. | true |
 
 #### Example JSON Structure

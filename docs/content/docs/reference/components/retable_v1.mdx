@@ -108,7 +108,7 @@ Name: insertRow
 | workspace_id | Workspace ID | STRING | ID of the workspace. | true |
 | project_id | Project ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the project. | true |
 | retable_id | Retable ID | STRING <details> <summary> Depends On </summary> project_id </details> | ID of the retable. | true |
-| row_ids | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> project_id </details> |  | false |
+| row_ids | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> retable_id </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -176,7 +176,7 @@ Name: updateRow
 | project_id | Project ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the project. | true |
 | retable_id | Retable ID | STRING <details> <summary> Depends On </summary> project_id </details> | ID of the retable. | true |
 | row_id | Row ID | INTEGER | ID of the row to update. | true |
-| row_ids | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> project_id </details> |  | false |
+| row_ids | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> retable_id </details> |  | false |
 
 #### Example JSON Structure
 ```json

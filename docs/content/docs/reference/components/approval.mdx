@@ -1,0 +1,72 @@
+---
+title: "Approval"
+description: "Approval component for manual intervention in workflows."
+---
+
+
+Categories: Helpers
+
+
+Type: approval/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Request Approval
+Name: requestApproval
+
+`Sends an approval request and waits for a human to approve or reject.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| formTitle | Form Title | STRING | The title for the approval form. Displayed as the main heading. | false |
+| formDescription | Form Description | STRING | A description shown under the form title. Use \n or &lt;br&gt; for line breaks. | false |
+| inputs | Form Inputs | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(fieldType), STRING\(fieldLabel), STRING\(fieldName), STRING\(fieldDescription), STRING\(placeholder), STRING\(defaultValue), STRING\(defaultValue), [&#123;STRING\(label), STRING\(value)&#125;]\(fieldOptions), BOOLEAN\(multipleChoice), INTEGER\(minSelection), INTEGER\(maxSelection), BOOLEAN\(required)&#125;] </details> | Define the form input fields for the approval request. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Request Approval",
+  "name" : "requestApproval",
+  "parameters" : {
+    "formTitle" : "",
+    "formDescription" : "",
+    "inputs" : [ {
+      "fieldType" : 1,
+      "fieldLabel" : "",
+      "fieldName" : "",
+      "fieldDescription" : "",
+      "placeholder" : "",
+      "defaultValue" : "",
+      "fieldOptions" : [ {
+        "label" : "",
+        "value" : ""
+      } ],
+      "multipleChoice" : false,
+      "minSelection" : 1,
+      "maxSelection" : 1,
+      "required" : false
+    } ]
+  },
+  "type" : "approval/v1/requestApproval"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+
+
