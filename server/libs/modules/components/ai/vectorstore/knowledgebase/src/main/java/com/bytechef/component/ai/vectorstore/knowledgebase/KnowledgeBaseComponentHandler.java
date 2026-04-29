@@ -24,8 +24,8 @@ import static com.bytechef.platform.component.definition.ai.vectorstore.Document
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseLoadAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseSearchAction;
@@ -37,7 +37,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -60,14 +59,14 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
         ClusterElementDefinitionService clusterElementDefinitionService,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
-        KnowledgeBaseTagService knowledgeBaseTagService, TagService tagService,
         @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
 
         this.componentDefinition =
             new KnowledgeBaseVectorStoreComponentDefinitionImpl(
                 clusterElementDefinitionService, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseTagService, tagService, vectorStore);
+                knowledgeBaseDocumentTagService, knowledgeBaseFileStorage, knowledgeBaseService, vectorStore);
     }
 
     @Override
@@ -82,8 +81,9 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
             ClusterElementDefinitionService clusterElementDefinitionService,
             KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
+            KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
             KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
-            KnowledgeBaseTagService knowledgeBaseTagService, TagService tagService, VectorStore vectorStore) {
+            VectorStore vectorStore) {
 
             super(
                 component(KNOWLEDGE_BASE)
@@ -97,12 +97,14 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                         KnowledgeBaseLoadAction.of(
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
                             knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
-                        KnowledgeBaseSearchAction.of(vectorStore, knowledgeBaseService, knowledgeBaseTagService))
+                        KnowledgeBaseSearchAction.of(
+                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService))
                     .clusterElements(
-                        KnowledgeBaseSearchTool.of(vectorStore, knowledgeBaseService, knowledgeBaseTagService),
+                        KnowledgeBaseSearchTool.of(
+                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
                         KnowledgeBaseVectorStore.of(
                             vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                            knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseTagService)));
+                            knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseDocumentTagService)));
         }
 
         @Override

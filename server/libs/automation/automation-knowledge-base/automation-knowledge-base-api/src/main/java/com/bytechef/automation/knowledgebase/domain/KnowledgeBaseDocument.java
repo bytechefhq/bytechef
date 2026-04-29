@@ -18,7 +18,6 @@ package com.bytechef.automation.knowledgebase.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.platform.tag.domain.Tag;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -156,28 +155,20 @@ public class KnowledgeBaseDocument {
         this.version = version;
     }
 
-    public List<Long> getTagIds() {
+    public List<String> getTagNames() {
         return knowledgeBaseDocumentTags
             .stream()
-            .map(KnowledgeBaseDocumentTag::getTagId)
+            .map(KnowledgeBaseDocumentTag::getTagName)
             .toList();
     }
 
-    public void setTagIds(List<Long> tagIds) {
+    public void setTagNames(List<String> tagNames) {
         this.knowledgeBaseDocumentTags = new HashSet<>();
 
-        if (!CollectionUtils.isEmpty(tagIds)) {
-            for (long tagId : tagIds) {
-                knowledgeBaseDocumentTags.add(new KnowledgeBaseDocumentTag(tagId));
+        if (!CollectionUtils.isEmpty(tagNames)) {
+            for (String tagName : tagNames) {
+                knowledgeBaseDocumentTags.add(new KnowledgeBaseDocumentTag(tagName));
             }
-        }
-    }
-
-    public void setTags(List<Tag> tags) {
-        if (CollectionUtils.isEmpty(tags)) {
-            setTagIds(List.of());
-        } else {
-            setTagIds(CollectionUtils.map(tags, Tag::getId));
         }
     }
 

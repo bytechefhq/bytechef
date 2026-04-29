@@ -6,12 +6,12 @@ import useKnowledgeBaseDocumentList from '../useKnowledgeBaseDocumentList';
 const hoisted = vi.hoisted(() => {
     return {
         allTagsData: {
-            knowledgeBaseDocumentTags: [] as Array<{id: string; name: string}>,
+            knowledgeBaseDocumentTags: [] as string[],
         },
         tagsByDocumentData: {
             knowledgeBaseDocumentTagsByDocument: [] as Array<{
                 knowledgeBaseDocumentId: string;
-                tags: Array<{id: string; name: string}>;
+                tags: string[];
             }>,
         },
     };
@@ -134,10 +134,7 @@ describe('useKnowledgeBaseDocumentList', () => {
                 knowledgeBaseDocumentTagsByDocument: [
                     {
                         knowledgeBaseDocumentId: 'doc-1',
-                        tags: [
-                            {id: 'tag-1', name: 'Tag 1'},
-                            {id: 'tag-2', name: 'Tag 2'},
-                        ],
+                        tags: ['Tag 1', 'Tag 2'],
                     },
                 ],
             };
@@ -149,8 +146,8 @@ describe('useKnowledgeBaseDocumentList', () => {
             const tags = result.current.getTagsForDocument('doc-1');
 
             expect(tags).toHaveLength(2);
-            expect(tags[0].name).toBe('Tag 1');
-            expect(tags[1].name).toBe('Tag 2');
+            expect(tags[0]).toBe('Tag 1');
+            expect(tags[1]).toBe('Tag 2');
         });
 
         it('returns empty array for non-existent document', () => {
@@ -158,7 +155,7 @@ describe('useKnowledgeBaseDocumentList', () => {
                 knowledgeBaseDocumentTagsByDocument: [
                     {
                         knowledgeBaseDocumentId: 'doc-1',
-                        tags: [{id: 'tag-1', name: 'Tag 1'}],
+                        tags: ['Tag 1'],
                     },
                 ],
             };
@@ -174,11 +171,7 @@ describe('useKnowledgeBaseDocumentList', () => {
     describe('getRemainingTagsForDocument', () => {
         it('returns all tags when document has no tags', () => {
             hoisted.allTagsData = {
-                knowledgeBaseDocumentTags: [
-                    {id: 'tag-1', name: 'Tag 1'},
-                    {id: 'tag-2', name: 'Tag 2'},
-                    {id: 'tag-3', name: 'Tag 3'},
-                ],
+                knowledgeBaseDocumentTags: ['Tag 1', 'Tag 2', 'Tag 3'],
             };
 
             const documents = [createMockDocument('doc-1', [])];
@@ -192,18 +185,14 @@ describe('useKnowledgeBaseDocumentList', () => {
 
         it('filters out tags already assigned to document', () => {
             hoisted.allTagsData = {
-                knowledgeBaseDocumentTags: [
-                    {id: 'tag-1', name: 'Tag 1'},
-                    {id: 'tag-2', name: 'Tag 2'},
-                    {id: 'tag-3', name: 'Tag 3'},
-                ],
+                knowledgeBaseDocumentTags: ['Tag 1', 'Tag 2', 'Tag 3'],
             };
 
             hoisted.tagsByDocumentData = {
                 knowledgeBaseDocumentTagsByDocument: [
                     {
                         knowledgeBaseDocumentId: 'doc-1',
-                        tags: [{id: 'tag-1', name: 'Tag 1'}],
+                        tags: ['Tag 1'],
                     },
                 ],
             };
@@ -215,27 +204,21 @@ describe('useKnowledgeBaseDocumentList', () => {
             const remainingTags = result.current.getRemainingTagsForDocument('doc-1');
 
             expect(remainingTags).toHaveLength(2);
-            expect(remainingTags.find((tag) => tag.id === 'tag-1')).toBeUndefined();
-            expect(remainingTags.find((tag) => tag.id === 'tag-2')).toBeDefined();
-            expect(remainingTags.find((tag) => tag.id === 'tag-3')).toBeDefined();
+            expect(remainingTags.find((tagName) => tagName === 'Tag 1')).toBeUndefined();
+            expect(remainingTags.find((tagName) => tagName === 'Tag 2')).toBeDefined();
+            expect(remainingTags.find((tagName) => tagName === 'Tag 3')).toBeDefined();
         });
 
         it('returns empty array when document has all tags', () => {
             hoisted.allTagsData = {
-                knowledgeBaseDocumentTags: [
-                    {id: 'tag-1', name: 'Tag 1'},
-                    {id: 'tag-2', name: 'Tag 2'},
-                ],
+                knowledgeBaseDocumentTags: ['Tag 1', 'Tag 2'],
             };
 
             hoisted.tagsByDocumentData = {
                 knowledgeBaseDocumentTagsByDocument: [
                     {
                         knowledgeBaseDocumentId: 'doc-1',
-                        tags: [
-                            {id: 'tag-1', name: 'Tag 1'},
-                            {id: 'tag-2', name: 'Tag 2'},
-                        ],
+                        tags: ['Tag 1', 'Tag 2'],
                     },
                 ],
             };

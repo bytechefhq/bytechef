@@ -25,5 +25,5 @@ public class KnowledgeBaseConstants {
     public static final String METADATA_KNOWLEDGE_BASE_ID = "knowledge_base_id";
     public static final String METADATA_KNOWLEDGE_BASE_DOCUMENT_ID = "knowledge_base_document_id";
     public static final String METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID = "knowledge_base_document_chunk_id";
-    public static final String METADATA_TAG_IDS = "tag_ids";
+    public static final String METADATA_TAG_NAMES = "tag_names";
 }

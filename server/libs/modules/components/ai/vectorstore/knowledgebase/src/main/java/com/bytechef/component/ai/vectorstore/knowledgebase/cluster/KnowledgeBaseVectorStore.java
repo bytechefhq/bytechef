@@ -22,9 +22,9 @@ import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConsta
 import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_IDS;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_NAMES;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.VECTOR_STORE;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
@@ -33,8 +33,8 @@ import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -65,7 +65,7 @@ public final class KnowledgeBaseVectorStore {
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagService knowledgeBaseTagService) {
+        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
         VectorStore kbVectorStore = createVectorStore(
             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
@@ -76,17 +76,17 @@ public final class KnowledgeBaseVectorStore {
             .description("Knowledge Base VectorStore.")
             .type(VectorStoreFunction.VECTOR_STORE)
             .properties(
-                integer(KNOWLEDGE_BASE_ID)
+                ComponentDsl.integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to retrieve documents from.")
                     .options(KnowledgeBaseOptionsUtils.knowledgeBaseOptions(knowledgeBaseService))
                     .required(true),
-                array(TAG_IDS)
+                array(TAG_NAMES)
                     .label("Tags")
                     .description(
                         "Filter results by tags. Documents with ANY of the selected tags will be returned (OR logic).")
-                    .items(integer())
-                    .options(KnowledgeBaseOptionsUtils.tagOptions(knowledgeBaseTagService))
+                    .items(string())
+                    .options(KnowledgeBaseOptionsUtils.tagOptions(knowledgeBaseDocumentTagService))
                     .optionsLookupDependsOn(KNOWLEDGE_BASE_ID)
                     .required(false))
             .object(() -> (
@@ -108,7 +108,6 @@ public final class KnowledgeBaseVectorStore {
             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
             knowledgeBaseService, vectorStore);
     }
-
 
     private static String deriveDocumentName(List<Document> documents) {
         if (!documents.isEmpty()) {
@@ -152,9 +151,9 @@ public final class KnowledgeBaseVectorStore {
             Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
 
             Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
-            List<Long> tagIds = inputParameters.getList(TAG_IDS, Long.class);
+            List<String> tagNames = inputParameters.getList(TAG_NAMES, String.class);
 
-            return new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId, tagIds);
+            return new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId, tagNames);
         }
 
         @Override
@@ -240,10 +239,10 @@ public final class KnowledgeBaseVectorStore {
             Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
 
             Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
-            List<Long> tagIds = inputParameters.getList(TAG_IDS, Long.class);
+            List<String> tagNames = inputParameters.getList(TAG_NAMES, String.class);
 
             org.springframework.ai.vectorstore.VectorStore wrappedVectorStore =
-                new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId, tagIds);
+                new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId, tagNames);
 
             return wrappedVectorStore.similaritySearch(inputParameters.getRequiredString(QUERY));
         }

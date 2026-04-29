@@ -64,7 +64,8 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
     };
 
     const handleDeleteTag = (deletedTag: TagType) => {
-        const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
+        const newTags =
+            tags?.filter((tag) => (tag.id != null ? tag.id !== deletedTag.id : tag.name !== deletedTag.name)) || [];
 
         updateTagsMutation.mutate(getRequest(id, newTags));
     };
@@ -74,7 +75,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
             <span className="text-xs text-gray-500">Tags:</span>
 
             {tags.slice(0, 3).map((tag) => (
-                <Tag key={tag.id} onDeleteTag={handleDeleteTag} tag={tag} />
+                <Tag key={tag.id ?? tag.name} onDeleteTag={handleDeleteTag} tag={tag} />
             ))}
 
             {tags.length > 3 && (
@@ -92,7 +93,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                     <PopoverContent align="end" className="w-min p-2">
                         <div className="flex w-min flex-col space-y-1">
                             {tags.slice(3).map((tag) => (
-                                <Tag key={tag.id} onDeleteTag={handleDeleteTag} tag={tag} />
+                                <Tag key={tag.id ?? tag.name} onDeleteTag={handleDeleteTag} tag={tag} />
                             ))}
                         </div>
                     </PopoverContent>

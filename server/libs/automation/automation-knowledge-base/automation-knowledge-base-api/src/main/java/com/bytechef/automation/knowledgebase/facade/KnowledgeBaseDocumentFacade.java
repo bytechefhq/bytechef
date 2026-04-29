@@ -17,7 +17,6 @@
 package com.bytechef.automation.knowledgebase.facade;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
-import com.bytechef.platform.tag.domain.Tag;
 import java.io.InputStream;
 import java.util.List;
 
@@ -48,10 +47,10 @@ public interface KnowledgeBaseDocumentFacade {
     void deleteKnowledgeBaseDocument(Long id);
 
     /**
-     * Updates the tags for a knowledge base document in both the relational database and the vector store.
+     * Updates the tag names for a knowledge base document in both the relational database and the vector store.
      *
      * @param knowledgeBaseDocumentId the ID of the document whose tags are to be updated
-     * @param tags                    the new list of tags
+     * @param tagNames                the new list of tag name strings
      */
-    void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<Tag> tags);
+    void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames);
 }

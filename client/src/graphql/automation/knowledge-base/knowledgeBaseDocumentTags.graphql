@@ -1,6 +1,3 @@
 query knowledgeBaseDocumentTags {
-    knowledgeBaseDocumentTags {
-        id
-        name
-    }
+    knowledgeBaseDocumentTags
 }

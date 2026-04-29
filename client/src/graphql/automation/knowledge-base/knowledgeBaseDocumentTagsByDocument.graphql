@@ -1,9 +1,6 @@
 query knowledgeBaseDocumentTagsByDocument {
     knowledgeBaseDocumentTagsByDocument {
         knowledgeBaseDocumentId
-        tags {
-            id
-            name
-        }
+        tags
     }
 }

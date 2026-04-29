@@ -16,10 +16,7 @@ query knowledgeBase($id: ID!) {
                 url
             }
             status
-            tags {
-                id
-                name
-            }
+            tags
             createdDate
             chunks {
                 id

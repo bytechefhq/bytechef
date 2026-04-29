@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260429000001" author="Marko Kriskovic">
+<!--        <sql dbms="postgresql">-->
+<!--            ALTER TABLE public.knowledge_base_document_tag-->
+<!--            DROP CONSTRAINT IF EXISTS fk_kb_document_tag_tag;-->
+<!--        </sql>-->
+
+        <dropPrimaryKey tableName="knowledge_base_document_tag" constraintName="knowledge_base_document_tag_pkey"/>
+
+        <dropColumn tableName="knowledge_base_document_tag" columnName="tag_id"/>
+
+        <addColumn tableName="knowledge_base_document_tag">
+            <column name="tag_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addPrimaryKey tableName="knowledge_base_document_tag" columnNames="knowledge_base_document_id,tag_name"/>
+    </changeSet>
+
+</databaseChangeLog>

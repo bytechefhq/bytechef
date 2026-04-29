@@ -91,7 +91,7 @@ public class KnowledgeBaseDocumentProcessWorker {
             List<Document> documents = knowledgeBaseEtlPipeline.process(
                 resource, fileEntry.getMimeType(),
                 knowledgeBase.getMinChunkSizeChars(), knowledgeBase.getMaxChunkSize(), knowledgeBase.getOverlap());
-            List<Long> tagIds = knowledgeBaseDocument.getTagIds();
+            List<String> tagNames = knowledgeBaseDocument.getTagNames();
 
             for (Document document : documents) {
                 KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = new KnowledgeBaseDocumentChunk();
@@ -103,7 +103,7 @@ public class KnowledgeBaseDocumentProcessWorker {
 
                 String vectorStoreId = knowledgeBaseEtlPipeline.writeChunkToVectorStore(
                     document, knowledgeBase.getId(), knowledgeBaseDocumentId, knowledgeBaseDocumentChunk.getId(),
-                    knowledgeBase.getEnvironmentId(), tagIds);
+                    knowledgeBase.getEnvironmentId(), tagNames);
 
                 knowledgeBaseDocumentChunk.setVectorStoreId(vectorStoreId);
 
@@ -141,11 +141,11 @@ public class KnowledgeBaseDocumentProcessWorker {
             KnowledgeBase knowledgeBase = knowledgeBaseService.getKnowledgeBase(
                 knowledgeBaseDocument.getKnowledgeBaseId());
 
-            List<Long> tagIds = knowledgeBaseDocument.getTagIds();
+            List<String> tagNames = knowledgeBaseDocument.getTagNames();
 
             knowledgeBaseEtlPipeline.processChunkUpdate(
                 event.getContent(), knowledgeBaseDocument.getKnowledgeBaseId(), knowledgeBaseDocument.getId(),
-                knowledgeBaseDocumentChunkId, knowledgeBase.getEnvironmentId(), tagIds);
+                knowledgeBaseDocumentChunkId, knowledgeBase.getEnvironmentId(), tagNames);
         } catch (RuntimeException exception) {
             logger.error(
                 "Error processing chunk update {}: {}", knowledgeBaseDocumentChunkId, exception.getMessage(),
