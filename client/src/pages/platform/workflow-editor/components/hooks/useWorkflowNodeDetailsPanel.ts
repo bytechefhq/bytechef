@@ -845,11 +845,12 @@ export default function useWorkflowNodeDetailsPanel({
 
         const dataPills = getDataPillsFromProperties(componentProperties, filteredNodeNames);
 
-        const workflowInputDataPills: Array<DataPillType> = workflow.inputs?.map((input) => ({
-            id: input.name,
-            nodeName: input.name,
-            value: input.name,
-        })) || [];
+        const workflowInputDataPills: Array<DataPillType> =
+            workflow.inputs?.map((input) => ({
+                id: input.name,
+                nodeName: input.name,
+                value: input.name,
+            })) || [];
 
         return [...dataPills.flat(Infinity), ...workflowInputDataPills];
     }, [
