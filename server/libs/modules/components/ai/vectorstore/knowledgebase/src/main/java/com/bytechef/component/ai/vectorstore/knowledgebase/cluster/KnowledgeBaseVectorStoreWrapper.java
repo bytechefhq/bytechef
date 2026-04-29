@@ -17,7 +17,7 @@
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
 import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_IDS;
+import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_NAMES;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -38,17 +38,17 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
 
     private final VectorStore vectorStore;
     private final Long knowledgeBaseId;
-    private final List<Long> tagIds;
+    private final List<String> tagNames;
 
     public KnowledgeBaseVectorStoreWrapper(VectorStore vectorStore, Long knowledgeBaseId) {
         this(vectorStore, knowledgeBaseId, null);
     }
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseVectorStoreWrapper(VectorStore vectorStore, Long knowledgeBaseId, List<Long> tagIds) {
+    public KnowledgeBaseVectorStoreWrapper(VectorStore vectorStore, Long knowledgeBaseId, List<String> tagNames) {
         this.vectorStore = vectorStore;
         this.knowledgeBaseId = knowledgeBaseId;
-        this.tagIds = tagIds == null ? null : List.copyOf(tagIds);
+        this.tagNames = tagNames == null ? null : List.copyOf(tagNames);
     }
 
     @Override
@@ -92,9 +92,9 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
             .eq(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId)
             .build();
 
-        if (tagIds != null && !tagIds.isEmpty()) {
+        if (tagNames != null && !tagNames.isEmpty()) {
             combinedFilter = new Filter.Expression(
-                Filter.ExpressionType.AND, combinedFilter, buildTagFilter(tagIds));
+                Filter.ExpressionType.AND, combinedFilter, buildTagFilter(tagNames));
         }
 
         if (request.getFilterExpression() != null) {
@@ -113,20 +113,20 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
     }
 
     /**
-     * Builds an OR filter expression on per-tag boolean flags ({@code tag_ids_ID: true}). Documents that have ANY of
-     * the specified tag IDs in their metadata will satisfy the expression.
+     * Builds an OR filter expression on per-tag boolean flags ({@code tag_names_NAME: true}). Documents that have ANY
+     * of the specified tag names in their metadata will satisfy the expression.
      */
-    public static Filter.Expression buildTagFilter(List<Long> tagIds) {
+    public static Filter.Expression buildTagFilter(List<String> tagNames) {
         FilterExpressionBuilder b = new FilterExpressionBuilder();
 
-        if (tagIds == null || tagIds.isEmpty()) {
+        if (tagNames == null || tagNames.isEmpty()) {
             return null;
         }
 
-        FilterExpressionBuilder.Op filter = b.eq(METADATA_TAG_IDS, tagIds.get(0));
+        FilterExpressionBuilder.Op filter = b.eq(METADATA_TAG_NAMES + "_" + tagNames.get(0), true);
 
-        for (int i = 1; i < tagIds.size(); i++) {
-            filter = b.or(filter, b.eq(METADATA_TAG_IDS,  tagIds.get(i)));
+        for (int i = 1; i < tagNames.size(); i++) {
+            filter = b.or(filter, b.eq(METADATA_TAG_NAMES + "_" + tagNames.get(i), true));
         }
 
         return filter.build();

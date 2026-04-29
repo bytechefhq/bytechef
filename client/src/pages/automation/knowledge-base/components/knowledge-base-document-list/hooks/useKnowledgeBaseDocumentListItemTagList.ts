@@ -1,21 +1,15 @@
 import {
     KnowledgeBaseDocumentTagsEntry,
-    Tag,
-    TagInput,
     UpdateKnowledgeBaseDocumentTagsInput,
     useUpdateKnowledgeBaseDocumentTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
-interface UpdateKnowledgeBaseDocumentTagsVarsI {
-    input: UpdateKnowledgeBaseDocumentTagsInput;
-}
-
 interface UseKnowledgeBaseDocumentListItemTagListProps {
     knowledgeBaseDocumentId: string;
-    remainingTags?: Tag[];
-    tags: Tag[];
+    remainingTags?: string[];
+    tags: string[];
 }
 
 export default function useKnowledgeBaseDocumentListItemTagList({
@@ -31,7 +25,7 @@ export default function useKnowledgeBaseDocumentListItemTagList({
                 queryClient.setQueryData(['knowledgeBaseDocumentTagsByDocument'], context.cachedTagsByDocumentData);
             }
         },
-        onMutate: async (variables: UpdateKnowledgeBaseDocumentTagsVarsI) => {
+        onMutate: async (variables: {input: UpdateKnowledgeBaseDocumentTagsInput}) => {
             await queryClient.cancelQueries({queryKey: ['knowledgeBaseDocumentTagsByDocument']});
 
             const previousTagsData = queryClient.getQueryData<{
@@ -43,14 +37,10 @@ export default function useKnowledgeBaseDocumentListItemTagList({
                     return previousTagsData;
                 }
 
-                const tagsWithTempIds = (variables.input.tags ?? []).map((tag: TagInput, index: number) => ({
-                    ...tag,
-                    id: tag.id ?? -(Date.now() + index),
-                }));
-
+                const updatedTags = variables.input.tags ?? [];
                 const updatedTagsByDocument = previousTagsData.knowledgeBaseDocumentTagsByDocument.map((entry) =>
                     entry.knowledgeBaseDocumentId === knowledgeBaseDocumentId
-                        ? {...entry, tags: tagsWithTempIds}
+                        ? {...entry, tags: updatedTags}
                         : entry
                 );
 
@@ -64,7 +54,7 @@ export default function useKnowledgeBaseDocumentListItemTagList({
                           ...previousTagsData,
                           knowledgeBaseDocumentTagsByDocument: [
                               ...previousTagsData.knowledgeBaseDocumentTagsByDocument,
-                              {knowledgeBaseDocumentId, tags: tagsWithTempIds},
+                              {knowledgeBaseDocumentId, tags: updatedTags},
                           ],
                       };
             })();
@@ -80,10 +70,10 @@ export default function useKnowledgeBaseDocumentListItemTagList({
         },
     });
 
-    const convertedTags = useMemo(() => tags.map((tag) => ({...tag, id: Number(tag.id)})), [tags]);
+    const convertedTags = useMemo(() => tags.map((tagName) => ({name: tagName})), [tags]);
 
     const convertedRemainingTags = useMemo(
-        () => remainingTags?.map((tag) => ({...tag, id: Number(tag.id)})),
+        () => remainingTags?.map((tagName) => ({name: tagName})),
         [remainingTags]
     );
 

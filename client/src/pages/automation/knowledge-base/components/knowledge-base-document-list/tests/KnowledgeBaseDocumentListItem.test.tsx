@@ -56,12 +56,9 @@ const mockDocument: KnowledgeBaseDocument = {
     status: 2,
 };
 
-const mockTags = [
-    {id: '1', name: 'Tag 1'},
-    {id: '2', name: 'Tag 2'},
-];
+const mockTags = ['Tag 1', 'Tag 2'];
 
-const mockRemainingTags = [{id: '3', name: 'Tag 3'}];
+const mockRemainingTags = ['Tag 3'];
 
 const defaultListItemMockReturn = {
     chunkCount: 2,
@@ -75,8 +72,8 @@ const defaultListItemMockReturn = {
 };
 
 const defaultTagListMockReturn = {
-    convertedRemainingTags: mockRemainingTags.map((tag) => ({...tag, id: Number(tag.id)})),
-    convertedTags: mockTags.map((tag) => ({...tag, id: Number(tag.id)})),
+    convertedRemainingTags: mockRemainingTags.map((tagName) => ({name: tagName})),
+    convertedTags: mockTags.map((tagName) => ({name: tagName})),
     updateTagsMutation: hoisted.updateTagsMutation,
 };
 

@@ -21,13 +21,14 @@ import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstant
 import static com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_IDS;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_NAMES;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -43,7 +44,7 @@ public class KnowledgeBaseSearchTool {
 
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
-        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagService knowledgeBaseTagService) {
+        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
         VectorStore kbVectorStore = createVectorStore(vectorStore);
 
@@ -60,13 +61,13 @@ public class KnowledgeBaseSearchTool {
                                 .description("The knowledge base to search.")
                                 .options(KnowledgeBaseOptionsUtils.knowledgeBaseOptions(knowledgeBaseService))
                                 .required(true),
-                            array(TAG_IDS)
+                            array(TAG_NAMES)
                                 .label("Tags")
                                 .description(
                                     "Filter results by tags. Documents with ANY of the selected tags will be " +
                                         "returned (OR logic).")
-                                .items(integer())
-                                .options(KnowledgeBaseOptionsUtils.tagOptions(knowledgeBaseTagService))
+                                .items(string())
+                                .options(KnowledgeBaseOptionsUtils.tagOptions(knowledgeBaseDocumentTagService))
                                 .optionsLookupDependsOn(KNOWLEDGE_BASE_ID)
                                 .required(false),
                             QUERY_PROPERTY),

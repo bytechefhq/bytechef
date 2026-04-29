@@ -1,7 +1,6 @@
 import {
     KnowledgeBaseDocument,
     KnowledgeBaseDocumentChunk,
-    Tag,
     useKnowledgeBaseDocumentTagsByDocumentQuery,
     useKnowledgeBaseDocumentTagsQuery,
 } from '@/shared/middleware/graphql';
@@ -20,7 +19,7 @@ export default function useKnowledgeBaseDocumentList({documents}: UseKnowledgeBa
         [tagsByDocumentData?.knowledgeBaseDocumentTagsByDocument]
     );
 
-    const allTags = useMemo(
+    const allTagNames = useMemo(
         () => allTagsData?.knowledgeBaseDocumentTags ?? [],
         [allTagsData?.knowledgeBaseDocumentTags]
     );
@@ -43,17 +42,16 @@ export default function useKnowledgeBaseDocumentList({documents}: UseKnowledgeBa
         return sortedChunksByDocument.get(documentId) || [];
     };
 
-    const getTagsForDocument = (documentId: string): Tag[] => {
+    const getTagsForDocument = (documentId: string): string[] => {
         const entry = tagsByDocument.find((tagEntry) => tagEntry.knowledgeBaseDocumentId === documentId);
 
-        return (entry?.tags as Tag[]) ?? [];
+        return (entry?.tags as string[]) ?? [];
     };
 
-    const getRemainingTagsForDocument = (documentId: string): Tag[] => {
-        const documentTags = getTagsForDocument(documentId);
-        const documentTagIds = new Set(documentTags.map((tag) => tag.id));
+    const getRemainingTagsForDocument = (documentId: string): string[] => {
+        const documentTagNames = new Set(getTagsForDocument(documentId));
 
-        return allTags.filter((tag) => !documentTagIds.has(tag.id));
+        return allTagNames.filter((tagName) => !documentTagNames.has(tagName));
     };
 
     return {
