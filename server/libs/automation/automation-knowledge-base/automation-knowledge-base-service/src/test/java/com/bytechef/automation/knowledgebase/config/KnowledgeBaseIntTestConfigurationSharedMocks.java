@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.config;
 
+import com.bytechef.automation.knowledgebase.config.KnowledgeBaseVectorStoreMetadataUpdater;
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -37,7 +38,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     EmbeddingModel.class, FileStorageService.class, FileStorageServiceRegistry.class,
-    KnowledgeBaseFileStorage.class, MessageBroker.class, VectorStore.class
+    KnowledgeBaseFileStorage.class, KnowledgeBaseVectorStoreMetadataUpdater.class, MessageBroker.class,
+    VectorStore.class
 })
 public @interface KnowledgeBaseIntTestConfigurationSharedMocks {
 }

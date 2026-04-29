@@ -122,7 +122,7 @@ public class KnowledgeBaseVectorStoreWriter {
             content = content.replace("\0", "");
         }
 
-        Map<String, Object> metadata = new java.util.HashMap<>(document.getMetadata());
+        Map<String, Object> metadata = new java.util.LinkedHashMap<>(document.getMetadata());
 
         metadata.put(METADATA_ENVIRONMENT_ID, environmentId);
         metadata.put(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId);
@@ -133,9 +133,7 @@ public class KnowledgeBaseVectorStoreWriter {
         }
 
         if (tagIds != null && !tagIds.isEmpty()) {
-            for (Long tagId : tagIds) {
-                metadata.put(METADATA_TAG_IDS + "_" + tagId, true);
-            }
+            metadata.put(METADATA_TAG_IDS, tagIds);
         }
 
         return new Document(document.getId(), content, metadata);

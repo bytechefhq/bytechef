@@ -37,6 +37,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
@@ -67,6 +68,20 @@ class KnowledgeBasePgVectorConfiguration {
             .batchingStrategy(batchingStrategy)
             .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
             .build();
+    }
+
+    @Bean
+    public KnowledgeBaseVectorStoreMetadataUpdater knowledgeBaseVectorStoreMetadataUpdater(
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
+        ObjectMapper objectMapper, PgVectorStoreProperties properties) {
+
+        String schemaName = properties.getSchemaName();
+        String tableName = "kb_" + properties.getTableName();
+        String fullTableName = (schemaName != null && !schemaName.isBlank())
+            ? schemaName + "." + tableName
+            : tableName;
+
+        return new KnowledgeBaseVectorStoreMetadataUpdater(pgVectorJdbcTemplate, objectMapper, fullTableName);
     }
 
     @Bean("knowledgeBaseEmbeddingModel")
