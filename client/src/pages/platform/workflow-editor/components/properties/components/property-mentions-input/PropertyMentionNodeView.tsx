@@ -26,6 +26,7 @@ function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node}: Nod
         class?: string;
         [key: string]: unknown;
     };
+
     const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             componentDefinitions: state.componentDefinitions,
@@ -35,13 +36,15 @@ function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node}: Nod
         }))
     );
 
-    const validReferenceSet = useMemo(() => buildValidDataPillReferenceSet(dataPills), [dataPills]);
+    const validDataPillReferenceSet = useMemo(() => buildValidDataPillReferenceSet(dataPills), [dataPills]);
 
     const mentionId = node.attrs.id as string | null | undefined;
     const dataPillLabel = `${node.attrs.label ?? node.attrs.id ?? ''}`;
 
     const isUnavailable =
-        mentionId != null && validReferenceSet.size > 0 && !isDataPillReferenceValid(mentionId, validReferenceSet);
+        mentionId != null &&
+        validDataPillReferenceSet.size > 0 &&
+        !isDataPillReferenceValid(mentionId, validDataPillReferenceSet);
 
     const controlType = editor.storage.MentionStorage.controlType as string | undefined;
 
