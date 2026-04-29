@@ -170,6 +170,89 @@ Type: OBJECT
 
 
 
+### Create List
+Name: createList
+
+`Create a new list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the list, which must be globally unique across all public lists in the portal. | true |
+| objectTypeId | Object Type ID | STRING | The object type ID of the type of objects that the list will store. (e.g., 0-1 for contacts). | true |
+| processingType | Processing Type | STRING <details> <summary> Options </summary> <span>MANUAL</span>, <span>DYNAMIC</span>, <span>SNAPSHOT</span> </details> | The processing type of the list. | true |
+| listFolderId | List Folder ID | INTEGER | The ID of the folder that the list should be created in. If left blank, then the list will be created in the root of the list folder structure. | false |
+| membershipSettings | Membership Settings | OBJECT <details> <summary> Properties </summary> &#123;BOOLEAN\(includeUnassigned), INTEGER\(membershipTeamId)&#125; </details> | Settings controlling list membership. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create List",
+  "name" : "createList",
+  "parameters" : {
+    "name" : "",
+    "objectTypeId" : "",
+    "processingType" : "",
+    "listFolderId" : 1,
+    "membershipSettings" : {
+      "includeUnassigned" : false,
+      "membershipTeamId" : 1
+    }
+  },
+  "type" : "hubspot/v1/createList"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| list | OBJECT <details> <summary> Properties </summary> &#123;STRING\(listId), INTEGER\(listVersion), STRING\(name), STRING\(objectTypeId), STRING\(processingStatus), STRING\(processingType), DATE_TIME\(createdAt), STRING\(createdById), DATE_TIME\(deletedAt), &#123;&#125;\(filterBranch), DATE_TIME\(filtersUpdatedAt), &#123;[INTEGER]\(teamsWithEditAccess), [INTEGER]\(usersWithEditAccess)&#125;\(listPermissions), &#123;BOOLEAN\(includeUnassigned), INTEGER\(membershipTeamId)&#125;\(membershipSettings), INTEGER\(size), DATE_TIME\(updatedAt), STRING\(updatedById)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "list" : {
+    "listId" : "",
+    "listVersion" : 1,
+    "name" : "",
+    "objectTypeId" : "",
+    "processingStatus" : "",
+    "processingType" : "",
+    "createdAt" : "2021-01-01T00:00:00",
+    "createdById" : "",
+    "deletedAt" : "2021-01-01T00:00:00",
+    "filterBranch" : { },
+    "filtersUpdatedAt" : "2021-01-01T00:00:00",
+    "listPermissions" : {
+      "teamsWithEditAccess" : [ 1 ],
+      "usersWithEditAccess" : [ 1 ]
+    },
+    "membershipSettings" : {
+      "includeUnassigned" : false,
+      "membershipTeamId" : 1
+    },
+    "size" : 1,
+    "updatedAt" : "2021-01-01T00:00:00",
+    "updatedById" : ""
+  }
+}
+```
+
+
+
+
 ### Delete Contact
 Name: deleteContact
 
@@ -254,6 +337,56 @@ Type: OBJECT
     "company" : "",
     "website" : ""
   }
+}
+```
+
+
+
+
+### Get Contacts
+Name: getContacts
+
+`Get all contacts.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Contacts",
+  "name" : "getContacts",
+  "type" : "hubspot/v1/getContacts"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| results | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), &#123;STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)&#125;\(properties)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "results" : [ {
+    "id" : "",
+    "properties" : {
+      "firstname" : "",
+      "lastname" : "",
+      "email" : "",
+      "phone" : "",
+      "company" : "",
+      "website" : ""
+    }
+  } ]
 }
 ```
 

@@ -74,6 +74,179 @@ Type: STRING
 
 
 
+### Extract Data
+Name: extractData
+
+`Uses AI to pull specific structured information from unstructured text content.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| provider | Provider | STRING |  | true |
+| model | Model | STRING <details> <summary> Depends On </summary> provider </details> | The model name to use. | true |
+| model | Model | STRING | ID of the model to use. | true |
+| model | URL | STRING | Url of the inference endpoint. | true |
+| text | Text | STRING | The text content to extract data from. | true |
+| responseSchema | Response Schema | STRING | Define desired structure for the structured data response. | true |
+| additionalContext | Additional Context | STRING | Extra information to guide the extraction process. | false |
+| maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | false |
+| temperature | Temperature | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract Data",
+  "name" : "extractData",
+  "parameters" : {
+    "provider" : "",
+    "model" : "",
+    "text" : "",
+    "responseSchema" : "",
+    "additionalContext" : "",
+    "maxTokens" : 1,
+    "temperature" : 0.0
+  },
+  "type" : "aiText/v1/extractData"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Mask
+Name: mask
+
+`Uses AI to detect and redact sensitive content from text.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| provider | Provider | STRING |  | true |
+| model | Model | STRING <details> <summary> Depends On </summary> provider </details> | The model name to use. | true |
+| model | Model | STRING | ID of the model to use. | true |
+| model | URL | STRING | Url of the inference endpoint. | true |
+| text | Text | STRING | The text to process. | true |
+| sensitiveKeywords | Sensitive Keywords | ARRAY <details> <summary> Items </summary> [STRING] </details> | Words or phrases to detect and redact. | false |
+| piiDetection | PII Detection | ARRAY <details> <summary> Items </summary> [STRING] </details> | Detect personally identifiable information (email, phone, SSN, credit card, IP address). | false |
+| customRegexPatterns | Custom Patterns | ARRAY <details> <summary> Items </summary> [STRING] </details> | Custom patterns to detect and redact. | false |
+| maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | false |
+| temperature | Temperature | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Mask",
+  "name" : "mask",
+  "parameters" : {
+    "provider" : "",
+    "model" : "",
+    "text" : "",
+    "sensitiveKeywords" : [ "" ],
+    "piiDetection" : [ "" ],
+    "customRegexPatterns" : [ "" ],
+    "maxTokens" : 1,
+    "temperature" : 0.0
+  },
+  "type" : "aiText/v1/mask"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{text=Hello, my name is [REDACTED_1] and my email is [EMAIL_1]., maskMap={[EMAIL_1]=john@example.com, [REDACTED_1]=John Doe}}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| text | STRING | The text with sensitive content redacted. |
+| maskMap | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Mapping of mask tokens to their original values. |
+
+
+
+
+#### Output Example
+```json
+{
+  "text" : "",
+  "maskMap" : { }
+}
+```
+
+
+
+
+### Unmask
+Name: unmask
+
+`Uses AI and a map of masking entities to unmask the text.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| provider | Provider | STRING |  | true |
+| model | Model | STRING <details> <summary> Depends On </summary> provider </details> | The model name to use. | true |
+| model | Model | STRING | ID of the model to use. | true |
+| model | URL | STRING | Url of the inference endpoint. | true |
+| text | Text | STRING | The text to process. | true |
+| maskMap | Masked map | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Map of masked entities to replace with values. | false |
+| maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | false |
+| temperature | Temperature | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Unmask",
+  "name" : "unmask",
+  "parameters" : {
+    "provider" : "",
+    "model" : "",
+    "text" : "",
+    "maskMap" : { },
+    "maxTokens" : 1,
+    "temperature" : 0.0
+  },
+  "type" : "aiText/v1/unmask"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```Hello, my name is [REDACTED] and my email is [EMAIL].```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
 ### Sentiment Analysis
 Name: sentimentAnalysis
 

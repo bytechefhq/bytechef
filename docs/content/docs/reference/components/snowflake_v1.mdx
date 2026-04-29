@@ -244,7 +244,7 @@ Name: insertRow
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
 | table | Table | STRING <details> <summary> Depends On </summary> schema, database </details> |  | true |
-| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> database, schema, table </details> |  | true |
 
 #### Example JSON Structure
 ```json
@@ -321,7 +321,7 @@ Name: updateRow
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
 | table | Table | STRING <details> <summary> Depends On </summary> schema, database </details> |  | true |
 | condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
-| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> database, schema, table </details> |  | true |
 
 #### Example JSON Structure
 ```json
