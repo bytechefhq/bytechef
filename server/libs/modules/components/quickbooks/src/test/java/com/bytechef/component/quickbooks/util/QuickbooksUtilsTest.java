@@ -35,6 +35,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.constant.ItemType;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -49,7 +50,7 @@ class QuickbooksUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
     private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private Parameters mockedParameters = mock(Parameters.class);
     private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -72,7 +73,7 @@ class QuickbooksUtilsTest {
     private void verifyProperties(
         ItemType type, boolean incomeRequired, boolean assetRequired, boolean inventoryDateRequired) {
 
-        when(mockedParameters.getRequired(TYPE, ItemType.class)).thenReturn(type);
+        mockedParameters = MockParametersFactory.create(Map.of(TYPE, type));
 
         List<? extends Property.ValueProperty<?>> properties =
             getPropertiesForItem(mockedParameters, mockedParameters, Map.of(), mockedActionContext);

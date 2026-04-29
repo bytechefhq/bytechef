@@ -71,8 +71,7 @@ class LinearNewIssueTriggerTest extends AbstractLinearTriggerTest {
     void testWebhookRequest() {
         linearUtilsMockedStatic.when(
             () -> LinearUtils.executeIssueTriggerQuery(
-                stringArgumentCaptor.capture(), webhookBodyArgumentCaptor.capture(),
-                triggerContextArgumentCaptor.capture()))
+                stringArgumentCaptor.capture(), webhookBodyArgumentCaptor.capture()))
             .thenReturn(Map.of(ID, "123"));
 
         Object result = LinearNewIssueTrigger.webhookRequest(
@@ -82,6 +81,5 @@ class LinearNewIssueTriggerTest extends AbstractLinearTriggerTest {
         assertEquals(Map.of(ID, "123"), result);
         assertEquals("create", stringArgumentCaptor.getValue());
         assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
-        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 }

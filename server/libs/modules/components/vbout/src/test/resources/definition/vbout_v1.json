@@ -146,7 +146,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "listid" ]
+        "optionsLookupDependsOn": null
       },
       "optionsLoadedDynamically": null,
       "placeholder": null,
@@ -1080,7 +1080,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "listid" ]
+        "optionsLookupDependsOn": null
       },
       "optionsLoadedDynamically": null,
       "placeholder": null,

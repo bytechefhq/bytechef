@@ -545,7 +545,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "collectionId", "siteId" ]
+        "optionsLookupDependsOn": [ "collectionId" ]
       },
       "optionsLoadedDynamically": null,
       "placeholder": null,
@@ -1085,7 +1085,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": [ "collectionId", "siteId" ]
+        "optionsLookupDependsOn": [ "collectionId" ]
       },
       "optionsLoadedDynamically": null,
       "placeholder": null,

@@ -5515,7 +5515,7 @@
       "options": null,
       "optionsDataSource": {
         "options": { },
-        "optionsLookupDependsOn": null
+        "optionsLookupDependsOn": [ "id" ]
       },
       "optionsLoadedDynamically": null,
       "placeholder": null,

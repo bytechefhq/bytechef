@@ -17,62 +17,68 @@
 package com.bytechef.component.linear.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.linear.constant.LinearConstants.ALL_PUBLIC_TEAMS;
+import static com.bytechef.component.linear.constant.LinearConstants.QUERY;
+import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class LinearUtilsTest {
 
-    private final Context mockedContext = mock(Context.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Executor mockedExecutor = mock(Executor.class);
-    private final Response mockedResponse = mock(Response.class);
-    private final Parameters mockedInputParameters = mock(Parameters.class);
+    private Parameters mockedInputParameters = mock(Parameters.class);
     private final Parameters mockedConnectionParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final List<Option<String>> expected = List.of(
-        option("test1", "1"),
-        option("test2", "2"));
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final List<Option<String>> expected = List.of(option("test1", "1"), option("test2", "2"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedTriggerContext.http(any()))
+    void beforeEach(Http mockedHttp, Executor mockedExecutor) {
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
     }
 
     @Test
-    void testGetAssigneeOptions() {
+    void testGetAssigneeOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> graphqlResponse = Map.of(
             "data", Map.of(
                 "users", Map.of(
@@ -86,11 +92,25 @@ class LinearUtilsTest {
         List<Option<String>> result = LinearUtils.getAssigneeOptions(
             mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expected.toArray()));
+        assertEquals(result, expected);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(Map.of(QUERY, "{users{nodes{id displayName}}}")), bodyArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetIssueOptions() {
+    void testGetIssueOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedInputParameters = MockParametersFactory.create(Map.of(TEAM_ID, "abc"));
+
         Map<String, Object> graphqlResponse = Map.of(
             "data", Map.of(
                 "issues", Map.of(
@@ -104,11 +124,25 @@ class LinearUtilsTest {
         List<Option<String>> result = LinearUtils.getIssueOptions(
             mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expected.toArray()));
+        assertEquals(result, expected);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(Map.of(QUERY, "{issues(filter: {team: {id: {eq: \"abc\" }}}){nodes{id title}}} ")),
+            bodyArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetProjectOptions() {
+    void testGetProjectOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> graphqlResponse = Map.of(
             "data", Map.of(
                 "projects", Map.of(
@@ -126,7 +160,11 @@ class LinearUtilsTest {
     }
 
     @Test
-    void testGetProjectStateOptions() {
+    void testGetProjectStateOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> graphqlResponse = Map.of(
             "data", Map.of(
                 "projectStatuses", Map.of(
@@ -140,11 +178,23 @@ class LinearUtilsTest {
         List<Option<String>> result = LinearUtils.getProjectStateOptions(
             mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expected.toArray()));
+        assertEquals(result, expected);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(Map.of(QUERY, "{projectStatuses {nodes {id name}}}")), bodyArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetIssueStateOptions() {
+    void testGetIssueStateOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> graphqlResponse = Map.of(
             "data", Map.of(
                 "workflowStates", Map.of(
@@ -158,11 +208,23 @@ class LinearUtilsTest {
         List<Option<String>> result = LinearUtils.getIssueStateOptions(
             mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expected.toArray()));
+        assertEquals(result, expected);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(Map.of(QUERY, "{workflowStates{nodes{id name}}}")), bodyArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetTeamOptions() {
+    void testGetTeamOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> graphqlResponse = Map.of(
             "data", Map.of(
                 "teams", Map.of(
@@ -176,11 +238,23 @@ class LinearUtilsTest {
         List<Option<String>> result = LinearUtils.getTeamOptions(
             mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expected.toArray()));
+        assertEquals(result, expected);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(Map.of(QUERY, "{teams{nodes{id name}}}")), bodyArgumentCaptor.getValue());
     }
 
     @Test
-    void testExecuteGraphQLQuery() {
+    void testExecuteGraphQLQuery(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         String query = "{users{nodes{id displayName}}}";
         Map<String, Object> expectedResponse = Map.of("data", Map.of("key", "value"));
 
@@ -189,7 +263,15 @@ class LinearUtilsTest {
 
         Map<String, Object> result = LinearUtils.executeGraphQLQuery(query, mockedContext);
 
-        assertEquals(expectedResponse, result);
+        assertEquals(result, expectedResponse);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(Map.of(QUERY, query)), bodyArgumentCaptor.getValue());
     }
 
     @Test
@@ -197,23 +279,26 @@ class LinearUtilsTest {
         WebhookBody mockedBody = mock(WebhookBody.class);
 
         Map<String, Object> mockIssue = Map.of("id", "123");
-        Map<String, Object> graphqlResponse = Map.of("data", Map.of("issue", mockIssue));
         Map<String, Object> webhookPayload = Map.of(
             "action", "create",
             "data", Map.of("id", "123"));
 
         when(mockedBody.getContent(any(TypeReference.class)))
             .thenReturn(webhookPayload);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(graphqlResponse);
 
-        Object result = LinearUtils.executeIssueTriggerQuery("create", mockedBody, mockedTriggerContext);
+        Object result = LinearUtils.executeIssueTriggerQuery("create", mockedBody);
 
         assertEquals(mockIssue, result);
     }
 
     @Test
-    void testCreateWebhook() {
+    void testCreateWebhook(
+        TriggerContext mockedTriggerContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedInputParameters = MockParametersFactory.create(Map.of(ALL_PUBLIC_TEAMS, false, TEAM_ID, "xy"));
+
         String url = "https://example.com/webhook";
         Map<String, Object> graphqlResponse = Map.of(
             "data", Map.of(
@@ -225,7 +310,22 @@ class LinearUtilsTest {
 
         WebhookEnableOutput result = LinearUtils.createWebhook(url, mockedTriggerContext, mockedInputParameters);
 
-        assertEquals(Map.of("id", "abc123"), result.parameters());
-        assertNull(result.webhookExpirationDate());
+        WebhookEnableOutput webhookEnableOutput = new WebhookEnableOutput(Map.of("id", "abc123"), null);
+
+        assertEquals(webhookEnableOutput, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(
+                Map.of(
+                    QUERY,
+                    "mutation {webhookCreate(input: {url: \"" + url
+                        + "\", teamId: \"xy\", resourceTypes: [\"Issue\"]}) {webhook {id}}}")),
+            bodyArgumentCaptor.getValue());
     }
 }

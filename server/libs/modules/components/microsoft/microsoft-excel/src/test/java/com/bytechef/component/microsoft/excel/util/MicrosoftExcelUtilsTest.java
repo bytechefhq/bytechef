@@ -81,7 +81,8 @@ class MicrosoftExcelUtilsTest {
 
     @Test
     void testCreatePropertiesForNewRowWhereFirstNewRowIsHeader() {
-        mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, true));
+        mockedParameters = MockParametersFactory.create(Map.of(
+            IS_THE_FIRST_ROW_HEADER, true, WORKBOOK_ID, "workbookId", WORKSHEET_NAME, "sheetName"));
 
         try (MockedStatic<MicrosoftExcelRowUtils> microsoftExcelRowUtilsMockedStatic =
             mockStatic(MicrosoftExcelRowUtils.class)) {
@@ -121,7 +122,8 @@ class MicrosoftExcelUtilsTest {
 
     @Test
     void testCreatePropertiesForNewRowWhereFirstNewRowNotHeader() {
-        mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, false));
+        mockedParameters = MockParametersFactory.create(Map.of(
+            IS_THE_FIRST_ROW_HEADER, false, WORKBOOK_ID, "workbookId", WORKSHEET_NAME, "sheetName"));
 
         List<ValueProperty<?>> result = MicrosoftExcelUtils.createPropertiesForNewRow(
             mockedParameters, mockedParameters, Map.of(), mockedActionContext);
@@ -176,7 +178,7 @@ class MicrosoftExcelUtilsTest {
     }
 
     @Test
-    void createPropertiesToUpdateRowWhenFirstRowIsHeaderAndUpdatingSelectedColumns() throws Exception {
+    void createPropertiesToUpdateRowWhenFirstRowIsHeaderAndUpdatingSelectedColumns() {
         mockedParameters = MockParametersFactory.create(
             Map.of(
                 IS_THE_FIRST_ROW_HEADER, true, UPDATE_WHOLE_ROW, false, WORKBOOK_ID, "workbookId",
@@ -223,8 +225,10 @@ class MicrosoftExcelUtilsTest {
     }
 
     @Test
-    void createPropertiesToUpdateRowWhenFirstRowIsNotHeaderAndUpdatingWholeRow() throws Exception {
-        mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, false, UPDATE_WHOLE_ROW, true));
+    void createPropertiesToUpdateRowWhenFirstRowIsNotHeaderAndUpdatingWholeRow() {
+        mockedParameters = MockParametersFactory.create(
+            Map.of(IS_THE_FIRST_ROW_HEADER, false, UPDATE_WHOLE_ROW, true, WORKBOOK_ID, "workbookId",
+                WORKSHEET_NAME, "sheetName"));
 
         List<ValueProperty<?>> propertiesToUpdateRow = MicrosoftExcelUtils.createPropertiesToUpdateRow(
             mockedParameters, mockedParameters, Map.of(), mockedActionContext);
@@ -241,7 +245,8 @@ class MicrosoftExcelUtilsTest {
     @Test
     void createPropertiesToUpdateRowWhenFirstRowIsNotHeaderAndUpdatingSelectedColumns() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(IS_THE_FIRST_ROW_HEADER, false, UPDATE_WHOLE_ROW, false));
+            Map.of(IS_THE_FIRST_ROW_HEADER, false, UPDATE_WHOLE_ROW, false, WORKBOOK_ID, "workbookId",
+                WORKSHEET_NAME, "sheetName"));
 
         List<ValueProperty<?>> propertiesToUpdateRow = MicrosoftExcelUtils.createPropertiesToUpdateRow(
             mockedParameters, mockedParameters, Map.of(), mockedActionContext);

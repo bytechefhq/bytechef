@@ -22,173 +22,188 @@ import static com.bytechef.component.copper.constant.CopperConstants.NAME;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class CopperOptionUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-
-    @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-    }
+    private Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetActivityTypeOptions() {
-        Map<String, List<Map<String, Object>>> linkedHashMap = new LinkedHashMap<>();
-        List<Map<String, Object>> list = new ArrayList<>();
-        Map<String, Object> map = new LinkedHashMap<>();
+    void testGetActivityTypeOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        map.put(NAME, "ActivityName");
-        map.put(ID, "ActivityId");
-        list.add(map);
-        linkedHashMap.put("user", list);
+        List<Map<String, Object>> userList = new ArrayList<>();
 
+        userList.add(Map.of(NAME, "ActivityName", ID, "ActivityId"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(linkedHashMap);
+            .thenReturn(Map.of("user", userList));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("ActivityName", "ActivityId"));
-
-        assertEquals(expectedOptions,
+        assertEquals(
+            List.of(option("ActivityName", "ActivityId")),
             CopperOptionUtils.getActivityTypeOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/activity_types", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetCompanyIdOptions() {
-        List<Map<String, String>> linkedHashMaps = new ArrayList<>();
+    void testGetCompanyIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        Map<String, String> tagMap = new LinkedHashMap<>();
-
-        tagMap.put(NAME, "companyName");
-        tagMap.put(ID, "123");
-
-        linkedHashMaps.add(tagMap);
-
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(linkedHashMaps);
+            .thenReturn(List.of(Map.of(NAME, "companyName", ID, "123")));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("companyName", "123"));
-
-        assertEquals(expectedOptions,
+        assertEquals(
+            List.of(option("companyName", "123")),
             CopperOptionUtils.getCompanyIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/companies/search", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetContactTypesOptions() {
-        List<Map<String, Object>> linkedHashMaps = new ArrayList<>();
+    void testGetContactTypesOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        Map<String, Object> tagMap = new LinkedHashMap<>();
-
-        tagMap.put(NAME, "ContactType");
-        tagMap.put(ID, "123");
-
-        linkedHashMaps.add(tagMap);
-
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(linkedHashMaps);
+            .thenReturn(List.of(Map.of(NAME, "ContactType", ID, "123")));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("ContactType", "123"));
-
-        assertEquals(expectedOptions,
+        assertEquals(
+            List.of(option("ContactType", "123")),
             CopperOptionUtils.getContactTypesOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/contact_types", stringArgumentCaptor.getValue());
+
     }
 
     @Test
-    void testGetParentOptions() {
-        Map<String, Object> parentMap = new LinkedHashMap<>();
+    void testGetParentOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        parentMap.put(NAME, "parentName");
-        parentMap.put(ID, "123");
+        mockedParameters = MockParametersFactory.create(Map.of(TYPE, LEAD));
 
-        List<Map<String, Object>> list = List.of(parentMap);
-
-        when(mockedParameters.getRequiredString(TYPE))
-            .thenReturn(LEAD);
-
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(list);
+            .thenReturn(List.of(Map.of(NAME, "parentName", ID, "123")));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("parentName", "123"));
-
-        assertEquals(expectedOptions,
+        assertEquals(
+            List.of(option("parentName", "123")),
             CopperOptionUtils.getParentOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/leads/search", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetTagsOptions() {
-        List<Map<String, Object>> linkedHashMaps = new ArrayList<>();
+    void testGetTagsOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        Map<String, Object> tagMap = new LinkedHashMap<>();
-
-        tagMap.put(NAME, "Tag1");
-
-        linkedHashMaps.add(tagMap);
-
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(linkedHashMaps);
+            .thenReturn(List.of(Map.of(NAME, "Tag1")));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("Tag1", "Tag1"));
-
-        assertEquals(expectedOptions,
+        assertEquals(
+            List.of(option("Tag1", "Tag1")),
             CopperOptionUtils.getTagsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/tags", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetUserOptions() {
-        List<Map<String, String>> tags = new ArrayList<>();
-        Map<String, String> tagMap = new LinkedHashMap<>();
+    void testGetUserOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        tagMap.put(NAME, "ContactType");
-        tagMap.put(ID, "123");
-
-        tags.add(tagMap);
-
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(tags);
+            .thenReturn(List.of(Map.of(NAME, "ContactType", ID, "123")));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("ContactType", "123"));
-
-        assertEquals(expectedOptions,
+        assertEquals(
+            List.of(option("ContactType", "123")),
             CopperOptionUtils.getUserOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/users/search", stringArgumentCaptor.getValue());
     }
 }
