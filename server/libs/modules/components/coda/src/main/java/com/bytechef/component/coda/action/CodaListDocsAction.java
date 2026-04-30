@@ -36,7 +36,7 @@ import java.util.Map;
 public class CodaListDocsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("listDocs")
         .title("List Docs")
-        .description("Returns a list of docs accessible by the user, and which they have opened at least once.")
+        .description("Returns a list of docs accessible by the user and which they have opened at least once.")
         .metadata(
             Map.of(
                 "method", "GET",
@@ -65,7 +65,8 @@ public class CodaListDocsAction {
         .output(outputSchema(object().properties(CodaDocListProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/coda_v1#list-docs");
 
     private CodaListDocsAction() {
     }
