@@ -1,6 +1,6 @@
 ---
 title: "Coda"
-description: "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform."
+description: "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps and databases into a single platform."
 ---
 
 
@@ -147,13 +147,16 @@ Type: OBJECT
 }
 ```
 
+#### Find Source Doc ID
+
+To find the Source Doc ID, click [here](/reference/components/coda_v1#how-to-find-doc-id).
 
 
 
 ### List Docs
 Name: listDocs
 
-`Returns a list of docs accessible by the user, and which they have opened at least once.`
+`Returns a list of docs accessible by the user and which they have opened at least once.`
 
 #### Properties
 
@@ -305,6 +308,21 @@ Type: OBJECT
 }
 ```
 
+#### Find Doc ID
+
+To find the Doc ID, click [here](/reference/components/coda_v1#how-to-find-doc-id).
+
+#### Find Table ID
+
+To find the Table ID, click [here](/reference/components/coda_v1#how-to-find-table-id).
+
+#### Find Row ID
+
+To find the Row ID, click [here](/reference/components/coda_v1#how-to-find-row-id).
+
+#### Find Column ID
+
+To find the Column ID, click [here](/reference/components/coda_v1#how-to-find-column-id).
 
 
 
@@ -360,6 +378,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Doc ID
+
+To find the Doc ID, click [here](/reference/components/coda_v1#how-to-find-doc-id).
+
+#### Find Table ID
+
+To find the Table ID, click [here](/reference/components/coda_v1#how-to-find-table-id).
 
 
 
@@ -371,3 +396,44 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find Doc ID
+
+- **Method 1: Via API**
+
+Use the `GET /docs` endpoint to retrieve a list of all docs and their IDs.
+
+- **Method 2: Via UI**
+
+To find a Doc ID, open the document in your browser. The ID is the long string of letters and numbers in the URL after `_d`.
+
+For example, in the URL `https://coda.io/d/Bytechef-testing_d123abc`, the Doc ID is 123abc.
+
+The Doc ID can also be found in the output of the following actions:
+* **Copy Doc**
+* **List Docs**
+
+### How to find Table ID
+
+- **Method 1: Via API**
+
+Use the `GET /docs/DOC_ID/tables` endpoint to retrieve a list of all tables and their IDs.
+
+### How to find Row ID
+
+- **Method 1: Via API**
+
+Use the `GET /docs/DOC_ID/tables/TABLE_ID/rows` endpoint to retrieve a list of all rows and their IDs.
+
+The Row ID can also be found in the output of the following actions:
+* **Insert Row**
+* **Update Row**
+
+### How to find Column ID
+
+- **Method 1: Via API**
+
+Use the `GET /docs/DOC_ID/tables/TABLE_ID/columns` endpoint to retrieve a list of all columns and their IDs.
