@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Send message to a channel.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mattermost_v1#send-message"
+    },
     "metadata": {
       "path": "/posts",
       "mimeType": "application/json",
@@ -5241,14 +5244,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mattermost_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.mattermost.com/api-documentation/"
+  },
   "description": "Mattermost is an open-source, self-hosted messaging platform designed for secure team collaboration and communication.",
   "icon": "path:assets/mattermost.svg",
   "metadata": null,
