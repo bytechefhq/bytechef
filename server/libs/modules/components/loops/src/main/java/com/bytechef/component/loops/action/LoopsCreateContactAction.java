@@ -30,17 +30,17 @@ import static com.bytechef.component.loops.constant.LoopsConstants.MAILING_LISTS
 import static com.bytechef.component.loops.constant.LoopsConstants.USER_GROUP;
 import static com.bytechef.component.loops.constant.LoopsConstants.USER_ID;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.loops.util.LoopsUtils;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Nikolina Spehar
@@ -93,8 +93,7 @@ public class LoopsCreateContactAction {
     private LoopsCreateContactAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context.http(http -> http.post("/contacts/create"))
             .body(
                 Body.of(
@@ -103,23 +102,16 @@ public class LoopsCreateContactAction {
                     LAST_NAME, inputParameters.getString(LAST_NAME),
                     USER_GROUP, inputParameters.getString(USER_GROUP),
                     USER_ID, inputParameters.getString(USER_ID),
-                    MAILING_LISTS, getMailingListObject(inputParameters.getList(MAILING_LISTS, String.class))))
+                    MAILING_LISTS,
+                    getMailingListObject(inputParameters.getList(MAILING_LISTS, String.class, List.of()))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 
     private static Map<String, Boolean> getMailingListObject(List<String> mailingLists) {
-        Map<String, Boolean> mailingListObject = new HashMap<>();
-
-        if (mailingLists == null) {
-            return mailingListObject;
-        }
-
-        for (String mailingList : mailingLists) {
-            mailingListObject.put(mailingList, true);
-        }
-
-        return mailingListObject;
+        return mailingLists.stream()
+            .distinct()
+            .collect(Collectors.toMap(Function.identity(), _ -> true));
     }
 }

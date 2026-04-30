@@ -25,18 +25,19 @@ import static com.bytechef.component.loops.constant.LoopsConstants.USER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
@@ -51,7 +52,7 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class LoopsCreateContactActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(EMAIL, "email", FIRST_NAME, "name", LAST_NAME, "name", USER_GROUP, "userGroup",
             USER_ID, "userId", MAILING_LISTS, List.of("mailingList1", "mailingList2")));
@@ -60,7 +61,7 @@ class LoopsCreateContactActionTest {
 
     @Test
     void testPerform(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
@@ -68,28 +69,24 @@ class LoopsCreateContactActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
         Object result = LoopsCreateContactAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(responseMap, result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/contacts/create", stringArgumentCaptor.getValue());
-        assertEquals(
-            Map.of(EMAIL, "email", FIRST_NAME, "name", LAST_NAME, "name", USER_GROUP, "userGroup",
-                USER_ID, "userId", MAILING_LISTS, Map.of("mailingList1", true, "mailingList2", true)),
-            body.getContent());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        Map<String, Object> emailexpectedBody = Map.of(
+            EMAIL, "email", FIRST_NAME, "name", LAST_NAME, "name", USER_GROUP, "userGroup",
+            USER_ID, "userId", MAILING_LISTS, Map.of("mailingList1", true, "mailingList2", true));
+
+        assertEquals(Body.of(emailexpectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }
