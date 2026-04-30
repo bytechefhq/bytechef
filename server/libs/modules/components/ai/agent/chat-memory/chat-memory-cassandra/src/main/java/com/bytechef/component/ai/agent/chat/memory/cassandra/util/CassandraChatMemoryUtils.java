@@ -23,14 +23,21 @@ import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.Cas
 import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.CassandraChatMemoryConstants.PORT;
 import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.CassandraChatMemoryConstants.TABLE;
 import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.CassandraChatMemoryConstants.USERNAME;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cassandra.CassandraChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cassandra.CassandraChatMemoryRepositoryConfig;
+import org.springframework.ai.chat.messages.Message;
 
 /**
  * @author Ivica Cardic
@@ -85,5 +92,21 @@ public class CassandraChatMemoryUtils {
         CassandraChatMemoryRepositoryConfig config = configBuilder.build();
 
         return CassandraChatMemoryRepository.create(config);
+    }
+
+    public static ActionDefinition.OptionsFunction<String> getFirstMessages() {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(connectionParameters);
+
+            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
+
+            List<String> conversationIds = chatMemoryRepository.findConversationIds();
+            for (String conversationId : conversationIds) {
+                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
+                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+            }
+
+            return options;
+        };
     }
 }

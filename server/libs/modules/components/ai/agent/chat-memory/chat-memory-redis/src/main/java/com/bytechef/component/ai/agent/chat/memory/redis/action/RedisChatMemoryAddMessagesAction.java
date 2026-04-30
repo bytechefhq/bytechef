@@ -29,6 +29,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.agent.chat.memory.redis.util.RedisChatMemoryUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -52,6 +53,7 @@ public class RedisChatMemoryAddMessagesAction {
             string(CONVERSATION_ID)
                 .label("Conversation ID")
                 .description("The unique identifier for the conversation.")
+                .options(RedisChatMemoryUtils.getFirstMessages())
                 .required(true),
             array(MESSAGES)
                 .label("Messages")

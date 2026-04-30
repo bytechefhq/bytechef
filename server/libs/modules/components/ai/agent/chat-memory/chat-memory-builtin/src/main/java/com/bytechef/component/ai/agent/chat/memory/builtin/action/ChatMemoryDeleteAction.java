@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.agent.chat.memory.builtin.util.ChatMemoryUtils;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -42,6 +43,7 @@ public class ChatMemoryDeleteAction {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation to delete.")
+                    .options(ChatMemoryUtils.getFirstMessages(chatMemoryRepository))
                     .required(true))
             .output(
                 outputSchema(

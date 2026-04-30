@@ -23,11 +23,18 @@ import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisCh
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.PORT;
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.TIME_TO_LIVE;
 import static com.bytechef.component.ai.agent.chat.memory.redis.constant.RedisChatMemoryConstants.USERNAME;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.redis.RedisChatMemoryRepository;
+import org.springframework.ai.chat.messages.Message;
 import redis.clients.jedis.JedisPooled;
 
 /**
@@ -86,6 +93,22 @@ public class RedisChatMemoryUtils {
         }
 
         return Duration.parse(timeToLive);
+    }
+
+    public static ActionDefinition.OptionsFunction<String> getFirstMessages() {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(connectionParameters);
+
+            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
+
+            List<String> conversationIds = chatMemoryRepository.findConversationIds();
+            for (String conversationId : conversationIds) {
+                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
+                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+            }
+
+            return options;
+        };
     }
 
     private RedisChatMemoryUtils() {
