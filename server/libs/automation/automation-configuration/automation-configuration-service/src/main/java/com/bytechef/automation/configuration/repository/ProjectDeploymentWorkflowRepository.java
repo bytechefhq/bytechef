@@ -35,7 +35,7 @@ public interface ProjectDeploymentWorkflowRepository extends ListCrudRepository<
     List<ProjectDeploymentWorkflow> findAllByProjectDeploymentIdIn(List<Long> projectDeploymentIds);
 
     @Query("""
-            SELECT DISTINCT project_deployment_workflow FROM project_deployment_workflow
+            SELECT DISTINCT project_deployment_workflow.* FROM project_deployment_workflow
             JOIN project_deployment_workflow_connection ON project_deployment_workflow.id = project_deployment_workflow_connection.project_deployment_workflow_id
             WHERE project_deployment_workflow_connection.connection_id = :connectionId
         """)
