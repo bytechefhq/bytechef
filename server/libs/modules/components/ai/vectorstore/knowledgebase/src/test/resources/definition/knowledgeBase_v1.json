@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
-    "search": [ ]
+    "search": [ ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ]
   },
   "actions": [ {
     "batch": null,
@@ -99,6 +99,7 @@
       "name": "query",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": false,
@@ -193,8 +194,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ ],
-    "search": [ ]
+    "search": [ ],
+    "vectorStore": [ ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -298,6 +299,7 @@
       "name": "query",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": true,

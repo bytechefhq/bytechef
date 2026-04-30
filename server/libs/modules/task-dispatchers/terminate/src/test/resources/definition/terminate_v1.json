@@ -20,6 +20,7 @@
     "name": "message",
     "options": null,
     "optionsFunction": null,
+    "optionsLoadedDynamically": null,
     "placeholder": null,
     "regex": null,
     "required": null,

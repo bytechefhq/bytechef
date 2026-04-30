@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "search": [ "EMBEDDING" ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -38,6 +38,7 @@
       "name": "query",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -106,8 +107,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "search": [ "EMBEDDING" ],
-    "vectorStore": [ "EMBEDDING" ]
+    "vectorStore": [ "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -152,6 +153,7 @@
       "name": "query",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -260,6 +262,7 @@
         "name": "publicEndpoint",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -281,6 +284,7 @@
         "name": "username",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -302,6 +306,7 @@
         "name": "password",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
