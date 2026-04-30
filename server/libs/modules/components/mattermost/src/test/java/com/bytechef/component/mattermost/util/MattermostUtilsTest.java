@@ -20,48 +20,59 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.mattermost.constant.MattermostConstants.DISPLAY_NAME;
 import static com.bytechef.component.mattermost.constant.MattermostConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class MattermostUtilsTest {
 
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetChannelIdOptions() {
-        when(mockedContext.http(any()))
+    void testGetChannelIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of(DISPLAY_NAME, "Channel 1", ID, "channel_id_1")));
 
         List<Option<String>> options = MattermostUtils.getChannelIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-        expectedOptions.add(option("Channel 1", "channel_id_1"));
+        assertEquals(options, List.of(option("Channel 1", "channel_id_1")));
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        assertEquals(expectedOptions, options);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/channels", stringArgumentCaptor.getValue());
     }
 }
