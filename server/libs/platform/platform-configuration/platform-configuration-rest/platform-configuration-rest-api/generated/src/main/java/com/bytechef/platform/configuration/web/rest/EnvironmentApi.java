@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T09:41:49.693717532+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 @Validated
 @Tag(name = "environment", description = "The Platform Environment Internal API")
 public interface EnvironmentApi {

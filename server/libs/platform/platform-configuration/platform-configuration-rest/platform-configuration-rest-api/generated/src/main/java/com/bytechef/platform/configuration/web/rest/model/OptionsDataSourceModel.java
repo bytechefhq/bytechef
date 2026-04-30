@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "OptionsDataSource", description = "Defines function that should dynamically load options for the property.")
 @JsonTypeName("OptionsDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T09:41:49.693717532+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class OptionsDataSourceModel {
 
   @Valid
