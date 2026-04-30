@@ -43,13 +43,12 @@ public class LoopsUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> mailingListOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> item : response) {
-            mailingListOptions.add(
-                option((String) item.get(NAME), (String) item.get(ID)));
+            options.add(option((String) item.get(NAME), (String) item.get(ID)));
         }
 
-        return mailingListOptions;
+        return options;
     }
 }
