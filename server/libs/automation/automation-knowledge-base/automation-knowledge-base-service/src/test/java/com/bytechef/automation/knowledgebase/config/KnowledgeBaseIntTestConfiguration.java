@@ -94,6 +94,11 @@ public class KnowledgeBaseIntTestConfiguration {
     }
 
     @Bean
+    KnowledgeBaseVectorStoreMetadataUpdater knowledgeBaseVectorStoreMetadataUpdater() {
+        return mock(KnowledgeBaseVectorStoreMetadataUpdater.class);
+    }
+
+    @Bean
     MessageBroker messageBroker() {
         return mock(MessageBroker.class);
     }

@@ -18,9 +18,11 @@ package com.bytechef.automation.knowledgebase.config;
 
 import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_NAMES;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,16 +34,23 @@ import tools.jackson.databind.ObjectMapper;
  *
  * @author Marko Kriskovic
  */
-public class KnowledgeBaseVectorStoreMetadataUpdater {
+public final class KnowledgeBaseVectorStoreMetadataUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(KnowledgeBaseVectorStoreMetadataUpdater.class);
+    private static final Pattern SAFE_TABLE_NAME_PATTERN = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_.]*$");
 
     private final JdbcTemplate pgVectorJdbcTemplate;
     private final ObjectMapper objectMapper;
     private final String fullTableName;
 
+    @SuppressFBWarnings("EI2")
     public KnowledgeBaseVectorStoreMetadataUpdater(
         JdbcTemplate pgVectorJdbcTemplate, ObjectMapper objectMapper, String fullTableName) {
+
+        if (!SAFE_TABLE_NAME_PATTERN.matcher(fullTableName)
+            .matches()) {
+            throw new IllegalArgumentException("Invalid table name: " + fullTableName);
+        }
 
         this.pgVectorJdbcTemplate = pgVectorJdbcTemplate;
         this.objectMapper = objectMapper;
@@ -56,6 +65,7 @@ public class KnowledgeBaseVectorStoreMetadataUpdater {
      * @param vectorStoreId the vector store document ID
      * @param tagNames      the new tag names to set; an empty list removes all tag fields
      */
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void updateTagNames(String vectorStoreId, List<String> tagNames) {
         List<String> rows = pgVectorJdbcTemplate.queryForList(
             "SELECT metadata::text FROM " + fullTableName + " WHERE id = ?::uuid",
