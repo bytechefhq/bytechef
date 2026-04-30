@@ -135,12 +135,16 @@ const PropertyComboBox = ({
 
     const lookupDependsOnValuesKey = getFormattedDependencyKey(lookupDependsOnValues);
 
+    const connectionIdKey = currentNode?.connectionId?.toString() ?? '';
+
     const queryOptions: {
         loadDependencyValueKey: string;
         request: GetWorkflowNodeOptionsRequest;
     } = useMemo(
         () => ({
-            loadDependencyValueKey: lookupDependsOnValuesKey,
+            loadDependencyValueKey: connectionIdKey
+                ? `${lookupDependsOnValuesKey}_${connectionIdKey}`
+                : lookupDependsOnValuesKey,
             request: {
                 environmentId: currentEnvironmentId,
                 id: workflowId,
@@ -151,6 +155,7 @@ const PropertyComboBox = ({
             },
         }),
         [
+            connectionIdKey,
             currentEnvironmentId,
             inputValue,
             lookupDependsOnPaths,
@@ -166,7 +171,9 @@ const PropertyComboBox = ({
         request: GetClusterElementNodeOptionsRequest;
     } = useMemo(
         () => ({
-            loadDependencyValueKey: lookupDependsOnValuesKey,
+            loadDependencyValueKey: connectionIdKey
+                ? `${lookupDependsOnValuesKey}_${connectionIdKey}`
+                : lookupDependsOnValuesKey,
             request: {
                 clusterElementType: currentNode?.clusterElementType || '',
                 clusterElementWorkflowNodeName: currentNode?.workflowNodeName || '',
@@ -178,6 +185,7 @@ const PropertyComboBox = ({
             },
         }),
         [
+            connectionIdKey,
             lookupDependsOnValuesKey,
             currentEnvironmentId,
             currentNode?.clusterElementType,

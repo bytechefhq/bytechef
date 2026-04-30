@@ -62,6 +62,15 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
+    public List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections) {

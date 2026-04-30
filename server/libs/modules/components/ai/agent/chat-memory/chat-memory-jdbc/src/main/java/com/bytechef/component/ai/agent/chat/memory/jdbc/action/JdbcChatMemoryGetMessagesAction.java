@@ -58,7 +58,6 @@ public class JdbcChatMemoryGetMessagesAction {
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
                     .options(JdbcChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
-                    .optionsLookupDependsOn(HOST, PORT, DATABASE, USERNAME, PASSWORD)
                     .required(true))
             .output(
                 outputSchema(

@@ -1147,7 +1147,7 @@ export default function useWorkflowNodeDetailsPanel({
         const currentMainRootElementConnectionId = workflowTestConfigurationConnections?.find(
             (connection) =>
                 connection.workflowNodeName === rootClusterElementNodeData?.workflowNodeName &&
-                !connection.workflowConnectionKey.includes('_')
+                currentWorkflowNodeConnections.some((conn) => conn.key === connection.workflowConnectionKey)
         )?.connectionId;
 
         if (currentNode.operationName && currentOperationName) {
@@ -1199,6 +1199,22 @@ export default function useWorkflowNodeDetailsPanel({
         workflowTestConfigurationConnections,
         currentTriggerDefinition,
     ]);
+
+    useEffect(() => {
+        const isClusterElementOrRoot =
+            !!currentNode?.clusterElementType ||
+            currentNode?.workflowNodeName === rootClusterElementNodeData?.workflowNodeName;
+
+        if (!isClusterElementOrRoot || !workflowTestConfigurationConnections) {
+            return;
+        }
+
+        queryClient.invalidateQueries({
+            queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions],
+        });
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowTestConfigurationConnections]);
 
     // Find cluster element component operations
     useEffect(() => {

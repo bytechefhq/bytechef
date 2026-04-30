@@ -40,6 +40,11 @@ public interface ActionDefinitionFacade {
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable Long connectionId);
 
+    List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, Long> connectionIds, Map<String, ?> extensions);
+
     OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds);

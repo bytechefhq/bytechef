@@ -52,6 +52,7 @@ import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionPar
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.MultipleConnectionsOptionsFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
@@ -126,6 +127,23 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return doExecuteOptions(
             componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
             searchText, componentConnection, actionContext);
+    }
+
+    @Override
+    public List<Option> executeOptions(
+        @ComponentNameParam String componentName, int componentVersion, String actionName,
+        String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @ConnectionParam Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions) {
+
+        ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, null, null, firstComponentConnection, null,
+            null, true);
+
+        return doExecuteMultipleConnectionsOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnections, extensions, actionContext);
     }
 
     @Override
@@ -412,9 +430,52 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
 
-            OptionsFunction<?> optionsFunction = getComponentOptionsFunction(
+            OptionsDataSource.BaseOptionsFunction baseOptionsFunction = getComponentBaseOptionsFunction(
                 componentName, componentVersion, actionName, propertyName, convertResult.inputParameters(),
                 convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
+
+            OptionsFunction<?> optionsFunction = (OptionsFunction<?>) baseOptionsFunction;
+
+            return optionsFunction
+                .apply(
+                    convertResult.inputParameters(), convertResult.connectionParameters(),
+                    convertResult.lookupDependsOnPathsMap(), searchText, context)
+                .stream()
+                .map(Option::new)
+                .toList();
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
+        }
+    }
+
+    private List<Option> doExecuteMultipleConnectionsOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, ActionContext context) {
+
+        try {
+            ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, firstComponentConnection);
+
+            OptionsDataSource.BaseOptionsFunction baseOptionsFunction = getComponentBaseOptionsFunction(
+                componentName, componentVersion, actionName, propertyName, convertResult.inputParameters(),
+                convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
+
+            if (baseOptionsFunction instanceof MultipleConnectionsOptionsFunction<?> mcOptionsFunction) {
+                return mcOptionsFunction
+                    .apply(
+                        convertResult.inputParameters(), componentConnections,
+                        ParametersFactory.create(extensions), context)
+                    .stream()
+                    .map(Option::new)
+                    .toList();
+            }
+
+            OptionsFunction<?> optionsFunction = (OptionsFunction<?>) baseOptionsFunction;
 
             return optionsFunction
                 .apply(
@@ -563,7 +624,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
     }
 
-    private OptionsFunction<?> getComponentOptionsFunction(
+    private OptionsDataSource.BaseOptionsFunction getComponentBaseOptionsFunction(
         String componentName, int componentVersion, String actionName, String propertyName,
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) throws Exception {
@@ -576,7 +637,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         OptionsDataSource<?> optionsDataSource = dynamicOptionsProperty.getOptionsDataSource()
             .orElseThrow(() -> new IllegalArgumentException("Options data source is not defined."));
 
-        return (OptionsFunction<?>) optionsDataSource.getOptions();
+        return optionsDataSource.getOptions();
     }
 
     private PropertiesFunction getComponentPropertiesFunction(

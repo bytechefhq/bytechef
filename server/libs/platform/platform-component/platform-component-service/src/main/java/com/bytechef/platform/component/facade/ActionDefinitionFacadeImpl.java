@@ -74,6 +74,17 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
+    public List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, Long> connectionIds, Map<String, ?> extensions) {
+
+        return actionDefinitionService.executeOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, getComponentConnections(connectionIds), extensions);
+    }
+
+    @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds) {
