@@ -66,6 +66,10 @@ public class BambooHrUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = context
             .http(http -> http.get("/employees/%s/files/view".formatted(inputParameters.getRequiredString(ID))))
             .header("accept", "application/xml")

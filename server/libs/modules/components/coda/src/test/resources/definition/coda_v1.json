@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Copies an existing doc.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/coda_v1#copy-doc"
+    },
     "metadata": {
       "path": "/docs",
       "mimeType": "application/json",
@@ -1429,8 +1432,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Returns a list of docs accessible by the user, and which they have opened at least once.",
-    "help": null,
+    "description": "Returns a list of docs accessible by the user and which they have opened at least once.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/coda_v1#list-docs"
+    },
     "metadata": {
       "method": "GET",
       "path": "/docs"
@@ -3178,7 +3184,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates the specified row in the table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/coda_v1#update-row"
+    },
     "metadata": {
       "path": "/docs/{docId}/tables/{tableId}/rows/{rowId}",
       "mimeType": "application/json",
@@ -3529,7 +3538,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Inserts row into a table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/coda_v1#insert-row"
+    },
     "metadata": null,
     "name": "insertRow",
     "outputDefinition": {
@@ -5199,7 +5211,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "listDocs",
-    "description": "Returns a list of docs accessible by the user, and which they have opened at least once.",
+    "description": "Returns a list of docs accessible by the user and which they have opened at least once.",
     "element": null,
     "help": null,
     "outputDefinition": {
@@ -7594,15 +7606,21 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/coda_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
-  "description": "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform.",
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://coda.io/developers/apis/v1"
+  },
+  "description": "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps and databases into a single platform.",
   "icon": "path:assets/coda.svg",
   "metadata": null,
   "name": "coda",

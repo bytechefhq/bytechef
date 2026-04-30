@@ -79,6 +79,10 @@ public class HubspotUtils extends AbstractHubspotUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (inputParameters.getFromPath("properties.pipeline", String.class) == null) {
+            return List.of();
+        }
+
         Map<String, Object> body = context
             .http(http -> http.get("/crm/v3/pipelines/deals/"
                 + inputParameters.getRequiredFromPath("properties.pipeline", String.class) + "/stages"))

@@ -2,7 +2,7 @@
 openapi: "3.0.0"
 info:
   title: "Coda"
-  description: "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform."
+  description: "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps and databases into a single platform."
   version: "v1"
 servers:
   - url: "https://coda.io/apis/v1"
@@ -10,8 +10,9 @@ paths:
   /docs:
     get:
       summary: "List Docs"
-      description: "Returns a list of docs accessible by the user, and which they have opened at least once."
+      description: "Returns a list of docs accessible by the user and which they have opened at least once."
       operationId: "listDocs"
+      x-help: "https://docs.bytechef.io/reference/components/coda_v1#list-docs"
       x-ai-agent-tool: true
       parameters:
         - name: "isOwner"
@@ -47,6 +48,7 @@ paths:
       summary: "Copy Doc"
       description: "Copies an existing doc."
       operationId: "copyDoc"
+      x-help: "https://docs.bytechef.io/reference/components/coda_v1#copy-doc"
       x-ai-agent-tool: true
       requestBody:
         description: "Parameters for copying the doc."
@@ -79,6 +81,7 @@ paths:
       summary: "Update Row"
       description: "Updates the specified row in the table."
       operationId: "updateRow"
+      x-help: "https://docs.bytechef.io/reference/components/coda_v1#update-row"
       x-ai-agent-tool: true
       parameters:
         - name: "docId"

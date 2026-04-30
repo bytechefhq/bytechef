@@ -57,7 +57,7 @@ public class CopperOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ArrayList<Map<String, Object>>> body = null;
+        Map<String, ArrayList<Map<String, Object>>> body;
 
         Http.Response response = context.http(http -> http.get("/activity_types"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -111,6 +111,10 @@ public class CopperOptionUtils {
     public static List<Option<String>> getParentOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
+
+        if (!inputParameters.containsKey(TYPE)) {
+            return List.of();
+        }
 
         String parentType = inputParameters.getRequiredString(TYPE);
 

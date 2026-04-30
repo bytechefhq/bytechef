@@ -94,7 +94,8 @@ public class CodaUpdateRowAction {
             .description("The result of a row update.")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/coda_v1#update-row");
 
     private CodaUpdateRowAction() {
     }

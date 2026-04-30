@@ -58,6 +58,10 @@ public class StripeUtils extends AbstractStripeUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(CUSTOMER_ID)) {
+            return List.of();
+        }
+
         Map<String, Object> body = context.http(http -> http.get("/subscriptions"))
             .queryParameter(CUSTOMER_ID, inputParameters.getRequiredString(CUSTOMER_ID))
             .configuration(responseType(ResponseType.JSON))
@@ -121,6 +125,10 @@ public class StripeUtils extends AbstractStripeUtils {
     public static List<Option<String>> getDefaultPaymentMethodOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(CUSTOMER_ID)) {
+            return List.of();
+        }
 
         Map<String, Object> body = context.http(
             http -> http.get("/customers/" + inputParameters.getRequiredString(CUSTOMER_ID) + "/payment_methods"))

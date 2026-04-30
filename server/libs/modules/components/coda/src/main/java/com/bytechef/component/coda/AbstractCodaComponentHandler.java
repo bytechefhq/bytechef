@@ -36,7 +36,7 @@ public abstract class AbstractCodaComponentHandler implements OpenApiComponentHa
         component("coda")
             .title("Coda")
             .description(
-                "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps, and databases into a single platform.")
+                "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps and databases into a single platform.")
             .version(1))
                 .actions(modifyActions(CodaCopyDocAction.ACTION_DEFINITION, CodaListDocsAction.ACTION_DEFINITION,
                     CodaUpdateRowAction.ACTION_DEFINITION))

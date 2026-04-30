@@ -42,6 +42,10 @@ public class GitlabUtils extends AbstractGitlabUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(PROJECT_ID)) {
+            return List.of();
+        }
+
         List<Option<Long>> options = new ArrayList<>();
 
         List<Map<String, Object>> body = context

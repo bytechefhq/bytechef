@@ -73,6 +73,10 @@ public class LiferayHeadlessAction {
                     (ActionDefinition.PropertiesFunction) (
                         inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
+                        if (!inputParameters.containsKey(APPLICATION) || !inputParameters.containsKey(ENDPOINT)) {
+                            return List.of();
+                        }
+
                         String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
                         if (endpoint.contains("batch")) {

@@ -65,6 +65,10 @@ public class MicrosoftDynamicsCrmUtils {
     public static PropertiesFunction getEntityFieldsProperties(boolean isNewRecord) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
+            if (!inputParameters.containsKey(ENTITY_TYPE)) {
+                return List.of();
+            }
+
             List<ValueProperty<?>> properties = new ArrayList<>();
 
             Map<String, Object> entityTypeAttributes = getEntityTypeAttributes(
@@ -263,6 +267,10 @@ public class MicrosoftDynamicsCrmUtils {
     public static List<Option<String>> getRecordIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(ENTITY_TYPE)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 

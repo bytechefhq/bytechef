@@ -46,6 +46,10 @@ public class GithubUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(REPOSITORY)) {
+            return List.of();
+        }
+
         String url = "/repos/%s/%s/collaborators".formatted(
             getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));
 
@@ -57,6 +61,10 @@ public class GithubUtils {
     public static List<Option<String>> getIssueOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(REPOSITORY)) {
+            return List.of();
+        }
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -74,6 +82,10 @@ public class GithubUtils {
     public static List<Option<String>> getLabels(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(REPOSITORY)) {
+            return List.of();
+        }
 
         String url = "/repos/%s/%s/labels".formatted(
             getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));

@@ -62,7 +62,8 @@ public class CodaCopyDocAction {
             .description("The result of a doc creation.")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/coda_v1#copy-doc");
 
     private CodaCopyDocAction() {
     }

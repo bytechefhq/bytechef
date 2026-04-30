@@ -64,7 +64,7 @@ public class SnowflakeConstants {
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty VALUES_DYNAMIC_PROPERTY = dynamicProperties(VALUES)
-        .propertiesLookupDependsOn(TABLE)
+        .propertiesLookupDependsOn(DATABASE, SCHEMA, TABLE)
         .properties(SnowflakePropertiesUtils::createPropertiesForColumn)
         .required(true);
 

@@ -59,6 +59,10 @@ public class QuickbooksUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext actionContext) {
 
+        if (!inputParameters.containsKey(TYPE)) {
+            return List.of();
+        }
+
         ItemType type = inputParameters.getRequired(TYPE, ItemType.class);
 
         ModifiableStringProperty incomeAccount = string(INCOME_ACCOUNT_REF)

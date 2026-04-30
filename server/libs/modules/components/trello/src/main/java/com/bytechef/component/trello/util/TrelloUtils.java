@@ -56,6 +56,10 @@ public class TrelloUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        if (!inputParameters.containsKey(ID_BOARD)) {
+            return List.of();
+        }
+
         List<Map<String, Object>> body = context
             .http(http -> http.get("/boards/" + inputParameters.getRequiredString(ID_BOARD) + "/cards"))
             .configuration(responseType(ResponseType.JSON))
@@ -68,6 +72,10 @@ public class TrelloUtils {
     public static List<Option<String>> getListOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        if (!inputParameters.containsKey(ID_BOARD)) {
+            return List.of();
+        }
 
         List<Map<String, Object>> body = context
             .http(http -> http.get("/boards/" + inputParameters.getRequiredString(ID_BOARD) + "/lists"))

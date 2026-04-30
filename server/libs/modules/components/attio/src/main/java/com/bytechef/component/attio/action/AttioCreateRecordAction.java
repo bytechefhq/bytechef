@@ -16,16 +16,11 @@
 
 package com.bytechef.component.attio.action;
 
-import static com.bytechef.component.attio.constant.AttioConstants.COMPANIES;
 import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.DATA;
-import static com.bytechef.component.attio.constant.AttioConstants.DEALS;
-import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
 import static com.bytechef.component.attio.constant.AttioConstants.PERSON_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
-import static com.bytechef.component.attio.constant.AttioConstants.USERS;
 import static com.bytechef.component.attio.constant.AttioConstants.VALUES;
-import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
 import static com.bytechef.component.attio.util.AttioUtils.getDealRecord;
 import static com.bytechef.component.attio.util.AttioUtils.getRecordValues;
 import static com.bytechef.component.attio.util.AttioUtils.getUserRecord;
@@ -58,21 +53,11 @@ public class AttioCreateRecordAction {
                 .description("Type of record that will be created.")
                 .options((OptionsFunction<String>) AttioUtils::getTargetObjectOptions)
                 .required(true),
-            PERSON_RECORD
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, PEOPLE))
-                .required(true),
-            COMPANY_RECORD
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, COMPANIES))
-                .required(true),
-            getUserRecord(true)
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, USERS))
-                .required(true),
-            getDealRecord(true)
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, DEALS))
-                .required(true),
-            getWorkspaceRecord(true)
-                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, WORKSPACES))
-                .required(true))
+            PERSON_RECORD,
+            COMPANY_RECORD,
+            getUserRecord(true),
+            getDealRecord(true),
+            getWorkspaceRecord(true))
         .output()
         .perform(AttioCreateRecordAction::perform);
 

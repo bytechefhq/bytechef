@@ -16,10 +16,12 @@
 
 package com.bytechef.component.airtable.datastream;
 
+import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
+import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
@@ -48,15 +50,17 @@ public class AirtableItemWriter implements ItemWriter {
             .type(DESTINATION)
             .object(AirtableItemWriter.class)
             .properties(
-                string("baseId").label("Base ID")
+                string(BASE_ID)
+                    .label("Base ID")
                     .description("ID of the base where table is located.")
                     .required(true)
-                    .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getBaseIdOptions),
-                string("tableId").label("Table ID")
+                    .options((OptionsFunction<String>) AirtableUtils::getBaseIdOptions),
+                string(TABLE_ID)
+                    .label("Table ID")
                     .description("The table where the record will be created.")
                     .required(true)
-                    .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getTableIdOptions)
-                    .optionsLookupDependsOn("baseId"));
+                    .options((OptionsFunction<String>) AirtableUtils::getTableIdOptions)
+                    .optionsLookupDependsOn(BASE_ID));
 
     private String baseId;
     private Context context;
@@ -67,8 +71,8 @@ public class AirtableItemWriter implements ItemWriter {
         Parameters inputParameters, Parameters connectionParameters, Context context,
         ExecutionContext executionContext) {
 
-        this.baseId = inputParameters.getRequiredString("baseId");
-        this.tableId = inputParameters.getRequiredString("tableId");
+        this.baseId = inputParameters.getRequiredString(BASE_ID);
+        this.tableId = inputParameters.getRequiredString(TABLE_ID);
         this.context = context;
     }
 

@@ -54,7 +54,7 @@ public class MondayDeleteItemAction {
                 .label("Item ID")
                 .description("ID of the item to delete.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getBoardItemsOptions)
-                .optionsLookupDependsOn(BOARD_ID, WORKSPACE_ID)
+                .optionsLookupDependsOn(BOARD_ID)
                 .required(true))
         .perform(MondayDeleteItemAction::perform);
 

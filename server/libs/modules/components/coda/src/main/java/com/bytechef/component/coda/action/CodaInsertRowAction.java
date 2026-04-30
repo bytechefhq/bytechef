@@ -45,6 +45,7 @@ public class CodaInsertRowAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertRow")
         .title("Insert Row")
         .description("Inserts row into a table.")
+        .help("", "https://docs.bytechef.io/reference/components/coda_v1#insert-row")
         .properties(
             string(DOC_ID)
                 .label("Doc ID")

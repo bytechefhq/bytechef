@@ -23,37 +23,46 @@ import static com.bytechef.component.hubspot.constant.HubspotConstants.ID;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.LABEL;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.RESULTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class HubspotUtilsTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final Context mockedContext = mock(Context.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of("properties", Map.of("pipeline", "123")));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Executor mockedExecutor = mock(Executor.class);
+    private Parameters mockedParameters = mock(Parameters.class);
+    private final Response mockedResponse = mock(Response.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testExtractFirstContentMap() {
@@ -68,10 +77,15 @@ class HubspotUtilsTest {
     }
 
     @Test
-    void testGetContactIdOptions() {
+    void testGetContactIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> propertiesMap = Map.of("firstname", "first", "lastname", "last");
 
-        mockHttpResponse();
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", "properties", propertiesMap))));
 
@@ -80,11 +94,26 @@ class HubspotUtilsTest {
         assertEquals(
             expectedOptions,
             HubspotUtils.getContactIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/crm/v3/objects/contacts", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetDealstageOptions() {
-        mockHttpResponse();
+    void testGetDealstageOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters = MockParametersFactory.create(Map.of("properties", Map.of("pipeline", "123")));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", LABEL, "label"))));
 
@@ -93,11 +122,24 @@ class HubspotUtilsTest {
         assertEquals(
             expectedOptions,
             HubspotUtils.getDealstageOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/crm/v3/pipelines/deals/123/stages", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetHubspotOwnerIdOptions() {
-        mockHttpResponse();
+    void testGetHubspotOwnerIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", "email", "label"))));
 
@@ -105,13 +147,25 @@ class HubspotUtilsTest {
 
         assertEquals(
             expectedOptions,
-            HubspotUtils.getHubspotOwnerIdOptions(mockedParameters, mockedParameters, Map.of(), "",
-                mockedContext));
+            HubspotUtils.getHubspotOwnerIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/crm/v3/owners", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetPipelineOptions() {
-        mockHttpResponse();
+    void testGetPipelineOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", LABEL, "label"))));
 
@@ -120,14 +174,26 @@ class HubspotUtilsTest {
         assertEquals(
             expectedOptions,
             HubspotUtils.getPipelineOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/crm/v3/pipelines/deals", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetTicketIdOptions() {
+    void testGetTicketIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> propertiesMap = Map.of("subject", "ticket");
 
-        mockHttpResponse();
-
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", "properties", propertiesMap))));
 
@@ -136,15 +202,14 @@ class HubspotUtilsTest {
         assertEquals(
             expectedOptions,
             HubspotUtils.getTicketIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
-    }
 
-    private void mockHttpResponse() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/crm/v3/objects/tickets", stringArgumentCaptor.getValue());
     }
 
     @Test
