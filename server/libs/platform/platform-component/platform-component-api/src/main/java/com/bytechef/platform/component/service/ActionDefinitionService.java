@@ -82,6 +82,11 @@ public interface ActionDefinitionService extends OperationDefinitionService {
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable ComponentConnection componentConnection);
 
+    List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions);
+
     /**
      * Executes the defined output logic for a specific component and its version, based on the given action name, input
      * parameters, and component connections. This method generates an output response that includes details such as the

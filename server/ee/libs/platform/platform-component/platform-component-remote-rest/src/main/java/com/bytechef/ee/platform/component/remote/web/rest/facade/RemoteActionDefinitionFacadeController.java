@@ -70,6 +70,22 @@ public class RemoteActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
+        value = "/execute-options-multiple-connections",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<List<Option>> executeOptionsMultipleConnections(
+        @Valid @RequestBody MultipleConnectionsOptionsRequest optionsRequest) {
+
+        return ResponseEntity.ok(
+            actionDefinitionFacade.executeOptions(
+                optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.actionName,
+                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.lookupDependsOnPaths,
+                optionsRequest.searchText, optionsRequest.connectionIds, optionsRequest.extensions));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
         value = "/execute-perform",
         produces = {
             "application/json"
@@ -97,6 +113,13 @@ public class RemoteActionDefinitionFacadeController {
             actionDefinitionFacade.executeOutput(
                 outputRequest.componentName, outputRequest.componentVersion, outputRequest.actionName,
                 outputRequest.inputParameters, outputRequest.connectionIds));
+    }
+
+    @SuppressFBWarnings("EI")
+    public record MultipleConnectionsOptionsRequest(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, Object> inputParameters, Map<String, Long> connectionIds, List<String> lookupDependsOnPaths,
+        String searchText, Map<String, Object> extensions) {
     }
 
     @SuppressFBWarnings("EI")

@@ -66,6 +66,20 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
+    public List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, Long> connectionIds, Map<String, ?> extensions) {
+
+        return defaultRestClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-options-multiple-connections"),
+            new MultipleConnectionsOptionsRequest(
+                componentName, componentVersion, actionName, propertyName, inputParameters, connectionIds,
+                lookupDependsOnPaths, searchText, extensions),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName,
         Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
@@ -115,6 +129,12 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
                         return Long.parseLong(v.toString());
                     }));
         }
+    }
+
+    private record MultipleConnectionsOptionsRequest(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds, List<String> lookupDependsOnPaths,
+        String searchText, Map<String, ?> extensions) {
     }
 
     private record OptionsRequest(

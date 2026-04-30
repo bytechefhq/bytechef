@@ -190,9 +190,6 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         @Nullable String searchText, long environmentId) {
 
-        Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName, environmentId)
-            .orElse(null);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -201,6 +198,10 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
             .fetch(workflow, workflowNodeName)
             .map(workflowTrigger -> {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+                Long connectionId = workflowTestConfigurationService
+                    .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName, environmentId)
+                    .orElse(null);
 
                 return triggerDefinitionFacade.executeOptions(
                     workflowNodeType.name(), workflowNodeType.version(),
@@ -224,11 +225,20 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                     Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
                         workflowId, workflowTask.getName(), environmentId);
 
+                    Map<String, Long> connectionIds = workflowTestConfigurationService
+                        .fetchWorkflowTestConfiguration(workflowId, environmentId)
+                        .stream()
+                        .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
+                            workflowTestConfiguration.getConnections()))
+                        .collect(Collectors.toMap(
+                            WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+                            WorkflowTestConfigurationConnection::getConnectionId));
+
                     return actionDefinitionFacade.executeOptions(
                         workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
                         workflowTask.evaluateParameters(
                             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
-                        lookupDependsOnPaths, searchText, connectionId);
+                        lookupDependsOnPaths, searchText, connectionIds, workflowTask.getExtensions());
                 });
     }
 }
