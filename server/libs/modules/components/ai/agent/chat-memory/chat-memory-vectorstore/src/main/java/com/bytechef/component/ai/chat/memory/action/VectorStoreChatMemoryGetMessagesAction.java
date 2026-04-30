@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.chat.memory.util.VectorStoreChatMemoryUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
@@ -57,6 +58,7 @@ public class VectorStoreChatMemoryGetMessagesAction {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
+                    .options(VectorStoreChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
                     .required(true),
                 integer(TOP_K)
                     .label("Top K")

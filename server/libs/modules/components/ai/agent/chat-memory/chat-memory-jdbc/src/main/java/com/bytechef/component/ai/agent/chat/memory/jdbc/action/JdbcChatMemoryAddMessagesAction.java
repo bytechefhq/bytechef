@@ -29,6 +29,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
@@ -57,6 +58,7 @@ public class JdbcChatMemoryAddMessagesAction {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
+                    .options(JdbcChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
                     .required(true),
                 array(MESSAGES)
                     .label("Messages")
