@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 import java.util.List;
 
@@ -48,6 +49,16 @@ public class CodaComponentHandler extends AbstractCodaComponentHandler {
         return modifiableComponentDefinition
             .icon("path:assets/coda.svg")
             .customAction(true)
+            .customActionHelp("", "https://coda.io/developers/apis/v1")
             .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/coda_v1#connection-setup")
+            .version(1);
     }
 }
