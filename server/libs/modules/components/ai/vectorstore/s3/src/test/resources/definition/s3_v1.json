@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -55,6 +55,7 @@
       "name": "query",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -106,8 +107,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "vectorStore": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -152,6 +153,7 @@
       "name": "query",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -260,6 +262,7 @@
         "name": "accessKeyId",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -281,6 +284,7 @@
         "name": "secretAccessKey",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -418,6 +422,7 @@
           "value": "cn-northwest-1"
         } ],
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -439,6 +444,7 @@
         "name": "bucketName",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -460,6 +466,7 @@
         "name": "key",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,

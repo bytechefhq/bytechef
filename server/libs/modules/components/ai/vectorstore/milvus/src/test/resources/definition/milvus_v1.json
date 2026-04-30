@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -38,6 +38,7 @@
       "name": "query",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -106,8 +107,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "vectorStore": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -152,6 +153,7 @@
       "name": "query",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": true,
@@ -260,6 +262,7 @@
         "name": "host",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -281,6 +284,7 @@
         "name": "port",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -302,6 +306,7 @@
         "name": "uri",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -323,6 +328,7 @@
         "name": "username",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -344,6 +350,7 @@
         "name": "password",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -365,6 +372,7 @@
         "name": "collection",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -386,6 +394,7 @@
         "name": "database",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
