@@ -44,7 +44,7 @@ public class BrowserUseConnection {
                         .defaultValue("X-Browser-Use-API-Key")
                         .hidden(true),
                     string(VALUE)
-                        .label("API key")
+                        .label("API Key")
                         .required(true)));
 
     private BrowserUseConnection() {

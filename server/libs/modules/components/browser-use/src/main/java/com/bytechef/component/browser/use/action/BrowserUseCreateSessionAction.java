@@ -33,13 +33,12 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.browser.use.util.BrowserUseUtils;
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -68,7 +67,7 @@ public class BrowserUseCreateSessionAction {
             string(SESSION_ID)
                 .label("Session ID")
                 .description("ID of an existing idle session to dispatch the task to.")
-                .options((ActionDefinition.OptionsFunction<String>) BrowserUseUtils::getSessionIdOptions)
+                .options((OptionsFunction<String>) BrowserUseUtils::getSessionIdOptions)
                 .required(false),
             bool(KEEP_ALIVE)
                 .label("Keep Alive")
@@ -90,21 +89,13 @@ public class BrowserUseCreateSessionAction {
     private BrowserUseCreateSessionAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         Object outputSchema = null;
-        Object output = inputParameters.get(OUTPUT_SCHEMA);
+        Map<String, String> output = inputParameters.getRequiredMap(OUTPUT_SCHEMA, String.class);
+        String format = output.get("format");
 
-        if (output instanceof Map<?, ?> map) {
-            String format = (String) map.get("format");
-
-            if ("JSON".equals(format)) {
-                outputSchema = map.get("schema");
-
-                if (outputSchema instanceof String s) {
-                    outputSchema = context.json(json -> json.read(s));
-                }
-            }
+        if ("JSON".equals(format)) {
+            outputSchema = context.json(json -> json.read(output.get("schema")));
         }
 
         return context.http(http -> http.post("/sessions"))
@@ -119,6 +110,6 @@ public class BrowserUseCreateSessionAction {
                     SKILLS, inputParameters.getBoolean(SKILLS)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
