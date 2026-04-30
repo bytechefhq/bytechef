@@ -35,6 +35,7 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
     private String regex;
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
+    private Boolean optionsLoadedDynamically;
 
     private StringProperty() {
     }
@@ -50,6 +51,7 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
             OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             stringProperty.getOptionsDataSource(), OptionsDataSource::new, null);
+        this.optionsLoadedDynamically = OptionalUtils.orElse(stringProperty.getOptionsLoadedDynamically(), false);
     }
 
     @Override
@@ -86,6 +88,11 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
         return optionsDataSource;
     }
 
+    @Nullable
+    public Boolean getOptionsLoadedDynamically() {
+        return optionsLoadedDynamically;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -95,12 +102,13 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
         if (!super.equals(o))
             return false;
         return Objects.equals(regex, that.regex) && Objects.equals(options, that.options)
-            && Objects.equals(optionsDataSource, that.optionsDataSource);
+            && Objects.equals(optionsDataSource, that.optionsDataSource)
+            && Objects.equals(optionsLoadedDynamically, that.optionsLoadedDynamically);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), regex, options, optionsDataSource);
+        return Objects.hash(super.hashCode(), regex, options, optionsDataSource, optionsLoadedDynamically);
     }
 
     @Override
@@ -119,6 +127,7 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
             ", defaultValue=" + defaultValue +
             ", optionsDataSource=" + optionsDataSource +
             ", options=" + options +
+            ", optionsLoadedDynamically=" + optionsLoadedDynamically +
             ", minLength=" + minLength +
             ", maxLength=" + maxLength +
             ", regex='" + regex + '\'' +

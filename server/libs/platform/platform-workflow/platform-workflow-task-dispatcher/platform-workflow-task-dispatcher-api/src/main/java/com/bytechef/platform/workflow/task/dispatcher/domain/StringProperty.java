@@ -32,6 +32,7 @@ public class StringProperty extends ValueProperty<String> {
     private String regex;
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
+    private Boolean optionsLoadedDynamically;
 
     private StringProperty() {
     }
@@ -47,6 +48,7 @@ public class StringProperty extends ValueProperty<String> {
         this.options = CollectionUtils.map(OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             stringProperty.getOptionsFunction(), optionsFunction -> new OptionsDataSource(), null);
+        this.optionsLoadedDynamically = OptionalUtils.orElse(stringProperty.getOptionsLoadedDynamically(), false);
     }
 
     @Override
@@ -74,6 +76,10 @@ public class StringProperty extends ValueProperty<String> {
         return optionsDataSource;
     }
 
+    public Boolean getOptionsLoadedDynamically() {
+        return optionsLoadedDynamically;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -90,12 +96,14 @@ public class StringProperty extends ValueProperty<String> {
 
         return Objects.equals(minLength, that.minLength) && Objects.equals(maxLength, that.maxLength) &&
             Objects.equals(regex, that.regex) && Objects.equals(options, that.options) &&
-            Objects.equals(optionsDataSource, that.optionsDataSource);
+            Objects.equals(optionsDataSource, that.optionsDataSource) &&
+            Objects.equals(optionsLoadedDynamically, that.optionsLoadedDynamically);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), minLength, maxLength, regex, options, optionsDataSource);
+        return Objects.hash(super.hashCode(), minLength, maxLength, regex, options, optionsDataSource,
+            optionsLoadedDynamically);
     }
 
     @Override
