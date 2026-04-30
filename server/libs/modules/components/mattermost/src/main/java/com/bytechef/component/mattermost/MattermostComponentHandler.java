@@ -41,7 +41,9 @@ public class MattermostComponentHandler extends AbstractMattermostComponentHandl
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .icon("path:assets/mattermost.svg")
-            .categories(ComponentCategory.COMMUNICATION);
+            .categories(ComponentCategory.COMMUNICATION)
+            .customAction(true)
+            .customActionHelp("", "https://developers.mattermost.com/api-documentation/");
     }
 
     @Override
@@ -69,6 +71,8 @@ public class MattermostComponentHandler extends AbstractMattermostComponentHandl
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "http://" + connectionParameters.getRequiredString(DOMAIN) +
-                "/api/v4");
+                "/api/v4")
+            .help("", "https://docs.bytechef.io/reference/components/mattermost_v1#connection-setup")
+            .version(1);
     }
 }
