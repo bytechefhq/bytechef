@@ -348,15 +348,16 @@ export const WorkflowExecutions = () => {
                                     <Button
                                         aria-label="Refresh workflow executions"
                                         disabled={workflowExecutionsIsFetching}
-                                        icon={
-                                            <RefreshCwIcon
-                                                className={twMerge(workflowExecutionsIsFetching && 'animate-spin')}
-                                            />
-                                        }
                                         onClick={() => refetchWorkflowExecutions()}
-                                        size="icon"
+                                        size="sm"
                                         variant="outline"
-                                    />
+                                    >
+                                        <RefreshCwIcon
+                                            className={twMerge(workflowExecutionsIsFetching && 'animate-spin')}
+                                        />
+
+                                        <span>Refresh</span>
+                                    </Button>
                                 </TooltipTrigger>
 
                                 <TooltipContent>Refresh</TooltipContent>
