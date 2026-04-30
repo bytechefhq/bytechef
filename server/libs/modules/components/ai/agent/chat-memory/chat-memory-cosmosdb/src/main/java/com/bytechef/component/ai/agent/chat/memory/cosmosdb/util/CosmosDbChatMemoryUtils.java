@@ -20,18 +20,28 @@ import static com.bytechef.component.ai.agent.chat.memory.cosmosdb.constant.Cosm
 import static com.bytechef.component.ai.agent.chat.memory.cosmosdb.constant.CosmosDbChatMemoryConstants.DATABASE_NAME;
 import static com.bytechef.component.ai.agent.chat.memory.cosmosdb.constant.CosmosDbChatMemoryConstants.ENDPOINT;
 import static com.bytechef.component.ai.agent.chat.memory.cosmosdb.constant.CosmosDbChatMemoryConstants.KEY;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosClientBuilder;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cosmosdb.CosmosDBChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cosmosdb.CosmosDBChatMemoryRepositoryConfig;
+import org.springframework.ai.chat.messages.Message;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public class CosmosDbChatMemoryUtils {
+
+    private CosmosDbChatMemoryUtils() {
+    }
 
     public static ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
         String endpoint = connectionParameters.getRequiredString(ENDPOINT);
@@ -53,6 +63,19 @@ public class CosmosDbChatMemoryUtils {
         return CosmosDBChatMemoryRepository.create(config);
     }
 
-    private CosmosDbChatMemoryUtils() {
+    public static ActionDefinition.OptionsFunction<String> getFirstMessages() {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(connectionParameters);
+
+            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
+
+            List<String> conversationIds = chatMemoryRepository.findConversationIds();
+            for (String conversationId : conversationIds) {
+                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
+                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+            }
+
+            return options;
+        };
     }
 }

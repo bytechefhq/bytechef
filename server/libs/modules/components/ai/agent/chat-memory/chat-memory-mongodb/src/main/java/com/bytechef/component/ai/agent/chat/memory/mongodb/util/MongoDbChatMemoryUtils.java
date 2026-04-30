@@ -20,7 +20,10 @@ import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.Mongo
 import static com.bytechef.component.ai.agent.chat.memory.mongodb.constant.MongoDbChatMemoryConstants.DATABASE_NAME;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -29,13 +32,20 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.mongo.MongoChatMemoryRepository;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public class MongoDbChatMemoryUtils {
+
+    private MongoDbChatMemoryUtils() {
+    }
 
     public static ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
         String connectionString = connectionParameters.getRequiredString(CONNECTION_STRING);
@@ -60,6 +70,19 @@ public class MongoDbChatMemoryUtils {
             .build();
     }
 
-    private MongoDbChatMemoryUtils() {
+    public static ActionDefinition.OptionsFunction<String> getFirstMessages() {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(connectionParameters);
+
+            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
+
+            List<String> conversationIds = chatMemoryRepository.findConversationIds();
+            for (String conversationId : conversationIds) {
+                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
+                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+            }
+
+            return options;
+        };
     }
 }
