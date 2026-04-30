@@ -24,12 +24,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.browser.use.util.BrowserUseUtils;
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Marija Horvat
@@ -44,7 +43,7 @@ public class BrowserUseGetSessionAction {
             string(SESSION_ID)
                 .label("Session ID")
                 .description("ID of an existing idle session.")
-                .options((ActionDefinition.OptionsFunction<String>) BrowserUseUtils::getSessionIdOptions)
+                .options((OptionsFunction<String>) BrowserUseUtils::getSessionIdOptions)
                 .required(true))
         .output(outputSchema(SESSION_RESPONSE_PROPERTY))
         .perform(BrowserUseGetSessionAction::perform);
@@ -52,12 +51,11 @@ public class BrowserUseGetSessionAction {
     private BrowserUseGetSessionAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
             .http(http -> http.get("/sessions/%s".formatted(inputParameters.getRequiredString(SESSION_ID))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
