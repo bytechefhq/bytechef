@@ -103,6 +103,12 @@ export interface StringProperty extends ValueProperty {
      * @memberof StringProperty
      */
     optionsDataSource?: OptionsDataSource;
+    /**
+     * If the property options should be loaded dynamically.
+     * @type {boolean}
+     * @memberof StringProperty
+     */
+    optionsLoadedDynamically?: boolean;
 }
 
 
@@ -132,6 +138,7 @@ export function StringPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
         'regex': json['regex'] == null ? undefined : json['regex'],
         'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionFromJSON)),
         'optionsDataSource': json['optionsDataSource'] == null ? undefined : OptionsDataSourceFromJSON(json['optionsDataSource']),
+        'optionsLoadedDynamically': json['optionsLoadedDynamically'] == null ? undefined : json['optionsLoadedDynamically'],
     };
 }
 
@@ -154,6 +161,7 @@ export function StringPropertyToJSONTyped(value?: StringProperty | null, ignoreD
         'regex': value['regex'],
         'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionToJSON)),
         'optionsDataSource': OptionsDataSourceToJSON(value['optionsDataSource']),
+        'optionsLoadedDynamically': value['optionsLoadedDynamically'],
     };
 }
 
