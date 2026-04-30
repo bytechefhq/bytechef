@@ -1,0 +1,128 @@
+---
+title: "Loops"
+description: "Loops is an email marketing and transactional email platform built for modern SaaS companies, helping businesses automate onboarding, product updates, and lifecycle messaging with simple workflows, API integrations, and scalable contact management."
+---
+
+
+Categories: Advertising
+
+
+Type: loops/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | API Key | STRING | To find your API key go to Settings -&gt; API in Loops and click Generate key. | true |
+
+
+
+## Connection Setup
+
+### Generate API Key
+
+1. Login to your [Loops](https://app.loops.so/)
+2. Click here to go to *Settings*.
+3. Click on *API*.
+4. Click on *Generate key* button.
+5. By clicking here you can copy your *API Key*.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/Fkow59YW5AqouKdvIxdk?type=1&controls=on"  width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Contact
+Name: createContact
+
+`Create a new contact with an email address and any other contact properties.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | Email Address | STRING | The contact’s email address. | true |
+| firstName | First Name | STRING | The contact’s first name. | false |
+| lastName | Last Name | STRING | The contact’s last name. | false |
+| userGroup | User Group | STRING | You can use groups to segment users when sending emails. Currently, a contact can only be in one user group. Groups like “Users”, “VIPs”, “Investors” or “Customers” | false |
+| userId | User ID | STRING | A unique user ID (for example, from an external application). | false |
+| mailingLists | Mailing Lists | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of mailing lists the user will be subscribed to. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "email" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "userGroup" : "",
+    "userId" : "",
+    "mailingLists" : [ "" ]
+  },
+  "type" : "loops/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the contact was created successfully. |
+| id | STRING | The internal ID of the new contact. |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "id" : ""
+}
+```
+
+#### How to find Mailing List ID
+
+1. Go to *Setting*.
+2. Click on *Lists*.
+3. There you will see your *Mailing lists*.
+4. Copy ID of the desired mailing list.
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
