@@ -12,6 +12,7 @@ paths:
       summary: "Send message"
       description: "Send message to a channel."
       operationId: "sendMessage"
+      x-help: "https://docs.bytechef.io/reference/components/mattermost_v1#send-message"
       x-ai-agent-tool: true
       requestBody:
         content:
