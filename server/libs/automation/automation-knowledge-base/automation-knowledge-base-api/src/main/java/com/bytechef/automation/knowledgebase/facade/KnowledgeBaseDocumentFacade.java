@@ -18,6 +18,7 @@ package com.bytechef.automation.knowledgebase.facade;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Facade for managing knowledge base documents including file storage operations.
@@ -44,4 +45,12 @@ public interface KnowledgeBaseDocumentFacade {
      * @param id the ID of the document to delete
      */
     void deleteKnowledgeBaseDocument(Long id);
+
+    /**
+     * Updates the tag names for a knowledge base document in both the relational database and the vector store.
+     *
+     * @param knowledgeBaseDocumentId the ID of the document whose tags are to be updated
+     * @param tagNames                the new list of tag name strings
+     */
+    void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames);
 }

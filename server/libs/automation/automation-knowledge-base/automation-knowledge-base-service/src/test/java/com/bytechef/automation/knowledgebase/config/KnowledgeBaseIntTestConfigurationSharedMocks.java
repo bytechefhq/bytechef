@@ -37,7 +37,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     EmbeddingModel.class, FileStorageService.class, FileStorageServiceRegistry.class,
-    KnowledgeBaseFileStorage.class, MessageBroker.class, VectorStore.class
+    KnowledgeBaseFileStorage.class, KnowledgeBaseVectorStoreMetadataUpdater.class, MessageBroker.class,
+    VectorStore.class
 })
 public @interface KnowledgeBaseIntTestConfigurationSharedMocks {
 }

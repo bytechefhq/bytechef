@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
-    "search": [ ]
+    "search": [ ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ]
   },
   "actions": [ {
     "batch": null,
@@ -114,7 +114,7 @@
       "hidden": null,
       "items": [ {
         "advancedOption": null,
-        "controlType": "INTEGER",
+        "controlType": "TEXT",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
@@ -122,22 +122,24 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": null,
-        "maxValue": null,
+        "languageId": null,
+        "maxLength": null,
         "metadata": { },
-        "minValue": null,
+        "minLength": null,
         "name": null,
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
+        "regex": null,
         "required": null,
-        "type": "INTEGER"
+        "type": "STRING"
       } ],
       "label": "Tags",
       "maxItems": null,
       "metadata": { },
       "minItems": null,
       "multipleValues": null,
-      "name": "tagIds",
+      "name": "tagNames",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -193,8 +195,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ ],
-    "search": [ ]
+    "search": [ ],
+    "vectorStore": [ ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -249,7 +251,7 @@
       "hidden": null,
       "items": [ {
         "advancedOption": null,
-        "controlType": "INTEGER",
+        "controlType": "TEXT",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
@@ -257,22 +259,24 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": null,
-        "maxValue": null,
+        "languageId": null,
+        "maxLength": null,
         "metadata": { },
-        "minValue": null,
+        "minLength": null,
         "name": null,
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
+        "regex": null,
         "required": null,
-        "type": "INTEGER"
+        "type": "STRING"
       } ],
       "label": "Tags",
       "maxItems": null,
       "metadata": { },
       "minItems": null,
       "multipleValues": null,
-      "name": "tagIds",
+      "name": "tagNames",
       "options": null,
       "optionsDataSource": {
         "options": { },
@@ -393,7 +397,7 @@
       "hidden": null,
       "items": [ {
         "advancedOption": null,
-        "controlType": "INTEGER",
+        "controlType": "TEXT",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
@@ -401,22 +405,24 @@
         "expressionEnabled": null,
         "hidden": null,
         "label": null,
-        "maxValue": null,
+        "languageId": null,
+        "maxLength": null,
         "metadata": { },
-        "minValue": null,
+        "minLength": null,
         "name": null,
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
+        "regex": null,
         "required": null,
-        "type": "INTEGER"
+        "type": "STRING"
       } ],
       "label": "Tags",
       "maxItems": null,
       "metadata": { },
       "minItems": null,
       "multipleValues": null,
-      "name": "tagIds",
+      "name": "tagNames",
       "options": null,
       "optionsDataSource": {
         "options": { },

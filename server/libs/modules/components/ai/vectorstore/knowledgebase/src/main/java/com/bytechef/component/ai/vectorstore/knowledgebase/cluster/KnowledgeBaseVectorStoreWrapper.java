@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_ID;
 import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
+import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_NAMES;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -38,17 +38,17 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
 
     private final VectorStore vectorStore;
     private final Long knowledgeBaseId;
-    private final List<Long> documentIds;
+    private final List<String> tagNames;
 
     public KnowledgeBaseVectorStoreWrapper(VectorStore vectorStore, Long knowledgeBaseId) {
         this(vectorStore, knowledgeBaseId, null);
     }
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseVectorStoreWrapper(VectorStore vectorStore, Long knowledgeBaseId, List<Long> documentIds) {
+    public KnowledgeBaseVectorStoreWrapper(VectorStore vectorStore, Long knowledgeBaseId, List<String> tagNames) {
         this.vectorStore = vectorStore;
         this.knowledgeBaseId = knowledgeBaseId;
-        this.documentIds = documentIds == null ? null : List.copyOf(documentIds);
+        this.tagNames = tagNames == null ? null : List.copyOf(tagNames);
     }
 
     @Override
@@ -92,9 +92,9 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
             .eq(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId)
             .build();
 
-        if (documentIds != null && !documentIds.isEmpty()) {
+        if (tagNames != null && !tagNames.isEmpty()) {
             combinedFilter = new Filter.Expression(
-                Filter.ExpressionType.AND, combinedFilter, buildDocumentIdFilter(documentIds));
+                Filter.ExpressionType.AND, combinedFilter, buildTagFilter(tagNames));
         }
 
         if (request.getFilterExpression() != null) {
@@ -113,14 +113,23 @@ public class KnowledgeBaseVectorStoreWrapper implements VectorStore {
     }
 
     /**
-     * Builds an IN filter expression on {@code knowledge_base_document_id}. Documents matching ANY of the supplied IDs
-     * will satisfy the expression.
+     * Builds an OR filter expression on per-tag boolean flags ({@code tag_names_NAME: true}). Documents that have ANY
+     * of the specified tag names in their metadata will satisfy the expression.
      */
-    public static Filter.Expression buildDocumentIdFilter(List<Long> documentIds) {
-        FilterExpressionBuilder filterExpressionBuilder = new FilterExpressionBuilder();
+    public static Filter.Expression buildTagFilter(List<String> tagNames) {
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
 
-        return filterExpressionBuilder.in(METADATA_KNOWLEDGE_BASE_DOCUMENT_ID, documentIds.toArray())
-            .build();
+        if (tagNames == null || tagNames.isEmpty()) {
+            return null;
+        }
+
+        FilterExpressionBuilder.Op filter = b.eq(METADATA_TAG_NAMES + "_" + tagNames.get(0), true);
+
+        for (int i = 1; i < tagNames.size(); i++) {
+            filter = b.or(filter, b.eq(METADATA_TAG_NAMES + "_" + tagNames.get(i), true));
+        }
+
+        return filter.build();
     }
 
     @Override

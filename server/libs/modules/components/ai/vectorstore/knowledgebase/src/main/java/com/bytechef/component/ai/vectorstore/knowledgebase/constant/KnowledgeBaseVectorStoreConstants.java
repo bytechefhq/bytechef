@@ -25,7 +25,7 @@ public final class KnowledgeBaseVectorStoreConstants {
     public static final String KNOWLEDGE_BASE_ID = "knowledgeBaseId";
     public static final String QUERY = "query";
     public static final String SIMILARITY_THRESHOLD = "similarityThreshold";
-    public static final String TAG_IDS = "tagIds";
+    public static final String TAG_NAMES = "tagNames";
     public static final String TOP_K = "topK";
 
     private KnowledgeBaseVectorStoreConstants() {

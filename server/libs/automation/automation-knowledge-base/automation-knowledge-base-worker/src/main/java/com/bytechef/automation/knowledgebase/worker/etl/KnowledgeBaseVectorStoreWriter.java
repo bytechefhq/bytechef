@@ -20,7 +20,7 @@ import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConsta
 import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
 import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_ID;
 import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_IDS;
+import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_NAMES;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -54,16 +54,16 @@ public class KnowledgeBaseVectorStoreWriter {
      * @param knowledgeBaseId         the knowledge base ID
      * @param knowledgeBaseDocumentId the knowledge base document ID
      * @param environmentId           the environment ordinal of the knowledge base
-     * @param tagIds                  the tag IDs associated with the document
+     * @param tagNames                the tag names associated with the document
      */
     public void write(
         List<Document> documents, long knowledgeBaseId, long knowledgeBaseDocumentId, long environmentId,
-        List<Long> tagIds) {
+        List<String> tagNames) {
 
         List<Document> sanitizedDocuments = documents.stream()
             .map(
                 document -> sanitizeDocument(
-                    document, knowledgeBaseId, knowledgeBaseDocumentId, -1, environmentId, tagIds))
+                    document, knowledgeBaseId, knowledgeBaseDocumentId, -1, environmentId, tagNames))
             .toList();
 
         vectorStore.add(sanitizedDocuments);
@@ -77,14 +77,14 @@ public class KnowledgeBaseVectorStoreWriter {
      * @param documentId           the knowledge base document ID
      * @param knowledgeBaseChunkId the knowledge base document chunk ID
      * @param environmentId        the environment ordinal of the knowledge base
-     * @param tagIds               the tag IDs associated with the document
+     * @param tagNames             the tag names associated with the document
      */
     public void writeChunk(
         Document document, Long knowledgeBaseId, Long documentId, Long knowledgeBaseChunkId, long environmentId,
-        List<Long> tagIds) {
+        List<String> tagNames) {
 
         Document sanitizedDocument = sanitizeDocument(
-            document, knowledgeBaseId, documentId, knowledgeBaseChunkId, environmentId, tagIds);
+            document, knowledgeBaseId, documentId, knowledgeBaseChunkId, environmentId, tagNames);
 
         vectorStore.add(List.of(sanitizedDocument));
     }
@@ -114,7 +114,7 @@ public class KnowledgeBaseVectorStoreWriter {
      */
     private Document sanitizeDocument(
         Document document, long knowledgeBaseId, long knowledgeBaseDocumentId, long knowledgeBaseDocumentChunkId,
-        long environmentId, List<Long> tagIds) {
+        long environmentId, List<String> tagNames) {
 
         String content = document.getText();
 
@@ -122,7 +122,7 @@ public class KnowledgeBaseVectorStoreWriter {
             content = content.replace("\0", "");
         }
 
-        Map<String, Object> metadata = new java.util.HashMap<>(document.getMetadata());
+        Map<String, Object> metadata = new java.util.LinkedHashMap<>(document.getMetadata());
 
         metadata.put(METADATA_ENVIRONMENT_ID, environmentId);
         metadata.put(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId);
@@ -132,9 +132,11 @@ public class KnowledgeBaseVectorStoreWriter {
             metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId);
         }
 
-        if (tagIds != null && !tagIds.isEmpty()) {
-            for (Long tagId : tagIds) {
-                metadata.put(METADATA_TAG_IDS + "_" + tagId, true);
+        if (tagNames != null && !tagNames.isEmpty()) {
+            metadata.put(METADATA_TAG_NAMES, tagNames);
+
+            for (String tagName : tagNames) {
+                metadata.put(METADATA_TAG_NAMES + "_" + tagName, true);
             }
         }
 

@@ -22,8 +22,6 @@ import com.bytechef.automation.knowledgebase.dto.DocumentStatusUpdate;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
-import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,18 +39,16 @@ class KnowledgeBaseDocumentGraphQlController {
     private final KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade;
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
-    private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     KnowledgeBaseDocumentGraphQlController(
         KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, TagService tagService) {
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
 
         this.knowledgeBaseDocumentChunkFacade = knowledgeBaseDocumentChunkFacade;
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
-        this.tagService = tagService;
     }
 
     @SchemaMapping(typeName = "KnowledgeBaseDocument", field = "chunks")
@@ -62,14 +58,14 @@ class KnowledgeBaseDocumentGraphQlController {
     }
 
     @SchemaMapping(typeName = "KnowledgeBaseDocument", field = "tags")
-    List<Tag> documentTags(KnowledgeBaseDocument document) {
-        List<Long> tagIds = document.getTagIds();
+    List<String> documentTags(KnowledgeBaseDocument document) {
+        List<String> tagNames = document.getTagNames();
 
-        if (tagIds == null || tagIds.isEmpty()) {
+        if (tagNames == null) {
             return List.of();
         }
 
-        return tagService.getTags(tagIds);
+        return tagNames;
     }
 
     @QueryMapping

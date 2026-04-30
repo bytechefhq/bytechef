@@ -26,7 +26,6 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkS
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseLoadAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseSearchAction;
@@ -38,7 +37,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -63,14 +61,12 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
-        KnowledgeBaseTagService knowledgeBaseTagService, TagService tagService,
         @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
 
         this.componentDefinition =
             new KnowledgeBaseVectorStoreComponentDefinitionImpl(
                 clusterElementDefinitionService, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                knowledgeBaseDocumentTagService, knowledgeBaseFileStorage, knowledgeBaseService,
-                knowledgeBaseTagService, tagService, vectorStore);
+                knowledgeBaseDocumentTagService, knowledgeBaseFileStorage, knowledgeBaseService, vectorStore);
     }
 
     @Override
@@ -87,7 +83,7 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
             KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
             KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
-            KnowledgeBaseTagService knowledgeBaseTagService, TagService tagService, VectorStore vectorStore) {
+            VectorStore vectorStore) {
 
             super(
                 component(KNOWLEDGE_BASE)
@@ -102,15 +98,13 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
                             knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
                         KnowledgeBaseSearchAction.of(
-                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService, tagService))
+                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService))
                     .clusterElements(
                         KnowledgeBaseSearchTool.of(
-                            vectorStore, knowledgeBaseDocumentTagService, knowledgeBaseService,
-                            knowledgeBaseTagService),
+                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
                         KnowledgeBaseVectorStore.of(
                             vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                            knowledgeBaseDocumentTagService, knowledgeBaseFileStorage, knowledgeBaseService,
-                            knowledgeBaseTagService)));
+                            knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseDocumentTagService)));
         }
 
         @Override

@@ -20,17 +20,13 @@ import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.Knowl
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Option;
-import com.bytechef.platform.tag.domain.Tag;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Shared option builders used by Knowledge Base cluster elements.
@@ -63,34 +59,25 @@ final class KnowledgeBaseOptionsUtils {
         };
     }
 
-    static ClusterElementDefinition.OptionsFunction<Long> tagOptions(KnowledgeBaseTagService knowledgeBaseTagService) {
+    static ClusterElementDefinition.OptionsFunction<String> tagOptions(
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
+
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             Long knowledgeBaseId = inputParameters.getLong(KNOWLEDGE_BASE_ID);
 
-            List<Tag> tags;
+            List<String> tagNames;
 
             if (knowledgeBaseId == null) {
-                tags = knowledgeBaseTagService.getAllTags();
+                tagNames = knowledgeBaseDocumentTagService.getAllTagNames();
             } else {
-                tags = knowledgeBaseTagService.getDocumentTagsByKnowledgeBaseId(knowledgeBaseId);
+                tagNames = knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseId(knowledgeBaseId);
             }
 
-            Map<Long, Tag> unique = new LinkedHashMap<>();
+            List<Option<String>> options = new ArrayList<>();
 
-            for (Tag tag : tags) {
-                Long tagId = Objects.requireNonNull(tag.getId());
-
-                unique.putIfAbsent(tagId, tag);
-            }
-
-            List<Option<Long>> options = new ArrayList<>();
-
-            for (Tag tag : unique.values()) {
-                String tagName = tag.getName();
-
+            for (String tagName : tagNames) {
                 if (matchesSearchText(tagName, searchText)) {
-                    options.add(option(tagName, Objects.requireNonNull(tag.getId())
-                        .longValue()));
+                    options.add(option(tagName, tagName));
                 }
             }
 

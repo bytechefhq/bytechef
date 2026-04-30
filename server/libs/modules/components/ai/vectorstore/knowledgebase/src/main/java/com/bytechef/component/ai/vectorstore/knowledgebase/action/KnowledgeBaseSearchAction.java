@@ -19,6 +19,7 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.SIMILARITY_THRESHOLD;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_NAMES;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TOP_K;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -32,21 +33,17 @@ import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
-import com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
-import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.service.TagService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.Filter.Expression;
 
 /**
  * Search action for querying the internal knowledge base vector store. Supports three search modes:
@@ -65,7 +62,7 @@ public final class KnowledgeBaseSearchAction {
 
     public static ActionDefinition of(
         VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService, TagService tagService) {
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
         return action(SEARCH)
             .title("Search Data")
@@ -83,12 +80,12 @@ public final class KnowledgeBaseSearchAction {
                     .description(
                         "The search query for semantic similarity search. Leave empty for tag-only search.")
                     .required(false),
-                array(KnowledgeBaseVectorStoreConstants.TAG_IDS)
+                array(TAG_NAMES)
                     .label("Tags")
                     .description(
                         "Filter results by tags. Documents with ANY of the selected tags will be returned (OR logic).")
-                    .items(integer())
-                    .options(getTagOptions(tagService))
+                    .items(string())
+                    .options(getTagOptions(knowledgeBaseDocumentTagService))
                     .required(false),
                 integer(TOP_K)
                     .label("Top K")
@@ -105,17 +102,13 @@ public final class KnowledgeBaseSearchAction {
             .output()
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
-                    inputParameters, vectorStore, knowledgeBaseDocumentTagService));
+                    inputParameters, vectorStore));
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static Object perform(
-        Parameters inputParameters, VectorStore vectorStore,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
-
+    private static Object perform(Parameters inputParameters, VectorStore vectorStore) {
         Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
         String query = inputParameters.getString(QUERY);
-        List<Long> tagIds = inputParameters.getList(KnowledgeBaseVectorStoreConstants.TAG_IDS, Long.class);
+        List<String> tagNames = inputParameters.getList(TAG_NAMES, String.class);
         int topK = inputParameters.getInteger(TOP_K, 10);
         double similarityThreshold = inputParameters.getDouble(SIMILARITY_THRESHOLD, 0.0);
 
@@ -123,36 +116,30 @@ public final class KnowledgeBaseSearchAction {
             vectorStore, knowledgeBaseId);
 
         boolean hasQuery = query != null && !query.isBlank();
-        boolean hasTags = tagIds != null && !tagIds.isEmpty();
+        boolean hasTags = tagNames != null && !tagNames.isEmpty();
 
         if (!hasQuery && !hasTags) {
             return List.of();
         }
 
-        List<Long> documentIds = hasTags
-            ? knowledgeBaseDocumentTagService.getDocumentIdsByTagIds(knowledgeBaseId, tagIds)
-            : List.of();
-
         if (!hasQuery) {
-            return searchByTagsOnly(wrappedVectorStore, documentIds, topK);
+            return searchByTagsOnly(wrappedVectorStore, tagNames, topK);
         }
 
         if (!hasTags) {
             return searchByVectorOnly(wrappedVectorStore, query, topK, similarityThreshold);
         }
 
-        return searchWithTagFilter(wrappedVectorStore, query, documentIds, topK, similarityThreshold);
+        return searchWithTagFilter(wrappedVectorStore, query, tagNames, topK, similarityThreshold);
     }
 
     /**
      * Tag-only search: retrieves documents that match any of the specified tags (OR logic). Uses a dummy query with tag
      * filtering since vector stores require a query.
      */
-    private static List<Document> searchByTagsOnly(VectorStore vectorStore, List<Long> documentIds, int topK) {
-        Filter.Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildDocumentIdFilter(documentIds);
+    private static List<Document> searchByTagsOnly(VectorStore vectorStore, List<String> tagNames, int topK) {
+        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagNames);
 
-        // For tag-only search, we use an empty query but rely on the filter
-        // Note: The vector store will still compute embeddings, but filtering will narrow results
         SearchRequest searchRequest = SearchRequest.builder()
             .query("")
             .topK(topK)
@@ -182,9 +169,9 @@ public final class KnowledgeBaseSearchAction {
      * Combined search: filters by tags (OR logic), then performs semantic similarity search.
      */
     private static List<Document> searchWithTagFilter(
-        VectorStore vectorStore, String query, List<Long> documentIds, int topK, double similarityThreshold) {
+        VectorStore vectorStore, String query, List<String> tagNames, int topK, double similarityThreshold) {
 
-        Filter.Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildDocumentIdFilter(documentIds);
+        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagNames);
 
         SearchRequest searchRequest = SearchRequest.builder()
             .query(query)
@@ -220,25 +207,38 @@ public final class KnowledgeBaseSearchAction {
         };
     }
 
-    private static ActionDefinition.OptionsFunction<Long> getTagOptions(TagService tagService) {
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
-            List<Option<Long>> options = new ArrayList<>();
+    private static ActionDefinition.OptionsFunction<String> getTagOptions(
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
-            List<Tag> tags = tagService.getTags();
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            Long knowledgeBaseId = inputParameters.getLong(KNOWLEDGE_BASE_ID);
 
-            for (Tag tag : tags) {
-                String tagName = tag.getName();
+            List<String> tagNames;
 
-                String tagNameLowerCase = tagName.toLowerCase(Locale.ROOT);
+            if (knowledgeBaseId == null) {
+                tagNames = knowledgeBaseDocumentTagService.getAllTagNames();
+            } else {
+                tagNames = knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseId(knowledgeBaseId);
+            }
 
-                if (searchText == null || tagNameLowerCase.contains(searchText.toLowerCase(Locale.ROOT))) {
-                    long tagId = Objects.requireNonNull(tag.getId());
+            List<Option<String>> options = new ArrayList<>();
 
-                    options.add(option(tagName, tagId));
+            for (String tagName : tagNames) {
+                if (matchesSearchText(tagName, searchText)) {
+                    options.add(option(tagName, tagName));
                 }
             }
 
             return options;
         };
+    }
+
+    private static boolean matchesSearchText(String value, String searchText) {
+        if (searchText == null) {
+            return true;
+        }
+
+        return value.toLowerCase(Locale.ROOT)
+            .contains(searchText.toLowerCase(Locale.ROOT));
     }
 }

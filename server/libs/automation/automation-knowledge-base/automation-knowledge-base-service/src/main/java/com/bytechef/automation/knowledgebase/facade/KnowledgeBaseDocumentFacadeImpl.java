@@ -16,12 +16,14 @@
 
 package com.bytechef.automation.knowledgebase.facade;
 
+import com.bytechef.automation.knowledgebase.config.KnowledgeBaseVectorStoreMetadataUpdater;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.automation.knowledgebase.event.KnowledgeBaseDocumentEvent;
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
@@ -44,19 +46,26 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     private final ApplicationEventPublisher eventPublisher;
     private final KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
+    private final KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService;
     private final KnowledgeBaseFileStorage knowledgeBaseFileStorage;
+    private final KnowledgeBaseVectorStoreMetadataUpdater knowledgeBaseVectorStoreMetadataUpdater;
     private final VectorStore vectorStore;
 
     @SuppressFBWarnings("EI")
     KnowledgeBaseDocumentFacadeImpl(
         ApplicationEventPublisher eventPublisher, KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
+        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
+        KnowledgeBaseVectorStoreMetadataUpdater knowledgeBaseVectorStoreMetadataUpdater,
         @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
 
         this.eventPublisher = eventPublisher;
         this.knowledgeBaseDocumentChunkService = knowledgeBaseDocumentChunkService;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
+        this.knowledgeBaseDocumentTagService = knowledgeBaseDocumentTagService;
         this.knowledgeBaseFileStorage = knowledgeBaseFileStorage;
+        this.knowledgeBaseVectorStoreMetadataUpdater = knowledgeBaseVectorStoreMetadataUpdater;
         this.vectorStore = vectorStore;
     }
 
@@ -109,5 +118,27 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
         knowledgeBaseFileStorage.deleteDocument(knowledgeBaseDocument.getDocument());
 
         knowledgeBaseDocumentService.delete(id);
+    }
+
+    @Override
+    public void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames) {
+        knowledgeBaseDocumentTagService.updateTagNames(knowledgeBaseDocumentId, tagNames);
+
+        KnowledgeBaseDocument knowledgeBaseDocument =
+            knowledgeBaseDocumentService.getKnowledgeBaseDocument(knowledgeBaseDocumentId);
+        List<String> updatedTagNames = knowledgeBaseDocument.getTagNames();
+
+        List<KnowledgeBaseDocumentChunk> chunks =
+            knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentId(knowledgeBaseDocumentId);
+
+        for (KnowledgeBaseDocumentChunk chunk : chunks) {
+            String vectorStoreId = chunk.getVectorStoreId();
+
+            if (vectorStoreId == null) {
+                continue;
+            }
+
+            knowledgeBaseVectorStoreMetadataUpdater.updateTagNames(vectorStoreId, updatedTagNames);
+        }
     }
 }

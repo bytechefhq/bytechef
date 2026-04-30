@@ -16,9 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.domain;
 
-import com.bytechef.platform.tag.domain.Tag;
 import java.util.Objects;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -28,18 +26,18 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("knowledge_base_document_tag")
 public final class KnowledgeBaseDocumentTag {
 
-    @Column("tag_id")
-    private AggregateReference<Tag, Long> tagId;
+    @Column("tag_name")
+    private String tagName;
 
     public KnowledgeBaseDocumentTag() {
     }
 
-    public KnowledgeBaseDocumentTag(Long tagId) {
-        this.tagId = tagId == null ? null : AggregateReference.to(tagId);
+    public KnowledgeBaseDocumentTag(String tagName) {
+        this.tagName = tagName;
     }
 
-    public Long getTagId() {
-        return tagId == null ? null : tagId.getId();
+    public String getTagName() {
+        return tagName;
     }
 
     @Override
@@ -52,18 +50,18 @@ public final class KnowledgeBaseDocumentTag {
             return false;
         }
 
-        return Objects.equals(tagId, that.tagId);
+        return Objects.equals(tagName, that.tagName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tagId);
+        return Objects.hash(tagName);
     }
 
     @Override
     public String toString() {
         return "KnowledgeBaseDocumentTag{" +
-            "tagId=" + tagId +
+            "tagName='" + tagName + '\'' +
             '}';
     }
 }

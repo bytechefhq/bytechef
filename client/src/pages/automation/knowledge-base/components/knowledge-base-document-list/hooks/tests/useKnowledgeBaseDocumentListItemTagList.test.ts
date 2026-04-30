@@ -38,15 +38,9 @@ vi.mock('@tanstack/react-query', () => ({
     })),
 }));
 
-const mockTags = [
-    {id: '1', name: 'Tag 1'},
-    {id: '2', name: 'Tag 2'},
-];
+const mockTags = ['Tag 1', 'Tag 2'];
 
-const mockRemainingTags = [
-    {id: '3', name: 'Tag 3'},
-    {id: '4', name: 'Tag 4'},
-];
+const mockRemainingTags = ['Tag 3', 'Tag 4'];
 
 describe('useKnowledgeBaseDocumentListItemTagList', () => {
     beforeEach(() => {
@@ -57,7 +51,7 @@ describe('useKnowledgeBaseDocumentListItemTagList', () => {
     });
 
     describe('convertedTags', () => {
-        it('converts tag ids to numbers', () => {
+        it('converts tag names to TagType objects', () => {
             const {result} = renderHook(() =>
                 useKnowledgeBaseDocumentListItemTagList({
                     knowledgeBaseDocumentId: 'doc-1',
@@ -65,10 +59,7 @@ describe('useKnowledgeBaseDocumentListItemTagList', () => {
                 })
             );
 
-            expect(result.current.convertedTags).toEqual([
-                {id: 1, name: 'Tag 1'},
-                {id: 2, name: 'Tag 2'},
-            ]);
+            expect(result.current.convertedTags).toEqual([{name: 'Tag 1'}, {name: 'Tag 2'}]);
         });
 
         it('handles empty tags array', () => {
@@ -83,10 +74,7 @@ describe('useKnowledgeBaseDocumentListItemTagList', () => {
         });
 
         it('preserves tag names during conversion', () => {
-            const tagsWithLongNames = [
-                {id: '100', name: 'Very Long Tag Name'},
-                {id: '200', name: 'Another Long Name'},
-            ];
+            const tagsWithLongNames = ['Very Long Tag Name', 'Another Long Name'];
 
             const {result} = renderHook(() =>
                 useKnowledgeBaseDocumentListItemTagList({
@@ -101,7 +89,7 @@ describe('useKnowledgeBaseDocumentListItemTagList', () => {
     });
 
     describe('convertedRemainingTags', () => {
-        it('converts remaining tag ids to numbers', () => {
+        it('converts remaining tag names to TagType objects', () => {
             const {result} = renderHook(() =>
                 useKnowledgeBaseDocumentListItemTagList({
                     knowledgeBaseDocumentId: 'doc-1',
@@ -110,10 +98,7 @@ describe('useKnowledgeBaseDocumentListItemTagList', () => {
                 })
             );
 
-            expect(result.current.convertedRemainingTags).toEqual([
-                {id: 3, name: 'Tag 3'},
-                {id: 4, name: 'Tag 4'},
-            ]);
+            expect(result.current.convertedRemainingTags).toEqual([{name: 'Tag 3'}, {name: 'Tag 4'}]);
         });
 
         it('returns undefined when remainingTags is not provided', () => {
@@ -165,7 +150,7 @@ describe('useKnowledgeBaseDocumentListItemTagList', () => {
                 result.current.updateTagsMutation.mutate({
                     input: {
                         knowledgeBaseDocumentId: 'doc-1',
-                        tags: [{id: '1', name: 'Tag 1'}],
+                        tags: ['Tag 1'],
                     },
                 });
             });
@@ -187,7 +172,7 @@ describe('useKnowledgeBaseDocumentListItemTagList', () => {
                 result.current.updateTagsMutation.mutate({
                     input: {
                         knowledgeBaseDocumentId: 'doc-1',
-                        tags: [{id: '1', name: 'Tag 1'}],
+                        tags: ['Tag 1'],
                     },
                 });
             });
@@ -236,12 +221,12 @@ describe('useKnowledgeBaseDocumentListItemTagList', () => {
 
             const firstConvertedTags = result.current.convertedTags;
 
-            const newTags = [{id: '5', name: 'New Tag'}];
+            const newTags = ['New Tag'];
 
             rerender({tags: newTags});
 
             expect(result.current.convertedTags).not.toBe(firstConvertedTags);
-            expect(result.current.convertedTags).toEqual([{id: 5, name: 'New Tag'}]);
+            expect(result.current.convertedTags).toEqual([{name: 'New Tag'}]);
         });
     });
 

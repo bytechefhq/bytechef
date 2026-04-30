@@ -16,54 +16,50 @@
 
 package com.bytechef.automation.knowledgebase.service;
 
-import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Service for accessing tags associated with KnowledgeBaseDocuments.
+ * Service for accessing tag names associated with KnowledgeBaseDocuments.
  *
  * @author Ivica Cardic
  */
 public interface KnowledgeBaseDocumentTagService {
 
     /**
-     * Retrieves a list of all tags used by documents.
+     * Retrieves a list of all distinct tag names used by documents.
      *
-     * @return a list of Tag objects representing all available tags
+     * @return a list of tag name strings representing all available document tags
      */
-    List<Tag> getAllTags();
+    List<String> getAllTagNames();
 
     /**
-     * Retrieves a mapping from document ID to list of tags assigned to that document.
+     * Retrieves all distinct tag names used by documents belonging to the given knowledge base.
      *
-     * @return a map where keys are document IDs and values are lists of Tag objects assigned to each document
+     * @param knowledgeBaseId the unique identifier of the knowledge base
+     * @return a list of tag name strings
      */
-    Map<Long, List<Tag>> getTagsByKnowledgeBaseDocumentId();
+    List<String> getTagNamesByKnowledgeBaseId(Long knowledgeBaseId);
 
     /**
-     * Retrieves a mapping from document name to list of tags assigned to that document.
+     * Retrieves a mapping from document ID to list of tag names assigned to that document.
      *
-     * @return a map where keys are document names and values are lists of Tag objects assigned to each document
+     * @return a map where keys are document IDs and values are lists of tag name strings
      */
-    Map<String, List<Tag>> getTagsByKnowledgeBaseDocumentName();
+    Map<Long, List<String>> getTagNamesByKnowledgeBaseDocumentId();
 
     /**
-     * Returns the IDs of documents within the given knowledgeBase that are tagged with at least one of the given tag
-     * IDs.
+     * Retrieves a mapping from document name to list of tag names assigned to that document.
      *
-     * @param knowledgeBaseId the unique identifier of the knowledgeBase
-     * @param tagIds          the tag IDs to filter by
-     * @return a list of matching document IDs
+     * @return a map where keys are document names and values are lists of tag name strings
      */
-    List<Long> getDocumentIdsByTagIds(Long knowledgeBaseId, List<Long> tagIds);
+    Map<String, List<String>> getTagNamesByKnowledgeBaseDocumentName();
 
     /**
-     * Updates the tags associated with a specific document.
+     * Updates the tag names associated with a specific document.
      *
      * @param knowledgeBaseDocumentId the unique identifier of the document whose tags are to be updated
-     * @param tags                    a list of Tag objects representing the new set of tags to associate with the
-     *                                document
+     * @param tagNames                a list of tag name strings representing the new set of tags
      */
-    void updateTags(long knowledgeBaseDocumentId, List<Tag> tags);
+    void updateTagNames(long knowledgeBaseDocumentId, List<String> tagNames);
 }
