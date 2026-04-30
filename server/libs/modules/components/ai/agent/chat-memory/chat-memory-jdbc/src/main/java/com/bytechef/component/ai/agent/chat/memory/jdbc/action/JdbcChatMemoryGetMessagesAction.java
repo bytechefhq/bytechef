@@ -17,6 +17,11 @@
 package com.bytechef.component.ai.agent.chat.memory.jdbc.action;
 
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.DATABASE;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.HOST;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.PASSWORD;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.PORT;
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.USERNAME;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils.getChatMemoryRepository;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -24,6 +29,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
@@ -51,6 +57,8 @@ public class JdbcChatMemoryGetMessagesAction {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
+                    .options(JdbcChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
+                    .optionsLookupDependsOn(HOST, PORT, DATABASE, USERNAME, PASSWORD)
                     .required(true))
             .output(
                 outputSchema(
