@@ -1,0 +1,296 @@
+---
+title: "Browser Use"
+description: "AI-powered browser automation that enables agents to perform web tasks such as navigating websites and extracting data."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: browserUse/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | API Key | STRING |  | true |
+
+
+
+## Connection Setup
+
+1. Go to your Browser Use Dashboard.
+2. On the left bar, you will find **Settings** -> **API Keys**.
+3. Click on **Create API Key**.
+4. Add label if you want and click **Create**.
+5. Copy your API Key and use it in ByteChef.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(53.05219207% + 32px)'}}>
+<iframe src="https://www.guidejar.com/embed/kUY5voL6TXCGKIsvVcd4?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Session
+Name: createSession
+
+`Create a session and/or dispatch a task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| task | Task | STRING | The natural-language instruction for the agent to execute. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>claude-sonnet-4.6</span>, <span>claude-opus-4.6</span>, <span>gpt-5.4-mini</span> </details> | The model to use. | true |
+| outputSchema | Output | OBJECT <details> <summary> Properties </summary> &#123;STRING\(format), STRING\(schema)&#125; </details> | Configure how the browser agent should return results. | true |
+| sessionId | Session ID | STRING | ID of an existing idle session to dispatch the task to. | false |
+| keepAlive | Keep Alive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, the session stays alive in idle state after the task completes instead of automatically stopping. | false |
+| enableScheduledTasks | Enable Scheduled Tasks | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, the agent can create scheduled tasks that run on a recurring basis. | false |
+| skills | Skills | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, enables built-in agent skills. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Session",
+  "name" : "createSession",
+  "parameters" : {
+    "task" : "",
+    "model" : "",
+    "outputSchema" : {
+      "format" : "",
+      "schema" : ""
+    },
+    "sessionId" : "",
+    "keepAlive" : false,
+    "enableScheduledTasks" : false,
+    "skills" : false
+  },
+  "type" : "browserUse/v1/createSession"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Unique session identifier. |
+| status | STRING | Current session lifecycle status. |
+| model | STRING | The model tier used for this session. |
+| createdAt | DATE_TIME | When the session was created. |
+| updatedAt | DATE_TIME | When the session was last updated. |
+| title | STRING | Auto-generated short title summarizing the task. |
+| output | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The agent's final output. |
+| outputSchema | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The JSON Schema that was requested for structured output, if any. |
+| stepCount | INTEGER | Number of steps the agent has executed so far. |
+| lastStepSummary | STRING | Human-readable summary of the most recent agent step. |
+| isTaskSuccessful | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the task completed successfully. |
+| liveUrl | STRING | URL to view the live browser session. |
+| recordingUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> | URLs to download session recordings. |
+| profileId | STRING | ID of the browser profile loaded in this session, if any. |
+| workspaceId | STRING | ID of the workspace attached to this session, if any. |
+| proxyCountryCode | STRING | Country code of the proxy used for this session, or null if no proxy. |
+| maxCostUsd | STRING | Maximum cost limit in USD set for this session. |
+| totalInputTokens | INTEGER | Total LLM input tokens consumed by this session. |
+| totalOutputTokens | INTEGER | Total LLM output tokens consumed by this session. |
+| proxyUsedMb | STRING | Proxy bandwidth used in megabytes. |
+| llmCostUsd | STRING | Cost of LLM usage in USD. |
+| proxyCostUsd | STRING | Cost of proxy bandwidth in USD. |
+| browserCostUsd | STRING | Cost of browser compute time in USD. |
+| totalCostUsd | STRING | Total session cost in USD (LLM + proxy + browser). |
+| screenshotUrl | STRING | URL of the latest browser screenshot. |
+| agentmailEmail | STRING | Temporary email address provisioned for this session (via AgentMail). |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "status" : "",
+  "model" : "",
+  "createdAt" : "2021-01-01T00:00:00",
+  "updatedAt" : "2021-01-01T00:00:00",
+  "title" : "",
+  "output" : { },
+  "outputSchema" : { },
+  "stepCount" : 1,
+  "lastStepSummary" : "",
+  "isTaskSuccessful" : false,
+  "liveUrl" : "",
+  "recordingUrls" : [ "" ],
+  "profileId" : "",
+  "workspaceId" : "",
+  "proxyCountryCode" : "",
+  "maxCostUsd" : "",
+  "totalInputTokens" : 1,
+  "totalOutputTokens" : 1,
+  "proxyUsedMb" : "",
+  "llmCostUsd" : "",
+  "proxyCostUsd" : "",
+  "browserCostUsd" : "",
+  "totalCostUsd" : "",
+  "screenshotUrl" : "",
+  "agentmailEmail" : ""
+}
+```
+
+#### Find Session ID
+
+To find the Session ID, click [here](/reference/components/browser-use_v1#how-to-find-the-session-id).
+
+
+
+### Get Session
+Name: getSession
+
+`Get session details.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sessionId | Session ID | STRING | ID of an existing idle session. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Session",
+  "name" : "getSession",
+  "parameters" : {
+    "sessionId" : ""
+  },
+  "type" : "browserUse/v1/getSession"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Unique session identifier. |
+| status | STRING | Current session lifecycle status. |
+| model | STRING | The model tier used for this session. |
+| createdAt | DATE_TIME | When the session was created. |
+| updatedAt | DATE_TIME | When the session was last updated. |
+| title | STRING | Auto-generated short title summarizing the task. |
+| output | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The agent's final output. |
+| outputSchema | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The JSON Schema that was requested for structured output, if any. |
+| stepCount | INTEGER | Number of steps the agent has executed so far. |
+| lastStepSummary | STRING | Human-readable summary of the most recent agent step. |
+| isTaskSuccessful | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the task completed successfully. |
+| liveUrl | STRING | URL to view the live browser session. |
+| recordingUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> | URLs to download session recordings. |
+| profileId | STRING | ID of the browser profile loaded in this session, if any. |
+| workspaceId | STRING | ID of the workspace attached to this session, if any. |
+| proxyCountryCode | STRING | Country code of the proxy used for this session, or null if no proxy. |
+| maxCostUsd | STRING | Maximum cost limit in USD set for this session. |
+| totalInputTokens | INTEGER | Total LLM input tokens consumed by this session. |
+| totalOutputTokens | INTEGER | Total LLM output tokens consumed by this session. |
+| proxyUsedMb | STRING | Proxy bandwidth used in megabytes. |
+| llmCostUsd | STRING | Cost of LLM usage in USD. |
+| proxyCostUsd | STRING | Cost of proxy bandwidth in USD. |
+| browserCostUsd | STRING | Cost of browser compute time in USD. |
+| totalCostUsd | STRING | Total session cost in USD (LLM + proxy + browser). |
+| screenshotUrl | STRING | URL of the latest browser screenshot. |
+| agentmailEmail | STRING | Temporary email address provisioned for this session (via AgentMail). |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "status" : "",
+  "model" : "",
+  "createdAt" : "2021-01-01T00:00:00",
+  "updatedAt" : "2021-01-01T00:00:00",
+  "title" : "",
+  "output" : { },
+  "outputSchema" : { },
+  "stepCount" : 1,
+  "lastStepSummary" : "",
+  "isTaskSuccessful" : false,
+  "liveUrl" : "",
+  "recordingUrls" : [ "" ],
+  "profileId" : "",
+  "workspaceId" : "",
+  "proxyCountryCode" : "",
+  "maxCostUsd" : "",
+  "totalInputTokens" : 1,
+  "totalOutputTokens" : 1,
+  "proxyUsedMb" : "",
+  "llmCostUsd" : "",
+  "proxyCostUsd" : "",
+  "browserCostUsd" : "",
+  "totalCostUsd" : "",
+  "screenshotUrl" : "",
+  "agentmailEmail" : ""
+}
+```
+
+#### Find Session ID
+
+To find the Session ID, click [here](/reference/components/browser-use_v1#how-to-find-the-session-id).
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find the Session ID
+
+- **Method 1: Via API**
+
+Use the `GET /sessions` endpoint to retrieve a list of all sessions and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Browser Use dashboard and on the left bar your will find Agent Sessions. Open Agent Sessions and there you will find a list of sessions. The second column in the table is Session ID.
+
+The Session ID can also be found in the output of the following actions:
+* **Create Session**
+* **Get Session**
