@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.953014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T09:41:49.693717532+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class StringPropertyModel extends ValuePropertyModel {
 
   private @Nullable String languageId;
@@ -53,6 +53,8 @@ public class StringPropertyModel extends ValuePropertyModel {
   private List<@Valid OptionModel> options = new ArrayList<>();
 
   private @Nullable OptionsDataSourceModel optionsDataSource;
+
+  private @Nullable Boolean optionsLoadedDynamically;
 
   public StringPropertyModel() {
     super();
@@ -241,6 +243,27 @@ public class StringPropertyModel extends ValuePropertyModel {
     this.optionsDataSource = optionsDataSource;
   }
 
+  public StringPropertyModel optionsLoadedDynamically(@Nullable Boolean optionsLoadedDynamically) {
+    this.optionsLoadedDynamically = optionsLoadedDynamically;
+    return this;
+  }
+
+  /**
+   * If the property options should be loaded dynamically.
+   * @return optionsLoadedDynamically
+   */
+  
+  @Schema(name = "optionsLoadedDynamically", description = "If the property options should be loaded dynamically.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("optionsLoadedDynamically")
+  public @Nullable Boolean getOptionsLoadedDynamically() {
+    return optionsLoadedDynamically;
+  }
+
+  @JsonProperty("optionsLoadedDynamically")
+  public void setOptionsLoadedDynamically(@Nullable Boolean optionsLoadedDynamically) {
+    this.optionsLoadedDynamically = optionsLoadedDynamically;
+  }
+
 
   public StringPropertyModel controlType(ControlTypeModel controlType) {
     super.controlType(controlType);
@@ -313,12 +336,13 @@ public class StringPropertyModel extends ValuePropertyModel {
         Objects.equals(this.regex, stringProperty.regex) &&
         Objects.equals(this.options, stringProperty.options) &&
         Objects.equals(this.optionsDataSource, stringProperty.optionsDataSource) &&
+        Objects.equals(this.optionsLoadedDynamically, stringProperty.optionsLoadedDynamically) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(languageId, defaultValue, exampleValue, maxLength, minLength, regex, options, optionsDataSource, super.hashCode());
+    return Objects.hash(languageId, defaultValue, exampleValue, maxLength, minLength, regex, options, optionsDataSource, optionsLoadedDynamically, super.hashCode());
   }
 
   @Override
@@ -334,6 +358,7 @@ public class StringPropertyModel extends ValuePropertyModel {
     sb.append("    regex: ").append(toIndentedString(regex)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
+    sb.append("    optionsLoadedDynamically: ").append(toIndentedString(optionsLoadedDynamically)).append("\n");
     sb.append("}");
     return sb.toString();
   }
