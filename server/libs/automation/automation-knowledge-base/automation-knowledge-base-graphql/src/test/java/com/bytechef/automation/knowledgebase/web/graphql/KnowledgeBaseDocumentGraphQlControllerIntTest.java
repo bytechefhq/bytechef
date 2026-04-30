@@ -95,8 +95,8 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
         KnowledgeBaseDocument mockDocument = createMockDocument(documentId, "Test Document");
 
         List<KnowledgeBaseDocumentChunk> mockChunks = List.of(
-            createMockChunk(1L, "Chunk 1"),
-            createMockChunk(2L, "Chunk 2"));
+            createMockChunk(1L),
+            createMockChunk(2L));
 
         when(knowledgeBaseDocumentService.getKnowledgeBaseDocument(documentId)).thenReturn(mockDocument);
         when(knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentId(documentId))
@@ -222,7 +222,7 @@ class KnowledgeBaseDocumentGraphQlControllerIntTest {
         return document;
     }
 
-    private KnowledgeBaseDocumentChunk createMockChunk(Long id, String content) {
+    private KnowledgeBaseDocumentChunk createMockChunk(Long id) {
         KnowledgeBaseDocumentChunk chunk = new KnowledgeBaseDocumentChunk();
 
         chunk.setId(id);
