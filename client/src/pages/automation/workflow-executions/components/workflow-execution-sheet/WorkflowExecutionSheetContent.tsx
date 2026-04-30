@@ -19,7 +19,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
         stackTrace: [],
     };
 
-    const [activeTab, setActiveTab] = useState<TabValueType>(jobFailedWithNoExecutions ? 'error' : 'input');
+    const [activeTab, setActiveTab] = useState<TabValueType>(jobFailedWithNoExecutions ? 'error' : 'output');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
         triggerExecution || job.taskExecutions?.[0] || undefined
@@ -28,7 +28,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
     const taskExecutions = job?.taskExecutions || [];
 
     const onTaskClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
-        setActiveTab(taskExecution.error ? 'error' : 'input');
+        setActiveTab(taskExecution.error ? 'error' : 'output');
         setSelectedItem(taskExecution);
     }, []);
 
