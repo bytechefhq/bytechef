@@ -1,0 +1,37 @@
+### How to find Doc ID
+
+- **Method 1: Via API**
+
+Use the `GET /docs` endpoint to retrieve a list of all docs and their IDs.
+
+- **Method 2: Via UI**
+
+To find a Doc ID, open the document in your browser. The ID is the long string of letters and numbers in the URL after `_d`.
+
+For example, in the URL `https://coda.io/d/Bytechef-testing_d123abc`, the Doc ID is 123abc.
+
+The Doc ID can also be found in the output of the following actions:
+* **Copy Doc**
+* **List Docs**
+
+### How to find Table ID
+
+- **Method 1: Via API**
+
+Use the `GET /docs/DOC_ID/tables` endpoint to retrieve a list of all tables and their IDs.
+
+### How to find Row ID
+
+- **Method 1: Via API**
+
+Use the `GET /docs/DOC_ID/tables/TABLE_ID/rows` endpoint to retrieve a list of all rows and their IDs.
+
+The Row ID can also be found in the output of the following actions:
+* **Insert Row**
+* **Update Row**
+
+### How to find Column ID
+
+- **Method 1: Via API**
+
+Use the `GET /docs/DOC_ID/tables/TABLE_ID/columns` endpoint to retrieve a list of all columns and their IDs.
