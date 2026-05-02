@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+                   logicalFilePath="config/liquibase/changelog/ai/agent_skill/20260412000101_ai_agent_skill_rename_tables.xml">
+
+    <changeSet id="20260412000101" author="Ivica Cardic">
+        <renameTable oldTableName="agent_skill" newTableName="ai_agent_skill"/>
+    </changeSet>
+</databaseChangeLog>
