@@ -30,6 +30,6 @@ public class EnvironmentServiceImpl implements EnvironmentService {
 
     @Override
     public List<Environment> getEnvironments() {
-        return List.of(Environment.PRODUCTION);
+        return List.of(Environment.DEVELOPMENT);
     }
 }

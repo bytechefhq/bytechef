@@ -34,7 +34,7 @@ public class EnvironmentServiceTest {
     public void testGetEnvironments() {
         List<Environment> environments = environmentService.getEnvironments();
 
-        assertThat(environments).containsExactly(Environment.PRODUCTION);
+        assertThat(environments).containsExactly(Environment.DEVELOPMENT);
     }
 
     @Test
