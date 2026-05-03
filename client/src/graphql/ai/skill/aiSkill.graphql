@@ -1,0 +1,9 @@
+query aiSkill($id: ID!) {
+    aiSkill(id: $id) {
+        id
+        name
+        description
+        createdDate
+        lastModifiedDate
+    }
+}

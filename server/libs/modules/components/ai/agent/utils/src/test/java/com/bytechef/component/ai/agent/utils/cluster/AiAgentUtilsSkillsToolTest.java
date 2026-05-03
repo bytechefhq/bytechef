@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.ai.agent.skill.facade.AiAgentSkillFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -48,7 +48,7 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 class AiAgentUtilsSkillsToolTest {
 
     @Mock
-    private AiAgentSkillFacade aiAgentSkillFacade;
+    private AiSkillFacade aiSkillFacade;
 
     @Mock
     private Context context;
@@ -63,7 +63,7 @@ class AiAgentUtilsSkillsToolTest {
 
     @BeforeEach
     void setUp() {
-        agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiAgentSkillFacade);
+        agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiSkillFacade);
     }
 
     @Test
@@ -71,7 +71,7 @@ class AiAgentUtilsSkillsToolTest {
         when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of());
 
         assertThrows(IllegalArgumentException.class, this::invokeApply);
-        verifyNoInteractions(aiAgentSkillFacade);
+        verifyNoInteractions(aiSkillFacade);
     }
 
     @Test
@@ -79,12 +79,12 @@ class AiAgentUtilsSkillsToolTest {
         byte[] zipBytes = createZipWithMdFile("skill1/SKILL.md", createSkillMd("Test Skill", "Do something useful."));
 
         when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(42L));
-        when(aiAgentSkillFacade.getAiAgentSkillDownload(42L)).thenReturn(zipBytes);
+        when(aiSkillFacade.getAiSkillDownload(42L)).thenReturn(zipBytes);
 
         ToolCallbackProvider toolCallbackProvider = invokeApply();
 
         assertNotNull(toolCallbackProvider);
-        verify(aiAgentSkillFacade).getAiAgentSkillDownload(42L);
+        verify(aiSkillFacade).getAiSkillDownload(42L);
     }
 
     @Test
@@ -103,8 +103,8 @@ class AiAgentUtilsSkillsToolTest {
     @Test
     void testApplyWithSkillLoadFailureCollectsError() {
         when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(99L));
-        when(aiAgentSkillFacade.getAiAgentSkillDownload(99L))
-            .thenThrow(new IllegalArgumentException("AiAgentSkill not found with id: 99"));
+        when(aiSkillFacade.getAiSkillDownload(99L))
+            .thenThrow(new IllegalArgumentException("AiSkill not found with id: 99"));
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
 
@@ -118,8 +118,8 @@ class AiAgentUtilsSkillsToolTest {
     void testApplyAccumulatesMultipleErrors() {
         when(inputParameters.getList("skills", Long.class, List.of()))
             .thenReturn(Arrays.asList(null, 77L));
-        when(aiAgentSkillFacade.getAiAgentSkillDownload(77L))
-            .thenThrow(new IllegalArgumentException("AiAgentSkill not found with id: 77"));
+        when(aiSkillFacade.getAiSkillDownload(77L))
+            .thenThrow(new IllegalArgumentException("AiSkill not found with id: 77"));
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, this::invokeApply);
 
@@ -133,14 +133,14 @@ class AiAgentUtilsSkillsToolTest {
         byte[] zipBytes2 = createZipWithMdFile("skill2/SKILL.md", createSkillMd("Skill 2", "Second skill."));
 
         when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(1L, 2L));
-        when(aiAgentSkillFacade.getAiAgentSkillDownload(1L)).thenReturn(zipBytes1);
-        when(aiAgentSkillFacade.getAiAgentSkillDownload(2L)).thenReturn(zipBytes2);
+        when(aiSkillFacade.getAiSkillDownload(1L)).thenReturn(zipBytes1);
+        when(aiSkillFacade.getAiSkillDownload(2L)).thenReturn(zipBytes2);
 
         ToolCallbackProvider toolCallbackProvider = invokeApply();
 
         assertNotNull(toolCallbackProvider);
-        verify(aiAgentSkillFacade).getAiAgentSkillDownload(1L);
-        verify(aiAgentSkillFacade).getAiAgentSkillDownload(2L);
+        verify(aiSkillFacade).getAiSkillDownload(1L);
+        verify(aiSkillFacade).getAiSkillDownload(2L);
     }
 
     @Test
