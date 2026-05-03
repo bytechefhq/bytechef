@@ -39,9 +39,7 @@ export default function useKnowledgeBaseDocumentListItemTagList({
 
                 const updatedTags = variables.input.tags ?? [];
                 const updatedTagsByDocument = previousTagsData.knowledgeBaseDocumentTagsByDocument.map((entry) =>
-                    entry.knowledgeBaseDocumentId === knowledgeBaseDocumentId
-                        ? {...entry, tags: updatedTags}
-                        : entry
+                    entry.knowledgeBaseDocumentId === knowledgeBaseDocumentId ? {...entry, tags: updatedTags} : entry
                 );
 
                 const documentHasTagsEntry = previousTagsData.knowledgeBaseDocumentTagsByDocument.some(
@@ -72,10 +70,7 @@ export default function useKnowledgeBaseDocumentListItemTagList({
 
     const convertedTags = useMemo(() => tags.map((tagName) => ({name: tagName})), [tags]);
 
-    const convertedRemainingTags = useMemo(
-        () => remainingTags?.map((tagName) => ({name: tagName})),
-        [remainingTags]
-    );
+    const convertedRemainingTags = useMemo(() => remainingTags?.map((tagName) => ({name: tagName})), [remainingTags]);
 
     return {
         convertedRemainingTags,
