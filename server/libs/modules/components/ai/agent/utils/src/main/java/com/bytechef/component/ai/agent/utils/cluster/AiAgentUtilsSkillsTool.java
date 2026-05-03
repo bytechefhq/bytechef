@@ -20,16 +20,16 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
-import static com.bytechef.platform.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
-import static com.bytechef.platform.ai.agent.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
+import static com.bytechef.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
+import static com.bytechef.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.ai.agent.skill.domain.AiAgentSkill;
-import com.bytechef.platform.ai.agent.skill.facade.AiAgentSkillFacade;
+import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
@@ -49,8 +49,8 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides a TOOLS cluster element that loads selected AiAgentSkill zip archives, extracts .md files, and passes them
- * to Spring AI Community's SkillsTool as skill resources.
+ * Provides a TOOLS cluster element that loads selected AiSkill zip archives, extracts .md files, and passes them to
+ * Spring AI Community's SkillsTool as skill resources.
  *
  * @author Ivica Cardic
  */
@@ -61,13 +61,13 @@ public class AiAgentUtilsSkillsTool {
     private static final String SKILLS = "skills";
     private static final String SKILL_ID = "skillId";
 
-    private final AiAgentSkillFacade aiAgentSkillFacade;
+    private final AiSkillFacade aiSkillFacade;
 
     public final ClusterElementDefinition<ToolCallbackProviderFunction> clusterElementDefinition;
 
     @SuppressFBWarnings("EI")
-    public AiAgentUtilsSkillsTool(AiAgentSkillFacade aiAgentSkillFacade) {
-        this.aiAgentSkillFacade = aiAgentSkillFacade;
+    public AiAgentUtilsSkillsTool(AiSkillFacade aiSkillFacade) {
+        this.aiSkillFacade = aiSkillFacade;
 
         this.clusterElementDefinition =
             ComponentDsl.<ToolCallbackProviderFunction>clusterElement("skillsTool")
@@ -115,7 +115,7 @@ public class AiAgentUtilsSkillsTool {
             }
 
             try {
-                byte[] zipBytes = aiAgentSkillFacade.getAiAgentSkillDownload(skillId);
+                byte[] zipBytes = aiSkillFacade.getAiSkillDownload(skillId);
 
                 Path skillDirectory = extractSkillToTempDirectory(zipBytes, skillId);
 
@@ -152,9 +152,9 @@ public class AiAgentUtilsSkillsTool {
 
         List<Option<Long>> options = new ArrayList<>();
 
-        List<AiAgentSkill> skills = aiAgentSkillFacade.getAiAgentSkills();
+        List<AiSkill> skills = aiSkillFacade.getAiSkills();
 
-        for (AiAgentSkill skill : skills) {
+        for (AiSkill skill : skills) {
             options.add(option(skill.getName(), skill.getId()
                 .longValue()));
         }

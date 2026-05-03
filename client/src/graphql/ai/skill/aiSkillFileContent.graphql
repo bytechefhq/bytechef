@@ -1,0 +1,3 @@
+query aiSkillFileContent($id: ID!, $path: String!) {
+    aiSkillFileContent(id: $id, path: $path)
+}

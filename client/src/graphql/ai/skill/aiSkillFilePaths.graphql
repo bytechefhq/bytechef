@@ -1,0 +1,3 @@
+query aiSkillFilePaths($id: ID!) {
+    aiSkillFilePaths(id: $id)
+}

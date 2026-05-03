@@ -30,7 +30,7 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTodoWriteTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.platform.ai.agent.skill.facade.AiAgentSkillFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,8 +41,8 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
 
-    public AiAgentUtilsComponentHandler(AiAgentSkillFacade aiAgentSkillFacade) {
-        AiAgentUtilsSkillsTool agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiAgentSkillFacade);
+    public AiAgentUtilsComponentHandler(AiSkillFacade aiSkillFacade) {
+        AiAgentUtilsSkillsTool agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiSkillFacade);
 
         this.componentDefinition = component("aiAgentUtils")
             .title("AI Agent Utils")
