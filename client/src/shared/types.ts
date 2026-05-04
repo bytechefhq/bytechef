@@ -368,6 +368,7 @@ export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
     controlType?: ControlType;
     custom?: boolean;
     expressionEnabled?: boolean;
+    optionsLoadedDynamically?: boolean;
     properties?: Array<PropertyAllType>;
 };
 
