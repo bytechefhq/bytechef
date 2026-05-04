@@ -91,7 +91,7 @@ const WorkflowNodeContextMenu = ({
             <ContextMenu>
                 <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 
-                <ContextMenuContent className="w-[280px] [padding:0px]">
+                <ContextMenuContent className="w-workflow-node-context-menu-width p-0">
                     {data.trigger ? (
                         <>
                             <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onSwitch}>
