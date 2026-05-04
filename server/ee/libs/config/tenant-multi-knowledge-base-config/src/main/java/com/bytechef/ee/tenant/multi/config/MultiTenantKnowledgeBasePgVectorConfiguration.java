@@ -12,12 +12,12 @@ import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.ee.tenant.multi.pgvector.MultiTenantPgVectorStore;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
+import com.openai.client.OpenAIClient;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -63,7 +63,7 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
     @Bean("knowledgeBaseEmbeddingModel")
     @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base.embedding", name = "provider", havingValue = "openai")
     OpenAiEmbeddingModel knowledgeBaseOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
+        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
 
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
@@ -73,7 +73,7 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
             .getOptions();
 
         return new OpenAiEmbeddingModel(
-            openAiApi,
+            openAIClient,
             MetadataMode.ALL,
             OpenAiEmbeddingOptions.builder()
                 .model(openAiEmbeddingOptions.getModel())
@@ -84,7 +84,7 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
     @ConditionalOnProperty(
         prefix = "bytechef.ai.knowledge-base.embedding", name = "provider", havingValue = "anthropic")
     OpenAiEmbeddingModel knowledgeBaseAnthropicOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
+        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
 
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
@@ -95,7 +95,7 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
             .getOptions();
 
         return new OpenAiEmbeddingModel(
-            openAiApi,
+            openAIClient,
             MetadataMode.ALL,
             OpenAiEmbeddingOptions.builder()
                 .model(anthropicEmbeddingOpenAiOptions.getModel())

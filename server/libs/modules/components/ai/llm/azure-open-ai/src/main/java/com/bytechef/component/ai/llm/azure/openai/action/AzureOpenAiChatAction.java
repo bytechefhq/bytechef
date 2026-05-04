@@ -49,8 +49,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
-import com.azure.ai.openai.OpenAIClientBuilder;
-import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -58,10 +56,9 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
-import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
-import org.springframework.ai.azure.openai.AzureOpenAiResponseFormat;
-import org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.Type;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatModel.ResponseFormat.Type;
+import org.springframework.ai.openai.OpenAiChatOptions;
 
 /**
  * @author Marko Kriskovic
@@ -92,7 +89,7 @@ public class AzureOpenAiChatAction {
         .perform(AzureOpenAiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
-        AzureOpenAiResponseFormat azureOpenAiResponseFormat = null;
+        OpenAiChatModel.ResponseFormat openAiResponseFormat = null;
 
         if (responseFormatRequired) {
             ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
@@ -100,23 +97,25 @@ public class AzureOpenAiChatAction {
 
             Type type = responseFormat == ResponseFormat.TEXT ? Type.TEXT : Type.JSON_OBJECT;
 
-            azureOpenAiResponseFormat = new AzureOpenAiResponseFormat(type, null);
+            openAiResponseFormat = OpenAiChatModel.ResponseFormat.builder()
+                .type(type)
+                .build();
         }
 
-        return AzureOpenAiChatModel.builder()
-            .openAIClientBuilder(
-                new OpenAIClientBuilder()
-                    .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                    .endpoint(connectionParameters.getString(ENDPOINT)))
-            .defaultOptions(
-                AzureOpenAiChatOptions.builder()
+        return OpenAiChatModel.builder()
+            .options(
+                OpenAiChatOptions.builder()
+                    .baseUrl(connectionParameters.getString(ENDPOINT))
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .microsoftFoundry(true)
                     .deploymentName(inputParameters.getRequiredString(MODEL))
+                    .model(inputParameters.getRequiredString(MODEL))
                     .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                     .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))
                     .N(inputParameters.getInteger(N))
                     .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .responseFormat(azureOpenAiResponseFormat)
+                    .responseFormat(openAiResponseFormat)
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))

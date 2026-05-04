@@ -38,68 +38,228 @@
         "value": "chatgpt-4o-latest"
       }, {
         "description": null,
-        "label": "gpt-3.5-turbo",
-        "value": "gpt-3.5-turbo"
+        "label": "codex-mini-latest",
+        "value": "codex-mini-latest"
       }, {
         "description": null,
-        "label": "gpt-3.5-turbo-instruct",
-        "value": "gpt-3.5-turbo-instruct"
+        "label": "gpt-3-5-turbo",
+        "value": "gpt-3-5-turbo"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0125",
+        "value": "gpt-3-5-turbo-0125"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0301",
+        "value": "gpt-3-5-turbo-0301"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0613",
+        "value": "gpt-3-5-turbo-0613"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-1106",
+        "value": "gpt-3-5-turbo-1106"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-16k",
+        "value": "gpt-3-5-turbo-16k"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-16k-0613",
+        "value": "gpt-3-5-turbo-16k-0613"
       }, {
         "description": null,
         "label": "gpt-4",
         "value": "gpt-4"
       }, {
         "description": null,
+        "label": "gpt-4-0125-preview",
+        "value": "gpt-4-0125-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4-0314",
+        "value": "gpt-4-0314"
+      }, {
+        "description": null,
+        "label": "gpt-4-0613",
+        "value": "gpt-4-0613"
+      }, {
+        "description": null,
+        "label": "gpt-4-1",
+        "value": "gpt-4-1"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-2025-04-14",
+        "value": "gpt-4-1-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-mini",
+        "value": "gpt-4-1-mini"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-mini-2025-04-14",
+        "value": "gpt-4-1-mini-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-nano",
+        "value": "gpt-4-1-nano"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-nano-2025-04-14",
+        "value": "gpt-4-1-nano-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1106-preview",
+        "value": "gpt-4-1106-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k",
+        "value": "gpt-4-32k"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k-0314",
+        "value": "gpt-4-32k-0314"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k-0613",
+        "value": "gpt-4-32k-0613"
+      }, {
+        "description": null,
         "label": "gpt-4-turbo",
         "value": "gpt-4-turbo"
       }, {
         "description": null,
-        "label": "gpt-4.1",
-        "value": "gpt-4.1"
+        "label": "gpt-4-turbo-2024-04-09",
+        "value": "gpt-4-turbo-2024-04-09"
       }, {
         "description": null,
-        "label": "gpt-4.1-mini",
-        "value": "gpt-4.1-mini"
+        "label": "gpt-4-turbo-preview",
+        "value": "gpt-4-turbo-preview"
       }, {
         "description": null,
-        "label": "gpt-4.1-nano",
-        "value": "gpt-4.1-nano"
+        "label": "gpt-4-vision-preview",
+        "value": "gpt-4-vision-preview"
       }, {
         "description": null,
         "label": "gpt-4o",
         "value": "gpt-4o"
       }, {
         "description": null,
+        "label": "gpt-4o-2024-05-13",
+        "value": "gpt-4o-2024-05-13"
+      }, {
+        "description": null,
+        "label": "gpt-4o-2024-08-06",
+        "value": "gpt-4o-2024-08-06"
+      }, {
+        "description": null,
+        "label": "gpt-4o-2024-11-20",
+        "value": "gpt-4o-2024-11-20"
+      }, {
+        "description": null,
         "label": "gpt-4o-audio-preview",
         "value": "gpt-4o-audio-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2024-10-01",
+        "value": "gpt-4o-audio-preview-2024-10-01"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2024-12-17",
+        "value": "gpt-4o-audio-preview-2024-12-17"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2025-06-03",
+        "value": "gpt-4o-audio-preview-2025-06-03"
       }, {
         "description": null,
         "label": "gpt-4o-mini",
         "value": "gpt-4o-mini"
       }, {
         "description": null,
+        "label": "gpt-4o-mini-2024-07-18",
+        "value": "gpt-4o-mini-2024-07-18"
+      }, {
+        "description": null,
         "label": "gpt-4o-mini-audio-preview",
         "value": "gpt-4o-mini-audio-preview"
       }, {
         "description": null,
-        "label": "gpt-4o-mini-realtime-preview",
-        "value": "gpt-4o-mini-realtime-preview"
+        "label": "gpt-4o-mini-audio-preview-2024-12-17",
+        "value": "gpt-4o-mini-audio-preview-2024-12-17"
       }, {
         "description": null,
         "label": "gpt-4o-mini-search-preview",
         "value": "gpt-4o-mini-search-preview"
       }, {
         "description": null,
-        "label": "gpt-4o-realtime-preview",
-        "value": "gpt-4o-realtime-preview"
+        "label": "gpt-4o-mini-search-preview-2025-03-11",
+        "value": "gpt-4o-mini-search-preview-2025-03-11"
       }, {
         "description": null,
         "label": "gpt-4o-search-preview",
         "value": "gpt-4o-search-preview"
       }, {
         "description": null,
+        "label": "gpt-4o-search-preview-2025-03-11",
+        "value": "gpt-4o-search-preview-2025-03-11"
+      }, {
+        "description": null,
         "label": "gpt-5",
         "value": "gpt-5"
+      }, {
+        "description": null,
+        "label": "gpt-5-1",
+        "value": "gpt-5-1"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-2025-11-13",
+        "value": "gpt-5-1-2025-11-13"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-chat-latest",
+        "value": "gpt-5-1-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-codex",
+        "value": "gpt-5-1-codex"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-mini",
+        "value": "gpt-5-1-mini"
+      }, {
+        "description": null,
+        "label": "gpt-5-2",
+        "value": "gpt-5-2"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-2025-12-11",
+        "value": "gpt-5-2-2025-12-11"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-chat-latest",
+        "value": "gpt-5-2-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-pro",
+        "value": "gpt-5-2-pro"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-pro-2025-12-11",
+        "value": "gpt-5-2-pro-2025-12-11"
+      }, {
+        "description": null,
+        "label": "gpt-5-2025-08-07",
+        "value": "gpt-5-2025-08-07"
+      }, {
+        "description": null,
+        "label": "gpt-5-3-chat-latest",
+        "value": "gpt-5-3-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-4",
+        "value": "gpt-5-4"
       }, {
         "description": null,
         "label": "gpt-5-chat-latest",
@@ -110,32 +270,64 @@
         "value": "gpt-5-mini"
       }, {
         "description": null,
+        "label": "gpt-5-mini-2025-08-07",
+        "value": "gpt-5-mini-2025-08-07"
+      }, {
+        "description": null,
         "label": "gpt-5-nano",
         "value": "gpt-5-nano"
+      }, {
+        "description": null,
+        "label": "gpt-5-nano-2025-08-07",
+        "value": "gpt-5-nano-2025-08-07"
       }, {
         "description": null,
         "label": "o1",
         "value": "o1"
       }, {
         "description": null,
+        "label": "o1-2024-12-17",
+        "value": "o1-2024-12-17"
+      }, {
+        "description": null,
         "label": "o1-mini",
         "value": "o1-mini"
       }, {
         "description": null,
-        "label": "o1-pro",
-        "value": "o1-pro"
+        "label": "o1-mini-2024-09-12",
+        "value": "o1-mini-2024-09-12"
+      }, {
+        "description": null,
+        "label": "o1-preview",
+        "value": "o1-preview"
+      }, {
+        "description": null,
+        "label": "o1-preview-2024-09-12",
+        "value": "o1-preview-2024-09-12"
       }, {
         "description": null,
         "label": "o3",
         "value": "o3"
       }, {
         "description": null,
+        "label": "o3-2025-04-16",
+        "value": "o3-2025-04-16"
+      }, {
+        "description": null,
         "label": "o3-mini",
         "value": "o3-mini"
       }, {
         "description": null,
+        "label": "o3-mini-2025-01-31",
+        "value": "o3-mini-2025-01-31"
+      }, {
+        "description": null,
         "label": "o4-mini",
         "value": "o4-mini"
+      }, {
+        "description": null,
+        "label": "o4-mini-2025-04-16",
+        "value": "o4-mini-2025-04-16"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -1064,68 +1256,228 @@
         "value": "chatgpt-4o-latest"
       }, {
         "description": null,
-        "label": "gpt-3.5-turbo",
-        "value": "gpt-3.5-turbo"
+        "label": "codex-mini-latest",
+        "value": "codex-mini-latest"
       }, {
         "description": null,
-        "label": "gpt-3.5-turbo-instruct",
-        "value": "gpt-3.5-turbo-instruct"
+        "label": "gpt-3-5-turbo",
+        "value": "gpt-3-5-turbo"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0125",
+        "value": "gpt-3-5-turbo-0125"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0301",
+        "value": "gpt-3-5-turbo-0301"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0613",
+        "value": "gpt-3-5-turbo-0613"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-1106",
+        "value": "gpt-3-5-turbo-1106"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-16k",
+        "value": "gpt-3-5-turbo-16k"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-16k-0613",
+        "value": "gpt-3-5-turbo-16k-0613"
       }, {
         "description": null,
         "label": "gpt-4",
         "value": "gpt-4"
       }, {
         "description": null,
+        "label": "gpt-4-0125-preview",
+        "value": "gpt-4-0125-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4-0314",
+        "value": "gpt-4-0314"
+      }, {
+        "description": null,
+        "label": "gpt-4-0613",
+        "value": "gpt-4-0613"
+      }, {
+        "description": null,
+        "label": "gpt-4-1",
+        "value": "gpt-4-1"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-2025-04-14",
+        "value": "gpt-4-1-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-mini",
+        "value": "gpt-4-1-mini"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-mini-2025-04-14",
+        "value": "gpt-4-1-mini-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-nano",
+        "value": "gpt-4-1-nano"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-nano-2025-04-14",
+        "value": "gpt-4-1-nano-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1106-preview",
+        "value": "gpt-4-1106-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k",
+        "value": "gpt-4-32k"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k-0314",
+        "value": "gpt-4-32k-0314"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k-0613",
+        "value": "gpt-4-32k-0613"
+      }, {
+        "description": null,
         "label": "gpt-4-turbo",
         "value": "gpt-4-turbo"
       }, {
         "description": null,
-        "label": "gpt-4.1",
-        "value": "gpt-4.1"
+        "label": "gpt-4-turbo-2024-04-09",
+        "value": "gpt-4-turbo-2024-04-09"
       }, {
         "description": null,
-        "label": "gpt-4.1-mini",
-        "value": "gpt-4.1-mini"
+        "label": "gpt-4-turbo-preview",
+        "value": "gpt-4-turbo-preview"
       }, {
         "description": null,
-        "label": "gpt-4.1-nano",
-        "value": "gpt-4.1-nano"
+        "label": "gpt-4-vision-preview",
+        "value": "gpt-4-vision-preview"
       }, {
         "description": null,
         "label": "gpt-4o",
         "value": "gpt-4o"
       }, {
         "description": null,
+        "label": "gpt-4o-2024-05-13",
+        "value": "gpt-4o-2024-05-13"
+      }, {
+        "description": null,
+        "label": "gpt-4o-2024-08-06",
+        "value": "gpt-4o-2024-08-06"
+      }, {
+        "description": null,
+        "label": "gpt-4o-2024-11-20",
+        "value": "gpt-4o-2024-11-20"
+      }, {
+        "description": null,
         "label": "gpt-4o-audio-preview",
         "value": "gpt-4o-audio-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2024-10-01",
+        "value": "gpt-4o-audio-preview-2024-10-01"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2024-12-17",
+        "value": "gpt-4o-audio-preview-2024-12-17"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2025-06-03",
+        "value": "gpt-4o-audio-preview-2025-06-03"
       }, {
         "description": null,
         "label": "gpt-4o-mini",
         "value": "gpt-4o-mini"
       }, {
         "description": null,
+        "label": "gpt-4o-mini-2024-07-18",
+        "value": "gpt-4o-mini-2024-07-18"
+      }, {
+        "description": null,
         "label": "gpt-4o-mini-audio-preview",
         "value": "gpt-4o-mini-audio-preview"
       }, {
         "description": null,
-        "label": "gpt-4o-mini-realtime-preview",
-        "value": "gpt-4o-mini-realtime-preview"
+        "label": "gpt-4o-mini-audio-preview-2024-12-17",
+        "value": "gpt-4o-mini-audio-preview-2024-12-17"
       }, {
         "description": null,
         "label": "gpt-4o-mini-search-preview",
         "value": "gpt-4o-mini-search-preview"
       }, {
         "description": null,
-        "label": "gpt-4o-realtime-preview",
-        "value": "gpt-4o-realtime-preview"
+        "label": "gpt-4o-mini-search-preview-2025-03-11",
+        "value": "gpt-4o-mini-search-preview-2025-03-11"
       }, {
         "description": null,
         "label": "gpt-4o-search-preview",
         "value": "gpt-4o-search-preview"
       }, {
         "description": null,
+        "label": "gpt-4o-search-preview-2025-03-11",
+        "value": "gpt-4o-search-preview-2025-03-11"
+      }, {
+        "description": null,
         "label": "gpt-5",
         "value": "gpt-5"
+      }, {
+        "description": null,
+        "label": "gpt-5-1",
+        "value": "gpt-5-1"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-2025-11-13",
+        "value": "gpt-5-1-2025-11-13"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-chat-latest",
+        "value": "gpt-5-1-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-codex",
+        "value": "gpt-5-1-codex"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-mini",
+        "value": "gpt-5-1-mini"
+      }, {
+        "description": null,
+        "label": "gpt-5-2",
+        "value": "gpt-5-2"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-2025-12-11",
+        "value": "gpt-5-2-2025-12-11"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-chat-latest",
+        "value": "gpt-5-2-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-pro",
+        "value": "gpt-5-2-pro"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-pro-2025-12-11",
+        "value": "gpt-5-2-pro-2025-12-11"
+      }, {
+        "description": null,
+        "label": "gpt-5-2025-08-07",
+        "value": "gpt-5-2025-08-07"
+      }, {
+        "description": null,
+        "label": "gpt-5-3-chat-latest",
+        "value": "gpt-5-3-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-4",
+        "value": "gpt-5-4"
       }, {
         "description": null,
         "label": "gpt-5-chat-latest",
@@ -1136,32 +1488,64 @@
         "value": "gpt-5-mini"
       }, {
         "description": null,
+        "label": "gpt-5-mini-2025-08-07",
+        "value": "gpt-5-mini-2025-08-07"
+      }, {
+        "description": null,
         "label": "gpt-5-nano",
         "value": "gpt-5-nano"
+      }, {
+        "description": null,
+        "label": "gpt-5-nano-2025-08-07",
+        "value": "gpt-5-nano-2025-08-07"
       }, {
         "description": null,
         "label": "o1",
         "value": "o1"
       }, {
         "description": null,
+        "label": "o1-2024-12-17",
+        "value": "o1-2024-12-17"
+      }, {
+        "description": null,
         "label": "o1-mini",
         "value": "o1-mini"
       }, {
         "description": null,
-        "label": "o1-pro",
-        "value": "o1-pro"
+        "label": "o1-mini-2024-09-12",
+        "value": "o1-mini-2024-09-12"
+      }, {
+        "description": null,
+        "label": "o1-preview",
+        "value": "o1-preview"
+      }, {
+        "description": null,
+        "label": "o1-preview-2024-09-12",
+        "value": "o1-preview-2024-09-12"
       }, {
         "description": null,
         "label": "o3",
         "value": "o3"
       }, {
         "description": null,
+        "label": "o3-2025-04-16",
+        "value": "o3-2025-04-16"
+      }, {
+        "description": null,
         "label": "o3-mini",
         "value": "o3-mini"
       }, {
         "description": null,
+        "label": "o3-mini-2025-01-31",
+        "value": "o3-mini-2025-01-31"
+      }, {
+        "description": null,
         "label": "o4-mini",
         "value": "o4-mini"
+      }, {
+        "description": null,
+        "label": "o4-mini-2025-04-16",
+        "value": "o4-mini-2025-04-16"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -2176,6 +2560,18 @@
         "description": null,
         "label": "dall-e-3",
         "value": "dall-e-3"
+      }, {
+        "description": null,
+        "label": "gpt-image-1",
+        "value": "gpt-image-1"
+      }, {
+        "description": null,
+        "label": "gpt-image-1-5",
+        "value": "gpt-image-1-5"
+      }, {
+        "description": null,
+        "label": "gpt-image-1-mini",
+        "value": "gpt-image-1-mini"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -2696,6 +3092,10 @@
         "value": "gpt-4o-mini-tts"
       }, {
         "description": null,
+        "label": "gpt-4o-mini-tts-2025-12-15",
+        "value": "gpt-4o-mini-tts-2025-12-15"
+      }, {
+        "description": null,
         "label": "tts-1",
         "value": "tts-1"
       }, {
@@ -3008,6 +3408,22 @@
       "name": "model",
       "options": [ {
         "description": null,
+        "label": "gpt-4o-mini-transcribe",
+        "value": "gpt-4o-mini-transcribe"
+      }, {
+        "description": null,
+        "label": "gpt-4o-mini-transcribe-2025-12-15",
+        "value": "gpt-4o-mini-transcribe-2025-12-15"
+      }, {
+        "description": null,
+        "label": "gpt-4o-transcribe",
+        "value": "gpt-4o-transcribe"
+      }, {
+        "description": null,
+        "label": "gpt-4o-transcribe-diarize",
+        "value": "gpt-4o-transcribe-diarize"
+      }, {
+        "description": null,
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
@@ -3306,24 +3722,24 @@
       "name": "responseFormat",
       "options": [ {
         "description": null,
-        "label": "json",
-        "value": "JSON"
+        "label": "JSON",
+        "value": "json"
       }, {
         "description": null,
-        "label": "srt",
-        "value": "SRT"
+        "label": "Text",
+        "value": "text"
       }, {
         "description": null,
-        "label": "text",
-        "value": "TEXT"
+        "label": "SRT",
+        "value": "srt"
       }, {
         "description": null,
-        "label": "verbose_json",
-        "value": "VERBOSE_JSON"
+        "label": "Verbose JSON",
+        "value": "verbose_json"
       }, {
         "description": null,
-        "label": "vtt",
-        "value": "VTT"
+        "label": "VTT",
+        "value": "vtt"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -3437,68 +3853,228 @@
         "value": "chatgpt-4o-latest"
       }, {
         "description": null,
-        "label": "gpt-3.5-turbo",
-        "value": "gpt-3.5-turbo"
+        "label": "codex-mini-latest",
+        "value": "codex-mini-latest"
       }, {
         "description": null,
-        "label": "gpt-3.5-turbo-instruct",
-        "value": "gpt-3.5-turbo-instruct"
+        "label": "gpt-3-5-turbo",
+        "value": "gpt-3-5-turbo"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0125",
+        "value": "gpt-3-5-turbo-0125"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0301",
+        "value": "gpt-3-5-turbo-0301"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-0613",
+        "value": "gpt-3-5-turbo-0613"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-1106",
+        "value": "gpt-3-5-turbo-1106"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-16k",
+        "value": "gpt-3-5-turbo-16k"
+      }, {
+        "description": null,
+        "label": "gpt-3-5-turbo-16k-0613",
+        "value": "gpt-3-5-turbo-16k-0613"
       }, {
         "description": null,
         "label": "gpt-4",
         "value": "gpt-4"
       }, {
         "description": null,
+        "label": "gpt-4-0125-preview",
+        "value": "gpt-4-0125-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4-0314",
+        "value": "gpt-4-0314"
+      }, {
+        "description": null,
+        "label": "gpt-4-0613",
+        "value": "gpt-4-0613"
+      }, {
+        "description": null,
+        "label": "gpt-4-1",
+        "value": "gpt-4-1"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-2025-04-14",
+        "value": "gpt-4-1-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-mini",
+        "value": "gpt-4-1-mini"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-mini-2025-04-14",
+        "value": "gpt-4-1-mini-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-nano",
+        "value": "gpt-4-1-nano"
+      }, {
+        "description": null,
+        "label": "gpt-4-1-nano-2025-04-14",
+        "value": "gpt-4-1-nano-2025-04-14"
+      }, {
+        "description": null,
+        "label": "gpt-4-1106-preview",
+        "value": "gpt-4-1106-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k",
+        "value": "gpt-4-32k"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k-0314",
+        "value": "gpt-4-32k-0314"
+      }, {
+        "description": null,
+        "label": "gpt-4-32k-0613",
+        "value": "gpt-4-32k-0613"
+      }, {
+        "description": null,
         "label": "gpt-4-turbo",
         "value": "gpt-4-turbo"
       }, {
         "description": null,
-        "label": "gpt-4.1",
-        "value": "gpt-4.1"
+        "label": "gpt-4-turbo-2024-04-09",
+        "value": "gpt-4-turbo-2024-04-09"
       }, {
         "description": null,
-        "label": "gpt-4.1-mini",
-        "value": "gpt-4.1-mini"
+        "label": "gpt-4-turbo-preview",
+        "value": "gpt-4-turbo-preview"
       }, {
         "description": null,
-        "label": "gpt-4.1-nano",
-        "value": "gpt-4.1-nano"
+        "label": "gpt-4-vision-preview",
+        "value": "gpt-4-vision-preview"
       }, {
         "description": null,
         "label": "gpt-4o",
         "value": "gpt-4o"
       }, {
         "description": null,
+        "label": "gpt-4o-2024-05-13",
+        "value": "gpt-4o-2024-05-13"
+      }, {
+        "description": null,
+        "label": "gpt-4o-2024-08-06",
+        "value": "gpt-4o-2024-08-06"
+      }, {
+        "description": null,
+        "label": "gpt-4o-2024-11-20",
+        "value": "gpt-4o-2024-11-20"
+      }, {
+        "description": null,
         "label": "gpt-4o-audio-preview",
         "value": "gpt-4o-audio-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2024-10-01",
+        "value": "gpt-4o-audio-preview-2024-10-01"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2024-12-17",
+        "value": "gpt-4o-audio-preview-2024-12-17"
+      }, {
+        "description": null,
+        "label": "gpt-4o-audio-preview-2025-06-03",
+        "value": "gpt-4o-audio-preview-2025-06-03"
       }, {
         "description": null,
         "label": "gpt-4o-mini",
         "value": "gpt-4o-mini"
       }, {
         "description": null,
+        "label": "gpt-4o-mini-2024-07-18",
+        "value": "gpt-4o-mini-2024-07-18"
+      }, {
+        "description": null,
         "label": "gpt-4o-mini-audio-preview",
         "value": "gpt-4o-mini-audio-preview"
       }, {
         "description": null,
-        "label": "gpt-4o-mini-realtime-preview",
-        "value": "gpt-4o-mini-realtime-preview"
+        "label": "gpt-4o-mini-audio-preview-2024-12-17",
+        "value": "gpt-4o-mini-audio-preview-2024-12-17"
       }, {
         "description": null,
         "label": "gpt-4o-mini-search-preview",
         "value": "gpt-4o-mini-search-preview"
       }, {
         "description": null,
-        "label": "gpt-4o-realtime-preview",
-        "value": "gpt-4o-realtime-preview"
+        "label": "gpt-4o-mini-search-preview-2025-03-11",
+        "value": "gpt-4o-mini-search-preview-2025-03-11"
       }, {
         "description": null,
         "label": "gpt-4o-search-preview",
         "value": "gpt-4o-search-preview"
       }, {
         "description": null,
+        "label": "gpt-4o-search-preview-2025-03-11",
+        "value": "gpt-4o-search-preview-2025-03-11"
+      }, {
+        "description": null,
         "label": "gpt-5",
         "value": "gpt-5"
+      }, {
+        "description": null,
+        "label": "gpt-5-1",
+        "value": "gpt-5-1"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-2025-11-13",
+        "value": "gpt-5-1-2025-11-13"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-chat-latest",
+        "value": "gpt-5-1-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-codex",
+        "value": "gpt-5-1-codex"
+      }, {
+        "description": null,
+        "label": "gpt-5-1-mini",
+        "value": "gpt-5-1-mini"
+      }, {
+        "description": null,
+        "label": "gpt-5-2",
+        "value": "gpt-5-2"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-2025-12-11",
+        "value": "gpt-5-2-2025-12-11"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-chat-latest",
+        "value": "gpt-5-2-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-pro",
+        "value": "gpt-5-2-pro"
+      }, {
+        "description": null,
+        "label": "gpt-5-2-pro-2025-12-11",
+        "value": "gpt-5-2-pro-2025-12-11"
+      }, {
+        "description": null,
+        "label": "gpt-5-2025-08-07",
+        "value": "gpt-5-2025-08-07"
+      }, {
+        "description": null,
+        "label": "gpt-5-3-chat-latest",
+        "value": "gpt-5-3-chat-latest"
+      }, {
+        "description": null,
+        "label": "gpt-5-4",
+        "value": "gpt-5-4"
       }, {
         "description": null,
         "label": "gpt-5-chat-latest",
@@ -3509,32 +4085,64 @@
         "value": "gpt-5-mini"
       }, {
         "description": null,
+        "label": "gpt-5-mini-2025-08-07",
+        "value": "gpt-5-mini-2025-08-07"
+      }, {
+        "description": null,
         "label": "gpt-5-nano",
         "value": "gpt-5-nano"
+      }, {
+        "description": null,
+        "label": "gpt-5-nano-2025-08-07",
+        "value": "gpt-5-nano-2025-08-07"
       }, {
         "description": null,
         "label": "o1",
         "value": "o1"
       }, {
         "description": null,
+        "label": "o1-2024-12-17",
+        "value": "o1-2024-12-17"
+      }, {
+        "description": null,
         "label": "o1-mini",
         "value": "o1-mini"
       }, {
         "description": null,
-        "label": "o1-pro",
-        "value": "o1-pro"
+        "label": "o1-mini-2024-09-12",
+        "value": "o1-mini-2024-09-12"
+      }, {
+        "description": null,
+        "label": "o1-preview",
+        "value": "o1-preview"
+      }, {
+        "description": null,
+        "label": "o1-preview-2024-09-12",
+        "value": "o1-preview-2024-09-12"
       }, {
         "description": null,
         "label": "o3",
         "value": "o3"
       }, {
         "description": null,
+        "label": "o3-2025-04-16",
+        "value": "o3-2025-04-16"
+      }, {
+        "description": null,
         "label": "o3-mini",
         "value": "o3-mini"
       }, {
         "description": null,
+        "label": "o3-mini-2025-01-31",
+        "value": "o3-mini-2025-01-31"
+      }, {
+        "description": null,
         "label": "o4-mini",
         "value": "o4-mini"
+      }, {
+        "description": null,
+        "label": "o4-mini-2025-04-16",
+        "value": "o4-mini-2025-04-16"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,

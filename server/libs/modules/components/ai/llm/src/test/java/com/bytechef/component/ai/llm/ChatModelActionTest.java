@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 
 /**
@@ -58,6 +59,8 @@ class ChatModelActionTest extends AbstractActionTest {
 
         when(mockedChat.createChatModel(mockedParameters, mockedParameters, true)).thenReturn(mockedChatModelModel);
 
+        when(mockedChatModelModel.getDefaultOptions()).thenReturn(ChatOptions.builder()
+            .build());
         when(mockedChatModelModel.call(any(Prompt.class))).thenReturn(
             new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER)))));
 

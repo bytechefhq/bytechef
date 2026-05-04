@@ -33,11 +33,11 @@ import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
 import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
+import com.bytechef.component.ai.llm.gemini.action.GeminiChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
 import com.bytechef.component.ai.llm.perplexity.action.PerplexityChatAction;
-import com.bytechef.component.ai.llm.vertex.gemini.action.VertexGeminiChatAction;
 import com.bytechef.component.ai.universal.text.action.AiTextAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -350,7 +350,7 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
             token = vertexGemini.getApiKey();
         }
 
-        return new ChatModelResult(VertexGeminiChatAction.CHAT_MODEL, token);
+        return new ChatModelResult(GeminiChatAction.CHAT_MODEL, token);
     }
 
     record ChatModelResult(ChatModel chatModel, String token) {

@@ -40,11 +40,17 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
+import com.openai.models.ChatModel;
+import com.openai.models.audio.AudioModel;
+import com.openai.models.audio.speech.SpeechModel;
+import com.openai.models.embeddings.EmbeddingModel;
+import com.openai.models.images.ImageModel;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.openai.api.OpenAiImageApi;
+import java.util.stream.Stream;
 
 /**
  * @author Monika Domiter
@@ -55,26 +61,24 @@ public final class OpenAiConstants {
     public static final String QUALITY = "quality";
 
     public static final List<Option<String>> IMAGE_MODELS = ModelUtils.getEnumOptions(
-        Arrays.stream(OpenAiImageApi.ImageModel.values())
-            .collect(Collectors.toMap(OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue)));
+        toModelMap(Arrays.stream(ImageModel.Known.values())
+            .map(ImageModel.Known::name)));
 
     public static final List<Option<String>> CHAT_MODELS = ModelUtils.getEnumOptions(
-        Arrays.stream(OpenAiApi.ChatModel.values())
-            .collect(Collectors.toMap(
-                chatModel -> {
-                    String value = chatModel.getValue();
-
-                    return value.replace("\n", "");
-                },
-                chatModel -> {
-                    String value = chatModel.getValue();
-
-                    return value.replace("\n", "");
-                })));
+        toModelMap(Arrays.stream(ChatModel.Known.values())
+            .map(ChatModel.Known::name)));
 
     public static final List<Option<String>> EMBEDDING_MODELS = ModelUtils.getEnumOptions(
-        Arrays.stream(OpenAiApi.EmbeddingModel.values())
-            .collect(Collectors.toMap(OpenAiApi.EmbeddingModel::getValue, OpenAiApi.EmbeddingModel::getValue)));
+        toModelMap(Arrays.stream(EmbeddingModel.Known.values())
+            .map(EmbeddingModel.Known::name)));
+
+    public static final List<Option<String>> SPEECH_MODELS = ModelUtils.getEnumOptions(
+        toModelMap(Arrays.stream(SpeechModel.Known.values())
+            .map(SpeechModel.Known::name)));
+
+    public static final List<Option<String>> TRANSCRIPTION_MODELS = ModelUtils.getEnumOptions(
+        toModelMap(Arrays.stream(AudioModel.Known.values())
+            .map(AudioModel.Known::name)));
 
     public static final Property CHAT_MODEL_PROPERTY = string(MODEL)
         .label("Model")
@@ -104,5 +108,12 @@ public final class OpenAiConstants {
         STORE_PROPERTY);
 
     private OpenAiConstants() {
+    }
+
+    private static Map<String, String> toModelMap(Stream<String> knownNames) {
+        return knownNames
+            .map(name -> name.toLowerCase()
+                .replace('_', '-'))
+            .collect(Collectors.toMap(Function.identity(), Function.identity(), (a, b) -> a));
     }
 }

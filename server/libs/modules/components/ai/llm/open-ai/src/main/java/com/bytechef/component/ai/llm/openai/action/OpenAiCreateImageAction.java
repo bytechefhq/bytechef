@@ -46,14 +46,12 @@ import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import com.bytechef.component.ai.llm.ImageModel.Style;
 import com.bytechef.component.ai.llm.openai.constant.OpenAiConstants;
 import com.bytechef.component.ai.llm.openai.definition.Size;
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
-import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.core.retry.RetryTemplate;
 
 /**
  * @author Monika Domiter
@@ -118,22 +116,23 @@ public class OpenAiCreateImageAction {
         Style style = inputParameters.get(STYLE, Style.class, NATURAL);
         Quality quality = inputParameters.get(QUALITY, Quality.class, STANDARD);
 
+        OpenAiImageOptions imageOptions = OpenAiImageOptions.builder()
+            .height(size.getDimensions()[1])
+            .model(inputParameters.getRequiredString(MODEL))
+            .N(inputParameters.getInteger(N))
+            .responseFormat(responseFormat.getValue())
+            .style(style.getValue())
+            .user(inputParameters.getString(USER))
+            .width(size.getDimensions()[0])
+            .build();
+
+        imageOptions.setQuality(quality.getValue());
+
         return new OpenAiImageModel(
-            OpenAiImageApi.builder()
+            OpenAIOkHttpClient.builder()
                 .apiKey(connectionParameters.getString(TOKEN))
-                .restClientBuilder(ModelUtils.getRestClientBuilder())
                 .build(),
-            OpenAiImageOptions.builder()
-                .height(size.getDimensions()[1])
-                .model(inputParameters.getRequiredString(MODEL))
-                .N(inputParameters.getInteger(N))
-                .responseFormat(responseFormat.getValue())
-                .quality(quality.getValue())
-                .style(style.getValue())
-                .user(inputParameters.getString(USER))
-                .width(size.getDimensions()[0])
-                .build(),
-            new RetryTemplate());
+            imageOptions);
     };
 
     private OpenAiCreateImageAction() {

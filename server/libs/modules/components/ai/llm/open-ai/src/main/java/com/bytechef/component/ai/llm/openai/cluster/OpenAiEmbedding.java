@@ -25,11 +25,11 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.vectorstore.EmbeddingFunction;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 
 public class OpenAiEmbedding {
 
@@ -48,7 +48,7 @@ public class OpenAiEmbedding {
 
     protected static EmbeddingModel apply(Parameters inputParameters, Parameters connectionParameters) {
         return new OpenAiEmbeddingModel(
-            OpenAiApi.builder()
+            OpenAIOkHttpClient.builder()
                 .apiKey(connectionParameters.getRequiredString(TOKEN))
                 .build(),
             MetadataMode.ALL,

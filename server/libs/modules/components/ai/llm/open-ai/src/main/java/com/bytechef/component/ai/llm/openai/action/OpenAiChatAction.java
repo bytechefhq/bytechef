@@ -43,11 +43,13 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.client.okhttp.OpenAIOkHttpClientAsync;
+import java.time.Duration;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatModel.ResponseFormat;
+import org.springframework.ai.openai.OpenAiChatModel.ResponseFormat.Type;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.openai.api.ResponseFormat;
-import org.springframework.ai.openai.api.ResponseFormat.Type;
 
 /**
  * @author Monika Kušter
@@ -77,18 +79,23 @@ public class OpenAiChatAction {
         }
 
         return OpenAiChatModel.builder()
-            .openAiApi(
-                OpenAiApi.builder()
+            .openAiClient(
+                OpenAIOkHttpClient.builder()
                     .apiKey(connectionParameters.getString(TOKEN))
-                    .restClientBuilder(ModelUtils.getRestClientBuilder())
+                    .timeout(Duration.ofMinutes(5))
                     .build())
-            .defaultOptions(
+            .openAiClientAsync(
+                OpenAIOkHttpClientAsync.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .timeout(Duration.ofMinutes(5))
+                    .build())
+            .options(
                 OpenAiChatOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))
                     .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                     .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .N(inputParameters.getInteger(N))
+                    .n(inputParameters.getInteger(N))
                     .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
                     .responseFormat(responseFormat)
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))

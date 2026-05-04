@@ -38,8 +38,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.azure.ai.openai.OpenAIClientBuilder;
-import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.ImageModel;
 import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import com.bytechef.component.ai.llm.ImageModel.Style;
@@ -48,8 +46,8 @@ import com.bytechef.component.ai.llm.azure.openai.definition.Size;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import org.springframework.ai.azure.openai.AzureOpenAiImageModel;
-import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
+import org.springframework.ai.openai.OpenAiImageModel;
+import org.springframework.ai.openai.OpenAiImageOptions;
 
 /**
  * @author Monika Domiter
@@ -112,19 +110,20 @@ public class AzureOpenAiCreateImageAction {
         Size size = inputParameters.getRequired(SIZE, Size.class);
         Style style = inputParameters.get(STYLE, Style.class, NATURAL);
 
-        return new AzureOpenAiImageModel(
-            new OpenAIClientBuilder()
-                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                .endpoint(connectionParameters.getString(ENDPOINT))
-                .buildClient(),
-            AzureOpenAiImageOptions.builder()
-                .height(size.getDimensions()[1])
-                .model(inputParameters.getRequiredString(MODEL))
-                .N(inputParameters.getInteger(N))
-                .responseFormat(responseFormat.getValue())
-                .style(style.getValue())
-                .user(inputParameters.getString(USER))
-                .width(size.getDimensions()[0])
-                .build());
+        OpenAiImageOptions imageOptions = OpenAiImageOptions.builder()
+            .baseUrl(connectionParameters.getString(ENDPOINT))
+            .apiKey(connectionParameters.getString(TOKEN))
+            .azure(true)
+            .deploymentName(inputParameters.getRequiredString(MODEL))
+            .height(size.getDimensions()[1])
+            .model(inputParameters.getRequiredString(MODEL))
+            .N(inputParameters.getInteger(N))
+            .responseFormat(responseFormat.getValue())
+            .style(style.getValue())
+            .user(inputParameters.getString(USER))
+            .width(size.getDimensions()[0])
+            .build();
+
+        return new OpenAiImageModel(imageOptions);
     };
 }

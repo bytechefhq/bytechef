@@ -42,6 +42,7 @@ import io.modelcontextprotocol.spec.McpServerTransportProviderBase;
 import io.modelcontextprotocol.spec.McpStreamableServerTransportProvider;
 import io.modelcontextprotocol.util.Assert;
 import io.modelcontextprotocol.util.McpUriTemplateManagerFactory;
+import io.modelcontextprotocol.util.ToolInputValidator;
 import io.modelcontextprotocol.util.Utils;
 import java.time.Duration;
 import java.util.Collections;
@@ -60,7 +61,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A fork of the MCP SDK's {@code McpAsyncServer} (1.1.0) that adds per-session tool filtering.
+ * A fork of the MCP SDK's {@code McpAsyncServer} (2.0.0-M2) that adds per-session tool filtering.
  *
  * <p>
  * The standard {@code McpAsyncServer} returns all registered tools to every client session. This class introduces a
@@ -82,6 +83,8 @@ public class FilterableMcpAsyncServer {
     private final McpJsonMapper jsonMapper;
 
     private final JsonSchemaValidator jsonSchemaValidator;
+
+    private final boolean validateToolInputs;
 
     private final McpSchema.ServerCapabilities serverCapabilities;
 
@@ -137,6 +140,7 @@ public class FilterableMcpAsyncServer {
      * @param requestTimeout            The request timeout duration.
      * @param uriTemplateManagerFactory The URI template manager factory.
      * @param jsonSchemaValidator       The JSON schema validator.
+     * @param validateToolInputs        Whether to validate tool call arguments against the tool input schema.
      * @param toolFilter                The tool filter function, or null for no filtering.
      */
     @SuppressFBWarnings("EI")
@@ -155,6 +159,7 @@ public class FilterableMcpAsyncServer {
         Duration requestTimeout,
         McpUriTemplateManagerFactory uriTemplateManagerFactory,
         JsonSchemaValidator jsonSchemaValidator,
+        boolean validateToolInputs,
         Function<McpAsyncServerExchange, List<McpServerFeatures.AsyncToolSpecification>> toolFilter) {
 
         this.mcpTransportProvider = mcpTransportProvider;
@@ -186,6 +191,7 @@ public class FilterableMcpAsyncServer {
 
         this.uriTemplateManagerFactory = uriTemplateManagerFactory;
         this.jsonSchemaValidator = jsonSchemaValidator;
+        this.validateToolInputs = validateToolInputs;
         // --- ByteChef modification: store tool filter ---
         this.toolFilter = toolFilter != null ? toolFilter : (exchange) -> List.copyOf(this.tools);
         // --- end ByteChef modification ---
@@ -623,6 +629,16 @@ public class FilterableMcpAsyncServer {
                     .message("Unknown tool: invalid_tool_name")
                     .data("Tool not found: " + callToolRequest.name())
                     .build());
+            }
+
+            Tool tool = toolSpecification.get()
+                .tool();
+
+            CallToolResult validationError = ToolInputValidator.validate(
+                tool, callToolRequest.arguments(), this.validateToolInputs, this.jsonSchemaValidator);
+
+            if (validationError != null) {
+                return Mono.just(validationError);
             }
 
             return toolSpecification.get()
@@ -1116,7 +1132,8 @@ public class FilterableMcpAsyncServer {
 
     private McpRequestHandler<McpSchema.CompleteResult> completionCompleteRequestHandler() {
         return (exchange, params) -> {
-            McpSchema.CompleteRequest request = parseCompletionParams(params);
+            McpSchema.CompleteRequest request = jsonMapper.convertValue(params,
+                new TypeRef<McpSchema.CompleteRequest>() {});
 
             if (request.ref() == null) {
                 return Mono.error(
@@ -1151,13 +1168,12 @@ public class FilterableMcpAsyncServer {
                         .build());
                 }
 
-                if (!promptSpec.prompt()
-                    .arguments()
-                    .stream()
-                    .filter(arg -> arg.name()
-                        .equals(argumentName))
-                    .findFirst()
-                    .isPresent()) {
+                List<McpSchema.PromptArgument> arguments = promptSpec.prompt()
+                    .arguments();
+
+                if (arguments == null || arguments.stream()
+                    .noneMatch(arg -> arg.name()
+                        .equals(argumentName))) {
 
                     logger.warn("Argument not found: {} in prompt: {}", argumentName, promptReference.name());
 
@@ -1226,41 +1242,6 @@ public class FilterableMcpAsyncServer {
             return Mono.defer(() -> specification.completionHandler()
                 .apply(exchange, request));
         };
-    }
-
-    @SuppressWarnings("unchecked")
-    private McpSchema.CompleteRequest parseCompletionParams(Object object) {
-        Map<String, Object> params = (Map<String, Object>) object;
-        Map<String, Object> refMap = (Map<String, Object>) params.get("ref");
-        Map<String, Object> argMap = (Map<String, Object>) params.get("argument");
-        Map<String, Object> contextMap = (Map<String, Object>) params.get("context");
-        Map<String, Object> meta = (Map<String, Object>) params.get("_meta");
-
-        String refType = (String) refMap.get("type");
-
-        McpSchema.CompleteReference ref = switch (refType) {
-            case PromptReference.TYPE -> new McpSchema.PromptReference(refType, (String) refMap.get("name"),
-                refMap.get("title") != null ? (String) refMap.get("title") : null);
-            case ResourceReference.TYPE -> new McpSchema.ResourceReference(refType, (String) refMap.get("uri"));
-            default -> throw new IllegalArgumentException("Invalid ref type: " + refType);
-        };
-
-        String argName = (String) argMap.get("name");
-        String argValue = (String) argMap.get("value");
-
-        McpSchema.CompleteRequest.CompleteArgument argument =
-            new McpSchema.CompleteRequest.CompleteArgument(argName, argValue);
-
-        McpSchema.CompleteRequest.CompleteContext context = null;
-
-        if (contextMap != null) {
-            @SuppressWarnings("unchecked")
-            Map<String, String> arguments = (Map<String, String>) contextMap.get("arguments");
-
-            context = new McpSchema.CompleteRequest.CompleteContext(arguments);
-        }
-
-        return new McpSchema.CompleteRequest(ref, argument, meta, context);
     }
 
     /**

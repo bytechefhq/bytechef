@@ -24,26 +24,24 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.openai.constant.OpenAiConstants.TRANSCRIPTION_MODELS;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
 import com.bytechef.component.ai.llm.definition.Language;
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.models.audio.AudioResponseFormat;
 import java.net.MalformedURLException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
-import org.springframework.ai.openai.api.OpenAiAudioApi;
-import org.springframework.ai.openai.api.OpenAiAudioApi.TranscriptResponseFormat;
-import org.springframework.ai.openai.api.OpenAiAudioApi.WhisperModel;
 
 /**
  * @author Monika Domiter
@@ -64,10 +62,7 @@ public class OpenAiCreateTranscriptionAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    ModelUtils.getEnumOptions(
-                        Arrays.stream(WhisperModel.values())
-                            .collect(Collectors.toMap(WhisperModel::getValue, WhisperModel::getValue)))),
+                .options(TRANSCRIPTION_MODELS),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -79,9 +74,11 @@ public class OpenAiCreateTranscriptionAction {
                 .label("Response format")
                 .description("The format of the transcript output")
                 .options(
-                    ModelUtils.getEnumOptions(
-                        Arrays.stream(TranscriptResponseFormat.values())
-                            .collect(Collectors.toMap(OpenAiAudioApi.TranscriptResponseFormat::getValue, Enum::name))))
+                    option("JSON", "json"),
+                    option("Text", "text"),
+                    option("SRT", "srt"),
+                    option("Verbose JSON", "verbose_json"),
+                    option("VTT", "vtt"))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
@@ -98,18 +95,20 @@ public class OpenAiCreateTranscriptionAction {
     private static final AudioTranscriptionModel AUDIO_TRANSCRIPTION = (inputParameters, connectionParameters) -> {
         Language language = inputParameters.get(LANGUAGE, Language.class);
 
-        return new OpenAiAudioTranscriptionModel(
-            OpenAiAudioApi.builder()
-                .apiKey(connectionParameters.getString(TOKEN))
-                .restClientBuilder(ModelUtils.getRestClientBuilder())
-                .build(),
-            OpenAiAudioTranscriptionOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .prompt(inputParameters.getString(PROMPT))
-                .language(language.getCode())
-                .responseFormat(TranscriptResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT)))
-                .temperature(inputParameters.getFloat(TEMPERATURE))
-                .build());
+        return OpenAiAudioTranscriptionModel.builder()
+            .openAiClient(
+                OpenAIOkHttpClient.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .build())
+            .options(
+                OpenAiAudioTranscriptionOptions.builder()
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .prompt(inputParameters.getString(PROMPT))
+                    .language(language.getCode())
+                    .responseFormat(AudioResponseFormat.of(inputParameters.getString(RESPONSE_FORMAT)))
+                    .temperature(inputParameters.getFloat(TEMPERATURE))
+                    .build())
+            .build();
     };
 
     private OpenAiCreateTranscriptionAction() {

@@ -942,10 +942,6 @@
         "description": null,
         "label": "dall-e-3",
         "value": "dall-e-3"
-      }, {
-        "description": null,
-        "label": "gpt-image-1-mini",
-        "value": "gpt-image-1-mini"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -1309,11 +1305,11 @@
       "type": "FILE_ENTRY"
     }, {
       "advancedOption": null,
-      "controlType": "SELECT",
+      "controlType": "TEXT",
       "defaultValue": null,
-      "description": "ID of the model to use.",
+      "description": "Whisper deployment name.",
       "displayCondition": null,
-      "exampleValue": null,
+      "exampleValue": "whisper",
       "expressionEnabled": null,
       "hidden": null,
       "label": "Model",
@@ -1322,11 +1318,7 @@
       "metadata": { },
       "minLength": null,
       "name": "model",
-      "options": [ {
-        "description": null,
-        "label": "whisper",
-        "value": "whisper"
-      } ],
+      "options": null,
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
       "placeholder": null,
@@ -1622,24 +1614,24 @@
       "name": "responseFormat",
       "options": [ {
         "description": null,
-        "label": "json",
-        "value": "JSON"
+        "label": "JSON",
+        "value": "json"
       }, {
         "description": null,
-        "label": "srt",
-        "value": "SRT"
+        "label": "Text",
+        "value": "text"
       }, {
         "description": null,
-        "label": "text",
-        "value": "TEXT"
+        "label": "SRT",
+        "value": "srt"
       }, {
         "description": null,
-        "label": "verbose_json",
-        "value": "VERBOSE_JSON"
+        "label": "Verbose JSON",
+        "value": "verbose_json"
       }, {
         "description": null,
-        "label": "vtt",
-        "value": "VTT"
+        "label": "VTT",
+        "value": "vtt"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,

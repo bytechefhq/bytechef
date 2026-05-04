@@ -116,15 +116,17 @@ public class McpClientUtils {
                 return List.of();
             }
 
-            McpSchema.JsonSchema inputSchema = tool.inputSchema();
+            Map<String, Object> inputSchema = tool.inputSchema();
 
-            Map<String, Object> schemaProperties = inputSchema.properties();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> schemaProperties = (Map<String, Object>) inputSchema.get("properties");
 
             if (schemaProperties == null) {
                 return List.of();
             }
 
-            List<String> requiredProperties = inputSchema.required();
+            @SuppressWarnings("unchecked")
+            List<String> requiredProperties = (List<String>) inputSchema.get("required");
 
             Set<String> requiredPropertyNames =
                 requiredProperties != null ? Set.copyOf(requiredProperties) : Set.of();
@@ -171,7 +173,9 @@ public class McpClientUtils {
                     .endpoint(endpoint);
 
                 if (requestCustomizer != null) {
-                    builder.customizeRequest(requestCustomizer);
+                    builder.httpRequestCustomizer(
+                        (httpRequestBuilder, method, uri, body, transportContext) -> requestCustomizer.accept(
+                            httpRequestBuilder));
                 }
 
                 yield builder.build();
@@ -181,7 +185,9 @@ public class McpClientUtils {
                     .sseEndpoint(endpoint);
 
                 if (requestCustomizer != null) {
-                    builder.customizeRequest(requestCustomizer);
+                    builder.httpRequestCustomizer(
+                        (httpRequestBuilder, method, uri, body, transportContext) -> requestCustomizer.accept(
+                            httpRequestBuilder));
                 }
 
                 yield builder.build();

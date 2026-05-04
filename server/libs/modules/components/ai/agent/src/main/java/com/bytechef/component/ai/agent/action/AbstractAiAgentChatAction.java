@@ -371,8 +371,7 @@ public abstract class AbstractAiAgentChatAction {
             if (simulationModel != null && !simulationModel.isEmpty()) {
                 requestSpec = requestSpec.options(
                     ChatOptions.builder()
-                        .model(simulationModel)
-                        .build());
+                        .model(simulationModel));
             }
 
             String generatedResponse = requestSpec.call()

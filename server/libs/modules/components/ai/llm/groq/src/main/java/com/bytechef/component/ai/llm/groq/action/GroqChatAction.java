@@ -55,10 +55,11 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
+import java.time.Duration;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatModel.ResponseFormat;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.openai.api.ResponseFormat;
 
 /**
  * @author Monika Domiter
@@ -105,13 +106,13 @@ public class GroqChatAction {
         }
 
         return OpenAiChatModel.builder()
-            .openAiApi(
-                OpenAiApi.builder()
+            .openAiClient(
+                OpenAIOkHttpClient.builder()
                     .apiKey(connectionParameters.getString(TOKEN))
-                    .baseUrl("https://api.groq.com/openai")
-                    .restClientBuilder(ModelUtils.getRestClientBuilder())
+                    .baseUrl("https://api.groq.com/openai/v1")
+                    .timeout(Duration.ofMinutes(5))
                     .build())
-            .defaultOptions(
+            .options(
                 OpenAiChatOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))
                     .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
