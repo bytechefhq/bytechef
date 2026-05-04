@@ -78,7 +78,7 @@ test.describe('ObjectProperty - Object property type (ObjectProperty.tsx)', () =
                 const integerProperty =
                     workflowPage.firstTaskComponentConfigurationPanel.getByLabel('Integer property');
 
-                const integerInput = integerProperty.getByRole('textbox');
+                const integerInput = integerProperty.getByRole('spinbutton');
 
                 await expect(integerInput).toHaveValue(expectedValues.Integer);
             });

@@ -106,6 +106,10 @@ export class WorkflowPage {
         return this.arrayPropertyItemAt(index).getByRole('textbox');
     }
 
+    arrayPropertyItemSpinbuttonAt(index: number): Locator {
+        return this.arrayPropertyItemAt(index).getByRole('spinbutton');
+    }
+
     async addArrayItemsToReachRowCount({
         itemType = 'STRING',
         targetRowCount,

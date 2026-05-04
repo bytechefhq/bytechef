@@ -5,6 +5,7 @@ import {WorkflowPage} from '../../pages/workflowPage';
 import sampleWorkflow from '../../sampleWorkflow.json';
 import {clickAndExpectToBeVisible} from '../../utils/clickAndExpectToBeVisible';
 import {type TestProjectI, type TestWorkflowI} from '../../utils/projectUtils';
+import {fillPropertyInput} from '../../utils/propertyValidationUtils';
 import {getWorkflowDefinition, openPropertiesTab, reopenConfigurationPanel} from '../../utils/workflowUtils';
 
 export const test = mergeTests(loginTest(), projectTest, importWorkflowTest);
@@ -69,7 +70,7 @@ test.describe('Reading from Workflow Definition', () => {
             await test.step('integer property', async () => {
                 const integerProperty = configurationPanel.getByLabel('Integer property');
 
-                const integerInput = integerProperty.getByRole('textbox');
+                const integerInput = integerProperty.getByRole('spinbutton');
 
                 await expect(integerInput).toHaveValue(expectedValues.Integer);
             });
@@ -216,6 +217,10 @@ test.describe('Saving to Workflow Definition', () => {
 
                     expect(expectedPropertyType).toBe('object');
                     expect(propertyInputValue).toBe(expectedPropertyValue[0].toString());
+                } else if (expectedPropertyName === 'Integer') {
+                    const integerInput = property.getByRole('spinbutton');
+
+                    await expect(integerInput).toHaveValue(expectedPropertyValue!.toString());
                 } else {
                     const propertyInputValue = await propertyInput.inputValue();
 
@@ -244,7 +249,7 @@ test.describe('Saving to Workflow Definition', () => {
     test('should save basic INTEGER property', async () => {
         const integerProperty = configurationPanel.getByLabel('Integer property');
 
-        const integerInput = integerProperty.getByRole('textbox');
+        const integerInput = integerProperty.getByRole('spinbutton');
 
         const testValue = 123;
 
@@ -259,7 +264,7 @@ test.describe('Saving to Workflow Definition', () => {
     test('should save negative value to the INTEGER property', async () => {
         const integerProperty = configurationPanel.getByLabel('Integer property');
 
-        const integerInput = integerProperty.getByRole('textbox');
+        const integerInput = integerProperty.getByRole('spinbutton');
 
         const testValue = -123;
 

@@ -402,7 +402,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
             });
 
             await test.step('Set first INTEGER row to a value and leave the second INTEGER row empty', async () => {
-                const firstIntegerInput = workflowPage.arrayPropertyItemTextboxAt(1);
+                const firstIntegerInput = workflowPage.arrayPropertyItemSpinbuttonAt(1);
 
                 await replaceMentionsInputValue({
                     input: firstIntegerInput,
@@ -410,7 +410,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
                     value: valueOnDeletedIntegerRow,
                 });
 
-                const secondIntegerInput = workflowPage.arrayPropertyItemTextboxAt(2);
+                const secondIntegerInput = workflowPage.arrayPropertyItemSpinbuttonAt(2);
 
                 await replaceMentionsInputValue({
                     input: secondIntegerInput,
@@ -434,7 +434,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
 
                 await expect(arrayItems).toHaveCount(2);
 
-                const remainingIntegerRowAfterDeleted = workflowPage.arrayPropertyItemTextboxAt(1);
+                const remainingIntegerRowAfterDeleted = workflowPage.arrayPropertyItemSpinbuttonAt(1);
 
                 await expect(remainingIntegerRowAfterDeleted).toHaveValue('');
             });

@@ -1,15 +1,25 @@
-import {expect, type Locator, type Page} from '@playwright/test';
+import {type Locator, type Page, expect} from '@playwright/test';
 
 import {WorkflowPage} from '../pages/workflowPage';
 import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
 
-export async function fillPropertyInput(
-    configurationPanel: Locator,
-    propertyLabel: string,
-    value: string
-): Promise<void> {
+interface FillPropertyInputProps {
+    configurationPanel: Locator;
+    inputRole?: 'textbox' | 'spinbutton';
+    propertyLabel: string;
+    value: string;
+}
+
+export async function fillPropertyInput({
+    configurationPanel,
+    inputRole = 'textbox',
+    propertyLabel,
+    value,
+}: FillPropertyInputProps): Promise<void> {
     const property = configurationPanel.getByLabel(propertyLabel);
-    const input = property.getByRole('textbox');
+
+    const input = property.getByRole(inputRole);
+
     await input.clear();
     await input.fill(value);
 }
@@ -20,7 +30,9 @@ export async function assertPropertyValidation(
     expectedError?: string
 ): Promise<void> {
     const property = configurationPanel.getByLabel(propertyLabel);
+
     const alert = property.locator('[role="alert"]');
+
     if (expectedError !== undefined) {
         await expect(alert).toBeVisible();
         await expect(alert).toHaveText(expectedError);
