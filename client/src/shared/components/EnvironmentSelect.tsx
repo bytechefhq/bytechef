@@ -21,7 +21,11 @@ interface EnvironmentOptionI {
     id: string;
 }
 
-const EnvironmentSelect = () => {
+interface EnvironmentSelectPropsI {
+    onChange?: (environmentId: number) => void;
+}
+
+const EnvironmentSelect = ({onChange}: EnvironmentSelectPropsI = {}) => {
     const application = useApplicationInfoStore((state) => state.application);
 
     const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
@@ -88,7 +92,13 @@ const EnvironmentSelect = () => {
 
             <DropdownMenuContent align="end" className="w-72">
                 <DropdownMenuRadioGroup
-                    onValueChange={(value) => setCurrentEnvironmentId(+value)}
+                    onValueChange={(value) => {
+                        const nextEnvironmentId = +value;
+
+                        setCurrentEnvironmentId(nextEnvironmentId);
+
+                        onChange?.(nextEnvironmentId);
+                    }}
                     value={currentEnvironmentId.toString()}
                 >
                     {environmentOptions.map(({config, id}) => {
