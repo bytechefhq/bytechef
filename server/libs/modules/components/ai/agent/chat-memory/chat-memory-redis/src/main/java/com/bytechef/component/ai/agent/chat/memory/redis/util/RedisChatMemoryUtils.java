@@ -31,7 +31,6 @@ import com.bytechef.component.definition.Parameters;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.redis.RedisChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
@@ -104,7 +103,8 @@ public class RedisChatMemoryUtils {
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+                options.add(option(conversationId, conversationId, messages.getFirst()
+                    .getText()));
             }
 
             return options;

@@ -17,11 +17,6 @@
 package com.bytechef.component.ai.agent.chat.memory.jdbc.action;
 
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.CONVERSATION_ID;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.DATABASE;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.HOST;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.PASSWORD;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.PORT;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.USERNAME;
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils.getChatMemoryRepository;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;

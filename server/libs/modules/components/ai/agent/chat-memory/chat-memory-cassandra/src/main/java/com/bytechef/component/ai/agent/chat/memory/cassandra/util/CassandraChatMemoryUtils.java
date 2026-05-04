@@ -33,7 +33,6 @@ import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cassandra.CassandraChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cassandra.CassandraChatMemoryRepositoryConfig;
@@ -103,7 +102,8 @@ public class CassandraChatMemoryUtils {
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+                options.add(option(conversationId, conversationId, messages.getFirst()
+                    .getText()));
             }
 
             return options;

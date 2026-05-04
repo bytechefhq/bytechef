@@ -24,6 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
+import java.util.List;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
@@ -31,9 +33,6 @@ import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepositoryConfig;
 import org.springframework.ai.chat.messages.Message;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -72,7 +71,8 @@ public class Neo4jChatMemoryUtils {
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+                options.add(option(conversationId, conversationId, messages.getFirst()
+                    .getText()));
             }
 
             return options;

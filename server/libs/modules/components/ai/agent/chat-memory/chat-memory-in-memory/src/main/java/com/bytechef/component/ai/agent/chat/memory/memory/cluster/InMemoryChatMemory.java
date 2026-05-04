@@ -16,9 +16,12 @@
 
 package com.bytechef.component.ai.agent.chat.memory.memory.cluster;
 
+import static com.bytechef.component.ai.agent.chat.memory.memory.constant.InMemoryChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 
 import com.bytechef.component.ai.agent.chat.memory.memory.util.InMemoryChatMemoryRepositoryHolder;
+import com.bytechef.component.ai.agent.chat.memory.memory.util.InMemoryChatMemoryUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -42,6 +45,12 @@ public class InMemoryChatMemory {
         ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("In Memory Chat Memory")
             .description("Memory is retrieved and added into the prompt's system text.")
+            .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation.")
+                    .options(InMemoryChatMemoryUtils.getFirstMessages())
+                    .required(true))
             .type(CHAT_MEMORY)
             .object(() -> InMemoryChatMemory::apply);
 
@@ -50,6 +59,7 @@ public class InMemoryChatMemory {
         Map<String, ComponentConnection> componentConnections) {
 
         return PromptChatMemoryAdvisor.builder(inMemoryChatMemory)
+            .conversationId(inputParameters.getString(CONVERSATION_ID))
             .build();
     }
 }

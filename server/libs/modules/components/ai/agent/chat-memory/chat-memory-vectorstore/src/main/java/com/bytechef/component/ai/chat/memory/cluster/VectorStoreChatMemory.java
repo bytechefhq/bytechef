@@ -16,9 +16,12 @@
 
 package com.bytechef.component.ai.chat.memory.cluster;
 
+import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 import static com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction.VECTOR_STORE;
 
+import com.bytechef.component.ai.chat.memory.util.VectorStoreChatMemoryUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -40,24 +43,36 @@ public class VectorStoreChatMemory {
 
     private static final String CHAT_MEMORY_RETRIEVE_SIZE = "chatMemoryRetrieveSize";
 
-    public final ClusterElementDefinition<ChatMemoryFunction> clusterElementDefinition =
-        ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
+
+    public static ClusterElementDefinition<ChatMemoryFunction> of(
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        return new VectorStoreChatMemory(clusterElementDefinitionService).build();
+    }
+
+    private VectorStoreChatMemory(ClusterElementDefinitionService clusterElementDefinitionService) {
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
+    }
+
+    private ClusterElementDefinition<ChatMemoryFunction> build() {
+        return ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("Vector Store Chat Memory")
             .description(
                 "Memory is retrieved from a VectorStore added into the prompt's system text. This only works for " +
                     "text based exchanges with the models, not multi-modal exchanges.")
             .type(CHAT_MEMORY)
             .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation.")
+                    .options(VectorStoreChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
+                    .required(true),
                 ComponentDsl.integer(CHAT_MEMORY_RETRIEVE_SIZE)
                     .label("Chat Memory Retrieve Size")
                     .description("The number of messages to retrieve from the vector store.")
                     .defaultValue(20))
             .object(() -> this::apply);
-
-    private final ClusterElementDefinitionService clusterElementDefinitionService;
-
-    public VectorStoreChatMemory(ClusterElementDefinitionService clusterElementDefinitionService) {
-        this.clusterElementDefinitionService = clusterElementDefinitionService;
     }
 
     protected VectorStoreChatMemoryAdvisor apply(
@@ -81,6 +96,7 @@ public class VectorStoreChatMemory {
                     ParametersFactory.create(clusterElement.getParameters()),
                     ParametersFactory.create(componentConnectionConnectionParameters),
                     ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
+            .conversationId(inputParameters.getString(CONVERSATION_ID))
             .defaultTopK(
                 inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
 

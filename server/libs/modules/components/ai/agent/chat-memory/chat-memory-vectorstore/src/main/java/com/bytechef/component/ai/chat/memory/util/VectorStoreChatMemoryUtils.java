@@ -65,7 +65,8 @@ public class VectorStoreChatMemoryUtils {
             componentConnections);
     }
 
-    public static MultipleConnectionsOptionsFunction<String> getFirstMessages(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public static MultipleConnectionsOptionsFunction<String>
+        getFirstMessages(ClusterElementDefinitionService clusterElementDefinitionService) {
         return (inputParameters, componentConnections, extensions, context) -> {
             VectorStore vectorStore = getVectorStore(extensions, componentConnections, clusterElementDefinitionService);
 
