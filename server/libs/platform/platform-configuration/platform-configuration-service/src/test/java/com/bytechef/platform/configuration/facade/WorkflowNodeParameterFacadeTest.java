@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -45,7 +46,9 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ObjectProperty;
+import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -694,6 +697,102 @@ public class WorkflowNodeParameterFacadeTest {
         // When/Then
         assertThrows(RuntimeException.class,
             () -> workflowNodeParameterFacade.deleteWorkflowNodeParameter(workflowId, workflowNodeName, path, 0));
+    }
+
+    @Test
+    void testDeleteWorkflowNodeParameterCascadesTransitiveDependents() {
+        // Given: A → B → C → D dependency chain. Clearing A must remove B, C, and D
+        // so dependent options aren't loaded with stale lookup values (issue #4886).
+
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String path = "A";
+
+        StringProperty propertyA = mock(StringProperty.class);
+
+        when(propertyA.getName()).thenReturn("A");
+        when(propertyA.getOptionsDataSource()).thenReturn(null);
+
+        OptionsDataSource bDataSource = mock(OptionsDataSource.class);
+
+        when(bDataSource.getOptionsLookupDependsOn()).thenReturn(List.of("A"));
+
+        StringProperty propertyB = mock(StringProperty.class);
+
+        when(propertyB.getName()).thenReturn("B");
+        when(propertyB.getOptionsDataSource()).thenReturn(bDataSource);
+
+        OptionsDataSource cDataSource = mock(OptionsDataSource.class);
+
+        when(cDataSource.getOptionsLookupDependsOn()).thenReturn(List.of("B"));
+
+        StringProperty propertyC = mock(StringProperty.class);
+
+        when(propertyC.getName()).thenReturn("C");
+        when(propertyC.getOptionsDataSource()).thenReturn(cDataSource);
+
+        OptionsDataSource dDataSource = mock(OptionsDataSource.class);
+
+        when(dDataSource.getOptionsLookupDependsOn()).thenReturn(List.of("C"));
+
+        StringProperty propertyD = mock(StringProperty.class);
+
+        when(propertyD.getName()).thenReturn("D");
+        when(propertyD.getOptionsDataSource()).thenReturn(dDataSource);
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        doReturn(List.of(propertyA, propertyB, propertyC, propertyD)).when(actionDefinition)
+            .getProperties();
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("A", "a-val");
+            parameters.put("B", "b-val");
+            parameters.put("C", "c-val");
+            parameters.put("D", "d-val");
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
+                workflowId, workflowNodeName, path, 0);
+
+            // Then
+            Map<String, ?> resultParameters = result.parameters();
+
+            assertFalse(resultParameters.containsKey("A"));
+            assertFalse(resultParameters.containsKey("B"));
+            assertFalse(resultParameters.containsKey("C"));
+            assertFalse(resultParameters.containsKey("D"));
+        }
     }
 
     @Test
