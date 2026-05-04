@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from '@/components/ui/context-menu';
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
@@ -42,6 +43,8 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const rootClusterElementId = id.split('-')[0];
     const effectiveDirection = isClusterElement ? 'TB' : layoutDirection;
 
+    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+
     const copiedNodeLabel = copiedNode?.label || '';
 
     const displayLabel = useMemo(() => {
@@ -64,7 +67,13 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         pasteNode({nodeIndex, taskDispatcherContext, updateWorkflowMutation});
     }, [id, nodeIndex, nodes, updateWorkflowMutation]);
 
-    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+    const handleDragEnter = useCallback(() => setDropzoneActive(true), []);
+
+    const handleDragLeave = useCallback(() => setDropzoneActive(false), []);
+
+    const handleDragOver = useCallback((event: React.DragEvent) => event.preventDefault(), []);
+
+    const handleDrop = useCallback(() => setDropzoneActive(false), []);
 
     return (
         <ContextMenu>
@@ -89,10 +98,10 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     : 'size-7 bg-gray-300',
                                 isClusterElement && 'mx-0 size-6'
                             )}
-                            onDragEnter={() => setDropzoneActive(true)}
-                            onDragLeave={() => setDropzoneActive(false)}
-                            onDragOver={(event) => event.preventDefault()}
-                            onDrop={() => setDropzoneActive(false)}
+                            onDragEnter={handleDragEnter}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
                             title="Click to add a node"
                         >
                             {data.label}
@@ -113,9 +122,9 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             </ContextMenuTrigger>
 
-            <ContextMenuContent className="w-[280px]">
+            <ContextMenuContent className="w-[280px] [padding:0px]">
                 <ContextMenuItem
-                    className="flex w-full cursor-pointer flex-col items-start gap-1 px-[var(--spacing-1,4px)] py-0"
+                    className="dropdown-menu-item flex w-full flex-col items-start gap-1"
                     disabled={!canPaste}
                     onClick={handlePasteClick}
                 >
@@ -126,7 +135,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     </div>
 
                     <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
-                        <span className="flex size-4 shrink-0 items-center justify-center">
+                        <span className="flex size-4 shrink-0 items-center justify-center overflow-hidden [&>svg]:size-4">
                             {copiedNode?.icon ?? null}
                         </span>
 

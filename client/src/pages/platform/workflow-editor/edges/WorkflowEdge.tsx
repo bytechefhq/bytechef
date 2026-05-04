@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from '@/components/ui/context-menu';
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
@@ -153,6 +154,30 @@ export default function WorkflowEdge({
         });
     }, [edges, id, nodes, sourceNode, sourceNodeId, updateWorkflowMutation]);
 
+    const handleDragEnter = useCallback(() => setDropzoneActive(true), []);
+
+    const handleDragLeave = useCallback((event: React.DragEvent) => {
+        const relatedTarget = event.relatedTarget as Node | null;
+
+        if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
+            setDropzoneActive(false);
+        }
+    }, []);
+
+    const handleDragOver = useCallback((event: React.DragEvent) => {
+        event.preventDefault();
+
+        setDropzoneActive(true);
+    }, []);
+
+    const handleDrop = useCallback((event: React.DragEvent) => {
+        event.preventDefault();
+
+        setDropzoneActive(false);
+    }, []);
+
+    const handleClick = useCallback((event: React.MouseEvent) => event.stopPropagation(), []);
+
     useEffect(() => {
         const handleGlobalDragEnd = () => {
             setDropzoneActive(false);
@@ -191,86 +216,75 @@ export default function WorkflowEdge({
             )}
 
             <EdgeLabelRenderer key={id}>
-                <WorkflowNodesPopoverMenu
-                    edgeId={id}
-                    hideClusterElementComponents
-                    hideTriggerComponents
-                    sourceNodeId={sourceNodeId}
+                <div
+                    className="nodrag nopan p-8"
+                    id={id}
+                    onClick={handleClick}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    style={{
+                        pointerEvents: 'all',
+                        position: 'absolute',
+                        transform: `translate(-50%, -50%) translate(${buttonPosition.x}px,${buttonPosition.y}px)`,
+                        zIndex: isDropzoneActive ? 40 : 'auto',
+                    }}
                 >
-                    <div
-                        className="nodrag nopan p-8"
-                        id={id}
-                        onDragEnter={() => setDropzoneActive(true)}
-                        onDragLeave={(event) => {
-                            const relatedTarget = event.relatedTarget as Node | null;
-
-                            if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
-                                setDropzoneActive(false);
-                            }
-                        }}
-                        onDragOver={(event) => {
-                            event.preventDefault();
-
-                            setDropzoneActive(true);
-                        }}
-                        onDrop={(event) => {
-                            event.preventDefault();
-
-                            setDropzoneActive(false);
-                        }}
-                        style={{
-                            pointerEvents: 'all',
-                            position: 'absolute',
-                            transform: `translate(-50%, -50%) translate(${buttonPosition.x}px,${buttonPosition.y}px)`,
-                            zIndex: isDropzoneActive ? 40 : 'auto',
-                        }}
-                    >
-                        <ContextMenu>
-                            <ContextMenuTrigger asChild disabled={!canPaste}>
-                                <div
-                                    className={twMerge(
-                                        'flex cursor-pointer items-center justify-center rounded transition-all',
-                                        isDropzoneActive
-                                            ? 'size-16 border-2 border-blue-100 bg-blue-100'
-                                            : 'size-6 border-2 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
-                                    )}
-                                    id={`${id}-button`}
+                    <ContextMenu>
+                        <ContextMenuTrigger asChild disabled={!canPaste}>
+                            <div>
+                                <WorkflowNodesPopoverMenu
+                                    edgeId={id}
+                                    hideClusterElementComponents
+                                    hideTriggerComponents
+                                    sourceNodeId={sourceNodeId}
                                 >
-                                    <PlusIcon
+                                    <div
                                         className={twMerge(
-                                            `text-muted-foreground`,
-                                            isDropzoneActive ? 'size-14 text-muted-foreground/50' : 'size-3.5'
+                                            'flex cursor-pointer items-center justify-center rounded transition-all',
+                                            isDropzoneActive
+                                                ? 'size-16 border-2 border-blue-100 bg-blue-100'
+                                                : 'size-6 border-2 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
                                         )}
-                                    />
+                                        id={`${id}-button`}
+                                    >
+                                        <PlusIcon
+                                            className={twMerge(
+                                                'text-muted-foreground',
+                                                isDropzoneActive ? 'size-14 text-muted-foreground/50' : 'size-3.5'
+                                            )}
+                                        />
+                                    </div>
+                                </WorkflowNodesPopoverMenu>
+                            </div>
+                        </ContextMenuTrigger>
+
+                        <ContextMenuContent className="w-[280px] [padding:0px]">
+                            <ContextMenuItem
+                                className="dropdown-menu-item flex w-full flex-col items-start gap-1"
+                                disabled={!canPaste}
+                                onClick={handlePasteClick}
+                            >
+                                <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
+                                    <ClipboardPlusIcon className="size-4 shrink-0" />
+
+                                    <span>Paste Here</span>
                                 </div>
-                            </ContextMenuTrigger>
 
-                            <ContextMenuContent className="w-[280px]">
-                                <ContextMenuItem
-                                    className="flex w-full cursor-pointer flex-col items-start gap-1 px-[var(--spacing-1,4px)] py-0"
-                                    disabled={!canPaste}
-                                    onClick={handlePasteClick}
-                                >
-                                    <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
-                                        <ClipboardPlusIcon className="size-4 shrink-0" />
+                                <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
+                                    <span className="flex size-4 shrink-0 items-center justify-center overflow-hidden [&>svg]:size-4">
+                                        {copiedNode?.icon ?? null}
+                                    </span>
 
-                                        <span>Paste Here</span>
-                                    </div>
-
-                                    <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
-                                        <span className="flex size-4 shrink-0 items-center justify-center">
-                                            {copiedNode?.icon ?? null}
-                                        </span>
-
-                                        <span className="line-clamp-1 flex-1 text-xs font-normal" title={displayLabel}>
-                                            {displayLabel}
-                                        </span>
-                                    </div>
-                                </ContextMenuItem>
-                            </ContextMenuContent>
-                        </ContextMenu>
-                    </div>
-                </WorkflowNodesPopoverMenu>
+                                    <span className="line-clamp-1 flex-1 text-xs font-normal" title={displayLabel}>
+                                        {displayLabel}
+                                    </span>
+                                </div>
+                            </ContextMenuItem>
+                        </ContextMenuContent>
+                    </ContextMenu>
+                </div>
             </EdgeLabelRenderer>
         </>
     );

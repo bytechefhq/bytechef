@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     ContextMenu,
@@ -24,7 +25,6 @@ interface WorkflowNodeContextMenuProps {
     children: ReactNode;
     data: NodeDataType;
     hasSavedPosition: boolean;
-    onContextMenuOpenChange?: (open: boolean) => void;
     onCopy: () => void;
     onDelete: () => void;
     onPaste: () => void;
@@ -38,7 +38,6 @@ const WorkflowNodeContextMenu = ({
     children,
     data,
     hasSavedPosition,
-    onContextMenuOpenChange,
     onCopy,
     onDelete,
     onPaste,
@@ -48,20 +47,7 @@ const WorkflowNodeContextMenu = ({
 }: WorkflowNodeContextMenuProps) => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-    const {copiedNode, setContextMenuOpen} = useWorkflowEditorStore(
-        useShallow((state) => ({
-            copiedNode: state.copiedNode,
-            setContextMenuOpen: state.setContextMenuOpen,
-        }))
-    );
-
-    const handleOpenChange = useCallback(
-        (open: boolean) => {
-            setContextMenuOpen(open);
-            onContextMenuOpenChange?.(open);
-        },
-        [onContextMenuOpenChange, setContextMenuOpen]
-    );
+    const copiedNode = useWorkflowEditorStore(useShallow((state) => state.copiedNode));
 
     const handleDeleteClick = useCallback(() => setDeleteDialogOpen(true), []);
 
@@ -75,7 +61,7 @@ const WorkflowNodeContextMenu = ({
         const copiedNodeLabel = copiedNode.label ?? copiedNode.componentName ?? 'Node';
 
         return (
-            <ContextMenuItem className="flex w-full flex-col items-start gap-1" onClick={onPaste}>
+            <ContextMenuItem className="dropdown-menu-item flex w-full flex-col items-start gap-1" onClick={onPaste}>
                 <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
                     <ClipboardPlusIcon className="size-4 shrink-0" />
 
@@ -83,7 +69,9 @@ const WorkflowNodeContextMenu = ({
                 </div>
 
                 <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
-                    <span className="flex size-4 shrink-0 items-center justify-center">{copiedNode.icon ?? null}</span>
+                    <span className="flex size-4 shrink-0 items-center justify-center overflow-hidden [&>svg]:size-4">
+                        {copiedNode.icon ?? null}
+                    </span>
 
                     <span
                         className="line-clamp-1 flex-1 text-xs font-normal"
@@ -100,49 +88,52 @@ const WorkflowNodeContextMenu = ({
 
     return (
         <>
-            <ContextMenu onOpenChange={handleOpenChange}>
+            <ContextMenu>
                 <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 
-                <ContextMenuContent className="w-[280px]">
+                <ContextMenuContent className="w-[280px] [padding:0px]">
                     {data.trigger ? (
                         <>
-                            <ContextMenuItem onClick={onSwitch}>
-                                <ArrowLeftRightIcon />
+                            <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onSwitch}>
+                                <ArrowLeftRightIcon className="size-4 shrink-0" />
                                 Replace
                             </ContextMenuItem>
 
-                            <ContextMenuItem onClick={onRename}>
-                                <TextCursorInputIcon />
+                            <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onRename}>
+                                <TextCursorInputIcon className="size-4 shrink-0" />
                                 Rename
                             </ContextMenuItem>
                         </>
                     ) : (
                         <>
-                            <ContextMenuItem onClick={onCopy}>
-                                <CopyIcon />
+                            <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onCopy}>
+                                <CopyIcon className="size-4 shrink-0" />
                                 Copy
                             </ContextMenuItem>
 
                             {pasteMenuItem}
 
-                            <ContextMenuSeparator />
+                            <ContextMenuSeparator className="m-0" />
 
-                            <ContextMenuItem onClick={onRename}>
-                                <TextCursorInputIcon />
+                            <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onRename}>
+                                <TextCursorInputIcon className="size-4 shrink-0" />
                                 Rename
                             </ContextMenuItem>
 
                             {hasSavedPosition && (
-                                <ContextMenuItem onClick={onResetPosition}>
-                                    <RefreshCcwIcon />
+                                <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onResetPosition}>
+                                    <RefreshCcwIcon className="size-4 shrink-0" />
                                     Reset position
                                 </ContextMenuItem>
                             )}
 
-                            <ContextMenuSeparator />
+                            <ContextMenuSeparator className="m-0" />
 
-                            <ContextMenuItem destructive onClick={handleDeleteClick}>
-                                <Trash2Icon />
+                            <ContextMenuItem
+                                className="dropdown-menu-item-destructive gap-2"
+                                onClick={handleDeleteClick}
+                            >
+                                <Trash2Icon className="size-4 shrink-0" />
                                 Delete
                             </ContextMenuItem>
                         </>
