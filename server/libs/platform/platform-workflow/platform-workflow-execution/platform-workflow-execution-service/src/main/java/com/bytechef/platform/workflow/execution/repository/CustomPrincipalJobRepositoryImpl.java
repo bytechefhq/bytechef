@@ -95,13 +95,13 @@ public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepos
         }
 
         if (startDate != null) {
-            query += "AND start_date >= ? ";
+            query += "AND CAST(job.start_date AS DATE) = CAST(? AS DATE) ";
 
             arguments.add(Timestamp.from(startDate));
         }
 
         if (endDate != null) {
-            query += "AND end_date <= ? ";
+            query += "AND CAST(job.end_date AS DATE) = CAST(? AS DATE) ";
 
             arguments.add(Timestamp.from(endDate));
         }
