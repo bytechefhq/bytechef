@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -117,7 +118,7 @@ public class GithubUtils {
         return options;
     }
 
-    public static List<Map<String,?>> searchIssues(Parameters inputParameters, Context context, String searchText) {
+    public static List<Map<String, ?>> searchIssues(Parameters inputParameters, Context context, String searchText) {
         String s = searchText + " in:title";
         String s1 = "repo:" + inputParameters.getString(OWNER, getOwnerName(context)) + "/"
             + inputParameters.getRequiredString(REPOSITORY);
@@ -166,10 +167,20 @@ public class GithubUtils {
                 .configuration(responseType(Http.ResponseType.JSON))
                 .execute();
 
-            List<Map<String, ?>> body = response.getBody(new TypeReference<>() {});
+            Object body1 = response.getBody();
 
-            if (body != null) {
-                items.addAll(body);
+            if (body1 instanceof List<?>) {
+                List<Map<String, ?>> body = response.getBody(new TypeReference<>() {});
+
+                if (body != null) {
+                    items.addAll(body);
+                }
+            } else {
+                Map<String, ?> body = response.getBody(new TypeReference<>() {});
+
+                if (body.get("items") instanceof List<?> list) {
+                    items.addAll((Collection<? extends Map<String, ?>>) list);
+                }
             }
 
             if (isEditorEnvironment) {
