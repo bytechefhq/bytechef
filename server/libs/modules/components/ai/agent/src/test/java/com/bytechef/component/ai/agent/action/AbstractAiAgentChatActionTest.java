@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 
 /**
@@ -66,6 +68,7 @@ class AbstractAiAgentChatActionTest {
         HashMap<String, Object> clusterElementParams = new HashMap<>();
 
         clusterElementParams.put("model", "gpt-4o");
+        clusterElementParams.put("conversationId", "sampleConversationId");
         clusterElementParams.put("nullableParam", null);
 
         Map<String, Object> modelElement = new HashMap<>();
@@ -74,16 +77,27 @@ class AbstractAiAgentChatActionTest {
         modelElement.put("type", "testComponent/v1/testModel");
         modelElement.put("parameters", clusterElementParams);
 
+        Map<String, Object> chatMemoryElement = new HashMap<>();
+
+        chatMemoryElement.put("name", "chatMemory_1");
+        chatMemoryElement.put("type", "testComponent/v1/testChatMemory");
+        chatMemoryElement.put("parameters", clusterElementParams);
+
         Parameters extensions = MockParametersFactory.create(
-            Map.of("clusterElements", Map.of("model", modelElement)));
+            Map.of("clusterElements", Map.of("model", modelElement, "chatMemory", chatMemoryElement)));
 
         ModelFunction modelFunction = mock(ModelFunction.class);
+        ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
 
         ChatModel chatModel = mock(ChatModel.class);
+        BaseChatMemoryAdvisor chatMemory = mock(BaseChatMemoryAdvisor.class);
 
-        when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);
         when(clusterElementDefinitionService.<ModelFunction>getClusterElement(
             eq("testComponent"), eq(1), eq("testModel"))).thenReturn(modelFunction);
+        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testChatMemory"))).thenReturn(chatMemoryFunction);
+        when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);
+        when(chatMemoryFunction.apply(any(), any(), any(), any())).thenAnswer(invocation -> chatMemory);
 
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);

@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.action;
 
-import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CONVERSATION_ID;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
@@ -97,18 +96,25 @@ public abstract class AbstractAiAgentChatAction {
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
-        ClusterElement clusterElement = clusterElementMap.getClusterElement(MODEL);
+        ClusterElement modelClusterElement = clusterElementMap.getClusterElement(MODEL);
 
         ModelFunction modelFunction = clusterElementDefinitionService.getClusterElement(
-            clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-            clusterElement.getClusterElementName());
+            modelClusterElement.getComponentName(), modelClusterElement.getComponentVersion(),
+            modelClusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
+        ComponentConnection modelConnection = connectionParameters.get(modelClusterElement.getWorkflowNodeName());
 
         ChatModel chatModel = (ChatModel) modelFunction.apply(
             ParametersFactory.create(
-                MapUtils.concat(new HashMap<>(inputParameters.toMap()), new HashMap<>(clusterElement.getParameters()))),
-            ParametersFactory.create(componentConnection.getParameters()), true);
+                MapUtils.concat(new HashMap<>(inputParameters.toMap()),
+                    new HashMap<>(modelClusterElement.getParameters()))),
+            ParametersFactory.create(modelConnection.getParameters()), true);
+
+        ClusterElement chatMemoryClusterElement = clusterElementMap.getClusterElement(CHAT_MEMORY);
+
+        Parameters chatMemoryParameters = ParametersFactory.create(chatMemoryClusterElement.getParameters());
+
+        String conversationId = chatMemoryParameters.getString("conversationId");
 
         @SuppressWarnings("unchecked")
         Map<String, Map<String, String>> toolSimulations =
@@ -119,7 +125,7 @@ public abstract class AbstractAiAgentChatAction {
 
         return createPrompt(chatClient, inputParameters, context)
             .advisors(getAdvisors(clusterElementMap, connectionParameters, context))
-            .advisors(getConversationAdvisor(inputParameters))
+            .advisors(getConversationAdvisor(conversationId))
             .messages(ModelUtils.getMessages(inputParameters, context))
             .toolCallbacks(
                 getToolCallbacks(
@@ -216,10 +222,8 @@ public abstract class AbstractAiAgentChatAction {
         }
     }
 
-    private static Consumer<ChatClient.AdvisorSpec> getConversationAdvisor(Parameters inputParameters) {
+    private static Consumer<ChatClient.AdvisorSpec> getConversationAdvisor(@Nullable String conversationId) {
         return advisor -> {
-            String conversationId = inputParameters.getString(CONVERSATION_ID);
-
             if (conversationId != null) {
                 advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
             }

@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.tool;
 
-import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CONVERSATION_ID;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
@@ -66,9 +65,7 @@ public class AiAgentChatTool {
                     SYSTEM_PROMPT_PROPERTY,
                     ATTACHMENTS_PROPERTY,
                     MESSAGES_PROPERTY,
-                    RESPONSE_PROPERTY,
-                    string(CONVERSATION_ID)
-                        .description("The conversation id used in conjunction with memory.")))
+                    RESPONSE_PROPERTY))
             .type(TOOLS)
             .object(
                 () -> (inputParameters, connectionParameters, extensions, componentConnections, context) -> performFn
