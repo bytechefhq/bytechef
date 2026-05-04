@@ -27,7 +27,7 @@ test.describe('Property validation - string', () => {
     test.describe('String Regular Expression', () => {
         test('should show validation error when value does not match regex (only letters allowed)', async () => {
             await test.step('Enter invalid value', async () => {
-                await fillPropertyInput(configurationPanel, 'stringRegEx property', '123');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'stringRegEx property', value: '123'});
             });
 
             await test.step('Assert validation error', async () => {
@@ -41,7 +41,7 @@ test.describe('Property validation - string', () => {
 
         test('should clear regex validation error when value matches (letters only)', async () => {
             await test.step('Enter invalid value', async () => {
-                await fillPropertyInput(configurationPanel, 'stringRegEx property', '12');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'stringRegEx property', value: '12'});
             });
 
             await test.step('Assert validation error', async () => {
@@ -53,7 +53,7 @@ test.describe('Property validation - string', () => {
             });
 
             await test.step('Enter valid value', async () => {
-                await fillPropertyInput(configurationPanel, 'stringRegEx property', 'ab');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'stringRegEx property', value: 'ab'});
             });
 
             await test.step('Assert no validation error', async () => {
@@ -63,7 +63,7 @@ test.describe('Property validation - string', () => {
 
         test('should not show validation error when value matches regex', async () => {
             await test.step('Enter valid value', async () => {
-                await fillPropertyInput(configurationPanel, 'stringRegEx property', 'abc');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'stringRegEx property', value: 'abc'});
             });
 
             await test.step('Assert no validation error', async () => {
@@ -75,7 +75,7 @@ test.describe('Property validation - string', () => {
     test.describe('String Min Length', () => {
         test('should show validation error when string length is below minLength', async () => {
             await test.step('Enter value below minLength', async () => {
-                await fillPropertyInput(configurationPanel, 'stringMinLength property', 'a');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'stringMinLength property', value: 'a'});
             });
 
             await test.step('Assert validation error', async () => {
@@ -89,7 +89,11 @@ test.describe('Property validation - string', () => {
 
         test('should not show validation error when string length meets minLength', async () => {
             await test.step('Enter value meeting minLength', async () => {
-                await fillPropertyInput(configurationPanel, 'stringMinLength property', 'abcde');
+                await fillPropertyInput({
+                    configurationPanel,
+                    propertyLabel: 'stringMinLength property',
+                    value: 'abcde',
+                });
             });
 
             await test.step('Assert no validation error', async () => {
@@ -101,7 +105,11 @@ test.describe('Property validation - string', () => {
     test.describe('String Max Length', () => {
         test('should show validation error when string length exceeds maxLength', async () => {
             await test.step('Enter value exceeding maxLength', async () => {
-                await fillPropertyInput(configurationPanel, 'stringMaxLength property', 'abcdef');
+                await fillPropertyInput({
+                    configurationPanel,
+                    propertyLabel: 'stringMaxLength property',
+                    value: 'abcdef',
+                });
             });
 
             await test.step('Assert validation error', async () => {
@@ -115,7 +123,7 @@ test.describe('Property validation - string', () => {
 
         test('should not show validation error when string length is within maxLength', async () => {
             await test.step('Enter value within maxLength', async () => {
-                await fillPropertyInput(configurationPanel, 'stringMaxLength property', 'abc');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'stringMaxLength property', value: 'abc'});
             });
 
             await test.step('Assert no validation error', async () => {
@@ -140,7 +148,12 @@ test.describe('Property validation - numeric', () => {
     test.describe('Integer Max Value', () => {
         test('should show validation error when value exceeds maxValue', async () => {
             await test.step('Enter value exceeding maxValue', async () => {
-                await fillPropertyInput(configurationPanel, 'integerMaxValue property', '11');
+                await fillPropertyInput({
+                    configurationPanel,
+                    inputRole: 'spinbutton',
+                    propertyLabel: 'integerMaxValue property',
+                    value: '11',
+                });
             });
 
             await test.step('Assert validation error', async () => {
@@ -154,7 +167,12 @@ test.describe('Property validation - numeric', () => {
 
         test('should not show validation error when value is within maxValue', async () => {
             await test.step('Enter value within maxValue', async () => {
-                await fillPropertyInput(configurationPanel, 'integerMaxValue property', '10');
+                await fillPropertyInput({
+                    configurationPanel,
+                    inputRole: 'spinbutton',
+                    propertyLabel: 'integerMaxValue property',
+                    value: '10',
+                });
             });
 
             await test.step('Assert no validation error', async () => {
@@ -166,7 +184,12 @@ test.describe('Property validation - numeric', () => {
     test.describe('Integer Min Value', () => {
         test('should show validation error when value is below minValue', async () => {
             await test.step('Enter value below minValue', async () => {
-                await fillPropertyInput(configurationPanel, 'integerMinValue property', '9');
+                await fillPropertyInput({
+                    configurationPanel,
+                    inputRole: 'spinbutton',
+                    propertyLabel: 'integerMinValue property',
+                    value: '9',
+                });
             });
 
             await test.step('Assert validation error', async () => {
@@ -180,7 +203,12 @@ test.describe('Property validation - numeric', () => {
 
         test('should not show validation error when value meets minValue', async () => {
             await test.step('Enter value meeting minValue', async () => {
-                await fillPropertyInput(configurationPanel, 'integerMinValue property', '10');
+                await fillPropertyInput({
+                    configurationPanel,
+                    inputRole: 'spinbutton',
+                    propertyLabel: 'integerMinValue property',
+                    value: '10',
+                });
             });
 
             await test.step('Assert no validation error', async () => {
@@ -192,7 +220,7 @@ test.describe('Property validation - numeric', () => {
     test.describe('Number Max Value', () => {
         test('should show validation error when value exceeds maxValue', async () => {
             await test.step('Enter value exceeding maxValue', async () => {
-                await fillPropertyInput(configurationPanel, 'numberMaxValue property', '6');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'numberMaxValue property', value: '6'});
             });
 
             await test.step('Assert validation error', async () => {
@@ -206,7 +234,7 @@ test.describe('Property validation - numeric', () => {
 
         test('should not show validation error when value is within maxValue', async () => {
             await test.step('Enter value within maxValue', async () => {
-                await fillPropertyInput(configurationPanel, 'numberMaxValue property', '5');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'numberMaxValue property', value: '5'});
             });
 
             await test.step('Assert no validation error', async () => {
@@ -218,7 +246,7 @@ test.describe('Property validation - numeric', () => {
     test.describe('Number Min Value', () => {
         test('should show validation error when value is below minValue', async () => {
             await test.step('Enter value below minValue', async () => {
-                await fillPropertyInput(configurationPanel, 'numberMinValue property', '4');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'numberMinValue property', value: '4'});
             });
 
             await test.step('Assert validation error', async () => {
@@ -232,7 +260,7 @@ test.describe('Property validation - numeric', () => {
 
         test('should not show validation error when value meets minValue', async () => {
             await test.step('Enter value meeting minValue', async () => {
-                await fillPropertyInput(configurationPanel, 'numberMinValue property', '5');
+                await fillPropertyInput({configurationPanel, propertyLabel: 'numberMinValue property', value: '5'});
             });
 
             await test.step('Assert no validation error', async () => {
@@ -244,7 +272,11 @@ test.describe('Property validation - numeric', () => {
     test.describe('Number max decimal places', () => {
         test('should show validation error when decimal places exceed maxNumberPrecision', async () => {
             await test.step('Enter value with too many decimal places', async () => {
-                await fillPropertyInput(configurationPanel, 'numberMaxNumPrecision property', '1.123');
+                await fillPropertyInput({
+                    configurationPanel,
+                    propertyLabel: 'numberMaxNumPrecision property',
+                    value: '1.123',
+                });
             });
 
             await test.step('Assert validation error', async () => {
@@ -258,7 +290,11 @@ test.describe('Property validation - numeric', () => {
 
         test('should not show validation error when decimal places are within maxNumberPrecision', async () => {
             await test.step('Enter value within max decimal places', async () => {
-                await fillPropertyInput(configurationPanel, 'numberMaxNumPrecision property', '1.12');
+                await fillPropertyInput({
+                    configurationPanel,
+                    propertyLabel: 'numberMaxNumPrecision property',
+                    value: '1.12',
+                });
             });
 
             await test.step('Assert no validation error', async () => {
@@ -270,7 +306,11 @@ test.describe('Property validation - numeric', () => {
     test.describe('Number min decimal places', () => {
         test('should show validation error when decimal places are below minNumberPrecision', async () => {
             await test.step('Enter value with too few decimal places', async () => {
-                await fillPropertyInput(configurationPanel, 'numberMinNumPrecision property', '1.1');
+                await fillPropertyInput({
+                    configurationPanel,
+                    propertyLabel: 'numberMinNumPrecision property',
+                    value: '1.1',
+                });
             });
 
             await test.step('Assert validation error', async () => {
@@ -284,7 +324,11 @@ test.describe('Property validation - numeric', () => {
 
         test('should not show validation error when decimal places meet minNumberPrecision', async () => {
             await test.step('Enter value meeting min decimal places', async () => {
-                await fillPropertyInput(configurationPanel, 'numberMinNumPrecision property', '1.12');
+                await fillPropertyInput({
+                    configurationPanel,
+                    propertyLabel: 'numberMinNumPrecision property',
+                    value: '1.12',
+                });
             });
 
             await test.step('Assert no validation error', async () => {
@@ -296,7 +340,11 @@ test.describe('Property validation - numeric', () => {
     test.describe('Number precision', () => {
         test('should show validation error when decimal places exceed numberPrecision', async () => {
             await test.step('Enter value with too many decimal places', async () => {
-                await fillPropertyInput(configurationPanel, 'numberPrecision property', '1.1234');
+                await fillPropertyInput({
+                    configurationPanel,
+                    propertyLabel: 'numberPrecision property',
+                    value: '1.1234',
+                });
             });
 
             await test.step('Assert validation error', async () => {
@@ -310,7 +358,11 @@ test.describe('Property validation - numeric', () => {
 
         test('should not show validation error when decimal places are within numberPrecision', async () => {
             await test.step('Enter value within number precision', async () => {
-                await fillPropertyInput(configurationPanel, 'numberPrecision property', '1.123');
+                await fillPropertyInput({
+                    configurationPanel,
+                    propertyLabel: 'numberPrecision property',
+                    value: '1.123',
+                });
             });
 
             await test.step('Assert no validation error', async () => {
