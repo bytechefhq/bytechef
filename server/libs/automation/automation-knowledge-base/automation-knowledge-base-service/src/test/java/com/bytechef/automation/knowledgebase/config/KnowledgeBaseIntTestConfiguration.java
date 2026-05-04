@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
@@ -94,8 +95,8 @@ public class KnowledgeBaseIntTestConfiguration {
     }
 
     @Bean
-    KnowledgeBaseVectorStoreMetadataUpdater knowledgeBaseVectorStoreMetadataUpdater() {
-        return mock(KnowledgeBaseVectorStoreMetadataUpdater.class);
+    KnowledgeBaseVectorStoreMetadataService knowledgeBaseVectorStoreMetadataUpdater() {
+        return mock(KnowledgeBaseVectorStoreMetadataService.class);
     }
 
     @Bean
