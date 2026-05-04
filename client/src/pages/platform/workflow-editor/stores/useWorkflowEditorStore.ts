@@ -9,9 +9,6 @@ export interface WorkflowEditorI {
     clusterElementsCanvasOpen: boolean;
     setClusterElementsCanvasOpen: (clusterElementsCanvasOpen: boolean) => void;
 
-    contextMenuOpen: boolean;
-    setContextMenuOpen: (contextMenuOpen: boolean) => void;
-
     copiedNode: NodeDataType | undefined;
     setCopiedNode: (copiedNode: NodeDataType | undefined) => void;
 
@@ -69,12 +66,6 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setClusterElementsCanvasOpen: (clusterElementsCanvasOpen) =>
                 set(() => ({
                     clusterElementsCanvasOpen,
-                })),
-
-            contextMenuOpen: false,
-            setContextMenuOpen: (contextMenuOpen) =>
-                set(() => ({
-                    contextMenuOpen,
                 })),
 
             copiedNode: undefined,
