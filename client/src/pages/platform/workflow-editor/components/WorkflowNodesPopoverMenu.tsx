@@ -26,6 +26,7 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     nodeIndex?: number;
     onOpenChange?: (open: boolean) => void;
     open?: boolean;
+    showPaste?: boolean;
     sourceNodeId: string;
     sourceNodeName?: string;
 }
@@ -42,6 +43,7 @@ const WorkflowNodesPopoverMenu = ({
     nodeIndex,
     onOpenChange: externalOnOpenChange,
     open: externalOpen,
+    showPaste = true,
     sourceNodeId,
     sourceNodeName,
 }: WorkflowNodesPopoverMenuProps) => {
@@ -187,7 +189,7 @@ const WorkflowNodesPopoverMenu = ({
                         hideTriggerComponents={hideTriggerComponents}
                         onPasteClose={handlePasteClose}
                         selectedComponentName={componentDefinitionToBeAdded?.name}
-                        showPaste
+                        showPaste={showPaste}
                         sourceNodeId={sourceNodeId}
                         updateWorkflowMutation={updateWorkflowMutation}
                     />

@@ -137,6 +137,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             hideTaskDispatchers
                             onOpenChange={setSwitchPopoverOpen}
                             open={switchPopoverOpen}
+                            showPaste={false}
                             sourceNodeId={id}
                         >
                             <Button
