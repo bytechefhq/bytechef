@@ -30,14 +30,13 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.mongo.MongoChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -79,7 +78,8 @@ public class MongoDbChatMemoryUtils {
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+                options.add(option(conversationId, conversationId, messages.getFirst()
+                    .getText()));
             }
 
             return options;

@@ -16,9 +16,12 @@
 
 package com.bytechef.component.ai.agent.chat.memory.cassandra.cluster;
 
+import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.CassandraChatMemoryConstants.CONVERSATION_ID;
 import static com.bytechef.component.ai.agent.chat.memory.cassandra.util.CassandraChatMemoryUtils.getChatMemoryRepository;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 
+import com.bytechef.component.ai.agent.chat.memory.cassandra.util.CassandraChatMemoryUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -41,6 +44,12 @@ public class CassandraChatMemory {
         ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("Cassandra Chat Memory")
             .description("Memory is retrieved from Cassandra and added into the prompt's system text.")
+            .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation.")
+                    .options(CassandraChatMemoryUtils.getFirstMessages())
+                    .required(true))
             .type(CHAT_MEMORY)
             .object(() -> CassandraChatMemory::apply);
 
@@ -55,6 +64,7 @@ public class CassandraChatMemory {
             .build();
 
         return PromptChatMemoryAdvisor.builder(chatMemory)
+            .conversationId(inputParameters.getString(CONVERSATION_ID))
             .build();
     }
 }

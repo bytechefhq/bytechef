@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.agent.chat.memory.jdbc.cluster;
 
+import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 
 import com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils;
@@ -51,6 +53,12 @@ public class JdbcChatMemory {
         return ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("JDBC Chat Memory")
             .description("Memory is retrieved from a JDBC database and added into the prompt's system text.")
+            .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation.")
+                    .options(JdbcChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
+                    .required(true))
             .type(CHAT_MEMORY)
             .object(() -> this::apply);
     }
@@ -67,6 +75,7 @@ public class JdbcChatMemory {
             .build();
 
         return PromptChatMemoryAdvisor.builder(chatMemory)
+            .conversationId(inputParameters.getString(CONVERSATION_ID))
             .build();
     }
 }

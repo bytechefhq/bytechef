@@ -16,9 +16,12 @@
 
 package com.bytechef.component.ai.agent.chat.memory.neo4j.cluster;
 
+import static com.bytechef.component.ai.agent.chat.memory.neo4j.constant.Neo4jChatMemoryConstants.CONVERSATION_ID;
 import static com.bytechef.component.ai.agent.chat.memory.neo4j.util.Neo4jChatMemoryUtils.getChatMemoryRepository;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 
+import com.bytechef.component.ai.agent.chat.memory.neo4j.util.Neo4jChatMemoryUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -41,6 +44,12 @@ public class Neo4jChatMemory {
         ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("Neo4j Chat Memory")
             .description("Memory is retrieved from Neo4j and added into the prompt's system text.")
+            .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation.")
+                    .options(Neo4jChatMemoryUtils.getFirstMessages())
+                    .required(true))
             .type(CHAT_MEMORY)
             .object(() -> Neo4jChatMemory::apply);
 
@@ -55,6 +64,7 @@ public class Neo4jChatMemory {
             .build();
 
         return PromptChatMemoryAdvisor.builder(chatMemory)
+            .conversationId(inputParameters.getString(CONVERSATION_ID))
             .build();
     }
 }

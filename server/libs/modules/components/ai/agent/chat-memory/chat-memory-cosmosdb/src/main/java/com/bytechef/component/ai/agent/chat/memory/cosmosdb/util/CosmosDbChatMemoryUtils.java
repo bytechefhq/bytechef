@@ -27,13 +27,12 @@ import com.azure.cosmos.CosmosClientBuilder;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cosmosdb.CosmosDBChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cosmosdb.CosmosDBChatMemoryRepositoryConfig;
 import org.springframework.ai.chat.messages.Message;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -72,7 +71,8 @@ public class CosmosDbChatMemoryUtils {
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+                options.add(option(conversationId, conversationId, messages.getFirst()
+                    .getText()));
             }
 
             return options;

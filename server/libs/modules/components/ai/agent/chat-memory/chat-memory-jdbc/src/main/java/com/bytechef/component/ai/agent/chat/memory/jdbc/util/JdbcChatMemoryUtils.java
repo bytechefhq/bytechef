@@ -16,11 +16,6 @@
 
 package com.bytechef.component.ai.agent.chat.memory.jdbc.util;
 
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.DATABASE;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.HOST;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.PASSWORD;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.PORT;
-import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.component.definition.ai.agent.DataSourceFunction.DATA_SOURCE;
 
@@ -35,18 +30,13 @@ import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.sql.DataSource;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
@@ -119,12 +109,6 @@ public class JdbcChatMemoryUtils {
 
         Map<String, ?> componentConnectionParameters = componentConnection.getParameters();
 
-        String host = componentConnectionParameters.get(HOST).toString();
-        String database = componentConnectionParameters.get(DATABASE).toString();
-        String password = componentConnectionParameters.get(PASSWORD).toString();
-        Integer port = Integer.valueOf(componentConnectionParameters.get(PORT).toString());
-        String username = componentConnectionParameters.get(USERNAME).toString();
-
         return dataSourceFunction.apply(
             ParametersFactory.create(clusterElement.getParameters()),
             ParametersFactory.create(componentConnectionParameters),
@@ -132,7 +116,8 @@ public class JdbcChatMemoryUtils {
             componentConnections);
     }
 
-    public static MultipleConnectionsOptionsFunction<String> getFirstMessages(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public static MultipleConnectionsOptionsFunction<String>
+        getFirstMessages(ClusterElementDefinitionService clusterElementDefinitionService) {
         return (inputParameters, componentConnections, extensions, context) -> {
             ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(
                 extensions, componentConnections, clusterElementDefinitionService);
@@ -142,7 +127,8 @@ public class JdbcChatMemoryUtils {
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst().getText()));
+                options.add(option(conversationId, conversationId, messages.getFirst()
+                    .getText()));
             }
 
             return options;

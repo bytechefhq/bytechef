@@ -53,7 +53,7 @@ public class VectorStoreChatMemoryComponentHandler implements ComponentHandler {
                     VectorStoreChatMemoryGetMessagesAction.getActionDefinition(clusterElementDefinitionService),
                     VectorStoreChatMemoryDeleteAction.getActionDefinition(clusterElementDefinitionService))
                 .clusterElements(
-                    new VectorStoreChatMemory(clusterElementDefinitionService).clusterElementDefinition));
+                    VectorStoreChatMemory.of(clusterElementDefinitionService)));
     }
 
     @Override

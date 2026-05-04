@@ -16,10 +16,14 @@
 
 package com.bytechef.component.ai.agent.chat.memory.builtin.cluster;
 
+import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.CONVERSATION_ID;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 
+import com.bytechef.component.ai.agent.chat.memory.builtin.util.ChatMemoryUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
@@ -34,20 +38,28 @@ public class ChatMemory {
         return ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("Chat Memory")
             .description("Memory is retrieved from the application database and added into the prompt's system text.")
+            .properties(
+                string(CONVERSATION_ID)
+                    .label("Conversation ID")
+                    .description("The unique identifier for the conversation.")
+                    .options(ChatMemoryUtils.getFirstMessages(chatMemoryRepository))
+                    .required(true))
             .type(CHAT_MEMORY)
             .object(() -> (inputParameters, connectionParameters, extensions, componentConnections) -> apply(
-                chatMemoryRepository));
+                inputParameters, chatMemoryRepository));
     }
 
     private ChatMemory() {
     }
 
-    protected static PromptChatMemoryAdvisor apply(ChatMemoryRepository chatMemoryRepository) {
+    protected static PromptChatMemoryAdvisor
+        apply(Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
         MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
             .chatMemoryRepository(chatMemoryRepository)
             .build();
 
         return PromptChatMemoryAdvisor.builder(chatMemory)
+            .conversationId(inputParameters.getString(CONVERSATION_ID))
             .build();
     }
 }
