@@ -16,95 +16,66 @@
 
 package com.bytechef.component.claude.code.util;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.TimeoutException;
-import org.zeroturnaround.exec.ProcessExecutor;
+import java.io.UncheckedIOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.springaicommunity.agents.claude.ClaudeAgentModel;
+import org.springaicommunity.agents.claude.ClaudeAgentOptions;
+import org.springaicommunity.agents.model.AgentApi;
+import org.springaicommunity.claude.agent.sdk.mcp.McpServerConfig;
 
 /**
- * Utility class for executing Claude Code CLI commands within workflow automation.
- *
  * @author Marko Kriskovic
  */
-public class ClaudeCodeUtil {
+public final class ClaudeCodeUtil {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private ClaudeCodeUtil() {
     }
 
-    /**
-     * Executes the provided bash command by writing it to a temporary script file and running it.
-     *
-     * <p>
-     * <b>Security Note:</b> Command injection is intentional for this component. The Claude Code component integrates
-     * the Claude Code CLI into workflows, allowing AI-assisted code generation and execution. Access to this component
-     * should be restricted through workflow-level permissions. Commands are constructed from workflow configuration,
-     * not from untrusted user input.
-     */
-    @SuppressFBWarnings("COMMAND_INJECTION")
-    public static String execute(String bashCommand) throws IOException, InterruptedException, TimeoutException {
-        File scriptFile = File.createTempFile("_script", ".sh");
+    public static AgentApi createAgentModel() {
+        return ClaudeAgentModel.builder()
+            .defaultOptions(ClaudeAgentOptions.builder()
+                .yolo(true)
+                .build())
+            .build();
+    }
 
-        writeStringToFile(scriptFile, bashCommand);
+    public static String serializeMcpServer(String label, McpServerConfig.McpHttpServerConfig serverConfig) {
+        Map<String, Object> envelope = Map.of(
+            "label", label,
+            "config", serverConfig);
 
         try {
-            Runtime runtime = Runtime.getRuntime();
-
-            Process chmodProcess = runtime.exec(new String[] {
-                "chmod", "u+x", scriptFile.getAbsolutePath()
-            });
-
-            int chmodRetCode = chmodProcess.waitFor();
-
-            if (chmodRetCode != 0) {
-                throw new IllegalStateException("Failed to chmod %s".formatted(chmodRetCode));
-            }
-
-            return new ProcessExecutor()
-                .command(scriptFile.getAbsolutePath())
-                .readOutput(true)
-                .execute()
-                .outputUTF8();
-        } finally {
-            deleteRecursively(scriptFile.toPath());
+            return OBJECT_MAPPER.writeValueAsString(envelope);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to serialize MCP server descriptor", e);
         }
     }
 
-    private static void deleteRecursively(Path root) throws IOException {
-        if (root == null || !Files.exists(root)) {
-            return;
+    public static Map<String, McpServerConfig> deserializeMcpServers(List<String> serializedServers) {
+        Map<String, McpServerConfig> servers = new LinkedHashMap<>();
+
+        for (String serialized : serializedServers) {
+            try {
+                Map<String, Object> envelope = OBJECT_MAPPER.readValue(
+                    serialized, new TypeReference<Map<String, Object>>() {});
+
+                String label = (String) envelope.get("label");
+                McpServerConfig config = OBJECT_MAPPER.convertValue(
+                    envelope.get("config"), McpServerConfig.class);
+
+                servers.put(label, config);
+            } catch (IOException e) {
+                throw new UncheckedIOException("Failed to deserialize MCP server descriptor", e);
+            }
         }
 
-        Files.walkFileTree(root, new SimpleFileVisitor<>() {
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-    }
-
-    private static void writeStringToFile(File file, String string) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            writer.write(string);
-        }
+        return servers;
     }
 }

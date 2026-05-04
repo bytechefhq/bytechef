@@ -16,8 +16,10 @@
 
 package com.bytechef.component.claude.code.action;
 
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.MCP_SERVERS;
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.SCRIPT;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -26,13 +28,18 @@ import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
+import java.util.List;
+import java.util.Map;
+import org.springaicommunity.agents.claude.ClaudeAgentOptions;
+import org.springaicommunity.agents.client.AgentClient;
+import org.springaicommunity.agents.client.AgentClientResponse;
+import org.springaicommunity.claude.agent.sdk.mcp.McpServerConfig;
 
 /**
  * @author Marko Kriskovic
  */
 public class ClaudeCodeChat {
+
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("chat")
         .title("Chat")
         .description("Chat with Claude with registered tools")
@@ -40,23 +47,43 @@ public class ClaudeCodeChat {
             string(SCRIPT)
                 .label("Message")
                 .description("Command to send to Claude")
-                .required(true))
+                .required(true),
+            array(MCP_SERVERS)
+                .label("MCP Servers")
+                .description("MCP servers (HTTP transport) configured via the 'Add MCP Server' action.")
+                .items(string())
+                .required(false))
         .output(
             outputSchema(
                 string()
-                    .description(
-                        "The output of the executed bash commands, including any standard output or error messages " +
-                            "generated during execution.")),
+                    .description("The output of the Claude agent run.")),
             sampleOutput("Sample result"))
         .perform(ClaudeCodeChat::perform);
 
     protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws IOException, InterruptedException, TimeoutException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String command =
-            "IS_SANDBOX=1 claude --dangerously-skip-permissions -p \"" + inputParameters.getString(SCRIPT) + "\"";
+        ClaudeAgentOptions.Builder optionsBuilder = ClaudeAgentOptions.builder()
+            .yolo(true);
 
-        return ClaudeCodeUtil.execute(command);
+        Map<String, McpServerConfig> mcpServers = readMcpServers(inputParameters);
+
+        if (!mcpServers.isEmpty()) {
+            optionsBuilder.mcpServers(mcpServers);
+        }
+
+        AgentClient agentClient = AgentClient.builder(ClaudeCodeUtil.createAgentModel())
+            .defaultOptions(optionsBuilder.build())
+            .build();
+
+        AgentClientResponse response = agentClient.run(inputParameters.getRequiredString(SCRIPT));
+
+        return response.getResult();
+    }
+
+    private static Map<String, McpServerConfig> readMcpServers(Parameters inputParameters) {
+        List<String> serializedServers = inputParameters.getList(MCP_SERVERS, String.class, List.of());
+
+        return ClaudeCodeUtil.deserializeMcpServers(serializedServers);
     }
 }

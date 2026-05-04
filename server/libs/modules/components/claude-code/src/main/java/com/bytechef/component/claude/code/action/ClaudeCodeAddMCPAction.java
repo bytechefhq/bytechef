@@ -18,7 +18,9 @@ package com.bytechef.component.claude.code.action;
 
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.AUTHENTICATION;
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.AUTHENTICATION_TYPE;
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.LABEL;
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.NAME;
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.URL;
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.VALUE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -33,9 +35,10 @@ import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
+import java.util.Map;
+import org.springaicommunity.claude.agent.sdk.mcp.McpServerConfig;
 
 /**
  * @author Marko Kriskovic
@@ -44,13 +47,13 @@ public class ClaudeCodeAddMCPAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addMCP")
         .title("Add MCP Server")
-        .description("Adds an MCP server and all its tools to Claude Code via http protocol")
+        .description("Builds an HTTP-transport MCP server descriptor that can be passed to the Chat action.")
         .properties(
-            string("label")
+            string(LABEL)
                 .label("Label")
                 .description("The name of the MCP server")
                 .required(true),
-            string("url")
+            string(URL)
                 .label("URL")
                 .description("The URL of the MCP server")
                 .required(true),
@@ -83,49 +86,42 @@ public class ClaudeCodeAddMCPAction {
         .output(
             outputSchema(
                 string()
-                    .description(
-                        "The output of the executed bash commands, including any standard output or error messages " +
-                            "generated during execution.")),
+                    .description("Serialized MCP server descriptor consumable by the Chat action.")),
             sampleOutput("Sample result"))
         .perform(ClaudeCodeAddMCPAction::perform);
 
     protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws IOException, InterruptedException, TimeoutException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        StringBuilder sb = new StringBuilder("claude mcp add ");
+        Map<String, String> headers = buildHeaders(inputParameters);
+        McpServerConfig.McpHttpServerConfig serverConfig = new McpServerConfig.McpHttpServerConfig(
+            inputParameters.getRequiredString(URL), headers);
 
-        sb.append(inputParameters.getString("label"))
-            .append(" --scope user --transport http ")
-            .append(inputParameters.getString("url"));
+        return ClaudeCodeUtil.serializeMcpServer(inputParameters.getRequiredString(LABEL), serverConfig);
+    }
 
-        switch (inputParameters.getInteger(AUTHENTICATION_TYPE)) {
+    private static Map<String, String> buildHeaders(Parameters inputParameters) {
+        Map<String, String> headers = new LinkedHashMap<>();
+        int authType = inputParameters.getInteger(AUTHENTICATION_TYPE);
+
+        switch (authType) {
             case 1:
-                sb.append(" --header \"")
-                    .append(AUTHENTICATION)
-                    .append(": Bearer ")
-                    .append(inputParameters.getString(AUTHENTICATION))
-                    .append("\"");
+                headers.put(AUTHENTICATION, "Bearer " + inputParameters.getString(AUTHENTICATION));
 
                 break;
             case 2:
-                sb.append(" --header");
-
                 List<Authentication> authentications = inputParameters.getList(
                     AUTHENTICATION, Authentication.class, List.of());
 
                 for (Authentication authentication : authentications) {
-                    sb.append(" \"")
-                        .append(authentication.name())
-                        .append(": ")
-                        .append(authentication.value())
-                        .append("\"");
+                    headers.put(authentication.name(), authentication.value());
                 }
 
                 break;
             default:
         }
-        return ClaudeCodeUtil.execute(sb.toString());
+
+        return headers;
     }
 
     public record Authentication(String name, String value) {

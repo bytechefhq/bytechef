@@ -21,9 +21,12 @@ package com.bytechef.component.claude.code.constant;
  */
 public class ClaudeCodeConstants {
 
-    public static final String SCRIPT = "script";
-    public static final String AUTHENTICATION_TYPE = "authenticationType";
     public static final String AUTHENTICATION = "Authentication";
+    public static final String AUTHENTICATION_TYPE = "authenticationType";
+    public static final String LABEL = "label";
+    public static final String MCP_SERVERS = "mcpServers";
     public static final String NAME = "name";
+    public static final String SCRIPT = "script";
+    public static final String URL = "url";
     public static final String VALUE = "value";
 }

@@ -36,7 +36,8 @@ public class ClaudeCodeComponentHandler implements ComponentHandler {
         .title("Claude Code")
         .description("Allows you to chat with Claude Code and added MCP tools")
         .icon("path:assets/anthropic.svg")
-        .actions(ClaudeCodeInitializeClaude.ACTION_DEFINITION,
+        .actions(
+            ClaudeCodeInitializeClaude.ACTION_DEFINITION,
             ClaudeCodeAddMCPAction.ACTION_DEFINITION,
             ClaudeCodeChat.ACTION_DEFINITION);
 
