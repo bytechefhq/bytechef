@@ -33,6 +33,7 @@ export function CopilotRuntimeProvider({
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {projectId, projectWorkflowId} = useParams();
 
@@ -78,6 +79,7 @@ export function CopilotRuntimeProvider({
             ...contextWithoutError,
             currentSelectedNode: currentComponent?.name,
             workflowId: workflow.id,
+            workspaceId: currentWorkspaceId,
             ...(workflow.id === workflowExecutionError?.workflowId
                 ? {workflowExecutionError: workflowExecutionError}
                 : {}),
