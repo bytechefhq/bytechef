@@ -50,6 +50,7 @@ interface CopilotStateI {
     messages: ThreadMessageLike[];
     addMessage: (message: ThreadMessageLike) => void;
     appendToLastAssistantMessage: (text: string) => void;
+    editUserMessage: (index: number, content: string) => void;
     resetMessages: () => void;
 
     savedState: {conversationId: string | undefined; context: ContextType; messages: ThreadMessageLike[]} | null;
@@ -115,6 +116,24 @@ export const useCopilotStore = create<CopilotStateI>()(
                 messages.push({role: 'assistant', content: text} as ThreadMessageLike);
 
                 return {...state, messages};
+            }),
+        editUserMessage: (index, content) =>
+            set((state) => {
+                if (index < 0 || index >= state.messages.length) {
+                    return state;
+                }
+
+                const target = state.messages[index];
+
+                if (target?.role !== 'user') {
+                    return state;
+                }
+
+                const truncated = state.messages.slice(0, index);
+
+                truncated.push({...target, content} as ThreadMessageLike);
+
+                return {...state, messages: truncated};
             }),
         resetMessages: () => set({messages: []}),
 
