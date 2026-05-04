@@ -36,7 +36,7 @@ export default function SuspendedPostHogPageView() {
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    posthog.init('phc_aeefCFCK39LWHaJo4xScGRRVyDK0woEJvV2dHTFbNkp', {
+    posthog.init('phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S', {
       api_host: 'https://eu.i.posthog.com',
       person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
       capture_pageview: false,
