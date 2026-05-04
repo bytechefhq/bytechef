@@ -3,7 +3,7 @@ import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} fr
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
 import {ClipboardPlusIcon} from 'lucide-react';
-import {memo, useCallback, useMemo, useState} from 'react';
+import {DragEvent, memo, useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -71,7 +71,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const handleDragLeave = useCallback(() => setDropzoneActive(false), []);
 
-    const handleDragOver = useCallback((event: React.DragEvent) => event.preventDefault(), []);
+    const handleDragOver = useCallback((event: DragEvent) => event.preventDefault(), []);
 
     const handleDrop = useCallback(() => setDropzoneActive(false), []);
 
