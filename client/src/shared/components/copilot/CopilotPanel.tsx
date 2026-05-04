@@ -69,8 +69,9 @@ const CopilotPanelContent = ({className, headerClassName, onClose}: Omit<Copilot
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     <ToggleGroup
+                        className="gap-0 rounded-md"
                         onValueChange={(value) => {
                             if (value) {
                                 setContext({
@@ -81,12 +82,19 @@ const CopilotPanelContent = ({className, headerClassName, onClose}: Omit<Copilot
                         }}
                         type="single"
                         value={context?.mode}
+                        variant="outline"
                     >
-                        <ToggleGroupItem value={MODE.ASK}>
+                        <ToggleGroupItem
+                            className="h-7 rounded-none rounded-l-md border-r-0 bg-white px-3 text-xs data-[state=on]:!bg-zinc-200 data-[state=on]:!text-zinc-900 dark:bg-zinc-900 dark:data-[state=on]:!bg-zinc-700 dark:data-[state=on]:!text-zinc-50"
+                            value={MODE.ASK}
+                        >
                             {MODE.ASK.charAt(0) + MODE.ASK.slice(1).toLowerCase()}
                         </ToggleGroupItem>
 
-                        <ToggleGroupItem value={MODE.BUILD}>
+                        <ToggleGroupItem
+                            className="h-7 rounded-none rounded-r-md bg-white px-3 text-xs data-[state=on]:!bg-zinc-200 data-[state=on]:!text-zinc-900 dark:bg-zinc-900 dark:data-[state=on]:!bg-zinc-700 dark:data-[state=on]:!text-zinc-50"
+                            value={MODE.BUILD}
+                        >
                             {MODE.BUILD.charAt(0) + MODE.BUILD.slice(1).toLowerCase()}
                         </ToggleGroupItem>
                     </ToggleGroup>
