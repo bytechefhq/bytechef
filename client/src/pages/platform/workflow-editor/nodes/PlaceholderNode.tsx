@@ -122,7 +122,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             </ContextMenuTrigger>
 
-            <ContextMenuContent className="w-[280px] [padding:0px]">
+            <ContextMenuContent className="w-workflow-node-context-menu-width p-0">
                 <ContextMenuItem
                     className="dropdown-menu-item flex w-full flex-col items-start gap-1"
                     disabled={!canPaste}
