@@ -72,21 +72,17 @@ class CodaInsertRowActionTest {
         Object result = CodaInsertRowAction.perform(parameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
-
-        Body body = bodyArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/docs/1/tables/2/rows", stringArgumentCaptor.getValue());
 
         Map<String, Object> expectedBody = Map.of("rows", List.of(Map.of(
             "cells", List.of(Map.of("column", "3", "value", "test")))));
 
-        assertEquals(expectedBody, body.getContent());
-
-        assertEquals("/docs/1/tables/2/rows", stringArgumentCaptor.getValue());
-
-        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(Body.of(expectedBody), bodyArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
-        assertEquals(ResponseType.JSON, configuration.getResponseType());
 
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
