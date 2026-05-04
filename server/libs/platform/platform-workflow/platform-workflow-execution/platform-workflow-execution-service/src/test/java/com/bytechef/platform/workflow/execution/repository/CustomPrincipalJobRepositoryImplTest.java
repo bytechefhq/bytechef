@@ -141,8 +141,8 @@ class CustomPrincipalJobRepositoryImplTest {
 
         String query = queryCaptor.getValue();
 
-        assertThat(query).contains("AND start_date >= ?");
-        assertThat(query).contains("AND end_date <= ?");
+        assertThat(query).contains("AND CAST(job.start_date AS DATE) = CAST(? AS DATE)");
+        assertThat(query).contains("AND CAST(job.end_date AS DATE) = CAST(? AS DATE)");
     }
 
     @Test
@@ -212,8 +212,8 @@ class CustomPrincipalJobRepositoryImplTest {
 
         assertThat(query).contains("WHERE type = ?");
         assertThat(query).contains("AND status = ?");
-        assertThat(query).contains("AND start_date >= ?");
-        assertThat(query).contains("AND end_date <= ?");
+        assertThat(query).contains("AND CAST(job.start_date AS DATE) = CAST(? AS DATE)");
+        assertThat(query).contains("AND CAST(job.end_date AS DATE) = CAST(? AS DATE)");
         assertThat(query).contains("AND principal_id IN(?,?)");
         assertThat(query).contains("AND workflow_id IN(?,?)");
         assertThat(query).contains("LIMIT ? OFFSET ?");
