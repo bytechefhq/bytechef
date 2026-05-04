@@ -46,7 +46,9 @@ import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -125,8 +127,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         setParameter(parameterPathParts, null, true, workflowNodeStructure.parameterMap);
 
-        // For now only check the first, root level of properties on which other properties could depend on
-
         checkDependOn(
             parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
             dynamicPropertyTypesMap);
@@ -174,8 +174,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String[] parameterPathParts = parameterPath.split("\\.");
 
         setParameter(parameterPathParts, null, true, workflowNodeStructure.parameterMap);
-
-        // For now only check the first, root level of properties on which other properties could depend on
 
         checkDependOn(
             parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
@@ -312,8 +310,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         setParameter(parameterPathParts, value, false, workflowNodeStructure.parameterMap);
 
-        // For now only check the first, root level of properties on which other properties could depend on
-
         checkDependOn(
             parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
             dynamicPropertyTypesMap);
@@ -363,8 +359,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String[] parameterPathParts = parameterPath.split("\\.");
 
         setParameter(parameterPathParts, value, false, workflowNodeStructure.parameterMap);
-
-        // For now only check the first, root level of properties on which other properties could depend on
 
         checkDependOn(
             parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
@@ -497,31 +491,51 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String name, List<? extends BaseProperty> properties, Map<String, ?> parameterMap,
         Map<String, ?> dynamicPropertyTypesMap) {
 
-        for (BaseProperty property : properties) {
-            List<String> dependOnPropertyNames = List.of();
+        // Cascade through dependency chains so that clearing A also clears B (depends on A),
+        // C (depends on B), etc. Without this, transitive dependents keep stale values whose
+        // options can no longer be loaded — a request to fetch them would pass null lookup
+        // values to the component's options function and fail.
 
-            if (property instanceof OptionsDataSourceAware optionsDataSourceAware) {
-                OptionsDataSource optionsDataSource = optionsDataSourceAware.getOptionsDataSource();
+        Set<String> visitedNames = new HashSet<>();
+        Deque<String> namesToCheck = new ArrayDeque<>();
 
-                if (optionsDataSource == null) {
-                    continue;
-                }
+        namesToCheck.add(name);
 
-                dependOnPropertyNames = optionsDataSource.getOptionsLookupDependsOn();
-            } else if (property instanceof DynamicPropertiesProperty dynamicPropertiesProperty) {
-                PropertiesDataSource propertiesDataSource = dynamicPropertiesProperty.getPropertiesDataSource();
+        while (!namesToCheck.isEmpty()) {
+            String currentName = namesToCheck.removeFirst();
 
-                if (propertiesDataSource == null) {
-                    continue;
-                }
-
-                dependOnPropertyNames = propertiesDataSource.getPropertiesLookupDependsOn();
+            if (!visitedNames.add(currentName)) {
+                continue;
             }
 
-            if (dependOnPropertyNames.contains(name)) {
-                parameterMap.remove(property.getName());
+            for (BaseProperty property : properties) {
+                List<String> dependOnPropertyNames = List.of();
 
-                checkDynamicPropertyType(property.getName(), dynamicPropertyTypesMap);
+                if (property instanceof OptionsDataSourceAware optionsDataSourceAware) {
+                    OptionsDataSource optionsDataSource = optionsDataSourceAware.getOptionsDataSource();
+
+                    if (optionsDataSource == null) {
+                        continue;
+                    }
+
+                    dependOnPropertyNames = optionsDataSource.getOptionsLookupDependsOn();
+                } else if (property instanceof DynamicPropertiesProperty dynamicPropertiesProperty) {
+                    PropertiesDataSource propertiesDataSource = dynamicPropertiesProperty.getPropertiesDataSource();
+
+                    if (propertiesDataSource == null) {
+                        continue;
+                    }
+
+                    dependOnPropertyNames = propertiesDataSource.getPropertiesLookupDependsOn();
+                }
+
+                if (dependOnPropertyNames.contains(currentName)) {
+                    parameterMap.remove(property.getName());
+
+                    checkDynamicPropertyType(property.getName(), dynamicPropertyTypesMap);
+
+                    namesToCheck.add(property.getName());
+                }
             }
         }
     }
