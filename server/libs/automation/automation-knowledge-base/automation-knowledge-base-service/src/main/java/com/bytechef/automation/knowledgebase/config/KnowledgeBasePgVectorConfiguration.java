@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.config;
 
+import com.bytechef.automation.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
@@ -71,7 +72,7 @@ class KnowledgeBasePgVectorConfiguration {
     }
 
     @Bean
-    public KnowledgeBaseVectorStoreMetadataUpdater knowledgeBaseVectorStoreMetadataUpdater(
+    public KnowledgeBaseVectorStoreMetadataService knowledgeBaseVectorStoreMetadataService(
         @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
         ObjectMapper objectMapper, PgVectorStoreProperties properties) {
 
@@ -81,7 +82,7 @@ class KnowledgeBasePgVectorConfiguration {
             ? schemaName + "." + tableName
             : tableName;
 
-        return new KnowledgeBaseVectorStoreMetadataUpdater(pgVectorJdbcTemplate, objectMapper, fullTableName);
+        return new KnowledgeBaseVectorStoreMetadataService(pgVectorJdbcTemplate, objectMapper, fullTableName);
     }
 
     @Bean("knowledgeBaseEmbeddingModel")
