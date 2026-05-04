@@ -130,6 +130,7 @@ const Property = ({
         name,
         options,
         optionsDataSource,
+        optionsLoadedDynamically,
         placeholder,
         propertiesDataSource,
         propertyParameterValue,
@@ -527,6 +528,7 @@ const Property = ({
                                                 minLength={minLength}
                                                 onBlur={() => {
                                                     field.onBlur();
+
                                                     handleControlledBlur(field.value);
                                                 }}
                                                 onChange={(event) => {
@@ -639,6 +641,7 @@ const Property = ({
                                         }}
                                         options={(formattedOptions as Array<Option>) || []}
                                         optionsDataSource={optionsDataSource}
+                                        optionsLoadedDynamically={optionsLoadedDynamically}
                                         path={calculatedPath}
                                         required={required}
                                         showInputTypeSwitchButton={isToolsClusterElement}
@@ -830,6 +833,7 @@ const Property = ({
                             onValueChange={(value: string) => handleSelectChange(value, name!)}
                             options={(formattedOptions as Array<Option>) || []}
                             optionsDataSource={optionsDataSource}
+                            optionsLoadedDynamically={optionsLoadedDynamically}
                             path={calculatedPath}
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}

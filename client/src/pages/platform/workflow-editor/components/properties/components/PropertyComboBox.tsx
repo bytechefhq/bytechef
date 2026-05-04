@@ -8,20 +8,24 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import {useClusterElementOptionsQuery} from '@/shared/middleware/graphql';
 import {
+    WorkflowNodeOptionKeys,
     useGetClusterElementNodeOptionsQuery,
     useGetWorkflowNodeOptionsQuery,
 } from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {CheckIcon, ChevronsUpDownIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {FocusEventHandler, ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
+import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/shallow';
 
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
 import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
+import PropertyInput from './property-input/PropertyInput';
 
 import type {
     GetClusterElementNodeOptionsRequest,
@@ -54,6 +58,7 @@ interface PropertyComboBoxProps {
     onValueChange?: (value: string) => void;
     options: Array<Option>;
     optionsDataSource?: OptionsDataSource;
+    optionsLoadedDynamically?: boolean;
     path?: string;
     placeholder?: string;
     required?: boolean;
@@ -79,6 +84,7 @@ const PropertyComboBox = ({
     onValueChange,
     options: initialOptions,
     optionsDataSource,
+    optionsLoadedDynamically,
     path: initialPath,
     placeholder = 'Select...',
     required,
@@ -89,6 +95,7 @@ const PropertyComboBox = ({
 }: PropertyComboBoxProps) => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(initialValue != null ? initialValue.toString() : defaultValue);
+    const [inputValue, setInputValue] = useState('');
 
     const clusterElementContext = useClusterElementContext();
 
@@ -139,10 +146,19 @@ const PropertyComboBox = ({
                 id: workflowId,
                 lookupDependsOnPaths,
                 propertyName: path!,
+                searchText: inputValue.length >= 3 ? inputValue : undefined,
                 workflowNodeName,
             },
         }),
-        [currentEnvironmentId, lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
+        [
+            currentEnvironmentId,
+            inputValue,
+            lookupDependsOnPaths,
+            lookupDependsOnValuesKey,
+            path,
+            workflowId,
+            workflowNodeName,
+        ]
     );
 
     const clusterElementQueryOptions: {
@@ -196,6 +212,7 @@ const PropertyComboBox = ({
         data: workflowNodeOptions,
         isLoading,
         isRefetching,
+        refetch: refetchWorkflowNodeOptions,
     } = useGetWorkflowNodeOptionsQuery(queryOptions, Boolean(queryEnabled && !currentNode?.clusterElementType));
 
     const {
@@ -406,11 +423,42 @@ const PropertyComboBox = ({
         [onValueChange]
     );
 
+    const handleInputValueChange = useDebouncedCallback((value: string) => {
+        setInputValue(value);
+    }, 300);
+
+    const queryClient = useQueryClient();
+
     useEffect(() => {
         if (initialValue != null) {
             setValue(initialValue.toString());
         }
     }, [initialValue]);
+
+    useEffect(() => {
+        if (!optionsLoadedDynamically) {
+            return;
+        }
+
+        if (inputValue.length < 3) {
+            return;
+        }
+
+        queryClient.invalidateQueries({
+            queryKey: WorkflowNodeOptionKeys.propertyWorkflowNodeOptions(
+                queryOptions.request,
+                queryOptions.loadDependencyValueKey
+            ),
+        });
+    }, [
+        inputValue,
+        optionsLoadedDynamically,
+        queryClient,
+        queryOptions.loadDependencyValueKey,
+        queryOptions.request,
+        refetchWorkflowNodeOptions,
+        workflowNodeOptions,
+    ]);
 
     return (
         <fieldset className="w-full space-y-1">
@@ -448,99 +496,125 @@ const PropertyComboBox = ({
             )}
 
             <Popover modal onOpenChange={setOpen} open={open}>
-                <PopoverTrigger aria-label={`Select options for property ${label ?? name}`} asChild onBlur={onBlur}>
-                    <Button
-                        aria-expanded={open}
-                        className={twMerge(
-                            'relative w-full justify-between whitespace-normal font-normal',
-                            showInputTypeSwitchButton && 'mt-0'
-                        )}
-                        disabled={
-                            !options.length &&
-                            (isRefetching ||
-                                isClusterElementNodeOptionsRefetching ||
-                                noOptionsAvailable ||
-                                !!missingConnection ||
-                                !connectionRequirementMet)
-                        }
-                        name={name}
-                        role="combobox"
-                        variant="outline"
-                    >
-                        {leadingIcon && (
-                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-200 bg-gray-100 px-3">
-                                {leadingIcon}
-                            </div>
-                        )}
+                {optionsLoadedDynamically && name && (
+                    <PopoverTrigger aria-label={`Select options for property ${label ?? name}`} asChild onBlur={onBlur}>
+                        <PropertyInput
+                            leadingIcon={leadingIcon}
+                            name={name}
+                            onChange={(event) => handleInputValueChange(event.target.value)}
+                            placeholder="Foo..."
+                            required={required}
+                            type="text"
+                            value={inputValue}
+                        />
+                    </PopoverTrigger>
+                )}
 
-                        {lookupDependsOnValues &&
-                            (isRefetching || isClusterElementNodeOptionsRefetching) &&
-                            !currentOption?.label && (
-                                <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
-                                    <LoadingIcon /> Refetching...
-                                </span>
+                {!optionsLoadedDynamically && (
+                    <PopoverTrigger aria-label={`Select options for property ${label ?? name}`} asChild onBlur={onBlur}>
+                        <Button
+                            aria-expanded={open}
+                            className={twMerge(
+                                'relative w-full justify-between whitespace-normal font-normal',
+                                showInputTypeSwitchButton && 'mt-0'
+                            )}
+                            disabled={
+                                !options.length &&
+                                (isRefetching ||
+                                    isClusterElementNodeOptionsRefetching ||
+                                    noOptionsAvailable ||
+                                    !!missingConnection ||
+                                    !connectionRequirementMet)
+                            }
+                            name={name}
+                            role="combobox"
+                            variant="outline"
+                        >
+                            {leadingIcon && (
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-200 bg-gray-100 px-3">
+                                    {leadingIcon}
+                                </div>
                             )}
 
-                        {(lookupDependsOnValues && (isLoading || isClusterElementNodeOptionsLoading)) ||
-                        isClusterElementOptionsLoading ? (
-                            <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
-                                <LoadingIcon /> Loading...
-                            </span>
-                        ) : null}
-
-                        {((lookupDependsOnValues &&
-                            !(isLoading || isClusterElementNodeOptionsLoading || isClusterElementOptionsLoading)) ||
-                            !lookupDependsOnValues) && (
-                            <>
-                                {currentOption ? (
-                                    <span
-                                        className={twMerge(
-                                            'flex w-full items-center font-normal',
-                                            leadingIcon && 'ml-9'
-                                        )}
-                                    >
-                                        {currentOption?.icon && (
-                                            <InlineSVG className="mr-2 size-6 flex-none" src={currentOption?.icon} />
-                                        )}
-
-                                        {currentOption?.label}
+                            {lookupDependsOnValues &&
+                                (isRefetching || isClusterElementNodeOptionsRefetching) &&
+                                !currentOption?.label && (
+                                    <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
+                                        <LoadingIcon /> Refetching...
                                     </span>
-                                ) : (
-                                    !(isRefetching || isClusterElementNodeOptionsRefetching) && (
-                                        <span className={placeholderClassName}>{memoizedPlaceholder}</span>
-                                    )
                                 )}
-                            </>
+
+                            {(lookupDependsOnValues && (isLoading || isClusterElementNodeOptionsLoading)) ||
+                            isClusterElementOptionsLoading ? (
+                                <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
+                                    <LoadingIcon /> Loading...
+                                </span>
+                            ) : null}
+
+                            {((lookupDependsOnValues &&
+                                !(isLoading || isClusterElementNodeOptionsLoading || isClusterElementOptionsLoading)) ||
+                                !lookupDependsOnValues) && (
+                                <>
+                                    {currentOption ? (
+                                        <span
+                                            className={twMerge(
+                                                'flex w-full items-center font-normal',
+                                                leadingIcon && 'ml-9'
+                                            )}
+                                        >
+                                            {currentOption?.icon && (
+                                                <InlineSVG
+                                                    className="mr-2 size-6 flex-none"
+                                                    src={currentOption?.icon}
+                                                />
+                                            )}
+
+                                            {currentOption?.label}
+                                        </span>
+                                    ) : (
+                                        !(isRefetching || isClusterElementNodeOptionsRefetching) && (
+                                            <span className={placeholderClassName}>{memoizedPlaceholder}</span>
+                                        )
+                                    )}
+                                </>
+                            )}
+
+                            <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                )}
+
+                <PopoverContent
+                    align="start"
+                    className="min-w-combo-box-popper-anchor-width p-0"
+                    onOpenAutoFocus={(event) => event.preventDefault()}
+                    side="bottom"
+                >
+                    <Command>
+                        {!optionsLoadedDynamically && (
+                            <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
                         )}
 
-                        <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
-                    </Button>
-                </PopoverTrigger>
-
-                <PopoverContent align="start" className="min-w-combo-box-popper-anchor-width p-0" side="bottom">
-                    <Command>
-                        <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
-
                         <CommandList>
-                            <CommandEmpty>No item found.</CommandEmpty>
+                            {!optionsLoadedDynamically && <CommandEmpty>No item found.</CommandEmpty>}
 
                             <CommandGroup>
-                                <CommandItem
-                                    className="cursor-pointer font-normal hover:bg-muted"
-                                    key="resetOption"
-                                    onSelect={() => {
-                                        setOpen(false);
+                                {optionsLoadedDynamically && (isLoading || isRefetching) && (
+                                    <div className="flex items-center gap-2 px-3 py-2">
+                                        <LoadingIcon className="size-4" />
 
-                                        if (onValueChange) {
-                                            onValueChange('');
-                                        }
-                                    }}
-                                    value=""
-                                >
-                                    <span>Select...</span>
+                                        <span className="text-sm">Loading options...</span>
+                                    </div>
+                                )}
 
-                                    {value === '' && <CheckIcon className="ml-auto size-4" />}
-                                </CommandItem>
+                                {optionsLoadedDynamically &&
+                                    !isLoading &&
+                                    !isRefetching &&
+                                    !(options as Array<ComboBoxItemType>)?.length && (
+                                        <div className="flex items-center gap-2 px-3 py-2">
+                                            <span className="text-sm">Start typing to filter...</span>
+                                        </div>
+                                    )}
 
                                 {(options as Array<ComboBoxItemType>)?.map((option) => {
                                     const labelAndDescription = [
@@ -580,6 +654,25 @@ const PropertyComboBox = ({
                                         </CommandItem>
                                     );
                                 })}
+
+                                {!optionsLoadedDynamically && (
+                                    <CommandItem
+                                        className="cursor-pointer font-normal hover:bg-muted"
+                                        key="resetOption"
+                                        onSelect={() => {
+                                            setOpen(false);
+
+                                            if (onValueChange) {
+                                                onValueChange('');
+                                            }
+                                        }}
+                                        value=""
+                                    >
+                                        <span>Select...</span>
+
+                                        {value === '' && <CheckIcon className="ml-auto size-4" />}
+                                    </CommandItem>
+                                )}
                             </CommandGroup>
                         </CommandList>
                     </Command>

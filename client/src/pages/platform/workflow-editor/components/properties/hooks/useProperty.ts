@@ -152,6 +152,7 @@ type UsePropertyReturnType = {
     name: string | undefined;
     options?: PropertyAllType['options'];
     optionsDataSource?: OptionsDataSource;
+    optionsLoadedDynamically?: boolean;
     placeholder: string;
     propertiesDataSource?: PropertiesDataSource;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -297,6 +298,7 @@ export const useProperty = ({
         numberPrecision,
         options,
         optionsDataSource,
+        optionsLoadedDynamically,
         placeholder = '',
         properties,
         propertiesDataSource,
@@ -316,6 +318,10 @@ export const useProperty = ({
     } = ERROR_MESSAGES.PROPERTY;
 
     let {displayCondition} = property;
+
+    if (optionsLoadedDynamically) {
+        console.log(property);
+    }
 
     const {
         deleteClusterElementParameterMutation,
@@ -1815,6 +1821,7 @@ export const useProperty = ({
         name,
         options,
         optionsDataSource,
+        optionsLoadedDynamically,
         placeholder,
         propertiesDataSource,
         propertyParameterValue,
