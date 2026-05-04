@@ -9,7 +9,45 @@ import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/W
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {Job, JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
+
+const getDeepestFailedExecution = (
+    execution: TaskExecution | TriggerExecution,
+    currentPath: string[] = []
+): {execution: TaskExecution | TriggerExecution; path: string[]} | null => {
+    const path = execution.id ? [...currentPath, execution.id] : currentPath;
+
+    if ('iterations' in execution && execution.iterations && execution.iterations.length > 0) {
+        for (let index = 0; index < execution.iterations.length; index++) {
+            const iteration = execution.iterations[index];
+            const iterationId = `${execution.id}-iteration-${index}`;
+
+            for (const iterationTask of iteration) {
+                const failedChild = getDeepestFailedExecution(iterationTask, [...path, iterationId]);
+
+                if (failedChild) {
+                    return failedChild;
+                }
+            }
+        }
+    }
+
+    if ('children' in execution && execution.children && execution.children.length > 0) {
+        for (const child of execution.children) {
+            const failedChild = getDeepestFailedExecution(child, path);
+
+            if (failedChild) {
+                return failedChild;
+            }
+        }
+    }
+
+    if (execution.error) {
+        return {execution, path};
+    }
+
+    return null;
+};
 
 const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
     const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
@@ -19,13 +57,35 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
         stackTrace: [],
     };
 
-    const [activeTab, setActiveTab] = useState<TabValueType>(jobFailedWithNoExecutions ? 'error' : 'output');
+    const taskExecutions = useMemo(() => job?.taskExecutions || [], [job?.taskExecutions]);
+
+    const deepestFailedExecutionResult = useMemo(() => {
+        if (triggerExecution) {
+            const result = getDeepestFailedExecution(triggerExecution);
+
+            if (result) {
+                return result;
+            }
+        }
+
+        for (const taskExecution of taskExecutions) {
+            const result = getDeepestFailedExecution(taskExecution);
+
+            if (result) {
+                return result;
+            }
+        }
+
+        return null;
+    }, [taskExecutions, triggerExecution]);
+
+    const [activeTab, setActiveTab] = useState<TabValueType>(
+        jobFailedWithNoExecutions || deepestFailedExecutionResult?.execution.error ? 'error' : 'output'
+    );
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
-        triggerExecution || job.taskExecutions?.[0] || undefined
+        deepestFailedExecutionResult?.execution || triggerExecution || job.taskExecutions?.[0] || undefined
     );
-
-    const taskExecutions = job?.taskExecutions || [];
 
     const onTaskClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
         setActiveTab(taskExecution.error ? 'error' : 'output');
@@ -49,12 +109,14 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
                             <Accordion
                                 className="ml-2 space-y-2"
                                 defaultValue={
-                                    isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || '']
+                                    deepestFailedExecutionResult?.path ||
+                                    (isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || ''])
                                 }
                                 type="multiple"
                             >
                                 {triggerExecution && (
                                     <WorkflowExecutionsAccordionItem
+                                        defaultValue={deepestFailedExecutionResult?.path}
                                         execution={triggerExecution}
                                         onExecutionClick={onTaskClick}
                                         selectedExecutionId={selectedItem?.id || ''}
@@ -65,6 +127,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
 
                                 {taskExecutions.map((taskExecution) => (
                                     <WorkflowExecutionsAccordionItem
+                                        defaultValue={deepestFailedExecutionResult?.path}
                                         execution={taskExecution}
                                         key={taskExecution.id}
                                         onExecutionClick={onTaskClick}
