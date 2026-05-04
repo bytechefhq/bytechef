@@ -17,6 +17,7 @@ const isTaskExecution = (execution: TaskExecution | TriggerExecution): execution
 
 interface WorkflowExecutionsAccordionItemProps {
     children: ReactNode;
+    defaultValue?: string[];
     execution: TaskExecution | TriggerExecution;
     onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
     selectedExecutionId: string;
@@ -24,6 +25,7 @@ interface WorkflowExecutionsAccordionItemProps {
 
 const WorkflowExecutionsAccordionItem = ({
     children,
+    defaultValue,
     execution,
     onExecutionClick,
     selectedExecutionId,
@@ -77,7 +79,7 @@ const WorkflowExecutionsAccordionItem = ({
                 onClick={(event) => event.stopPropagation()}
             >
                 {hasIterations ? (
-                    <Accordion className="mt-2 space-y-2" type="multiple">
+                    <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
                         {taskExecution.iterations?.map((iteration, index) => {
                             const iterationValue = `${taskExecution.id}-iteration-${index}`;
                             const currentIterationItem = taskExecution.input?.items?.[index];
@@ -139,9 +141,14 @@ const WorkflowExecutionsAccordionItem = ({
 
                                     {convertedIterationItems.length > 0 && (
                                         <AccordionContent className="border-l border-stroke-neutral-secondary p-0 pl-4">
-                                            <Accordion className="mt-2 space-y-2" type="multiple">
+                                            <Accordion
+                                                className="mt-2 space-y-2"
+                                                defaultValue={defaultValue}
+                                                type="multiple"
+                                            >
                                                 {convertedIterationItems.map((convertedIterationItem) => (
                                                     <WorkflowExecutionsAccordionItem
+                                                        defaultValue={defaultValue}
                                                         execution={convertedIterationItem}
                                                         key={convertedIterationItem.id}
                                                         onExecutionClick={onExecutionClick}
@@ -160,9 +167,10 @@ const WorkflowExecutionsAccordionItem = ({
                         })}
                     </Accordion>
                 ) : (
-                    <Accordion className="mt-2 space-y-2" type="multiple">
+                    <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
                         {taskExecution.children?.map((childTaskExecution) => (
                             <WorkflowExecutionsAccordionItem
+                                defaultValue={defaultValue}
                                 execution={childTaskExecution}
                                 key={childTaskExecution.id}
                                 onExecutionClick={onExecutionClick}
