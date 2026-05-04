@@ -485,7 +485,6 @@ WorkflowNodeContent.displayName = 'WorkflowNodeContent';
 
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
-    const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
     const [renameValue, setRenameValue] = useState('');
     const [switchPopoverOpen, setSwitchPopoverOpen] = useState(false);
 
@@ -755,7 +754,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const isRenaming = renamingNodeName === data.name;
 
-    const suppressHover = isContextMenuOpen || isRenaming || switchPopoverOpen;
+    const suppressHover = isRenaming || switchPopoverOpen;
 
     const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
 
@@ -808,7 +807,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 canPaste={canPaste}
                 data={data}
                 hasSavedPosition={!!hasSavedNodePosition}
-                onContextMenuOpenChange={setIsContextMenuOpen}
                 onCopy={handleCopyNode}
                 onDelete={handleDelete}
                 onPaste={handlePasteNode}
