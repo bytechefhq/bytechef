@@ -179,7 +179,7 @@ export const WorkflowExecutions = () => {
 
     const handleEndDateChange = (date?: Date) => {
         const normalizedDate = date
-            ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999))
+            ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
             : undefined;
 
         setFilterEndDate(normalizedDate);
