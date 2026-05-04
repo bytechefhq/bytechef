@@ -80,14 +80,6 @@
         "description": null,
         "label": "open-mistral-nemo",
         "value": "open-mistral-nemo"
-      }, {
-        "description": null,
-        "label": "pixtral-12b-latest",
-        "value": "pixtral-12b-latest"
-      }, {
-        "description": null,
-        "label": "pixtral-large-latest",
-        "value": "pixtral-large-latest"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -2473,14 +2465,6 @@
         "description": null,
         "label": "open-mistral-nemo",
         "value": "open-mistral-nemo"
-      }, {
-        "description": null,
-        "label": "pixtral-12b-latest",
-        "value": "pixtral-12b-latest"
-      }, {
-        "description": null,
-        "label": "pixtral-large-latest",
-        "value": "pixtral-large-latest"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,

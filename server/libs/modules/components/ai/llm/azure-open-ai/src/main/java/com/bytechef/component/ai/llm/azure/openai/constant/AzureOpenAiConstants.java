@@ -22,10 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
+import java.util.Map;
 
 public class AzureOpenAiConstants {
 
@@ -36,11 +34,7 @@ public class AzureOpenAiConstants {
         .required(true);
 
     public static final List<Option<String>> IMAGE_MODELS = ModelUtils.getEnumOptions(
-        Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
-            .collect(
-                Collectors.toMap(
-                    AzureOpenAiImageOptions.ImageModel::getValue,
-                    AzureOpenAiImageOptions.ImageModel::getValue)));
+        Map.of("dall-e-2", "dall-e-2", "dall-e-3", "dall-e-3"));
 
     private AzureOpenAiConstants() {
     }

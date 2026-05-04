@@ -23,15 +23,14 @@ import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
-import com.github.mizosoft.methanol.Methanol;
-import java.net.http.HttpClient;
+import com.openai.client.OpenAIClient;
+import com.openai.client.OpenAIClientAsync;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.client.okhttp.OpenAIOkHttpClientAsync;
 import java.time.Duration;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
-import org.springframework.web.client.RestClient;
 
 /**
  * @author Ivica Cardic
@@ -72,28 +71,19 @@ class AiConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.openai", name = "api-key")
-    OpenAiApi openAiApi() {
-        return OpenAiApi.builder()
+    OpenAIClient openAiClient() {
+        return OpenAIOkHttpClient.builder()
             .apiKey(openAiApiKey)
-            .restClientBuilder(getRestClientBuilder())
+            .timeout(Duration.ofSeconds(60))
             .build();
     }
 
-    private static RestClient.Builder getRestClientBuilder() {
-        HttpClient httpClient = Methanol.newBuilder()
-            .autoAcceptEncoding(true)
-            .connectTimeout(Duration.ofSeconds(60))
-            .defaultHeaders(httpHeaders -> {
-                httpHeaders.setHeader("Accept-Encoding", "gzip, deflate");
-            })
-            .headersTimeout(Duration.ofSeconds(60))
-            .readTimeout(Duration.ofSeconds(60))
-            .requestTimeout(Duration.ofSeconds(60))
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.openai", name = "api-key")
+    OpenAIClientAsync openAiClientAsync() {
+        return OpenAIOkHttpClientAsync.builder()
+            .apiKey(openAiApiKey)
+            .timeout(Duration.ofSeconds(60))
             .build();
-
-        JdkClientHttpRequestFactory jdkClientHttpRequestFactory = new JdkClientHttpRequestFactory(httpClient);
-
-        return RestClient.builder()
-            .requestFactory(jdkClientHttpRequestFactory);
     }
 }

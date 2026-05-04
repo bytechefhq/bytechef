@@ -29,23 +29,18 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions.WhisperModel;
 
-import com.azure.ai.openai.OpenAIClientBuilder;
-import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
 import com.bytechef.component.ai.llm.definition.Language;
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.openai.models.audio.AudioResponseFormat;
 import java.net.MalformedURLException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionModel;
-import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions;
-import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 
 /**
  * @author Monika Domiter
@@ -64,12 +59,9 @@ public class AzureOpenAiCreateTranscriptionAction {
                 .required(true),
             string(MODEL)
                 .label("Model")
-                .description("ID of the model to use.")
+                .description("Whisper deployment name.")
                 .required(true)
-                .options(
-                    ModelUtils.getEnumOptions(
-                        Arrays.stream(WhisperModel.values())
-                            .collect(Collectors.toMap(WhisperModel::getValue, WhisperModel::getValue)))),
+                .exampleValue("whisper"),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -81,9 +73,11 @@ public class AzureOpenAiCreateTranscriptionAction {
                 .label("Response Format")
                 .description("The format of the transcript output")
                 .options(
-                    ModelUtils.getEnumOptions(
-                        Arrays.stream(TranscriptResponseFormat.values())
-                            .collect(Collectors.toMap(clazz -> String.valueOf(clazz.getValue()), Enum::name))))
+                    option("JSON", "json"),
+                    option("Text", "text"),
+                    option("SRT", "srt"),
+                    option("Verbose JSON", "verbose_json"),
+                    option("VTT", "vtt"))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
@@ -109,17 +103,19 @@ public class AzureOpenAiCreateTranscriptionAction {
     private static final AudioTranscriptionModel AUDIO_TRANSCRIPTION = (inputParameters, connectionParameters) -> {
         Language language = inputParameters.get(LANGUAGE, Language.class);
 
-        return new AzureOpenAiAudioTranscriptionModel(
-            new OpenAIClientBuilder()
-                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                .endpoint(connectionParameters.getString(ENDPOINT))
-                .buildClient(),
-            AzureOpenAiAudioTranscriptionOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .prompt(inputParameters.getString(PROMPT))
-                .language(language.getCode())
-                .responseFormat(TranscriptResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT)))
-                .temperature(inputParameters.getFloat(TEMPERATURE))
-                .build());
+        return OpenAiAudioTranscriptionModel.builder()
+            .options(
+                OpenAiAudioTranscriptionOptions.builder()
+                    .baseUrl(connectionParameters.getString(ENDPOINT))
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .microsoftFoundry(true)
+                    .deploymentName(inputParameters.getRequiredString(MODEL))
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .prompt(inputParameters.getString(PROMPT))
+                    .language(language.getCode())
+                    .responseFormat(AudioResponseFormat.of(inputParameters.getString(RESPONSE_FORMAT)))
+                    .temperature(inputParameters.getFloat(TEMPERATURE))
+                    .build())
+            .build();
     };
 }

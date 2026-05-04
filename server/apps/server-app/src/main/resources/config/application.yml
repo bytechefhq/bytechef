@@ -169,6 +169,8 @@ spring:
     name: server-app
   autoconfigure:
     exclude:
+      org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration,
       org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration,
       org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,
       org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration

@@ -108,6 +108,11 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
         return String.format(template, this.jsonSchema);
     }
 
+    @Override
+    public String getJsonSchema() {
+        return this.jsonSchema;
+    }
+
     private static String preview(String text) {
         int limit = 200;
 

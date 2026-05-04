@@ -30,9 +30,9 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
+import com.bytechef.component.ai.llm.gemini.constant.GeminiConstants;
 import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
 import com.bytechef.component.ai.llm.openai.constant.OpenAiConstants;
-import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -75,7 +75,7 @@ public class AiTextUtils {
             case ANTHROPIC -> AnthropicConstants.MODELS;
             case MISTRAL -> MistralConstants.CHAT_MODELS;
             case OPEN_AI -> OpenAiConstants.CHAT_MODELS;
-            case VERTEX_GEMINI -> VertexGeminiConstants.MODELS;
+            case VERTEX_GEMINI -> GeminiConstants.MODELS;
             default -> throw new IllegalStateException("Unexpected value: " + provider);
         };
     }

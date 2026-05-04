@@ -19,13 +19,13 @@ package com.bytechef.ee.ai.copilot.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
+import com.openai.client.OpenAIClient;
 import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
@@ -74,28 +74,9 @@ public class CopilotPgVectorConfiguration {
     }
 
     @Bean("copilotEmbeddingModel")
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
-    OpenAiEmbeddingModel copilotOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
-
-        ApplicationProperties.Ai ai = applicationProperties.getAi();
-
-        OpenAi openAi = ai.getOpenAi();
-
-        OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
-            .getOptions();
-
-        return new OpenAiEmbeddingModel(
-            openAiApi, MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(openAiEmbeddingOptions.getModel())
-                .build());
-    }
-
-    @Bean("copilotEmbeddingModel")
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
     OpenAiEmbeddingModel copilotAnthropicOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAiApi openAiApi) {
+        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
 
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
@@ -106,9 +87,28 @@ public class CopilotPgVectorConfiguration {
             .getOptions();
 
         return new OpenAiEmbeddingModel(
-            openAiApi, MetadataMode.ALL,
+            openAIClient, MetadataMode.ALL,
             OpenAiEmbeddingOptions.builder()
                 .model(anthropicEmbeddingOpenAiOptions.getModel())
+                .build());
+    }
+
+    @Bean("copilotEmbeddingModel")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    OpenAiEmbeddingModel copilotOpenAiEmbeddingModel(
+        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
+
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        OpenAi openAi = ai.getOpenAi();
+
+        OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
+            .getOptions();
+
+        return new OpenAiEmbeddingModel(
+            openAIClient, MetadataMode.ALL,
+            OpenAiEmbeddingOptions.builder()
+                .model(openAiEmbeddingOptions.getModel())
                 .build());
     }
 }

@@ -67,6 +67,8 @@ public class FilterableMcpServerBuilder {
 
     private McpUriTemplateManagerFactory uriTemplateManagerFactory = new DefaultMcpUriTemplateManagerFactory();
 
+    private boolean validateToolInputs;
+
     private Function<McpAsyncServerExchange, List<McpServerFeatures.AsyncToolSpecification>> toolFilter;
 
     @SuppressFBWarnings("EI")
@@ -152,6 +154,12 @@ public class FilterableMcpServerBuilder {
         return this;
     }
 
+    public FilterableMcpServerBuilder validateToolInputs(boolean validateToolInputs) {
+        this.validateToolInputs = validateToolInputs;
+
+        return this;
+    }
+
     public FilterableMcpServerBuilder toolFilter(
         Function<McpAsyncServerExchange, List<McpServerFeatures.AsyncToolSpecification>> toolFilter) {
 
@@ -164,6 +172,6 @@ public class FilterableMcpServerBuilder {
         return new FilterableMcpAsyncServer(
             transportProvider, McpJsonDefaults.getMapper(), serverInfo, serverCapabilities, instructions, tools,
             resources, resourceTemplates, prompts, completions, rootsChangeConsumers, requestTimeout,
-            uriTemplateManagerFactory, McpJsonDefaults.getSchemaValidator(), toolFilter);
+            uriTemplateManagerFactory, McpJsonDefaults.getSchemaValidator(), validateToolInputs, toolFilter);
     }
 }
