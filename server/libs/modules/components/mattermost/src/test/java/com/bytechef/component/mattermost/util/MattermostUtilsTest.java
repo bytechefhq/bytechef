@@ -33,6 +33,7 @@ import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -49,7 +50,6 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class MattermostUtilsTest {
 
-    private final Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -72,7 +72,7 @@ class MattermostUtilsTest {
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/channels", stringArgumentCaptor.getValue());
     }
 }
