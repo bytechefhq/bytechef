@@ -29,6 +29,7 @@ public class VectorStoreChatMemoryConstants {
 
     public static final String METADATA_CONVERSATION_ID = "conversationId";
     public static final String METADATA_MESSAGE_TYPE = "messageType";
+    public static final String METADATA_TIMESTAMP = "timestamp";
 
     private VectorStoreChatMemoryConstants() {
     }

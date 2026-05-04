@@ -55,7 +55,7 @@ public class RedisChatMemoryUtils {
             builder.timeToLive(parseDuration(timeToLive));
         }
 
-        return builder.build();
+        return new OrderedRedisChatMemoryRepository(builder.build(), jedisClient, "chat-memory-idx");
     }
 
     public static JedisPooled getJedisClient(Parameters connectionParameters) {
