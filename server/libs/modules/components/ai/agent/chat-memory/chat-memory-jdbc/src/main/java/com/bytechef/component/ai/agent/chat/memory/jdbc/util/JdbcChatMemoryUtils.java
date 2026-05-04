@@ -34,8 +34,12 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.chat.memory.repository.jdbc.HsqldbChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.MysqlChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.OracleChatMemoryRepositoryDialect;
+import org.springframework.ai.chat.memory.repository.jdbc.SqlServerChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -60,10 +64,27 @@ public class JdbcChatMemoryUtils {
 
         JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
 
-        return JdbcChatMemoryRepository.builder()
+        ChatMemoryRepository delegate = JdbcChatMemoryRepository.builder()
             .jdbcTemplate(jdbcTemplate)
             .dialect(dialect)
             .build();
+
+        return new OrderedJdbcChatMemoryRepository(
+            delegate, jdbcTemplate, getSelectConversationIdsOrderedSql(dialect));
+    }
+
+    private static String getSelectConversationIdsOrderedSql(JdbcChatMemoryRepositoryDialect dialect) {
+        if (dialect instanceof MysqlChatMemoryRepositoryDialect) {
+            return "SELECT conversation_id FROM SPRING_AI_CHAT_MEMORY GROUP BY conversation_id ORDER BY MAX(`timestamp`) DESC";
+        } else if (dialect instanceof OracleChatMemoryRepositoryDialect) {
+            return "SELECT CONVERSATION_ID FROM SPRING_AI_CHAT_MEMORY GROUP BY CONVERSATION_ID ORDER BY MAX(\"TIMESTAMP\") DESC";
+        } else if (dialect instanceof SqlServerChatMemoryRepositoryDialect) {
+            return "SELECT conversation_id FROM SPRING_AI_CHAT_MEMORY GROUP BY conversation_id ORDER BY MAX([timestamp]) DESC";
+        } else if (dialect instanceof HsqldbChatMemoryRepositoryDialect) {
+            return "SELECT conversation_id FROM SPRING_AI_CHAT_MEMORY GROUP BY conversation_id ORDER BY MAX(timestamp) DESC";
+        }
+
+        return "SELECT conversation_id FROM SPRING_AI_CHAT_MEMORY GROUP BY conversation_id ORDER BY MAX(\"timestamp\") DESC";
     }
 
     private static void initializeSchema(DataSource dataSource) {

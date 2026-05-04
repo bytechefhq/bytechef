@@ -64,9 +64,11 @@ public class MongoDbChatMemoryUtils {
         MongoTemplate mongoTemplate = new MongoTemplate(
             new SimpleMongoClientDatabaseFactory(mongoClient, databaseName));
 
-        return MongoChatMemoryRepository.builder()
+        ChatMemoryRepository delegate = MongoChatMemoryRepository.builder()
             .mongoTemplate(mongoTemplate)
             .build();
+
+        return new OrderedMongoChatMemoryRepository(delegate, mongoTemplate);
     }
 
     public static ActionDefinition.OptionsFunction<String> getFirstMessages() {

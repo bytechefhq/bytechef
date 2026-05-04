@@ -22,6 +22,7 @@ import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemo
 import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemoryConstants.MESSAGE_ROLE;
 import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemoryConstants.METADATA_CONVERSATION_ID;
 import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemoryConstants.METADATA_MESSAGE_TYPE;
+import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemoryConstants.METADATA_TIMESTAMP;
 import static com.bytechef.component.ai.chat.memory.util.VectorStoreChatMemoryUtils.getVectorStore;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -37,6 +38,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +115,9 @@ public class VectorStoreChatMemoryAddMessagesAction {
                     content,
                     Map.of(
                         METADATA_CONVERSATION_ID, conversationId,
-                        METADATA_MESSAGE_TYPE, role));
+                        METADATA_MESSAGE_TYPE, role,
+                        METADATA_TIMESTAMP, Instant.now()
+                            .toEpochMilli()));
 
                 documents.add(document);
             }

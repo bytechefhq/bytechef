@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.chat.memory.util;
 
 import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemoryConstants.METADATA_CONVERSATION_ID;
+import static com.bytechef.component.ai.chat.memory.constant.VectorStoreChatMemoryConstants.METADATA_TIMESTAMP;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction.VECTOR_STORE;
 
@@ -30,10 +31,10 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -77,21 +78,36 @@ public class VectorStoreChatMemoryUtils {
 
             List<Document> documents = vectorStore.similaritySearch(searchRequest);
 
-            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
-            Set<String> seenConversationIds = new LinkedHashSet<>();
+            Map<String, Long> maxTimestampByConversation = new HashMap<>();
+            Map<String, String> firstTextByConversation = new HashMap<>();
 
             for (Document document : documents) {
                 Map<String, Object> metadata = document.getMetadata();
                 Object conversationIdObj = metadata.get(METADATA_CONVERSATION_ID);
 
-                if (conversationIdObj != null) {
-                    String conversationId = conversationIdObj.toString();
+                if (conversationIdObj == null) {
+                    continue;
+                }
 
-                    if (seenConversationIds.add(conversationId)) {
-                        options.add(option(conversationId, conversationId, document.getText()));
-                    }
+                String conversationId = conversationIdObj.toString();
+                Object timestampObj = metadata.get(METADATA_TIMESTAMP);
+                long timestamp = timestampObj instanceof Number number ? number.longValue() : 0L;
+
+                if (!maxTimestampByConversation.containsKey(conversationId)
+                    || timestamp > maxTimestampByConversation.get(conversationId)) {
+
+                    maxTimestampByConversation.put(conversationId, timestamp);
+                    firstTextByConversation.put(conversationId, document.getText());
                 }
             }
+
+            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
+
+            maxTimestampByConversation.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEach(entry -> options.add(
+                    option(entry.getKey(), entry.getKey(), firstTextByConversation.get(entry.getKey()))));
 
             return options;
         };
