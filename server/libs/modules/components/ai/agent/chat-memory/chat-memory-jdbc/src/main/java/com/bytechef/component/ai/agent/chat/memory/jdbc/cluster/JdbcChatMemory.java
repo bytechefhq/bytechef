@@ -57,7 +57,7 @@ public class JdbcChatMemory {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
-                    .options(JdbcChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
+                    .options(JdbcChatMemoryUtils.getClusterElementFirstMessages())
                     .required(true))
             .type(CHAT_MEMORY)
             .object(() -> this::apply);

@@ -113,8 +113,10 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
 
         List<FieldDefinition> sourceFields = ((ClusterElementContextAware) context).resolveClusterElement(
             SOURCE,
-            (clusterElement, inputParameters1, connectionParameters1, context1) -> ((FieldsProvider) clusterElement)
-                .getFields(inputParameters1, connectionParameters1, context1));
+            (
+                clusterElement, inputParameters1, connectionParameters1, extensions1, componentConnections1,
+                context1) -> ((FieldsProvider) clusterElement)
+                    .getFields(inputParameters1, connectionParameters1, context1));
 
         if (sourceFields == null || sourceFields.isEmpty()) {
             properties.add(
@@ -127,8 +129,10 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
 
         List<FieldDefinition> destinationFields = ((ClusterElementContextAware) context).resolveClusterElement(
             DESTINATION,
-            (clusterElement, inputParameters1, connectionParameters1, context1) -> ((FieldsProvider) clusterElement)
-                .getFields(inputParameters1, connectionParameters1, context1));
+            (
+                clusterElement, inputParameters1, connectionParameters1, extensions1, componentConnections1,
+                context1) -> ((FieldsProvider) clusterElement)
+                    .getFields(inputParameters1, connectionParameters1, context1));
 
         if (destinationFields == null || destinationFields.isEmpty()) {
             properties.add(
@@ -227,8 +231,10 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
 
         List<FieldDefinition> fields = ((ClusterElementContextAware) context).resolveClusterElement(
             clusterElementType,
-            (clusterElement, inputParameters1, connectionParameters1, context1) -> ((FieldsProvider) clusterElement)
-                .getFields(inputParameters1, connectionParameters1, context1));
+            (
+                clusterElement, inputParameters1, connectionParameters1, extensions1, componentConnections1,
+                context1) -> ((FieldsProvider) clusterElement)
+                    .getFields(inputParameters1, connectionParameters1, context1));
 
         if (fields != null && !fields.isEmpty()) {
             return fields.stream()

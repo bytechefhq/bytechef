@@ -17,12 +17,10 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
-
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +28,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @FunctionalInterface
-public interface MultipleConnectionsOptionsFunction<T>  extends OptionsDataSource.BaseOptionsFunction {
+public interface MultipleConnectionsOptionsFunction<T> extends OptionsDataSource.BaseOptionsFunction {
 
     /**
      *

@@ -72,7 +72,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         Map<String, Long> connectionIds, Map<String, ?> extensions) {
 
         return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-options-multiple-connections"),
+            uriBuilder -> toUri(uriBuilder, componentName,
+                ACTION_DEFINITION_FACADE + "/execute-options-multiple-connections"),
             new MultipleConnectionsOptionsRequest(
                 componentName, componentVersion, actionName, propertyName, inputParameters, connectionIds,
                 lookupDependsOnPaths, searchText, extensions),
