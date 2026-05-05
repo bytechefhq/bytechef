@@ -17,11 +17,22 @@ import useWorkflowExecutionSheet from './hooks/useWorkflowExecutionSheet';
 
 const WorkflowExecutionSheet = () => {
     const {
+        activeTab,
         copilotEnabled,
         copilotPanelOpen,
+        deepestFailedExecution,
+        dialogOpen,
         handleCopilotClick,
         handleCopilotClose,
         handleOpenChange,
+        handleTaskClick,
+        isTriggerExecution,
+        jobFailedWithNoExecutions,
+        jobFailureError,
+        selectedItem,
+        setActiveTab,
+        setDialogOpen,
+        taskExecutions,
         workflowExecution,
         workflowExecutionLoading,
         workflowExecutionSheetOpen,
@@ -93,7 +104,18 @@ const WorkflowExecutionSheet = () => {
                                 >
                                     {workflowExecution?.job && (
                                         <WorkflowExecutionSheetContent
+                                            activeTab={activeTab}
+                                            deepestFailedExecution={deepestFailedExecution}
+                                            dialogOpen={dialogOpen}
+                                            handleTaskClick={handleTaskClick}
+                                            isTriggerExecution={isTriggerExecution}
                                             job={workflowExecution.job}
+                                            jobFailedWithNoExecutions={jobFailedWithNoExecutions}
+                                            jobFailureError={jobFailureError}
+                                            selectedItem={selectedItem}
+                                            setActiveTab={setActiveTab}
+                                            setDialogOpen={setDialogOpen}
+                                            taskExecutions={taskExecutions}
                                             triggerExecution={workflowExecution?.triggerExecution}
                                         />
                                     )}
