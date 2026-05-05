@@ -66,10 +66,11 @@ public class ZohoConnection {
         .required(true);
 
     public static ModifiableConnectionDefinition createConnection(
-        String baseUrl, Map<String, Boolean> scopes, boolean addOrganizationProperty) {
+        String baseUrl, Map<String, Boolean> scopes, boolean addOrganizationProperty, int version, String helpLink) {
 
         return connection()
             .baseUri((connectionParameters, context) -> connectionParameters.getString("api_domain") + baseUrl)
+            .help("", helpLink)
             .authorizations(
                 authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .title("OAuth2 Authorization Code")
@@ -97,7 +98,8 @@ public class ZohoConnection {
                         }
 
                         return ApplyResponse.ofHeaders(headers);
-                    }));
+                    }))
+            .version(version);
     }
 
     private ZohoConnection() {

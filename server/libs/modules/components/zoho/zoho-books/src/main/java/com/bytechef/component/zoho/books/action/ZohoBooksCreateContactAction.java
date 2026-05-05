@@ -48,7 +48,8 @@ public class ZohoBooksCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Create a contact.")
+        .description("Create a new contact.")
+        .help("", "https://docs.bytechef.io/reference/components/zoho-books_v1#create-contact")
         .properties(
             string(CONTACT_NAME)
                 .label("Contact Name")

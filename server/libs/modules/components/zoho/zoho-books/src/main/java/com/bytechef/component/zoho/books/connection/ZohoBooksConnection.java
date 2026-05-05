@@ -28,7 +28,8 @@ import java.util.Map;
 public class ZohoBooksConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = ZohoConnection.createConnection(
-        "/books/v3", createScopesMap(), true);
+        "/books/v3", createScopesMap(), true, 1,
+        "https://docs.bytechef.io/reference/components/zoho-books_v1#connection-setup");
 
     private ZohoBooksConnection() {
     }
