@@ -107,9 +107,6 @@ class WorkflowNodeOptionFacadeTest {
         String searchText = "invoice";
         long environmentId = 1L;
 
-        when(workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
-            workflowId, workflowNodeName, environmentId))
-                .thenReturn(Optional.empty());
         doReturn(Map.of()).when(workflowTestConfigurationService)
             .getWorkflowTestConfigurationInputs(workflowId, environmentId);
 
@@ -148,11 +145,9 @@ class WorkflowNodeOptionFacadeTest {
         String workflowNodeName = "httpClient1";
         String propertyName = "method";
         long environmentId = 1L;
-        long connectionId = 50L;
 
-        when(workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
-            workflowId, workflowNodeName, environmentId))
-                .thenReturn(Optional.of(connectionId));
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
+            .thenReturn(Optional.empty());
         doReturn(Map.of()).when(workflowTestConfigurationService)
             .getWorkflowTestConfigurationInputs(workflowId, environmentId);
 
@@ -165,6 +160,8 @@ class WorkflowNodeOptionFacadeTest {
         when(workflowTask.getName()).thenReturn(workflowNodeName);
         doReturn(Map.of()).when(workflowTask)
             .evaluateParameters(anyMap(), any(Evaluator.class));
+        doReturn(Map.of()).when(workflowTask)
+            .getExtensions();
 
         doReturn(Map.of()).when(workflowNodeOutputFacade)
             .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq(workflowNodeName), eq(environmentId));
@@ -172,7 +169,7 @@ class WorkflowNodeOptionFacadeTest {
         List<Option> expectedOptions = List.of(mock(Option.class));
 
         when(actionDefinitionFacade.executeOptions(
-            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId)))
+            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap()))
                 .thenReturn(expectedOptions);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
@@ -185,7 +182,8 @@ class WorkflowNodeOptionFacadeTest {
             assertEquals(expectedOptions, result);
 
             verify(actionDefinitionFacade).executeOptions(
-                eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId));
+                eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(),
+                anyMap());
         }
     }
 

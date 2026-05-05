@@ -113,7 +113,7 @@ class ClusterElementContextImplTest {
 
         String result = context.resolveClusterElement(
             clusterElementType,
-            (element, inputParams, connectionParams, ctx) -> "result");
+            (element, inputParams, connectionParams, extensions, componentConnections, ctx) -> "result");
 
         assertEquals("result", result);
     }
@@ -129,7 +129,7 @@ class ClusterElementContextImplTest {
 
         assertThrows(NullPointerException.class, () -> context.resolveClusterElement(
             clusterElementType,
-            (element, inputParams, connectionParams, ctx) -> "result"));
+            (element, inputParams, connectionParams, extensions, componentConnections, ctx) -> "result"));
     }
 
     @Test
