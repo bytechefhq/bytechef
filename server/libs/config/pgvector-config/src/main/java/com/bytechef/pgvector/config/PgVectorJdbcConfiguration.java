@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.pgvector.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.zaxxer.hikari.HikariDataSource;
