@@ -57,7 +57,7 @@ export default function DateTimePicker({onChange, value}: {onChange: (date: Date
             </PopoverTrigger>
 
             <PopoverContent align="start" className="w-auto p-0">
-                <Calendar autoFocus mode="single" onSelect={handleSelect} selected={date} />
+                <Calendar autoFocus defaultMonth={date} mode="single" onSelect={handleSelect} selected={date} />
 
                 <div className="border-t p-3">
                     <input
