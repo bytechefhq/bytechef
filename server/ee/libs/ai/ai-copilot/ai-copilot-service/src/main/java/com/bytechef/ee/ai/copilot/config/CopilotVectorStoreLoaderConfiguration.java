@@ -15,9 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -241,17 +243,40 @@ class CopilotVectorStoreLoaderConfiguration {
         return chunks;
     }
 
+    private void deleteStaleDocsFromVectorStore(
+        List<Map<String, Object>> vectorsMetadataList, Set<String> resourceNames) {
+
+        Set<String> deleted = new HashSet<>();
+
+        for (Map<String, Object> metadata : vectorsMetadataList) {
+            if (!DOCS.equals(metadata.get(CATEGORY))) {
+                continue;
+            }
+
+            String name = (String) metadata.get(NAME);
+
+            if (name != null && !resourceNames.contains(name) && deleted.add(name)) {
+                deleteFromVectorStore(name);
+            }
+        }
+    }
+
     private void storeDocsDocuments(List<Map<String, Object>> vectorsMetadataList) {
         List<Document> documentList = new ArrayList<>();
+        Set<String> resourceNames = new HashSet<>();
 
-        storeDocsFromClasspath(vectorsMetadataList, documentList);
+        storeDocsFromClasspath(vectorsMetadataList, documentList, resourceNames);
 
         for (List<Document> batch : batchingStrategy.batch(documentList)) {
             vectorStore.add(batch);
         }
+
+        deleteStaleDocsFromVectorStore(vectorsMetadataList, resourceNames);
     }
 
-    private void storeDocsFromClasspath(List<Map<String, Object>> vectorsMetadataList, List<Document> documentList) {
+    private void storeDocsFromClasspath(
+        List<Map<String, Object>> vectorsMetadataList, List<Document> documentList, Set<String> resourceNames) {
+
         try {
             Resource[] resources = resourcePatternResolver.getResources(CLASSPATH_DOCS_PATTERN);
 
@@ -261,6 +286,7 @@ class CopilotVectorStoreLoaderConfiguration {
                         String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                         String docName = extractDocName(resource);
 
+                        resourceNames.add(docName);
                         addToDocuments(vectorsMetadataList, docName, content, documentList);
                     }
                 }
