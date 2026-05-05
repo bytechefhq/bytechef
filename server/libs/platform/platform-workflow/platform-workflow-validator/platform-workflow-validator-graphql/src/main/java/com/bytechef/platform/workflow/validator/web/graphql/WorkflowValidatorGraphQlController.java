@@ -41,4 +41,9 @@ public class WorkflowValidatorGraphQlController {
     public WorkflowValidatorFacade.WorkflowValidationResult validateWorkflow(@Argument String workflow) {
         return workflowValidatorFacade.validateWorkflow(workflow);
     }
+
+    @QueryMapping
+    public WorkflowValidatorFacade.WorkflowValidationResult validateWorkflowById(@Argument String workflowId) {
+        return workflowValidatorFacade.validateWorkflowById(workflowId);
+    }
 }

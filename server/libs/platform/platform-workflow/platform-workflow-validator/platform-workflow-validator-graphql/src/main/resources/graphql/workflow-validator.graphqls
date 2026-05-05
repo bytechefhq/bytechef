@@ -1,5 +1,6 @@
 extend type Query {
     validateWorkflow(workflow: String!): WorkflowValidationResult!
+    validateWorkflowById(workflowId: String!): WorkflowValidationResult!
 }
 
 type WorkflowValidationResult {
