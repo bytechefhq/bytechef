@@ -242,17 +242,19 @@ export default function WorkflowEdge({
                                 >
                                     <div
                                         className={twMerge(
-                                            'flex cursor-pointer items-center justify-center rounded transition-all',
+                                            'flex cursor-pointer items-center justify-center rounded border-2 transition-all',
                                             isDropzoneActive
-                                                ? 'size-16 border-2 border-blue-100 bg-blue-100'
-                                                : 'size-6 border-2 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
+                                                ? 'size-16 border-surface-brand-secondary-hover bg-surface-brand-secondary-hover' // zamijeniti blue-100 s tokenom
+                                                : 'size-6 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
                                         )}
                                         id={`${id}-button`}
                                     >
                                         <PlusIcon
                                             className={twMerge(
-                                                'text-muted-foreground',
-                                                isDropzoneActive ? 'size-14 text-muted-foreground/50' : 'size-3.5'
+                                                'text-content-neutral-secondary',
+                                                isDropzoneActive
+                                                    ? 'size-14 text-content-neutral-secondary/50'
+                                                    : 'size-3.5'
                                             )}
                                         />
                                     </div>
