@@ -19,6 +19,7 @@ package com.bytechef.component.linear.trigger;
 import static com.bytechef.component.linear.constant.LinearConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.linear.util.LinearUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -32,7 +33,7 @@ import org.mockito.stubbing.Answer;
 class LinearRemovedIssueTriggerTest extends AbstractLinearTriggerTest {
 
     @Test
-    void testWebhookEnable() {
+    void testWebhookEnable(TriggerContext mockedTriggerContext) {
         String webhookUrl = "testWebhookUrl";
         WebhookEnableOutput expectedOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
@@ -43,7 +44,7 @@ class LinearRemovedIssueTriggerTest extends AbstractLinearTriggerTest {
             .thenReturn(expectedOutput);
 
         WebhookEnableOutput actualOutput = LinearRemovedIssueTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            mockedParameters, null, webhookUrl, null, mockedTriggerContext);
 
         assertEquals(expectedOutput, actualOutput);
         assertEquals(webhookUrl, stringArgumentCaptor.getValue());
@@ -52,7 +53,7 @@ class LinearRemovedIssueTriggerTest extends AbstractLinearTriggerTest {
     }
 
     @Test
-    void testWebhookDisable() {
+    void testWebhookDisable(TriggerContext mockedTriggerContext) {
         mockedParameters = MockParametersFactory.create(Map.of(ID, "123"));
 
         linearUtilsMockedStatic.when(
@@ -61,7 +62,7 @@ class LinearRemovedIssueTriggerTest extends AbstractLinearTriggerTest {
             .thenAnswer((Answer<Void>) invocation -> null);
 
         LinearRemovedIssueTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            null, null, mockedParameters, null, mockedTriggerContext);
 
         assertEquals("123", stringArgumentCaptor.getValue());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
@@ -75,8 +76,8 @@ class LinearRemovedIssueTriggerTest extends AbstractLinearTriggerTest {
             .thenReturn(Map.of(ID, "123"));
 
         Object result = LinearRemovedIssueTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            null, null, null, null, mockedWebhookBody,
+            null, null, null);
 
         assertEquals(Map.of(ID, "123"), result);
         assertEquals("remove", stringArgumentCaptor.getValue());

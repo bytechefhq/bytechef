@@ -20,7 +20,7 @@ import static com.bytechef.component.linear.constant.LinearConstants.BODY;
 import static com.bytechef.component.linear.constant.LinearConstants.ISSUE_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
@@ -28,22 +28,24 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.linear.util.LinearUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class LinearCreateCommentActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform(ActionContext mockedContext) {
         Parameters parameters = MockParametersFactory.create(
             Map.of(TEAM_ID, "1", ISSUE_ID, "2", BODY, "This is a comment."));
 
@@ -53,13 +55,13 @@ class LinearCreateCommentActionTest {
                     stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(Map.of("data", Map.of("commentCreate", Map.of("id", "abc"))));
 
-            Object result = LinearCreateCommentAction.perform(parameters, parameters, mockedActionContext);
+            Object result = LinearCreateCommentAction.perform(parameters, null, mockedContext);
 
             assertEquals(Map.of("id", "abc"), result);
             assertEquals(
                 "mutation{commentCreate(input: {issueId: \"2\", body: \"This is a comment.\"}){success comment{id issue{id} body}}}",
                 stringArgumentCaptor.getValue());
-            assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }
 }
