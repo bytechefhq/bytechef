@@ -19,48 +19,55 @@ package com.bytechef.zoho.commons;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.zoho.commons.ZohoConstants.CONTACT_NAME;
 import static com.bytechef.component.zoho.commons.ZohoConstants.CONTACT_TYPE;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import com.bytechef.component.zoho.commons.ZohoUtils;
 import java.util.List;
 import java.util.Map;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class ZohoUtilsTest {
 
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final List<Option<String>> expectedOptions = List.of(
         option("List 1", "list1"), option("List 2", "list2"));
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Response mockedResponse = mock(Response.class);
 
     @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
+    void beforeEach(Executor mockedExecutor, Http mockedHttp) {
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
     }
 
     @Test
-    void testGetCurrencyOptions() {
+    void testGetCurrencyOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> mockedCurrencyMap = Map.of(
             "currencies", List.of(
                 Map.of("currency_name", "List 1", "currency_id", "list1"),
@@ -70,13 +77,24 @@ class ZohoUtilsTest {
             .thenReturn(mockedCurrencyMap);
 
         List<Option<String>> result = ZohoUtils.getCurrencyOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
+        assertEquals(result, expectedOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/settings/currencies", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetCustomersOptions() {
+    void testGetCustomersOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> mockedCustomersMap = Map.of(
             "contacts", List.of(
                 Map.of(CONTACT_NAME, "List 1", "contact_id", "list1", CONTACT_TYPE, "customer"),
@@ -86,13 +104,24 @@ class ZohoUtilsTest {
             .thenReturn(mockedCustomersMap);
 
         List<Option<String>> result = ZohoUtils.getCustomersOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
+        assertEquals(result, expectedOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/contacts", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetItemsOptions() {
+    void testGetItemsOptions(
+        Context mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> mockedItemsMap = Map.of(
             "items", List.of(
                 Map.of("name", "List 1", "item_id", "list1"),
@@ -102,8 +131,15 @@ class ZohoUtilsTest {
             .thenReturn(mockedItemsMap);
 
         List<Option<String>> result = ZohoUtils.getItemsOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
+        assertEquals(result, expectedOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/items", stringArgumentCaptor.getValue());
     }
 }

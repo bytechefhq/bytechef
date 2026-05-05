@@ -25,9 +25,16 @@ import static com.bytechef.component.zoho.commons.ZohoConstants.DATE;
 import static com.bytechef.component.zoho.commons.ZohoConstants.LINE_ITEMS;
 import static com.bytechef.component.zoho.commons.ZohoConstants.PAYMENT_TERMS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +46,12 @@ import org.mockito.ArgumentCaptor;
  */
 class ZohoBooksCreateSalesOrderActionTest extends AbstractZohoBooksActionTest {
 
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
     @Test
-    void testPerform() {
+    void testPerform(
+        Context mockedContext, Executor mockedExecutor,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         mockedParameters = MockParametersFactory.create(
             Map.of(
                 CUSTOMER_ID, "1", USE_CUSTOM_SALES_ORDER_NUMBER, "true", SALES_ORDER_NUMBER, "1",
@@ -55,14 +64,21 @@ class ZohoBooksCreateSalesOrderActionTest extends AbstractZohoBooksActionTest {
         Object result = ZohoBooksCreateSalesOrderAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
-        assertEquals(List.of("ignore_auto_number_generation", "true"), stringArgumentCaptor.getAllValues());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            List.of("/salesorders", "ignore_auto_number_generation", "true"), stringArgumentCaptor.getAllValues());
 
         Map<String, Object> expectedBodyMap = Map.of(
             CUSTOMER_ID, "1", SALES_ORDER_NUMBER, "1",
             LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)), CURRENCY_ID, "euro",
             DATE, "2025-04-29", SHIPMENT_DATE, "2025-05-29", PAYMENT_TERMS, 15);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(expectedBodyMap, body.getContent());
     }
