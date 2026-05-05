@@ -20,6 +20,17 @@ import {TabValueType} from '@/shared/types';
 import {AlertCircleIcon, ExpandIcon, ScrollTextIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
+interface WorkflowExecutionsTabsPanelProps {
+    activeTab: TabValueType;
+    setActiveTab: (value: TabValueType) => void;
+    dialogOpen: boolean;
+    setDialogOpen: (open: boolean) => void;
+    selectedItem: TriggerExecution | TaskExecution | undefined;
+    job: Job;
+    isEditorEnvironment?: boolean;
+    triggerExecution?: TriggerExecution;
+}
+
 const WorkflowExecutionsTabsPanel = ({
     activeTab,
     dialogOpen,
@@ -29,16 +40,7 @@ const WorkflowExecutionsTabsPanel = ({
     setActiveTab,
     setDialogOpen,
     triggerExecution,
-}: {
-    activeTab: TabValueType;
-    setActiveTab: (value: TabValueType) => void;
-    dialogOpen: boolean;
-    setDialogOpen: (open: boolean) => void;
-    selectedItem: TriggerExecution | TaskExecution | undefined;
-    job: Job;
-    isEditorEnvironment?: boolean;
-    triggerExecution?: TriggerExecution;
-}) => {
+}: WorkflowExecutionsTabsPanelProps) => {
     const ff_2896 = useFeatureFlagsStore()('ff-2896');
 
     const displayValue = useMemo(

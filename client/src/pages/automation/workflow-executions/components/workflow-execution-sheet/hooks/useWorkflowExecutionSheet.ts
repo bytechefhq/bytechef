@@ -1,16 +1,79 @@
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
+import {JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useCallback, useMemo, useState} from 'react';
+import {TabValueType} from '@/shared/types';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../../../stores/useWorkflowExecutionSheetStore';
 
 const POLLING_INTERVAL_MS = 2000;
 
+interface GetDeepestFailedExecutionProps {
+    currentPath: string[];
+    execution: TaskExecution | TriggerExecution;
+    isTriggerExecution?: boolean;
+}
+
+const getDeepestFailedExecution = ({
+    currentPath,
+    execution,
+    isTriggerExecution = false,
+}: GetDeepestFailedExecutionProps): {execution: TaskExecution | TriggerExecution; path: string[]} | null => {
+    const path = execution.id ? [...currentPath, execution.id] : currentPath;
+
+    if (isTriggerExecution && execution.error) {
+        return {execution, path};
+    }
+
+    if ('iterations' in execution && execution.iterations && execution.iterations.length > 0) {
+        let failedChild = null;
+
+        execution.iterations.forEach((iteration, index) => {
+            const iterationId = `${execution.id}-iteration-${index}`;
+
+            iteration.forEach(
+                (iterationTask) =>
+                    (failedChild = getDeepestFailedExecution({
+                        currentPath: [...path, iterationId],
+                        execution: iterationTask,
+                        isTriggerExecution,
+                    }))
+            );
+        });
+
+        return failedChild;
+    }
+
+    if ('children' in execution && execution.children && execution.children.length > 0) {
+        let failedChild = null;
+
+        execution.children.forEach(
+            (child) =>
+                (failedChild = getDeepestFailedExecution({
+                    currentPath: path,
+                    execution: child,
+                    isTriggerExecution,
+                }))
+        );
+
+        return failedChild;
+    }
+
+    if (execution.error) {
+        return {execution, path};
+    }
+
+    return null;
+};
+
 const useWorkflowExecutionSheet = () => {
+    const [activeTab, setActiveTab] = useState<TabValueType>('output');
     const [copilotPanelOpen, setCopilotPanelOpen] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(undefined);
 
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
         useWorkflowExecutionSheetStore(
@@ -47,6 +110,55 @@ const useWorkflowExecutionSheet = () => {
         POLLING_INTERVAL_MS
     );
 
+    const job = workflowExecution?.job;
+    const triggerExecution = workflowExecution?.triggerExecution;
+
+    const taskExecutions = useMemo(() => job?.taskExecutions || [], [job?.taskExecutions]);
+
+    const deepestFailedExecution = useMemo(() => {
+        if (triggerExecution) {
+            const result = getDeepestFailedExecution({
+                currentPath: [],
+                execution: triggerExecution,
+                isTriggerExecution: true,
+            });
+
+            if (result) {
+                return result;
+            }
+        }
+
+        for (const taskExecution of taskExecutions) {
+            const result = getDeepestFailedExecution({
+                currentPath: [],
+                execution: taskExecution,
+            });
+
+            if (result) {
+                return result;
+            }
+        }
+
+        return null;
+    }, [taskExecutions, triggerExecution]);
+
+    const jobIdRef = useRef<string | undefined>(undefined);
+
+    const jobFailedWithNoExecutions = !job?.taskExecutions?.length && job?.status === JobStatusEnum.Failed;
+
+    const jobFailureError = job?.error ?? {
+        message: 'Workflow execution failed before any executions were created.',
+        stackTrace: [],
+    };
+
+    const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
+
+    const handleTaskClick = (taskExecution: TaskExecution | TriggerExecution) => {
+        setActiveTab(taskExecution.error ? 'error' : 'output');
+
+        setSelectedItem(taskExecution);
+    };
+
     const handleCopilotClick = useCallback(() => {
         const {
             context: currentContext,
@@ -71,6 +183,7 @@ const useWorkflowExecutionSheet = () => {
 
     const handleCopilotClose = useCallback(() => {
         useCopilotStore.getState().restoreConversationState();
+
         setCopilotPanelOpen(false);
     }, []);
 
@@ -83,12 +196,44 @@ const useWorkflowExecutionSheet = () => {
         setWorkflowExecutionSheetOpen(!workflowExecutionSheetOpen);
     }, [workflowExecutionSheetOpen, setWorkflowExecutionSheetOpen]);
 
+    useEffect(() => {
+        if (!job?.id || job.id === jobIdRef.current) {
+            return;
+        }
+
+        jobIdRef.current = job.id;
+
+        const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
+
+        const jobFailedWithNoExecutions = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
+
+        const newActiveTab = jobFailedWithNoExecutions || deepestFailedExecution?.execution.error ? 'error' : 'output';
+
+        setActiveTab(newActiveTab);
+
+        const newSelectedItem =
+            deepestFailedExecution?.execution || triggerExecution || job.taskExecutions?.[0] || undefined;
+
+        setSelectedItem(newSelectedItem);
+    }, [deepestFailedExecution, job, triggerExecution]);
+
     return {
+        activeTab,
         copilotEnabled,
         copilotPanelOpen,
+        deepestFailedExecution,
+        dialogOpen,
         handleCopilotClick,
         handleCopilotClose,
         handleOpenChange,
+        handleTaskClick,
+        isTriggerExecution,
+        jobFailedWithNoExecutions,
+        jobFailureError,
+        selectedItem,
+        setActiveTab,
+        setDialogOpen,
+        taskExecutions,
         workflowExecution,
         workflowExecutionLoading,
         workflowExecutionSheetOpen,
