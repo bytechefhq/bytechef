@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new issue.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#create-issue"
+    },
     "metadata": null,
     "name": "createIssue",
     "outputDefinition": {
@@ -406,7 +409,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an issue.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#update-issue"
+    },
     "metadata": null,
     "name": "updateIssue",
     "outputDefinition": {
@@ -831,7 +837,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new project.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#create-project"
+    },
     "metadata": null,
     "name": "createProject",
     "outputDefinition": {
@@ -1223,7 +1232,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update a project.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#update-project"
+    },
     "metadata": null,
     "name": "updateProject",
     "outputDefinition": {
@@ -1615,7 +1627,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new comment.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#create-comment"
+    },
     "metadata": null,
     "name": "createComment",
     "outputDefinition": {
@@ -2013,7 +2028,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Perform a raw Graphql query.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#raw-graphql-query"
+    },
     "metadata": null,
     "name": "rawGraphqlQuery",
     "outputDefinition": {
@@ -4388,14 +4406,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://linear.app/developers/graphql"
+  },
   "description": "Linear is a project management and issue tracking tool designed primarily for software teams.",
   "icon": "path:assets/linear.svg",
   "metadata": null,
@@ -4409,7 +4433,10 @@
     "deprecated": null,
     "description": "Triggers when new issue is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#new-issue"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newIssue",
@@ -5047,7 +5074,10 @@
     "deprecated": null,
     "description": "Triggers when an issue is updated.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#updated-issue"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "updatedIssue",
@@ -5685,7 +5715,10 @@
     "deprecated": null,
     "description": "Triggers when an issue is removed.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linear_v1#removed-issue"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "removedIssue",

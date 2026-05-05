@@ -114,6 +114,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Team ID, Status ID and Assignee ID
+
+To find the Team ID, click [here](/reference/components/linear_v1#how-to-find-the-team-id).
+
+To find the Status ID, click [here](/reference/components/linear_v1#how-to-find-the-issue-status-id).
+
+To find the Assignee ID, click [here](/reference/components/linear_v1#how-to-find-the-assignee-id).
 
 
 
@@ -180,6 +187,15 @@ Type: OBJECT
 }
 ```
 
+#### Find Team ID, Issue ID, Status ID and Assignee ID
+
+To find the Team ID, click [here](/reference/components/linear_v1#how-to-find-the-team-id).
+
+To find the Issue ID, click [here](/reference/components/linear_v1#how-to-find-the-issue-id).
+
+To find the Status ID, click [here](/reference/components/linear_v1#how-to-find-the-issue-status-id).
+
+To find the Assignee ID, click [here](/reference/components/linear_v1#how-to-find-the-assignee-id).
 
 
 
@@ -244,6 +260,11 @@ Type: OBJECT
 }
 ```
 
+#### Find Team ID and Status ID
+
+To find the Team ID, click [here](/reference/components/linear_v1#how-to-find-the-team-id).
+
+To find the Status ID, click [here](/reference/components/linear_v1#how-to-find-the-project-status-id).
 
 
 
@@ -308,6 +329,11 @@ Type: OBJECT
 }
 ```
 
+#### Find Project ID and Status ID
+
+To find the Project ID, click [here](/reference/components/linear_v1#how-to-find-the-project-id).
+
+To find the Status ID, click [here](/reference/components/linear_v1#how-to-find-the-project-status-id).
 
 
 
@@ -369,6 +395,11 @@ Type: OBJECT
 }
 ```
 
+#### Find Team ID and Issue ID
+
+To find the Team ID, click [here](/reference/components/linear_v1#how-to-find-the-team-id).
+
+To find the Issue ID, click [here](/reference/components/linear_v1#how-to-find-the-issue-id).
 
 
 
@@ -476,6 +507,9 @@ Type: OBJECT
   "type" : "linear/v1/newIssue"
 }
 ```
+#### Find Team ID
+
+To find the Team ID, click [here](/reference/components/linear_v1#how-to-find-the-team-id).
 
 
 
@@ -528,6 +562,9 @@ Type: OBJECT
   "type" : "linear/v1/updatedIssue"
 }
 ```
+#### Find Team ID
+
+To find the Team ID, click [here](/reference/components/linear_v1#how-to-find-the-team-id).
 
 
 
@@ -580,8 +617,78 @@ Type: OBJECT
   "type" : "linear/v1/removedIssue"
 }
 ```
+#### Find Team ID
+
+To find the Team ID, click [here](/reference/components/linear_v1#how-to-find-the-team-id).
 
 
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find the Team ID
+
+- **Method 1: Via API**
+
+Use the `{teams{nodes{id name}}}` query to retrieve a list of all teams and their IDs.
+
+The Team ID can also be found in the output of the following triggers:
+* **New Issue** Trigger
+* **Removed Issue** Trigger
+* **Updated Issue** Trigger
+
+### How to find the Issue ID
+
+- **Method 1: Via API**
+
+Use the `{issues{nodes{id title}}}` query to retrieve a list of all issues and their IDs.
+
+The Issue ID can also be found in the output of the following actions and triggers:
+* **Create Comment**
+* **Create Issue**
+* **Update Issue**
+* **New Issue** Trigger
+* **Removed Issue** Trigger
+* **Updated Issue** Trigger
+
+### How to find the Issue Status ID
+
+- **Method 1: Via API**
+
+Use the `{workflowStates{nodes{id name}}}` query to retrieve a list of all statuses and their IDs.
+
+### How to find the Assignee ID
+
+- **Method 1: Via API**
+
+Use the `{users{nodes{id displayName}}}` query to retrieve a list of all assignees and their IDs.
+
+The Assignee ID can also be found in the output of the following triggers:
+* **New Issue** Trigger
+* **Removed Issue** Trigger
+* **Updated Issue** Trigger
+
+### How to find the Project Status ID
+
+- **Method 1: Via API**
+
+Use the `{projectStatuses {nodes {id name}}}` query to retrieve a list of all statuses and their IDs.
+
+### How to find the Project ID
+
+- **Method 1: Via API**
+
+Use the `{projects{nodes{id name}}}` query to retrieve a list of all projects and their IDs.
+
+The Project ID can also be found in the output of the following actions:
+* **Create Project**
+* **Update Project**
