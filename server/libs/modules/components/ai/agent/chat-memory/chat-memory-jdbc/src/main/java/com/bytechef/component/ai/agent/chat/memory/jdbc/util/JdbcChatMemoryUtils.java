@@ -19,9 +19,11 @@ package com.bytechef.component.ai.agent.chat.memory.jdbc.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.component.definition.ai.agent.DataSourceFunction.DATA_SOURCE;
 
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOptionsFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.DataSourceFunction;
@@ -135,6 +137,50 @@ public class JdbcChatMemoryUtils {
             ParametersFactory.create(componentConnectionParameters),
             ParametersFactory.create(clusterElement.getExtensions()),
             componentConnections);
+    }
+
+    public static ClusterElementDefinition.OptionsFunction<String> getClusterElementFirstMessages() {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            DataSource dataSource = ((ClusterElementContextAware) context).resolveClusterElement(
+                DATA_SOURCE,
+                (
+                    dataSourceFn, elementInputParams, elementConnectionParams, elementExtensions,
+                    elementComponentConnections, ctx) -> {
+                    try {
+                        return ((DataSourceFunction) dataSourceFn).apply(
+                            elementInputParams, elementConnectionParams,
+                            ParametersFactory.create(Map.of()), Map.of());
+                    } catch (Exception exception) {
+                        return null;
+                    }
+                });
+
+            if (dataSource == null) {
+                return List.of();
+            }
+
+            initializeSchema(dataSource);
+
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+            JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
+            ChatMemoryRepository chatMemoryRepository = new OrderedJdbcChatMemoryRepository(
+                JdbcChatMemoryRepository.builder()
+                    .jdbcTemplate(jdbcTemplate)
+                    .dialect(dialect)
+                    .build(),
+                jdbcTemplate, getSelectConversationIdsOrderedSql(dialect));
+
+            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
+            List<String> conversationIds = chatMemoryRepository.findConversationIds();
+
+            for (String conversationId : conversationIds) {
+                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
+                options.add(option(conversationId, conversationId, messages.getFirst()
+                    .getText()));
+            }
+
+            return options;
+        };
     }
 
     public static MultipleConnectionsOptionsFunction<String>

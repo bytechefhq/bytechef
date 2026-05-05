@@ -19,6 +19,8 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.ComponentConnection;
+import java.util.Map;
 
 /**
  * Extends the functionality of the {@link ClusterElementContext} and {@link JobContextAware} interfaces to provide
@@ -64,6 +66,7 @@ public interface ClusterElementContextAware extends ClusterElementContext, JobCo
          */
         T apply(
             Object clusterElement, Parameters inputParameters, Parameters connectionParameters,
+            Parameters extensions, Map<String, ComponentConnection> componentConnections,
             ClusterElementContext context);
     }
 }

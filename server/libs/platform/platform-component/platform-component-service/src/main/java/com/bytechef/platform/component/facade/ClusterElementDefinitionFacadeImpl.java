@@ -181,6 +181,8 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
                     clusterElementObject, ParametersFactory.create(inputParameters),
                     ParametersFactory.create(
                         clusterElementConnection == null ? Map.of() : clusterElementConnection.getParameters()),
+                    ParametersFactory.create(clusterElement.getExtensions()),
+                    clusterElementConnections,
                     context);
             }
         };

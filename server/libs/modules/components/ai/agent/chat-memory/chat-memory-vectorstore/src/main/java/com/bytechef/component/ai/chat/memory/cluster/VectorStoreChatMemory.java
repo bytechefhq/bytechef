@@ -66,7 +66,7 @@ public class VectorStoreChatMemory {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
-                    .options(VectorStoreChatMemoryUtils.getFirstMessages(clusterElementDefinitionService))
+                    .options(VectorStoreChatMemoryUtils.getClusterElementFirstMessages())
                     .required(true),
                 ComponentDsl.integer(CHAT_MEMORY_RETRIEVE_SIZE)
                     .label("Chat Memory Retrieve Size")
