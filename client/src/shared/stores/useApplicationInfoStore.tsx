@@ -115,7 +115,10 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 enabled: json.helpHub.enabled === 'true',
                             },
                             loading: false,
-                            signUp: json.signUp,
+                            signUp: {
+                                activationRequired: json.signUp?.activationRequired === 'true',
+                                enabled: json.signUp?.enabled === 'true',
+                            },
                             socialLogin: {
                                 enabled: json.socialLogin?.enabled === 'true',
                             },
