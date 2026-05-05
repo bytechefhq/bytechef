@@ -52,7 +52,9 @@ public class LinearConnection {
                     "timeSchedule:write", false,
                     "admin", true))
                 .tokenUrl((connectionParameters, context) -> "https://api.linear.app/oauth/token")
-                .refreshUrl((connectionParameters, context) -> "https://api.linear.app/oauth/token"));
+                .refreshUrl((connectionParameters, context) -> "https://api.linear.app/oauth/token"))
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#connection-setup")
+        .version(1);
 
     private LinearConnection() {
     }

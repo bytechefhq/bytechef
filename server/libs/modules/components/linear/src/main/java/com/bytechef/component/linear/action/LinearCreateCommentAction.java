@@ -42,6 +42,7 @@ public class LinearCreateCommentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createComment")
         .title("Create Comment")
         .description("Creates a new comment.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#create-comment")
         .properties(
             string(TEAM_ID)
                 .label("Team ID")

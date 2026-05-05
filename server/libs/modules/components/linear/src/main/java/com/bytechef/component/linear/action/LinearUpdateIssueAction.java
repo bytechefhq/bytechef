@@ -49,6 +49,7 @@ public class LinearUpdateIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateIssue")
         .title("Update Issue")
         .description("Update an issue.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#update-issue")
         .properties(
             string(TEAM_ID)
                 .label("Team ID")

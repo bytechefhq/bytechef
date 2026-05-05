@@ -43,6 +43,8 @@ public class LinearComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("linear")
         .title("Linear")
         .description("Linear is a project management and issue tracking tool designed primarily for software teams.")
+        .customAction(true)
+        .customActionHelp("", "https://linear.app/developers/graphql")
         .icon("path:assets/linear.svg")
         .categories(ComponentCategory.PROJECT_MANAGEMENT)
         .connection(LinearConnection.CONNECTION_DEFINITION)
@@ -63,7 +65,8 @@ public class LinearComponentHandler implements ComponentHandler {
             tool(LinearCreateProjectAction.ACTION_DEFINITION),
             tool(LinearUpdateProjectAction.ACTION_DEFINITION),
             tool(LinearCreateCommentAction.ACTION_DEFINITION),
-            tool(LinearRawGraphqlQueryAction.ACTION_DEFINITION));
+            tool(LinearRawGraphqlQueryAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

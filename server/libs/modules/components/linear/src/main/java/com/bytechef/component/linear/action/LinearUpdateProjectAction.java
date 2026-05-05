@@ -49,6 +49,7 @@ public class LinearUpdateProjectAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateProject")
         .title("Update Project")
         .description("Update a project.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#update-project")
         .properties(
             string(PROJECT_ID)
                 .label("Project ID")

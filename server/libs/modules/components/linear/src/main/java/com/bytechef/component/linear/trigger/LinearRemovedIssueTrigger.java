@@ -44,6 +44,7 @@ public class LinearRemovedIssueTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("removedIssue")
         .title("Removed Issue")
         .description("Triggers when an issue is removed.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#removed-issue")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             ALL_PUBLIC_TEAMS_PROPERTY,

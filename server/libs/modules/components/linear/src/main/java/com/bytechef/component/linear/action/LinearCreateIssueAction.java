@@ -48,6 +48,7 @@ public class LinearCreateIssueAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
         .title("Create Issue")
         .description("Creates a new issue.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#create-issue")
         .properties(
             string(TITLE)
                 .label("Issue Title")
