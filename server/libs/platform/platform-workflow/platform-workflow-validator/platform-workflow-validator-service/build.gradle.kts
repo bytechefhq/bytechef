@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework:spring-core")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
+    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 }

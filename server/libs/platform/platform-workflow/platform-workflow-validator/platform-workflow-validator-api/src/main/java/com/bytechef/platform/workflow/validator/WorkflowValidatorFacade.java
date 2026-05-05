@@ -35,6 +35,14 @@ public interface WorkflowValidatorFacade {
     WorkflowValidationResult validateWorkflow(String workflow);
 
     /**
+     * Validates a workflow identified by its ID.
+     *
+     * @param workflowId the ID of the workflow to validate
+     * @return a {@link WorkflowValidationResult} containing lists of errors and warnings
+     */
+    WorkflowValidationResult validateWorkflowById(String workflowId);
+
+    /**
      * Holds the result of a workflow validation, containing lists of error messages and warning messages.
      */
     @SuppressFBWarnings("EI")

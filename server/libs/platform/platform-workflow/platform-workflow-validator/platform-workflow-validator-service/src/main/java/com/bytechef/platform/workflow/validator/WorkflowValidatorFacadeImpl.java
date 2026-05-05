@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ActionDefinition;
@@ -35,6 +37,7 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -54,19 +57,23 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     private final ComponentDefinitionService componentDefinitionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final WorkflowService workflowService;
 
+    @SuppressFBWarnings("EI2")
     public WorkflowValidatorFacadeImpl(
         ActionDefinitionService actionDefinitionService,
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TriggerDefinitionService triggerDefinitionService) {
+        TriggerDefinitionService triggerDefinitionService,
+        WorkflowService workflowService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionService = triggerDefinitionService;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -92,6 +99,13 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             .toList();
 
         return new WorkflowValidationResult(errorList, warningList);
+    }
+
+    @Override
+    public WorkflowValidationResult validateWorkflowById(String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        return validateWorkflow(workflow.getDefinition());
     }
 
     private List<PropertyInfo> getTaskProperties(String taskType, String kind) {
