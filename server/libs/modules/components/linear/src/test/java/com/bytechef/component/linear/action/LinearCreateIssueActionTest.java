@@ -23,9 +23,9 @@ import static com.bytechef.component.linear.constant.LinearConstants.STATUS_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
@@ -33,22 +33,24 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.linear.util.LinearUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 class LinearCreateIssueActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform(ActionContext mockedContext) {
         Parameters parameters = MockParametersFactory.create(
             Map.of(TITLE, "Title", TEAM_ID, "1", STATUS_ID, "Done", PRIORITY, 0, ASSIGNEE_ID, "abc", DESCRIPTION,
                 "This is a description."));
@@ -62,13 +64,13 @@ class LinearCreateIssueActionTest {
                     stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(Map.of("data", Map.of("issueCreate", Map.of("id", "abc"))));
 
-            Object result = LinearCreateIssueAction.perform(parameters, parameters, mockedActionContext);
+            Object result = LinearCreateIssueAction.perform(parameters, null, mockedContext);
 
             assertEquals(Map.of("id", "abc"), result);
             assertEquals(
                 "mutation{issueCreate(input: {title: \"Title\", teamId: \"1\", stateId: \"Done\", priority: 0, assigneeId: \"abc\", description: \"This is a description.\"}){success issue{id title}}}",
                 stringArgumentCaptor.getValue());
-            assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }
 }

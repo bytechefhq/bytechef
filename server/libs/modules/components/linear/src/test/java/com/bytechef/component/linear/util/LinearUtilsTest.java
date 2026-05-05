@@ -60,7 +60,6 @@ import org.mockito.ArgumentCaptor;
 class LinearUtilsTest {
 
     private Parameters mockedInputParameters = mock(Parameters.class);
-    private final Parameters mockedConnectionParameters = mock(Parameters.class);
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final List<Option<String>> expected = List.of(option("test1", "1"), option("test2", "2"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -90,7 +89,7 @@ class LinearUtilsTest {
             .thenReturn(graphqlResponse);
 
         List<Option<String>> result = LinearUtils.getAssigneeOptions(
-            mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
         assertEquals(result, expected);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
@@ -122,7 +121,7 @@ class LinearUtilsTest {
             .thenReturn(graphqlResponse);
 
         List<Option<String>> result = LinearUtils.getIssueOptions(
-            mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
+            mockedInputParameters, null, null, null, mockedContext);
 
         assertEquals(result, expected);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
@@ -154,7 +153,7 @@ class LinearUtilsTest {
             .thenReturn(graphqlResponse);
 
         List<Option<String>> result = LinearUtils.getProjectOptions(
-            mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
         assertThat(result, Matchers.containsInAnyOrder(expected.toArray()));
     }
@@ -176,7 +175,7 @@ class LinearUtilsTest {
             .thenReturn(graphqlResponse);
 
         List<Option<String>> result = LinearUtils.getProjectStateOptions(
-            mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
         assertEquals(result, expected);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
@@ -206,7 +205,7 @@ class LinearUtilsTest {
             .thenReturn(graphqlResponse);
 
         List<Option<String>> result = LinearUtils.getIssueStateOptions(
-            mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
         assertEquals(result, expected);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
@@ -236,7 +235,7 @@ class LinearUtilsTest {
             .thenReturn(graphqlResponse);
 
         List<Option<String>> result = LinearUtils.getTeamOptions(
-            mockedInputParameters, mockedConnectionParameters, Map.of(), "", mockedContext);
+            null, null, null, null, mockedContext);
 
         assertEquals(result, expected);
         assertNotNull(httpFunctionArgumentCaptor.getValue());

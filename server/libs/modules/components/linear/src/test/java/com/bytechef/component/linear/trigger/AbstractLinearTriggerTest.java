@@ -16,40 +16,34 @@
 
 package com.bytechef.component.linear.trigger;
 
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.linear.util.LinearUtils;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 abstract class AbstractLinearTriggerTest {
 
-    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
-    protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
-    protected WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     protected Parameters mockedParameters = mock(Parameters.class);
-    protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected MockedStatic<LinearUtils> linearUtilsMockedStatic;
-    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    protected ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = ArgumentCaptor.forClass(WebhookBody.class);
-    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
-        ArgumentCaptor.forClass(TriggerContext.class);
-    protected String workflowExecutionId = "testWorkflowExecutionId";
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    protected ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = forClass(WebhookBody.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = forClass(TriggerContext.class);
 
     @BeforeEach
     void beforeEach() {
