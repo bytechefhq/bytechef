@@ -52,6 +52,7 @@ public class ZohoBooksCreateSalesOrderAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSalesOrder")
         .title("Create Sales Order")
         .description("Create a sales order for your customer.")
+        .help("", "https://docs.bytechef.io/reference/components/zoho-books_v1#create-sales-order")
         .properties(
             string(CUSTOMER_ID)
                 .label("Customer ID")

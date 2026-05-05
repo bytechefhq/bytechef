@@ -39,6 +39,8 @@ public class ZohoBooksComponentHandler implements ComponentHandler {
         .description(
             "Zoho Books is cloud-based accounting software for managing your accounting tasks and organizing " +
                 "your transactions.")
+        .customAction(true)
+        .customActionHelp("", "https://www.zoho.com/books/api/v3/introduction/#overview")
         .icon("path:assets/zoho-books.svg")
         .categories(ComponentCategory.ACCOUNTING)
         .connection(ZohoBooksConnection.CONNECTION_DEFINITION)
@@ -49,7 +51,8 @@ public class ZohoBooksComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(ZohoBooksCreateContactAction.ACTION_DEFINITION),
             tool(ZohoBooksCreateInvoiceAction.ACTION_DEFINITION),
-            tool(ZohoBooksCreateSalesOrderAction.ACTION_DEFINITION));
+            tool(ZohoBooksCreateSalesOrderAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
