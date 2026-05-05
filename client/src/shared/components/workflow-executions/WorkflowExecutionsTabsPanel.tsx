@@ -96,14 +96,26 @@ const WorkflowExecutionsTabsPanel = ({
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>
                         {activeTab === 'input'
-                            ? selectedItem?.startDate?.toLocaleDateString()
-                            : selectedItem?.endDate?.toLocaleDateString()}
+                            ? selectedItem?.startDate &&
+                              (selectedItem.startDate instanceof Date
+                                  ? selectedItem.startDate.toLocaleDateString()
+                                  : new Date(selectedItem.startDate).toLocaleDateString())
+                            : selectedItem?.endDate &&
+                              (selectedItem.endDate instanceof Date
+                                  ? selectedItem.endDate.toLocaleDateString()
+                                  : new Date(selectedItem.endDate).toLocaleDateString())}
                     </span>
 
                     <span>
                         {activeTab === 'input'
-                            ? selectedItem?.startDate?.toLocaleTimeString()
-                            : selectedItem?.endDate?.toLocaleTimeString()}
+                            ? selectedItem?.startDate &&
+                              (selectedItem.startDate instanceof Date
+                                  ? selectedItem.startDate.toLocaleTimeString()
+                                  : new Date(selectedItem.startDate).toLocaleTimeString())
+                            : selectedItem?.endDate &&
+                              (selectedItem.endDate instanceof Date
+                                  ? selectedItem.endDate.toLocaleTimeString()
+                                  : new Date(selectedItem.endDate).toLocaleTimeString())}
                     </span>
                 </div>
             </div>
