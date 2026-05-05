@@ -23,7 +23,9 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ClusterElementContextAware.ClusterElementFunction;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,6 +37,8 @@ class ClusterElementResolverFunctionTest {
     void testResolveReturnsExpectedResult() {
         Parameters inputParameters = mock(Parameters.class);
         Parameters connectionParameters = mock(Parameters.class);
+        Parameters extensions = mock(Parameters.class);
+        Map<String, ComponentConnection> componentConnections = Map.of();
         ClusterElementContext context = mock(ClusterElementContext.class);
 
         ClusterElementResolverFunction resolver = new ClusterElementResolverFunction() {
@@ -44,7 +48,8 @@ class ClusterElementResolverFunctionTest {
                 ClusterElementType clusterElementType, ClusterElementFunction<T> clusterElementFunction) {
 
                 if ("SOURCE".equals(clusterElementType.name())) {
-                    return clusterElementFunction.apply("element", inputParameters, connectionParameters, context);
+                    return clusterElementFunction.apply(
+                        "element", inputParameters, connectionParameters, extensions, componentConnections, context);
                 }
 
                 return null;
@@ -56,13 +61,13 @@ class ClusterElementResolverFunctionTest {
 
         String result = resolver.resolve(
             sourceType,
-            (clusterElement, inputParams, connectionParams, ctx) -> "source-result");
+            (clusterElement, inputParams, connectionParams, exts, connections, ctx) -> "source-result");
 
         assertEquals("source-result", result);
 
         String otherResult = resolver.resolve(
             otherType,
-            (clusterElement, inputParams, connectionParams, ctx) -> "other-result");
+            (clusterElement, inputParams, connectionParams, exts, connections, ctx) -> "other-result");
 
         assertNull(otherResult);
     }
@@ -71,6 +76,8 @@ class ClusterElementResolverFunctionTest {
     void testResolveWithDifferentReturnTypes() {
         Parameters inputParameters = mock(Parameters.class);
         Parameters connectionParameters = mock(Parameters.class);
+        Parameters extensions = mock(Parameters.class);
+        Map<String, ComponentConnection> componentConnections = Map.of();
         ClusterElementContext context = mock(ClusterElementContext.class);
 
         ClusterElementResolverFunction resolver = new ClusterElementResolverFunction() {
@@ -79,7 +86,8 @@ class ClusterElementResolverFunctionTest {
             public <T> T resolve(
                 ClusterElementType clusterElementType, ClusterElementFunction<T> clusterElementFunction) {
 
-                return clusterElementFunction.apply("element", inputParameters, connectionParameters, context);
+                return clusterElementFunction.apply(
+                    "element", inputParameters, connectionParameters, extensions, componentConnections, context);
             }
         };
 
@@ -87,19 +95,19 @@ class ClusterElementResolverFunctionTest {
 
         String stringResult = resolver.resolve(
             sourceType,
-            (clusterElement, inputParams, connectionParams, ctx) -> "string");
+            (clusterElement, inputParams, connectionParams, exts, connections, ctx) -> "string");
 
         assertEquals("string", stringResult);
 
         Integer intResult = resolver.resolve(
             sourceType,
-            (clusterElement, inputParams, connectionParams, ctx) -> 42);
+            (clusterElement, inputParams, connectionParams, exts, connections, ctx) -> 42);
 
         assertEquals(42, intResult);
 
         Boolean boolResult = resolver.resolve(
             sourceType,
-            (clusterElement, inputParams, connectionParams, ctx) -> true);
+            (clusterElement, inputParams, connectionParams, exts, connections, ctx) -> true);
 
         assertEquals(true, boolResult);
     }
@@ -108,6 +116,8 @@ class ClusterElementResolverFunctionTest {
     void testResolveProvidesClusterElementToFunction() {
         Parameters inputParameters = mock(Parameters.class);
         Parameters connectionParameters = mock(Parameters.class);
+        Parameters extensions = mock(Parameters.class);
+        Map<String, ComponentConnection> componentConnections = Map.of();
         ClusterElementContext context = mock(ClusterElementContext.class);
         String expectedElement = "testElement";
 
@@ -117,7 +127,8 @@ class ClusterElementResolverFunctionTest {
             public <T> T resolve(
                 ClusterElementType clusterElementType, ClusterElementFunction<T> clusterElementFunction) {
 
-                return clusterElementFunction.apply(expectedElement, inputParameters, connectionParameters, context);
+                return clusterElementFunction.apply(
+                    expectedElement, inputParameters, connectionParameters, extensions, componentConnections, context);
             }
         };
 
@@ -125,7 +136,7 @@ class ClusterElementResolverFunctionTest {
 
         String result = resolver.resolve(
             type,
-            (clusterElement, inputParams, connectionParams, ctx) -> "Element: " + clusterElement);
+            (clusterElement, inputParams, connectionParams, exts, connections, ctx) -> "Element: " + clusterElement);
 
         assertEquals("Element: testElement", result);
     }
