@@ -103,7 +103,7 @@ class CopilotVectorStoreLoaderConfiguration {
                 int vectorHash = (int) fileMetadata.get("hash");
 
                 if (vectorHash != hash) {
-                    deleteFromVectorStore(name, vectorHash);
+                    deleteFromVectorStore(name);
 
                     addDocumentChunks(name, documents, cleanedDocument, hash);
                 }
@@ -118,8 +118,8 @@ class CopilotVectorStoreLoaderConfiguration {
             .anyMatch(map -> fileName.equals(map.get(NAME)) && DOCS.equals(map.get(CATEGORY)));
     }
 
-    private void deleteFromVectorStore(String name, int hash) {
-        vectorStore.delete(String.format("name == '%s' AND category == '%s' AND hash == '%d'", name, DOCS, hash));
+    private void deleteFromVectorStore(String name) {
+        vectorStore.delete(String.format("name == '%s' AND category == '%s'", name, DOCS));
     }
 
     private static String extractDocName(Resource resource) {
