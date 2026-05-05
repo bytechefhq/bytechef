@@ -43,7 +43,7 @@ const WorkflowNodesPopoverMenu = ({
     nodeIndex,
     onOpenChange: externalOnOpenChange,
     open: externalOpen,
-    showPaste = true,
+    showPaste = false,
     sourceNodeId,
     sourceNodeName,
 }: WorkflowNodesPopoverMenuProps) => {
