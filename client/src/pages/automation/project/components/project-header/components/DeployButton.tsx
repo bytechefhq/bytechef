@@ -34,8 +34,14 @@ const DeployButton = ({project}: {project: Project}) => {
         return (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <span className="ml-2 inline-flex">
-                        <Button disabled icon={<RocketIcon />} label="Deploy" variant="outline" />
+                    <span className="inline-flex">
+                        <Button
+                            className="rounded-l-none border-l-0"
+                            disabled
+                            icon={<RocketIcon />}
+                            label="Deploy"
+                            variant="outline"
+                        />
                     </span>
                 </TooltipTrigger>
 
