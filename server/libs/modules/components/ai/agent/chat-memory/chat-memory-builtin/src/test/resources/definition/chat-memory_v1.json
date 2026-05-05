@@ -158,8 +158,11 @@
       "metadata": { },
       "minLength": null,
       "name": "conversationId",
-      "options": [ ],
-      "optionsDataSource": null,
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -553,8 +556,11 @@
       "metadata": { },
       "minLength": null,
       "name": "conversationId",
-      "options": [ ],
-      "optionsDataSource": null,
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -733,8 +739,11 @@
       "metadata": { },
       "minLength": null,
       "name": "conversationId",
-      "options": [ ],
-      "optionsDataSource": null,
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -957,8 +966,12 @@
       "metadata": { },
       "minLength": null,
       "name": "conversationId",
-      "options": [ ],
-      "optionsDataSource": null,
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
       "required": true,
