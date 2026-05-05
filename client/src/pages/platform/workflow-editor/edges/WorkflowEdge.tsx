@@ -3,7 +3,7 @@ import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} fr
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {type DragEvent, type MouseEvent, useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -164,19 +164,19 @@ export default function WorkflowEdge({
         }
     }, []);
 
-    const handleDragOver = useCallback((event: React.DragEvent) => {
+    const handleDragOver = useCallback((event: DragEvent) => {
         event.preventDefault();
 
         setDropzoneActive(true);
     }, []);
 
-    const handleDrop = useCallback((event: React.DragEvent) => {
+    const handleDrop = useCallback((event: DragEvent) => {
         event.preventDefault();
 
         setDropzoneActive(false);
     }, []);
 
-    const handleClick = useCallback((event: React.MouseEvent) => event.stopPropagation(), []);
+    const handleClick = useCallback((event: MouseEvent) => event.stopPropagation(), []);
 
     useEffect(() => {
         const handleGlobalDragEnd = () => {
