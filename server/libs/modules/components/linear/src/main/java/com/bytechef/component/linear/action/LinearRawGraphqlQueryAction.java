@@ -38,6 +38,7 @@ public class LinearRawGraphqlQueryAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("rawGraphqlQuery")
         .title("Raw Graphql Query")
         .description("Perform a raw Graphql query.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#raw-graphql-query")
         .properties(
             string(QUERY)
                 .label("Query")

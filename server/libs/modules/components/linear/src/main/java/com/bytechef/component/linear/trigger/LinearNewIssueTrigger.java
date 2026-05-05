@@ -44,6 +44,7 @@ public class LinearNewIssueTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newIssue")
         .title("New Issue")
         .description("Triggers when new issue is created.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#new-issue")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             ALL_PUBLIC_TEAMS_PROPERTY,

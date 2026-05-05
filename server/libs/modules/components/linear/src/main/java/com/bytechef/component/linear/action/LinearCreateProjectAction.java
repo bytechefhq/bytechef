@@ -49,6 +49,7 @@ public class LinearCreateProjectAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createProject")
         .title("Create Project")
         .description("Creates a new project.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#create-project")
         .properties(
             string(NAME)
                 .label("Project Name")

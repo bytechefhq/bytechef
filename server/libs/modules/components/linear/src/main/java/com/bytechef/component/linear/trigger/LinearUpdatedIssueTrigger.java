@@ -44,6 +44,7 @@ public class LinearUpdatedIssueTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("updatedIssue")
         .title("Updated Issue")
         .description("Triggers when an issue is updated.")
+        .help("", "https://docs.bytechef.io/reference/components/linear_v1#updated-issue")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             ALL_PUBLIC_TEAMS_PROPERTY,
