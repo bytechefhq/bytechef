@@ -30,9 +30,7 @@ describe('DateTimePicker', () => {
 
         await userEvent.click(trigger);
 
-        // Calendar should be visible.
-        // We look for a day, e.g., 26th.
-        const day26 = screen.getByText('26');
+        const day26 = screen.getByLabelText('Tuesday, December 26th, 2023');
 
         await userEvent.click(day26);
 
