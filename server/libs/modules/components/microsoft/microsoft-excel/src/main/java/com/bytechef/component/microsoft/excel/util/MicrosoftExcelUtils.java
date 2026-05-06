@@ -190,7 +190,11 @@ public class MicrosoftExcelUtils {
             if (integer == 1 && body.get(VALUES) instanceof List<?> list) {
                 return list.stream()
                     .filter(obj -> obj instanceof List<?> innerList && innerList.stream()
-                        .anyMatch(innerObj -> !((String) innerObj).isEmpty()))
+                        .anyMatch(innerObj -> {
+                            String string = innerObj.toString();
+
+                            return !string.isEmpty();
+                        }))
                     .findFirst()
                     .map(ignore -> integer)
                     .orElse(0);
