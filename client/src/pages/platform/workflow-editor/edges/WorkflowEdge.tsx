@@ -154,29 +154,29 @@ export default function WorkflowEdge({
         });
     }, [edges, id, nodes, sourceNode, sourceNodeId, updateWorkflowMutation]);
 
-    const handleDragEnter = useCallback(() => setDropzoneActive(true), []);
+    const handleDragEnter = () => setDropzoneActive(true);
 
-    const handleDragLeave = useCallback((event: React.DragEvent) => {
+    const handleDragLeave = (event: DragEvent) => {
         const relatedTarget = event.relatedTarget as Node | null;
 
         if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
             setDropzoneActive(false);
         }
-    }, []);
+    };
 
-    const handleDragOver = useCallback((event: DragEvent) => {
+    const handleDragOver = (event: DragEvent) => {
         event.preventDefault();
 
         setDropzoneActive(true);
-    }, []);
+    };
 
-    const handleDrop = useCallback((event: DragEvent) => {
+    const handleDrop = (event: DragEvent) => {
         event.preventDefault();
 
         setDropzoneActive(false);
-    }, []);
+    };
 
-    const handleClick = useCallback((event: MouseEvent) => event.stopPropagation(), []);
+    const handleClick = (event: MouseEvent) => event.stopPropagation();
 
     useEffect(() => {
         const handleGlobalDragEnd = () => {
@@ -244,7 +244,7 @@ export default function WorkflowEdge({
                                         className={twMerge(
                                             'flex cursor-pointer items-center justify-center rounded border-2 transition-all',
                                             isDropzoneActive
-                                                ? 'size-16 border-surface-brand-secondary-hover bg-surface-brand-secondary-hover' // zamijeniti blue-100 s tokenom
+                                                ? 'size-16 border-surface-brand-secondary-hover bg-surface-brand-secondary-hover'
                                                 : 'size-6 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
                                         )}
                                         id={`${id}-button`}
