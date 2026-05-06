@@ -5,8 +5,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Create a contact.",
-    "help": null,
+    "description": "Create a new contact.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-books_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -831,7 +834,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an invoice for your customer.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-books_v1#create-invoice"
+    },
     "metadata": null,
     "name": "createInvoice",
     "outputDefinition": {
@@ -1245,7 +1251,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a sales order for your customer.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-books_v1#create-sales-order"
+    },
     "metadata": null,
     "name": "createSalesOrder",
     "outputDefinition": {
@@ -1672,7 +1681,7 @@
   } ],
   "clusterElements": [ {
     "name": "createContact",
-    "description": "Create a contact.",
+    "description": "Create a new contact.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -3482,14 +3491,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-books_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://www.zoho.com/books/api/v3/introduction/#overview"
+  },
   "description": "Zoho Books is cloud-based accounting software for managing your accounting tasks and organizing your transactions.",
   "icon": "path:assets/zoho-books.svg",
   "metadata": null,
