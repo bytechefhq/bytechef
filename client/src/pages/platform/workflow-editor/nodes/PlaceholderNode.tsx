@@ -67,13 +67,13 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         pasteNode({nodeIndex, taskDispatcherContext, updateWorkflowMutation});
     }, [id, nodeIndex, nodes, updateWorkflowMutation]);
 
-    const handleDragEnter = useCallback(() => setDropzoneActive(true), []);
+    const handleDragEnter = () => setDropzoneActive(true);
 
-    const handleDragLeave = useCallback(() => setDropzoneActive(false), []);
+    const handleDragLeave = () => setDropzoneActive(false);
 
-    const handleDragOver = useCallback((event: DragEvent) => event.preventDefault(), []);
+    const handleDragOver = (event: DragEvent) => event.preventDefault();
 
-    const handleDrop = useCallback(() => setDropzoneActive(false), []);
+    const handleDrop = () => setDropzoneActive(false);
 
     return (
         <ContextMenu>
