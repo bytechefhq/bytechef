@@ -1,85 +1,44 @@
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
 import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
 import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/WorkflowExecutionsHeader';
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
-import {getErrorItem, getInitialSelectedItem} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
-import {JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {TabValueType} from '@/shared/types';
 import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
-import {useCallback, useEffect, useState} from 'react';
+
+import useWorkflowExecutions from './properties/hooks/useWorkflowExecutions';
 
 interface WorkflowExecutionsTestOutputProps {
     onCloseClick?: () => void;
     resizablePanelSize?: number;
     workflowIsRunning: boolean;
-    workflowTestExecution?: WorkflowTestExecution;
+    workflowTestExecution: WorkflowTestExecution;
 }
 
 const WorkflowExecutionsTestOutput = ({
     onCloseClick,
-    resizablePanelSize = 350,
+    resizablePanelSize = 300,
     workflowIsRunning,
     workflowTestExecution,
 }: WorkflowExecutionsTestOutputProps) => {
-    const [activeTab, setActiveTab] = useState<TabValueType>('output');
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
-        getInitialSelectedItem(workflowTestExecution)
-    );
-
-    const job = workflowTestExecution?.job;
-    const triggerExecution = workflowTestExecution?.triggerExecution;
-    const currentWorkflowId = job?.workflowId;
-
-    useEffect(() => {
-        setSelectedItem(getInitialSelectedItem(workflowTestExecution));
-        setActiveTab('output');
-    }, [workflowTestExecution]);
-
-    const hasNoTaskExecutions = !job?.taskExecutions || job.taskExecutions.length === 0;
-    const jobFailedWithNoExecutions = hasNoTaskExecutions && job?.status === JobStatusEnum.Failed;
-    const jobFailureError = job?.error ?? {
-        message: 'Workflow execution failed before any executions were created.',
-        stackTrace: [],
-    };
-
-    useEffect(() => {
-        const errorItem = getErrorItem(workflowTestExecution);
-
-        if (errorItem?.error && currentWorkflowId) {
-            useCopilotStore.getState().setWorkflowExecutionError({
-                errorMessage: errorItem.error.message,
-                stackTrace: errorItem.error.stackTrace,
-                title: errorItem.title,
-                workflowId: currentWorkflowId,
-            });
-        } else if (jobFailedWithNoExecutions && job?.error && currentWorkflowId) {
-            useCopilotStore.getState().setWorkflowExecutionError({
-                errorMessage: job.error.message,
-                stackTrace: job.error.stackTrace,
-                title: 'Workflow',
-                workflowId: currentWorkflowId,
-            });
-        } else if (!errorItem?.error) {
-            useCopilotStore.getState().setWorkflowExecutionError(undefined);
-        }
-    }, [workflowTestExecution, currentWorkflowId, jobFailedWithNoExecutions, job?.error]);
-
-    const taskExecutions = job?.taskExecutions || [];
-
-    const onTaskClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
-        setActiveTab(taskExecution.error ? 'error' : 'output');
-        setSelectedItem(taskExecution);
-    }, []);
-
-    const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
+    const {
+        activeTab,
+        dialogOpen,
+        handleExecutionClick,
+        isTriggerExecution,
+        job,
+        jobFailedWithNoExecutions,
+        jobFailureError,
+        selectedExecution,
+        setActiveTab,
+        setDialogOpen,
+        taskExecutions,
+        triggerExecution,
+    } = useWorkflowExecutions({workflowTestExecution});
 
     return (
         <div className="flex size-full flex-col">
@@ -126,15 +85,15 @@ const WorkflowExecutionsTestOutput = ({
                                                 defaultValue={
                                                     isTriggerExecution
                                                         ? [triggerExecution?.id || '']
-                                                        : [selectedItem?.id || '']
+                                                        : [selectedExecution?.id || '']
                                                 }
                                                 type="multiple"
                                             >
                                                 {triggerExecution && (
                                                     <WorkflowExecutionsAccordionItem
                                                         execution={triggerExecution}
-                                                        onExecutionClick={onTaskClick}
-                                                        selectedExecutionId={selectedItem?.id || ''}
+                                                        onExecutionClick={handleExecutionClick}
+                                                        selectedExecutionId={selectedExecution?.id || ''}
                                                     >
                                                         <WorkflowTriggerExecutionItem
                                                             triggerExecution={triggerExecution}
@@ -146,8 +105,8 @@ const WorkflowExecutionsTestOutput = ({
                                                     <WorkflowExecutionsAccordionItem
                                                         execution={taskExecution}
                                                         key={taskExecution.id}
-                                                        onExecutionClick={onTaskClick}
-                                                        selectedExecutionId={selectedItem?.id || ''}
+                                                        onExecutionClick={handleExecutionClick}
+                                                        selectedExecutionId={selectedExecution?.id || ''}
                                                     >
                                                         <WorkflowTaskExecutionItem taskExecution={taskExecution} />
                                                     </WorkflowExecutionsAccordionItem>
@@ -165,7 +124,7 @@ const WorkflowExecutionsTestOutput = ({
                                                 dialogOpen={dialogOpen}
                                                 isEditorEnvironment={true}
                                                 job={job}
-                                                selectedItem={selectedItem}
+                                                selectedItem={selectedExecution}
                                                 setActiveTab={setActiveTab}
                                                 setDialogOpen={setDialogOpen}
                                                 triggerExecution={triggerExecution}
