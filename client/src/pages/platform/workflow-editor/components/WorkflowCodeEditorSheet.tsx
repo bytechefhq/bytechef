@@ -195,7 +195,7 @@ const WorkflowCodeEditorSheet = ({
 
                             <ResizablePanel defaultSize={500}>
                                 {workflowIsRunning ? (
-                                    <div className="flex items-center gap-x-1 p-3">
+                                    <div className="flex size-full items-center justify-center gap-x-1 p-3 text-center">
                                         <span className="flex animate-spin text-gray-400">
                                             <RefreshCwIcon className="size-4" />
                                         </span>
@@ -203,11 +203,13 @@ const WorkflowCodeEditorSheet = ({
                                         <span className="text-muted-foreground">Workflow is running...</span>
                                     </div>
                                 ) : (
-                                    <WorkflowExecutionsTestOutput
-                                        resizablePanelSize={400}
-                                        workflowIsRunning={workflowIsRunning}
-                                        workflowTestExecution={workflowTestExecution}
-                                    />
+                                    workflowTestExecution && (
+                                        <WorkflowExecutionsTestOutput
+                                            resizablePanelSize={400}
+                                            workflowIsRunning={workflowIsRunning}
+                                            workflowTestExecution={workflowTestExecution}
+                                        />
+                                    )
                                 )}
                             </ResizablePanel>
                         </ResizablePanelGroup>
