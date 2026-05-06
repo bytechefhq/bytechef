@@ -28,7 +28,7 @@ const WorkflowExecutionsTestOutput = ({
     workflowIsRunning,
     workflowTestExecution,
 }: WorkflowExecutionsTestOutputProps) => {
-    const [activeTab, setActiveTab] = useState<TabValueType>('input');
+    const [activeTab, setActiveTab] = useState<TabValueType>('output');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
         getInitialSelectedItem(workflowTestExecution)
@@ -40,7 +40,7 @@ const WorkflowExecutionsTestOutput = ({
 
     useEffect(() => {
         setSelectedItem(getInitialSelectedItem(workflowTestExecution));
-        setActiveTab('input');
+        setActiveTab('output');
     }, [workflowTestExecution]);
 
     const hasNoTaskExecutions = !job?.taskExecutions || job.taskExecutions.length === 0;
@@ -75,7 +75,7 @@ const WorkflowExecutionsTestOutput = ({
     const taskExecutions = job?.taskExecutions || [];
 
     const onTaskClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
-        setActiveTab(taskExecution.error ? 'error' : 'input');
+        setActiveTab(taskExecution.error ? 'error' : 'output');
         setSelectedItem(taskExecution);
     }, []);
 
