@@ -1,6 +1,6 @@
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {getErrorItem, getInitialSelectedItem} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
-import {ExecutionError} from '@/shared/middleware/graphql';
+import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {
     Job,
     JobStatusEnum,
@@ -9,10 +9,12 @@ import {
     WorkflowTestExecution,
 } from '@/shared/middleware/platform/workflow/test';
 import {TabValueType} from '@/shared/types';
-import {useEffect, useState} from 'react';
+import getDeepestFailedExecution from '@/shared/util/getDeepestFailedExecution';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 type UseWorkflowExecutionsReturnType = {
     activeTab: TabValueType;
+    deepestFailedExecution: {execution: TaskExecution | TriggerExecution; path: string[]} | null;
     dialogOpen: boolean;
     handleExecutionClick: (taskExecution: TaskExecution | TriggerExecution) => void;
     isTriggerExecution: boolean;
@@ -41,9 +43,38 @@ const useWorkflowExecutions = ({
 
     const currentWorkflowId = job?.workflowId;
 
-    const hasTaskExecutions = job?.taskExecutions || job?.taskExecutions?.length;
+    const jobIdRef = useRef<string | undefined>(undefined);
 
-    const jobFailedWithNoExecutions = !hasTaskExecutions && job?.status === JobStatusEnum.Failed;
+    const taskExecutions = useMemo(() => job?.taskExecutions || [], [job?.taskExecutions]);
+
+    const deepestFailedExecution = useMemo(() => {
+        if (triggerExecution) {
+            const result = getDeepestFailedExecution({
+                currentPath: [],
+                execution: triggerExecution,
+                isTriggerExecution: true,
+            });
+
+            if (result) {
+                return result;
+            }
+        }
+
+        for (const taskExecution of taskExecutions) {
+            const result = getDeepestFailedExecution({
+                currentPath: [],
+                execution: taskExecution,
+            });
+
+            if (result) {
+                return result;
+            }
+        }
+
+        return null;
+    }, [taskExecutions, triggerExecution]);
+
+    const jobFailedWithNoExecutions = !taskExecutions.length && job?.status === JobStatusEnum.Failed;
     const jobFailureError = job?.error ?? {
         message: 'Workflow execution failed before any executions were created.',
         stackTrace: [],
@@ -89,8 +120,30 @@ const useWorkflowExecutions = ({
         }
     }, [workflowTestExecution, currentWorkflowId, jobFailedWithNoExecutions, job]);
 
+    useEffect(() => {
+        if (!job?.id || job.id === jobIdRef.current) {
+            return;
+        }
+
+        jobIdRef.current = job.id;
+
+        const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
+
+        const jobFailedWithNoExecutions = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
+
+        const newActiveTab = jobFailedWithNoExecutions || deepestFailedExecution?.execution.error ? 'error' : 'output';
+
+        setActiveTab(newActiveTab);
+
+        const newSelectedExecution =
+            deepestFailedExecution?.execution || triggerExecution || job.taskExecutions?.[0] || undefined;
+
+        setSelectedExecution(newSelectedExecution);
+    }, [deepestFailedExecution, job, triggerExecution]);
+
     return {
         activeTab,
+        deepestFailedExecution,
         dialogOpen,
         handleExecutionClick,
         isTriggerExecution: selectedExecution?.id === triggerExecution?.id,

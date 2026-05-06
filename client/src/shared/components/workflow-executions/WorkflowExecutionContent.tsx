@@ -2,6 +2,7 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {ChevronRightIcon} from 'lucide-react';
 import {Suspense, lazy, useMemo, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import {getFilteredOutput, hasValue} from './WorkflowExecutionsUtils';
 
@@ -41,11 +42,11 @@ const WorkflowExecutionContent = ({
                     {error.message || 'No message.'}
                 </span>
 
-                {error?.stackTrace && error.stackTrace.length > 0 && (
+                {error.stackTrace && error.stackTrace.length > 0 && (
                     <Collapsible onOpenChange={setStackTraceOpen} open={stackTraceOpen}>
                         <CollapsibleTrigger className="flex cursor-pointer items-center gap-1">
                             <ChevronRightIcon
-                                className={`size-4 transition-transform ${stackTraceOpen ? 'rotate-90' : ''}`}
+                                className={twMerge('size-4 transition-transform', stackTraceOpen && 'rotate-90')}
                             />
 
                             <span className="text-sm font-semibold">Stack Trace</span>
@@ -53,8 +54,8 @@ const WorkflowExecutionContent = ({
 
                         <CollapsibleContent>
                             <div className="mt-2 flex flex-col space-y-1 pl-5 text-sm">
-                                {error.stackTrace.map((line, index) => (
-                                    <div className="text-sm" key={index}>
+                                {error.stackTrace.map((line) => (
+                                    <div className="text-sm" key={line}>
                                         {line}
                                     </div>
                                 ))}
