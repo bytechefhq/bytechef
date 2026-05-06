@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.open.router.action.OpenRouterChatAction;
+import com.bytechef.component.ai.llm.open.router.action.OpenRouterCreateImageAction;
 import com.bytechef.component.ai.llm.open.router.cluster.OpenRouterChatModel;
 import com.bytechef.component.ai.llm.open.router.connection.OpenRouterConnection;
 import com.bytechef.component.definition.ComponentCategory;
@@ -39,7 +40,8 @@ public class OpenRouterComponentHandler implements ComponentHandler {
         .icon("path:assets/open-router.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OpenRouterConnection.CONNECTION_DEFINITION)
-        .actions(OpenRouterChatAction.ACTION_DEFINITION)
+        .actions(OpenRouterChatAction.ACTION_DEFINITION,
+            OpenRouterCreateImageAction.ACTION_DEFINITION)
         .clusterElements(OpenRouterChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override

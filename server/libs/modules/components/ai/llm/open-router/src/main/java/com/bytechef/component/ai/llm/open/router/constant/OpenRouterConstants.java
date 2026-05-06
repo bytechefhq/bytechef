@@ -58,12 +58,19 @@ public class OpenRouterConstants {
     public static final String MAX_COMPLETION_TOKENS = "maxCompletionTokens";
     public static final String SUPPORTED_PARAMETERS = "supportedParameters";
     public static final String TOP_LOGPROBS = "topLogprobs";
+    public static final String ASPECT_RATIO = "aspectRatio";
 
     public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .options(getOpenRouterModels())
+        .options(getOpenRouterModels("text"))
         .optionsLookupDependsOn(SUPPORTED_PARAMETERS)
+        .required(true);
+
+    public static final ModifiableStringProperty IMAGE_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .options(getOpenRouterModels("image"))
         .required(true);
 
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)

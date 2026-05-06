@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * @author Marko Kriskovic
  */
 public class OpenRouterUtils {
-    public static ActionDefinition.OptionsFunction<String> getOpenRouterModels() {
+    public static ActionDefinition.OptionsFunction<String> getOpenRouterModels(String outputType) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             List<String> supportedParametersArray = inputParameters.getList(SUPPORTED_PARAMETERS, String.class);
             String supportedParametersString = supportedParametersArray != null && !supportedParametersArray.isEmpty()
@@ -39,7 +39,7 @@ public class OpenRouterUtils {
 
             Context.Http.Executor executor = context.http(http -> http.get("/models"))
                 .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-                .queryParameter("output_modalities", "text");
+                .queryParameter("output_modalities", outputType);
 
             if (supportedParametersString != null) {
                 executor = executor.queryParameter("supported_parameters", supportedParametersString);
