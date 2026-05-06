@@ -120,11 +120,13 @@ const Project = () => {
                         <ResizableHandle className="bg-muted" />
 
                         <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
-                            <WorkflowExecutionsTestOutput
-                                onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
-                                workflowIsRunning={workflowIsRunning}
-                                workflowTestExecution={workflowTestExecution}
-                            />
+                            {workflowTestExecution && (
+                                <WorkflowExecutionsTestOutput
+                                    onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
+                                    workflowIsRunning={workflowIsRunning}
+                                    workflowTestExecution={workflowTestExecution}
+                                />
+                            )}
                         </ResizablePanel>
                     </ResizablePanelGroup>
                 </div>
