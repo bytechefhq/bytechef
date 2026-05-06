@@ -63,7 +63,7 @@ Creation of OAuth 2.0 application is documented [here](/reference/components/zoh
 ### Create Contact
 Name: createContact
 
-`Create a contact.`
+`Create a new contact.`
 
 #### Properties
 
@@ -146,6 +146,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Currency ID
+
+To find the Currency ID, click [here](/reference/components/zoho-books_v1#how-to-find-the-currency-id).
 
 
 
@@ -214,6 +217,17 @@ Type: OBJECT
 }
 ```
 
+#### Find Customer ID
+
+To find the Customer ID, click [here](/reference/components/zoho-books_v1#how-to-find-the-customer-id).
+
+#### Find Item ID
+
+To find the Item ID, click [here](/reference/components/zoho-books_v1#how-to-find-the-item-id).
+
+#### Find Currency ID
+
+To find the Currency ID, click [here](/reference/components/zoho-books_v1#how-to-find-the-currency-id).
 
 
 
@@ -284,8 +298,50 @@ Type: OBJECT
 }
 ```
 
+#### Find Customer ID
+
+To find the Customer ID, click [here](/reference/components/zoho-books_v1#how-to-find-the-customer-id).
+
+#### Find Item ID
+
+To find the Item ID, click [here](/reference/components/zoho-books_v1#how-to-find-the-item-id).
+
+#### Find Currency ID
+
+To find the Currency ID, click [here](/reference/components/zoho-books_v1#how-to-find-the-currency-id).
 
 
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find the Currency ID
+
+- **Method 1: Via API**
+
+Use the `GET /settings/currencies` endpoint to retrieve a list of all currencies and their IDs.
+
+### How to find the Customer ID
+
+- **Method 1: Via API**
+
+Use the `GET /contacts` endpoint to retrieve a list of all customers and their IDs.
+
+- **Method 2: Via UI**
+
+Open your Zoho Books dashboard, then navigate to Sales -> Customers from the left-hand menu. Select the desired customer, scroll down to the Record Info section and you’ll find the Customer ID listed there.
+
+### How to find the Item ID
+
+- **Method 1: Via API**
+
+Use the `GET /items` endpoint to retrieve a list of all items and their IDs.
