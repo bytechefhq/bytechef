@@ -4,70 +4,13 @@ import {JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middlewar
 import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {TabValueType} from '@/shared/types';
+import getDeepestFailedExecution from '@/shared/util/getDeepestFailedExecution';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../../../stores/useWorkflowExecutionSheetStore';
 
 const POLLING_INTERVAL_MS = 2000;
-
-interface GetDeepestFailedExecutionProps {
-    currentPath: string[];
-    execution: TaskExecution | TriggerExecution;
-    isTriggerExecution?: boolean;
-}
-
-const getDeepestFailedExecution = ({
-    currentPath,
-    execution,
-    isTriggerExecution = false,
-}: GetDeepestFailedExecutionProps): {execution: TaskExecution | TriggerExecution; path: string[]} | null => {
-    const path = execution.id ? [...currentPath, execution.id] : currentPath;
-
-    if (isTriggerExecution && execution.error) {
-        return {execution, path};
-    }
-
-    if ('iterations' in execution && execution.iterations && execution.iterations.length > 0) {
-        let failedChild = null;
-
-        execution.iterations.forEach((iteration, index) => {
-            const iterationId = `${execution.id}-iteration-${index}`;
-
-            iteration.forEach(
-                (iterationTask) =>
-                    (failedChild = getDeepestFailedExecution({
-                        currentPath: [...path, iterationId],
-                        execution: iterationTask,
-                        isTriggerExecution,
-                    }))
-            );
-        });
-
-        return failedChild;
-    }
-
-    if ('children' in execution && execution.children && execution.children.length > 0) {
-        let failedChild = null;
-
-        execution.children.forEach(
-            (child) =>
-                (failedChild = getDeepestFailedExecution({
-                    currentPath: path,
-                    execution: child,
-                    isTriggerExecution,
-                }))
-        );
-
-        return failedChild;
-    }
-
-    if (execution.error) {
-        return {execution, path};
-    }
-
-    return null;
-};
 
 const useWorkflowExecutionSheet = () => {
     const [activeTab, setActiveTab] = useState<TabValueType>('output');

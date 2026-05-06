@@ -27,6 +27,7 @@ const WorkflowExecutionsTestOutput = ({
 }: WorkflowExecutionsTestOutputProps) => {
     const {
         activeTab,
+        deepestFailedExecution,
         dialogOpen,
         handleExecutionClick,
         isTriggerExecution,
@@ -83,14 +84,16 @@ const WorkflowExecutionsTestOutput = ({
                                             <Accordion
                                                 className="ml-2 space-y-2"
                                                 defaultValue={
-                                                    isTriggerExecution
+                                                    deepestFailedExecution?.path ||
+                                                    (isTriggerExecution
                                                         ? [triggerExecution?.id || '']
-                                                        : [selectedExecution?.id || '']
+                                                        : [selectedExecution?.id || ''])
                                                 }
                                                 type="multiple"
                                             >
                                                 {triggerExecution && (
                                                     <WorkflowExecutionsAccordionItem
+                                                        defaultValue={deepestFailedExecution?.path}
                                                         execution={triggerExecution}
                                                         onExecutionClick={handleExecutionClick}
                                                         selectedExecutionId={selectedExecution?.id || ''}
@@ -103,6 +106,7 @@ const WorkflowExecutionsTestOutput = ({
 
                                                 {taskExecutions.map((taskExecution) => (
                                                     <WorkflowExecutionsAccordionItem
+                                                        defaultValue={deepestFailedExecution?.path}
                                                         execution={taskExecution}
                                                         key={taskExecution.id}
                                                         onExecutionClick={handleExecutionClick}
