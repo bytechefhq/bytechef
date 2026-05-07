@@ -18,58 +18,84 @@ package com.bytechef.component.zoho.crm.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Luka Ljubić
  */
+@ExtendWith(MockContextSetupExtension.class)
 class ZohoCrmUtilTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("option", "123"));
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach
-    void beforeEach() {
-        when(mockedActionContext.http(any()))
+    void beforeEach(Http mockedHttp, Executor mockedExecutor) {
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
     }
 
     @Test
-    void testGetProfileOptions() {
+    void testGetProfileOptions(
+        ActionContext mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("profiles", List.of(Map.of("name", "option", "id", "123"))));
 
         assertEquals(
             expectedOptions,
-            ZohoCrmUtils.getProfileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            ZohoCrmUtils.getProfileOptions(
+                null, null, null, null, mockedContext));
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/settings/profiles", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetRoleOptions() {
+    void testGetRoleOptions(
+        ActionContext mockedContext, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("roles", List.of(Map.of("name", "option", "id", "123"))));
 
         assertEquals(
             expectedOptions,
-            ZohoCrmUtils.getRoleOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            ZohoCrmUtils.getRoleOptions(
+                null, null, null, null, mockedContext));
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/settings/roles", stringArgumentCaptor.getValue());
     }
 }
