@@ -1,9 +1,0 @@
-query aiAgentSkill($id: ID!) {
-    aiAgentSkill(id: $id) {
-        id
-        name
-        description
-        createdDate
-        lastModifiedDate
-    }
-}

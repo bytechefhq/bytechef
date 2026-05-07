@@ -31,6 +31,7 @@ import {lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
 
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
+const AiSkills = lazy(() => import('@/pages/automation/ai/skills/AiSkills'));
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
 const AutomationConnections = lazy(() =>
     import('@/pages/automation/connections/Connections').then((module) => ({default: module.Connections}))
@@ -742,6 +743,64 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'approval-tasks',
+                                },
+                                {
+                                    loader: async () => redirect('/automation/ai/skills'),
+                                    path: 'ai',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AiSkills />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai/skills',
+                                },
+                                {
+                                    loader: async () => redirect('/automation/ai/skills/create/write'),
+                                    path: 'ai/skills/create',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AiSkills />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai/skills/create/write',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AiSkills />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai/skills/create/upload',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AiSkills />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai/skills/create/ai',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AiSkills />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai/skills/:skillId',
                                 },
                                 {
                                     children: [

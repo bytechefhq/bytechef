@@ -213,8 +213,8 @@ export enum AiAgentScenarioType {
   SingleTurn = 'SINGLE_TURN'
 }
 
-export type AiAgentSkill = {
-  __typename?: 'AiAgentSkill';
+export type AiSkill = {
+  __typename?: 'AiSkill';
   /** Epoch milliseconds (UTC) */
   createdDate?: Maybe<Scalars['Long']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -1404,8 +1404,8 @@ export type Mutation = {
   createAiAgentJudge: AiAgentJudge;
   createAiAgentScenarioJudge: AiAgentScenarioJudge;
   createAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
-  createAiAgentSkill: AiAgentSkill;
-  createAiAgentSkillFromInstructions: AiAgentSkill;
+  createAiSkill: AiSkill;
+  createAiSkillFromInstructions: AiSkill;
   createApiConnector: ApiConnector;
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
@@ -1428,7 +1428,7 @@ export type Mutation = {
   deleteAiAgentJudge: Scalars['Boolean']['output'];
   deleteAiAgentScenarioJudge: Scalars['Boolean']['output'];
   deleteAiAgentScenarioToolSimulation: Scalars['Boolean']['output'];
-  deleteAiAgentSkill: Scalars['Boolean']['output'];
+  deleteAiSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
@@ -1484,7 +1484,7 @@ export type Mutation = {
   updateAiAgentJudge: AiAgentJudge;
   updateAiAgentScenarioJudge: AiAgentScenarioJudge;
   updateAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
-  updateAiAgentSkill: AiAgentSkill;
+  updateAiSkill: AiSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
@@ -1571,7 +1571,7 @@ export type MutationCreateAiAgentScenarioToolSimulationArgs = {
 };
 
 
-export type MutationCreateAiAgentSkillArgs = {
+export type MutationCreateAiSkillArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   fileBytes: Scalars['String']['input'];
   filename: Scalars['String']['input'];
@@ -1579,7 +1579,7 @@ export type MutationCreateAiAgentSkillArgs = {
 };
 
 
-export type MutationCreateAiAgentSkillFromInstructionsArgs = {
+export type MutationCreateAiSkillFromInstructionsArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   instructions: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -1702,7 +1702,7 @@ export type MutationDeleteAiAgentScenarioToolSimulationArgs = {
 };
 
 
-export type MutationDeleteAiAgentSkillArgs = {
+export type MutationDeleteAiSkillArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2034,7 +2034,7 @@ export type MutationUpdateAiAgentScenarioToolSimulationArgs = {
 };
 
 
-export type MutationUpdateAiAgentSkillArgs = {
+export type MutationUpdateAiSkillArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -2418,10 +2418,10 @@ export type Query = {
   aiAgentEvalTest?: Maybe<AiAgentEvalTest>;
   aiAgentEvalTests: Array<AiAgentEvalTest>;
   aiAgentJudges: Array<AiAgentJudge>;
-  aiAgentSkill: AiAgentSkill;
-  aiAgentSkillFileContent: Scalars['String']['output'];
-  aiAgentSkillFilePaths: Array<Scalars['String']['output']>;
-  aiAgentSkills: Array<AiAgentSkill>;
+  aiSkill: AiSkill;
+  aiSkillFileContent: Scalars['String']['output'];
+  aiSkillFilePaths: Array<Scalars['String']['output']>;
+  aiSkills: Array<AiSkill>;
   apiConnector?: Maybe<ApiConnector>;
   apiConnectors: Array<ApiConnector>;
   apiKey?: Maybe<ApiKey>;
@@ -2597,18 +2597,18 @@ export type QueryAiAgentJudgesArgs = {
 };
 
 
-export type QueryAiAgentSkillArgs = {
+export type QueryAiSkillArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryAiAgentSkillFileContentArgs = {
+export type QueryAiSkillFileContentArgs = {
   id: Scalars['ID']['input'];
   path: Scalars['String']['input'];
 };
 
 
-export type QueryAiAgentSkillFilePathsArgs = {
+export type QueryAiSkillFilePathsArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -3669,34 +3669,34 @@ export type UpdateAiAgentScenarioToolSimulationMutationVariables = Exact<{
 
 export type UpdateAiAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', updateAiAgentScenarioToolSimulation: { __typename?: 'AiAgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
 
-export type AiAgentSkillQueryVariables = Exact<{
+export type AiSkillQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AiAgentSkillQuery = { __typename?: 'Query', aiAgentSkill: { __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type AiSkillQuery = { __typename?: 'Query', aiSkill: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type AiAgentSkillFileContentQueryVariables = Exact<{
+export type AiSkillFileContentQueryVariables = Exact<{
   id: Scalars['ID']['input'];
   path: Scalars['String']['input'];
 }>;
 
 
-export type AiAgentSkillFileContentQuery = { __typename?: 'Query', aiAgentSkillFileContent: string };
+export type AiSkillFileContentQuery = { __typename?: 'Query', aiSkillFileContent: string };
 
-export type AiAgentSkillFilePathsQueryVariables = Exact<{
+export type AiSkillFilePathsQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type AiAgentSkillFilePathsQuery = { __typename?: 'Query', aiAgentSkillFilePaths: Array<string> };
+export type AiSkillFilePathsQuery = { __typename?: 'Query', aiSkillFilePaths: Array<string> };
 
-export type AiAgentSkillsQueryVariables = Exact<{ [key: string]: never; }>;
+export type AiSkillsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AiAgentSkillsQuery = { __typename?: 'Query', aiAgentSkills: Array<{ __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null }> };
+export type AiSkillsQuery = { __typename?: 'Query', aiSkills: Array<{ __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null }> };
 
-export type CreateAiAgentSkillMutationVariables = Exact<{
+export type CreateAiSkillMutationVariables = Exact<{
   name: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   filename: Scalars['String']['input'];
@@ -3704,32 +3704,32 @@ export type CreateAiAgentSkillMutationVariables = Exact<{
 }>;
 
 
-export type CreateAiAgentSkillMutation = { __typename?: 'Mutation', createAiAgentSkill: { __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiSkillMutation = { __typename?: 'Mutation', createAiSkill: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type CreateAiAgentSkillFromInstructionsMutationVariables = Exact<{
+export type CreateAiSkillFromInstructionsMutationVariables = Exact<{
   name: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   instructions: Scalars['String']['input'];
 }>;
 
 
-export type CreateAiAgentSkillFromInstructionsMutation = { __typename?: 'Mutation', createAiAgentSkillFromInstructions: { __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiSkillFromInstructionsMutation = { __typename?: 'Mutation', createAiSkillFromInstructions: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
-export type DeleteAiAgentSkillMutationVariables = Exact<{
+export type DeleteAiSkillMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteAiAgentSkillMutation = { __typename?: 'Mutation', deleteAiAgentSkill: boolean };
+export type DeleteAiSkillMutation = { __typename?: 'Mutation', deleteAiSkill: boolean };
 
-export type UpdateAiAgentSkillMutationVariables = Exact<{
+export type UpdateAiSkillMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type UpdateAiAgentSkillMutation = { __typename?: 'Mutation', updateAiAgentSkill: { __typename?: 'AiAgentSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiSkillMutation = { __typename?: 'Mutation', updateAiSkill: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
 
 export type ApprovalTaskQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5824,9 +5824,9 @@ export const useUpdateAiAgentScenarioToolSimulationMutation = <
   }
     )};
 
-export const AiAgentSkillDocument = new TypedDocumentString(`
-    query aiAgentSkill($id: ID!) {
-  aiAgentSkill(id: $id) {
+export const AiSkillDocument = new TypedDocumentString(`
+    query aiSkill($id: ID!) {
+  aiSkill(id: $id) {
     id
     name
     description
@@ -5836,69 +5836,69 @@ export const AiAgentSkillDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAiAgentSkillQuery = <
-      TData = AiAgentSkillQuery,
+export const useAiSkillQuery = <
+      TData = AiSkillQuery,
       TError = unknown
     >(
-      variables: AiAgentSkillQueryVariables,
-      options?: Omit<UseQueryOptions<AiAgentSkillQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentSkillQuery, TError, TData>['queryKey'] }
+      variables: AiSkillQueryVariables,
+      options?: Omit<UseQueryOptions<AiSkillQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AiAgentSkillQuery, TError, TData>(
+    return useQuery<AiSkillQuery, TError, TData>(
       {
-    queryKey: ['aiAgentSkill', variables],
-    queryFn: fetcher<AiAgentSkillQuery, AiAgentSkillQueryVariables>(AiAgentSkillDocument, variables),
+    queryKey: ['aiSkill', variables],
+    queryFn: fetcher<AiSkillQuery, AiSkillQueryVariables>(AiSkillDocument, variables),
     ...options
   }
     )};
 
-export const AiAgentSkillFileContentDocument = new TypedDocumentString(`
-    query aiAgentSkillFileContent($id: ID!, $path: String!) {
-  aiAgentSkillFileContent(id: $id, path: $path)
+export const AiSkillFileContentDocument = new TypedDocumentString(`
+    query aiSkillFileContent($id: ID!, $path: String!) {
+  aiSkillFileContent(id: $id, path: $path)
 }
     `);
 
-export const useAiAgentSkillFileContentQuery = <
-      TData = AiAgentSkillFileContentQuery,
+export const useAiSkillFileContentQuery = <
+      TData = AiSkillFileContentQuery,
       TError = unknown
     >(
-      variables: AiAgentSkillFileContentQueryVariables,
-      options?: Omit<UseQueryOptions<AiAgentSkillFileContentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentSkillFileContentQuery, TError, TData>['queryKey'] }
+      variables: AiSkillFileContentQueryVariables,
+      options?: Omit<UseQueryOptions<AiSkillFileContentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillFileContentQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AiAgentSkillFileContentQuery, TError, TData>(
+    return useQuery<AiSkillFileContentQuery, TError, TData>(
       {
-    queryKey: ['aiAgentSkillFileContent', variables],
-    queryFn: fetcher<AiAgentSkillFileContentQuery, AiAgentSkillFileContentQueryVariables>(AiAgentSkillFileContentDocument, variables),
+    queryKey: ['aiSkillFileContent', variables],
+    queryFn: fetcher<AiSkillFileContentQuery, AiSkillFileContentQueryVariables>(AiSkillFileContentDocument, variables),
     ...options
   }
     )};
 
-export const AiAgentSkillFilePathsDocument = new TypedDocumentString(`
-    query aiAgentSkillFilePaths($id: ID!) {
-  aiAgentSkillFilePaths(id: $id)
+export const AiSkillFilePathsDocument = new TypedDocumentString(`
+    query aiSkillFilePaths($id: ID!) {
+  aiSkillFilePaths(id: $id)
 }
     `);
 
-export const useAiAgentSkillFilePathsQuery = <
-      TData = AiAgentSkillFilePathsQuery,
+export const useAiSkillFilePathsQuery = <
+      TData = AiSkillFilePathsQuery,
       TError = unknown
     >(
-      variables: AiAgentSkillFilePathsQueryVariables,
-      options?: Omit<UseQueryOptions<AiAgentSkillFilePathsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentSkillFilePathsQuery, TError, TData>['queryKey'] }
+      variables: AiSkillFilePathsQueryVariables,
+      options?: Omit<UseQueryOptions<AiSkillFilePathsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillFilePathsQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AiAgentSkillFilePathsQuery, TError, TData>(
+    return useQuery<AiSkillFilePathsQuery, TError, TData>(
       {
-    queryKey: ['aiAgentSkillFilePaths', variables],
-    queryFn: fetcher<AiAgentSkillFilePathsQuery, AiAgentSkillFilePathsQueryVariables>(AiAgentSkillFilePathsDocument, variables),
+    queryKey: ['aiSkillFilePaths', variables],
+    queryFn: fetcher<AiSkillFilePathsQuery, AiSkillFilePathsQueryVariables>(AiSkillFilePathsDocument, variables),
     ...options
   }
     )};
 
-export const AiAgentSkillsDocument = new TypedDocumentString(`
-    query aiAgentSkills {
-  aiAgentSkills {
+export const AiSkillsDocument = new TypedDocumentString(`
+    query aiSkills {
+  aiSkills {
     id
     name
     description
@@ -5908,25 +5908,25 @@ export const AiAgentSkillsDocument = new TypedDocumentString(`
 }
     `);
 
-export const useAiAgentSkillsQuery = <
-      TData = AiAgentSkillsQuery,
+export const useAiSkillsQuery = <
+      TData = AiSkillsQuery,
       TError = unknown
     >(
-      variables?: AiAgentSkillsQueryVariables,
-      options?: Omit<UseQueryOptions<AiAgentSkillsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentSkillsQuery, TError, TData>['queryKey'] }
+      variables?: AiSkillsQueryVariables,
+      options?: Omit<UseQueryOptions<AiSkillsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillsQuery, TError, TData>['queryKey'] }
     ) => {
     
-    return useQuery<AiAgentSkillsQuery, TError, TData>(
+    return useQuery<AiSkillsQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['aiAgentSkills'] : ['aiAgentSkills', variables],
-    queryFn: fetcher<AiAgentSkillsQuery, AiAgentSkillsQueryVariables>(AiAgentSkillsDocument, variables),
+    queryKey: variables === undefined ? ['aiSkills'] : ['aiSkills', variables],
+    queryFn: fetcher<AiSkillsQuery, AiSkillsQueryVariables>(AiSkillsDocument, variables),
     ...options
   }
     )};
 
-export const CreateAiAgentSkillDocument = new TypedDocumentString(`
-    mutation createAiAgentSkill($name: String!, $description: String, $filename: String!, $fileBytes: String!) {
-  createAiAgentSkill(
+export const CreateAiSkillDocument = new TypedDocumentString(`
+    mutation createAiSkill($name: String!, $description: String, $filename: String!, $fileBytes: String!) {
+  createAiSkill(
     name: $name
     description: $description
     filename: $filename
@@ -5941,22 +5941,22 @@ export const CreateAiAgentSkillDocument = new TypedDocumentString(`
 }
     `);
 
-export const useCreateAiAgentSkillMutation = <
+export const useCreateAiSkillMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAiAgentSkillMutation, TError, CreateAiAgentSkillMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiSkillMutation, TError, CreateAiSkillMutationVariables, TContext>) => {
     
-    return useMutation<CreateAiAgentSkillMutation, TError, CreateAiAgentSkillMutationVariables, TContext>(
+    return useMutation<CreateAiSkillMutation, TError, CreateAiSkillMutationVariables, TContext>(
       {
-    mutationKey: ['createAiAgentSkill'],
-    mutationFn: (variables?: CreateAiAgentSkillMutationVariables) => fetcher<CreateAiAgentSkillMutation, CreateAiAgentSkillMutationVariables>(CreateAiAgentSkillDocument, variables)(),
+    mutationKey: ['createAiSkill'],
+    mutationFn: (variables?: CreateAiSkillMutationVariables) => fetcher<CreateAiSkillMutation, CreateAiSkillMutationVariables>(CreateAiSkillDocument, variables)(),
     ...options
   }
     )};
 
-export const CreateAiAgentSkillFromInstructionsDocument = new TypedDocumentString(`
-    mutation createAiAgentSkillFromInstructions($name: String!, $description: String, $instructions: String!) {
-  createAiAgentSkillFromInstructions(
+export const CreateAiSkillFromInstructionsDocument = new TypedDocumentString(`
+    mutation createAiSkillFromInstructions($name: String!, $description: String, $instructions: String!) {
+  createAiSkillFromInstructions(
     name: $name
     description: $description
     instructions: $instructions
@@ -5970,41 +5970,41 @@ export const CreateAiAgentSkillFromInstructionsDocument = new TypedDocumentStrin
 }
     `);
 
-export const useCreateAiAgentSkillFromInstructionsMutation = <
+export const useCreateAiSkillFromInstructionsMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateAiAgentSkillFromInstructionsMutation, TError, CreateAiAgentSkillFromInstructionsMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateAiSkillFromInstructionsMutation, TError, CreateAiSkillFromInstructionsMutationVariables, TContext>) => {
     
-    return useMutation<CreateAiAgentSkillFromInstructionsMutation, TError, CreateAiAgentSkillFromInstructionsMutationVariables, TContext>(
+    return useMutation<CreateAiSkillFromInstructionsMutation, TError, CreateAiSkillFromInstructionsMutationVariables, TContext>(
       {
-    mutationKey: ['createAiAgentSkillFromInstructions'],
-    mutationFn: (variables?: CreateAiAgentSkillFromInstructionsMutationVariables) => fetcher<CreateAiAgentSkillFromInstructionsMutation, CreateAiAgentSkillFromInstructionsMutationVariables>(CreateAiAgentSkillFromInstructionsDocument, variables)(),
+    mutationKey: ['createAiSkillFromInstructions'],
+    mutationFn: (variables?: CreateAiSkillFromInstructionsMutationVariables) => fetcher<CreateAiSkillFromInstructionsMutation, CreateAiSkillFromInstructionsMutationVariables>(CreateAiSkillFromInstructionsDocument, variables)(),
     ...options
   }
     )};
 
-export const DeleteAiAgentSkillDocument = new TypedDocumentString(`
-    mutation deleteAiAgentSkill($id: ID!) {
-  deleteAiAgentSkill(id: $id)
+export const DeleteAiSkillDocument = new TypedDocumentString(`
+    mutation deleteAiSkill($id: ID!) {
+  deleteAiSkill(id: $id)
 }
     `);
 
-export const useDeleteAiAgentSkillMutation = <
+export const useDeleteAiSkillMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<DeleteAiAgentSkillMutation, TError, DeleteAiAgentSkillMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<DeleteAiSkillMutation, TError, DeleteAiSkillMutationVariables, TContext>) => {
     
-    return useMutation<DeleteAiAgentSkillMutation, TError, DeleteAiAgentSkillMutationVariables, TContext>(
+    return useMutation<DeleteAiSkillMutation, TError, DeleteAiSkillMutationVariables, TContext>(
       {
-    mutationKey: ['deleteAiAgentSkill'],
-    mutationFn: (variables?: DeleteAiAgentSkillMutationVariables) => fetcher<DeleteAiAgentSkillMutation, DeleteAiAgentSkillMutationVariables>(DeleteAiAgentSkillDocument, variables)(),
+    mutationKey: ['deleteAiSkill'],
+    mutationFn: (variables?: DeleteAiSkillMutationVariables) => fetcher<DeleteAiSkillMutation, DeleteAiSkillMutationVariables>(DeleteAiSkillDocument, variables)(),
     ...options
   }
     )};
 
-export const UpdateAiAgentSkillDocument = new TypedDocumentString(`
-    mutation updateAiAgentSkill($id: ID!, $name: String!, $description: String) {
-  updateAiAgentSkill(id: $id, name: $name, description: $description) {
+export const UpdateAiSkillDocument = new TypedDocumentString(`
+    mutation updateAiSkill($id: ID!, $name: String!, $description: String) {
+  updateAiSkill(id: $id, name: $name, description: $description) {
     id
     name
     description
@@ -6014,15 +6014,15 @@ export const UpdateAiAgentSkillDocument = new TypedDocumentString(`
 }
     `);
 
-export const useUpdateAiAgentSkillMutation = <
+export const useUpdateAiSkillMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateAiAgentSkillMutation, TError, UpdateAiAgentSkillMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateAiSkillMutation, TError, UpdateAiSkillMutationVariables, TContext>) => {
     
-    return useMutation<UpdateAiAgentSkillMutation, TError, UpdateAiAgentSkillMutationVariables, TContext>(
+    return useMutation<UpdateAiSkillMutation, TError, UpdateAiSkillMutationVariables, TContext>(
       {
-    mutationKey: ['updateAiAgentSkill'],
-    mutationFn: (variables?: UpdateAiAgentSkillMutationVariables) => fetcher<UpdateAiAgentSkillMutation, UpdateAiAgentSkillMutationVariables>(UpdateAiAgentSkillDocument, variables)(),
+    mutationKey: ['updateAiSkill'],
+    mutationFn: (variables?: UpdateAiSkillMutationVariables) => fetcher<UpdateAiSkillMutation, UpdateAiSkillMutationVariables>(UpdateAiSkillDocument, variables)(),
     ...options
   }
     )};

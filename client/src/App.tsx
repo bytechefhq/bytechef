@@ -18,6 +18,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
     CircleIcon,
+    FileTextIcon,
     FolderIcon,
     Layers3Icon,
     LayoutTemplateIcon,
@@ -26,6 +27,7 @@ import {
     MessagesSquareIcon,
     ServerIcon,
     Settings2Icon,
+    SparklesIcon,
     SquareIcon,
     Table2Icon,
     UnplugIcon,
@@ -83,8 +85,14 @@ const automationNavigation: NavigationType[] = [
         icon: VectorSquareIcon,
         name: 'Knowledge Base',
     },
+    {
+        href: '/automation/asset-files',
+        icon: FileTextIcon,
+        name: 'Files',
+    },
     {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
     {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
+    {href: '/automation/ai', icon: SparklesIcon, name: 'AI'},
 ];
 
 const embeddedNavigation: NavigationType[] = [
@@ -174,6 +182,7 @@ function App() {
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
     const ff_3955 = useFeatureFlagsStore()('ff-3955');
     const ff_4000 = useFeatureFlagsStore()('ff-4000');
+    const ff_4545 = useFeatureFlagsStore()('ff-4545');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
@@ -206,6 +215,10 @@ function App() {
 
         if (navItem.href === '/automation/approval-tasks') {
             return ff_732;
+        }
+
+        if (navItem.href === '/automation/ai') {
+            return ff_4545 && edition === EditionType.EE;
         }
 
         return true;
