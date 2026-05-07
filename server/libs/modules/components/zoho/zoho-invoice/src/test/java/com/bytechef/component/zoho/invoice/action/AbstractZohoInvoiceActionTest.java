@@ -16,40 +16,37 @@
 
 package com.bytechef.component.zoho.invoice.action;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
+@ExtendWith(MockContextSetupExtension.class)
 abstract class AbstractZohoInvoiceActionTest {
 
-    protected ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    protected ActionContext mockedContext = mock(ActionContext.class);
-    protected Executor mockedExecutor = mock(Executor.class);
+    protected ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     protected Parameters mockedParameters;
-    protected Response mockedResponse = mock(Response.class);
     protected Object mockedObject = mock(Object.class);
 
     @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
+    void beforeEach(Executor mockedExecutor, Http mockedHttp, Response mockedResponse) {
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
     }
