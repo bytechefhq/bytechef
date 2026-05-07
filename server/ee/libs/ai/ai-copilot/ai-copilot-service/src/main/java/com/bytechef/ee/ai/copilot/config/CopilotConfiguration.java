@@ -11,12 +11,12 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.AnthropicClientAsync;
-import com.bytechef.ai.mcp.tool.automation.impl.ClusterElementTools;
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ReadProjectToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ReadProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ScriptTools;
+import com.bytechef.ai.mcp.tool.automation.ClusterElementTools;
+import com.bytechef.ai.mcp.tool.automation.ProjectTools;
+import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.ReadProjectTools;
+import com.bytechef.ai.mcp.tool.automation.ReadProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.ScriptTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
@@ -105,11 +105,11 @@ public class CopilotConfiguration {
 
     @Bean
     CodeEditorSpringAIAgent codeEditorAskSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools) throws AGUIException {
         String name = Source.CODE_EDITOR.name() + "_" + Mode.ASK.name();
 
-        List<Object> tools = new ArrayList<>(List.of(readProjectWorkflowToolsImpl, componentTools));
+        List<Object> tools = new ArrayList<>(List.of(readProjectWorkflowTools, componentTools));
 
         firecrawlTools.ifPresent(tools::add);
 
@@ -126,7 +126,7 @@ public class CopilotConfiguration {
     @Bean
     CodeEditorSpringAIAgent codeEditorBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ScriptTools scriptTools,
-        ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
+        ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools)
         throws AGUIException {
 
@@ -137,7 +137,7 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorBuildResource))
-            .tools(List.of(readProjectWorkflowToolsImpl, scriptTools, componentTools))
+            .tools(List.of(readProjectWorkflowTools, scriptTools, componentTools))
             .state(state)
             .build();
     }
@@ -217,7 +217,7 @@ public class CopilotConfiguration {
 
     @Bean
     ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl,
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, TaskTools taskTools) throws AGUIException {
 
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.ASK.name();
@@ -227,7 +227,7 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementAskResource))
-            .tools(List.of(readProjectWorkflowToolsImpl, componentTools, taskTools))
+            .tools(List.of(readProjectWorkflowTools, componentTools, taskTools))
             .state(state)
             .build();
     }
@@ -235,7 +235,7 @@ public class CopilotConfiguration {
     @Bean
     ClusterElementSpringAIAgent clusterElementBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ClusterElementTools clusterElementTools,
-        ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl, ComponentTools componentTools, TaskTools taskTools)
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools)
         throws AGUIException {
 
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.BUILD.name();
@@ -245,7 +245,7 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
-            .tools(List.of(readProjectWorkflowToolsImpl, clusterElementTools, componentTools, taskTools))
+            .tools(List.of(readProjectWorkflowTools, clusterElementTools, componentTools, taskTools))
             .state(state)
             .build();
     }
@@ -282,8 +282,8 @@ public class CopilotConfiguration {
 
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorAskSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ReadProjectToolsImpl readProjectToolsImpl,
-        ReadProjectWorkflowToolsImpl readProjectWorkflowToolsImpl, ComponentTools componentTools, TaskTools taskTools,
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
         Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor)
         throws AGUIException {
@@ -291,7 +291,7 @@ public class CopilotConfiguration {
         String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.ASK.name();
 
         List<Object> tools = new ArrayList<>(
-            List.of(readProjectToolsImpl, readProjectWorkflowToolsImpl, componentTools, taskTools));
+            List.of(readProjectTools, readProjectWorkflowTools, componentTools, taskTools));
 
         firecrawlTools.ifPresent(tools::add);
 
@@ -310,8 +310,8 @@ public class CopilotConfiguration {
 
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectToolsImpl,
-        ProjectWorkflowToolsImpl projectWorkflowToolsImpl, TaskTools taskTools, ScriptTools scriptTools,
+        ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
+        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
         WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade)
         throws AGUIException {
 
@@ -323,7 +323,7 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
             .state(state)
-            .tools(List.of(projectToolsImpl, projectWorkflowToolsImpl, taskTools, scriptTools))
+            .tools(List.of(projectTools, projectWorkflowTools, taskTools, scriptTools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();
