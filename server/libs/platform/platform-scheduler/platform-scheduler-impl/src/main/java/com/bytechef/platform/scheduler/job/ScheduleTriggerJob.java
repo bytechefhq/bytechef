@@ -42,8 +42,10 @@ public class ScheduleTriggerJob implements Job {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
         Date fireTime = context.getFireTime();
 
+        Map<String, Object> output = JsonUtils.readMap(jobDataMap.getString("output"), Object.class);
+
         LocalDateTime localDateTime = fireTime.toInstant()
-            .atZone(ZoneId.systemDefault())
+            .atZone(ZoneId.of((String) output.get("timezone")))
             .toLocalDateTime();
 
         eventPublisher.publishEvent(
@@ -51,9 +53,7 @@ public class ScheduleTriggerJob implements Job {
                 new TriggerListenerEvent.ListenerParameters(
                     WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId")),
                     fireTime.toInstant(),
-                    MapUtils.concat(
-                        Map.of("fireTime", fireTime, "datetime", localDateTime),
-                        JsonUtils.readMap(jobDataMap.getString("output"), Object.class)))));
+                    MapUtils.concat(Map.of("fireTime", fireTime, "dateTime", localDateTime), output))));
     }
 
     @Autowired
