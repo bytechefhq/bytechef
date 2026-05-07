@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.DATE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.EXPRESSION;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.FIRE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
@@ -61,11 +61,11 @@ public class ScheduleCronTrigger {
                 object()
                     .properties(
                         string(FIRE_TIME)
+                            .description("The exact date and time when the trigger was activated."),
+                        dateTime(DATE_TIME)
                             .description(
-                                "The exact date and time when the trigger was activated, formatted according to the " +
+                                "The date and time when the trigger was activated, formatted according to the " +
                                     "specified timezone."),
-                        dateTime(DATETIME)
-                            .description("The date and time when the trigger was activated."),
                         string(EXPRESSION)
                             .description(
                                 "The cron schedule expression that defines the timing pattern for triggering " +
