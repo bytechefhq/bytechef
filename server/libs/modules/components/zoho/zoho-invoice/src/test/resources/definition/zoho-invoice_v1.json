@@ -5,8 +5,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Create a contact.",
-    "help": null,
+    "description": "Create a new contact.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-invoice_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -215,7 +218,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Name of the contact's company. ",
+      "description": "Name of the contact's company.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -771,7 +774,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an invoice for your customer.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-invoice_v1#create-invoice"
+    },
     "metadata": null,
     "name": "createInvoice",
     "outputDefinition": {
@@ -1159,8 +1165,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Create a item.",
-    "help": null,
+    "description": "Create a new item.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-invoice_v1#create-item"
+    },
     "metadata": null,
     "name": "createItem",
     "outputDefinition": {
@@ -1446,7 +1455,7 @@
   } ],
   "clusterElements": [ {
     "name": "createContact",
-    "description": "Create a contact.",
+    "description": "Create a new contact.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -1654,7 +1663,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Name of the contact's company. ",
+      "description": "Name of the contact's company.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2600,7 +2609,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "createItem",
-    "description": "Create a item.",
+    "description": "Create a new item.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -3030,14 +3039,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-invoice_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://www.zoho.com/invoice/api/v3/introduction/#overview"
+  },
   "description": "Zoho Invoice is an online invoicing software used to create, send, and manage professional invoices, along with tracking payments and automating billing workflows.",
   "icon": "path:assets/zoho-invoice.svg",
   "metadata": null,
