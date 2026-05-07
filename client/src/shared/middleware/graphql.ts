@@ -3266,6 +3266,7 @@ export type StringProperty = Property & {
   name?: Maybe<Scalars['String']['output']>;
   options?: Maybe<Array<Option>>;
   optionsDataSource?: Maybe<OptionsDataSource>;
+  optionsLoadedDynamically?: Maybe<Scalars['Boolean']['output']>;
   placeholder?: Maybe<Scalars['String']['output']>;
   regex?: Maybe<Scalars['String']['output']>;
   required?: Maybe<Scalars['Boolean']['output']>;
