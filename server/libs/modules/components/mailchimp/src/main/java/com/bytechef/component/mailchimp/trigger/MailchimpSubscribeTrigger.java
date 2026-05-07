@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -48,7 +48,7 @@ public class MailchimpSubscribeTrigger {
     private static final String LIST_ID = "listId";
     private static final String SUBSCRIBE = "subscribe";
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDsl.trigger(SUBSCRIBE)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(SUBSCRIBE)
         .title("Subscribe")
         .description("Triggers when an Audience subscriber is added to the list.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
@@ -96,8 +96,8 @@ public class MailchimpSubscribeTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
         String server = MailchimpUtils.getMailChimpServer(
             connectionParameters.getRequiredString(ACCESS_TOKEN), context);
@@ -108,13 +108,12 @@ public class MailchimpSubscribeTrigger {
                     server, inputParameters.getRequiredString(LIST_ID))))
             .body(
                 Body.of(
-                    Map.of(
-                        "url", webhookUrl,
-                        "events", Map.of(SUBSCRIBE, true),
-                        "sources", Map.of(
-                            "user", true,
-                            "admin", true,
-                            "api", true))))
+                    "url", webhookUrl,
+                    "events", Map.of(SUBSCRIBE, true),
+                    "sources", Map.of(
+                        "user", true,
+                        "admin", true,
+                        "api", true)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -131,9 +130,8 @@ public class MailchimpSubscribeTrigger {
     }
 
     protected static Object webhookRequest(
-        Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, Parameters output,
-        TriggerContext context) {
+        Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
+        WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
         if (body == null) {
             return null;
