@@ -1,0 +1,128 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Billing Internal API"
+  version: "1"
+servers:
+  - url: "/api/platform/internal"
+tags:
+  - name: "billing"
+    description: "The Platform Billing Internal API"
+paths:
+  /billing/subscription:
+    get:
+      description: "Get the current billing subscription"
+      summary: "Get the current billing subscription"
+      tags:
+        - "billing"
+      operationId: "getCurrentSubscription"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillingSubscription"
+    put:
+      description: "Upgrade or downgrade the current billing subscription. Upgrades are applied immediately with prorated charge; downgrades are scheduled for the end of the current billing period."
+      summary: "Upgrade or downgrade the current billing subscription"
+      tags:
+        - "billing"
+      operationId: "upgradeSubscription"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutSessionRequest"
+      responses:
+        "204":
+          description: "Successful operation."
+    delete:
+      description: "Cancel the current billing subscription at the end of the current billing period."
+      summary: "Cancel the current billing subscription at period end"
+      tags:
+        - "billing"
+      operationId: "cancelSubscription"
+      responses:
+        "204":
+          description: "Successful operation."
+  /billing/reactivate:
+    post:
+      description: "Reactivate a subscription that was scheduled for cancellation at period end."
+      summary: "Reactivate a cancelled-at-period-end billing subscription"
+      tags:
+        - "billing"
+      operationId: "reactivateSubscription"
+      responses:
+        "204":
+          description: "Successful operation."
+  /billing/checkout:
+    post:
+      description: "Create a Stripe Checkout Session"
+      summary: "Create a Stripe Checkout Session"
+      tags:
+        - "billing"
+      operationId: "createCheckoutSession"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutSessionRequest"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutSession"
+components:
+  schemas:
+    BillingSubscription:
+      description: "A billing subscription."
+      type: "object"
+      properties:
+        planName:
+          description: "The plan name."
+          type: "string"
+        status:
+          description: "The subscription status."
+          type: "string"
+        taskLimit:
+          description: "The task limit."
+          type: "integer"
+          format: "int32"
+        currentPeriodEnd:
+          description: "The current period end date."
+          type: "string"
+          format: "date-time"
+        cancelAtPeriodEnd:
+          description: "Whether the subscription cancels at period end."
+          type: "boolean"
+        scheduledPlanName:
+          description: "The plan name scheduled to take effect at the next billing period (set when a downgrade is pending)."
+          type: "string"
+        tasksUsed:
+          description: "Number of task executions used in the current billing period."
+          type: "integer"
+          format: "int32"
+    CheckoutSessionRequest:
+      description: "A checkout session request."
+      type: "object"
+      required:
+        - "planName"
+      properties:
+        planName:
+          description: "The plan name."
+          type: "string"
+          enum:
+            - "STARTER"
+            - "GROWTH"
+    CheckoutSession:
+      description: "A checkout session."
+      type: "object"
+      properties:
+        checkoutUrl:
+          description: "The Stripe Checkout URL."
+          type: "string"
