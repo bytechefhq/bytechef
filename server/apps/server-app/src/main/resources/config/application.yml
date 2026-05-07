@@ -169,6 +169,13 @@ spring:
           enabled: false
       sqs:
         enabled: false
+  data:
+    redis:
+      database: ${bytechef.redis.database}
+      host: ${bytechef.redis.host}
+      port: ${bytechef.redis.port}
+      password: ${bytechef.redis.password}
+      timeout: ${bytechef.redis.timeout}
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: ${bytechef.datasource.url}
@@ -185,6 +192,10 @@ spring:
       locations: classpath*:graphql/**/
   jmx:
     enabled: false
+  kafka:
+    bootstrap-servers: ${bytechef.kafka.bootstrap-servers}
+    consumer:
+      group-id: ${bytechef.kafka.consumer.group-id}
   mail:
     host: ${bytechef.mail.host}
     port: ${bytechef.mail.port}
@@ -216,9 +227,13 @@ spring:
         - dev
         - api-docs
   rabbitmq:
+    host: ${bytechef.rabbitmq.host}
     listener:
       direct:
         prefetch: 1
+    password: ${bytechef.rabbitmq.password}
+    port: ${bytechef.rabbitmq.port}
+    username: ${bytechef.rabbitmq.username}
   shell:
     interactive:
       enabled: false
