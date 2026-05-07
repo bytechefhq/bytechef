@@ -2877,6 +2877,67 @@
       "required": true
     },
     "workflowNodeDescription": null
+  }, {
+    "name": "embedding",
+    "description": "Open Router embedding.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the model to use.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": 1536,
+      "description": "The number of dimensions for the output embeddings",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Dimension",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": 1,
+      "name": "dimension",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    } ],
+    "title": "Open Router Embedding",
+    "type": {
+      "name": "EMBEDDING",
+      "key": "embedding",
+      "label": "Embedding",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
     "name": "artificial-intelligence",
