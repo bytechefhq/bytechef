@@ -58,9 +58,8 @@ public class MailchimpUtils extends AbstractMailchimpUtils {
         Map<String, ?> response = context
             .http(http -> http.get("/lists"))
             .queryParameters(
-                Map.of(
-                    "fields", List.of("lists.id,lists.name,total_items"),
-                    "count", List.of("1000")))
+                "fields", "lists.id,lists.name,total_items",
+                "count", "1000")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
