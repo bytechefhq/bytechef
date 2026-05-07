@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chat.memory.memory;
+package com.bytechef.component.ai.agent.chat.memory.memory.util;
 
 import com.bytechef.tenant.TenantContext;
 import com.github.benmanes.caffeine.cache.Cache;
