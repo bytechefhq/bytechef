@@ -5,18 +5,60 @@ description: Configuration options for ByteChef through environment variables
 
 ByteChef can be configured using environment variables. This page documents all available environment variables, organized by category.
 
-## AI Configuration
+## AI Copilot Configuration
 
-| Environment Variable                                  | Description                                       | Default Value |
-|-------------------------------------------------------|---------------------------------------------------|------------|
-| `BYTECHEF_AI_COPILOT_ENABLED`                         | Enable or disable the AI copilot feature          | `false`    |
-| `BYTECHEF_AI_COPILOT_PROVIDER`                        | The AI provider to use for copilot (OPENAI, ANTHROPIC) | `OPENAI`   |
-| `BYTECHEF_AI_COPILOT_OPENAI_API_KEY`                  | OpenAI API key for copilot (sensitive)            | -          |
-| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_MODEL`       | OpenAI model to use for chat                      | `gpt-5.2`  |
-| `BYTECHEF_AI_COPILOT_OPENAI_CHAT_OPTIONS_TEMPERATURE` | Temperature setting for OpenAI chat               | `0.5`      |
-| `BYTECHEF_AI_COPILOT_OPENAI_EMBEDDING_OPTIONS_MODEL`  | Embeddings for OpenAI                             | `text-embedding-3-small`  |
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
+| `BYTECHEF_AI_COPILOT_PROVIDER` | The AI provider to use for copilot (OPENAI, ANTHROPIC) | `ANTHROPIC` |
 
-## AI Providers
+## AI Command Center Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_COMMAND_CENTER_ENABLED` | Enable or disable the AI Command Center surface (REST/GraphQL controllers, JDBC repositories, service beans) | `false` |
+
+## AI Firecrawl Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_FIRECRAWL_API_KEY` | Firecrawl API key (sensitive) | - |
+| `BYTECHEF_AI_FIRECRAWL_BASE_URL` | Firecrawl API base URL | `https://api.firecrawl.dev/v2` |
+| `BYTECHEF_AI_FIRECRAWL_ENABLED` | Enable or disable Firecrawl | `false` |
+
+## AI Gateway Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_GATEWAY_ENABLED` | Enable or disable the AI Gateway | `false` |
+| `BYTECHEF_AI_GATEWAY_OTLP_MAX_SPANS_PER_REQUEST` | Maximum spans accepted in a single OTLP request body. Requests exceeding this return HTTP 413. | `1000` |
+| `BYTECHEF_AI_GATEWAY_RATE_LIMITING_ENABLED` | Enable or disable AI Gateway rate limiting | `false` |
+| `BYTECHEF_AI_GATEWAY_RATE_LIMITING_PROVIDER` | Rate limiting provider | - |
+| `BYTECHEF_AI_GATEWAY_EXTERNAL_SCORES_MAX_BATCH_SIZE` | Maximum scores accepted in a single batch POST. Requests exceeding this return HTTP 413. | `1000` |
+
+## AI Knowledge Base Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED` | Enable or disable knowledge base AI features | `false` |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER` | OCR provider for knowledge base documents (NONE, AZURE, MISTRAL) | `NONE` |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_MISTRAL_API_KEY` | Mistral OCR API key (sensitive) | - |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_SUBSCRIPTIONS_DOCUMENT_PROCESS_EVENTS` | Number of subscribers for document process events | `1` |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_SUBSCRIPTIONS_DOCUMENT_CHUNK_UPDATE_EVENTS` | Number of subscribers for document chunk update events | `1` |
+
+## AI MCP Server Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_MCP_SERVER_ENABLED` | Enable or disable the MCP (Model Context Protocol) server | `false` |
+
+## AI Memory Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_MEMORY_PROVIDER` | Memory storage provider for chat-style interactions (AWS, IN_MEMORY, JDBC, REDIS) | `JDBC` |
+
+## AI Provider API Keys
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
@@ -24,13 +66,38 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_API_KEY` | Azure OpenAI API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_DEEP_SEEK_API_KEY` | DeepSeek API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_GROQ_API_KEY` | Groq API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_NVIDIA_API_KEY` | NVIDIA API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_HUGGING_FACE_API_KEY` | HuggingFace API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_MISTRAL_API_KEY` | Mistral API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_NVIDIA_API_KEY` | NVIDIA API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_OPENAI_API_KEY` | OpenAI API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_PERPLEXITY_API_KEY` | Perplexity API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_STABILITY_API_KEY` | Stability API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_VERTEX_GEMINI_API_KEY` | Vertex Gemini API key (sensitive) | - |
+
+## AI Chat Model Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_PROVIDER_CHAT_ANTHROPIC_OPTIONS_MODEL` | Anthropic chat model name | `claude-sonnet-4-6` |
+| `BYTECHEF_AI_PROVIDER_CHAT_ANTHROPIC_OPTIONS_TEMPERATURE` | Anthropic chat temperature (0.0-1.0) | `0.5` |
+| `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_MODEL` | OpenAI chat model name | `gpt-5.1` |
+| `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_TEMPERATURE` | OpenAI chat temperature (0.0-2.0) | `1` |
+| `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_REASONING_EFFECT` | OpenAI reasoning effect (NONE, LOW, MEDIUM, HIGH) | `MEDIUM` |
+| `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_VERBOSITY` | OpenAI response verbosity (NONE, LOW, MEDIUM, HIGH) | `LOW` |
+
+## AI Embedding Model Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_PROVIDER_EMBEDDING_OPENAI_OPTIONS_MODEL` | OpenAI embedding model name | `text-embedding-3-small` |
+
+## AI Vectorstore Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_VECTORSTORE_PROVIDER` | Vector store provider (PGVECTOR) | `PGVECTOR` |
+| `BYTECHEF_AI_VECTORSTORE_PG_VECTOR_URL` | JDBC URL for the pgvector PostgreSQL database | - |
+| `BYTECHEF_AI_VECTORSTORE_PG_VECTOR_USERNAME` | pgvector database username (sensitive) | - |
+| `BYTECHEF_AI_VECTORSTORE_PG_VECTOR_PASSWORD` | pgvector database password (sensitive) | - |
 
 ## Analytics Configuration
 
@@ -139,7 +206,7 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_FILE_STORAGE_PROVIDER` | File storage provider (AWS, FILESYSTEM, JDBC) | `FILESYSTEM` |
-| `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` | Base directory for filesystem storage | - |
+| `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` | Base directory for filesystem storage | `${user.home}/bytechef/data/file-storage` |
 | `BYTECHEF_FILE_STORAGE_AWS_BUCKET` | AWS S3 bucket name | - |
 
 ## Help Hub Configuration
@@ -147,6 +214,13 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_HELP_HUB_ENABLED` | Enable or disable the help hub | `false` |
+
+## Kafka Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_KAFKA_BOOTSTRAP_SERVERS` | Comma-separated list of Kafka bootstrap servers (`host:port`) | - |
+| `BYTECHEF_KAFKA_CONSUMER_GROUP_ID` | Kafka consumer group identifier | - |
 
 ## Mail Configuration
 
@@ -185,6 +259,25 @@ ByteChef can be configured using environment variables. This page documents all 
 |---|---|---|
 | `BYTECHEF_PUBLIC_URL` | Public URL of the ByteChef instance | `http://127.0.0.1:8080` |
 
+## RabbitMQ Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_RABBITMQ_HOST` | RabbitMQ server hostname | - |
+| `BYTECHEF_RABBITMQ_PORT` | RabbitMQ server port | `5672` |
+| `BYTECHEF_RABBITMQ_USERNAME` | RabbitMQ username (sensitive) | - |
+| `BYTECHEF_RABBITMQ_PASSWORD` | RabbitMQ password (sensitive) | - |
+
+## Redis Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_REDIS_HOST` | Redis server hostname | - |
+| `BYTECHEF_REDIS_PORT` | Redis server port | `6379` |
+| `BYTECHEF_REDIS_PASSWORD` | Redis password (sensitive) | - |
+| `BYTECHEF_REDIS_DATABASE` | Redis database index | `0` |
+| `BYTECHEF_REDIS_TIMEOUT` | Connection timeout in milliseconds | `0` |
+
 ## Resources Configuration
 
 | Environment Variable | Description | Default Value |
@@ -219,8 +312,8 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_SIGNUP_ACTIVATION_REQUIRED` | Require account activation | `false` |
-| `BYTECHEF_SIGNUP_ENABLED` | Enable sign up | `true` |
+| `BYTECHEF_SIGN_UP_ACTIVATION_REQUIRED` | Require account activation | `false` |
+| `BYTECHEF_SIGN_UP_ENABLED` | Enable sign up | `true` |
 
 ## Tenant Configuration
 
@@ -234,6 +327,13 @@ System administrator is used for accessing protected data reachable through /act
 |---|---|---|
 | `BYTECHEF_UPGRADE_ENABLED` | Run database upgrades (Liquibase migrations) at startup. Disable on read-only replicas or when only a designated instance should apply schema changes in a multi-instance deployment. | `true` |
 
+## User Guiding Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_USER_GUIDING_ENABLED` | Enable or disable user guiding (in-application tutorials) | `false` |
+| `BYTECHEF_USER_GUIDING_CONTAINER_ID` | Container ID for the UserGuiding SDK | - |
+
 ## Webhook URL Configuration
 
 | Environment Variable | Description | Default Value |
@@ -244,9 +344,11 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_OBSERVABILITY_ENABLED` | Enable or disable OTel metrics, logging and tracing | `false` |
+| `BYTECHEF_OBSERVABILITY_LOGGING_ENABLED` | Enable or disable OTel logging | `false` |
 | `BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT` | OTel logging endpoint URL | `http://localhost:4318/v1/logs` |
+| `BYTECHEF_OBSERVABILITY_METRICS_ENABLED` | Enable or disable OTel metrics | `false` |
 | `BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT` | OTel metrics endpoint URL | `http://localhost:4318/v1/metrics` |
+| `BYTECHEF_OBSERVABILITY_TRACING_ENABLED` | Enable or disable OTel tracing | `false` |
 | `BYTECHEF_OBSERVABILITY_TRACING_ENDPOINT` | OTel tracing endpoint URL | `http://localhost:4318/v1/traces` |
 
 ## Worker Configuration
@@ -254,8 +356,9 @@ System administrator is used for accessing protected data reachable through /act
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_WORKER_ENABLED` | Enable or disable the worker | `true` |
-| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | Number of subscribers for default worker queue | `10` |
-| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_<EVENT_TYPE>` | Number of subscribers for specific worker queue | - |
+| `BYTECHEF_WORKER_TASK_DEFAULT_TIMEOUT` | Default timeout for task execution in milliseconds | - |
+| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | Number of concurrent consumers for the `default` worker queue | `10` |
+| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_<QUEUE_NAME>` | Number of concurrent consumers for an additional worker queue (e.g., `captions` for tasks routed via `node: captions`). The queue must be created before tasks can be routed to it; ByteChef creates the queue automatically when the worker bootstraps if it doesn't already exist. | - |
 
 ## Workflow Configuration
 
