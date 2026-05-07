@@ -17,16 +17,10 @@
 package com.bytechef.automation.knowledgebase.config;
 
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
-import com.openai.client.OpenAIClient;
 import io.micrometer.observation.ObservationRegistry;
-import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
@@ -48,13 +42,12 @@ class KnowledgeBasePgVectorConfiguration {
 
     @Bean
     public VectorStore knowledgeBasePgVectorStore(
-        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
-        @Qualifier("knowledgeBaseEmbeddingModel") EmbeddingModel knowledgeBaseEmbeddingModel,
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel,
         PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         BatchingStrategy batchingStrategy) {
 
-        return PgVectorStore.builder(pgVectorJdbcTemplate, knowledgeBaseEmbeddingModel)
+        return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
             .schemaName(properties.getSchemaName())
             .idType(properties.getIdType())
             .vectorTableName("kb_" + properties.getTableName())
@@ -83,46 +76,5 @@ class KnowledgeBasePgVectorConfiguration {
             : tableName;
 
         return new KnowledgeBaseVectorStoreMetadataService(pgVectorJdbcTemplate, objectMapper, fullTableName);
-    }
-
-    @Bean("knowledgeBaseEmbeddingModel")
-    @ConditionalOnProperty(
-        prefix = "bytechef.ai.knowledge-base.embedding", name = "provider", havingValue = "openai")
-    OpenAiEmbeddingModel knowledgeBaseOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
-
-        ApplicationProperties.Ai ai = applicationProperties.getAi();
-
-        ApplicationProperties.Ai.OpenAi openAi = ai.getOpenAi();
-
-        ApplicationProperties.Ai.OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
-            .getOptions();
-
-        return new OpenAiEmbeddingModel(
-            openAIClient, MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(openAiEmbeddingOptions.getModel())
-                .build());
-    }
-
-    @Bean("knowledgeBaseEmbeddingModel")
-    @ConditionalOnProperty(
-        prefix = "bytechef.ai.knowledge-base.embedding", name = "provider", havingValue = "anthropic")
-    OpenAiEmbeddingModel knowledgeBaseAnthropicOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
-
-        ApplicationProperties.Ai ai = applicationProperties.getAi();
-
-        Anthropic anthropic = ai.getAnthropic();
-
-        Anthropic.Embedding.OpenAi.Options anthropicEmbeddingOpenAiOptions = anthropic.getEmbedding()
-            .getOpenAi()
-            .getOptions();
-
-        return new OpenAiEmbeddingModel(
-            openAIClient, MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(anthropicEmbeddingOpenAiOptions.getModel())
-                .build());
     }
 }

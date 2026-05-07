@@ -8,7 +8,7 @@
 package com.bytechef.ee.tenant.multi.config;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.Embedding;
 import com.bytechef.ee.tenant.multi.pgvector.MultiTenantPgVectorStore;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
@@ -61,36 +61,12 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
     }
 
     @Bean("knowledgeBaseEmbeddingModel")
-    @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base.embedding", name = "provider", havingValue = "openai")
     OpenAiEmbeddingModel knowledgeBaseOpenAiEmbeddingModel(
         ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
 
-        ApplicationProperties.Ai ai = applicationProperties.getAi();
-
-        ApplicationProperties.Ai.OpenAi openAi = ai.getOpenAi();
-
-        ApplicationProperties.Ai.OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
-            .getOptions();
-
-        return new OpenAiEmbeddingModel(
-            openAIClient,
-            MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(openAiEmbeddingOptions.getModel())
-                .build());
-    }
-
-    @Bean("knowledgeBaseEmbeddingModel")
-    @ConditionalOnProperty(
-        prefix = "bytechef.ai.knowledge-base.embedding", name = "provider", havingValue = "anthropic")
-    OpenAiEmbeddingModel knowledgeBaseAnthropicOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
-
-        ApplicationProperties.Ai ai = applicationProperties.getAi();
-
-        Anthropic anthropic = ai.getAnthropic();
-
-        Anthropic.Embedding.OpenAi.Options anthropicEmbeddingOpenAiOptions = anthropic.getEmbedding()
+        Embedding.OpenAi.Options options = applicationProperties.getAi()
+            .getProvider()
+            .getEmbedding()
             .getOpenAi()
             .getOptions();
 
@@ -98,7 +74,7 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
             openAIClient,
             MetadataMode.ALL,
             OpenAiEmbeddingOptions.builder()
-                .model(anthropicEmbeddingOpenAiOptions.getModel())
+                .model(options.getModel())
                 .build());
     }
 }

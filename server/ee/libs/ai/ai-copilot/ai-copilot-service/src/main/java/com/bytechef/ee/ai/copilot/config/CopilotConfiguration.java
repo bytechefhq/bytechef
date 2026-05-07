@@ -9,8 +9,6 @@ package com.bytechef.ee.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
-import com.anthropic.client.AnthropicClient;
-import com.anthropic.client.AnthropicClientAsync;
 import com.bytechef.ai.mcp.tool.automation.ClusterElementTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
@@ -21,50 +19,28 @@ import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
-import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
 import com.bytechef.ee.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
-import com.openai.client.OpenAIClient;
-import com.openai.client.OpenAIClientAsync;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.micrometer.observation.ObservationRegistry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import org.springframework.ai.anthropic.AnthropicChatModel;
-import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
-import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.observation.ChatModelObservationConvention;
-import org.springframework.ai.model.tool.DefaultToolExecutionEligibilityPredicate;
-import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.ai.model.tool.ToolExecutionEligibilityPredicate;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @version ee
@@ -75,7 +51,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class CopilotConfiguration {
 
-    private final ApplicationProperties.Ai ai;
     private final Resource promptWorkflowEditorAskResource;
     private final Resource promptWorkflowEditorBuildResource;
     private final Resource promptCodeEditorAskResource;
@@ -86,7 +61,6 @@ public class CopilotConfiguration {
 
     @SuppressFBWarnings("EI")
     public CopilotConfiguration(
-        ApplicationProperties applicationProperties,
         @Value("classpath:prompt_workflow_editor_ask.txt") Resource promptWorkflowEditorAskResource,
         @Value("classpath:prompt_workflow_editor_build.txt") Resource promptWorkflowEditorBuildResource,
         @Value("classpath:prompt_code_editor_ask.txt") Resource promptCodeEditorAskResource,
@@ -94,7 +68,6 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_cluster_element_ask.txt") Resource promptClusterElementAskResource,
         @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource) {
 
-        this.ai = applicationProperties.getAi();
         this.promptWorkflowEditorAskResource = promptWorkflowEditorAskResource;
         this.promptWorkflowEditorBuildResource = promptWorkflowEditorBuildResource;
         this.promptCodeEditorAskResource = promptCodeEditorAskResource;
@@ -143,79 +116,6 @@ public class CopilotConfiguration {
     }
 
     @Bean
-    @Primary
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    ChatModel copilotAnthropicChatModel(
-        AnthropicClient anthropicClient, AnthropicClientAsync anthropicClientAsync,
-        ObjectProvider<ToolExecutionEligibilityPredicate> anthropicToolExecutionEligibilityPredicate,
-        ObjectProvider<ObservationRegistry> observationRegistryProvider,
-        ObjectProvider<ChatModelObservationConvention> observationConvention, ToolCallingManager toolCallingManager) {
-
-        Anthropic.Chat.Options anthropicChatOptions = ai.getAnthropic()
-            .getChat()
-            .getOptions();
-
-        var chatModel = AnthropicChatModel.builder()
-            .anthropicClient(anthropicClient)
-            .anthropicClientAsync(anthropicClientAsync)
-            .options(
-                AnthropicChatOptions.builder()
-                    .model(anthropicChatOptions.getModel())
-                    .temperature(anthropicChatOptions.getTemperature())
-                    .maxTokens(64000)
-                    .build())
-            .observationRegistry(observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP))
-            .toolCallingManager(toolCallingManager)
-            .toolExecutionEligibilityPredicate(anthropicToolExecutionEligibilityPredicate
-                .getIfUnique(DefaultToolExecutionEligibilityPredicate::new))
-            .build();
-
-        observationConvention.ifAvailable(chatModel::setObservationConvention);
-
-        return chatModel;
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
-    OpenAiChatModel copilotOpenAiChatModel(
-        OpenAIClient openAIClient, OpenAIClientAsync openAIClientAsync,
-        ObjectProvider<ObservationRegistry> observationRegistry,
-        ObjectProvider<ChatModelObservationConvention> observationConvention,
-        ObjectProvider<ToolExecutionEligibilityPredicate> openAiToolExecutionEligibilityPredicate,
-        ToolCallingManager toolCallingManager) {
-
-        OpenAi.Chat.Options openAiChatOptions = ai.getOpenAi()
-            .getChat()
-            .getOptions();
-
-        var chatModel = OpenAiChatModel.builder()
-            .openAiClient(openAIClient)
-            .openAiClientAsync(openAIClientAsync)
-            .options(
-                OpenAiChatOptions.builder()
-                    .model(openAiChatOptions.getModel())
-                    .temperature(openAiChatOptions.getTemperature())
-                    .reasoningEffort(
-                        openAiChatOptions.getReasoningEffect()
-                            .name()
-                            .toLowerCase())
-                    .verbosity(
-                        openAiChatOptions.getVerbosity()
-                            .name()
-                            .toLowerCase())
-                    .build())
-            .toolCallingManager(toolCallingManager)
-            .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
-            .toolExecutionEligibilityPredicate(
-                openAiToolExecutionEligibilityPredicate.getIfUnique(DefaultToolExecutionEligibilityPredicate::new))
-            .build();
-
-        observationConvention.ifAvailable(chatModel::setObservationConvention);
-
-        return chatModel;
-    }
-
-    @Bean
     ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, TaskTools taskTools) throws AGUIException {
@@ -247,30 +147,6 @@ public class CopilotConfiguration {
             .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
             .tools(List.of(readProjectWorkflowTools, clusterElementTools, componentTools, taskTools))
             .state(state)
-            .build();
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.memory", name = "provider", havingValue = "in_memory")
-    ChatMemory inMemoryChatMemory() {
-        return MessageWindowChatMemory.builder()
-            .chatMemoryRepository(new InMemoryChatMemoryRepository())
-            .maxMessages(500)
-            .build();
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.memory", name = "provider", havingValue = "jdbc")
-    ChatMemory jdbcChatMemory(JdbcTemplate jdbcTemplate) {
-        return MessageWindowChatMemory.builder()
-            .chatMemoryRepository(
-                JdbcChatMemoryRepository
-                    .builder()
-                    .jdbcTemplate(jdbcTemplate)
-                    .dialect(JdbcChatMemoryRepositoryDialect.from(Objects.requireNonNull(jdbcTemplate.getDataSource())))
-                    .dataSource(jdbcTemplate.getDataSource())
-                    .build())
-            .maxMessages(500)
             .build();
     }
 

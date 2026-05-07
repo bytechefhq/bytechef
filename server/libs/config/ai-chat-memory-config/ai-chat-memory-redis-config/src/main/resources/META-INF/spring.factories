@@ -1,0 +1,2 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+com.bytechef.ai.chat.memory.redis.boot.RedisChatMemoryEnvironmentPostProcessor

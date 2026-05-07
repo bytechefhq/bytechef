@@ -488,22 +488,18 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
-        private Agent agent = new Agent();
-        private Anthropic anthropic = new Anthropic();
+        private CommandCenter commandCenter = new CommandCenter();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
+        private Gateway gateway = new Gateway();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
         private Mcp mcp = new Mcp();
-        private OpenAi openAi = new OpenAi();
+        private Memory memory = new Memory();
         private Provider provider = new Provider();
         private Vectorstore vectorstore = new Vectorstore();
 
-        public Agent getAgent() {
-            return agent;
-        }
-
-        public Anthropic getAnthropic() {
-            return anthropic;
+        public CommandCenter getCommandCenter() {
+            return commandCenter;
         }
 
         public Copilot getCopilot() {
@@ -514,6 +510,10 @@ public class ApplicationProperties {
             return firecrawl;
         }
 
+        public Gateway getGateway() {
+            return gateway;
+        }
+
         public KnowledgeBase getKnowledgeBase() {
             return knowledgeBase;
         }
@@ -522,8 +522,8 @@ public class ApplicationProperties {
             return mcp;
         }
 
-        public OpenAi getOpenAi() {
-            return openAi;
+        public Memory getMemory() {
+            return memory;
         }
 
         public Provider getProvider() {
@@ -534,12 +534,8 @@ public class ApplicationProperties {
             return vectorstore;
         }
 
-        public void setAgent(Agent agent) {
-            this.agent = agent;
-        }
-
-        public void setAnthropic(Anthropic anthropic) {
-            this.anthropic = anthropic;
+        public void setCommandCenter(CommandCenter commandCenter) {
+            this.commandCenter = commandCenter;
         }
 
         public void setCopilot(Copilot copilot) {
@@ -550,6 +546,10 @@ public class ApplicationProperties {
             this.firecrawl = firecrawl;
         }
 
+        public void setGateway(Gateway gateway) {
+            this.gateway = gateway;
+        }
+
         public void setKnowledgeBase(KnowledgeBase knowledgeBase) {
             this.knowledgeBase = knowledgeBase;
         }
@@ -558,8 +558,8 @@ public class ApplicationProperties {
             this.mcp = mcp;
         }
 
-        public void setOpenAi(OpenAi openAi) {
-            this.openAi = openAi;
+        public void setMemory(Memory memory) {
+            this.memory = memory;
         }
 
         public void setProvider(Provider provider) {
@@ -571,328 +571,58 @@ public class ApplicationProperties {
         }
 
         /**
-         * AI agent configuration.
+         * AI memory configuration. Cross-cutting concern shared by copilot, agents, and command-center surfaces — not
+         * owned by any single product surface. Stores conversation history for chat-style interactions.
          */
-        public static class Agent {
-
-            /** Agent memory configuration */
-            private Memory memory = new Memory();
-
-            public Memory getMemory() {
-                return memory;
-            }
-
-            public void setMemory(Memory memory) {
-                this.memory = memory;
-            }
+        public static class Memory {
 
             /**
-             * Agent memory configuration for storing conversation history and context.
+             * Memory storage provider type.
              */
-            public static class Memory {
+            public enum Provider {
+                /** AWS-based memory storage */
+                AWS,
+                /** In-memory storage (non-persistent) */
+                IN_MEMORY,
+                /** JDBC-based memory storage */
+                JDBC,
+                /** Redis-based memory storage */
+                REDIS
+            }
 
-                /**
-                 * Memory storage provider type.
-                 */
-                public enum Provider {
-                    /** JDBC-based memory storage */
-                    JDBC,
-                    /** Redis-based memory storage */
-                    REDIS
-                }
+            /** Memory storage provider */
+            private Provider provider = Provider.JDBC;
 
-                /** Whether agent memory is enabled */
-                private boolean enabled = true;
+            public Provider getProvider() {
+                return provider;
+            }
 
-                /** Memory storage provider */
-                private Provider provider = Provider.JDBC;
-
-                /** JDBC memory storage configuration */
-                private Jdbc jdbc = new Jdbc();
-
-                /** Redis memory storage configuration */
-                private Redis redis = new Redis();
-
-                public boolean isEnabled() {
-                    return enabled;
-                }
-
-                public void setEnabled(boolean enabled) {
-                    this.enabled = enabled;
-                }
-
-                public Provider getProvider() {
-                    return provider;
-                }
-
-                public void setProvider(Provider provider) {
-                    this.provider = provider;
-                }
-
-                public Jdbc getJdbc() {
-                    return jdbc;
-                }
-
-                public void setJdbc(Jdbc jdbc) {
-                    this.jdbc = jdbc;
-                }
-
-                public Redis getRedis() {
-                    return redis;
-                }
-
-                public void setRedis(Redis redis) {
-                    this.redis = redis;
-                }
-
-                /**
-                 * JDBC-based agent memory storage configuration.
-                 */
-                public static class Jdbc {
-
-                    /** Whether to automatically initialize the database schema */
-                    private boolean initializeSchema = true;
-
-                    public boolean isInitializeSchema() {
-                        return initializeSchema;
-                    }
-
-                    public void setInitializeSchema(boolean initializeSchema) {
-                        this.initializeSchema = initializeSchema;
-                    }
-                }
-
-                /**
-                 * Redis-based agent memory storage configuration.
-                 */
-                public static class Redis {
-
-                    /** Redis server hostname */
-                    private String host = "localhost";
-
-                    /** Redis server port */
-                    private int port = 6379;
-
-                    /** Redis index name for chat memory */
-                    private String indexName = "bytechef-chat-memory-idx";
-
-                    /** Key prefix for Redis keys */
-                    private String keyPrefix = "bytechef-chat-memory:";
-
-                    /** Time to live for memory entries */
-                    private String timeToLive;
-
-                    /** Whether to automatically initialize the Redis schema */
-                    private boolean initializeSchema = true;
-
-                    public String getHost() {
-                        return host;
-                    }
-
-                    public void setHost(String host) {
-                        this.host = host;
-                    }
-
-                    public int getPort() {
-                        return port;
-                    }
-
-                    public void setPort(int port) {
-                        this.port = port;
-                    }
-
-                    public String getIndexName() {
-                        return indexName;
-                    }
-
-                    public void setIndexName(String indexName) {
-                        this.indexName = indexName;
-                    }
-
-                    public String getKeyPrefix() {
-                        return keyPrefix;
-                    }
-
-                    public void setKeyPrefix(String keyPrefix) {
-                        this.keyPrefix = keyPrefix;
-                    }
-
-                    public String getTimeToLive() {
-                        return timeToLive;
-                    }
-
-                    public void setTimeToLive(String timeToLive) {
-                        this.timeToLive = timeToLive;
-                    }
-
-                    public boolean isInitializeSchema() {
-                        return initializeSchema;
-                    }
-
-                    public void setInitializeSchema(boolean initializeSchema) {
-                        this.initializeSchema = initializeSchema;
-                    }
-                }
+            public void setProvider(Provider provider) {
+                this.provider = provider;
             }
         }
 
         /**
-         * Anthropic AI provider configuration.
+         * Command Center properties. Mirrors the {@link Copilot} flag pattern: a single {@code enabled} switch toggles
+         * the whole CC surface (REST/GraphQL controllers, JDBC repositories, service beans). Kept as a sibling of
+         * {@code copilot} rather than nested inside it because Command Center is its own product surface —
+         * workflow-chat dispatch and personal-agent management live here even on deployments where the LLM copilot is
+         * disabled.
          */
-        public static class Anthropic {
+        public static class CommandCenter {
 
-            /** Anthropic API key */
-            private String apiKey;
+            /** Whether Command Center is enabled */
+            private boolean enabled;
 
-            /** Chat model configuration */
-            private Chat chat = new Chat();
-
-            /** Embedding model configuration */
-            private Embedding embedding = new Embedding();
-
-            public String getApiKey() {
-                return apiKey;
+            public boolean isEnabled() {
+                return enabled;
             }
 
-            public Chat getChat() {
-                return chat;
-            }
-
-            public void setApiKey(String apiKey) {
-                this.apiKey = apiKey;
-            }
-
-            public void setChat(Chat chat) {
-                this.chat = chat;
-            }
-
-            public Embedding getEmbedding() {
-                return embedding;
-            }
-
-            public void setEmbedding(Embedding embedding) {
-                this.embedding = embedding;
-            }
-
-            /**
-             * Anthropic chat model configuration.
-             */
-            public static class Chat {
-
-                /** Chat model options */
-                private Options options = new Options();
-
-                public Options getOptions() {
-                    return options;
-                }
-
-                public void setOptions(Options options) {
-                    this.options = options;
-                }
-
-                /**
-                 * Chat model configuration options.
-                 */
-                public static class Options {
-
-                    /** AI model name (e.g., claude-3-opus-20240229) */
-                    private String model;
-
-                    /** Temperature for response randomness (0.0-1.0) */
-                    private Double temperature;
-
-                    public String getModel() {
-                        return model;
-                    }
-
-                    public void setModel(String model) {
-                        this.model = model;
-                    }
-
-                    public Double getTemperature() {
-                        return temperature;
-                    }
-
-                    public void setTemperature(Double temperature) {
-                        this.temperature = temperature;
-                    }
-                }
-            }
-
-            /**
-             * Anthropic embedding configuration (using external provider).
-             */
-            public static class Embedding {
-
-                /**
-                 * Embedding provider type for Anthropic.
-                 */
-                public enum Provider {
-                    /** OpenAI embedding provider */
-                    OPENAI
-                }
-
-                /** OpenAI embedding configuration */
-                private OpenAi openAi = new OpenAi();
-
-                /** Embedding provider */
-                private Provider provider = Provider.OPENAI;
-
-                public OpenAi getOpenAi() {
-                    return openAi;
-                }
-
-                public void setOpenAi(OpenAi openAi) {
-                    this.openAi = openAi;
-                }
-
-                public Provider getProvider() {
-                    return provider;
-                }
-
-                public void setProvider(Provider provider) {
-                    this.provider = provider;
-                }
-
-                /**
-                 * OpenAI embedding configuration for Anthropic.
-                 */
-                public static class OpenAi {
-
-                    /** OpenAI embedding options */
-                    private Options options = new Options();
-
-                    public Options getOptions() {
-                        return options;
-                    }
-
-                    public void setOptions(Options options) {
-                        this.options = options;
-                    }
-
-                    /**
-                     * OpenAI embedding model options.
-                     */
-                    public static class Options {
-
-                        /** Embedding model name */
-                        private String model;
-
-                        public String getModel() {
-                            return model;
-                        }
-
-                        public void setModel(String model) {
-                            this.model = model;
-                        }
-                    }
-                }
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
         }
 
-        /**
-         * AI Copilot configuration for workflow assistance.
-         */
         public static class Copilot {
 
             /**
@@ -911,11 +641,6 @@ public class ApplicationProperties {
             /** AI provider for Copilot */
             private Provider provider = Provider.OPENAI;
 
-            /** Vector store configuration for Copilot context */
-            private Vectorstore vectorstore = new Vectorstore();
-
-            private Memory memory = new Memory();
-
             public boolean isEnabled() {
                 return enabled;
             }
@@ -930,58 +655,6 @@ public class ApplicationProperties {
 
             public void setProvider(Provider provider) {
                 this.provider = provider;
-            }
-
-            public Vectorstore getVectorstore() {
-                return vectorstore;
-            }
-
-            public void setVectorstore(Vectorstore vectorstore) {
-                this.vectorstore = vectorstore;
-            }
-
-            public Memory getMemory() {
-                return memory;
-            }
-
-            public void setMemory(Memory memory) {
-                this.memory = memory;
-            }
-
-            /**
-             * Vector store configuration for Copilot.
-             */
-            public static class Vectorstore {
-
-                /** Vector store provider */
-                private Ai.Vectorstore.Provider provider = Ai.Vectorstore.Provider.PGVECTOR;
-
-                public Ai.Vectorstore.Provider getProvider() {
-                    return provider;
-                }
-
-                public void setProvider(Ai.Vectorstore.Provider provider) {
-                    this.provider = provider;
-                }
-            }
-
-            public static class Memory {
-
-                public enum Provider {
-                    IN_MEMORY,
-                    JDBC,
-                    AWS_S3
-                }
-
-                private Provider provider = Provider.IN_MEMORY;
-
-                public Provider getProvider() {
-                    return provider;
-                }
-
-                public void setProvider(Provider provider) {
-                    this.provider = provider;
-                }
             }
         }
 
@@ -1025,24 +698,17 @@ public class ApplicationProperties {
         }
 
         /**
-         * Knowledge base AI configuration.
+         * Gateway configuration.
          */
-        public static class KnowledgeBase {
+        public static class Gateway {
 
-            /** Whether knowledge base AI features are enabled */
             private boolean enabled;
 
-            /** Embedding model configuration for knowledge base */
-            private Embedding embedding = new Embedding();
+            private Otlp otlp = new Otlp();
 
-            /** OCR configuration */
-            private Ocr ocr = new Ocr();
+            private RateLimiting rateLimiting = new RateLimiting();
 
-            /** Event subscription configuration */
-            private Subscriptions subscriptions = new Subscriptions();
-
-            /** Vector store configuration for knowledge base */
-            private Vectorstore vectorstore = new Vectorstore();
+            private ExternalScores externalScores = new ExternalScores();
 
             public boolean isEnabled() {
                 return enabled;
@@ -1052,12 +718,106 @@ public class ApplicationProperties {
                 this.enabled = enabled;
             }
 
-            public Embedding getEmbedding() {
-                return embedding;
+            public Otlp getOtlp() {
+                return otlp;
             }
 
-            public void setEmbedding(Embedding embedding) {
-                this.embedding = embedding;
+            public void setOtlp(Otlp otlp) {
+                this.otlp = otlp;
+            }
+
+            public RateLimiting getRateLimiting() {
+                return rateLimiting;
+            }
+
+            public void setRateLimiting(RateLimiting rateLimiting) {
+                this.rateLimiting = rateLimiting;
+            }
+
+            public ExternalScores getExternalScores() {
+                return externalScores;
+            }
+
+            public void setExternalScores(ExternalScores externalScores) {
+                this.externalScores = externalScores;
+            }
+
+            public static class Otlp {
+
+                /** Maximum spans accepted in a single OTLP request body. Requests exceeding this return HTTP 413. */
+                private int maxSpansPerRequest = 1_000;
+
+                public int getMaxSpansPerRequest() {
+                    return maxSpansPerRequest;
+                }
+
+                public void setMaxSpansPerRequest(int maxSpansPerRequest) {
+                    this.maxSpansPerRequest = maxSpansPerRequest;
+                }
+            }
+
+            public static class ExternalScores {
+
+                /**
+                 * Maximum scores accepted in a single batch POST. Requests exceeding this return HTTP 413. Without this
+                 * cap, a single workspace could ship a multi-million-row batch and monopolise the connection pool (each
+                 * row opens its own transaction in {@code AiExternalScoreFacadeImpl.recordBatch}).
+                 */
+                private int maxBatchSize = 1_000;
+
+                public int getMaxBatchSize() {
+                    return maxBatchSize;
+                }
+
+                public void setMaxBatchSize(int maxBatchSize) {
+                    this.maxBatchSize = maxBatchSize;
+                }
+            }
+
+            public static class RateLimiting {
+
+                private boolean enabled;
+
+                private String provider;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public String getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(String provider) {
+                    this.provider = provider;
+                }
+            }
+        }
+
+        /**
+         * Knowledge base configuration.
+         */
+        public static class KnowledgeBase {
+
+            /** Whether knowledge base AI features are enabled */
+            private boolean enabled;
+
+            /** OCR configuration */
+            private Ocr ocr = new Ocr();
+
+            /** Event subscription configuration */
+            private Subscriptions subscriptions = new Subscriptions();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
 
             public Ocr getOcr() {
@@ -1074,84 +834,6 @@ public class ApplicationProperties {
 
             public void setSubscriptions(Subscriptions subscriptions) {
                 this.subscriptions = subscriptions;
-            }
-
-            public Vectorstore getVectorstore() {
-                return vectorstore;
-            }
-
-            public void setVectorstore(Vectorstore vectorstore) {
-                this.vectorstore = vectorstore;
-            }
-
-            /**
-             * Knowledge base embedding configuration.
-             */
-            public static class Embedding {
-
-                /**
-                 * Embedding provider for knowledge base.
-                 */
-                public enum Provider {
-                    /** OpenAI embedding provider */
-                    OPENAI
-                }
-
-                /** OpenAI embedding configuration */
-                private OpenAi openAi = new OpenAi();
-
-                /** Embedding provider */
-                private Provider provider = Provider.OPENAI;
-
-                public OpenAi getOpenAi() {
-                    return openAi;
-                }
-
-                public void setOpenAi(OpenAi openAi) {
-                    this.openAi = openAi;
-                }
-
-                public Provider getProvider() {
-                    return provider;
-                }
-
-                public void setProvider(Provider provider) {
-                    this.provider = provider;
-                }
-
-                /**
-                 * OpenAI embedding configuration for knowledge base.
-                 */
-                public static class OpenAi {
-
-                    /** OpenAI embedding options */
-                    private Options options = new Options();
-
-                    public Options getOptions() {
-                        return options;
-                    }
-
-                    public void setOptions(Options options) {
-                        this.options = options;
-                    }
-
-                    /**
-                     * OpenAI embedding model options for knowledge base.
-                     */
-                    public static class Options {
-
-                        /** Embedding model name */
-                        private String model;
-
-                        public String getModel() {
-                            return model;
-                        }
-
-                        public void setModel(String model) {
-                            this.model = model;
-                        }
-                    }
-                }
             }
 
             /**
@@ -1238,23 +920,6 @@ public class ApplicationProperties {
                     this.documentChunkUpdateEvents = documentChunkUpdateEvents;
                 }
             }
-
-            /**
-             * Knowledge base vector store configuration.
-             */
-            public static class Vectorstore {
-
-                /** Vector store provider */
-                private Ai.Vectorstore.Provider provider = Ai.Vectorstore.Provider.PGVECTOR;
-
-                public Ai.Vectorstore.Provider getProvider() {
-                    return provider;
-                }
-
-                public void setProvider(Ai.Vectorstore.Provider provider) {
-                    this.provider = provider;
-                }
-            }
         }
 
         /**
@@ -1291,151 +956,6 @@ public class ApplicationProperties {
         }
 
         /**
-         * OpenAI provider configuration.
-         */
-        public static class OpenAi {
-
-            /** OpenAI API key */
-            private String apiKey;
-
-            /** Chat model configuration */
-            private Chat chat = new Chat();
-
-            /** Embedding model configuration */
-            private Embedding embedding = new Embedding();
-
-            public String getApiKey() {
-                return apiKey;
-            }
-
-            public void setApiKey(String apiKey) {
-                this.apiKey = apiKey;
-            }
-
-            public Chat getChat() {
-                return chat;
-            }
-
-            public Embedding getEmbedding() {
-                return embedding;
-            }
-
-            public void setChat(Chat chat) {
-                this.chat = chat;
-            }
-
-            public void setEmbedding(Embedding embedding) {
-                this.embedding = embedding;
-            }
-
-            /**
-             * OpenAI chat model configuration.
-             */
-            public static class Chat {
-
-                /** Chat model options */
-                private Options options = new Options();
-
-                public Options getOptions() {
-                    return options;
-                }
-
-                public void setOptions(Options options) {
-                    this.options = options;
-                }
-
-                /**
-                 * OpenAI chat model options.
-                 */
-                public static class Options {
-
-                    public enum Setting {
-                        NONE,
-                        LOW,
-                        MEDIUM,
-                        HIGH
-                    }
-
-                    /** Chat model name (e.g., gpt-4, gpt-3.5-turbo) */
-                    private String model;
-
-                    /** Temperature for response randomness (0.0-2.0) */
-                    private Double temperature;
-
-                    private Setting reasoningEffect = Setting.NONE;
-
-                    private Setting verbosity = Setting.LOW;
-
-                    public String getModel() {
-                        return model;
-                    }
-
-                    public Double getTemperature() {
-                        return temperature;
-                    }
-
-                    public Setting getReasoningEffect() {
-                        return reasoningEffect;
-                    }
-
-                    public Setting getVerbosity() {
-                        return verbosity;
-                    }
-
-                    public void setModel(String model) {
-                        this.model = model;
-                    }
-
-                    public void setTemperature(Double temperature) {
-                        this.temperature = temperature;
-                    }
-
-                    public void setReasoningEffect(Setting setting) {
-                        this.reasoningEffect = setting;
-                    }
-
-                    public void setVerbosity(Setting setting) {
-                        this.verbosity = setting;
-                    }
-                }
-            }
-
-            /**
-             * OpenAI embedding model configuration.
-             */
-            public static class Embedding {
-
-                /** Embedding model options */
-                private Options options = new Options();
-
-                public Options getOptions() {
-                    return options;
-                }
-
-                public void setOptions(Options options) {
-                    this.options = options;
-                }
-
-                /**
-                 * OpenAI embedding model options.
-                 */
-                public static class Options {
-
-                    /** Embedding model name (e.g., text-embedding-ada-002) */
-                    private String model;
-
-                    public String getModel() {
-                        return model;
-                    }
-
-                    public void setModel(String model) {
-                        this.model = model;
-                    }
-                }
-            }
-        }
-
-        /**
          * AI provider API key configuration for various AI services.
          */
         public static class Provider {
@@ -1464,8 +984,14 @@ public class ApplicationProperties {
             /** Azure OpenAI configuration */
             private AzureOpenAi azureOpenAi = new AzureOpenAi();
 
+            /** Chat model configuration grouped by provider */
+            private Chat chat = new Chat();
+
             /** DeepSeek configuration */
             private DeepSeek deepSeek = new DeepSeek();
+
+            /** Embedding model configuration grouped by provider */
+            private Embedding embedding = new Embedding();
 
             /** Groq configuration */
             private Groq groq = new Groq();
@@ -1520,8 +1046,16 @@ public class ApplicationProperties {
                 return azureOpenAi;
             }
 
+            public Chat getChat() {
+                return chat;
+            }
+
             public DeepSeek getDeepSeek() {
                 return deepSeek;
+            }
+
+            public Embedding getEmbedding() {
+                return embedding;
             }
 
             public Groq getGroq() {
@@ -1584,8 +1118,16 @@ public class ApplicationProperties {
                 this.azureOpenAi = azureOpenAi;
             }
 
+            public void setChat(Chat chat) {
+                this.chat = chat;
+            }
+
             public void setDeepSeek(DeepSeek deepSeek) {
                 this.deepSeek = deepSeek;
+            }
+
+            public void setEmbedding(Embedding embedding) {
+                this.embedding = embedding;
             }
 
             public void setGroq(Groq groq) {
@@ -1839,6 +1381,202 @@ public class ApplicationProperties {
                     this.apiKey = apiKey;
                 }
             }
+
+            /**
+             * Chat model configuration grouped by provider.
+             */
+            public static class Chat {
+
+                /** Anthropic chat model configuration */
+                private Anthropic anthropic = new Anthropic();
+
+                /** OpenAI chat model configuration */
+                private OpenAi openAi = new OpenAi();
+
+                public Anthropic getAnthropic() {
+                    return anthropic;
+                }
+
+                public void setAnthropic(Anthropic anthropic) {
+                    this.anthropic = anthropic;
+                }
+
+                public OpenAi getOpenAi() {
+                    return openAi;
+                }
+
+                public void setOpenAi(OpenAi openAi) {
+                    this.openAi = openAi;
+                }
+
+                /**
+                 * Anthropic chat model configuration.
+                 */
+                public static class Anthropic {
+
+                    /** Chat model options */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Anthropic chat model options.
+                     */
+                    public static class Options {
+
+                        /** AI model name (e.g., claude-3-opus-20240229) */
+                        private String model;
+
+                        /** Temperature for response randomness (0.0-1.0) */
+                        private Double temperature;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+
+                        public Double getTemperature() {
+                            return temperature;
+                        }
+
+                        public void setTemperature(Double temperature) {
+                            this.temperature = temperature;
+                        }
+                    }
+                }
+
+                /**
+                 * OpenAI chat model configuration.
+                 */
+                public static class OpenAi {
+
+                    /** Chat model options */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * OpenAI chat model options.
+                     */
+                    public static class Options {
+
+                        public enum Setting {
+                            NONE,
+                            LOW,
+                            MEDIUM,
+                            HIGH
+                        }
+
+                        /** Chat model name (e.g., gpt-4, gpt-3.5-turbo) */
+                        private String model;
+
+                        /** Temperature for response randomness (0.0-2.0) */
+                        private Double temperature;
+
+                        private Setting reasoningEffect = Setting.NONE;
+
+                        private Setting verbosity = Setting.LOW;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public Double getTemperature() {
+                            return temperature;
+                        }
+
+                        public Setting getReasoningEffect() {
+                            return reasoningEffect;
+                        }
+
+                        public Setting getVerbosity() {
+                            return verbosity;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+
+                        public void setTemperature(Double temperature) {
+                            this.temperature = temperature;
+                        }
+
+                        public void setReasoningEffect(Setting setting) {
+                            this.reasoningEffect = setting;
+                        }
+
+                        public void setVerbosity(Setting setting) {
+                            this.verbosity = setting;
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Embedding model configuration grouped by provider.
+             */
+            public static class Embedding {
+
+                /** OpenAI embedding model configuration */
+                private OpenAi openAi = new OpenAi();
+
+                public OpenAi getOpenAi() {
+                    return openAi;
+                }
+
+                public void setOpenAi(OpenAi openAi) {
+                    this.openAi = openAi;
+                }
+
+                /**
+                 * OpenAI embedding model configuration.
+                 */
+                public static class OpenAi {
+
+                    /** Embedding model options */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * OpenAI embedding model options.
+                     */
+                    public static class Options {
+
+                        /** Embedding model name (e.g., text-embedding-ada-002) */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+            }
         }
 
         /**
@@ -1854,8 +1592,19 @@ public class ApplicationProperties {
                 PGVECTOR
             }
 
+            /** Vector store provider */
+            private Provider provider = Provider.PGVECTOR;
+
             /** PgVector configuration */
             private PgVector pgVector = new PgVector();
+
+            public Provider getProvider() {
+                return provider;
+            }
+
+            public void setProvider(Provider provider) {
+                this.provider = provider;
+            }
 
             public PgVector getPgVector() {
                 return pgVector;

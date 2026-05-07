@@ -1,58 +1,34 @@
 bytechef:
   ai:
-    agent:
-      memory:
-        enabled: true
-        # Memory provider (jdbc | redis) default: jdbc
-        provider: jdbc
-        jdbc:
-          initialize-schema: true
-        redis:
-          host: localhost
-          port: 6379
-          index-name: bytechef-chat-memory-idx
-          key-prefix: "bytechef-chat-memory:"
-          # time-to-live: 24h
-          initialize-schema: true
-    anthropic:
-      chat:
-        options:
-          model: claude-sonnet-4-6
-          temperature: 0.5
-      embedding:
-        provider: openai
-        openai:
-          options:
-            model: text-embedding-3-small
     copilot:
       enabled: false
-      provider: openai
-      vectorstore:
-        provider: pgvector
-      memory:
-        provider: in_memory
+      provider: anthropic
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
     knowledge-base:
+      enabled: false
+    memory:
+      # Chat memory provider (inmemory | jdbc | redis | aws) default: jdbc
+      provider: jdbc
+    provider:
+      chat:
+        anthropic:
+          options:
+            model: claude-sonnet-4-6
+            temperature: 0.5
+        openai:
+          options:
+            model: gpt-5.1
+            temperature: 1
+            reasoning-effect: medium
+            verbosity: low
       embedding:
-        provider: openai
         openai:
           options:
             model: text-embedding-3-small
-      enabled: false
-      vectorstore:
-        provider: pgvector
-    openai:
-      chat:
-        options:
-          model: gpt-5.1
-          temperature: 1
-          reasoning-effect: medium
-          verbosity: low
-      embedding:
-        options:
-          model: text-embedding-3-small
+    vectorstore:
+      provider: pgvector
   analytics:
     enabled: false
   cache:

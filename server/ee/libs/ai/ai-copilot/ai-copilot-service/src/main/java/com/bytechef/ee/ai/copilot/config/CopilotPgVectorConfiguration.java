@@ -16,16 +16,9 @@
 
 package com.bytechef.ee.ai.copilot.config;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Anthropic;
-import com.bytechef.config.ApplicationProperties.Ai.OpenAi;
-import com.openai.client.OpenAIClient;
 import io.micrometer.observation.ObservationRegistry;
-import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
@@ -50,13 +43,12 @@ public class CopilotPgVectorConfiguration {
 
     @Bean
     public VectorStore copilotPgVectorStore(
-        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
-        @Qualifier("copilotEmbeddingModel") EmbeddingModel copilotEmbeddingModel, PgVectorStoreProperties properties,
-        ObjectProvider<ObservationRegistry> observationRegistry,
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel,
+        PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         BatchingStrategy batchingStrategy) {
 
-        return PgVectorStore.builder(pgVectorJdbcTemplate, copilotEmbeddingModel)
+        return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
             .schemaName(properties.getSchemaName())
             .idType(properties.getIdType())
             .vectorTableName("copilot_" + properties.getTableName())
@@ -71,44 +63,5 @@ public class CopilotPgVectorConfiguration {
             .batchingStrategy(batchingStrategy)
             .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
             .build();
-    }
-
-    @Bean("copilotEmbeddingModel")
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    OpenAiEmbeddingModel copilotAnthropicOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
-
-        ApplicationProperties.Ai ai = applicationProperties.getAi();
-
-        Anthropic anthropic = ai.getAnthropic();
-
-        Anthropic.Embedding.OpenAi.Options anthropicEmbeddingOpenAiOptions = anthropic.getEmbedding()
-            .getOpenAi()
-            .getOptions();
-
-        return new OpenAiEmbeddingModel(
-            openAIClient, MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(anthropicEmbeddingOpenAiOptions.getModel())
-                .build());
-    }
-
-    @Bean("copilotEmbeddingModel")
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
-    OpenAiEmbeddingModel copilotOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
-
-        ApplicationProperties.Ai ai = applicationProperties.getAi();
-
-        OpenAi openAi = ai.getOpenAi();
-
-        OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
-            .getOptions();
-
-        return new OpenAiEmbeddingModel(
-            openAIClient, MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(openAiEmbeddingOptions.getModel())
-                .build());
     }
 }
