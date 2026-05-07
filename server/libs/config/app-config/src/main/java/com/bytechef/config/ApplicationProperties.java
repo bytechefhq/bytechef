@@ -88,6 +88,9 @@ public class ApplicationProperties {
     /** Help hub configuration */
     private HelpHub helpHub = new HelpHub();
 
+    /** Kafka connection configuration */
+    private Kafka kafka = new Kafka();
+
     /** Email configuration */
     private Mail mail = new Mail();
 
@@ -102,6 +105,12 @@ public class ApplicationProperties {
 
     /** Public URL for the application */
     private String publicUrl;
+
+    /** RabbitMQ connection configuration */
+    private Rabbitmq rabbitmq = new Rabbitmq();
+
+    /** Redis connection configuration */
+    private Redis redis = new Redis();
 
     /** Static resources configuration */
     private Resources resources = new Resources();
@@ -191,6 +200,10 @@ public class ApplicationProperties {
         return helpHub;
     }
 
+    public Kafka getKafka() {
+        return kafka;
+    }
+
     public Mail getMail() {
         return mail;
     }
@@ -209,6 +222,14 @@ public class ApplicationProperties {
 
     public String getPublicUrl() {
         return publicUrl;
+    }
+
+    public Rabbitmq getRabbitmq() {
+        return rabbitmq;
+    }
+
+    public Redis getRedis() {
+        return redis;
     }
 
     public Resources getResources() {
@@ -311,6 +332,10 @@ public class ApplicationProperties {
         this.helpHub = helpHub;
     }
 
+    public void setKafka(Kafka kafka) {
+        this.kafka = kafka;
+    }
+
     public void setMail(Mail mail) {
         this.mail = mail;
     }
@@ -329,6 +354,14 @@ public class ApplicationProperties {
 
     public void setPublicUrl(String publicUrl) {
         this.publicUrl = publicUrl;
+    }
+
+    public void setRabbitmq(Rabbitmq rabbitmq) {
+        this.rabbitmq = rabbitmq;
+    }
+
+    public void setRedis(Redis redis) {
+        this.redis = redis;
     }
 
     public void setResources(Resources resources) {
@@ -2317,6 +2350,51 @@ public class ApplicationProperties {
     }
 
     /**
+     * Kafka connection configuration.
+     */
+    public static class Kafka {
+
+        /** Comma-separated list of Kafka bootstrap servers (host:port) */
+        private String bootstrapServers;
+
+        /** Kafka consumer configuration */
+        private Consumer consumer = new Consumer();
+
+        public String getBootstrapServers() {
+            return bootstrapServers;
+        }
+
+        public Consumer getConsumer() {
+            return consumer;
+        }
+
+        public void setBootstrapServers(String bootstrapServers) {
+            this.bootstrapServers = bootstrapServers;
+        }
+
+        public void setConsumer(Consumer consumer) {
+            this.consumer = consumer;
+        }
+
+        /**
+         * Kafka consumer configuration.
+         */
+        public static class Consumer {
+
+            /** Consumer group identifier */
+            private String groupId;
+
+            public String getGroupId() {
+                return groupId;
+            }
+
+            public void setGroupId(String groupId) {
+                this.groupId = groupId;
+            }
+        }
+    }
+
+    /**
      * Email configuration for sending notifications and alerts.
      */
     public static class Mail {
@@ -2576,6 +2654,117 @@ public class ApplicationProperties {
             public void setClientSecret(String clientSecret) {
                 this.clientSecret = clientSecret;
             }
+        }
+    }
+
+    /**
+     * RabbitMQ connection configuration.
+     */
+    public static class Rabbitmq {
+
+        /** RabbitMQ server hostname */
+        private String host;
+
+        /** RabbitMQ server password */
+        private String password;
+
+        /** RabbitMQ server port */
+        private int port = 5672;
+
+        /** RabbitMQ server username */
+        private String username;
+
+        public String getHost() {
+            return host;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+    }
+
+    /**
+     * Redis connection configuration.
+     */
+    public static class Redis {
+
+        /** Redis database index */
+        private int database;
+
+        /** Redis server hostname */
+        private String host;
+
+        /** Redis server password */
+        private String password;
+
+        /** Redis server port */
+        private int port = 6379;
+
+        /** Connection timeout in milliseconds */
+        private long timeout;
+
+        public int getDatabase() {
+            return database;
+        }
+
+        public String getHost() {
+            return host;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public long getTimeout() {
+            return timeout;
+        }
+
+        public void setDatabase(int database) {
+            this.database = database;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
+
+        public void setTimeout(long timeout) {
+            this.timeout = timeout;
         }
     }
 
