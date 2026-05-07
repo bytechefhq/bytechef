@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add user to your organization.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-crm_v1#add-user"
+    },
     "metadata": null,
     "name": "addUser",
     "outputDefinition": {
@@ -407,7 +410,7 @@
       "advancedOption": null,
       "controlType": "EMAIL",
       "defaultValue": null,
-      "description": "User's email. An invitation will be sent to this email address",
+      "description": "User's email. An invitation will be sent to this email address.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -486,7 +489,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets information about the current organization.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-crm_v1#get-organization"
+    },
     "metadata": null,
     "name": "getOrganization",
     "outputDefinition": {
@@ -1294,7 +1300,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Lists users found in Zoho account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-crm_v1#list-users"
+    },
     "metadata": null,
     "name": "listUsers",
     "outputDefinition": {
@@ -2592,7 +2601,7 @@
       "advancedOption": null,
       "controlType": "EMAIL",
       "defaultValue": null,
-      "description": "User's email. An invitation will be sent to this email address",
+      "description": "User's email. An invitation will be sent to this email address.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -4500,14 +4509,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zoho-crm_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://www.zoho.com/crm/developer/docs/api/v8/"
+  },
   "description": "Zoho CRM is a cloud-based customer relationship management platform that integrates sales, marketing, and customer support activities to streamline business processes and enhance team.",
   "icon": "path:assets/zoho-crm.svg",
   "metadata": null,

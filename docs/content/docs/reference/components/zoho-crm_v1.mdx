@@ -59,7 +59,7 @@ Name: addUser
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | first_name | First Name | STRING | First name of the user. | true |
 | last_name | Last Name | STRING | Last name of the user. | false |
-| email | Email | STRING | User's email. An invitation will be sent to this email address | true |
+| email | Email | STRING | User's email. An invitation will be sent to this email address. | true |
 | role | Role ID | STRING | ID of the role you want to assign the user with. | true |
 | profile | Profile ID | STRING | ID of the profile you want to assign the user with. | true |
 
@@ -109,6 +109,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Role ID
+
+To find the Role ID, click [here](/reference/components/zoho-crm_v1#how-to-find-the-role-id).
+
+#### Find Profile ID
+
+To find the Profile ID, click [here](/reference/components/zoho-crm_v1#how-to-find-the-profile-id).
 
 
 
@@ -239,3 +246,30 @@ Type: OBJECT
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find the Role ID
+
+- **Method 1: Via API**
+
+Use the `GET /settings/roles` endpoint to retrieve a list of all roles and their IDs.
+
+The Role ID can also be found in the output of the following actions:
+* **List Users**
+
+### How to find the Profile ID
+
+- **Method 1: Via API**
+
+Use the `GET /settings/profiles` endpoint to retrieve a list of all profiles and their IDs.
+
+The Profile ID can also be found in the output of the following actions:
+* **List Users**
