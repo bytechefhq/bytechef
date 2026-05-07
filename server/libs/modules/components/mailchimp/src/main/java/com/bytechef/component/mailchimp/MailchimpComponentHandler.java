@@ -43,6 +43,7 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://mailchimp.com/developer/marketing/api/")
             .icon("path:assets/mailchimp.svg")
             .categories(ComponentCategory.MARKETING_AUTOMATION);
     }
@@ -53,6 +54,8 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://%s.api.mailchimp.com/3.0".formatted(
-                MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context)));
+                MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context)))
+            .version(1)
+            .help("", "https://docs.bytechef.io/reference/components/mailchimp_v1#connection-setup");
     }
 }
