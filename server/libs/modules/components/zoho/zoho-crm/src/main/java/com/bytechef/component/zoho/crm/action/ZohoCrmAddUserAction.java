@@ -49,6 +49,7 @@ public class ZohoCrmAddUserAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addUser")
         .title("Add User")
         .description("Add user to your organization.")
+        .help("", "https://docs.bytechef.io/reference/components/zoho-crm_v1#add-user")
         .properties(
             string(FIRST_NAME)
                 .label("First Name")
@@ -60,7 +61,7 @@ public class ZohoCrmAddUserAction {
                 .required(false),
             string(EMAIL)
                 .label("Email")
-                .description("User's email. An invitation will be sent to this email address")
+                .description("User's email. An invitation will be sent to this email address.")
                 .controlType(ControlType.EMAIL)
                 .required(true),
             string(ROLE)

@@ -37,6 +37,7 @@ public class ZohoCrmGetOrganizationAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getOrganization")
         .title("Get Organization")
         .description("Gets information about the current organization.")
+        .help("", "https://docs.bytechef.io/reference/components/zoho-crm_v1#get-organization")
         .output(
             outputSchema(
                 object()

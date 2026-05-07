@@ -40,6 +40,7 @@ public class ZohoCrmListUsersAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listUsers")
         .title("List Users")
         .description("Lists users found in Zoho account.")
+        .help("", "https://docs.bytechef.io/reference/components/zoho-crm_v1#list-users")
         .properties(
             string(TYPE)
                 .label("Type")

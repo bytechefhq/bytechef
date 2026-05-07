@@ -40,6 +40,8 @@ public class ZohoCrmComponentHandler implements ComponentHandler {
         .description(
             "Zoho CRM is a cloud-based customer relationship management platform that integrates sales, marketing, " +
                 "and customer support activities to streamline business processes and enhance team.")
+        .customAction(true)
+        .customActionHelp("", "https://www.zoho.com/crm/developer/docs/api/v8/")
         .categories(ComponentCategory.CRM)
         .connection(CONNECTION_DEFINITION)
         .actions(
@@ -50,7 +52,8 @@ public class ZohoCrmComponentHandler implements ComponentHandler {
             tool(ZohoCrmAddUserAction.ACTION_DEFINITION),
             tool(ZohoCrmGetOrganizationAction.ACTION_DEFINITION),
             tool(ZohoCrmListUsersAction.ACTION_DEFINITION))
-        .icon("path:assets/zoho-crm.svg");
+        .icon("path:assets/zoho-crm.svg")
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
