@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.llm.open.router.model;
 
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.BASE_URL;
+
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -39,9 +41,6 @@ import org.springframework.web.client.RestClient;
  * @author Marko Kriskovic
  */
 public class OpenRouterChatModel implements org.springframework.ai.chat.model.ChatModel {
-
-    private static final String BASE_URL = "https://openrouter.ai/api/v1";
-
     private final RestClient restClient;
     private final String model;
     private final Double frequencyPenalty;

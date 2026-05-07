@@ -22,6 +22,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SPEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.VOICE;
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.BASE_URL;
 import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.SPEECH_MODEL_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -47,9 +48,6 @@ import org.springframework.web.client.RestClient;
  * @author Marko Kriskovic
  */
 public class OpenRouterCreateSpeechAction {
-
-    private static final String BASE_URL = "https://openrouter.ai/api/v1";
-
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPEECH)
         .title("Create Speech")
         .description("Generate an audio file from the input text")

@@ -79,6 +79,12 @@ public class OpenRouterConstants {
         .options(getOpenRouterModels("speech"))
         .required(true);
 
+    public static final ModifiableStringProperty TRANSCRIPTION_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .options(getOpenRouterModels("transcription"))
+        .required(true);
+
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency Penalty")
         .description(
@@ -233,4 +239,6 @@ public class OpenRouterConstants {
             .map(param -> option(param, param))
             .collect(Collectors.toList());
     }
+
+    public static final String BASE_URL = "https://openrouter.ai/api/v1";
 }

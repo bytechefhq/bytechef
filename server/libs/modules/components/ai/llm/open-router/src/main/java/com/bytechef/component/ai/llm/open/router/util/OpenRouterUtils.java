@@ -39,6 +39,7 @@ public class OpenRouterUtils {
 
             Context.Http.Executor executor = context.http(http -> http.get("/models"))
                 .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+//                .queryParameter("input_modalities", inputType)
                 .queryParameter("output_modalities", outputType);
 
             if (supportedParametersString != null) {
