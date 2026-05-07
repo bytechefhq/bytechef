@@ -59,7 +59,7 @@ import org.springframework.ai.document.DocumentTransformer;
  * <p>
  * Unlike other vector store components, the Knowledge Base does not accept an {@code EMBEDDING} cluster element — all
  * knowledge bases share one pgvector index with fixed dimensions, so the embedding model is globally configured via
- * {@code bytechef.ai.knowledge-base.embedding.*}.
+ * {@code bytechef.ai.provider.embedding.*}.
  *
  * @author Ivica Cardic
  */

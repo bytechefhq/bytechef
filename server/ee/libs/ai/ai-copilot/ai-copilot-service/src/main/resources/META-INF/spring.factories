@@ -1,3 +1,0 @@
-org.springframework.boot.EnvironmentPostProcessor=\
-com.bytechef.ee.ai.copilot.boot.CopilotEnvironmentPostProcessor,\
-com.bytechef.ee.ai.copilot.boot.JdbcMemoryEnvironmentPostProcessor

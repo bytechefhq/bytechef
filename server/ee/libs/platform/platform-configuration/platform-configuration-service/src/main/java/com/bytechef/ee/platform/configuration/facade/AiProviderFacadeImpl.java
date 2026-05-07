@@ -64,8 +64,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
         return Arrays.stream(Provider.values())
             .map(provider -> {
-                ComponentDefinition componentDefinition = componentDefinitions
-                    .stream()
+                ComponentDefinition componentDefinition = componentDefinitions.stream()
                     .filter(curComponentDefinition -> {
                         String name = provider.getName();
 
@@ -81,8 +80,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                     return null;
                 }
 
-                Property property = properties
-                    .stream()
+                Property property = properties.stream()
                     .filter(curProperty -> curProperty.getKey()
                         .equals(provider.getKey()))
                     .findFirst()

@@ -145,26 +145,8 @@ spring:
       embedding: none
       image: none
       moderation: none
-    anthropic:
-      api-key: ${bytechef.ai.anthropic.api-key}
-      chat:
-        options:
-          model: ${bytechef.ai.anthropic.chat.options.model}
-          temperature: ${bytechef.ai.anthropic.chat.options.temperature}
-    openai:
-      api-key: ${bytechef.ai.openai.api-key}
-      chat:
-        options:
-          model: ${bytechef.ai.openai.chat.options.model}
-          temperature: ${bytechef.ai.openai.chat.options.temperature}
     vectorstore:
       type: none
-      pgvector:
-        index-type: hnsw
-        distance-type: cosine_distance
-        dimensions: 1536
-        max-document-batch-size: 10000
-        initialize-schema: true
   application:
     name: server-app
   autoconfigure:

@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
@@ -48,7 +49,7 @@ import org.springframework.transaction.TransactionManager;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "spring.ai.vectorstore", name = "type", havingValue = "pgvector")
+@ConditionalOnProperty(prefix = "bytechef.ai.vectorstore", name = "provider", havingValue = "pgvector")
 class PgVectorJdbcConfiguration {
 
     private final ApplicationProperties.Ai.Vectorstore.PgVector pgVector;
@@ -78,11 +79,13 @@ class PgVectorJdbcConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(name = "pgVectorDataSource")
     JdbcTemplate pgVectorJdbcTemplate(@Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
         return new JdbcTemplate(pgVectorDataSource);
     }
 
     @Bean
+    @ConditionalOnBean(name = "pgVectorDataSource")
     NamedParameterJdbcOperations pgVectorNamedParameterJdbcOperations(
         @Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
 
@@ -90,6 +93,7 @@ class PgVectorJdbcConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(name = "pgVectorDataSource")
     TransactionManager pgVectorTransactionManager(
         @Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
 
@@ -97,6 +101,7 @@ class PgVectorJdbcConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(name = "pgVectorDataSource")
     DataAccessStrategy pgVectorDataAccessStrategy(
         @Qualifier("pgVectorNamedParameterJdbcOperations") NamedParameterJdbcOperations operations,
         JdbcConverter jdbcConverter, RelationalMappingContext context, Dialect jdbcDialect) {
@@ -108,6 +113,7 @@ class PgVectorJdbcConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(name = "pgVectorDataSource")
     JdbcAggregateTemplate pgVectorJdbcAggregateTemplate(
         ApplicationContext applicationContext, RelationalMappingContext context, JdbcConverter jdbcConverter,
         @Qualifier("pgVectorDataAccessStrategy") DataAccessStrategy dataAccessStrategy) {

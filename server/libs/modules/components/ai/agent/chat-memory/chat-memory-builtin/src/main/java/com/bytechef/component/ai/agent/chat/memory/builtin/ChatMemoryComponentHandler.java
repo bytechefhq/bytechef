@@ -25,15 +25,10 @@ import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryDele
 import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryGetMessagesAction;
 import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryListConversationsAction;
 import com.bytechef.component.ai.agent.chat.memory.builtin.cluster.ChatMemory;
-import com.bytechef.component.ai.agent.chat.memory.builtin.config.JdbcChatMemoryRepositoryFactory;
-import com.bytechef.component.ai.agent.chat.memory.builtin.config.RedisChatMemoryRepositoryFactory;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.config.ApplicationProperties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import javax.sql.DataSource;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,25 +40,7 @@ public class ChatMemoryComponentHandler implements ComponentHandler {
     private final ComponentDefinition componentDefinition;
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-    public ChatMemoryComponentHandler(
-        ApplicationProperties applicationProperties, @Autowired(required = false) DataSource dataSource) {
-
-        ChatMemoryRepository chatMemoryRepository = null;
-
-        if (applicationProperties != null) {
-            ApplicationProperties.Ai.Agent.Memory memoryProperties =
-                applicationProperties.getAi()
-                    .getAgent()
-                    .getMemory();
-
-            if (memoryProperties.isEnabled()) {
-                chatMemoryRepository = switch (memoryProperties.getProvider()) {
-                    case JDBC -> JdbcChatMemoryRepositoryFactory.create(applicationProperties, dataSource);
-                    case REDIS -> RedisChatMemoryRepositoryFactory.create(applicationProperties);
-                };
-            }
-        }
-
+    public ChatMemoryComponentHandler(ChatMemoryRepository chatMemoryRepository) {
         this.componentDefinition = component(CHAT_MEMORY)
             .title("Chat Memory")
             .description("Built-in chat memory.")

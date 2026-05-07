@@ -104,7 +104,10 @@ include("server:libs:automation:automation-workflow:automation-workflow-executio
 include("server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-rest")
 include("server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-service")
 
-include("server:libs:config:ai-config")
+include("server:libs:config:ai-chat-memory-config:ai-chat-memory-in-memory-config")
+include("server:libs:config:ai-chat-memory-config:ai-chat-memory-jdbc-config")
+include("server:libs:config:ai-chat-memory-config:ai-chat-memory-redis-config")
+include("server:libs:config:ai-model-config")
 include("server:libs:config:app-config")
 include("server:libs:config:async-config")
 include("server:libs:config:automation-demo-config")

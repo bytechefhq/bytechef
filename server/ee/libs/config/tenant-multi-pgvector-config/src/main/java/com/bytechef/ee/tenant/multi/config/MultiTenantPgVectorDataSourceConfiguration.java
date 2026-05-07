@@ -32,7 +32,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Configuration
 @ConditionalOnEEVersion
 @ConditionalOnMultiTenant
-@ConditionalOnProperty(prefix = "spring.ai.vectorstore", name = "type", havingValue = "pgvector")
+@ConditionalOnProperty(prefix = "bytechef.ai.vectorstore", name = "provider", havingValue = "pgvector")
 class MultiTenantPgVectorDataSourceConfiguration {
 
     private final ApplicationProperties.Ai.Vectorstore.PgVector pgVector;
