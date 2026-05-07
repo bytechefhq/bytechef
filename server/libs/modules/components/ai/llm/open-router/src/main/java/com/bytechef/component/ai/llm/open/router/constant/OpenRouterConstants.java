@@ -73,6 +73,12 @@ public class OpenRouterConstants {
         .options(getOpenRouterModels("image"))
         .required(true);
 
+    public static final ModifiableStringProperty SPEECH_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .options(getOpenRouterModels("speech"))
+        .required(true);
+
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency Penalty")
         .description(
