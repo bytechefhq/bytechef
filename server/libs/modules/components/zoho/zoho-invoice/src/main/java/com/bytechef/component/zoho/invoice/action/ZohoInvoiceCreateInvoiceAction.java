@@ -49,6 +49,7 @@ public class ZohoInvoiceCreateInvoiceAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createInvoice")
         .title("Create Invoice")
         .description("Create an invoice for your customer.")
+        .help("", "https://docs.bytechef.io/reference/components/zoho-invoice_v1#create-invoice")
         .properties(
             string(CUSTOMER_ID)
                 .label("Customer ID")

@@ -44,7 +44,8 @@ public class ZohoInvoiceCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Create a contact.")
+        .description("Create a new contact.")
+        .help("", "https://docs.bytechef.io/reference/components/zoho-invoice_v1#create-contact")
         .properties(
             string(CONTACT_NAME)
                 .label("Contact Name")
@@ -53,7 +54,7 @@ public class ZohoInvoiceCreateContactAction {
                 .required(true),
             string(COMPANY_NAME)
                 .label("Company Name")
-                .description("Name of the contact's company. ")
+                .description("Name of the contact's company.")
                 .maxLength(200)
                 .required(false),
             string(WEBSITE)

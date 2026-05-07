@@ -41,7 +41,8 @@ public class ZohoInvoiceCreateItemAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createItem")
         .title("Create Item")
-        .description("Create a item.")
+        .description("Create a new item.")
+        .help("", "https://docs.bytechef.io/reference/components/zoho-invoice_v1#create-item")
         .properties(
             string(NAME)
                 .label("Item Name")
