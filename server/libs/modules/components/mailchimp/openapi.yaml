@@ -10,34 +10,33 @@ paths:
       description: "Adds a new member to the list."
       summary: "Add Member to List"
       tags:
-      - "Members"
+        - "Members"
       operationId: "addMemberToList"
       x-ai-agent-tool: true
       parameters:
-      - name: "listId"
-        description: "The unique ID for the list."
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-          title: "List ID"
-          x-dynamic-options: true
-      - name: "skip_merge_validation"
-        description: "If skip_merge_validation is true, member data will be accepted\
-          \ without merge field values, even if the merge field is usually required.\
-          \ This defaults to false."
-        in: "query"
-        required: false
-        schema:
-          type: "boolean"
+        - name: "listId"
+          description: "The unique ID for the list."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            title: "List ID"
+            x-dynamic-options: true
+        - name: "skip_merge_validation"
+          description: "If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            title: "Skip Merge Validation"
       requestBody:
         content:
           application/json:
             schema:
               type: "object"
               required:
-              - "email_address"
-              - "status"
+                - "email_address"
+                - "status"
               properties:
                 email_address:
                   description: "Email address for a subscriber."
@@ -45,21 +44,18 @@ paths:
                 status:
                   $ref: "#/components/schemas/Status"
                 email_type:
-                  description: "Type of email this member asked to get ('html' or\
-                    \ 'text')."
+                  description: "Type of email this member asked to get ('html' or 'text')."
                   type: "string"
                   enum:
-                  - "html"
-                  - "text"
+                    - "html"
+                    - "text"
                 merge_fields:
-                  description: "A dictionary of merge fields where the keys are the\
-                    \ merge tags."
+                  description: "A dictionary of merge fields where the keys are the merge tags."
                   type: "object"
                   additionalProperties:
                     type: "string"
                 interests:
-                  description: "The key of this object's properties is the ID of the\
-                    \ interest in question."
+                  description: "The key of this object's properties is the ID of the interest in question."
                   type: "object"
                   additionalProperties:
                     type: "string"
@@ -89,23 +85,19 @@ paths:
                         description: "The id for the marketing permission on the list."
                         type: "string"
                       enabled:
-                        description: "If the subscriber has opted-in to the marketing\
-                          \ permission."
+                        description: "If the subscriber has opted-in to the marketing permission."
                         type: "boolean"
                 ip_signup:
                   description: "IP address the subscriber signed up from."
                   type: "string"
                 timestamp_signup:
-                  description: "The date and time the subscriber signed up for the\
-                    \ list in ISO 8601 format."
+                  description: "The date and time the subscriber signed up for the list in ISO 8601 format."
                   type: "string"
                 ip_opt:
-                  description: "The IP address the subscriber used to confirm their\
-                    \ opt-in status."
+                  description: "The IP address the subscriber used to confirm their opt-in status."
                   type: "string"
                 timestamp_opt:
-                  description: "The date and time the subscriber confirmed their opt-in\
-                    \ status in ISO 8601 format."
+                  description: "The date and time the subscriber confirmed their opt-in status in ISO 8601 format."
                   type: "string"
                 tags:
                   description: "The tags that are associated with a member."
@@ -114,16 +106,14 @@ paths:
                     type: "string"
       responses:
         "200":
-          description: "Individuals who are currently or have been previously subscribed\
-            \ to this list, including members who have bounced or unsubscribed."
+          description: "Individuals who are currently or have been previously subscribed to this list, including members who have bounced or unsubscribed."
           content:
             application/json:
               schema:
                 type: "object"
                 properties:
                   id:
-                    description: "The MD5 hash of the lowercase version of the list\
-                      \ member's email address."
+                    description: "The MD5 hash of the lowercase version of the list member's email address."
                     type: "string"
                   email_address:
                     description: "Email address for a subscriber."
@@ -132,21 +122,16 @@ paths:
                     description: "An identifier for the address across all of Mailchimp."
                     type: "string"
                   contact_id:
-                    description: "As Mailchimp evolves beyond email, you may eventually\
-                      \ have contacts without email addresses. While the id is the\
-                      \ MD5 hash of their email address, this contact_id is agnostic\
-                      \ of contact’s inclusion of an email address."
+                    description: "As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address."
                     type: "string"
                   full_name:
                     description: "The contact's full name."
                     type: "string"
                   web_id:
-                    description: "The ID used in the Mailchimp web application. View\
-                      \ this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}."
+                    description: "The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}."
                     type: "string"
                   email_type:
-                    description: "Type of email this member asked to get ('html' or\
-                      \ 'text')."
+                    description: "Type of email this member asked to get ('html' or 'text')."
                     type: "string"
                   status:
                     $ref: "#/components/schemas/Status"
@@ -157,15 +142,12 @@ paths:
                     description: "Indicates whether a contact consents to 1:1 messaging."
                     type: "boolean"
                   merge_fields:
-                    description: "A dictionary of merge fields where the keys are\
-                      \ the merge tags. See the Merge Fields documentation for more\
-                      \ about the structure."
+                    description: "A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure."
                     type: "object"
                     additionalProperties:
                       type: "string"
                   interests:
-                    description: "The key of this object's properties is the ID of\
-                      \ the interest in question."
+                    description: "The key of this object's properties is the ID of the interest in question."
                     type: "object"
                     additionalProperties:
                       type: "string"
@@ -180,43 +162,35 @@ paths:
                         description: "A subscriber's average clickthrough rate."
                         type: "number"
                       ecommerce_data:
-                        description: "Ecommerce stats for the list member if the list\
-                          \ is attached to a store."
+                        description: "Ecommerce stats for the list member if the list is attached to a store."
                         type: "object"
                         properties:
                           total_revenue:
-                            description: "The total revenue the list member has brought\
-                              \ in."
+                            description: "The total revenue the list member has brought in."
                             type: "number"
                           number_of_orders:
-                            description: "The total number of orders placed by the\
-                              \ list member."
+                            description: "The total number of orders placed by the list member."
                             type: "number"
                           currency_code:
-                            description: "The three-letter ISO 4217 code for the currency\
-                              \ that the store accepts."
+                            description: "The three-letter ISO 4217 code for the currency that the store accepts."
                             type: "string"
                   ip_signup:
                     description: "IP address the subscriber signed up from."
                     type: "string"
                   timestamp_signup:
-                    description: "The date and time the subscriber signed up for the\
-                      \ list in ISO 8601 format."
+                    description: "The date and time the subscriber signed up for the list in ISO 8601 format."
                     type: "string"
                   ip_opt:
-                    description: "The IP address the subscriber used to confirm their\
-                      \ opt-in status."
+                    description: "The IP address the subscriber used to confirm their opt-in status."
                     type: "string"
                   timestamp_opt:
-                    description: "The date and time the subscriber confirmed their\
-                      \ opt-in status in ISO 8601 format."
+                    description: "The date and time the subscriber confirmed their opt-in status in ISO 8601 format."
                     type: "string"
                   member_rating:
                     description: "Star rating for this member, between 1 and 5."
                     type: "integer"
                   last_changed:
-                    description: "The date and time the member's info was last changed\
-                      \ in ISO 8601 format."
+                    description: "The date and time the member's info was last changed in ISO 8601 format."
                     type: "string"
                   language:
                     description: "If set/detected, the subscriber's language."
@@ -241,8 +215,7 @@ paths:
                         description: "The time difference in hours from GMT."
                         type: "integer"
                       dstoff:
-                        description: "The offset for timezones where daylight saving\
-                          \ time is observed."
+                        description: "The offset for timezones where daylight saving time is observed."
                         type: "integer"
                       country_code:
                         description: "The unique code for the location country."
@@ -260,15 +233,13 @@ paths:
                       type: "object"
                       properties:
                         marketing_permission_id:
-                          description: "The id for the marketing permission on the\
-                            \ list"
+                          description: "The id for the marketing permission on the list"
                           type: "string"
                         text:
                           description: "The text of the marketing permission."
                           type: "string"
                         enabled:
-                          description: "If the subscriber has opted-in to the marketing\
-                            \ permission."
+                          description: "If the subscriber has opted-in to the marketing permission."
                           type: "boolean"
                   last_note:
                     description: "The most recent Note added about this member."
@@ -278,8 +249,7 @@ paths:
                         description: "The note id."
                         type: "integer"
                       created_at:
-                        description: "The date and time the note was created in ISO\
-                          \ 8601 format."
+                        description: "The date and time the note was created in ISO 8601 format."
                         type: "string"
                       created_by:
                         description: "The author of the note."
@@ -288,8 +258,7 @@ paths:
                         description: "The content of the note."
                         type: "string"
                   source:
-                    description: "The source from which the subscriber was added to\
-                      \ this list."
+                    description: "The source from which the subscriber was added to this list."
                     type: "string"
                   tags_count:
                     description: "The number of tags applied to this member."
@@ -308,35 +277,25 @@ paths:
                     description: "The list id."
                     type: "string"
                   _links:
-                    description: "The list of link types and descriptions for the API\
-                      \ schema documents."
+                    description: "The list of link types and descriptions for the API schema documents."
                     type: "array"
                     items:
                       type: "object"
                       properties:
                         rel:
-                          description: "As with an HTML 'rel' attribute, this describes\
-                            \ the type of link."
+                          description: "As with an HTML 'rel' attribute, this describes the type of link."
                           type: "string"
                         href:
-                          description: "This property contains a fully-qualified URL\
-                            \ that can be called to retrieve the linked resource or\
-                            \ perform the linked action."
+                          description: "This property contains a fully-qualified URL that can be called to retrieve the linked resource or perform the linked action."
                           type: "string"
                         method:
-                          description: "The HTTP method that should be used when accessing\
-                            \ the URL defined in 'href'. Possible values: \"GET\"\
-                            , \"POST\", \"PUT\", \"PATCH\", \"DELETE\", \"OPTIONS\"\
-                            , or \"HEAD\"."
+                          description: "The HTTP method that should be used when accessing the URL defined in 'href'. Possible values: \"GET\", \"POST\", \"PUT\", \"PATCH\", \"DELETE\", \"OPTIONS\", or \"HEAD\"."
                           type: "string"
                         targetSchema:
-                          description: "For GETs, this is a URL representing the schema\
-                            \ that the response should conform to."
+                          description: "For GETs, this is a URL representing the schema that the response should conform to."
                           type: "string"
                         schema:
-                          description: "For HTTP methods that can receive bodies (POST\
-                            \ and PUT), this is a URL representing the schema that\
-                            \ the body should conform to."
+                          description: "For HTTP methods that can receive bodies (POST and PUT), this is a URL representing the schema that the body should conform to."
                           type: "string"
               example: "{ \"id\": \"string\", \"email_address\": \"string\", \"unique_email_id\"\
                 : \"string\", \"contact_id\": \"string\", \"full_name\": \"string\"\
@@ -367,11 +326,11 @@ components:
       description: "Subscriber's current status."
       type: "string"
       enum:
-      - "subscribed"
-      - "unsubscribed"
-      - "cleaned"
-      - "pending"
-      - "transactional"
+        - "subscribed"
+        - "unsubscribed"
+        - "cleaned"
+        - "pending"
+        - "transactional"
   securitySchemes:
     oauth2:
       type: "oauth2"
