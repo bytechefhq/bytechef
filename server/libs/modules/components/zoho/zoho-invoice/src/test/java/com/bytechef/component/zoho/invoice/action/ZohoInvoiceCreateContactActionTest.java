@@ -23,11 +23,19 @@ import static com.bytechef.component.zoho.commons.ZohoConstants.CURRENCY_ID;
 import static com.bytechef.component.zoho.commons.ZohoConstants.SHIPPING_ADDRESS;
 import static com.bytechef.component.zoho.commons.ZohoConstants.WEBSITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
@@ -35,7 +43,10 @@ import org.junit.jupiter.api.Test;
 class ZohoInvoiceCreateContactActionTest extends AbstractZohoInvoiceActionTest {
 
     @Test
-    void testPerform() {
+    void testPerform(
+        ActionContext mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> parametersMap = Map.of(
             CONTACT_NAME, "name",
             COMPANY_NAME, "company",
@@ -66,9 +77,16 @@ class ZohoInvoiceCreateContactActionTest extends AbstractZohoInvoiceActionTest {
 
         mockedParameters = MockParametersFactory.create(parametersMap);
 
-        Object result = ZohoInvoiceCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = ZohoInvoiceCreateContactAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/contacts", stringArgumentCaptor.getValue());
 
         Body body = bodyArgumentCaptor.getValue();
 
