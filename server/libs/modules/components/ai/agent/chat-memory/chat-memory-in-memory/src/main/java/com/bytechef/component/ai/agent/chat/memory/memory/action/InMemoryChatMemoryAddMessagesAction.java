@@ -26,7 +26,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.agent.chat.memory.memory.InMemoryChatMemoryRepositoryHolder;
+import com.bytechef.component.ai.agent.chat.memory.memory.util.InMemoryChatMemoryRepositoryHolder;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
