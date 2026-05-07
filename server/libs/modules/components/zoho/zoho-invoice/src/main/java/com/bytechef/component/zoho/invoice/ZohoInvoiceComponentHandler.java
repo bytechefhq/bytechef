@@ -39,6 +39,8 @@ public class ZohoInvoiceComponentHandler implements ComponentHandler {
         .description(
             "Zoho Invoice is an online invoicing software used to create, send, and manage professional invoices, " +
                 "along with tracking payments and automating billing workflows.")
+        .customAction(true)
+        .customActionHelp("", "https://www.zoho.com/invoice/api/v3/introduction/#overview")
         .icon("path:assets/zoho-invoice.svg")
         .categories(ComponentCategory.ACCOUNTING)
         .connection(ZohoInvoiceConnection.CONNECTION_DEFINITION)
@@ -49,7 +51,8 @@ public class ZohoInvoiceComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(ZohoInvoiceCreateContactAction.ACTION_DEFINITION),
             tool(ZohoInvoiceCreateInvoiceAction.ACTION_DEFINITION),
-            tool(ZohoInvoiceCreateItemAction.ACTION_DEFINITION));
+            tool(ZohoInvoiceCreateItemAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

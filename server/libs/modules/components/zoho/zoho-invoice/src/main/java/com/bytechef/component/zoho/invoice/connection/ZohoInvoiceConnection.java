@@ -27,7 +27,8 @@ import java.util.Map;
 public class ZohoInvoiceConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = ZohoConnection.createConnection(
-        "/invoice/v3", createScopesMap(), true);
+        "/invoice/v3", createScopesMap(), true, 1,
+        "https://docs.bytechef.io/reference/components/zoho-invoice_v1#connection-setup");
 
     private static Map<String, Boolean> createScopesMap() {
         Map<String, Boolean> map = new LinkedHashMap<>();
