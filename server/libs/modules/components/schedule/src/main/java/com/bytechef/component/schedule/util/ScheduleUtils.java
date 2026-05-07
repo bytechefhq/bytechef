@@ -51,15 +51,13 @@ public class ScheduleUtils {
         Set<String> zoneIds = ZoneId.getAvailableZoneIds();
 
         for (String zoneId : zoneIds) {
-            if ((zoneId.startsWith("Etc/GMT+") || zoneId.startsWith("Etc/GMT-")) && !zoneId.equals("Etc/GMT-0")) {
-                ZonedDateTime zonedDateTime = now.atZone(ZoneId.of(zoneId));
+            ZonedDateTime zonedDateTime = now.atZone(ZoneId.of(zoneId));
 
-                ZoneOffset zoneOffset = zonedDateTime.getOffset();
+            ZoneOffset zoneOffset = zonedDateTime.getOffset();
 
-                String zoneOffsetId = zoneOffset.getId();
+            String zoneOffsetId = zoneOffset.getId();
 
-                options.add(option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
-            }
+            options.add(option(zoneId + " (GMT" + zoneOffsetId.replace("Z", "+00:00") + ")", zoneId));
         }
 
         options.sort((o1, o2) -> {
