@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.llm.open.router.connection;
 
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.BASE_URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
@@ -30,7 +31,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public final class OpenRouterConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://openrouter.ai/api/v1")
+        .baseUri((connectionParameters, context) -> BASE_URL)
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")

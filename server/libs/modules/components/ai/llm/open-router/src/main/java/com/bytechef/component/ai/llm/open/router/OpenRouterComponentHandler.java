@@ -22,6 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.open.router.action.OpenRouterChatAction;
 import com.bytechef.component.ai.llm.open.router.action.OpenRouterCreateImageAction;
 import com.bytechef.component.ai.llm.open.router.action.OpenRouterCreateSpeechAction;
+import com.bytechef.component.ai.llm.open.router.action.OpenRouterCreateTranscriptionAction;
 import com.bytechef.component.ai.llm.open.router.cluster.OpenRouterChatModel;
 import com.bytechef.component.ai.llm.open.router.connection.OpenRouterConnection;
 import com.bytechef.component.definition.ComponentCategory;
@@ -43,7 +44,8 @@ public class OpenRouterComponentHandler implements ComponentHandler {
         .connection(OpenRouterConnection.CONNECTION_DEFINITION)
         .actions(OpenRouterChatAction.ACTION_DEFINITION,
             OpenRouterCreateImageAction.ACTION_DEFINITION,
-            OpenRouterCreateSpeechAction.ACTION_DEFINITION)
+            OpenRouterCreateSpeechAction.ACTION_DEFINITION,
+            OpenRouterCreateTranscriptionAction.ACTION_DEFINITION)
         .clusterElements(OpenRouterChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override

@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.llm.open.router.model;
 
+import static com.bytechef.component.ai.llm.open.router.constant.OpenRouterConstants.BASE_URL;
+
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +38,6 @@ import org.springframework.web.client.RestClient;
  * @author Marko Kriskovic
  */
 public class OpenRouterImageModel implements ImageModel {
-
-    private static final String BASE_URL = "https://openrouter.ai/api/v1";
-
     private final RestClient restClient;
     private final String model;
     private final String aspectRatio;
