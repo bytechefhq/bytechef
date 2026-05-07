@@ -28,6 +28,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY;
+import static com.bytechef.component.ai.llm.open.router.util.OpenRouterUtils.getOpenRouterEmbeddingModels;
 import static com.bytechef.component.ai.llm.open.router.util.OpenRouterUtils.getOpenRouterModels;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -59,6 +60,7 @@ public class OpenRouterConstants {
     public static final String SUPPORTED_PARAMETERS = "supportedParameters";
     public static final String TOP_LOGPROBS = "topLogprobs";
     public static final String ASPECT_RATIO = "aspectRatio";
+    public static final String DIMENSION = "dimension";
 
     public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
         .label("Model")
@@ -77,6 +79,12 @@ public class OpenRouterConstants {
         .label("Model")
         .description("ID of the model to use.")
         .options(getOpenRouterModels("speech"))
+        .required(true);
+
+    public static final ModifiableStringProperty EMBEDDING_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .options(getOpenRouterEmbeddingModels())
         .required(true);
 
     public static final ModifiableStringProperty TRANSCRIPTION_MODEL_PROPERTY = string(MODEL)
