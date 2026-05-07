@@ -16,23 +16,38 @@
 
 package com.bytechef.component.ai.agent.chat.memory.memory;
 
+import com.bytechef.tenant.TenantContext;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 
 /**
- * Singleton holder for the shared InMemoryChatMemoryRepository instance.
+ * Tenant-scoped holder for {@link InMemoryChatMemoryRepository} instances.
+ *
+ * <p>
+ * Each tenant gets its own repository so conversation IDs cannot collide across tenants and
+ * {@code findConversationIds()} only ever returns the current tenant's conversations. The repositories live in a
+ * Caffeine cache rather than a plain {@link java.util.concurrent.ConcurrentHashMap} so idle tenants don't pin memory
+ * forever — {@code expireAfterAccess} keeps an actively chatting tenant hot while dropping tenants that have gone
+ * silent for the TTL window. This data is intentionally process-local (the {@link InMemoryChatMemoryRepository} is not
+ * serializable), so we use Caffeine directly rather than the Spring {@code CacheManager} abstraction that would
+ * otherwise allow swapping in Redis.
  *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("MS")
 public final class InMemoryChatMemoryRepositoryHolder {
 
-    private static final InMemoryChatMemoryRepository INSTANCE = new InMemoryChatMemoryRepository();
+    private static final Cache<String, InMemoryChatMemoryRepository> REPOSITORIES = Caffeine.newBuilder()
+        .expireAfterAccess(Duration.ofHours(1))
+        .build();
 
     private InMemoryChatMemoryRepositoryHolder() {
     }
 
     public static InMemoryChatMemoryRepository getInstance() {
-        return INSTANCE;
+        return REPOSITORIES.get(TenantContext.getCurrentTenantId(), _ -> new InMemoryChatMemoryRepository());
     }
 }
