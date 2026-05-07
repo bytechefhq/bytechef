@@ -1,0 +1,3 @@
+query GetAssetFileTextContent($id: ID!) {
+    assetFileTextContent(id: $id)
+}

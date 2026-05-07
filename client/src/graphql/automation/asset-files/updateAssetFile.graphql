@@ -1,0 +1,15 @@
+mutation UpdateAssetFile($input: UpdateAssetFileInput!) {
+    updateAssetFile(input: $input) {
+        createdBy
+        createdDate
+        description
+        downloadUrl
+        id
+        lastModifiedBy
+        lastModifiedDate
+        mimeType
+        name
+        sizeBytes
+        source
+    }
+}
