@@ -338,8 +338,6 @@ dependencies {
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
 
-    testImplementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-automation-impl"))
-    testImplementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
@@ -351,6 +349,10 @@ dependencies {
 
 configure<com.gorylenko.GitPropertiesPluginExtension> {
     dotGitDirectory = project.rootProject.layout.projectDirectory.dir(".git")
+}
+
+tasks.named<Test>("testIntegration") {
+    maxHeapSize = "1g"
 }
 
 // Task to build component JARs for the fast IntelliJ startup (respects includeComponents/excludeComponents)

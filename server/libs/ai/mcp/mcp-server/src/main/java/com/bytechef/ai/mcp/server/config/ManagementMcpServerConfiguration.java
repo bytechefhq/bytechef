@@ -17,10 +17,10 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
-import com.bytechef.ai.mcp.tool.automation.impl.ClusterElementTools;
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ScriptTools;
+import com.bytechef.ai.mcp.tool.automation.ClusterElementTools;
+import com.bytechef.ai.mcp.tool.automation.ProjectTools;
+import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.ScriptTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
@@ -64,16 +64,16 @@ public class ManagementMcpServerConfiguration {
 
     private final ComponentTools componentTools;
     private final @Nullable FirecrawlTools firecrawlTools;
-    private final ProjectToolsImpl projectTools;
-    private final ProjectWorkflowToolsImpl projectWorkflowTools;
+    private final ProjectTools projectTools;
+    private final ProjectWorkflowTools projectWorkflowTools;
     private final TaskTools taskTools;
     private final ScriptTools scriptTools;
     private final ClusterElementTools clusterElementTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ComponentTools componentTools, @Nullable FirecrawlTools firecrawlTools, ProjectToolsImpl projectTools,
-        ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        ComponentTools componentTools, @Nullable FirecrawlTools firecrawlTools, ProjectTools projectTools,
+        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
         ClusterElementTools clusterElementTools) {
 
         this.componentTools = componentTools;

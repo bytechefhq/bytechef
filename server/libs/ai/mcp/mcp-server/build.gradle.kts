@@ -7,7 +7,7 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.security:spring-security-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-automation-impl"))
+    implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-automation"))
     implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))

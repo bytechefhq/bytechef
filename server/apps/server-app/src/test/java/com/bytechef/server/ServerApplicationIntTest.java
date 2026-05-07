@@ -19,12 +19,6 @@ package com.bytechef.server;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ScriptTools;
-import com.bytechef.ai.mcp.tool.platform.ComponentTools;
-import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools;
-import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseFacade;
@@ -64,18 +58,6 @@ class ServerApplicationIntTest {
 
     @Test
     void testContextLoads() {
-    }
-
-    @Test
-    void testAiToolsBeansNotPresentWhenFeatureDisabled() {
-        // Verify that AI/MCP tool beans are not present when both
-        // bytechef.ai.mcp.server.enabled and bytechef.ai.copilot.enabled are false
-        assertThat(applicationContext.getBeanNamesForType(ComponentTools.class)).isEmpty();
-        assertThat(applicationContext.getBeanNamesForType(TaskTools.class)).isEmpty();
-        assertThat(applicationContext.getBeanNamesForType(TaskDispatcherTools.class)).isEmpty();
-        assertThat(applicationContext.getBeanNamesForType(ProjectToolsImpl.class)).isEmpty();
-        assertThat(applicationContext.getBeanNamesForType(ProjectWorkflowToolsImpl.class)).isEmpty();
-        assertThat(applicationContext.getBeanNamesForType(ScriptTools.class)).isEmpty();
     }
 
     @Test

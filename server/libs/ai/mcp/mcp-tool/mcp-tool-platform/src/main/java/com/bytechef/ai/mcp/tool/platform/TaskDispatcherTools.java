@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.mcp.tool.platform;
 
-import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import com.bytechef.ai.mcp.tool.platform.exception.TaskDispatcherToolErrorType;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.exception.ExecutionException;
@@ -42,7 +41,6 @@ import org.springframework.stereotype.Component;
  * @author Marko Kriskovic
  */
 @Component
-@ConditionalOnAiEnabled
 public class TaskDispatcherTools {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDispatcherTools.class);

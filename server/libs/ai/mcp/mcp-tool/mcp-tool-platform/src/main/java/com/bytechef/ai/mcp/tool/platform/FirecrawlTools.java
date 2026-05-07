@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.mcp.tool.platform;
 
-import com.bytechef.ai.mcp.tool.config.ConditionalOnAiEnabled;
 import com.bytechef.ai.mcp.tool.platform.exception.FirecrawlToolErrorType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.exception.ExecutionException;
@@ -42,7 +41,6 @@ import org.springframework.web.client.RestClient;
  * @author Marko Krišković
  */
 @Component
-@ConditionalOnAiEnabled
 @ConditionalOnProperty(name = "bytechef.ai.firecrawl.enabled")
 public class FirecrawlTools {
 
