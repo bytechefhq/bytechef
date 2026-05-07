@@ -13,6 +13,7 @@ paths:
         - "Members"
       operationId: "addMemberToList"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/mailchimp_v1#add-member-to-list"
       parameters:
         - name: "listId"
           description: "The unique ID for the list."

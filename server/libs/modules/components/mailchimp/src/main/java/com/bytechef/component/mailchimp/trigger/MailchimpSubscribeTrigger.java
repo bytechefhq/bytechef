@@ -51,6 +51,7 @@ public class MailchimpSubscribeTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(SUBSCRIBE)
         .title("Subscribe")
         .description("Triggers when an Audience subscriber is added to the list.")
+        .help("", "https://docs.bytechef.io/reference/components/mailchimp_v1#subscribe")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(LIST_ID)
