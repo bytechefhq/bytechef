@@ -21,6 +21,8 @@ export function DesktopSidebar({
 }) {
     const {pathname} = useLocation();
 
+    const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
     return (
         <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
             <div className="flex w-sidebar-width border-r border-r-border/50 bg-muted">
@@ -38,7 +40,7 @@ export function DesktopSidebar({
                                     <Link
                                         className={twMerge(
                                             'flex items-center rounded-lg p-2 hover:text-blue-600',
-                                            pathname.includes(item.href) && 'text-blue-600'
+                                            isActive(item.href) && 'text-blue-600'
                                         )}
                                         to={item.href}
                                     >

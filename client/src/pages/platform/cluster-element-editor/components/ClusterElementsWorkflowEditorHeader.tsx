@@ -1,14 +1,14 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {FlaskConicalIcon, PlayIcon, SparklesIcon, TextInitialIcon, ZapIcon} from 'lucide-react';
+import {ExternalLinkIcon, FlaskConicalIcon, PlayIcon, SparklesIcon, TextInitialIcon, ZapIcon} from 'lucide-react';
 
 interface ClusterElementsWorkflowEditorHeaderProps {
     copilotEnabled: boolean;
     onCopilotClick: () => void;
     onEvalsClick?: () => void;
-    onSkillsClick?: () => void;
     onTestClick: () => void;
     onToggleEditor: (showAiAgent: boolean) => void;
+    showSkills?: boolean;
     showTestButton: boolean;
     showToggleEditor: boolean;
     toggleEditorLabel?: string;
@@ -18,9 +18,9 @@ const ClusterElementsWorkflowEditorHeader = ({
     copilotEnabled,
     onCopilotClick,
     onEvalsClick,
-    onSkillsClick,
     onTestClick,
     onToggleEditor,
+    showSkills,
     showTestButton,
     showToggleEditor,
     toggleEditorLabel = 'Switch to simple editor',
@@ -43,19 +43,25 @@ const ClusterElementsWorkflowEditorHeader = ({
                     </Tooltip>
                 )}
 
-                {onSkillsClick && (
+                {showSkills && (
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
-                                className="[&_svg]:size-5"
-                                icon={<ZapIcon />}
-                                onClick={onSkillsClick}
-                                size="icon"
-                                variant="ghost"
-                            />
+                            <a
+                                className="relative inline-flex size-9 items-center justify-center rounded-md text-content-neutral-secondary hover:bg-surface-neutral-primary"
+                                href="/automation/ai/skills"
+                                rel="noreferrer"
+                                target="_blank"
+                            >
+                                <ZapIcon className="size-5" />
+
+                                <ExternalLinkIcon
+                                    aria-hidden
+                                    className="absolute right-0.5 top-0.5 size-2.5 text-content-neutral-secondary/70"
+                                />
+                            </a>
                         </TooltipTrigger>
 
-                        <TooltipContent>Agent Skills</TooltipContent>
+                        <TooltipContent>Manage AI Skills</TooltipContent>
                     </Tooltip>
                 )}
 

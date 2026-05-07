@@ -5,9 +5,6 @@ import useAiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-e
 import AiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals';
 import useAiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAiAgentEvals';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
-import AiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/AiAgentSkills';
-import useAiAgentSkills from '@/pages/platform/cluster-element-editor/ai-agent-skills/hooks/useAiAgentSkills';
-import {useAiAgentSkillsStore} from '@/pages/platform/cluster-element-editor/ai-agent-skills/stores/useAiAgentSkillsStore';
 import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -38,13 +35,11 @@ export default function AiAgentEditor({
     workflowNodeOutputs,
 }: AiAgentEditorProps) {
     const {evalsPanelOpen, setEvalsPanelOpen} = useAiAgentEvalsStore();
-    const {setSkillsPanelOpen, skillsHeaderInfo, skillsPanelOpen} = useAiAgentSkillsStore();
 
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
     const ff_4545 = useFeatureFlagsStore()('ff-4545');
     const ff_4553 = useFeatureFlagsStore()('ff-4553');
-    const ff_4554 = useFeatureFlagsStore()('ff-4554');
     const ff_4572 = useFeatureFlagsStore()('ff-4572');
 
     const {handleNodeDetailsPanelClose, showNodeDetailsPanel, updateWorkflowMutation} = useAiAgentEditor({
@@ -52,7 +47,6 @@ export default function AiAgentEditor({
         workflowNodeOutputs,
     });
     const {handleClose: handleEvalsClose} = useAiAgentEvals();
-    const {handleClose: handleSkillsClose} = useAiAgentSkills({enabled: skillsPanelOpen});
 
     if (evalsPanelOpen) {
         return (
@@ -71,24 +65,6 @@ export default function AiAgentEditor({
         );
     }
 
-    if (skillsPanelOpen) {
-        return (
-            <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
-                <AiAgentHeader
-                    copilotEnabled={ff_4554 && copilotEnabled}
-                    onClose={handleSkillsClose}
-                    onCopilotClick={onCopilotClick}
-                    subtitle={skillsHeaderInfo.subtitle}
-                    title={skillsHeaderInfo.title}
-                />
-
-                <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pl-2 pr-4">
-                    <AiAgentSkills />
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
             <AiAgentHeader
@@ -96,8 +72,8 @@ export default function AiAgentEditor({
                 onClose={onClose}
                 onCopilotClick={onCopilotClick}
                 onEvalsClick={ff_4553 ? () => setEvalsPanelOpen(true) : undefined}
-                onSkillsClick={ff_4545 ? () => setSkillsPanelOpen(true) : undefined}
                 onToggleEditor={onToggleEditor}
+                showSkills={ff_4545}
             />
 
             <div className="grid min-h-0 flex-1 grid-cols-2 gap-6 overflow-hidden px-4 py-4">

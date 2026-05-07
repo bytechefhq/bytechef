@@ -1,9 +1,0 @@
-query aiAgentSkills {
-    aiAgentSkills {
-        id
-        name
-        description
-        createdDate
-        lastModifiedDate
-    }
-}
