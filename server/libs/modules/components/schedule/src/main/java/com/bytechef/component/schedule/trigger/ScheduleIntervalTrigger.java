@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.DATE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.FIRE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.INTERVAL;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIME_UNIT;
@@ -71,11 +71,11 @@ public class ScheduleIntervalTrigger {
                 object()
                     .properties(
                         string(FIRE_TIME)
+                            .description("The exact date and time when the trigger was activated."),
+                        dateTime(DATE_TIME)
                             .description(
-                                "The exact date and time when the trigger was activated, formatted according to the " +
+                                "The date and time when the trigger was activated, formatted according to the " +
                                     "specified timezone."),
-                        dateTime(DATETIME)
-                            .description("The date and time when the trigger was activated."),
                         integer(INTERVAL)
                             .description(
                                 "The interval value that determines how frequently the workflow is triggered, " +

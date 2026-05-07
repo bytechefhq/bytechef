@@ -23,7 +23,7 @@ public class ScheduleConstants {
 
     public static final String DAY_OF_MONTH = "dayOfMonth";
     public static final String DAY_OF_WEEK = "dayOfWeek";
-    public static final String DATETIME = "datetime";
+    public static final String DATE_TIME = "dateTime";
     public static final String EXPRESSION = "expression";
     public static final String FIRE_TIME = "fireTime";
     public static final String HOUR = "hour";

@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.DATE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DAY_OF_MONTH;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.FIRE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.HOUR;
@@ -80,11 +80,11 @@ public class ScheduleEveryMonthTrigger {
                 object()
                     .properties(
                         string(FIRE_TIME)
+                            .description("The exact date and time when the trigger was activated."),
+                        dateTime(DATE_TIME)
                             .description(
-                                "The exact date and time when the trigger was activated, formatted according to the " +
+                                "The date and time when the trigger was activated, formatted according to the " +
                                     "specified timezone."),
-                        dateTime(DATETIME)
-                            .description("The date and time when the trigger was activated."),
                         integer(HOUR)
                             .description("The hour of the day (0-23) at which the workflow was set to trigger."),
                         integer(MINUTE)
