@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.knowledgebase.config.KnowledgeBaseIntTestConfiguration;
 import com.bytechef.automation.knowledgebase.config.KnowledgeBaseIntTestConfigurationSharedMocks;
+import com.bytechef.automation.knowledgebase.config.WorkspaceTestFixture;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.automation.knowledgebase.dto.DocumentStatusUpdate;
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Integration tests for {@link KnowledgeBaseDocumentService}.
@@ -55,16 +57,23 @@ class KnowledgeBaseDocumentServiceIntTest {
     @Autowired
     private KnowledgeBaseRepository knowledgeBaseRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private KnowledgeBase knowledgeBase;
 
     @BeforeEach
     public void beforeEach() {
         knowledgeBaseDocumentRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
+        WorkspaceTestFixture.deleteAllWorkspaces(jdbcTemplate);
+
+        long workspaceId = WorkspaceTestFixture.seedWorkspace(jdbcTemplate, "Test Workspace");
 
         knowledgeBase = new KnowledgeBase();
 
         knowledgeBase.setName("Test KnowledgeBase");
+        knowledgeBase.setWorkspaceId(workspaceId);
 
         knowledgeBase = knowledgeBaseRepository.save(knowledgeBase);
     }
@@ -73,6 +82,7 @@ class KnowledgeBaseDocumentServiceIntTest {
     public void afterEach() {
         knowledgeBaseDocumentRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
+        WorkspaceTestFixture.deleteAllWorkspaces(jdbcTemplate);
     }
 
     @Test

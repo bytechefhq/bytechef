@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.knowledgebase.config.KnowledgeBaseIntTestConfiguration;
 import com.bytechef.automation.knowledgebase.config.KnowledgeBaseIntTestConfigurationSharedMocks;
+import com.bytechef.automation.knowledgebase.config.WorkspaceTestFixture;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Integration tests for {@link KnowledgeBaseService}.
@@ -48,14 +50,23 @@ class KnowledgeBaseServiceIntTest {
     @Autowired
     private KnowledgeBaseRepository knowledgeBaseRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private long workspaceId;
+
     @BeforeEach
     public void beforeEach() {
         knowledgeBaseRepository.deleteAll();
+        WorkspaceTestFixture.deleteAllWorkspaces(jdbcTemplate);
+
+        workspaceId = WorkspaceTestFixture.seedWorkspace(jdbcTemplate, "Test Workspace");
     }
 
     @AfterEach
     public void afterEach() {
         knowledgeBaseRepository.deleteAll();
+        WorkspaceTestFixture.deleteAllWorkspaces(jdbcTemplate);
     }
 
     @Test
@@ -141,6 +152,7 @@ class KnowledgeBaseServiceIntTest {
         knowledgeBase.setMaxChunkSize(2048);
         knowledgeBase.setMinChunkSizeChars(256);
         knowledgeBase.setOverlap(128);
+        knowledgeBase.setWorkspaceId(workspaceId);
 
         KnowledgeBase savedKnowledgeBase = knowledgeBaseService.createKnowledgeBase(knowledgeBase);
 
@@ -150,12 +162,14 @@ class KnowledgeBaseServiceIntTest {
         assertThat(savedKnowledgeBase.getMaxChunkSize()).isEqualTo(2048);
         assertThat(savedKnowledgeBase.getMinChunkSizeChars()).isEqualTo(256);
         assertThat(savedKnowledgeBase.getOverlap()).isEqualTo(128);
+        assertThat(savedKnowledgeBase.getWorkspaceId()).isEqualTo(workspaceId);
     }
 
     private KnowledgeBase createKnowledgeBase(String name) {
         KnowledgeBase knowledgeBase = new KnowledgeBase();
 
         knowledgeBase.setName(name);
+        knowledgeBase.setWorkspaceId(workspaceId);
 
         return knowledgeBase;
     }
