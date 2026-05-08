@@ -65,20 +65,27 @@ public class MailchimpSubscribeTrigger {
                     .properties(
                         object("data")
                             .properties(
-                                string("email"),
-                                string("email_type"),
-                                string("id"),
+                                string("email")
+                                    .description("The email address of the subscriber."),
+                                string("email_type")
+                                    .description("The type of email address used for the subscriber."),
+                                string("id")
+                                    .description(
+                                        "The MD5 hash of the lowercase version of the list member's email address."),
                                 string("ip_opt"),
                                 string("ip_signup"),
-                                string("list_id"),
+                                string("list_id")
+                                    .description("The ID of the list the subscriber was added to."),
                                 object("merges")
                                     .properties(
                                         string("EMAIL"),
                                         string("FNAME"),
                                         string("INTERESTS"),
                                         string("LNAME"))),
-                        dateTime("fired_at"),
-                        string("type"))))
+                        dateTime("fired_at")
+                            .description("The date and time the webhook was triggered."),
+                        string("type")
+                            .description("The type of webhook that was triggered."))))
         .webhookDisable(MailchimpSubscribeTrigger::webhookDisable)
         .webhookEnable(MailchimpSubscribeTrigger::webhookEnable)
         .webhookRequest(MailchimpSubscribeTrigger::webhookRequest);
