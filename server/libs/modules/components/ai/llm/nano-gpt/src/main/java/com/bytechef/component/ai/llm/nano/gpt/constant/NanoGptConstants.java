@@ -405,5 +405,4 @@ public class NanoGptConstants {
 
     public static final String BASE_URL = "https://nano-gpt.com/api/v1";
     public static final String TRANSCRIBE_URL = "https://nano-gpt.com/api/transcribe";
-    public static final String TTS_URL = "https://nano-gpt.com/api/tts";
 }
