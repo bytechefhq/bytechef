@@ -46,6 +46,9 @@ interface WorkflowDataStateI {
     setNodes: (nodes: Node[]) => void;
     onNodesChange: OnNodesChange;
 
+    projectName: string;
+    setProjectName: (projectName: string) => void;
+
     reset: () => void;
     initializeWithCanvasWidth: (canvasWidth: number) => void;
 
@@ -163,6 +166,9 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
 
             isNodeDragging: false,
             setIsNodeDragging: (dragging) => set({isNodeDragging: dragging}),
+
+            projectName: null,
+            setProjectName: (projectName) => set({projectName}),
 
             savedPositionCrossAxisShift: 0,
             setSavedPositionCrossAxisShift: (shift) => set({savedPositionCrossAxisShift: shift}),

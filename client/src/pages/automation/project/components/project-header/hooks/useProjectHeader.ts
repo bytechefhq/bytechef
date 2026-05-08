@@ -34,7 +34,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
 
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const workflow = useWorkflowDataStore((state) => state.workflow);
+    const {setProjectName, workflow} = useWorkflowDataStore();
     const {setShowBottomPanelOpen, setWorkflowIsRunning, setWorkflowTestExecution, showBottomPanel} =
         useWorkflowEditorStore(
             useShallow((state) => ({
@@ -254,6 +254,15 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             setJobId(null);
         }
     }, [workflowTestStreamError, persistJobId, setWorkflowIsRunning, setStreamRequest]);
+
+    // Store projectName
+    useEffect(() => {
+        if (!project?.name) {
+            return;
+        }
+
+        setProjectName(project.name);
+    }, [project?.name, setProjectName]);
 
     return {
         handleProjectWorkflowValueChange,
