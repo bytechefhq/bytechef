@@ -1,0 +1,6 @@
+query ValidateWorkflowById($workflowId: String!) {
+    validateWorkflowById(workflowId: $workflowId) {
+        errors
+        warnings
+    }
+}

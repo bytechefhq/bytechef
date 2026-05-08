@@ -1,0 +1,6 @@
+query ValidateWorkflow($workflowDefinition: String!) {
+    validateWorkflow(workflow: $workflowDefinition) {
+        errors
+        warnings
+    }
+}

@@ -38,6 +38,7 @@ const config: CodegenConfig = {
         afterAllFileWrite: ['prettier --write'],
     },
     schema: [
+        '../server/libs/platform/platform-workflow/platform-workflow-validator/platform-workflow-validator-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/platform/platform-configuration/platform-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-data-table/**/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-knowledge-base/automation-knowledge-base-graphql/src/main/resources/graphql/**/*.graphqls',
