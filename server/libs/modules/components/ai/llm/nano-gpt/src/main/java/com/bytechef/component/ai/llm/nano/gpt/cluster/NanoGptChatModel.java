@@ -28,7 +28,6 @@ import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.P
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.REASONING_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.STOP_PROPERTY;
-import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.SUPPORTED_PARAMETERS_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_LOGPROBS_PROPERTY;
@@ -53,7 +52,6 @@ public class NanoGptChatModel {
             .type(ModelFunction.MODEL)
             .object(() -> NanoGptChatModel::apply)
             .properties(
-                SUPPORTED_PARAMETERS_PROPERTY,
                 CHAT_MODEL_PROPERTY,
                 FREQUENCY_PENALTY_PROPERTY,
                 LOGIT_BIAS_PROPERTY,
