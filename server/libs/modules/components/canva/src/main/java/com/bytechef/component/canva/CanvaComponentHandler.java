@@ -37,7 +37,8 @@ public class CanvaComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("canva")
         .title("Canva")
         .description(
-            "Canva is a web and mobile application designed to help users create, design, and collaborate on visual content.")
+            "Canva is a web and mobile application designed to help users create, design, and collaborate on visual " +
+                "content.")
         .customAction(true)
         .customActionHelp("Canva API documentation", "https://www.canva.dev/docs/connect/")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)

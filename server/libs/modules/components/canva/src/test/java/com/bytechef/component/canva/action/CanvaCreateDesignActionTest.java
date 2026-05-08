@@ -18,10 +18,10 @@ package com.bytechef.component.canva.action;
 
 import static com.bytechef.component.canva.constant.CanvaConstants.ASSET_ID;
 import static com.bytechef.component.canva.constant.CanvaConstants.DESIGN_TYPE;
-import static com.bytechef.component.canva.constant.CanvaConstants.HEIGHT;
+import static com.bytechef.component.canva.constant.CanvaConstants.NAME;
 import static com.bytechef.component.canva.constant.CanvaConstants.TITLE;
 import static com.bytechef.component.canva.constant.CanvaConstants.TYPE;
-import static com.bytechef.component.canva.constant.CanvaConstants.WIDTH;
+import static com.bytechef.component.canva.constant.CanvaConstants.TYPE_AND_ASSET;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -53,8 +53,7 @@ class CanvaCreateDesignActionTest {
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            TYPE, "type_and_asset", DESIGN_TYPE, Map.of(TYPE, "preset", WIDTH, 20, HEIGHT, 20), TITLE, "test", ASSET_ID,
-            "123"));
+            TYPE, "preset", TITLE, "test", ASSET_ID, "123", NAME, "name"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -86,8 +85,8 @@ class CanvaCreateDesignActionTest {
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals(Http.Body.of(
             Map.of(
-                TYPE, "type_and_asset",
-                DESIGN_TYPE, Map.of(TYPE, "preset", WIDTH, 20, HEIGHT, 20),
+                TYPE, TYPE_AND_ASSET,
+                DESIGN_TYPE, Map.of(TYPE, "preset", NAME, "name"),
                 TITLE, "test",
                 ASSET_ID, "123"),
             Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
