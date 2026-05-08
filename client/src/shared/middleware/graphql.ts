@@ -2529,6 +2529,8 @@ export type Query = {
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
   user?: Maybe<AdminUser>;
   users?: Maybe<AdminUserPage>;
+  validateWorkflow: WorkflowValidationResult;
+  validateWorkflowById: WorkflowValidationResult;
   workflowNodeComponentConnections: Array<ComponentConnection>;
   workflowNodeMissingRequiredProperties: Array<Scalars['String']['output']>;
   workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
@@ -3105,6 +3107,16 @@ export type QueryUsersArgs = {
 };
 
 
+export type QueryValidateWorkflowArgs = {
+  workflow: Scalars['String']['input'];
+};
+
+
+export type QueryValidateWorkflowByIdArgs = {
+  workflowId: Scalars['String']['input'];
+};
+
+
 export type QueryWorkflowNodeComponentConnectionsArgs = {
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
@@ -3456,6 +3468,12 @@ export type WorkflowTrigger = {
   name: Scalars['String']['output'];
   parameters?: Maybe<Scalars['Map']['output']>;
   type: Scalars['String']['output'];
+};
+
+export type WorkflowValidationResult = {
+  __typename?: 'WorkflowValidationResult';
+  errors: Array<Scalars['String']['output']>;
+  warnings: Array<Scalars['String']['output']>;
 };
 
 export type AiAgentEvalResultQueryVariables = Exact<{
@@ -4900,6 +4918,20 @@ export type UpdateMcpToolMutationVariables = Exact<{
 
 
 export type UpdateMcpToolMutation = { __typename?: 'Mutation', updateMcpTool?: { __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null, version?: number | null } | null };
+
+export type ValidateWorkflowQueryVariables = Exact<{
+  workflowDefinition: Scalars['String']['input'];
+}>;
+
+
+export type ValidateWorkflowQuery = { __typename?: 'Query', validateWorkflow: { __typename?: 'WorkflowValidationResult', errors: Array<string>, warnings: Array<string> } };
+
+export type ValidateWorkflowByIdQueryVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+}>;
+
+
+export type ValidateWorkflowByIdQuery = { __typename?: 'Query', validateWorkflowById: { __typename?: 'WorkflowValidationResult', errors: Array<string>, warnings: Array<string> } };
 
 export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
   workflowId: Scalars['String']['input'];
@@ -10580,6 +10612,56 @@ export const useUpdateMcpToolMutation = <
       {
     mutationKey: ['updateMcpTool'],
     mutationFn: (variables?: UpdateMcpToolMutationVariables) => fetcher<UpdateMcpToolMutation, UpdateMcpToolMutationVariables>(UpdateMcpToolDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ValidateWorkflowDocument = new TypedDocumentString(`
+    query ValidateWorkflow($workflowDefinition: String!) {
+  validateWorkflow(workflow: $workflowDefinition) {
+    errors
+    warnings
+  }
+}
+    `);
+
+export const useValidateWorkflowQuery = <
+      TData = ValidateWorkflowQuery,
+      TError = unknown
+    >(
+      variables: ValidateWorkflowQueryVariables,
+      options?: Omit<UseQueryOptions<ValidateWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ValidateWorkflowQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ValidateWorkflowQuery, TError, TData>(
+      {
+    queryKey: ['ValidateWorkflow', variables],
+    queryFn: fetcher<ValidateWorkflowQuery, ValidateWorkflowQueryVariables>(ValidateWorkflowDocument, variables),
+    ...options
+  }
+    )};
+
+export const ValidateWorkflowByIdDocument = new TypedDocumentString(`
+    query ValidateWorkflowById($workflowId: String!) {
+  validateWorkflowById(workflowId: $workflowId) {
+    errors
+    warnings
+  }
+}
+    `);
+
+export const useValidateWorkflowByIdQuery = <
+      TData = ValidateWorkflowByIdQuery,
+      TError = unknown
+    >(
+      variables: ValidateWorkflowByIdQueryVariables,
+      options?: Omit<UseQueryOptions<ValidateWorkflowByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ValidateWorkflowByIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ValidateWorkflowByIdQuery, TError, TData>(
+      {
+    queryKey: ['ValidateWorkflowById', variables],
+    queryFn: fetcher<ValidateWorkflowByIdQuery, ValidateWorkflowByIdQueryVariables>(ValidateWorkflowByIdDocument, variables),
     ...options
   }
     )};
