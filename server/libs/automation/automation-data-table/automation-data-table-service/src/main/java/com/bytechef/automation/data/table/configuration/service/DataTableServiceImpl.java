@@ -18,9 +18,7 @@ package com.bytechef.automation.data.table.configuration.service;
 
 import com.bytechef.automation.data.table.configuration.domain.DataTable;
 import com.bytechef.automation.data.table.configuration.domain.DataTableInfo;
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
 import com.bytechef.automation.data.table.configuration.repository.DataTableRepository;
-import com.bytechef.automation.data.table.configuration.repository.WorkspaceDataTableRepository;
 import com.bytechef.automation.data.table.domain.ColumnSpec;
 import com.bytechef.automation.data.table.domain.ColumnType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,16 +40,11 @@ public class DataTableServiceImpl implements DataTableService {
 
     private final DataTableRepository dataTableRepository;
     private final JdbcTemplate jdbcTemplate;
-    private final WorkspaceDataTableRepository workspaceDataTableRepository;
 
     @SuppressFBWarnings("EI")
-    public DataTableServiceImpl(
-        DataTableRepository dataTableRepository, JdbcTemplate jdbcTemplate,
-        WorkspaceDataTableRepository workspaceDataTableRepository) {
-
+    public DataTableServiceImpl(DataTableRepository dataTableRepository, JdbcTemplate jdbcTemplate) {
         this.dataTableRepository = dataTableRepository;
         this.jdbcTemplate = jdbcTemplate;
-        this.workspaceDataTableRepository = workspaceDataTableRepository;
     }
 
     /**
@@ -128,13 +121,13 @@ public class DataTableServiceImpl implements DataTableService {
 
         createTable(baseName, description, columnSpecs, environmentId);
 
-        long id = getIdByBaseName(baseName);
+        DataTable dataTable = dataTableRepository.findByName(baseName)
+            .orElseThrow(() -> new IllegalStateException("Data table '" + baseName + "' missing after creation"));
 
-        WorkspaceDataTable existingWorkspaceDataTable = workspaceDataTableRepository.findByWorkspaceIdAndDataTableId(
-            workspaceId, id);
+        if (dataTable.getWorkspaceId() == null) {
+            dataTable.setWorkspaceId(workspaceId);
 
-        if (existingWorkspaceDataTable == null) {
-            workspaceDataTableRepository.save(new WorkspaceDataTable(id, workspaceId));
+            dataTableRepository.save(dataTable);
         }
     }
 
@@ -158,14 +151,6 @@ public class DataTableServiceImpl implements DataTableService {
         jdbcTemplate.execute(sql);
 
         if (!hasPhysicalTablesForBaseName(baseName)) {
-            dataTableRepository.findByName(baseName)
-                .ifPresent(dataTable -> {
-                    List<WorkspaceDataTable> workspaceDataTables =
-                        workspaceDataTableRepository.findByDataTableId(dataTable.getId());
-
-                    workspaceDataTableRepository.deleteAll(workspaceDataTables);
-                });
-
             dataTableRepository.deleteByName(baseName);
         }
     }
@@ -285,9 +270,9 @@ public class DataTableServiceImpl implements DataTableService {
     @Override
     public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
         List<DataTableInfo> dataTableInfos = listTables(environmentId);
-        Set<Long> dataTableIds = workspaceDataTableRepository.findAllByWorkspaceId(workspaceId)
+        Set<Long> dataTableIds = dataTableRepository.findAllByWorkspaceId(workspaceId)
             .stream()
-            .map(WorkspaceDataTable::getDataTableId)
+            .map(DataTable::getId)
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 

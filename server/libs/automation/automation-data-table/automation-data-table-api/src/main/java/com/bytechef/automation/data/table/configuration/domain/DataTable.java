@@ -46,6 +46,9 @@ public class DataTable {
 
     private String description;
 
+    @Column("workspace_id")
+    private Long workspaceId;
+
     @MappedCollection(idColumn = "data_table_id")
     private Set<DataTableTag> dataTableTags = new HashSet<>();
 
@@ -74,6 +77,12 @@ public class DataTable {
     public DataTable(Long id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public DataTable(Long id, String name, Long workspaceId) {
+        this.id = id;
+        this.name = name;
+        this.workspaceId = workspaceId;
     }
 
     @Override
@@ -154,6 +163,14 @@ public class DataTable {
         this.version = version;
     }
 
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     public List<Long> getTagIds() {
         return dataTableTags
             .stream()
@@ -185,6 +202,7 @@ public class DataTable {
             "id=" + id +
             ", name='" + name + '\'' +
             ", description='" + description + '\'' +
+            ", workspaceId=" + workspaceId +
             ", dataTableTags=" + dataTableTags +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +
