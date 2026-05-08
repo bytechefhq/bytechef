@@ -16,17 +16,23 @@
 
 package com.bytechef.component.ai.llm.nano.gpt.action;
 
-import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SIZE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
-import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.ASPECT_RATIO;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.GUIDANCE_SCALE;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.IMAGE_MODEL_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.N;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.NUM_INFERENCE_STEPS;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.STRENGTH;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -44,42 +50,57 @@ public class NanoGptCreateImageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_IMAGE)
         .title("Create Image")
-        .description("Create an image using text-to-image models")
+        .description("Create an image using text-to-image models.")
         .properties(
             IMAGE_MODEL_PROPERTY,
             IMAGE_MESSAGE_PROPERTY,
-            string(ASPECT_RATIO)
-                .label("Aspect Ratio")
-                .description("Specific aspect ratios for generated images")
-                .options(
-                    option("1:1", "1:1", "1024×1024 (default)"),
-                    option("2:3", "2:3", "832×1248"),
-                    option("3:2", "3:2", "1248×832"),
-                    option("3:4", "3:4", "864×1184"),
-                    option("4:3", "4:3", "1184×864"),
-                    option("4:5", "4:5", "896×1152"),
-                    option("5:4", "5:4", "1152×896"),
-                    option("9:16", "9:16", "768×1344"),
-                    option("16:9", "16:9", "1344×768"),
-                    option("21:9", "21:9", "1536×672"),
-                    option("1:4", "1:4", "supported by google/gemini-3.1-flash-image-preview only"),
-                    option("4:1", "4:1", "supported by google/gemini-3.1-flash-image-preview only"),
-                    option("1:8", "1:8", "supported by google/gemini-3.1-flash-image-preview only"),
-                    option("8:1", "8:1", "supported by google/gemini-3.1-flash-image-preview only"))
-                .defaultValue("1:1")
-                .required(false),
             string(SIZE)
                 .label("Size")
-                .description("The size of the generated images.")
+                .description("The size of the generated image.")
                 .options(
-                    option("1K", "1K", "Standard resolution (default)"),
-                    option("2K", "2K", "Higher resolution"),
-                    option("4K", "4K", "Highest resolution"),
-                    option("0.5K", "0.5K",
-                        "Lower resolution, optimized for efficiency (supported by google/gemini-3.1-flash-image-preview only)"))
-                .defaultValue("1K")
+                    option("256×256", "256x256"),
+                    option("512×512", "512x512"),
+                    option("1024×1024", "1024x1024"))
                 .required(false),
-            ATTACHMENTS_PROPERTY,
+            string(RESPONSE_FORMAT)
+                .label("Response Format")
+                .description("Whether to return a signed URL or base64-encoded bytes.")
+                .options(
+                    option("URL", "url"),
+                    option("Base64 JSON", "b64_json"))
+                .defaultValue("url")
+                .required(false),
+            integer(N)
+                .label("Number of Images")
+                .description("Number of images to generate.")
+                .defaultValue(1)
+                .minValue(1)
+                .required(false),
+            integer(SEED)
+                .label("Seed")
+                .description("Random seed for reproducible generation.")
+                .required(false),
+            number(GUIDANCE_SCALE)
+                .label("Guidance Scale")
+                .description("How closely the model follows the text prompt (0–20).")
+                .defaultValue(7.5)
+                .minValue(0)
+                .maxValue(20)
+                .required(false),
+            number(STRENGTH)
+                .label("Strength")
+                .description("How much the output differs from the input image in img2img mode (0–1).")
+                .defaultValue(0.8)
+                .minValue(0)
+                .maxValue(1)
+                .required(false),
+            integer(NUM_INFERENCE_STEPS)
+                .label("Inference Steps")
+                .description("Number of denoising steps. More steps produce higher quality but take longer (1–100).")
+                .defaultValue(30)
+                .minValue(1)
+                .maxValue(100)
+                .required(false),
             USER_PROPERTY)
         .output(ModelUtils::output)
         .perform(NanoGptCreateImageAction::perform);
@@ -89,7 +110,12 @@ public class NanoGptCreateImageAction {
             .apiKey(connectionParameters.getString(TOKEN))
             .model(inputParameters.getRequiredString(MODEL))
             .size(inputParameters.getString(SIZE))
-            .aspectRatio(inputParameters.getString(ASPECT_RATIO))
+            .responseFormat(inputParameters.getString(RESPONSE_FORMAT, "url"))
+            .n(inputParameters.getInteger(N))
+            .seed(inputParameters.getInteger(SEED))
+            .guidanceScale(inputParameters.getDouble(GUIDANCE_SCALE))
+            .strength(inputParameters.getDouble(STRENGTH))
+            .numInferenceSteps(inputParameters.getInteger(NUM_INFERENCE_STEPS))
             .user(inputParameters.getString(USER))
             .build();
 
