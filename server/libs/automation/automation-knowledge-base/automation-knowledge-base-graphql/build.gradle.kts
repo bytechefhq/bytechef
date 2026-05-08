@@ -1,5 +1,6 @@
 dependencies {
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
+    implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
     implementation("org.springframework.boot:spring-boot-autoconfigure")

@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;

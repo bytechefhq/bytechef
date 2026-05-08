@@ -16,12 +16,12 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
-import com.bytechef.automation.knowledgebase.dto.DocumentStatusUpdate;
-import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
-import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
