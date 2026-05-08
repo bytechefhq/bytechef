@@ -1,0 +1,13 @@
+query aiObservabilityWebhookDeliveries($subscriptionId: ID!) {
+    aiObservabilityWebhookDeliveries(subscriptionId: $subscriptionId) {
+        attemptCount
+        createdDate
+        deliveredDate
+        errorMessage
+        eventType
+        httpStatus
+        id
+        status
+        subscriptionId
+    }
+}

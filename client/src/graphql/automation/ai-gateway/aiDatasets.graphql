@@ -1,0 +1,34 @@
+query aiDatasets($workspaceId: ID!) {
+    aiDatasets: aiEvalDatasets(workspaceId: $workspaceId) {
+        archivedDate
+        createdDate
+        description
+        id
+        name
+        tags
+        workspaceId
+    }
+}
+
+query aiDatasetVersions($datasetId: ID!) {
+    aiDatasetVersions: aiEvalDatasetVersions(datasetId: $datasetId) {
+        createdDate
+        datasetId
+        frozen
+        id
+        itemCount
+        label
+    }
+}
+
+query aiDatasetItems($versionId: ID!) {
+    aiDatasetItems: aiEvalDatasetItems(versionId: $versionId) {
+        createdDate
+        datasetVersionId
+        expectedOutput
+        id
+        input
+        metadata
+        sourceTraceId
+    }
+}

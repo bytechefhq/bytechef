@@ -13,6 +13,9 @@ export interface ApplicationInfoI {
         copilot: {
             enabled: boolean;
         };
+        gateway: {
+            enabled: boolean;
+        };
         knowledgeBase: {
             enabled: boolean;
         };
@@ -71,6 +74,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     copilot: {
                         enabled: false,
                     },
+                    gateway: {
+                        enabled: false,
+                    },
                     knowledgeBase: {
                         enabled: false,
                     },
@@ -108,6 +114,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             ai: {
                                 copilot: {
                                     enabled: json.ai.copilot.enabled === 'true',
+                                },
+                                gateway: {
+                                    enabled: json.ai.gateway?.enabled === 'true',
                                 },
                                 knowledgeBase: {
                                     enabled: json.ai.knowledgeBase?.enabled === 'true',

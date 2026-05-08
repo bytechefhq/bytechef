@@ -1,0 +1,71 @@
+query aiGatewayModels {
+    aiGatewayModels {
+        alias
+        capabilities
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+query aiGatewayModelsByProvider($providerId: ID!) {
+    aiGatewayModelsByProvider(providerId: $providerId) {
+        alias
+        capabilities
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation createAiGatewayModel($input: CreateAiGatewayModelInput!) {
+    createAiGatewayModel(input: $input) {
+        alias
+        capabilities
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation updateAiGatewayModel($id: ID!, $input: UpdateAiGatewayModelInput!) {
+    updateAiGatewayModel(id: $id, input: $input) {
+        alias
+        capabilities
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation deleteAiGatewayModel($id: ID!) {
+    deleteAiGatewayModel(id: $id)
+}

@@ -1,0 +1,59 @@
+query workspaceAiGatewayProviders($workspaceId: ID!) {
+    workspaceAiGatewayProviders(workspaceId: $workspaceId) {
+        baseUrl
+        config
+        createdBy
+        createdDate
+        enabled
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        type
+        version
+    }
+}
+
+mutation createWorkspaceAiGatewayProvider($input: CreateWorkspaceAiGatewayProviderInput!) {
+    createWorkspaceAiGatewayProvider(input: $input) {
+        baseUrl
+        config
+        createdBy
+        createdDate
+        enabled
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        type
+        version
+    }
+}
+
+mutation deleteWorkspaceAiGatewayProvider($workspaceId: ID!, $providerId: ID!) {
+    deleteWorkspaceAiGatewayProvider(workspaceId: $workspaceId, providerId: $providerId)
+}
+
+mutation updateWorkspaceAiGatewayProvider($workspaceId: ID!, $id: ID!, $input: UpdateAiGatewayProviderInput!) {
+    updateWorkspaceAiGatewayProvider(workspaceId: $workspaceId, id: $id, input: $input) {
+        baseUrl
+        config
+        createdBy
+        createdDate
+        enabled
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        type
+        version
+    }
+}
+
+mutation testWorkspaceAiGatewayProviderConnection($workspaceId: ID!, $providerId: ID!) {
+    testWorkspaceAiGatewayProviderConnection(workspaceId: $workspaceId, providerId: $providerId) {
+        errorMessage
+        latencyMs
+        ok
+    }
+}

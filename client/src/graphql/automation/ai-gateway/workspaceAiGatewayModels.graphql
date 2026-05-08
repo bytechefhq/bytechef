@@ -1,0 +1,57 @@
+query workspaceAiGatewayModels($workspaceId: ID!) {
+    workspaceAiGatewayModels(workspaceId: $workspaceId) {
+        alias
+        capabilities
+        contextWindow
+        defaultRoutingPolicyId
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation createWorkspaceAiGatewayModel($input: CreateWorkspaceAiGatewayModelInput!) {
+    createWorkspaceAiGatewayModel(input: $input) {
+        alias
+        capabilities
+        contextWindow
+        defaultRoutingPolicyId
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation deleteWorkspaceAiGatewayModel($workspaceId: ID!, $modelId: ID!) {
+    deleteWorkspaceAiGatewayModel(workspaceId: $workspaceId, modelId: $modelId)
+}
+
+mutation updateWorkspaceAiGatewayModel($id: ID!, $input: UpdateAiGatewayModelInput!) {
+    updateWorkspaceAiGatewayModel(id: $id, input: $input) {
+        alias
+        capabilities
+        contextWindow
+        defaultRoutingPolicyId
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}

@@ -1,0 +1,38 @@
+query aiExperimentComparison($experimentIds: [ID!]!) {
+    experimentComparison(experimentIds: $experimentIds) {
+        aggregateScoreDeltas {
+            deltas {
+                average
+                count
+                experimentId
+            }
+            scoreName
+        }
+        experiments {
+            averageLatencyMs
+            completedRuns
+            failedRuns
+            id
+            model
+            totalCost
+            totalRuns
+        }
+        rows {
+            datasetItemId
+            runsByExperiment {
+                cost
+                experimentId
+                latencyMs
+                runId
+                scores {
+                    dataType
+                    name
+                    stringValue
+                    value
+                }
+                status
+                traceId
+            }
+        }
+    }
+}

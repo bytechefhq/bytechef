@@ -1,0 +1,15 @@
+query aiGatewaySpendSummaries($startDate: Long!, $endDate: Long!) {
+    aiGatewaySpendSummaries(startDate: $startDate, endDate: $endDate) {
+        apiKeyId
+        createdDate
+        id
+        model
+        periodEnd
+        periodStart
+        provider
+        requestCount
+        totalCost
+        totalInputTokens
+        totalOutputTokens
+    }
+}

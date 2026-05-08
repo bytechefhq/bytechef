@@ -1,0 +1,13 @@
+mutation playgroundChatCompletion($input: PlaygroundChatCompletionInput!) {
+    playgroundChatCompletion(input: $input) {
+        completionTokens
+        content
+        cost
+        finishReason
+        latencyMs
+        model
+        promptTokens
+        totalTokens
+        traceId
+    }
+}
