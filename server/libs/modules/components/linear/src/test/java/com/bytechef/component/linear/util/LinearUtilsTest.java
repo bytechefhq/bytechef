@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.linear.constant.LinearConstants.ALL_PUBLIC_TEAMS;
 import static com.bytechef.component.linear.constant.LinearConstants.QUERY;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -47,7 +46,6 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -155,7 +153,17 @@ class LinearUtilsTest {
         List<Option<String>> result = LinearUtils.getProjectOptions(
             null, null, null, null, mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expected.toArray()));
+        assertEquals(result, expected);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/graphql", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(Map.of(QUERY, "{projects{nodes{id name}}}")),
+            bodyArgumentCaptor.getValue());
     }
 
     @Test
@@ -277,7 +285,6 @@ class LinearUtilsTest {
     void testExecuteIssueTriggerQuery() {
         WebhookBody mockedBody = mock(WebhookBody.class);
 
-        Map<String, Object> mockIssue = Map.of("id", "123");
         Map<String, Object> webhookPayload = Map.of(
             "action", "create",
             "data", Map.of("id", "123"));
@@ -287,7 +294,7 @@ class LinearUtilsTest {
 
         Object result = LinearUtils.executeIssueTriggerQuery("create", mockedBody);
 
-        assertEquals(mockIssue, result);
+        assertEquals(Map.of("id", "123"), result);
     }
 
     @Test
@@ -300,9 +307,7 @@ class LinearUtilsTest {
 
         String url = "https://example.com/webhook";
         Map<String, Object> graphqlResponse = Map.of(
-            "data", Map.of(
-                "webhookCreate", Map.of(
-                    "webhook", Map.of("id", "abc123"))));
+            "data", Map.of("webhookCreate", Map.of("webhook", Map.of("id", "abc123"))));
 
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(graphqlResponse);
