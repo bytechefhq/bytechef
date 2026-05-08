@@ -56,7 +56,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
                     aiAgentChatActionDefinition,
-                    AiAgentStreamChatAction.of(clusterElementDefinitionService, aiAgentToolFacade, toolCallingManager))
+                    AiAgentStreamChatAction.of(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));
     }
 

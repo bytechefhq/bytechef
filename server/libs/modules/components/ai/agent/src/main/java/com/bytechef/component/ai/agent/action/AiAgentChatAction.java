@@ -53,11 +53,11 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager) {
 
-        return new AiAgentChatAction(clusterElementDefinitionService, aiAgentToolFacade, toolCallingManager).build();
+        return new AiAgentChatAction(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager).build();
     }
 
     private AiAgentChatAction(
-        ClusterElementDefinitionService clusterElementDefinitionService, AiAgentToolFacade aiAgentToolFacade,
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager) {
 
         super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
