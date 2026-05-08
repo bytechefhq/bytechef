@@ -59,6 +59,15 @@ public class NanoGptChatModel implements org.springframework.ai.chat.model.ChatM
     private final Double topP;
     private final String user;
     private final String verbosity;
+    private final Double minP;
+    private final Integer minTokens;
+    private final Integer mirostatMode;
+    private final Double mirostatTau;
+    private final Double mirostatEta;
+    private final Double repetitionPenalty;
+    private final Double tfs;
+    private final Double topA;
+    private final Double typicalP;
 
     private NanoGptChatModel(Builder builder) {
         this.restClient = ModelUtils.getRestClientBuilder()
@@ -82,6 +91,15 @@ public class NanoGptChatModel implements org.springframework.ai.chat.model.ChatM
         this.topP = builder.topP;
         this.user = builder.user;
         this.verbosity = builder.verbosity;
+        this.minP = builder.minP;
+        this.minTokens = builder.minTokens;
+        this.mirostatMode = builder.mirostatMode;
+        this.mirostatTau = builder.mirostatTau;
+        this.mirostatEta = builder.mirostatEta;
+        this.repetitionPenalty = builder.repetitionPenalty;
+        this.tfs = builder.tfs;
+        this.topA = builder.topA;
+        this.typicalP = builder.typicalP;
     }
 
     public static Builder builder() {
@@ -183,7 +201,43 @@ public class NanoGptChatModel implements org.springframework.ai.chat.model.ChatM
         }
 
         if (reasoning != null) {
-            body.put("reasoning", reasoning);
+            body.put("reasoning_effort", reasoning);
+        }
+
+        if (minP != null) {
+            body.put("min_p", minP);
+        }
+
+        if (minTokens != null) {
+            body.put("min_tokens", minTokens);
+        }
+
+        if (mirostatMode != null) {
+            body.put("mirostat_mode", mirostatMode);
+        }
+
+        if (mirostatTau != null) {
+            body.put("mirostat_tau", mirostatTau);
+        }
+
+        if (mirostatEta != null) {
+            body.put("mirostat_eta", mirostatEta);
+        }
+
+        if (repetitionPenalty != null) {
+            body.put("repetition_penalty", repetitionPenalty);
+        }
+
+        if (tfs != null) {
+            body.put("tfs", tfs);
+        }
+
+        if (topA != null) {
+            body.put("top_a", topA);
+        }
+
+        if (typicalP != null) {
+            body.put("typical_p", typicalP);
         }
 
         if (seed != null) {
@@ -253,6 +307,15 @@ public class NanoGptChatModel implements org.springframework.ai.chat.model.ChatM
         private Double topP;
         private String user;
         private String verbosity;
+        private Double minP;
+        private Integer minTokens;
+        private Integer mirostatMode;
+        private Double mirostatTau;
+        private Double mirostatEta;
+        private Double repetitionPenalty;
+        private Double tfs;
+        private Double topA;
+        private Double typicalP;
 
         public Builder apiKey(String apiKey) {
             this.apiKey = apiKey;
@@ -341,6 +404,51 @@ public class NanoGptChatModel implements org.springframework.ai.chat.model.ChatM
 
         public Builder verbosity(String verbosity) {
             this.verbosity = verbosity;
+            return this;
+        }
+
+        public Builder minP(Double minP) {
+            this.minP = minP;
+            return this;
+        }
+
+        public Builder minTokens(Integer minTokens) {
+            this.minTokens = minTokens;
+            return this;
+        }
+
+        public Builder mirostatMode(Integer mirostatMode) {
+            this.mirostatMode = mirostatMode;
+            return this;
+        }
+
+        public Builder mirostatTau(Double mirostatTau) {
+            this.mirostatTau = mirostatTau;
+            return this;
+        }
+
+        public Builder mirostatEta(Double mirostatEta) {
+            this.mirostatEta = mirostatEta;
+            return this;
+        }
+
+        public Builder repetitionPenalty(Double repetitionPenalty) {
+            this.repetitionPenalty = repetitionPenalty;
+            return this;
+        }
+
+        public Builder tfs(Double tfs) {
+            this.tfs = tfs;
+            return this;
+        }
+
+        public Builder topA(Double topA) {
+            this.topA = topA;
+            return this;
+        }
+
+        public Builder typicalP(Double typicalP) {
+            this.typicalP = typicalP;
             return this;
         }
 

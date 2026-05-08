@@ -56,7 +56,25 @@ import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.T
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_LOGPROBS;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_LOGPROBS_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIN_P;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIN_P_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIN_TOKENS;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIN_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIROSTAT_ETA;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIROSTAT_ETA_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIROSTAT_MODE;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIROSTAT_MODE_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIROSTAT_TAU;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.MIROSTAT_TAU_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.REPETITION_PENALTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.REPETITION_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TFS;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TFS_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_A;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_A_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TYPICAL_P;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TYPICAL_P_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.VERBOSITY_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -100,7 +118,16 @@ public class NanoGptChatAction {
             TOP_K_PROPERTY,
             TOP_P_PROPERTY,
             VERBOSITY_PROPERTY,
-            USER_PROPERTY)
+            USER_PROPERTY,
+            MIN_P_PROPERTY,
+            MIN_TOKENS_PROPERTY,
+            MIROSTAT_MODE_PROPERTY,
+            MIROSTAT_TAU_PROPERTY,
+            MIROSTAT_ETA_PROPERTY,
+            REPETITION_PENALTY_PROPERTY,
+            TFS_PROPERTY,
+            TOP_A_PROPERTY,
+            TYPICAL_P_PROPERTY)
         .output(ModelUtils::output)
         .perform(NanoGptChatAction::perform);
 
@@ -133,6 +160,15 @@ public class NanoGptChatAction {
             .topP(inputParameters.getDouble(TOP_P))
             .verbosity(inputParameters.getString(VERBOSITY))
             .user(inputParameters.getString(USER))
+            .minP(inputParameters.getDouble(MIN_P))
+            .minTokens(inputParameters.getInteger(MIN_TOKENS))
+            .mirostatMode(inputParameters.getInteger(MIROSTAT_MODE))
+            .mirostatTau(inputParameters.getDouble(MIROSTAT_TAU))
+            .mirostatEta(inputParameters.getDouble(MIROSTAT_ETA))
+            .repetitionPenalty(inputParameters.getDouble(REPETITION_PENALTY))
+            .tfs(inputParameters.getDouble(TFS))
+            .topA(inputParameters.getDouble(TOP_A))
+            .typicalP(inputParameters.getDouble(TYPICAL_P))
             .build();
     };
 
