@@ -11,10 +11,13 @@ const DataPillPanelBodyInputsItem = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({
-        environmentId: currentEnvironmentId,
-        workflowId: workflow.id!,
-    });
+    const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery(
+        {
+            environmentId: currentEnvironmentId,
+            workflowId: workflow.id!,
+        },
+        !!workflow.id
+    );
 
     if (!workflow.inputs || workflow.inputs.length === 0) {
         return <p className="text-sm">No defined inputs.</p>;
