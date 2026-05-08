@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
