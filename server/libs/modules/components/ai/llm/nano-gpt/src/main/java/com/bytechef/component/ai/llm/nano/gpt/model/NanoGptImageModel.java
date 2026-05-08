@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.ai.image.Image;
 import org.springframework.ai.image.ImageGeneration;
-import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
@@ -38,21 +37,31 @@ import org.springframework.web.client.RestClient;
  * @author Marko Kriskovic
  */
 public class NanoGptImageModel implements ImageModel {
+
     private final RestClient restClient;
     private final String model;
-    private final String aspectRatio;
     private final String size;
+    private final String responseFormat;
     private final String user;
+    private final Integer n;
+    private final Integer seed;
+    private final Double guidanceScale;
+    private final Double strength;
+    private final Integer numInferenceSteps;
 
     private NanoGptImageModel(Builder builder) {
         this.restClient = ModelUtils.getRestClientBuilder()
-            .baseUrl(BASE_URL)
             .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + builder.apiKey)
             .build();
         this.model = builder.model;
-        this.aspectRatio = builder.aspectRatio;
         this.size = builder.size;
+        this.responseFormat = builder.responseFormat;
         this.user = builder.user;
+        this.n = builder.n;
+        this.seed = builder.seed;
+        this.guidanceScale = builder.guidanceScale;
+        this.strength = builder.strength;
+        this.numInferenceSteps = builder.numInferenceSteps;
     }
 
     public static Builder builder() {
@@ -61,10 +70,49 @@ public class NanoGptImageModel implements ImageModel {
 
     @Override
     public ImageResponse call(ImagePrompt prompt) {
-        Map<String, Object> body = buildRequestBody(prompt.getInstructions());
+        String promptText = prompt.getInstructions()
+            .getFirst()
+            .getText();
+
+        Map<String, Object> body = new HashMap<>();
+
+        body.put("prompt", promptText);
+        body.put("model", model);
+
+        if (n != null) {
+            body.put("n", n);
+        }
+
+        if (size != null) {
+            body.put("size", size);
+        }
+
+        if (responseFormat != null) {
+            body.put("response_format", responseFormat);
+        }
+
+        if (seed != null) {
+            body.put("seed", seed);
+        }
+
+        if (guidanceScale != null) {
+            body.put("guidance_scale", guidanceScale);
+        }
+
+        if (strength != null) {
+            body.put("strength", strength);
+        }
+
+        if (numInferenceSteps != null) {
+            body.put("num_inference_steps", numInferenceSteps);
+        }
+
+        if (user != null) {
+            body.put("user", user);
+        }
 
         Map<String, Object> response = restClient.post()
-            .uri("/chat/completions")
+            .uri(BASE_URL + "/images/generations")
             .contentType(MediaType.APPLICATION_JSON)
             .body(body)
             .retrieve()
@@ -73,77 +121,37 @@ public class NanoGptImageModel implements ImageModel {
         return buildResponse(response);
     }
 
-    private Map<String, Object> buildRequestBody(List<ImageMessage> messages) {
-        Map<String, Object> body = new HashMap<>();
-
-        List<Map<String, Object>> messageList = messages.stream()
-            .map(message -> Map.<String, Object>of("role", "user", "content", message.getText()))
-            .collect(Collectors.toList());
-
-        body.put("model", model);
-        body.put("messages", messageList);
-        body.put("modalities", List.of("image"));
-
-        Map<String, Object> imageConfig = new HashMap<>();
-
-        if (aspectRatio != null) {
-            imageConfig.put("aspect_ratio", aspectRatio);
-        }
-
-        if (size != null) {
-            imageConfig.put("image_size", size);
-        }
-
-        if (!imageConfig.isEmpty()) {
-            body.put("image_config", imageConfig);
-        }
-
-        if (user != null) {
-            body.put("user", user);
-        }
-
-        return body;
-    }
-
     @SuppressWarnings("unchecked")
     private ImageResponse buildResponse(Map<String, Object> response) {
-        List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
-        Map<String, Object> message = (Map<String, Object>) choices.getFirst()
-            .get("message");
-        List<Map<String, Object>> images = (List<Map<String, Object>>) message.get("images");
-        Map<String, Object> imageUrl = (Map<String, Object>) images.getFirst()
-            .get("image_url");
-        String url = (String) imageUrl.get("url");
+        List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
 
-        if (url.startsWith("data:")) {
-            String b64Json = url.substring(url.indexOf(',') + 1);
+        List<ImageGeneration> generations = data.stream()
+            .map(item -> {
+                String url = (String) item.get("url");
+                String b64Json = (String) item.get("b64_json");
 
-            return new ImageResponse(List.of(new ImageGeneration(new Image(null, b64Json))));
-        }
+                return new ImageGeneration(new Image(url, b64Json));
+            })
+            .collect(Collectors.toList());
 
-        return new ImageResponse(List.of(new ImageGeneration(new Image(url, null))));
+        return new ImageResponse(generations);
     }
 
     public static class Builder {
 
         private String apiKey;
         private String model;
-        private String aspectRatio;
         private String size;
+        private String responseFormat;
         private String user;
+        private Integer n;
+        private Integer seed;
+        private Double guidanceScale;
+        private Double strength;
+        private Integer numInferenceSteps;
 
         public Builder apiKey(String apiKey) {
             this.apiKey = apiKey;
-            return this;
-        }
-
-        public Builder aspectRatio(String aspectRatio) {
-            this.aspectRatio = aspectRatio;
-            return this;
-        }
-
-        public Builder size(String size) {
-            this.size = size;
             return this;
         }
 
@@ -152,8 +160,43 @@ public class NanoGptImageModel implements ImageModel {
             return this;
         }
 
+        public Builder size(String size) {
+            this.size = size;
+            return this;
+        }
+
+        public Builder responseFormat(String responseFormat) {
+            this.responseFormat = responseFormat;
+            return this;
+        }
+
         public Builder user(String user) {
             this.user = user;
+            return this;
+        }
+
+        public Builder n(Integer n) {
+            this.n = n;
+            return this;
+        }
+
+        public Builder seed(Integer seed) {
+            this.seed = seed;
+            return this;
+        }
+
+        public Builder guidanceScale(Double guidanceScale) {
+            this.guidanceScale = guidanceScale;
+            return this;
+        }
+
+        public Builder strength(Double strength) {
+            this.strength = strength;
+            return this;
+        }
+
+        public Builder numInferenceSteps(Integer numInferenceSteps) {
+            this.numInferenceSteps = numInferenceSteps;
             return this;
         }
 

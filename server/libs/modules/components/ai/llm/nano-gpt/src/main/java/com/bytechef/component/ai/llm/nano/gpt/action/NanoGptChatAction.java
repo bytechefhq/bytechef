@@ -52,7 +52,6 @@ import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.P
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.REASONING_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.STOP_PROPERTY;
-import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.SUPPORTED_PARAMETERS_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TOP_LOGPROBS;
@@ -80,7 +79,6 @@ public class NanoGptChatAction {
         .title("Ask")
         .description("Ask anything you want.")
         .properties(
-            SUPPORTED_PARAMETERS_PROPERTY,
             CHAT_MODEL_PROPERTY,
             PROMPT_PROPERTY,
             FORMAT_PROPERTY,
