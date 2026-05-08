@@ -19,9 +19,9 @@ package com.bytechef.component.ai.llm.nano.gpt.action;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_TRANSCRIPTION;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FILE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LANGUAGE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.LANGUAGE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TRANSCRIBE_URL;
+import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TRANSCRIPTION_LANGUAGE_PROPERTY;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TRANSCRIPTION_MODEL_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -57,7 +57,7 @@ public class NanoGptCreateTranscriptionAction {
                 .description(
                     "The audio file to transcribe. Supported formats: MP3, WAV, M4A, OGG, AAC (max 3MB).")
                 .required(true),
-            LANGUAGE_PROPERTY)
+            TRANSCRIPTION_LANGUAGE_PROPERTY)
         .output(outputSchema(string()))
         .perform(NanoGptCreateTranscriptionAction::perform);
 
