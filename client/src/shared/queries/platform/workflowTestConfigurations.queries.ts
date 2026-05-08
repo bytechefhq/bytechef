@@ -35,9 +35,13 @@ export const useGetWorkflowTestConfigurationConnectionsQuery = (
         staleTime: DEFINITION_STALE_TIME,
     });
 
-export const useGetWorkflowTestConfigurationQuery = (requestParameters: GetWorkflowTestConfigurationRequest) =>
+export const useGetWorkflowTestConfigurationQuery = (
+    requestParameters: GetWorkflowTestConfigurationRequest,
+    enabled?: boolean
+) =>
     useQuery<WorkflowTestConfiguration, Error>({
         queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(requestParameters.workflowId),
         queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfiguration(requestParameters),
         retry: false,
+        enabled: enabled === undefined ? true : enabled,
     });
