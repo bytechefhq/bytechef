@@ -60,6 +60,7 @@ const ClusterElementsCanvasDialog = ({
         (state) => state.workflowNodeDetailsPanelOpen
     );
     const ff_4070 = useFeatureFlagsStore()('ff-4070');
+    const ff_4545 = useFeatureFlagsStore()('ff-4545');
     const ff_4553 = useFeatureFlagsStore()('ff-4553');
 
     const {handleClose: handleEvalsClose} = useAiAgentEvals();
@@ -191,7 +192,7 @@ const ClusterElementsCanvasDialog = ({
                                 }
                                 onTestClick={handleTestClick}
                                 onToggleEditor={handleToggleEditor}
-                                showSkills={isAiAgentClusterRoot}
+                                showSkills={ff_4545 && isAiAgentClusterRoot}
                                 showTestButton={isAiAgentClusterRoot}
                                 showToggleEditor={
                                     isAiAgentClusterRoot || (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
