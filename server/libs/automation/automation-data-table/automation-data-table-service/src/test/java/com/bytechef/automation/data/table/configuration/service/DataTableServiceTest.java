@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.data.table.configuration.service;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,13 +23,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.data.table.configuration.domain.DataTable;
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
 import com.bytechef.automation.data.table.configuration.repository.DataTableRepository;
-import com.bytechef.automation.data.table.configuration.repository.WorkspaceDataTableRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,33 +45,22 @@ class DataTableServiceTest {
     @Mock
     private JdbcTemplate jdbcTemplate;
 
-    @Mock
-    private WorkspaceDataTableRepository workspaceDataTableRepository;
-
     private DataTableServiceImpl dataTableService;
 
     @BeforeEach
     void setUp() {
-        dataTableService = new DataTableServiceImpl(dataTableRepository, jdbcTemplate, workspaceDataTableRepository);
+        dataTableService = new DataTableServiceImpl(dataTableRepository, jdbcTemplate);
     }
 
     @Test
     void testDropTableShouldDeleteMetadataWhenNoPhysicalTablesRemain() {
-        DataTable dataTable = new DataTable(1L, "mytable");
-        WorkspaceDataTable workspaceDataTable = new WorkspaceDataTable(1L, 100L);
-
         when(jdbcTemplate.queryForObject(
             anyString(), eq(Integer.class), anyString()))
                 .thenReturn(0);
-        when(dataTableRepository.findByName("mytable"))
-            .thenReturn(Optional.of(dataTable));
-        when(workspaceDataTableRepository.findByDataTableId(1L))
-            .thenReturn(List.of(workspaceDataTable));
 
         dataTableService.dropTable("mytable", 1L);
 
         verify(jdbcTemplate).execute(contains("DROP TABLE IF EXISTS"));
-        verify(workspaceDataTableRepository).deleteAll(List.of(workspaceDataTable));
         verify(dataTableRepository).deleteByName("mytable");
     }
 
@@ -91,7 +74,6 @@ class DataTableServiceTest {
 
         verify(jdbcTemplate).execute(contains("DROP TABLE IF EXISTS"));
         verify(dataTableRepository, never()).findByName(anyString());
-        verify(workspaceDataTableRepository, never()).deleteAll(any());
         verify(dataTableRepository, never()).deleteByName(anyString());
     }
 }
