@@ -13,5 +13,6 @@ spring:
     contexts: connection
 
 bytechef:
+  edition: EE
   encryption:
     provider: filesystem
