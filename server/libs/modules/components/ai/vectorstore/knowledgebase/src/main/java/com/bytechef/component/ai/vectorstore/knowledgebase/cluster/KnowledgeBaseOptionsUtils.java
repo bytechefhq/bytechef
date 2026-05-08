@@ -19,11 +19,11 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Option;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

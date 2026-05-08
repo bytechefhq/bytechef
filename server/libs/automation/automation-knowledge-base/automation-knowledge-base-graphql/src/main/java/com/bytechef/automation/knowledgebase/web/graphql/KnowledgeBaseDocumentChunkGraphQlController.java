@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
-import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

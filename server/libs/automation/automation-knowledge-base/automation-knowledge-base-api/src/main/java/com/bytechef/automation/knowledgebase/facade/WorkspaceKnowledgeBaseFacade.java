@@ -16,8 +16,9 @@
 
 package com.bytechef.automation.knowledgebase.facade;
 
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Defines the interface for managing and retrieving knowledge bases associated with specific workspaces. This facade
@@ -55,4 +56,26 @@ public interface WorkspaceKnowledgeBaseFacade {
      * @param knowledgeBaseId the ID of the knowledge base to delete
      */
     void deleteWorkspaceKnowledgeBase(Long knowledgeBaseId);
+
+    /**
+     * Clones an existing knowledge base into the target environment within the same workspace, copying the chunking
+     * configuration (max chunk size, min chunk size chars, overlap), description, and name. Documents are
+     * <strong>not</strong> copied — the destination knowledge base starts empty so the caller can re-ingest documents
+     * deliberately rather than having async embed jobs silently kicked off as a side effect of the clone.
+     *
+     * <p>
+     * Same-workspace, cross-environment scope: the {@code workspaceId} carries over. The source knowledge base must
+     * belong to the supplied workspace; if not, an {@link IllegalArgumentException} is thrown so a forged knowledge
+     * base id from another workspace cannot bypass the boundary.
+     * </p>
+     *
+     * @param knowledgeBaseId     id of the source knowledge base
+     * @param workspaceId         owning workspace — verified against the source for defense in depth
+     * @param targetEnvironmentId target environment ordinal
+     *                            ({@link com.bytechef.platform.configuration.domain.Environment#ordinal()})
+     * @param newName             optional name override for the clone; falls back to the source name when null
+     * @return the persisted clone
+     */
+    KnowledgeBase cloneWorkspaceKnowledgeBase(
+        Long knowledgeBaseId, Long workspaceId, long targetEnvironmentId, @Nullable String newName);
 }

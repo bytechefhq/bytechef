@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_NAMES;
+import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
+import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_NAMES;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;

@@ -16,25 +16,17 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_ENVIRONMENT_ID;
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_ID;
-import static com.bytechef.automation.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_NAMES;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.VECTOR_STORE;
+import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_ENVIRONMENT_ID;
+import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
+import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_ID;
+import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
-import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -42,6 +34,14 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

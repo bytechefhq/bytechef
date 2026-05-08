@@ -26,11 +26,6 @@ import static com.bytechef.platform.component.definition.VectorStoreComponentDef
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
-import com.bytechef.automation.knowledgebase.file.storage.KnowledgeBaseFileStorage;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentChunkService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -47,6 +42,11 @@ import com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransfo
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

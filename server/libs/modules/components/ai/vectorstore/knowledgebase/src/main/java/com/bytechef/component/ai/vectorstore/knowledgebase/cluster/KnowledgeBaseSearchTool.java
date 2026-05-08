@@ -27,14 +27,14 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.stream.Stream;
 
 /**

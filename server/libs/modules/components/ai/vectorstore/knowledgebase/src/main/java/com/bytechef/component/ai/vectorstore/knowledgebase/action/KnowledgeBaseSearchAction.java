@@ -29,14 +29,14 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
-import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

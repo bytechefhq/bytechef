@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
-import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentFacade;
-import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
