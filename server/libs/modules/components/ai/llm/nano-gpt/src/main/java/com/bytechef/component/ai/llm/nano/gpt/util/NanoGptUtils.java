@@ -98,17 +98,17 @@ public class NanoGptUtils {
     }
 
     public static ActionDefinition.OptionsFunction<String> getNanoGptSpeechModels() {
-        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) ->
-            fetchAudioModels("tts", context);
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> fetchAudioModels(
+            "tts", context);
     }
 
     public static ActionDefinition.OptionsFunction<String> getNanoGptTranscriptionModels() {
-        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) ->
-            fetchAudioModels("stt", context);
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> fetchAudioModels(
+            "stt", context);
     }
 
     private static List<com.bytechef.component.definition.Option<String>> fetchAudioModels(
-            String type, Context context) {
+        String type, Context context) {
 
         AudioModelsResponse response = context.http(http -> http.get("/audio-models"))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
@@ -136,15 +136,17 @@ public class NanoGptUtils {
             return displayName;
         }
 
-        return displayName + " - $" + formatCost(model.pricing().per_million_tokens()) + " per 1M tokens";
+        return displayName + " - $" + formatCost(model.pricing()
+            .per_million_tokens()) + " per 1M tokens";
     }
 
     private static String formatImageModelLabel(NanoGptImageModel model) {
         String displayName = model.name() != null ? model.name() : model.id();
 
-        if (model.pricing() == null || model.pricing().per_image() == null || model.pricing()
-            .per_image()
-            .isEmpty()) {
+        if (model.pricing() == null || model.pricing()
+            .per_image() == null || model.pricing()
+                .per_image()
+                .isEmpty()) {
             return displayName;
         }
 
@@ -158,12 +160,16 @@ public class NanoGptUtils {
             return displayName;
         }
 
-        if ("tts".equals(type) && model.pricing().per_thousand_chars() != null) {
-            return displayName + " - $" + formatCost(model.pricing().per_thousand_chars()) + " per 1K chars";
+        if ("tts".equals(type) && model.pricing()
+            .per_thousand_chars() != null) {
+            return displayName + " - $" + formatCost(model.pricing()
+                .per_thousand_chars()) + " per 1K chars";
         }
 
-        if ("stt".equals(type) && model.pricing().per_minute() != null) {
-            return displayName + " - $" + formatCost(model.pricing().per_minute()) + " per min";
+        if ("stt".equals(type) && model.pricing()
+            .per_minute() != null) {
+            return displayName + " - $" + formatCost(model.pricing()
+                .per_minute()) + " per min";
         }
 
         return displayName;

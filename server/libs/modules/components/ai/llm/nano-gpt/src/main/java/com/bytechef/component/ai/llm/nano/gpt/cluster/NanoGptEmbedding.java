@@ -81,7 +81,7 @@ public class NanoGptEmbedding {
         private final Integer dimensions;
 
         FloatEncodingEmbeddingModel(
-                OpenAIClient client, MetadataMode metadataMode, String model, Integer dimensions) {
+            OpenAIClient client, MetadataMode metadataMode, String model, Integer dimensions) {
 
             this.client = client;
             this.metadataMode = metadataMode;
@@ -100,7 +100,8 @@ public class NanoGptEmbedding {
                 builder.dimensions(dimensions);
             }
 
-            CreateEmbeddingResponse response = client.embeddings().create(builder.build());
+            CreateEmbeddingResponse response = client.embeddings()
+                .create(builder.build());
             List<Embedding> embeddings = new ArrayList<>();
 
             for (com.openai.models.embeddings.Embedding embedding : response.data()) {
@@ -117,11 +118,14 @@ public class NanoGptEmbedding {
             EmbeddingResponse response = call(
                 new EmbeddingRequest(List.of(document.getFormattedContent(metadataMode)), null));
 
-            if (response.getResults().isEmpty()) {
+            if (response.getResults()
+                .isEmpty()) {
                 return new float[0];
             }
 
-            return response.getResults().getFirst().getOutput();
+            return response.getResults()
+                .getFirst()
+                .getOutput();
         }
     }
 }

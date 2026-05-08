@@ -24,7 +24,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.SPEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.VOICE;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.BASE_URL;
 import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.SPEECH_MODEL_PROPERTY;
-import static com.bytechef.component.ai.llm.nano.gpt.constant.NanoGptConstants.TTS_URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
@@ -148,7 +147,7 @@ public class NanoGptCreateSpeechAction {
         AtomicReference<MediaType> contentTypeRef = new AtomicReference<>();
 
         byte[] initialBytes = restClient.post()
-            .uri(TTS_URL)
+            .uri(BASE_URL + "/tts")
             .contentType(MediaType.APPLICATION_JSON)
             .body(requestBody)
             .exchange((request, response) -> {
