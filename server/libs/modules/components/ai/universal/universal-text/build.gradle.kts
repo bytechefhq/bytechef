@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:deepseek"))
     implementation(project(":server:libs:modules:components:ai:llm:groq"))
     implementation(project(":server:libs:modules:components:ai:llm:mistral"))
+    implementation(project(":server:libs:modules:components:ai:llm:nano-gpt"))
     implementation(project(":server:libs:modules:components:ai:llm:nvidia"))
     implementation(project(":server:libs:modules:components:ai:llm:open-ai"))
     implementation(project(":server:libs:modules:components:ai:llm:open-router"))
