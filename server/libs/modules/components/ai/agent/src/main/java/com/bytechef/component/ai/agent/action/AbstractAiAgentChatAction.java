@@ -303,7 +303,7 @@ public abstract class AbstractAiAgentChatAction {
         };
     }
 
-    private List<Advisor> getAdvisors(
+    List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
         ActionContext context) {
 
