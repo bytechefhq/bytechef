@@ -30,7 +30,7 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTodoWriteTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import org.springframework.stereotype.Component;
 
 /**
