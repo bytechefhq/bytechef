@@ -5,7 +5,7 @@
 
 import {pathToFileURL} from 'node:url';
 
-const REQUIRED_DESCRIPTION = 'Node.js 20.19+ or 22.12+';
+const REQUIRED_DESCRIPTION = 'Node.js 20.19+, 22.12+, or 24+';
 
 export function satisfies(version) {
     const [major, minor] = version.split('.').map(Number);
@@ -18,7 +18,7 @@ export function satisfies(version) {
         return minor >= 12;
     }
 
-    return major >= 23;
+    return major >= 24;
 }
 
 export function assertSupportedNodeVersion(version = process.versions.node) {

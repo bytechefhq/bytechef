@@ -36,16 +36,22 @@ describe('check-node-version', () => {
             expect(satisfies('22.20.0')).toBe(true);
         });
 
-        it('accepts Node 23+ — newer majors are allowed', () => {
-            expect(satisfies('23.0.0')).toBe(true);
+        it('rejects Node 23.x — transitive deps require >=24 for new majors', () => {
+            expect(satisfies('23.0.0')).toBe(false);
+            expect(satisfies('23.11.0')).toBe(false);
+        });
+
+        it('accepts Node 24+ — the next major after 22.x supported by deps', () => {
+            expect(satisfies('24.0.0')).toBe(true);
             expect(satisfies('24.5.1')).toBe(true);
+            expect(satisfies('25.0.0')).toBe(true);
         });
     });
 
     describe('assertSupportedNodeVersion', () => {
         it('throws with a clear message for unsupported versions', () => {
             expect(() => assertSupportedNodeVersion('20.12.0')).toThrow(/Node\.js 20\.12\.0 is not supported/);
-            expect(() => assertSupportedNodeVersion('20.12.0')).toThrow(/20\.19\+ or 22\.12\+/);
+            expect(() => assertSupportedNodeVersion('20.12.0')).toThrow(/20\.19\+, 22\.12\+, or 24\+/);
         });
 
         it('does not throw for supported versions', () => {
