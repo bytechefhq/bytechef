@@ -2,7 +2,8 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+                   logicalFilePath="config/liquibase/changelog/automation/knowledge_base/20260321000001_automation_knowledge_base_document_nullable_document.xml">
 
     <changeSet id="20260321000001" author="Ivica Cardic">
         <dropNotNullConstraint tableName="knowledge_base_document" columnName="document" columnDataType="TEXT"/>
