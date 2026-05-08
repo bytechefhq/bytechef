@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.knowledgebase.config.KnowledgeBaseIntTestConfiguration;
 import com.bytechef.automation.knowledgebase.config.KnowledgeBaseIntTestConfigurationSharedMocks;
-import com.bytechef.automation.knowledgebase.config.WorkspaceTestFixture;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocumentChunk;
@@ -38,7 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Integration tests for {@link KnowledgeBaseDocumentChunkService}.
@@ -62,9 +60,6 @@ class KnowledgeBaseDocumentChunkServiceIntTest {
     @Autowired
     private KnowledgeBaseRepository knowledgeBaseRepository;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     private KnowledgeBase knowledgeBase;
     private KnowledgeBaseDocument document;
 
@@ -73,14 +68,10 @@ class KnowledgeBaseDocumentChunkServiceIntTest {
         knowledgeBaseDocumentChunkRepository.deleteAll();
         knowledgeBaseDocumentRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
-        WorkspaceTestFixture.deleteAllWorkspaces(jdbcTemplate);
-
-        long workspaceId = WorkspaceTestFixture.seedWorkspace(jdbcTemplate, "Test Workspace");
 
         knowledgeBase = new KnowledgeBase();
 
         knowledgeBase.setName("Test KnowledgeBase");
-        knowledgeBase.setWorkspaceId(workspaceId);
 
         knowledgeBase = knowledgeBaseRepository.save(knowledgeBase);
 
@@ -99,7 +90,6 @@ class KnowledgeBaseDocumentChunkServiceIntTest {
         knowledgeBaseDocumentChunkRepository.deleteAll();
         knowledgeBaseDocumentRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
-        WorkspaceTestFixture.deleteAllWorkspaces(jdbcTemplate);
     }
 
     @Test

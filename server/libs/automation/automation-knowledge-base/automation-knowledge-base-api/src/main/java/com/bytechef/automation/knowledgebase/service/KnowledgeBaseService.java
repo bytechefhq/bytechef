@@ -61,15 +61,6 @@ public interface KnowledgeBaseService {
     List<KnowledgeBase> getKnowledgeBases(int environment);
 
     /**
-     * Retrieves a list of knowledge bases for the specified workspace and environment.
-     *
-     * @param workspaceId the workspace id to filter by
-     * @param environment the environment ordinal to filter by
-     * @return a list of {@code KnowledgeBase} objects in the given workspace and environment
-     */
-    List<KnowledgeBase> getKnowledgeBases(Long workspaceId, int environment);
-
-    /**
      * Updates an existing KnowledgeBase identified by the given ID with the provided new values.
      *
      * @param id            the unique identifier of the KnowledgeBase to update
