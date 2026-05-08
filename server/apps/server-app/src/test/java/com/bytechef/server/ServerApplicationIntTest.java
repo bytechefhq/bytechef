@@ -28,6 +28,7 @@ import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentServic
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseTagService;
+import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.ee.ai.copilot.config.CopilotConfiguration;
 import com.bytechef.ee.ai.copilot.config.CopilotPgVectorConfiguration;
 import com.bytechef.ee.ai.copilot.service.CopilotVectorStoreService;
@@ -76,6 +77,7 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentChunkService.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseTagService.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentTagService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(WorkspaceKnowledgeBaseService.class)).isEmpty();
 
         // Verify that knowledge base facades are not present
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseFacade.class)).isEmpty();

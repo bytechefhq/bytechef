@@ -18,8 +18,10 @@ package com.bytechef.automation.knowledgebase.facade;
 
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.automation.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.automation.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -41,21 +43,31 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceKnowledgeBaseFacadeImpl(
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService,
+        WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
 
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseService = knowledgeBaseService;
+        this.workspaceKnowledgeBaseService = workspaceKnowledgeBaseService;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId) {
-        return knowledgeBaseService.getKnowledgeBases(workspaceId, (int) environmentId);
+        List<WorkspaceKnowledgeBase> workspaceKnowledgeBases =
+            workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId);
+
+        return workspaceKnowledgeBases.stream()
+            .map(workspaceKnowledgeBase -> knowledgeBaseService.getKnowledgeBase(
+                workspaceKnowledgeBase.getKnowledgeBaseId()))
+            .filter(knowledgeBase -> knowledgeBase.getEnvironmentId() == environmentId)
+            .toList();
     }
 
     @Override
@@ -69,9 +81,12 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         }
 
         knowledgeBase.setEnvironment(environments[(int) environmentId]);
-        knowledgeBase.setWorkspaceId(workspaceId);
 
-        return knowledgeBaseService.createKnowledgeBase(knowledgeBase);
+        KnowledgeBase createdKnowledgeBase = knowledgeBaseService.createKnowledgeBase(knowledgeBase);
+
+        workspaceKnowledgeBaseService.assignKnowledgeBaseToWorkspace(createdKnowledgeBase.getId(), workspaceId);
+
+        return createdKnowledgeBase;
     }
 
     @Override
@@ -81,6 +96,8 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         for (KnowledgeBaseDocument document : documents) {
             knowledgeBaseDocumentFacade.deleteKnowledgeBaseDocument(document.getId());
         }
+
+        workspaceKnowledgeBaseService.removeKnowledgeBaseFromWorkspace(knowledgeBaseId);
 
         knowledgeBaseService.deleteKnowledgeBase(knowledgeBaseId);
     }

@@ -64,12 +64,6 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<KnowledgeBase> getKnowledgeBases(Long workspaceId, int environment) {
-        return knowledgeBaseRepository.findAllByWorkspaceIdAndEnvironment(workspaceId, environment);
-    }
-
-    @Override
     public KnowledgeBase updateKnowledgeBase(Long id, KnowledgeBase knowledgeBase) {
         KnowledgeBase existingKnowledgeBase = getKnowledgeBase(id);
 

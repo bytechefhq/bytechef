@@ -27,6 +27,4 @@ public interface KnowledgeBaseRepository
     extends PagingAndSortingRepository<KnowledgeBase, Long>, ListCrudRepository<KnowledgeBase, Long> {
 
     List<KnowledgeBase> findAllByEnvironment(int environment);
-
-    List<KnowledgeBase> findAllByWorkspaceIdAndEnvironment(Long workspaceId, int environment);
 }

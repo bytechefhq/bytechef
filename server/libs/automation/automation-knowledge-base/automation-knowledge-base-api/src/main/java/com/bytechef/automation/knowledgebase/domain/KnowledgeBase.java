@@ -56,9 +56,6 @@ public class KnowledgeBase {
 
     private int overlap = 200;
 
-    @Column("workspace_id")
-    private Long workspaceId;
-
     @MappedCollection(idColumn = "knowledge_base_id")
     private Set<KnowledgeBaseTag> knowledgeBaseTags = new HashSet<>();
 
@@ -188,14 +185,6 @@ public class KnowledgeBase {
         this.version = version;
     }
 
-    public Long getWorkspaceId() {
-        return workspaceId;
-    }
-
-    public void setWorkspaceId(Long workspaceId) {
-        this.workspaceId = workspaceId;
-    }
-
     public List<Long> getTagIds() {
         return knowledgeBaseTags
             .stream()
@@ -249,7 +238,6 @@ public class KnowledgeBase {
             ", maxChunkSize=" + maxChunkSize +
             ", minChunkSizeChars=" + minChunkSizeChars +
             ", overlap=" + overlap +
-            ", workspaceId=" + workspaceId +
             ", knowledgeBaseTags=" + knowledgeBaseTags +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +
