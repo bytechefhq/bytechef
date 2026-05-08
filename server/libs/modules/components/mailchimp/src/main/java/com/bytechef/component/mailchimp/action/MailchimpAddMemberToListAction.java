@@ -359,7 +359,8 @@ public class MailchimpAddMemberToListAction {
                 Map.entry("_links",
                     List.of(Map.<String, Object>ofEntries(Map.entry("rel", "string"), Map.entry("href", "string"),
                         Map.entry("method", "GET"), Map.entry("targetSchema", "string"),
-                        Map.entry("schema", "string")))))));
+                        Map.entry("schema", "string")))))))
+        .help("", "https://docs.bytechef.io/reference/components/mailchimp_v1#add-member-to-list");
 
     private MailchimpAddMemberToListAction() {
     }
