@@ -82,31 +82,33 @@ public class CanvaConnection {
 
                     return params;
                 })
-                .authorizationCallback((connection, code, redirectUri, verifier, context) -> {
-                    String clientId = connection.getString(CLIENT_ID);
-                    String clientSecret = connection.getString(CLIENT_SECRET);
-                    String valueToEncode = clientId + ":" + clientSecret;
-                    String encode = context.encoder(
-                        encoder -> encoder.base64Encode(valueToEncode.getBytes(StandardCharsets.UTF_8)));
+                .authorizationCallback(
+                    (connection, code, redirectUri, verifier, context) -> {
 
-                    Http.Response response =
-                        context.http(http -> http.post("https://api.canva.com/rest/v1/oauth/token"))
-                            .headers(Map.of(
-                                "Content-Type", List.of("application/x-www-form-urlencoded"),
-                                "Authorization", List.of("Basic " + encode)))
-                            .body(
-                                Body.of(
-                                    Map.of(
-                                        "grant_type", "authorization_code",
-                                        "code_verifier", CODE_VERIFIER,
-                                        "code", code,
-                                        "redirect_uri", redirectUri),
-                                    BodyContentType.FORM_URL_ENCODED))
-                            .configuration(Http.responseType(Http.ResponseType.JSON))
-                            .execute();
+                        String clientId = connection.getString(CLIENT_ID);
+                        String clientSecret = connection.getString(CLIENT_SECRET);
+                        String valueToEncode = clientId + ":" + clientSecret;
+                        String encode = context.encoder(
+                            encoder -> encoder.base64Encode(valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
-                    return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
-                }))
+                        Http.Response response =
+                            context.http(http -> http.post("https://api.canva.com/rest/v1/oauth/token"))
+                                .headers(Map.of(
+                                    "Content-Type", List.of("application/x-www-form-urlencoded"),
+                                    "Authorization", List.of("Basic " + encode)))
+                                .body(
+                                    Body.of(
+                                        Map.of(
+                                            "grant_type", "authorization_code",
+                                            "code_verifier", CODE_VERIFIER,
+                                            "code", code,
+                                            "redirect_uri", redirectUri),
+                                        BodyContentType.FORM_URL_ENCODED))
+                                .configuration(Http.responseType(Http.ResponseType.JSON))
+                                .execute();
+
+                        return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
+                    }))
         .version(1)
         .help("", "https://docs.bytechef.io/reference/components/canva_v1#connection-setup");
 

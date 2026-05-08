@@ -17,11 +17,14 @@
 package com.bytechef.component.canva.action;
 
 import static com.bytechef.component.canva.constant.CanvaConstants.ASSET_ID;
+import static com.bytechef.component.canva.constant.CanvaConstants.CUSTOM;
 import static com.bytechef.component.canva.constant.CanvaConstants.DESIGN_TYPE;
 import static com.bytechef.component.canva.constant.CanvaConstants.HEIGHT;
 import static com.bytechef.component.canva.constant.CanvaConstants.NAME;
+import static com.bytechef.component.canva.constant.CanvaConstants.PRESET;
 import static com.bytechef.component.canva.constant.CanvaConstants.TITLE;
 import static com.bytechef.component.canva.constant.CanvaConstants.TYPE;
+import static com.bytechef.component.canva.constant.CanvaConstants.TYPE_AND_ASSET;
 import static com.bytechef.component.canva.constant.CanvaConstants.WIDTH;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -35,9 +38,11 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -52,43 +57,34 @@ public class CanvaCreateDesignAction {
         .properties(
             string(TYPE)
                 .label("Type")
-                .description("The type of design.")
-                .placeholder("type_and_asset")
+                .options(
+                    option("Preset", PRESET),
+                    option("Custom", CUSTOM))
                 .required(true),
-            object(DESIGN_TYPE)
-                .description("The desired design type.")
-                .properties(
-                    string("type")
-                        .label("Type")
-                        .options(
-                            option("Preset", "preset"),
-                            option("Custom", "custom"))
-                        .required(true),
-                    string(NAME)
-                        .label("Name")
-                        .description("The name of the design type.")
-                        .options(
-                            option("Doc", "doc"),
-                            option("Email", "email"),
-                            option("Presentation", "presentation"),
-                            option("Whiteboard", "whiteboard"))
-                        .displayCondition("%s == '%s'".formatted("design_type.type", "preset"))
-                        .required(true),
-                    integer(WIDTH)
-                        .label("Width")
-                        .description("The width of the design, in pixels.")
-                        .minValue(40)
-                        .maxValue(8000)
-                        .displayCondition("%s == '%s'".formatted("design_type.type", "custom"))
-                        .required(true),
-                    integer(HEIGHT)
-                        .label("Height")
-                        .description("The height of the design, in pixels.")
-                        .minValue(40)
-                        .maxValue(8000)
-                        .displayCondition("%s == '%s'".formatted("design_type.type", "custom"))
-                        .required(true))
-                .required(false),
+            string(NAME)
+                .label("Name")
+                .description("The name of the design type.")
+                .options(
+                    option("Doc", "doc"),
+                    option("Email", "email"),
+                    option("Presentation", "presentation"),
+                    option("Whiteboard", "whiteboard"))
+                .displayCondition("%s == '%s'".formatted("type", PRESET))
+                .required(true),
+            integer(WIDTH)
+                .label("Width")
+                .description("The width of the design, in pixels.")
+                .minValue(40)
+                .maxValue(8000)
+                .displayCondition("%s == '%s'".formatted("type", CUSTOM))
+                .required(true),
+            integer(HEIGHT)
+                .label("Height")
+                .description("The height of the design, in pixels.")
+                .minValue(40)
+                .maxValue(8000)
+                .displayCondition("%s == '%s'".formatted("type", CUSTOM))
+                .required(true),
             string(TITLE)
                 .label("Title")
                 .description("The name of the design.")
@@ -139,26 +135,32 @@ public class CanvaCreateDesignAction {
     public static Map<String, Object>
         perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Map<String, Object> body = new java.util.HashMap<>();
-
-        body.put(TYPE, inputParameters.getRequiredString(TYPE));
-        appendToBody(body, DESIGN_TYPE, inputParameters.get(DESIGN_TYPE));
-        appendToBody(body, TITLE, inputParameters.getString(TITLE));
-        appendToBody(body, ASSET_ID, inputParameters.getString(ASSET_ID));
-
         return context
             .http(http -> http.post("/designs"))
-            .body(Http.Body.of(body))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .body(
+                Body.of(
+                    TYPE, TYPE_AND_ASSET,
+                    DESIGN_TYPE, getDesignType(inputParameters),
+                    TITLE, inputParameters.getString(TITLE),
+                    ASSET_ID, inputParameters.getString(ASSET_ID)))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }
 
-    private static void appendToBody(Map<String, Object> body, String name, Object value) {
+    private static Map<String, Object> getDesignType(Parameters inputParameters) {
+        Map<String, Object> designType = new HashMap<>();
+        String type = inputParameters.getRequiredString(TYPE);
 
-        if (value != null) {
-            body.put(name, value);
+        designType.put(TYPE, type);
+
+        if (type.equals(PRESET)) {
+            designType.put(NAME, inputParameters.getRequiredString(NAME));
+        } else if (type.equals(CUSTOM)) {
+            designType.put(HEIGHT, inputParameters.getRequiredInteger(HEIGHT));
+            designType.put(WIDTH, inputParameters.getRequiredInteger(WIDTH));
         }
-    }
 
+        return designType;
+    }
 }

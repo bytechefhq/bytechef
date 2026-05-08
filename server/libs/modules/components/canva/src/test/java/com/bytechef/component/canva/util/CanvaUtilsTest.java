@@ -62,7 +62,8 @@ class CanvaUtilsTest {
                 "id", "123",
                 "status", "success"));
 
-        Map<String, Object> result = CanvaUtils.pollJob(mockedContext, "/asset-uploads/123", "status", 10, 0);
+        Map<String, Object> result = CanvaUtils.pollJob(
+            mockedContext, "/asset-uploads/123", 10, 0);
 
         assertEquals(
             Map.of(

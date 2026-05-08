@@ -30,13 +30,7 @@ public class CanvaUtils {
     private CanvaUtils() {
     }
 
-    public static Map<String, Object> pollJob(
-        Context context,
-        String url,
-        String terminalField,
-        int maxAttempts,
-        long delayMs) {
-
+    public static Map<String, Object> pollJob(Context context, String url, int maxAttempts, long delayMs) {
         Map<String, Object> response;
         String status;
         int attempt = 0;

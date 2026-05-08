@@ -17,15 +17,18 @@
 package com.bytechef.component.canva.action;
 
 import static com.bytechef.component.canva.constant.CanvaConstants.AS_SINGLE_IMAGE;
+import static com.bytechef.component.canva.constant.CanvaConstants.DELAY_MS;
 import static com.bytechef.component.canva.constant.CanvaConstants.DESIGN_ID;
 import static com.bytechef.component.canva.constant.CanvaConstants.EXPORT_QUALITY;
 import static com.bytechef.component.canva.constant.CanvaConstants.FORMAT;
 import static com.bytechef.component.canva.constant.CanvaConstants.HEIGHT;
 import static com.bytechef.component.canva.constant.CanvaConstants.LOSSLESS;
+import static com.bytechef.component.canva.constant.CanvaConstants.MAX_ATTEMPTS;
 import static com.bytechef.component.canva.constant.CanvaConstants.PAGES;
 import static com.bytechef.component.canva.constant.CanvaConstants.QUALITY;
 import static com.bytechef.component.canva.constant.CanvaConstants.SIZE;
 import static com.bytechef.component.canva.constant.CanvaConstants.TRANSPARENT_BACKGROUND;
+import static com.bytechef.component.canva.constant.CanvaConstants.TYPE;
 import static com.bytechef.component.canva.constant.CanvaConstants.VIDEO_QUALITY;
 import static com.bytechef.component.canva.constant.CanvaConstants.WIDTH;
 import static com.bytechef.component.canva.util.CanvaUtils.pollJob;
@@ -42,8 +45,10 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,101 +66,97 @@ public class CanvaExportDesignAction {
                 .label("Design ID")
                 .description("The design ID.")
                 .required(true),
-            object(FORMAT)
-                .label("Format")
-                .description("Details about the desired export format.")
-                .properties(
-                    string("type")
-                        .label("Type")
-                        .options(
-                            option("pdf", "pdf", "Export the design as a PDF."),
-                            option("jpg", "jpg", "Export the design as a JPEG."),
-                            option("png", "png", "Export the design as a PNG."),
-                            option("pptx", "pptx", "Export the design as a PPTX."),
-                            option("gif", "gif", "Export the design as a GIF."),
-                            option("mp4", "mp4", "Export the design as an MP4."),
-                            option("html_bundle", "html_bundle", "Export the email design as an HTML bundle."),
-                            option("html_standalone", "html_standalone",
-                                "Export the email design as a standalone HTML file with hosted assets."))
-                        .required(true),
-                    integer(QUALITY)
-                        .label("Quality")
-                        .description(
-                            "The quality of the exported JPEG that determines how compressed the exported file should be.")
-                        .minValue(1)
-                        .maxValue(100)
-                        .displayCondition("%s == '%s'".formatted("format.type", "jpg"))
-                        .required(true),
-                    string(VIDEO_QUALITY)
-                        .label("Video quality")
-                        .description("The orientation and resolution of the exported video.")
-                        .options(
-                            option("horizontal_480p", "horizontal_480p"),
-                            option("horizontal_720p", "horizontal_720p"),
-                            option("horizontal_1080p", "horizontal_1080p"),
-                            option("horizontal_4k", "horizontal_4k"),
-                            option("vertical_480p", "vertical_480p"),
-                            option("vertical_720p", "vertical_720p"),
-                            option("vertical_1080p", "vertical_1080p"),
-                            option("vertical_4k", "vertical_4k"))
-                        .displayCondition("%s == '%s'".formatted("format.type", "mp4"))
-                        .required(true),
-                    string(EXPORT_QUALITY)
-                        .label("Export quality")
-                        .description("Specifies the export quality of the design.")
-                        .options(
-                            option("Regular", "regular"),
-                            option("Pro", "pro"))
-                        .displayCondition("%s != '%s' || %s != '%s' || %s != '%s'".formatted("format.type", "pptx",
-                            "format.type", "html_bundle", "format.type", "html_standalone"))
-                        .required(false),
-                    integer(WIDTH)
-                        .label("Width")
-                        .description("Specify the width in pixels of the exported image.")
-                        .minValue(40)
-                        .maxValue(25000)
-                        .displayCondition("%s == '%s' || %s == '%s' || %s == '%s' ".formatted("format.type", "jpg",
-                            "format.type", "png", "format.type", "gif"))
-                        .required(false),
-                    integer(HEIGHT)
-                        .label("Height")
-                        .description("Specify the height in pixels of the exported image.")
-                        .minValue(40)
-                        .maxValue(25000)
-                        .displayCondition("%s == '%s' || %s == '%s' || %s == '%s' ".formatted("format.type", "jpg",
-                            "format.type", "png", "format.type", "gif"))
-                        .required(false),
-                    string(SIZE)
-                        .label("Size")
-                        .description("The paper size of the export PDF file.")
-                        .options(
-                            option("a4", "a4"),
-                            option("a3", "a3"),
-                            option("letter", "letter"),
-                            option("legal", "legal"))
-                        .displayCondition("%s == '%s'".formatted("format.type", "pdf"))
-                        .required(false),
-                    bool(LOSSLESS)
-                        .label("Lossless")
-                        .description("If set to true (default), the PNG is exported without compression.")
-                        .displayCondition("%s == '%s'".formatted("format.type", "png"))
-                        .required(false),
-                    bool(TRANSPARENT_BACKGROUND)
-                        .label("Transparent background")
-                        .description("If set to true, the PNG is exported with a transparent background.")
-                        .displayCondition("%s == '%s'".formatted("format.type", "png"))
-                        .required(false),
-                    bool(AS_SINGLE_IMAGE)
-                        .label("As single image")
-                        .description("When true, multi-page designs are merged into a single image.")
-                        .displayCondition("%s == '%s'".formatted("format.type", "png"))
-                        .required(false),
-                    array(PAGES)
-                        .label("Pages")
-                        .description("To specify which pages to export in a multi-page design.")
-                        .items(integer())
-                        .required(false))
-                .required(true))
+            string(TYPE)
+                .label("Type")
+                .options(
+                    option("pdf", "pdf", "Export the design as a PDF."),
+                    option("jpg", "jpg", "Export the design as a JPEG."),
+                    option("png", "png", "Export the design as a PNG."),
+                    option("pptx", "pptx", "Export the design as a PPTX."),
+                    option("gif", "gif", "Export the design as a GIF."),
+                    option("mp4", "mp4", "Export the design as an MP4."),
+                    option("html_bundle", "html_bundle",
+                        "Export the email design as an HTML bundle."),
+                    option("html_standalone", "html_standalone",
+                        "Export the email design as a standalone HTML file with hosted assets."))
+                .required(true),
+            integer(QUALITY)
+                .label("Quality")
+                .description(
+                    "The quality of the exported JPEG that determines how compressed the exported file should be.")
+                .minValue(1)
+                .maxValue(100)
+                .displayCondition("%s == '%s'".formatted("type", "jpg"))
+                .required(true),
+            string(VIDEO_QUALITY)
+                .label("Video quality")
+                .description("The orientation and resolution of the exported video.")
+                .options(
+                    option("horizontal_480p", "horizontal_480p"),
+                    option("horizontal_720p", "horizontal_720p"),
+                    option("horizontal_1080p", "horizontal_1080p"),
+                    option("horizontal_4k", "horizontal_4k"),
+                    option("vertical_480p", "vertical_480p"),
+                    option("vertical_720p", "verformat.put(WIDTH, inputParameters.getInteger(WIDTH));tical_720p"),
+                    option("vertical_1080p", "vertical_1080p"),
+                    option("vertical_4k", "vertical_4k"))
+                .displayCondition("%s == '%s'".formatted("type", "mp4"))
+                .required(true),
+            string(EXPORT_QUALITY)
+                .label("Export quality")
+                .description("Specifies the export quality of the design.")
+                .options(
+                    option("Regular", "regular"),
+                    option("Pro", "pro"))
+                .displayCondition("%s != '%s' || %s != '%s' || %s != '%s'".formatted(
+                    "format.type", "pptx", "format.type", "html_bundle", "format.type", "html_standalone"))
+                .required(false),
+            integer(WIDTH)
+                .label("Width")
+                .description("Specify the width in pixels of the exported image.")
+                .minValue(40)
+                .maxValue(25000)
+                .displayCondition("%s == '%s' || %s == '%s' || %s == '%s' ".formatted(
+                    "type", "jpg", "type", "png", "type", "gif"))
+                .required(false),
+            integer(HEIGHT)
+                .label("Height")
+                .description("Specify the height in pixels of the exported image.")
+                .minValue(40)
+                .maxValue(25000)
+                .displayCondition("%s == '%s' || %s == '%s' || %s == '%s' ".formatted(
+                    "type", "jpg", "type", "png", "type", "gif"))
+                .required(false),
+            string(SIZE)
+                .label("Size")
+                .description("The paper size of the export PDF file.")
+                .options(
+                    option("a4", "a4"),
+                    option("a3", "a3"),
+                    option("letter", "letter"),
+                    option("legal", "legal"))
+                .displayCondition("%s == '%s'".formatted("type", "pdf"))
+                .required(false),
+            bool(LOSSLESS)
+                .label("Lossless")
+                .description("If set to true (default), the PNG is exported without compression.")
+                .displayCondition("%s == '%s'".formatted("type", "png"))
+                .required(false),
+            bool(TRANSPARENT_BACKGROUND)
+                .label("Transparent background")
+                .description("If set to true, the PNG is exported with a transparent background.")
+                .displayCondition("%s == '%s'".formatted("type", "png"))
+                .required(false),
+            bool(AS_SINGLE_IMAGE)
+                .label("As single image")
+                .description("When true, multi-page designs are merged into a single image.")
+                .displayCondition("%s == '%s'".formatted("type", "png"))
+                .required(false),
+            array(PAGES)
+                .label("Pages")
+                .description("To specify which pages to export in a multi-page design.")
+                .items(integer())
+                .required(false))
         .output(
             outputSchema(
                 object()
@@ -169,42 +170,70 @@ public class CanvaExportDesignAction {
                             .items(string()))))
         .perform(CanvaExportDesignAction::perform);
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Object jobObj = getJob(inputParameters, context);
+        Object exportJob = createExportJob(inputParameters, context);
 
-        if (!(jobObj instanceof Map<?, ?> jobMap)) {
-            throw new IllegalStateException("Invalid response: 'job' is missing or not an object");
+        if (!(exportJob instanceof Map<?, ?> jobMap)) {
+            throw new ProviderException("Canva export design action was not successful.");
         }
 
-        String id = jobMap.get("id")
-            .toString();
-
-        return pollJob(context, "/exports/" + id, "status", 10, 500);
-
+        return pollJob(context, "/exports/" + jobMap.get("id"), MAX_ATTEMPTS, DELAY_MS);
     }
 
-    private static Object getJob(Parameters inputParameters, Context context) {
-
-        Object formatObj = inputParameters.get(FORMAT);
-
-        Map<String, Object> format = new HashMap<>();
-        ((Map<?, ?>) formatObj).forEach((k, v) -> format.put(String.valueOf(k), v));
-
-        if (format.containsKey(VIDEO_QUALITY)) {
-            format.put(QUALITY, format.remove(VIDEO_QUALITY));
-        }
-
+    private static Object createExportJob(Parameters inputParameters, Context context) {
         Map<String, Object> response = context
             .http(http -> http.post("/exports"))
-            .body(Http.Body.of(Map.of(
-                DESIGN_ID, inputParameters.getRequiredString(DESIGN_ID),
-                FORMAT, format)))
+            .body(
+                Body.of(
+                    DESIGN_ID, inputParameters.getRequiredString(DESIGN_ID),
+                    FORMAT, getFormatObject(inputParameters)))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         return response.get("job");
+    }
+
+    private static Map<String, Object> getFormatObject(Parameters inputParameters) {
+        String type = inputParameters.getRequiredString(TYPE);
+
+        Map<String, Object> format = new HashMap<>();
+
+        format.put(TYPE, type);
+        format.put(PAGES, inputParameters.getArray(PAGES));
+
+        switch (type) {
+            case "pdf" -> {
+                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
+                format.put(SIZE, inputParameters.getString(SIZE));
+            }
+            case "jpg" -> {
+                format.put(QUALITY, inputParameters.getRequiredString(QUALITY));
+                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
+                format.put(HEIGHT, inputParameters.getInteger(HEIGHT));
+                format.put(WIDTH, inputParameters.getInteger(WIDTH));
+            }
+            case "png" -> {
+                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
+                format.put(HEIGHT, inputParameters.getInteger(HEIGHT));
+                format.put(WIDTH, inputParameters.getInteger(WIDTH));
+                format.put(LOSSLESS, inputParameters.getBoolean(LOSSLESS));
+                format.put(TRANSPARENT_BACKGROUND, inputParameters.getBoolean(TRANSPARENT_BACKGROUND));
+                format.put(AS_SINGLE_IMAGE, inputParameters.getBoolean(AS_SINGLE_IMAGE));
+            }
+            case "gif" -> {
+                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
+                format.put(HEIGHT, inputParameters.getInteger(HEIGHT));
+                format.put(WIDTH, inputParameters.getInteger(WIDTH));
+            }
+            case "mp4" -> {
+                format.put(QUALITY, inputParameters.getRequiredString(VIDEO_QUALITY));
+                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
+            }
+        }
+
+        return format;
     }
 }
