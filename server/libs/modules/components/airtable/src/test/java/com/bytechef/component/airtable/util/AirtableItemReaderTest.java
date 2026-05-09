@@ -16,10 +16,15 @@
 
 package com.bytechef.component.airtable.util;
 
+import static com.bytechef.component.airtable.datastream.AirtableItemReader.LAST_MODIFIED_FIELD_NAME;
+import static com.bytechef.component.definition.datastream.ItemReader.SINCE_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.airtable.datastream.AirtableItemReader;
@@ -30,10 +35,13 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.exception.ProviderException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -162,6 +170,69 @@ class AirtableItemReaderTest {
             .type()).isEqualTo(Integer.class);
     }
 
+    @Test
+    void testSupportsIncrementalReturnsTrue() {
+        assertThat(new AirtableItemReader().supportsIncremental()).isTrue();
+    }
+
+    @Test
+    void testFullPullWhenSinceAbsent() {
+        Map<String, Object> emptyResponse = Map.of("records", List.of());
+
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+
+        when(executionContext.get(SINCE_KEY, Long.class)).thenReturn(Optional.empty());
+        when(inputParameters.getString(LAST_MODIFIED_FIELD_NAME)).thenReturn(null);
+
+        Context openContext = mock(Context.class);
+        Http mockHttp = setupOpenMocks(openContext, emptyResponse);
+
+        airtableItemReader.open(inputParameters, connectionParameters, openContext, executionContext);
+
+        verify(mockHttp).get("/base123/table456");
+        verify(mockedExecutor, never()).queryParameter(eq("filterByFormula"), any(String.class));
+    }
+
+    @Test
+    void testFilterByFormulaWhenSinceAndFieldPresent() {
+        Map<String, Object> emptyResponse = Map.of("records", List.of());
+
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+
+        long sinceMillis = 1_700_000_000_000L;
+        String expectedIso = Instant.ofEpochMilli(sinceMillis)
+            .toString();
+
+        when(executionContext.get(SINCE_KEY, Long.class)).thenReturn(Optional.of(sinceMillis));
+        when(inputParameters.getString(LAST_MODIFIED_FIELD_NAME)).thenReturn("LastModified");
+
+        Context openContext = mock(Context.class);
+        setupOpenMocks(openContext, emptyResponse);
+
+        airtableItemReader.open(inputParameters, connectionParameters, openContext, executionContext);
+
+        String expectedFormula = "IS_AFTER({LastModified}, '%s')".formatted(expectedIso);
+
+        verify(mockedExecutor).queryParameter("filterByFormula", expectedFormula);
+    }
+
+    @Test
+    void testFullPullWhenOnlyFieldNameSet() {
+        Map<String, Object> emptyResponse = Map.of("records", List.of());
+
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+
+        when(executionContext.get(SINCE_KEY, Long.class)).thenReturn(Optional.empty());
+        when(inputParameters.getString(LAST_MODIFIED_FIELD_NAME)).thenReturn("LastModified");
+
+        Context openContext = mock(Context.class);
+        setupOpenMocks(openContext, emptyResponse);
+
+        airtableItemReader.open(inputParameters, connectionParameters, openContext, executionContext);
+
+        verify(mockedExecutor, never()).queryParameter(eq("filterByFormula"), any(String.class));
+    }
+
     @SuppressWarnings("unchecked")
     private void setupMocks(Map<String, List<AirtableTable>> tablesMap) {
         when(context.http(any())).thenAnswer(invocation -> {
@@ -176,5 +247,23 @@ class AirtableItemReaderTest {
 
             return function.apply(mockHttp);
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Http setupOpenMocks(Context openContext, Map<String, Object> bodyResponse) {
+        Http mockHttp = mock(Http.class);
+
+        when(mockHttp.get(any(String.class))).thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any())).thenReturn(mockedExecutor);
+        when(mockedExecutor.execute()).thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class))).thenReturn(bodyResponse);
+
+        when(openContext.http(any())).thenAnswer(invocation -> {
+            Context.ContextFunction<Http, Http.Executor> function = invocation.getArgument(0);
+
+            return function.apply(mockHttp);
+        });
+
+        return mockHttp;
     }
 }

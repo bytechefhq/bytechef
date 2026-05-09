@@ -1227,6 +1227,31 @@
       "regex": null,
       "required": true,
       "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Optional. Name of the Airtable field holding the row's last-modified timestamp (ISO-8601). When set, the reader filters upstream by this field for incremental syncs.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Last Modified Field",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "lastModifiedFieldName",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "baseId", "tableId" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
     } ],
     "title": "Read table row",
     "type": {

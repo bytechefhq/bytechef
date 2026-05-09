@@ -34,15 +34,19 @@ import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.definition.datastream.ItemReader;
 import com.bytechef.component.exception.ProviderException;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public class AirtableItemReader implements ItemReader {
+
+    public static final String LAST_MODIFIED_FIELD_NAME = "lastModifiedFieldName";
 
     public static final ModifiableClusterElementDefinition<AirtableItemReader> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<AirtableItemReader>clusterElement("read")
@@ -61,13 +65,28 @@ public class AirtableItemReader implements ItemReader {
                     .description("ID of the table where the record is located.")
                     .required(true)
                     .options((OptionsFunction<String>) AirtableUtils::getTableIdOptions)
-                    .optionsLookupDependsOn(BASE_ID));
+                    .optionsLookupDependsOn(BASE_ID),
+                string(LAST_MODIFIED_FIELD_NAME)
+                    .label("Last Modified Field")
+                    .description(
+                        "Optional. Name of the Airtable field holding the row's last-modified timestamp " +
+                            "(ISO-8601). When set, the reader filters upstream by this field for incremental syncs.")
+                    .options((OptionsFunction<String>) AirtableUtils::getLastModifiedFieldOptions)
+                    .optionsLookupDependsOn(BASE_ID, TABLE_ID)
+                    .required(false));
 
     private String baseId;
     private Context context;
+    private @Nullable String lastModifiedFieldName;
     private String nextOffset;
     private Iterator<?> recordIterator = Collections.emptyIterator();
+    private @Nullable String sinceIsoString;
     private String tableId;
+
+    @Override
+    public boolean supportsIncremental() {
+        return true;
+    }
 
     @Override
     public void open(
@@ -77,6 +96,13 @@ public class AirtableItemReader implements ItemReader {
         this.baseId = inputParameters.getRequiredString(BASE_ID);
         this.context = context;
         this.tableId = inputParameters.getRequiredString(TABLE_ID);
+        this.lastModifiedFieldName = inputParameters.getString(LAST_MODIFIED_FIELD_NAME);
+
+        Long sinceMillis = executionContext.get(SINCE_KEY, Long.class)
+            .orElse(null);
+
+        this.sinceIsoString = sinceMillis == null ? null : Instant.ofEpochMilli(sinceMillis)
+            .toString();
 
         loadPage(null);
     }
@@ -120,6 +146,12 @@ public class AirtableItemReader implements ItemReader {
 
         if (offset != null && !offset.isEmpty()) {
             executor.queryParameter("offset", offset);
+        }
+
+        if (sinceIsoString != null && lastModifiedFieldName != null && !lastModifiedFieldName.isBlank()) {
+            String formula = "IS_AFTER({%s}, '%s')".formatted(lastModifiedFieldName, sinceIsoString);
+
+            executor.queryParameter("filterByFormula", formula);
         }
 
         Http.Response response = executor

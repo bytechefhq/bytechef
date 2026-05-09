@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -276,6 +277,62 @@ public class AirtableUtils extends AbstractAirtableUtils {
 
         return options;
     }
+
+    /**
+     * Options for the source-cluster-element's "Last Modified Field" property. Returns the table's fields filtered to
+     * timestamp-bearing types ({@code lastModifiedTime}, {@code createdTime}, {@code dateTime}, {@code date}) — the
+     * reader uses the value as an ISO-8601 timestamp to drive the incremental filter, so non-temporal fields would
+     * silently produce empty incremental syncs and surface as a hard-to-diagnose data bug.
+     *
+     * <p>
+     * Wired with {@code .optionsLookupDependsOn(BASE_ID, TABLE_ID)} so the dropdown is gated on those two parameters
+     * being filled in first; otherwise it short-circuits to an empty list (Airtable's metadata endpoint requires a
+     * baseId and the table-id filter to disambiguate).
+     * </p>
+     */
+    public static List<Option<String>> getLastModifiedFieldOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        if (!inputParameters.containsKey(BASE_ID) || !inputParameters.containsKey(TABLE_ID)) {
+            return List.of();
+        }
+
+        String url = "/meta/bases/%s/tables".formatted(inputParameters.getRequiredString(BASE_ID));
+
+        Http.Response response = context.http(http -> http.get(url))
+            .configuration(Http.responseType(ResponseType.JSON))
+            .execute();
+
+        Map<?, ?> body = response.getBody(Map.class);
+
+        if (body.containsKey("error")) {
+            throw new ProviderException.BadRequestException(
+                (String) ((Map<?, ?>) body.get("error")).get("message"));
+        }
+
+        Map<String, List<AirtableTable>> tablesMap = response.getBody(new TypeReference<>() {});
+
+        List<AirtableTable> tables = tablesMap.get("tables");
+
+        AirtableTable table = tables.stream()
+            .filter(curTable -> Objects.equals(curTable.id(), inputParameters.getRequiredString(TABLE_ID)))
+            .findFirst()
+            .orElseThrow(() -> new ProviderException.BadRequestException("Requested table does not exist"));
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (AirtableField field : table.fields()) {
+            if (TIMESTAMP_FIELD_TYPES.contains(field.type())) {
+                options.add(option(field.name(), field.name()));
+            }
+        }
+
+        return options;
+    }
+
+    private static final Set<String> TIMESTAMP_FIELD_TYPES = Set.of(
+        "lastModifiedTime", "createdTime", "dateTime", "date");
 
     public static List<Option<String>> getTableIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
