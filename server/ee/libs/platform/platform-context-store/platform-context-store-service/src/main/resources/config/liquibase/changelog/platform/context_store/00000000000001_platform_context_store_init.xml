@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="00000000000001-1" author="Ivica Cardic">
+        <!--
+            Parent Context Store entity. Each row is an env-stamped logical store; sources, entities, records, and
+            ClickHouse projection tables hang off context_store_id and inherit environment transitively. Mirrors
+            KnowledgeBase's parent role over KnowledgeBaseSource. See
+            docs/superpowers/specs/2026-05-13-context-store-multi-env-design.md.
+        -->
+        <createTable tableName="context_store">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <!--
+                Environment ordinal: 0 = DEVELOPMENT, 1 = STAGING, 2 = PRODUCTION. Stored as INT for ordinal stability
+                (see com.bytechef.platform.configuration.domain.Environment). Uniqueness of (workspace_id, environment,
+                name) is enforced at the application layer in WorkspaceContextStoreFacade — cross-table unique with the
+                workspace_context_store relation row can't be expressed in SQL.
+            -->
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(256)"/>
+            <column name="created_date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_modified_by" type="VARCHAR(256)"/>
+            <column name="last_modified_date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--
+            Tag join table for Context Store. Mirrors knowledge_base_tag — composite PK on (context_store_id, tag_id),
+            FK to context_store (cascade delete) and to platform tag table. Surfaced as tagIds: [ID!] on the
+            ContextStore GraphQL type so the management page can filter and the form dialog can pick tags.
+        -->
+        <createTable tableName="context_store_tag">
+            <column name="context_store_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="context_store_tag" columnNames="context_store_id,tag_id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="context_store_tag"
+            baseColumnNames="context_store_id"
+            constraintName="fk_context_store_tag_context_store"
+            referencedTableName="context_store"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="context_store_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_context_store_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="context_store_source">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!--
+                FK to the parent context_store. Env is inherited via this column; there is no environment column on
+                context_store_source itself. See docs/superpowers/specs/2026-05-13-context-store-multi-env-design.md.
+            -->
+            <column name="context_store_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <!--
+                Source absorbed the former context_store_entity table — each source is 1:1 with its record shape, so
+                idField, indexedFields, semanticIndexFields, storedFields, parameters, entityName, description and the
+                ClickHouse projection table name now live directly on the source. The multi-entity-per-source story was
+                over-promised (the workflow generator only ever used entities.get(0)); collapsing to 1:1 drops a layer
+                of indirection from every consumer.
+            -->
+            <column name="entity_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="id_field" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stored_fields" type="JSONB"/>
+            <column name="indexed_fields" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="semantic_index_fields" type="JSONB"/>
+            <column name="parameters" type="JSONB"/>
+            <!--
+                Cached ClickHouse table name when the deployment is opted in to ClickHouse
+                (bytechef.context-store.clickhouse.url set). Null for Postgres-only deployments. Populated by the
+                facade's create flow when the provisioner bean is available.
+            -->
+            <column name="clickhouse_table_name" type="VARCHAR(255)"/>
+            <column name="source_component_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_component_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_cluster_element_name" type="VARCHAR(256)"/>
+            <column name="connection_id" type="BIGINT"/>
+            <column name="cadence" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_sync_run_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_sync_job_execution_id" type="BIGINT"/>
+            <column name="workflow_id" type="VARCHAR(256)"/>
+            <!--
+                Phase 17b: paired-cadence support. Nullable: when set, the workflow generator emits a second
+                schedule trigger that runs FULL_REPLACE on this rare cadence alongside the existing incremental
+                cadence. Single-cadence (today's MVP) leaves this null.
+            -->
+            <column name="full_replace_cadence" type="VARCHAR(64)"/>
+            <!--
+                Phase 17b: TombstoneStrategy ordinal. 0 = PERIODIC_FULL_REPLACE (default — pair with
+                full_replace_cadence to recover deletions), 1 = UPSTREAM_CHANGE_FEED (source component emits
+                deletion events itself), 2 = NONE (append-only). Backfilled to 0 for existing rows because that
+                matches today's behavior when paired with a daily full-replace cadence.
+            -->
+            <column name="tombstone_strategy" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(256)"/>
+            <column name="created_date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_modified_by" type="VARCHAR(256)"/>
+            <column name="last_modified_date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="context_store_source"
+            baseColumnNames="context_store_id"
+            constraintName="fk_context_store_source_context_store"
+            referencedTableName="context_store"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <!--
+            Source name is unique within a parent Context Store. A workspace can have a "customers" source in its DEV
+            store and another "customers" source in its PROD store — these are independent rows pointing at different
+            context_store_id parents.
+        -->
+        <addUniqueConstraint
+            tableName="context_store_source"
+            columnNames="context_store_id, name"
+            constraintName="uk_context_store_source_name"/>
+
+        <createTable tableName="context_store_record">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="source_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_record_id" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload_hash" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_seen_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="created_date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_modified_date" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="context_store_record"
+            baseColumnNames="source_id"
+            constraintName="fk_context_store_record_source"
+            referencedTableName="context_store_source"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addUniqueConstraint
+            tableName="context_store_record"
+            columnNames="source_id, source_record_id"
+            constraintName="uk_context_store_record_source_record"/>
+
+        <sql>CREATE INDEX idx_context_store_record_payload_gin ON context_store_record USING GIN (payload);</sql>
+        <sql>CREATE INDEX idx_context_store_record_deleted_at ON context_store_record (deleted_at) WHERE deleted_at IS NOT NULL;</sql>
+
+        <createTable tableName="context_store_record_index">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="record_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="field_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value_text" type="TEXT"/>
+            <column name="value_numeric" type="NUMERIC"/>
+            <column name="value_timestamp" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="context_store_record_index"
+            baseColumnNames="record_id"
+            constraintName="fk_context_store_record_index_record"
+            referencedTableName="context_store_record"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="context_store_record_index" indexName="idx_context_store_record_index_record_field">
+            <column name="record_id"/>
+            <column name="field_name"/>
+        </createIndex>
+
+        <sql>CREATE INDEX idx_context_store_record_index_field_text ON context_store_record_index (field_name, value_text) WHERE value_text IS NOT NULL;</sql>
+        <sql>CREATE INDEX idx_context_store_record_index_field_numeric ON context_store_record_index (field_name, value_numeric) WHERE value_numeric IS NOT NULL;</sql>
+        <sql>CREATE INDEX idx_context_store_record_index_field_timestamp ON context_store_record_index (field_name, value_timestamp) WHERE value_timestamp IS NOT NULL;</sql>
+    </changeSet>
+</databaseChangeLog>

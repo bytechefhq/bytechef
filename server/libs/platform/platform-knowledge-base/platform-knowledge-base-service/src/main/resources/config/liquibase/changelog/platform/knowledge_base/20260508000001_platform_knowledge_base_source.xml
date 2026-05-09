@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+                   logicalFilePath="config/liquibase/changelog/platform/knowledge_base/20260508000001_platform_knowledge_base_source.xml">
+
+    <changeSet id="20260508000001" author="Ivica Cardic">
+        <addColumn tableName="knowledge_base_document">
+            <column name="source_id" type="BIGINT"/>
+            <column name="source_record_id" type="VARCHAR(512)"/>
+            <column name="synced_payload_hash" type="VARCHAR(16)"/>
+            <column name="last_seen_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="deleted_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+
+        <createTable tableName="knowledge_base_source">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_component_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_component_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_cluster_element_name" type="VARCHAR(256)"/>
+            <column name="connection_id" type="BIGINT"/>
+            <column name="knowledge_base_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cadence" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_sync_run_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_sync_job_execution_id" type="BIGINT"/>
+            <column name="workflow_id" type="VARCHAR(256)"/>
+            <column name="metadata_fields" type="JSONB"/>
+            <!--
+                Phase 17b: paired-cadence support. Nullable: when set, the workflow generator emits a second
+                schedule trigger that runs FULL_REPLACE on this rare cadence alongside the existing incremental
+                cadence. Single-cadence (today's MVP) leaves this null.
+            -->
+            <column name="full_replace_cadence" type="VARCHAR(64)"/>
+            <!--
+                Phase 17b: TombstoneStrategy ordinal. 0 = PERIODIC_FULL_REPLACE (default — pair with
+                full_replace_cadence to recover deletions), 1 = UPSTREAM_CHANGE_FEED (source component emits
+                deletion events itself), 2 = NONE (append-only). Backfilled to 0 for existing rows because that
+                matches today's behavior when paired with a daily full-replace cadence.
+            -->
+            <column name="tombstone_strategy" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(256)"/>
+            <column name="created_date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_modified_by" type="VARCHAR(256)"/>
+            <column name="last_modified_date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            tableName="knowledge_base_source"
+            columnNames="name"
+            constraintName="uk_knowledge_base_source_name"/>
+
+        <addForeignKeyConstraint
+            baseTableName="knowledge_base_source"
+            baseColumnNames="knowledge_base_id"
+            constraintName="fk_kb_source_kb"
+            referencedTableName="knowledge_base"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="knowledge_base_source" indexName="idx_kb_source_knowledge_base">
+            <column name="knowledge_base_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="knowledge_base_document"
+            baseColumnNames="source_id"
+            constraintName="fk_kb_document_source"
+            referencedTableName="knowledge_base_source"
+            referencedColumnNames="id"
+            onDelete="SET NULL"/>
+
+        <sql>CREATE UNIQUE INDEX uk_kb_doc_source_record ON knowledge_base_document (source_id, source_record_id) WHERE source_id IS NOT NULL;</sql>
+        <sql>CREATE INDEX idx_kb_doc_source ON knowledge_base_document (source_id) WHERE source_id IS NOT NULL;</sql>
+        <sql>CREATE INDEX idx_kb_doc_deleted_at ON knowledge_base_document (deleted_at) WHERE deleted_at IS NOT NULL;</sql>
+    </changeSet>
+</databaseChangeLog>
