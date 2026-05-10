@@ -130,6 +130,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
+    @WithTokenRefresh(
+        errorTypeClass = ActionDefinitionErrorType.class,
+        errorTypeField = "EXECUTE_OPTIONS")
     public List<Option> executeOptions(
         @ComponentNameParam String componentName, int componentVersion, String actionName,
         String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
@@ -465,11 +468,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, actionName, propertyName, convertResult.inputParameters(),
                 convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
 
-            if (baseOptionsFunction instanceof MultipleConnectionsOptionsFunction<?> mcOptionsFunction) {
-                return mcOptionsFunction
+            if (baseOptionsFunction instanceof MultipleConnectionsOptionsFunction<?> multipleConnectionsOptionsFunction) {
+
+                return multipleConnectionsOptionsFunction
                     .apply(
-                        convertResult.inputParameters(), componentConnections,
-                        ParametersFactory.create(extensions), context)
+                        convertResult.inputParameters(), componentConnections, ParametersFactory.create(extensions),
+                        context)
                     .stream()
                     .map(Option::new)
                     .toList();

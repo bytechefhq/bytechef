@@ -45,7 +45,6 @@ class OrderedMongoChatMemoryRepository implements ChatMemoryRepository {
     }
 
     @Override
-    @SuppressWarnings("NullAway")
     public List<String> findConversationIds() {
         Aggregation aggregation = Aggregation.newAggregation(
             Aggregation.group("conversationId")
@@ -57,7 +56,7 @@ class OrderedMongoChatMemoryRepository implements ChatMemoryRepository {
 
         return results.getMappedResults()
             .stream()
-            .map(doc -> doc.getString("_id"))
+            .map(document -> document.getString("_id"))
             .collect(Collectors.toList());
     }
 

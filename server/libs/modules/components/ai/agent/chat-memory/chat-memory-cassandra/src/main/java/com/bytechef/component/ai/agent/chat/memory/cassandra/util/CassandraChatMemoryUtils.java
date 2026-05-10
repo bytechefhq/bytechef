@@ -76,9 +76,8 @@ public class CassandraChatMemoryUtils {
 
         CqlSession session = sessionBuilder.build();
 
-        CassandraChatMemoryRepositoryConfig.Builder configBuilder =
-            CassandraChatMemoryRepositoryConfig.builder()
-                .withCqlSession(session);
+        CassandraChatMemoryRepositoryConfig.Builder configBuilder = CassandraChatMemoryRepositoryConfig.builder()
+            .withCqlSession(session);
 
         if (keyspace != null && !keyspace.isBlank()) {
             configBuilder.withKeyspaceName(keyspace);
@@ -100,10 +99,13 @@ public class CassandraChatMemoryUtils {
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
 
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
+
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst()
-                    .getText()));
+
+                Message message = messages.getFirst();
+
+                options.add(option(conversationId, conversationId, message.getText()));
             }
 
             return options;

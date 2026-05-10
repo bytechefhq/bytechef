@@ -104,10 +104,11 @@ public abstract class AbstractAiAgentChatAction {
 
         ComponentConnection modelConnection = connectionParameters.get(modelClusterElement.getWorkflowNodeName());
 
+        Map<String, Object> concatenatedInputParameters = MapUtils.concat(
+            new HashMap<>(inputParameters.toMap()), new HashMap<>(modelClusterElement.getParameters()));
+
         ChatModel chatModel = (ChatModel) modelFunction.apply(
-            ParametersFactory.create(
-                MapUtils.concat(new HashMap<>(inputParameters.toMap()),
-                    new HashMap<>(modelClusterElement.getParameters()))),
+            ParametersFactory.create(concatenatedInputParameters),
             ParametersFactory.create(modelConnection.getParameters()), true);
 
         ClusterElement chatMemoryClusterElement = clusterElementMap.getClusterElement(CHAT_MEMORY);

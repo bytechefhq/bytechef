@@ -69,10 +69,13 @@ public class Neo4jChatMemoryUtils {
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
 
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
+
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst()
-                    .getText()));
+
+                Message message = messages.getFirst();
+
+                options.add(option(conversationId, conversationId, message.getText()));
             }
 
             return options;

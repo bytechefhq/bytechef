@@ -25,9 +25,15 @@ import java.util.List;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class ChatMemoryUtils {
-    public static ActionDefinition.OptionsFunction<String>
-        getFirstMessages(ChatMemoryRepository chatMemoryRepository) {
+
+    private ChatMemoryUtils() {
+    }
+
+    public static ActionDefinition.OptionsFunction<String> getFirstMessages(ChatMemoryRepository chatMemoryRepository) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             if (chatMemoryRepository == null) {
                 return List.of();
@@ -36,10 +42,13 @@ public class ChatMemoryUtils {
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
 
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
+
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst()
-                    .getText()));
+
+                Message message = messages.getFirst();
+
+                options.add(option(conversationId, conversationId, message.getText()));
             }
 
             return options;
