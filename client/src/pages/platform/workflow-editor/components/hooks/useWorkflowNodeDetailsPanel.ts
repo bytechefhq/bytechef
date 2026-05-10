@@ -1147,7 +1147,9 @@ export default function useWorkflowNodeDetailsPanel({
         const currentMainRootElementConnectionId = workflowTestConfigurationConnections?.find(
             (connection) =>
                 connection.workflowNodeName === rootClusterElementNodeData?.workflowNodeName &&
-                currentWorkflowNodeConnections.some((conn) => conn.key === connection.workflowConnectionKey)
+                currentWorkflowNodeConnections.some(
+                    (curConnection) => curConnection.key === connection.workflowConnectionKey
+                )
         )?.connectionId;
 
         if (currentNode.operationName && currentOperationName) {
