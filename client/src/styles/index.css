@@ -55,28 +55,28 @@ ol[data-sonner-toaster] [data-sonner-toast] {
 }
 
 .aui-thread-root .aui-md-h1 {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
+    font-size: 1.4rem !important;
+    line-height: 2.25rem !important;
 }
 
 .aui-thread-root .aui-md-h2 {
-    font-size: 1.5rem;
-    line-height: 2rem;
+    font-size: 1.3rem !important;
+    line-height: 2rem !important;
 }
 
 .aui-thread-root .aui-md-h3 {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
+    font-size: 1.25rem !important;
+    line-height: 1.75rem !important;
 }
 
 .aui-thread-root .aui-md-h4 {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
+    font-size: 1.125rem !important;
+    line-height: 1.75rem !important;
 }
 
 .aui-thread-root .aui-md-h5 {
-    font-size: 1rem;
-    line-height: 1.5rem;
+    font-size: 1rem !important;
+    line-height: 1.5rem !important;
 }
 
 .aui-thread-root .aui-composer-root {
