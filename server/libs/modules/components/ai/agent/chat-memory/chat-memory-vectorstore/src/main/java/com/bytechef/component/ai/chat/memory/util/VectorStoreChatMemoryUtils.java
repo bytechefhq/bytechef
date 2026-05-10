@@ -37,8 +37,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -48,7 +46,8 @@ import org.springframework.ai.vectorstore.VectorStore;
  */
 public class VectorStoreChatMemoryUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(VectorStoreChatMemoryUtils.class);
+    private VectorStoreChatMemoryUtils() {
+    }
 
     public static VectorStore getVectorStore(
         Parameters extensions, Map<String, ComponentConnection> componentConnections,
@@ -68,8 +67,7 @@ public class VectorStoreChatMemoryUtils {
         return vectorStoreFunction.apply(
             ParametersFactory.create(clusterElement.getParameters()),
             ParametersFactory.create(componentConnectionParameters),
-            ParametersFactory.create(clusterElement.getExtensions()),
-            componentConnections);
+            ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
     }
 
     public static ClusterElementDefinition.OptionsFunction<String> getClusterElementFirstMessages() {
@@ -84,7 +82,9 @@ public class VectorStoreChatMemoryUtils {
                             elementInputParams, elementConnectionParams,
                             elementExtensions, elementComponentConnections);
                     } catch (Exception exception) {
-                        log.error("Failed to resolve VectorStore for conversation ID options", exception);
+                        context.log(
+                            log -> log.error("Failed to resolve VectorStore for conversation ID options", exception));
+
                         return null;
                     }
                 });
@@ -115,8 +115,8 @@ public class VectorStoreChatMemoryUtils {
                 Object timestampObj = metadata.get(METADATA_TIMESTAMP);
                 long timestamp = timestampObj instanceof Number number ? number.longValue() : 0L;
 
-                if (!maxTimestampByConversation.containsKey(conversationId)
-                    || timestamp > maxTimestampByConversation.get(conversationId)) {
+                if (!maxTimestampByConversation.containsKey(conversationId) ||
+                    timestamp > maxTimestampByConversation.get(conversationId)) {
 
                     maxTimestampByConversation.put(conversationId, timestamp);
                     firstTextByConversation.put(conversationId, document.getText());
@@ -135,8 +135,9 @@ public class VectorStoreChatMemoryUtils {
         };
     }
 
-    public static MultipleConnectionsOptionsFunction<String>
-        getFirstMessages(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public static MultipleConnectionsOptionsFunction<String> getFirstMessages(
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
         return (inputParameters, componentConnections, extensions, context) -> {
             VectorStore vectorStore = getVectorStore(extensions, componentConnections, clusterElementDefinitionService);
 
@@ -160,10 +161,11 @@ public class VectorStoreChatMemoryUtils {
 
                 String conversationId = conversationIdObj.toString();
                 Object timestampObj = metadata.get(METADATA_TIMESTAMP);
+
                 long timestamp = timestampObj instanceof Number number ? number.longValue() : 0L;
 
-                if (!maxTimestampByConversation.containsKey(conversationId)
-                    || timestamp > maxTimestampByConversation.get(conversationId)) {
+                if (!maxTimestampByConversation.containsKey(conversationId) ||
+                    timestamp > maxTimestampByConversation.get(conversationId)) {
 
                     maxTimestampByConversation.put(conversationId, timestamp);
                     firstTextByConversation.put(conversationId, document.getText());
@@ -180,8 +182,5 @@ public class VectorStoreChatMemoryUtils {
 
             return options;
         };
-    }
-
-    private VectorStoreChatMemoryUtils() {
     }
 }

@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.redis.RedisChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
@@ -40,6 +41,9 @@ import redis.clients.jedis.JedisPooled;
  * @author Ivica Cardic
  */
 public class RedisChatMemoryUtils {
+
+    private RedisChatMemoryUtils() {
+    }
 
     public static ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
         JedisPooled jedisClient = getJedisClient(connectionParameters);
@@ -78,8 +82,7 @@ public class RedisChatMemoryUtils {
     }
 
     private static Duration parseDuration(String timeToLive) {
-        timeToLive = timeToLive.trim()
-            .toLowerCase();
+        timeToLive = StringUtils.lowerCase(StringUtils.trim(timeToLive));
 
         if (timeToLive.endsWith("d")) {
             return Duration.ofDays(Long.parseLong(timeToLive.substring(0, timeToLive.length() - 1)));
@@ -101,16 +104,16 @@ public class RedisChatMemoryUtils {
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
 
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
+
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst()
-                    .getText()));
+
+                Message message = messages.getFirst();
+
+                options.add(option(conversationId, conversationId, message.getText()));
             }
 
             return options;
         };
-    }
-
-    private RedisChatMemoryUtils() {
     }
 }

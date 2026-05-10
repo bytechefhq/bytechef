@@ -45,7 +45,6 @@ class OrderedRedisChatMemoryRepository implements ChatMemoryRepository {
     }
 
     @Override
-    @SuppressWarnings("NullAway")
     public List<String> findConversationIds() {
         AggregationBuilder aggregation = new AggregationBuilder("*")
             .groupBy("@conversation_id", Reducers.max("@timestamp")

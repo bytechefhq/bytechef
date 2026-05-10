@@ -54,6 +54,9 @@ import org.springframework.jdbc.support.JdbcUtils;
  */
 public class JdbcChatMemoryUtils {
 
+    private JdbcChatMemoryUtils() {
+    }
+
     public static ChatMemoryRepository getChatMemoryRepository(
         Parameters extensions, Map<String, ComponentConnection> componentConnections,
         ClusterElementDefinitionService clusterElementDefinitionService) throws Exception {
@@ -135,8 +138,7 @@ public class JdbcChatMemoryUtils {
         return dataSourceFunction.apply(
             ParametersFactory.create(clusterElement.getParameters()),
             ParametersFactory.create(componentConnectionParameters),
-            ParametersFactory.create(clusterElement.getExtensions()),
-            componentConnections);
+            ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
     }
 
     public static ClusterElementDefinition.OptionsFunction<String> getClusterElementFirstMessages() {
@@ -163,20 +165,23 @@ public class JdbcChatMemoryUtils {
 
             JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
             JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
+            JdbcChatMemoryRepository jdbcChatMemoryRepository = JdbcChatMemoryRepository.builder()
+                .jdbcTemplate(jdbcTemplate)
+                .dialect(dialect)
+                .build();
+
             ChatMemoryRepository chatMemoryRepository = new OrderedJdbcChatMemoryRepository(
-                JdbcChatMemoryRepository.builder()
-                    .jdbcTemplate(jdbcTemplate)
-                    .dialect(dialect)
-                    .build(),
-                jdbcTemplate, getSelectConversationIdsOrderedSql(dialect));
+                jdbcChatMemoryRepository, jdbcTemplate, getSelectConversationIdsOrderedSql(dialect));
 
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
 
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst()
-                    .getText()));
+
+                Message message = messages.getFirst();
+
+                options.add(option(conversationId, conversationId, message.getText()));
             }
 
             return options;
@@ -192,16 +197,16 @@ public class JdbcChatMemoryUtils {
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
 
             List<String> conversationIds = chatMemoryRepository.findConversationIds();
+
             for (String conversationId : conversationIds) {
                 List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-                options.add(option(conversationId, conversationId, messages.getFirst()
-                    .getText()));
+
+                Message message = messages.getFirst();
+
+                options.add(option(conversationId, conversationId, message.getText()));
             }
 
             return options;
         };
-    }
-
-    private JdbcChatMemoryUtils() {
     }
 }

@@ -61,6 +61,8 @@ public interface ClusterElementContextAware extends ClusterElementContext, JobCo
          * @param clusterElement       the cluster element to be processed or transformed
          * @param inputParameters      the parameters used to configure the operation for processing the cluster element
          * @param connectionParameters the parameters used to manage connections or interactions during processing
+         * @param extensions           the extensions containing nested cluster elements
+         * @param componentConnections the component connections map
          * @param context              the context in which the cluster element is being processed
          * @return the result of applying the function to the provided cluster element
          */

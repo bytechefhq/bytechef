@@ -43,7 +43,6 @@ class OrderedJdbcChatMemoryRepository implements ChatMemoryRepository {
     }
 
     @Override
-    @SuppressWarnings("NullAway")
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<String> findConversationIds() {
         return jdbcTemplate.queryForList(findConversationIdsOrderedSql, String.class);
