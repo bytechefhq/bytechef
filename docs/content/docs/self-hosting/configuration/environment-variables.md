@@ -272,7 +272,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | `"default-src 'self'; frame-src 'self' https://.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://.command.ai https://.commandbar.com https://.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://.commandbar.com https://cdn.jsdelivr.net https://.command.ai https://unpkg.com; img-src 'self' https://.command.ai data:; font-src 'self' data:; media-src 'self' https://.command.ai; connect-src 'self' https://.command.ai https://.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';"` |
+| `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | `"default-src 'self'; frame-src 'self' https://*.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.command.ai https://*.commandbar.com https://*.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://*.commandbar.com https://cdn.jsdelivr.net https://*.command.ai https://unpkg.com; img-src 'self' https://*.command.ai data:; font-src 'self' data:; media-src 'self' https://*.command.ai; connect-src 'self' https://*.command.ai https://*.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';"` |
 | `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | Remember Me key (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIALLOGIN_ENABLED` | Enable social login | `false` |
 | `BYTECHEF_SECURITY_SOCIALLOGIN_GOOGLE_CLIENTID` | Google OAuth2 client ID (sensitive) | - |
