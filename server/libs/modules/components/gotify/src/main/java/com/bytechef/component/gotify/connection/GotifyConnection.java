@@ -31,6 +31,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public class GotifyConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/gotify_v1#connection-setup")
         .baseUri((connectionParameters, context) -> connectionParameters.getRequiredString(BASE_URI))
         .authorizations(authorization(AuthorizationType.BEARER_TOKEN)
             .title("Bearer Token")

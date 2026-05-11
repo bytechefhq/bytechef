@@ -115,6 +115,7 @@ public class GotifySendMessageAction {
                                                     .description("Extra information.")))),
                         string("date")
                             .description("Date when the message was sent."))))
+        .help("", "https://docs.bytechef.io/reference/components/gotify_v1#send-message")
         .perform(GotifySendMessageAction::perform);
 
     private GotifySendMessageAction() {
