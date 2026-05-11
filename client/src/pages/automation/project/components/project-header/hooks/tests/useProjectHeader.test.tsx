@@ -33,8 +33,8 @@ const hoisted = vi.hoisted(() => {
 
 // Mocks for Zustand stores used inside the hook
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => {
-    const state = {workflow: {id: 'wf-1'}};
-    return {default: (selector: (s: typeof state) => unknown) => selector(state)};
+    const state = {setProjectName: vi.fn(), workflow: {id: 'wf-1'}};
+    return {default: (selector?: (s: typeof state) => unknown) => (selector ? selector(state) : state)};
 });
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => {
