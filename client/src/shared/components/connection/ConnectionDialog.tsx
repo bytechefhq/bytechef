@@ -21,7 +21,7 @@ import Properties from '@/pages/platform/workflow-editor/components/properties/P
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
-import {TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
+import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {
     Authorization,
     AuthorizationType,
@@ -267,7 +267,7 @@ const ConnectionDialog = ({
         }, 300);
     }
 
-    async function handleCodeSuccess(payload: {code: string; [key: string]: string}) {
+    async function handleCodeSuccess(payload: CodePayloadI) {
         if (payload.code) {
             await saveConnection(payload);
         }
