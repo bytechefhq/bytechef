@@ -43,7 +43,12 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const rootClusterElementId = id.split('-')[0];
     const effectiveDirection = isClusterElement ? 'TB' : layoutDirection;
 
-    const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
+    const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
+
+    const canPaste = useMemo(
+        () => !clusterElementsCanvasOpen && !!copiedNode && copiedWorkflowId === workflow.id,
+        [clusterElementsCanvasOpen, copiedNode, copiedWorkflowId, workflow.id]
+    );
 
     const copiedNodeLabel = copiedNode?.label || '';
 
@@ -77,7 +82,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     return (
         <ContextMenu>
-            <ContextMenuTrigger asChild disabled={!canPaste}>
+            <ContextMenuTrigger asChild disabled={!canPaste || isClusterElement}>
                 <div>
                     <WorkflowNodesPopoverMenu
                         clusterElementType={data.clusterElementType}
@@ -88,6 +93,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         key={`${id}-${nodeIndex}`}
                         multipleClusterElementsNode={data.multipleClusterElementsNode}
                         nodeIndex={nodeIndex}
+                        showPaste={canPaste}
                         sourceNodeId={data.clusterElementType ? rootClusterElementId : id}
                     >
                         <div
