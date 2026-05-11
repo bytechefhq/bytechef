@@ -95,11 +95,13 @@ const WorkflowCodeEditorSheet = ({
                         <div className="flex items-center gap-2">
                             <CodeXmlIcon />
 
-                            <span className="flex items-center justify-center gap-1 text-sm font-semibold">
-                                Edit
+                            <div className="flex items-center justify-center gap-1 text-sm font-semibold">
+                                <span>Edit</span>
+
                                 <span className="font-normal text-content-neutral-secondary">{projectName} /</span>
-                                {workflow.label}
-                            </span>
+
+                                <span>{workflow.label}</span>
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-2">
