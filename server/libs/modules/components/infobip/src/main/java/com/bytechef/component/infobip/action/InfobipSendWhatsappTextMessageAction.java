@@ -61,6 +61,9 @@ public class InfobipSendWhatsappTextMessageAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .output(outputSchema(WHATSAPP_MESSAGE_OUTPUT_PROPERTY))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/infobip_v1#send-whatsapp-text-message")
         .perform(InfobipSendWhatsappTextMessageAction::perform);
 
     private InfobipSendWhatsappTextMessageAction() {

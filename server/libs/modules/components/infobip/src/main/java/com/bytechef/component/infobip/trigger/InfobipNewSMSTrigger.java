@@ -48,6 +48,9 @@ public class InfobipNewSMSTrigger {
                 .label("Number")
                 .required(true))
         .output()
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/infobip_v1#new-sms-message")
         .webhookEnable(InfobipNewSMSTrigger::webhookEnable)
         .webhookDisable(InfobipNewSMSTrigger::webhookDisable)
         .webhookRequest(InfobipNewSMSTrigger::webhookRequest);

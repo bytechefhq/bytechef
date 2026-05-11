@@ -50,6 +50,9 @@ public class InfobipNewWhatsAppMessageTrigger {
             string(KEYWORD)
                 .label("Keyword"))
         .output()
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/infobip_v1#new-whatsapp-message")
         .webhookEnable(InfobipNewWhatsAppMessageTrigger::webhookEnable)
         .webhookDisable(InfobipNewWhatsAppMessageTrigger::webhookDisable)
         .webhookRequest(InfobipNewWhatsAppMessageTrigger::dynamicWebhookRequest);

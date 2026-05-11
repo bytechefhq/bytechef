@@ -37,6 +37,8 @@ public class InfobipConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/infobip_v1#connection-setup")
         .authorizations(
             authorization(AuthorizationType.API_KEY)
                 .title("API Key")
