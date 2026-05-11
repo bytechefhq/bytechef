@@ -17,6 +17,7 @@
 package com.bytechef.component.canva.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -25,11 +26,14 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,48 +59,20 @@ class CanvaUtilsTest {
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(
-                "id", "123",
-                "status", "in_progress"))
-            .thenReturn(Map.of(
-                "id", "123",
-                "status", "success"));
+            .thenReturn(Map.of("id", "123", "status", "in_progress"))
+            .thenReturn(Map.of("id", "123", "status", "success"));
 
-        Map<String, Object> result = CanvaUtils.pollJob(
-            mockedContext, "/asset-uploads/123", 10, 0);
+        Map<String, Object> result = CanvaUtils.pollJob(mockedContext, "/asset-uploads/123", 10, 0);
 
-        assertEquals(
-            Map.of(
-                "id", "123",
-                "status", "success"),
-            result);
+        assertEquals(Map.of("id", "123", "status", "success"), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(List.of("/asset-uploads/123", "/asset-uploads/123"), stringArgumentCaptor.getAllValues());
+        assertEquals(List.of(Body.of(Map.of()), Body.of(Map.of())), bodyArgumentCaptor.getAllValues());
 
-        assertEquals("/asset-uploads/123", stringArgumentCaptor.getAllValues()
-            .get(0));
-        assertEquals("/asset-uploads/123", stringArgumentCaptor.getAllValues()
-            .get(1));
-        assertEquals(2, bodyArgumentCaptor.getAllValues()
-            .size());
+        for (ConfigurationBuilder configurationBuilder : configurationBuilderArgumentCaptor.getAllValues()) {
+            Configuration configuration = configurationBuilder.build();
 
-        Body firstBody = bodyArgumentCaptor.getAllValues()
-            .get(0);
-
-        assertEquals(Http.BodyContentType.JSON, firstBody.getContentType());
-
-        Body secondBody = bodyArgumentCaptor.getAllValues()
-            .get(1);
-
-        assertEquals(Http.BodyContentType.JSON, secondBody.getContentType());
-
-        ContextFunction<Http, Executor> function =
-            httpFunctionArgumentCaptor.getValue();
-
-        assertEquals(true, function != null);
-
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
+        }
     }
 }

@@ -33,9 +33,11 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -58,6 +60,7 @@ class CanvaUploadAssetActionTest {
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final FileEntry fileEntry = mock(FileEntry.class);
     private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
+    private final ArgumentCaptor<Long> longArgumentCaptor = forClass(Long.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(ASSET_NAME, "test", ASSET, fileEntry));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -72,7 +75,7 @@ class CanvaUploadAssetActionTest {
             canvaUtilsMockedStatic.when(
                 () -> CanvaUtils.pollJob(
                     contextArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                    integerArgumentCaptor.capture(), integerArgumentCaptor.capture()))
+                    integerArgumentCaptor.capture(), longArgumentCaptor.capture()))
                 .thenReturn(Map.of());
 
             when(mockedHttp.post(stringArgumentCaptor.capture()))
@@ -92,25 +95,19 @@ class CanvaUploadAssetActionTest {
             Object result = CanvaUploadAssetAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(Map.of(), result);
-
-            List<String> expectedStrings = List.of("/asset-uploads", "Asset-Upload-Metadata", "jsonName");
-
-            assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
-
-            ContextFunction<Http, Executor> function = httpFunctionArgumentCaptor.getValue();
-            assertNotNull(function);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+            assertEquals(
+                List.of("/asset-uploads", "Asset-Upload-Metadata", "jsonName", "/asset-uploads/123"),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(Body.of(fileEntry, "application/octet-stream"), bodyArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-            Http.Configuration configuration = configurationBuilder.build();
-            Http.ResponseType responseType = configuration.getResponseType();
+            Configuration configuration = configurationBuilder.build();
 
-            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-
-            Body body = bodyArgumentCaptor.getValue();
-
-            assertEquals(fileEntry, body.getContent());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(List.of(MAX_ATTEMPTS, DELAY_MS), integerArgumentCaptor.getAllValues());
+            assertEquals(MAX_ATTEMPTS, integerArgumentCaptor.getValue());
+            assertEquals(DELAY_MS, longArgumentCaptor.getValue());
         }
     }
 }
