@@ -39,7 +39,7 @@ import java.util.Map;
 public class TeamworkCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
-        .description("Create a new task")
+        .description("Create a new task.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -48,18 +48,20 @@ public class TeamworkCreateTaskAction {
 
             ))
         .properties(integer("tasklistId").label("Task List ID")
-            .description("Task list where new task is added")
+            .description("Task list where new task is added.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<Long>) TeamworkUtils::getTasklistIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             object("task").properties(string("name").label("Name")
-                .description("Task name")
+                .description("Name of the task.")
                 .required(false),
                 string("description").label("Description")
+                    .description("Description of the task.")
                     .required(false),
                 date("dueAt").label("Due Date")
+                    .description("Due date of the task.")
                     .required(false))
                 .metadata(
                     Map.of(
@@ -74,7 +76,8 @@ public class TeamworkCreateTaskAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/teamwork_v1#create-task");
 
     private TeamworkCreateTaskAction() {
     }

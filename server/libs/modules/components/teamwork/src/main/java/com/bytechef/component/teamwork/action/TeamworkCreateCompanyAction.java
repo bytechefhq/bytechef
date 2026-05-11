@@ -46,6 +46,7 @@ public class TeamworkCreateCompanyAction {
             .description("The name of the company.")
             .required(false),
             string("emailOne").label("Email")
+                .description("Email address of the company.")
                 .required(false),
             string("phone").label("Phone")
                 .description("Phone number for the company.")
@@ -68,7 +69,8 @@ public class TeamworkCreateCompanyAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/teamwork_v1#create-company");
 
     private TeamworkCreateCompanyAction() {
     }
