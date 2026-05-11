@@ -16,21 +16,26 @@
 
 package com.bytechef.component.capsule.crm.action;
 
-import static com.bytechef.component.capsule.crm.action.CapsuleCRMCreateTaskAction.POST_TASKS_CONTEXT_FUNCTION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CATEGORY;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DESCRIPTION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DETAIL;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DUE_ON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
@@ -38,7 +43,10 @@ import org.junit.jupiter.api.Test;
 class CapsuleCRMCreateTaskActionTest extends AbstractCapsuleCRMActionTest {
 
     @Test
-    void testPerform() {
+    void testPerform(
+        ActionContext mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
         when(mockedParameters.getRequiredString(DESCRIPTION))
@@ -50,13 +58,19 @@ class CapsuleCRMCreateTaskActionTest extends AbstractCapsuleCRMActionTest {
         when(mockedParameters.get(CATEGORY))
             .thenReturn(propertyStubsMap.get(CATEGORY));
 
-        Object result = CapsuleCRMCreateTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = CapsuleCRMCreateTaskAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(responeseMap, result);
 
-        verify(mockedContext, times(1)).http(POST_TASKS_CONTEXT_FUNCTION);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/tasks", stringArgumentCaptor.getValue());
+
+        Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("task", propertyStubsMap), body.getContent());
     }
