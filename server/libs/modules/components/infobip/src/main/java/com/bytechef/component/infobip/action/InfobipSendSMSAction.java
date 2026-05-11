@@ -110,6 +110,7 @@ public class InfobipSendSMSAction {
                                                 integer(MESSAGE_COUNT)
                                                     .description(
                                                         "Number of SMS message parts required to deliver the message.")))))))
+        .help("", "https://docs.bytechef.io/reference/components/infobip_v1#send-sms")
         .perform(InfobipSendSMSAction::perform);
 
     private InfobipSendSMSAction() {

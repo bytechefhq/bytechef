@@ -41,6 +41,8 @@ public class InfobipComponentHandler implements ComponentHandler {
             "Infobip is a global communications platform that provide cloud-based messaging and omnichannel " +
                 "communication solutions for businesses.")
         .customAction(true)
+        .customActionHelp("", "https://www.infobip.com/docs/api/channels")
+        .version(1)
         .icon("path:assets/infobip.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(InfobipConnection.CONNECTION_DEFINITION)
