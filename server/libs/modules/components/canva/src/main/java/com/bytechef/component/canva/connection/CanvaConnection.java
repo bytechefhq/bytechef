@@ -30,9 +30,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.TypeReference;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +39,10 @@ import java.util.Map;
  */
 public class CanvaConnection {
 
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private static final String CODE_VERIFIER = generateCodeVerifier();
-
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.canva.com/rest/v1")
         .authorizations(
-            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)
@@ -71,62 +65,33 @@ public class CanvaConnection {
 
                     return map;
                 })
-                .oAuth2AuthorizationExtraQueryParameters((connection, context) -> {
-                    Map<String, String> params = new LinkedHashMap<>();
+                .authorizationCallback((connection, code, redirectUri, verifier, context) -> {
+                    String clientId = connection.getString(CLIENT_ID);
+                    String clientSecret = connection.getString(CLIENT_SECRET);
+                    String valueToEncode = clientId + ":" + clientSecret;
+                    String encode = context.encoder(
+                        encoder -> encoder.base64Encode(valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
-                    String codeChallenge = generateCodeChallenge();
+                    Http.Response response =
+                        context.http(http -> http.post("https://api.canva.com/rest/v1/oauth/token"))
+                            .headers(Map.of(
+                                "Content-Type", List.of("application/x-www-form-urlencoded"),
+                                "Authorization", List.of("Basic " + encode)))
+                            .body(
+                                Body.of(
+                                    Map.of(
+                                        "grant_type", "authorization_code",
+                                        "code_verifier", verifier,
+                                        "code", code,
+                                        "redirect_uri", redirectUri),
+                                    BodyContentType.FORM_URL_ENCODED))
+                            .configuration(Http.responseType(Http.ResponseType.JSON))
+                            .execute();
 
-                    params.put("code_challenge", codeChallenge);
-                    params.put("code_challenge_method", "S256");
-                    params.put("response_type", "code");
-
-                    return params;
-                })
-                .authorizationCallback(
-                    (connection, code, redirectUri, verifier, context) -> {
-
-                        String clientId = connection.getString(CLIENT_ID);
-                        String clientSecret = connection.getString(CLIENT_SECRET);
-                        String valueToEncode = clientId + ":" + clientSecret;
-                        String encode = context.encoder(
-                            encoder -> encoder.base64Encode(valueToEncode.getBytes(StandardCharsets.UTF_8)));
-
-                        Http.Response response =
-                            context.http(http -> http.post("https://api.canva.com/rest/v1/oauth/token"))
-                                .headers(Map.of(
-                                    "Content-Type", List.of("application/x-www-form-urlencoded"),
-                                    "Authorization", List.of("Basic " + encode)))
-                                .body(
-                                    Body.of(
-                                        Map.of(
-                                            "grant_type", "authorization_code",
-                                            "code_verifier", CODE_VERIFIER,
-                                            "code", code,
-                                            "redirect_uri", redirectUri),
-                                        BodyContentType.FORM_URL_ENCODED))
-                                .configuration(Http.responseType(Http.ResponseType.JSON))
-                                .execute();
-
-                        return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
-                    }))
+                    return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
+                }))
         .version(1)
         .help("", "https://docs.bytechef.io/reference/components/canva_v1#connection-setup");
-
-    private static String generateCodeVerifier() {
-        byte[] bytes = new byte[32];
-        SECURE_RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder()
-            .withoutPadding()
-            .encodeToString(bytes);
-    }
-
-    private static String generateCodeChallenge() throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(CODE_VERIFIER.getBytes(StandardCharsets.UTF_8));
-        return Base64.getUrlEncoder()
-            .withoutPadding()
-            .encodeToString(hash);
-    }
 
     private CanvaConnection() {
     }
