@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        workspace_ai_eval_dataset — workspace ↔ ai_eval_dataset membership row. Extracted from
+        platform/ai/eval/dataset/00000000000001_ai_eval_dataset_init.xml so the workspace relation lives next to its
+        automation-ai-eval-dataset service (mirrors workspace_ai_eval_rule and workspace_ai_prompt). Loaded after
+        platform/ai/eval/dataset because master.xml orders platform before automation/ai/eval/dataset, so the FK
+        from workspace_ai_eval_dataset.ai_eval_dataset_id → ai_eval_dataset.id resolves cleanly at startup.
+    -->
+    <changeSet id="20260423000002-workspace" author="ivicac">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="workspace_ai_eval_dataset"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="workspace_ai_eval_dataset">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ai_eval_dataset_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ws_ai_eval_dataset" references="ai_eval_dataset(id)"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_ws_ai_eval_dataset" tableName="workspace_ai_eval_dataset" columnNames="workspace_id,ai_eval_dataset_id"/>
+
+        <createIndex tableName="workspace_ai_eval_dataset" indexName="idx_ws_ai_eval_dataset_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Shared ai_llm_usage table — single canonical LLM bookkeeping store for every agent surface (AI Gateway,
+        AI Hub, future ad-hoc AI agents). The entity is workspace-agnostic; workspace association lives on
+        workspace_ai_llm_usage. Cost-dashboard queries (SUM(cost) GROUP BY workspace) JOIN through the relation —
+        index on workspace_ai_llm_usage.workspace_id keeps the JOIN index-only.
+
+        Insert-path semantics: every recorded LLM call MUST insert both rows in the same transaction so a half-write
+        (entity row but no membership) doesn't orphan a usage row from analytics.
+    -->
+    <changeSet id="00000000000001-ai-llm-usage" author="Ivica Cardic">
+        <createTable tableName="ai_llm_usage">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="request_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="api_key_id" type="BIGINT"/>
+            <column name="routing_policy_id" type="BIGINT"/>
+            <column name="requested_model" type="VARCHAR(256)"/>
+            <column name="routed_model" type="VARCHAR(256)"/>
+            <column name="routed_provider" type="VARCHAR(64)"/>
+            <column name="routing_strategy" type="INT"/>
+            <column name="latency_ms" type="INT"/>
+            <column name="input_tokens" type="INT"/>
+            <column name="output_tokens" type="INT"/>
+            <column name="cost" type="DECIMAL(10,6)"/>
+            <column name="status" type="INT"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="cache_hit" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="project_id" type="BIGINT"/>
+            <!-- AI Hub attribution dims (null on gateway rows) -->
+            <column name="user_id" type="BIGINT"/>
+            <column name="owner_id" type="BIGINT"/>
+            <column name="source" type="INT"/>
+            <column name="agent_name" type="VARCHAR(64)"/>
+            <column name="parent_agent" type="VARCHAR(64)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_llm_usage" indexName="idx_ai_llm_usage_created">
+            <column name="created_date"/>
+        </createIndex>
+
+        <createIndex tableName="ai_llm_usage" indexName="idx_ai_llm_usage_api_key">
+            <column name="api_key_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_llm_usage" indexName="idx_ai_llm_usage_model">
+            <column name="routed_model"/>
+        </createIndex>
+
+        <createIndex tableName="ai_llm_usage" indexName="idx_ai_llm_usage_project">
+            <column name="project_id"/>
+        </createIndex>
+
+        <createIndex tableName="ai_llm_usage" indexName="idx_ai_llm_usage_source_created">
+            <column name="source"/>
+            <column name="created_date" descending="true"/>
+        </createIndex>
+
+        <createIndex tableName="ai_llm_usage" indexName="idx_ai_llm_usage_agent_created">
+            <column name="agent_name"/>
+            <column name="created_date" descending="true"/>
+        </createIndex>
+
+        <createTable tableName="workspace_ai_llm_usage">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ai_llm_usage_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            constraintName="uk_workspace_ai_llm_usage"
+            tableName="workspace_ai_llm_usage"
+            columnNames="workspace_id, ai_llm_usage_id"/>
+
+        <createIndex tableName="workspace_ai_llm_usage" indexName="idx_workspace_ai_llm_usage_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_ai_llm_usage"
+            baseColumnNames="ai_llm_usage_id"
+            constraintName="fk_workspace_ai_llm_usage_usage"
+            referencedTableName="ai_llm_usage"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

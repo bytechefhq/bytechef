@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Idempotency for OTLP span ingest. OTLP/HTTP exporters retry the entire batch on transient
+        failures (per spec), so a duplicate POST would otherwise re-insert the same span and double-count
+        tokens, costs, and the bytechef_ai_otlp_spans_ingested counter.
+
+        Trace deduplication already exists via (workspace_id, external_trace_id). Spans need an analogous
+        guard scoped to their parent trace: within a trace, a given OTel span_id (the 8-byte hex from the
+        protobuf) is unique. Internal spans (created by the gateway itself rather than ingested from OTLP)
+        legitimately have no external_span_id, so the unique index is partial (PostgreSQL: WHERE clause).
+
+        Index build is split into its own changeSet and uses CREATE UNIQUE INDEX CONCURRENTLY so the
+        spans table — which can be in the tens of millions of rows in a long-running tenant — is not
+        blocked from OTLP writes while the build runs. A non-concurrent CREATE UNIQUE INDEX takes an
+        ACCESS EXCLUSIVE-class lock for the full duration of the build; on a 50M-row table that lock
+        translates directly into a multi-minute ingest stall during deploy. CONCURRENTLY trades that
+        for two table scans and a longer wall-clock build, but holds only a SHARE UPDATE EXCLUSIVE
+        lock that does not block writers.
+    -->
+    <changeSet id="20260422000001-01" author="ivicac">
+        <addColumn tableName="ai_observability_span">
+            <column name="external_span_id" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        runInTransaction="false" is required: PostgreSQL rejects CREATE INDEX CONCURRENTLY inside a
+        transaction block, and Liquibase wraps changeSets in BEGIN/COMMIT by default. Liquibase will
+        record the changeSet as applied even if the build aborts partway through; the IF NOT EXISTS
+        guard makes a re-run safe (PostgreSQL marks a partially-built CONCURRENTLY index as INVALID
+        and leaves it visible to subsequent CREATE statements).
+    -->
+    <changeSet id="20260422000001-02" author="ivicac" dbms="postgresql" runInTransaction="false">
+        <sql>
+            CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS uq_ai_obs_span_trace_external
+                ON ai_observability_span (trace_id, external_span_id)
+                WHERE external_span_id IS NOT NULL;
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX CONCURRENTLY IF EXISTS uq_ai_obs_span_trace_external;</sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

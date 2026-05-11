@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Author note: workspace_ai_prompt was extracted from
+        platform/ai/prompt/20260423000003_ai_prompt_init.xml so the workspace ↔ ai_prompt membership table lives next
+        to its automation-ai-prompt service code (mirroring the workspace_ai_eval_* split between platform-ai-eval
+        and automation-ai-eval). The ai_prompt + ai_prompt_version tables remain in platform/ai/prompt; this
+        changelog is loaded after platform/ai/prompt because master.xml orders platform before automation/ai/prompt,
+        so the FK from workspace_ai_prompt.ai_prompt_id → ai_prompt.id is created in the same startup pass after
+        ai_prompt has already been created.
+    -->
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="workspace_ai_prompt"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="workspace_ai_prompt">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ai_prompt_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ws_ai_prompt" references="ai_prompt(id)"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint constraintName="uk_ws_ai_prompt" tableName="workspace_ai_prompt" columnNames="workspace_id,ai_prompt_id"/>
+
+        <createIndex tableName="workspace_ai_prompt" indexName="idx_ws_ai_prompt_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

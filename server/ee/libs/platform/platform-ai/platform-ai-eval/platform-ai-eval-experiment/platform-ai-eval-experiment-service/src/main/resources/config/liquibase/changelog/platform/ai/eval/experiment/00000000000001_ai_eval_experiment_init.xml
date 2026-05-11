@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        ai_eval_experiment + ai_eval_experiment_run — extracted from automation/ai_gateway/00000000000007 as part of
+        the platform/automation split (mirrors ai_eval_dataset). Tables were renamed from ai_experiment* to
+        ai_eval_experiment* to scope them under the platform-ai-eval module. The workspace_ai_eval_experiment
+        membership table is in automation/ai/eval/experiment/00000000000001_workspace_ai_eval_experiment_init.xml.
+    -->
+    <changeSet id="20260423000005" author="ivicac">
+        <createTable tableName="ai_eval_experiment">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="dataset_version_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_eval_experiment_dataset_version"
+                             references="ai_eval_dataset_version(id)"/>
+            </column>
+            <column name="prompt_version_id" type="BIGINT"/>
+            <column name="model" type="VARCHAR(256)"/>
+            <column name="status" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="metadata" type="CLOB"/>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="started_date" type="DATETIME"/>
+            <column name="completed_date" type="DATETIME"/>
+        </createTable>
+
+        <createIndex tableName="ai_eval_experiment" indexName="idx_ai_eval_experiment_dataset_version">
+            <column name="dataset_version_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20260423000006" author="ivicac">
+        <createTable tableName="ai_eval_experiment_run">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="experiment_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_eval_experiment_run_experiment"
+                             references="ai_eval_experiment(id)"/>
+            </column>
+            <column name="dataset_item_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_eval_experiment_run_item"
+                             references="ai_eval_dataset_item(id)"/>
+            </column>
+            <column name="trace_id" type="BIGINT"/>
+            <column name="status" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latency_ms" type="INT"/>
+            <column name="cost" type="DECIMAL(20,6)"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="created_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_eval_experiment_run" indexName="idx_ai_eval_experiment_run_experiment">
+            <column name="experiment_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

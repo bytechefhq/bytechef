@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        ai_prompt and ai_prompt_version tables themselves were extracted to platform/ai/prompt/. This changeset
+        retains only the gateway-specific FKs from ai_observability_span to those tables, since ai_observability_span
+        lives under automation/ai_gateway/ and the FK can only be installed once both ends exist.
+    -->
+    <changeSet id="00000000000003" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="ai_observability_span"/>
+                <tableExists tableName="ai_prompt"/>
+                <tableExists tableName="ai_prompt_version"/>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_span_prompt"
+                                 baseTableName="ai_observability_span" baseColumnNames="prompt_id"
+                                 referencedTableName="ai_prompt" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_span_prompt_version"
+                                 baseTableName="ai_observability_span" baseColumnNames="prompt_version_id"
+                                 referencedTableName="ai_prompt_version" referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+    Partial unique index that pins the "at most one unfrozen version per dataset" invariant in the database.
+    Without this, two concurrent addItem / addItems calls on the same dataset can both observe no unfrozen
+    version, both call createVersion, and produce two unfrozen versions for the same dataset — at which
+    point findFirstByDatasetIdAndFrozenFalseOrderByVersionNumberDesc starts returning a non-deterministic
+    winner and items split across orphaned versions.
+
+    The service-layer getOrCreateUnfrozenVersion now catches DuplicateKeyException from this index and
+    re-fetches the winner, mirroring the AiObservabilityOtlpIngestFacadeImpl.resolveOrCreateTrace pattern.
+
+    Index build uses CREATE UNIQUE INDEX CONCURRENTLY + runInTransaction="false" so existing dataset
+    write paths are not stalled by the deploy. The dataset_version table is much smaller than the spans
+    table, but the same lock-class concern applies: a non-concurrent CREATE UNIQUE INDEX on a hot row
+    in production blocks every concurrent INSERT to ai_eval_dataset_version until build completes. The
+    IF NOT EXISTS guard makes the changeSet re-runnable if the build aborts partway through.
+    -->
+    <changeSet id="20260425000001" author="ivicac" dbms="postgresql" runInTransaction="false">
+        <sql>
+            CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS ux_ai_eval_dataset_version_unfrozen_per_dataset
+                ON ai_eval_dataset_version (dataset_id)
+                WHERE frozen = false;
+        </sql>
+
+        <rollback>
+            DROP INDEX CONCURRENTLY IF EXISTS ux_ai_eval_dataset_version_unfrozen_per_dataset;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

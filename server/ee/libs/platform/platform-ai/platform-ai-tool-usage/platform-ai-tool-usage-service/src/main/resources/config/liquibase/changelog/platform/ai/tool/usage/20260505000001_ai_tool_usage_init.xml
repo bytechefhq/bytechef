@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Shared AI tool-usage table. The entity is workspace-agnostic; workspace association lives on
+        workspace_ai_tool_usage. Cost-dashboard queries (SUM(cost) GROUP BY workspace, tool_name) JOIN through
+        the relation. The membership insert is mandatory on the hot path of every recorded tool call and shares
+        the parent insert's transaction.
+
+        environment stays denormalised on the entity row — analytics queries that GROUP BY environment don't
+        also need a workspace dimension and benefit from the index-only path. owner_id remains FK-free so the
+        column is reusable across owner kinds (CC task id, AI agent run id) without a per-kind FK.
+    -->
+    <changeSet id="20260505000001-1" author="Ivica Cardic">
+        <createTable tableName="ai_tool_usage">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_id" type="BIGINT"/>
+            <column name="tool_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="estimated_cost_usd" type="DECIMAL(12,6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_ms" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="metadata_json" type="TEXT"/>
+            <column name="environment" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_tool_usage" indexName="idx_ai_tool_usage_tool_created">
+            <column name="tool_name"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <createIndex tableName="ai_tool_usage" indexName="idx_ai_tool_usage_environment_created">
+            <column name="environment"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <createTable tableName="workspace_ai_tool_usage">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ai_tool_usage_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            constraintName="uk_workspace_ai_tool_usage"
+            tableName="workspace_ai_tool_usage"
+            columnNames="workspace_id, ai_tool_usage_id"/>
+
+        <createIndex tableName="workspace_ai_tool_usage" indexName="idx_workspace_ai_tool_usage_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_ai_tool_usage"
+            baseColumnNames="ai_tool_usage_id"
+            constraintName="fk_workspace_ai_tool_usage_usage"
+            referencedTableName="ai_tool_usage"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>
