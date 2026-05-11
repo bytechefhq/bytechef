@@ -5,8 +5,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Creates a new Person or Organization",
-    "help": null,
+    "description": "Creates a new person or organization.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/capsule-crm_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -21,7 +24,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Represents if this party is a person or an organisation.",
+      "description": "Represents if this party is a person or an organization.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -95,7 +98,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The name of the organisation.",
+      "description": "The name of the organization.",
       "displayCondition": "type == 'organization'",
       "exampleValue": null,
       "expressionEnabled": null,
@@ -187,7 +190,7 @@
           "advancedOption": null,
           "controlType": "SELECT",
           "defaultValue": null,
-          "description": "The type of the email address",
+          "description": "The type of the email address.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": null,
@@ -539,8 +542,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Creates a new Task",
-    "help": null,
+    "description": "Creates a new task.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/capsule-crm_v1#create-task"
+    },
     "metadata": null,
     "name": "createTask",
     "outputDefinition": {
@@ -1109,14 +1115,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/capsule-crm_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developer.capsulecrm.com/v2/overview/getting-started"
+  },
   "description": "Capsule CRM is a cloud-based customer relationship management platform designed to help businesses manage contacts, track sales opportunities, and collaborate with their teams efficiently.",
   "icon": "path:assets/capsule-crm.svg",
   "metadata": null,
