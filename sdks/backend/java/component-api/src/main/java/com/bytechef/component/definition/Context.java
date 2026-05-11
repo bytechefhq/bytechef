@@ -223,6 +223,13 @@ public interface Context {
          */
         String base64UrlEncode(String value);
 
+        /**
+         *
+         * @param bytes
+         * @return
+         */
+        String base64UrlEncode(byte[] bytes);
+
     }
 
     /**

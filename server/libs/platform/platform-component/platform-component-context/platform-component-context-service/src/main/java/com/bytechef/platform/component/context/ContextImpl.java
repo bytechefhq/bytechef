@@ -413,6 +413,11 @@ class ContextImpl implements Context {
         public String base64UrlEncode(String value) {
             return EncodingUtils.urlEncode(value);
         }
+
+        @Override
+        public String base64UrlEncode(byte[] bytes) {
+            return EncodingUtils.urlEncodeBase64ToString(bytes);
+        }
     }
 
     private record EscaperImpl() implements Escaper {
