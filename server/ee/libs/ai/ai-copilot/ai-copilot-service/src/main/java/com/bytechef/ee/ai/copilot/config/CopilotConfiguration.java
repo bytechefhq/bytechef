@@ -21,6 +21,7 @@ import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
+import com.bytechef.ee.ai.copilot.agent.ConverterSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
@@ -55,6 +56,7 @@ public class CopilotConfiguration {
     private final Resource promptWorkflowEditorBuildResource;
     private final Resource promptCodeEditorAskResource;
     private final Resource promptCodeEditorBuildResource;
+    private final Resource promptConverterBuildResource;
     private final Resource promptClusterElementAskResource;
     private final Resource promptClusterElementBuildResource;
     private final State state = new State();
@@ -65,6 +67,7 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_workflow_editor_build.txt") Resource promptWorkflowEditorBuildResource,
         @Value("classpath:prompt_code_editor_ask.txt") Resource promptCodeEditorAskResource,
         @Value("classpath:prompt_code_editor_build.txt") Resource promptCodeEditorBuildResource,
+        @Value("classpath:prompt_converter_build.txt") Resource promptConverterBuildResource,
         @Value("classpath:prompt_cluster_element_ask.txt") Resource promptClusterElementAskResource,
         @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource) {
 
@@ -72,6 +75,7 @@ public class CopilotConfiguration {
         this.promptWorkflowEditorBuildResource = promptWorkflowEditorBuildResource;
         this.promptCodeEditorAskResource = promptCodeEditorAskResource;
         this.promptCodeEditorBuildResource = promptCodeEditorBuildResource;
+        this.promptConverterBuildResource = promptConverterBuildResource;
         this.promptClusterElementAskResource = promptClusterElementAskResource;
         this.promptClusterElementBuildResource = promptClusterElementBuildResource;
     }
@@ -202,6 +206,24 @@ public class CopilotConfiguration {
             .tools(List.of(projectTools, projectWorkflowTools, taskTools, scriptTools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
+            .build();
+    }
+
+    @Bean
+    ConverterSpringAIAgent converterBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectToolsImpl,
+        ProjectWorkflowTools projectWorkflowToolsImpl, TaskTools taskTools, ScriptTools scriptTools)
+        throws AGUIException {
+
+        String name = Source.CONVERTER.name() + "_" + Mode.BUILD.name();
+
+        return ConverterSpringAIAgent.builder()
+            .agentId(name.toLowerCase())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptConverterBuildResource))
+            .state(state)
+            .tools(List.of(projectToolsImpl, projectWorkflowToolsImpl, taskTools, scriptTools))
             .build();
     }
 
