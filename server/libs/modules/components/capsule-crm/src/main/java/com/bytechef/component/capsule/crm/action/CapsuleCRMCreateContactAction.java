@@ -43,6 +43,7 @@ import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -53,11 +54,12 @@ public class CapsuleCRMCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Creates a new Person or Organization")
+        .description("Creates a new person or organization.")
+        .help("", "https://docs.bytechef.io/reference/components/capsule-crm_v1#create-contact")
         .properties(
             string(TYPE)
                 .label("Type")
-                .description("Represents if this party is a person or an organisation.")
+                .description("Represents if this party is a person or an organization.")
                 .options(
                     option("Person", PERSON.getValue()),
                     option("Organization", ORGANIZATION.getValue()))
@@ -74,7 +76,7 @@ public class CapsuleCRMCreateContactAction {
                 .required(true),
             string(NAME)
                 .label("Name")
-                .description("The name of the organisation.")
+                .description("The name of the organization.")
                 .displayCondition("%s == '%s'".formatted(TYPE, ORGANIZATION.getValue()))
                 .required(true),
             string(ABOUT)
@@ -93,7 +95,7 @@ public class CapsuleCRMCreateContactAction {
                                 .required(true),
                             string(TYPE)
                                 .label("Type")
-                                .description("The type of the email address")
+                                .description("The type of the email address.")
                                 .options(
                                     option("Home", "Home"),
                                     option("Work", "Work"))
@@ -174,7 +176,7 @@ public class CapsuleCRMCreateContactAction {
 
         return actionContext.http(POST_PARTIES_CONTEXT_FUNCTION)
             .body(
-                Http.Body.of(
+                Body.of(
                     "party",
                     new Object[] {
                         TYPE, contactType.getValue(),

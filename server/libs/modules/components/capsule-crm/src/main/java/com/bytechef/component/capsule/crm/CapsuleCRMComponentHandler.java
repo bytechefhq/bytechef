@@ -38,11 +38,14 @@ public class CapsuleCRMComponentHandler implements ComponentHandler {
             "Capsule CRM is a cloud-based customer relationship management platform designed to help businesses " +
                 "manage contacts, track sales opportunities, and collaborate with their teams efficiently.")
         .icon("path:assets/capsule-crm.svg")
+        .customAction(true)
+        .customActionHelp("", "https://developer.capsulecrm.com/v2/overview/getting-started")
         .connection(CONNECTION_DEFINITION)
         .categories(ComponentCategory.CRM)
         .actions(
             CapsuleCRMCreateContactAction.ACTION_DEFINITION,
-            CapsuleCRMCreateTaskAction.ACTION_DEFINITION);
+            CapsuleCRMCreateTaskAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

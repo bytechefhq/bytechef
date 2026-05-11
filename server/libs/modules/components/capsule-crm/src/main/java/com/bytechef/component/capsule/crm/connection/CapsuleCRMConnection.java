@@ -31,13 +31,15 @@ public class CapsuleCRMConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.capsulecrm.com/api/v2")
+        .help("", "https://docs.bytechef.io/reference/components/capsule-crm_v1#connection-setup")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
                     string(TOKEN)
                         .label("Token")
-                        .required(true)));
+                        .required(true)))
+        .version(1);
 
     private CapsuleCRMConnection() {
     }

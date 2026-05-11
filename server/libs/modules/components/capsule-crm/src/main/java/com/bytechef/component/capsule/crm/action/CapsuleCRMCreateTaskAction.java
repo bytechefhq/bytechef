@@ -34,6 +34,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -44,7 +45,8 @@ public class CapsuleCRMCreateTaskAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
-        .description("Creates a new Task")
+        .description("Creates a new task.")
+        .help("", "https://docs.bytechef.io/reference/components/capsule-crm_v1#create-task")
         .properties(
             string(DESCRIPTION)
                 .label("Description")
@@ -106,7 +108,7 @@ public class CapsuleCRMCreateTaskAction {
 
         return actionContext.http(POST_TASKS_CONTEXT_FUNCTION)
             .body(
-                Http.Body.of(
+                Body.of(
                     "task",
                     new Object[] {
                         DESCRIPTION, inputParameters.getRequiredString(DESCRIPTION),
