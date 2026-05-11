@@ -98,7 +98,6 @@ const WorkflowCodeEditorSheet = ({
                             <span className="flex items-center justify-center gap-1 text-sm font-semibold">
                                 Edit
                                 <span className="font-normal text-content-neutral-secondary">{projectName} /</span>
-
                                 {workflow.label}
                             </span>
                         </div>
