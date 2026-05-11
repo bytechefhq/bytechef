@@ -16,7 +16,6 @@
 
 package com.bytechef.component.capsule.crm.action;
 
-import static com.bytechef.component.capsule.crm.action.CapsuleCRMCreateContactAction.POST_PARTIES_CONTEXT_FUNCTION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ABOUT;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ADDRESS;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ADDRESSES;
@@ -29,16 +28,22 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PH
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STREET;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.capsule.crm.constant.ContactType;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
@@ -55,7 +60,10 @@ class CapsuleCRMCreateContactActionTest extends AbstractCapsuleCRMActionTest {
         Map.of(NUMBER, "12345678", TYPE, "Home"));
 
     @Test
-    void testPerform() {
+    void testPerform(
+        ActionContext mockedContext, ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
         when(mockedParameters.getString(FIRST_NAME))
@@ -73,13 +81,18 @@ class CapsuleCRMCreateContactActionTest extends AbstractCapsuleCRMActionTest {
         when((List<Map<String, String>>) mockedParameters.getList(PHONE_NUMBERS))
             .thenReturn(phoneNumbers);
 
-        Object result = CapsuleCRMCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = CapsuleCRMCreateContactAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(responeseMap, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        verify(mockedContext, times(1)).http(POST_PARTIES_CONTEXT_FUNCTION);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/parties", stringArgumentCaptor.getValue());
+
+        Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("party", propertyStubsMap), body.getContent());
     }

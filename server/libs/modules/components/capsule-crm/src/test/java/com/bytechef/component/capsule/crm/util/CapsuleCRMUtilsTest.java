@@ -16,36 +16,45 @@
 
 package com.bytechef.component.capsule.crm.util;
 
-import static com.bytechef.component.capsule.crm.util.CapsuleCRMUtils.GET_COUNTRIES_CONTEXT_FUNCTION;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class CapsuleCRMUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetCountryOptions() {
+    void testGetCountryOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
         List<Map<String, Object>> countries = new ArrayList<>();
         Map<String, Object> countryMap = new LinkedHashMap<>();
@@ -56,12 +65,8 @@ class CapsuleCRMUtilsTest {
 
         map.put("countries", countries);
 
-        when(mockedContext.http(GET_COUNTRIES_CONTEXT_FUNCTION))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
@@ -71,7 +76,15 @@ class CapsuleCRMUtilsTest {
 
         assertEquals(
             expectedOptions,
-            CapsuleCRMUtils.getCountryOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            CapsuleCRMUtils.getCountryOptions(
+                null, null, null, null, mockedContext));
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/countries", stringArgumentCaptor.getValue());
 
     }
 }
