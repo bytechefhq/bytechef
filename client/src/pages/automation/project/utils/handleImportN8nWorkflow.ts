@@ -1,9 +1,9 @@
-import { ChangeEvent } from 'react';
-import { UseMutationResult } from '@tanstack/react-query';
 import {
     CreateProjectWorkflow200Response,
     CreateProjectWorkflowRequest,
 } from '@/shared/middleware/automation/configuration';
+import {UseMutationResult} from '@tanstack/react-query';
+import {ChangeEvent} from 'react';
 
 const handleImportN8nWorkflow = async (
     event: ChangeEvent<HTMLInputElement>,
@@ -24,12 +24,11 @@ const handleImportN8nWorkflow = async (
             ? (file as Blob).text()
             : new Response(file).text());
 
-
         const convertedWorkflow = await convertN8nWorkflow(json);
 
         importProjectWorkflowMutation.mutate({
             id: projectId,
-            workflow: { definition: convertedWorkflow },
+            workflow: {definition: convertedWorkflow},
         });
     }
 };

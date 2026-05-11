@@ -30,6 +30,8 @@ import {ProjectGitConfigurationKeys} from '@/ee/shared/mutations/automation/proj
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
+import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConverterN8nToWorkflow';
+import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -56,7 +58,8 @@ import {
     EllipsisVerticalIcon,
     GitBranchIcon,
     GitPullRequestArrowIcon,
-    LayoutTemplateIcon, LoaderCircleIcon,
+    LayoutTemplateIcon,
+    LoaderCircleIcon,
     PlusIcon,
     RocketIcon,
     SendIcon,
@@ -71,8 +74,6 @@ import {toast} from 'sonner';
 
 import TagList from '../../../../../shared/components/TagList';
 import ProjectDialog from '../ProjectDialog';
-import handleImportN8nWorkflow from "@/pages/automation/project/utils/handleImportN8nWorkflow";
-import {useConvertN8nToWorkflow} from "@/pages/automation/project/hooks/useConverterN8nToWorkflow";
 
 interface ProjectItemProps {
     project: Project;
@@ -116,7 +117,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     const queryClient = useQueryClient();
 
-    const { convertN8nWorkflow } = useConvertN8nToWorkflow();
+    const {convertN8nWorkflow} = useConvertN8nToWorkflow();
     const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
@@ -333,15 +334,15 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         <DropdownMenuTrigger asChild>
                                             <Button
                                                 aria-label="More Workflow Creation Actions"
-                                                size="xs"
-                                                variant="outline"
                                                 icon={
                                                     isImportingN8nWorkflow ? (
-                                                        <LoaderCircleIcon className="animate-spin text-primary"/>
+                                                        <LoaderCircleIcon className="animate-spin text-primary" />
                                                     ) : (
                                                         <ChevronDownIcon />
                                                     )
                                                 }
+                                                size="xs"
+                                                variant="outline"
                                             >
                                                 <> </>
                                             </Button>
@@ -375,6 +376,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             >
                                                 <UploadIcon /> Import Workflow
                                             </DropdownMenuItem>
+
                                             <DropdownMenuItem
                                                 className="cursor-pointer"
                                                 onClick={() => {
@@ -676,8 +678,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
             <input
                 accept=".json"
                 className="hidden"
-                ref={converterHiddenFileInputRef}
-                type="file"
                 onChange={async (event) => {
                     if (!event.target.files?.length) return;
 
@@ -696,6 +696,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         }
                     }
                 }}
+                ref={converterHiddenFileInputRef}
+                type="file"
             />
         </>
     );
