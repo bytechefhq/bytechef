@@ -34,6 +34,9 @@ public class GotifyComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("gotify")
         .title("Gotify")
+        .version(1)
+        .customAction(true)
+        .customActionHelp("", "https://gotify.net/docs/swagger-docs")
         .description("A simple server for sending and receiving messages.")
         .icon("path:assets/gotify.svg")
         .categories(ComponentCategory.COMMUNICATION)
