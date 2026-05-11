@@ -1,0 +1,9 @@
+mutation createContextStoreSource($input: CreateContextStoreSourceInput!) {
+    createContextStoreSource(input: $input) {
+        id
+        name
+        status
+        enabled
+        cadence
+    }
+}

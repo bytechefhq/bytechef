@@ -61,8 +61,8 @@ const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 const AssetFiles = lazy(() => import('@/pages/automation/asset-files/AssetFiles'));
 const AiHub = lazy(() => import('@/pages/automation/ai-hub/AiHub'));
-const ContextStoreSourceDetail = lazy(() => import('@/pages/automation/context-store/ContextStoreSourceDetail'));
 const ContextStoreSources = lazy(() => import('@/pages/automation/context-store/ContextStoreSources'));
+const ContextStores = lazy(() => import('@/pages/automation/context-store/ContextStores'));
 const AiHubPersonalAgentsPage = lazy(() => import('@/pages/automation/ai-hub/personal-agents/AiHubPersonalAgents'));
 const AiHubPersonalAgentFormPage = lazy(
     () => import('@/pages/automation/ai-hub/personal-agents/AiHubPersonalAgentForm')
@@ -817,24 +817,24 @@ export const getRouter = (queryClient: QueryClient) =>
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper hasLeftSidebar>
-                                                    <ContextStoreSources />
+                                                    <ContextStores />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'context-store',
+                                    path: 'context-stores',
                                 },
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper hasLeftSidebar>
-                                                    <ContextStoreSourceDetail />
+                                                    <ContextStoreSources />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'context-store/:id',
+                                    path: 'context-stores/:id',
                                 },
                                 {
                                     element: (

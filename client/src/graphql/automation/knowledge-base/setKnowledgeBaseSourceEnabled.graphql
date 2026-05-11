@@ -1,0 +1,7 @@
+mutation setKnowledgeBaseSourceEnabled($id: ID!, $enabled: Boolean!) {
+    setKnowledgeBaseSourceEnabled(id: $id, enabled: $enabled) {
+        id
+        enabled
+        status
+    }
+}

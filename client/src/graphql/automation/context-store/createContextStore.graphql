@@ -1,0 +1,10 @@
+mutation createContextStore($workspaceId: ID!, $environmentId: ID!, $input: CreateContextStoreInput!) {
+    createContextStore(workspaceId: $workspaceId, environmentId: $environmentId, input: $input) {
+        id
+        name
+        description
+        environment
+        tagIds
+        version
+    }
+}

@@ -36,6 +36,9 @@ export interface ApplicationInfoI {
     billing: {
         enabled: boolean;
     };
+    contextStore: {
+        enabled: boolean;
+    };
     featureFlags: Record<string, boolean>;
     helpHub: {
         commandBar: {
@@ -98,6 +101,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                 billing: {
                     enabled: false,
                 },
+                contextStore: {
+                    enabled: false,
+                },
                 featureFlags: {},
 
                 getApplicationInfo: async () => {
@@ -152,6 +158,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             application: json.application,
                             billing: {
                                 enabled: json.billing?.enabled === 'true',
+                            },
+                            contextStore: {
+                                enabled: json.contextStore?.enabled === 'true',
                             },
                             featureFlags: json.featureFlags,
                             helpHub: {

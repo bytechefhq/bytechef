@@ -1,0 +1,9 @@
+mutation createKnowledgeBaseSource($input: CreateKnowledgeBaseSourceInput!) {
+    createKnowledgeBaseSource(input: $input) {
+        id
+        name
+        status
+        enabled
+        cadence
+    }
+}

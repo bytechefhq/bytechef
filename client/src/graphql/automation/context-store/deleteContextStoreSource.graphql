@@ -1,0 +1,3 @@
+mutation deleteContextStoreSource($id: ID!) {
+    deleteContextStoreSource(id: $id)
+}

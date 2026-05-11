@@ -4,7 +4,7 @@ import useKnowledgeBaseDocumentListItem from '@/pages/automation/knowledge-base/
 import useKnowledgeBaseDocumentListItemTagList from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItemTagList';
 import TagList from '@/shared/components/TagList';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
-import {ChevronDownIcon} from 'lucide-react';
+import {ChevronDownIcon, WorkflowIcon} from 'lucide-react';
 
 interface KnowledgeBaseDocumentListItemProps {
     document: KnowledgeBaseDocument;
@@ -61,6 +61,18 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
                         {document.createdDate && (
                             <span className="text-xs text-muted-foreground">
                                 Created {new Date(document.createdDate).toLocaleDateString()}
+                            </span>
+                        )}
+
+                        {document.sourceId && (
+                            <span
+                                className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700"
+                                data-testid={`document-source-badge-${document.id}`}
+                                title="Synced from a Knowledge Base Source"
+                            >
+                                <WorkflowIcon className="size-3" />
+
+                                {`Synced from #${document.sourceId}`}
                             </span>
                         )}
 

@@ -1,0 +1,14 @@
+query contextStores($workspaceId: ID!, $environmentId: ID!) {
+    contextStores(workspaceId: $workspaceId, environmentId: $environmentId) {
+        id
+        name
+        description
+        environment
+        tagIds
+        tags {
+            id
+            name
+        }
+        version
+    }
+}

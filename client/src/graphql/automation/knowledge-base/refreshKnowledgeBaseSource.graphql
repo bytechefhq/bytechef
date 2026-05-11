@@ -1,0 +1,3 @@
+mutation refreshKnowledgeBaseSource($id: ID!) {
+    refreshKnowledgeBaseSource(id: $id)
+}

@@ -1,0 +1,9 @@
+mutation updateContextStoreSource($id: ID!, $input: UpdateContextStoreSourceInput!) {
+    updateContextStoreSource(id: $id, input: $input) {
+        id
+        name
+        cadence
+        enabled
+        status
+    }
+}

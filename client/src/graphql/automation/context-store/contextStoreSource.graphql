@@ -1,0 +1,25 @@
+query contextStoreSource($id: ID!) {
+    contextStoreSource(id: $id) {
+        id
+        name
+        entityName
+        description
+        idField
+        storedFields
+        indexedFields
+        semanticIndexFields
+        parameters
+        sourceComponentName
+        sourceComponentVersion
+        sourceClusterElementName
+        connectionId
+        cadence
+        status
+        enabled
+        lastSyncRunAt
+        lastSyncJobExecutionId
+        workflowId
+        fullReplaceCadence
+        tombstoneStrategy
+    }
+}

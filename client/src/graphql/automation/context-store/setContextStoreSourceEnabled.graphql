@@ -1,0 +1,7 @@
+mutation setContextStoreSourceEnabled($id: ID!, $enabled: Boolean!) {
+    setContextStoreSourceEnabled(id: $id, enabled: $enabled) {
+        id
+        enabled
+        status
+    }
+}

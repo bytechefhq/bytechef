@@ -1,0 +1,9 @@
+mutation updateKnowledgeBaseSource($id: ID!, $input: UpdateKnowledgeBaseSourceInput!) {
+    updateKnowledgeBaseSource(id: $id, input: $input) {
+        id
+        name
+        cadence
+        enabled
+        status
+    }
+}

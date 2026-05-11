@@ -1,0 +1,17 @@
+query knowledgeBaseSources($workspaceId: ID!, $environmentId: ID!, $filter: KnowledgeBaseSourceFilter) {
+    knowledgeBaseSources(workspaceId: $workspaceId, environmentId: $environmentId, filter: $filter) {
+        id
+        name
+        knowledgeBaseId
+        sourceComponentName
+        sourceComponentVersion
+        sourceClusterElementName
+        connectionId
+        cadence
+        status
+        enabled
+        lastSyncRunAt
+        lastSyncJobExecutionId
+        workflowId
+    }
+}
