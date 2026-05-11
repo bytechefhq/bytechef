@@ -14,6 +14,7 @@ paths:
       summary: "Create Company"
       description: "Creates a new company."
       operationId: "createCompany"
+      x-help: "https://docs.bytechef.io/reference/components/teamwork_v1#create-company"
       requestBody:
         content:
           application/json:
@@ -30,6 +31,7 @@ paths:
                       type: "string"
                       format: "email"
                       title: "Email"
+                      description: "Email address of the company."
                     phone:
                       type: "string"
                       description: "Phone number for the company."
@@ -61,11 +63,12 @@ paths:
       tags:
         - "Tasks"
       summary: "Create Task"
-      description: "Create a new task"
+      description: "Create a new task."
       operationId: "createTask"
+      x-help: "https://docs.bytechef.io/reference/components/teamwork_v1#create-task"
       parameters:
         - name: "tasklistId"
-          description: "Task list where new task is added"
+          description: "Task list where new task is added."
           in: "path"
           required: true
           schema:
@@ -83,13 +86,15 @@ paths:
                   properties:
                     name:
                       type: "string"
-                      description: "Task name"
+                      description: "Name of the task."
                     description:
                       type: "string"
+                      description: "Description of the task."
                     dueAt:
                       type: "string"
                       format: "date"
                       title: "Due Date"
+                      description: "Due date of the task."
       responses:
         201:
           description: "Response contains information about created task."

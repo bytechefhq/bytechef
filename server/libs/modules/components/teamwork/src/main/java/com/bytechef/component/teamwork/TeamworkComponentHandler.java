@@ -38,6 +38,7 @@ public class TeamworkComponentHandler extends AbstractTeamworkComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://apidocs.teamwork.com/docs/teamwork/v3")
             .icon("path:assets/teamwork.svg")
             .categories(ComponentCategory.CRM, ComponentCategory.PROJECT_MANAGEMENT);
     }
@@ -59,6 +60,8 @@ public class TeamworkComponentHandler extends AbstractTeamworkComponentHandler {
                             .label("API Key")
                             .required(true)))
             .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(SITE_NAME)
-                + ".teamwork.com/projects/api/v3");
+                + ".teamwork.com/projects/api/v3")
+            .help("", "https://docs.bytechef.io/reference/components/teamwork_v1#connection-setup")
+            .version(1);
     }
 }
