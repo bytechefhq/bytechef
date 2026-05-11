@@ -67,6 +67,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -90,6 +92,7 @@ import tools.jackson.core.type.TypeReference;
 public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
 
     private static final Logger logger = LoggerFactory.getLogger(ConnectionDefinitionServiceImpl.class);
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
@@ -350,24 +353,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
-        String verifier = null;
 
-        if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
-            PkceFunction pkceFunction = authorization.getPkce()
-                .orElse(getDefaultPkceFunction());
-
-            // TODO pkce
-            Authorization.Pkce pkce;
-
-            try {
-                pkce = pkceFunction.apply(null, null, "SHA256", context);
-            } catch (Exception e) {
-                throw new ConfigurationException(
-                    e, ConnectionDefinitionErrorType.AUTHORIZATION_CALLBACK_FAILED);
-            }
-
-            verifier = pkce.verifier();
-        }
+        String verifier = MapUtils.getString(connectionParameters, "code_verifier");
 
         AuthorizationCallbackFunction authorizationCallbackFunction = authorization.getAuthorizationCallback()
             .orElse(
@@ -684,6 +671,21 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             verifier, challenge, challengeMethod);
     }
 
+    private String generateChallenge(String verifier, Context context) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(verifier.getBytes(StandardCharsets.UTF_8));
+
+        return context.encoder(encoder -> encoder.base64UrlEncode(hash));
+    }
+
+    private String generateVerifier(Context context) {
+        byte[] bytes = new byte[32];
+
+        SECURE_RANDOM.nextBytes(bytes);
+
+        return context.encoder(encoder -> encoder.base64UrlEncode(bytes));
+    }
+
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static String getDefaultRefreshUrl(
         Parameters connectionParameters, TokenUrlFunction tokenUrlFunction, Context context) {
@@ -745,6 +747,41 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 .orElse((curConnectionParameters, context1) -> Map.of());
 
         Parameters parameters = ParametersFactory.create(connectionParameters);
+
+        if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+            PkceFunction pkceFunction = authorization.getPkce()
+                .orElse(getDefaultPkceFunction());
+
+            String verifier = generateVerifier(context);
+            String challenge;
+
+            try {
+                challenge = generateChallenge(verifier, context);
+            } catch (Exception e) {
+                throw new ConfigurationException(
+                    e, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
+            }
+
+            try {
+                Authorization.Pkce pkce = pkceFunction.apply(verifier, challenge, "S256", context);
+
+                Map<String, String> extraQueryParameters = new LinkedHashMap<>(
+                    oAuth2AuthorizationExtraQueryParametersFunction.apply(parameters, context));
+
+                extraQueryParameters.put("code_challenge", pkce.challenge());
+                extraQueryParameters.put("code_challenge_method", pkce.challengeMethod());
+                extraQueryParameters.put("code_verifier", pkce.verifier());
+
+                return new OAuth2AuthorizationParameters(
+                    authorizationUrlFunction.apply(parameters, context),
+                    clientIdFunction.apply(parameters, context),
+                    extraQueryParameters,
+                    scopesFunction.apply(parameters, context));
+            } catch (Exception e) {
+                throw new ConfigurationException(
+                    e, ConnectionDefinitionErrorType.INVALID_OAUTH2_AUTHORIZATION_PARAMETERS);
+            }
+        }
 
         try {
             if (logger.isTraceEnabled()) {
