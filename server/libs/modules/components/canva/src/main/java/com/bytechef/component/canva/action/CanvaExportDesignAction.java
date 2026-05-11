@@ -17,13 +17,11 @@
 package com.bytechef.component.canva.action;
 
 import static com.bytechef.component.canva.constant.CanvaConstants.AS_SINGLE_IMAGE;
-import static com.bytechef.component.canva.constant.CanvaConstants.DELAY_MS;
 import static com.bytechef.component.canva.constant.CanvaConstants.DESIGN_ID;
 import static com.bytechef.component.canva.constant.CanvaConstants.EXPORT_QUALITY;
 import static com.bytechef.component.canva.constant.CanvaConstants.FORMAT;
 import static com.bytechef.component.canva.constant.CanvaConstants.HEIGHT;
 import static com.bytechef.component.canva.constant.CanvaConstants.LOSSLESS;
-import static com.bytechef.component.canva.constant.CanvaConstants.MAX_ATTEMPTS;
 import static com.bytechef.component.canva.constant.CanvaConstants.PAGES;
 import static com.bytechef.component.canva.constant.CanvaConstants.QUALITY;
 import static com.bytechef.component.canva.constant.CanvaConstants.SIZE;
@@ -42,13 +40,13 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
+import com.bytechef.component.canva.util.CanvaUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.exception.ProviderException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,8 +73,7 @@ public class CanvaExportDesignAction {
                     option("pptx", "pptx", "Export the design as a PPTX."),
                     option("gif", "gif", "Export the design as a GIF."),
                     option("mp4", "mp4", "Export the design as an MP4."),
-                    option("html_bundle", "html_bundle",
-                        "Export the email design as an HTML bundle."),
+                    option("html_bundle", "html_bundle", "Export the email design as an HTML bundle."),
                     option("html_standalone", "html_standalone",
                         "Export the email design as a standalone HTML file with hosted assets."))
                 .required(true),
@@ -97,7 +94,7 @@ public class CanvaExportDesignAction {
                     option("horizontal_1080p", "horizontal_1080p"),
                     option("horizontal_4k", "horizontal_4k"),
                     option("vertical_480p", "vertical_480p"),
-                    option("vertical_720p", "verformat.put(WIDTH, inputParameters.getInteger(WIDTH));tical_720p"),
+                    option("vertical_720p", "vertical_720p"),
                     option("vertical_1080p", "vertical_1080p"),
                     option("vertical_4k", "vertical_4k"))
                 .displayCondition("%s == '%s'".formatted("type", "mp4"))
@@ -168,22 +165,19 @@ public class CanvaExportDesignAction {
                         array("URLs")
                             .description("Download URL(s) for the completed export job. ")
                             .items(string()))))
-        .perform(CanvaExportDesignAction::perform);
+        .perform(CanvaExportDesignAction::perform)
+        .processErrorResponse(CanvaUtils::processErrorResponse);
 
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Object exportJob = createExportJob(inputParameters, context);
+        Map<String, Object> exportJob = createExportJob(inputParameters, context);
 
-        if (!(exportJob instanceof Map<?, ?> jobMap)) {
-            throw new ProviderException("Canva export design action was not successful.");
-        }
-
-        return pollJob(context, "/exports/" + jobMap.get("id"), MAX_ATTEMPTS, DELAY_MS);
+        return pollJob(context, "/exports/" + exportJob.get("id"));
     }
 
-    private static Object createExportJob(Parameters inputParameters, Context context) {
-        Map<String, Object> response = context
+    private static Map<String, Object> createExportJob(Parameters inputParameters, Context context) {
+        Map<String, Map<String, Object>> response = context
             .http(http -> http.post("/exports"))
             .body(
                 Body.of(
@@ -202,38 +196,47 @@ public class CanvaExportDesignAction {
         Map<String, Object> format = new HashMap<>();
 
         format.put(TYPE, type);
-        format.put(PAGES, inputParameters.getArray(PAGES));
+
+        addIfNotNull(PAGES, inputParameters.getList(PAGES, Integer.class), format);
 
         switch (type) {
             case "pdf" -> {
-                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
-                format.put(SIZE, inputParameters.getString(SIZE));
+                addIfNotNull(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY), format);
+                addIfNotNull(SIZE, inputParameters.getString(SIZE), format);
             }
             case "jpg" -> {
                 format.put(QUALITY, inputParameters.getRequiredString(QUALITY));
-                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
-                format.put(HEIGHT, inputParameters.getInteger(HEIGHT));
-                format.put(WIDTH, inputParameters.getInteger(WIDTH));
+
+                addIfNotNull(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY), format);
+                addIfNotNull(HEIGHT, inputParameters.getInteger(HEIGHT), format);
+                addIfNotNull(WIDTH, inputParameters.getInteger(WIDTH), format);
             }
             case "png" -> {
-                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
-                format.put(HEIGHT, inputParameters.getInteger(HEIGHT));
-                format.put(WIDTH, inputParameters.getInteger(WIDTH));
-                format.put(LOSSLESS, inputParameters.getBoolean(LOSSLESS));
-                format.put(TRANSPARENT_BACKGROUND, inputParameters.getBoolean(TRANSPARENT_BACKGROUND));
-                format.put(AS_SINGLE_IMAGE, inputParameters.getBoolean(AS_SINGLE_IMAGE));
+                addIfNotNull(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY), format);
+                addIfNotNull(HEIGHT, inputParameters.getInteger(HEIGHT), format);
+                addIfNotNull(WIDTH, inputParameters.getInteger(WIDTH), format);
+                addIfNotNull(LOSSLESS, inputParameters.getBoolean(LOSSLESS), format);
+                addIfNotNull(TRANSPARENT_BACKGROUND, inputParameters.getBoolean(TRANSPARENT_BACKGROUND), format);
+                addIfNotNull(AS_SINGLE_IMAGE, inputParameters.getBoolean(AS_SINGLE_IMAGE), format);
             }
             case "gif" -> {
-                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
-                format.put(HEIGHT, inputParameters.getInteger(HEIGHT));
-                format.put(WIDTH, inputParameters.getInteger(WIDTH));
+                addIfNotNull(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY), format);
+                addIfNotNull(WIDTH, inputParameters.getInteger(WIDTH), format);
             }
             case "mp4" -> {
                 format.put(QUALITY, inputParameters.getRequiredString(VIDEO_QUALITY));
-                format.put(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY));
+
+                addIfNotNull(EXPORT_QUALITY, inputParameters.getString(EXPORT_QUALITY), format);
             }
+            default -> throw new IllegalArgumentException("Unsupported type: " + type);
         }
 
         return format;
+    }
+
+    private static void addIfNotNull(String key, Object value, Map<String, Object> map) {
+        if (value != null) {
+            map.put(key, value);
+        }
     }
 }

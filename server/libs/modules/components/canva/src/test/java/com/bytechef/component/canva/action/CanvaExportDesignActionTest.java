@@ -16,10 +16,8 @@
 
 package com.bytechef.component.canva.action;
 
-import static com.bytechef.component.canva.constant.CanvaConstants.DELAY_MS;
 import static com.bytechef.component.canva.constant.CanvaConstants.DESIGN_ID;
 import static com.bytechef.component.canva.constant.CanvaConstants.FORMAT;
-import static com.bytechef.component.canva.constant.CanvaConstants.MAX_ATTEMPTS;
 import static com.bytechef.component.canva.constant.CanvaConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,8 +56,6 @@ class CanvaExportDesignActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
-    private final ArgumentCaptor<Long> longArgumentCaptor = forClass(Long.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(DESIGN_ID, "design-1", TYPE, "png"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -73,8 +69,7 @@ class CanvaExportDesignActionTest {
         try (MockedStatic<CanvaUtils> canvaUtilsMockedStatic = mockStatic(CanvaUtils.class)) {
             canvaUtilsMockedStatic.when(
                 () -> CanvaUtils.pollJob(
-                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                    integerArgumentCaptor.capture(), longArgumentCaptor.capture()))
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(Map.of());
 
             when(mockedHttp.post(stringArgumentCaptor.capture()))
@@ -90,8 +85,6 @@ class CanvaExportDesignActionTest {
             assertNotNull(httpFunctionArgumentCaptor.getValue());
             assertEquals(List.of("/exports", "/exports/123"), stringArgumentCaptor.getAllValues());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(MAX_ATTEMPTS, integerArgumentCaptor.getValue());
-            assertEquals(DELAY_MS, longArgumentCaptor.getValue());
             assertEquals(
                 Body.of(Map.of(DESIGN_ID, "design-1", FORMAT, Map.of(TYPE, "png")), BodyContentType.JSON),
                 bodyArgumentCaptor.getValue());

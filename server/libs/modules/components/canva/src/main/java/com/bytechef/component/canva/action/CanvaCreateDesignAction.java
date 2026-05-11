@@ -36,6 +36,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
+import com.bytechef.component.canva.util.CanvaUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -130,10 +131,11 @@ public class CanvaCreateDesignAction {
                                     .description("A URL for retrieving the thumbnail image.")),
                         integer("page_count")
                             .description("The total number of pages in the design."))))
-        .perform(CanvaCreateDesignAction::perform);
+        .perform(CanvaCreateDesignAction::perform)
+        .processErrorResponse(CanvaUtils::processErrorResponse);
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return context
             .http(http -> http.post("/designs"))

@@ -26,14 +26,12 @@ public class CanvaConstants {
     public static final String ASSET_NAME = "asset_name";
     public static final String AS_SINGLE_IMAGE = "as_single_image";
     public static final String CUSTOM = "custom";
-    public static final int DELAY_MS = 500;
     public static final String DESIGN_ID = "design_id";
     public static final String DESIGN_TYPE = "design_type";
     public static final String EXPORT_QUALITY = "export_quality";
     public static final String FORMAT = "format";
     public static final String HEIGHT = "height";
     public static final String LOSSLESS = "lossless";
-    public static final int MAX_ATTEMPTS = 10;
     public static final String NAME = "name";
     public static final String PAGES = "pages";
     public static final String PRESET = "preset";
