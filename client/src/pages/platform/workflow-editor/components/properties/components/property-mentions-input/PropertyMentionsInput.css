@@ -3,6 +3,22 @@
         @apply w-full;
     }
 
+    &.property-mentions-editor--no-wrap {
+        > div {
+            min-width: 100%;
+            width: max-content;
+        }
+
+        .tiptap {
+            max-width: none !important;
+            min-width: 100%;
+            white-space: pre !important;
+            width: max-content;
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+        }
+    }
+
     .tiptap .property-mention--unavailable {
         @apply inline-flex;
         @apply items-stretch;

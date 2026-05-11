@@ -69,7 +69,7 @@ const PropertyMentionsInputEditorSheet = ({
                 <SheetCloseButton />
             </header>
 
-            <div className="property-mentions-editor m-3 flex min-h-0 flex-1 rounded-md bg-surface-neutral-primary p-3 overflow-auto">
+            <div className="property-mentions-editor property-mentions-editor--no-wrap m-3 flex min-h-0 flex-1 overflow-auto rounded-md bg-surface-neutral-primary p-3">
                 <PropertyMentionsInputEditor
                     className="size-full"
                     componentDefinitions={componentDefinitions}
