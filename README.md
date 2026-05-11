@@ -10,7 +10,7 @@
 # **The open-source platform that unifies AI agent orchestration and workflow automation**
 ### Autonomy and precision — in one platform.
 
-[Documentation](https://www.youtube.com/watch?v=vFpobtcdWSc) · [Live Demo](https://demo.bytechef.io) · [Discord](https://discord.gg/VKvNxHjpYx) · [Connect on X](https://x.com/bytechefhq) · [Roadmap](https://github.com/orgs/bytechefhq/projects/3)
+[Documentation](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) · [Live Demo](https://www.youtube.com/watch?v=vFpobtcdWSc) · [Discord](https://discord.gg/VKvNxHjpYx) · [Connect on X](https://x.com/bytechefhq) · [Roadmap](https://github.com/orgs/bytechefhq/projects/3)
 
 </div>
 
