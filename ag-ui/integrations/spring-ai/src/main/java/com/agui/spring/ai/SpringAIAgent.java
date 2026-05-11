@@ -186,6 +186,10 @@ public class SpringAIAgent extends LocalAgent {
      * @param deferredEvents Events that will be deferred and emitted later
      */
     private void onEvent(AgentSubscriber subscriber, ChatResponse evt, AssistantMessage assistantMessage, String messageId, List<BaseEvent> deferredEvents) {
+        if (evt.getResult() == null) {
+            return;
+        }
+
         if (evt.hasToolCalls()) {
             assistantMessage.setToolCalls(new ArrayList<>());
             evt.getResult().getOutput().getToolCalls()
