@@ -8,7 +8,7 @@ import {NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {NodeDataType} from '@/shared/types';
+import {ClusterElementsType, NodeDataType} from '@/shared/types';
 import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
@@ -30,6 +30,7 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {mapHandlePosition} from '../utils/directionUtils';
+import {getTask} from '../utils/getTask';
 import {getContextFromTaskNodeData} from '../utils/getTaskDispatcherContext';
 import handleDeleteTask from '../utils/handleDeleteTask';
 import pasteNode from '../utils/pasteNode';
@@ -200,6 +201,8 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                 hideClusterElementComponents={!data.clusterElementType}
                                 hideTaskDispatchers={!!data.clusterElementType}
                                 hideTriggerComponents
+                                onOpenChange={setSwitchPopoverOpen}
+                                open={switchPopoverOpen}
                                 sourceNodeId={data.clusterElementType && parentClusterRootId ? parentClusterRootId : id}
                                 sourceNodeName={data.workflowNodeName}
                             >
@@ -692,20 +695,57 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             const trimmed = newLabel.trim();
 
             if (trimmed && trimmed !== nodeLabel) {
-                saveWorkflowDefinition({
-                    decorative: true,
-                    nodeData: {
-                        ...data,
-                        label: trimmed,
-                        name: data.workflowNodeName,
-                    },
-                    updateWorkflowMutation: updateWorkflowMutation!,
-                });
+                if (isClusterElement && rootClusterElementNodeData && workflow.definition) {
+                    const workflowDefinition = JSON.parse(workflow.definition);
+                    const workflowDefinitionTasks = workflowDefinition.tasks ?? [];
+
+                    const mainClusterRootTask = getTask({
+                        tasks: workflowDefinitionTasks,
+                        workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                    });
+
+                    if (mainClusterRootTask?.clusterElements) {
+                        const updatedClusterElements = updateClusterElementLabel(
+                            mainClusterRootTask.clusterElements as ClusterElementsType,
+                            data.workflowNodeName,
+                            trimmed
+                        );
+
+                        saveWorkflowDefinition({
+                            decorative: true,
+                            nodeData: {
+                                ...mainClusterRootTask,
+                                clusterElements: updatedClusterElements,
+                                componentName: rootClusterElementNodeData.componentName,
+                                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                            } as NodeDataType,
+                            updateWorkflowMutation: updateWorkflowMutation!,
+                        });
+                    }
+                } else {
+                    saveWorkflowDefinition({
+                        decorative: true,
+                        nodeData: {
+                            ...data,
+                            label: trimmed,
+                            name: data.workflowNodeName,
+                        },
+                        updateWorkflowMutation: updateWorkflowMutation!,
+                    });
+                }
             }
 
             setRenamingNodeName(undefined);
         },
-        [data, nodeLabel, setRenamingNodeName, updateWorkflowMutation]
+        [
+            data,
+            isClusterElement,
+            nodeLabel,
+            rootClusterElementNodeData,
+            setRenamingNodeName,
+            updateWorkflowMutation,
+            workflow.definition,
+        ]
     );
 
     const handleRenameKeyDown = useCallback(
@@ -737,11 +777,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         const taskDispatcherContext = data.taskDispatcher ? undefined : getContextFromTaskNodeData(data, 1);
 
         pasteNode({
+            cancelWorkflowQueries: cancelWorkflowQueries!,
             sourceNodeName: data.name,
             taskDispatcherContext,
             updateWorkflowMutation: updateWorkflowMutation!,
         });
-    }, [data, updateWorkflowMutation]);
+    }, [cancelWorkflowQueries, data, updateWorkflowMutation]);
 
     const handleDelete = useCallback(() => handleDeleteNodeClick(data), [data, handleDeleteNodeClick]);
 
@@ -751,6 +792,15 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
 
     const handleSwitch = useCallback(() => setSwitchPopoverOpen(true), []);
+
+    const handleClusterElementCopy = useCallback(() => {}, []);
+
+    const handleClusterElementPaste = useCallback(() => {}, []);
+
+    const handleClusterElementResetPosition = useCallback(
+        () => handleRemoveSavedClusterElementPosition(data.workflowNodeName),
+        [data.workflowNodeName, handleRemoveSavedClusterElementPosition]
+    );
 
     const isRenaming = renamingNodeName === data.name;
 
@@ -813,6 +863,29 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 onRename={handleStartRename}
                 onResetPosition={handleResetPosition}
                 onSwitch={handleSwitch}
+                showCopy
+                showDelete
+                showRename
+            >
+                <WorkflowNodeContent {...sharedContentProps} />
+            </WorkflowNodeContextMenu>
+        );
+    }
+
+    if (isClusterElement && !isMainRootClusterElement) {
+        return (
+            <WorkflowNodeContextMenu
+                data={data}
+                hasSavedPosition={!!hasSavedClusterElementPosition}
+                onCopy={handleClusterElementCopy}
+                onDelete={handleDelete}
+                onPaste={handleClusterElementPaste}
+                onRename={handleStartRename}
+                onResetPosition={handleClusterElementResetPosition}
+                onSwitch={handleSwitch}
+                showDelete
+                showRename
+                showReplace={!data.multipleClusterElementsNode}
             >
                 <WorkflowNodeContent {...sharedContentProps} />
             </WorkflowNodeContextMenu>
@@ -821,5 +894,38 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     return <WorkflowNodeContent {...sharedContentProps} />;
 };
+
+function updateClusterElementLabel(
+    clusterElements: ClusterElementsType,
+    targetName: string,
+    newLabel: string
+): ClusterElementsType {
+    const updated: ClusterElementsType = {};
+
+    for (const [key, value] of Object.entries(clusterElements)) {
+        if (Array.isArray(value)) {
+            updated[key] = value.map((element) => {
+                const withUpdatedNested = element.clusterElements
+                    ? {
+                          ...element,
+                          clusterElements: updateClusterElementLabel(element.clusterElements, targetName, newLabel),
+                      }
+                    : element;
+
+                return element.name === targetName ? {...withUpdatedNested, label: newLabel} : withUpdatedNested;
+            });
+        } else if (value !== null && typeof value === 'object') {
+            const withUpdatedNested = value.clusterElements
+                ? {...value, clusterElements: updateClusterElementLabel(value.clusterElements, targetName, newLabel)}
+                : value;
+
+            updated[key] = value.name === targetName ? {...withUpdatedNested, label: newLabel} : withUpdatedNested;
+        } else {
+            updated[key] = value;
+        }
+    }
+
+    return updated;
+}
 
 export default memo(WorkflowNode);
