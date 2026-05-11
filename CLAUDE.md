@@ -75,7 +75,7 @@ docker compose -f docker-compose.dev.server.yml up -d
 ## Architecture Overview
 
 ### Core Technology Stack
-- **Backend**: Java 25 with Spring Boot 4.0.5
+- **Backend**: Java 25 with Spring Boot 4.0.6
 - **Frontend**: React 19.2 with TypeScript 5.9, Vite 8, TailwindCSS 3.4
 - **Database**: PostgreSQL 15+ with Liquibase migrations
 - **Message Broker**: Memory(default), Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS
@@ -83,7 +83,7 @@ docker compose -f docker-compose.dev.server.yml up -d
 - **Code Execution**: GraalVM Polyglot 25.0.2 (Java, JavaScript, Python, Ruby)
 - **Testing**: JUnit 5, Vitest 4, Testcontainers
 - **Node.js**: Version 20.19+ required for client development
-- **Additional Tools**: MapStruct 1.6.3, Jackson 3.x (`tools.jackson` package), SpringDoc OpenAPI 3.0.0
+- **Additional Tools**: MapStruct 1.6.3, Jackson 2.19 (transitioning to 3.x — both `com.fasterxml.jackson` and `tools.jackson` packages currently appear in deps), SpringDoc OpenAPI 3.0.3
 
 ### Main Server Module Structure
 
