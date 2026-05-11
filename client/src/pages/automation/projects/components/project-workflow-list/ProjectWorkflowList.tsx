@@ -3,6 +3,8 @@ import EmptyList from '@/components/EmptyList';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
+import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConverterN8nToWorkflow';
+import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -19,8 +21,6 @@ import {ChevronDownIcon, LayoutTemplateIcon, LoaderCircleIcon, UploadIcon, Workf
 import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
-import handleImportN8nWorkflow from "@/pages/automation/project/utils/handleImportN8nWorkflow";
-import {useConvertN8nToWorkflow} from "@/pages/automation/project/hooks/useConverterN8nToWorkflow";
 
 const ProjectWorkflowList = ({
     componentDefinitions,
@@ -58,7 +58,7 @@ const ProjectWorkflowList = ({
 
     const queryClient = useQueryClient();
 
-    const { convertN8nWorkflow } = useConvertN8nToWorkflow();
+    const {convertN8nWorkflow} = useConvertN8nToWorkflow();
     const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
@@ -176,12 +176,12 @@ const ProjectWorkflowList = ({
                                                 <Button
                                                     icon={
                                                         isImportingN8nWorkflow ? (
-                                                            <LoaderCircleIcon className="animate-spin"/>
+                                                            <LoaderCircleIcon className="animate-spin" />
                                                         ) : (
                                                             <ChevronDownIcon />
                                                         )
-                                                    }>
-                                                </Button>
+                                                    }
+                                                ></Button>
                                             </DropdownMenuTrigger>
 
                                             <DropdownMenuContent align="end" className="p-0">
@@ -210,6 +210,7 @@ const ProjectWorkflowList = ({
                                                 >
                                                     <UploadIcon /> Import Workflow
                                                 </DropdownMenuItem>
+
                                                 <DropdownMenuItem
                                                     onClick={(event) => {
                                                         event.stopPropagation();
@@ -252,11 +253,10 @@ const ProjectWorkflowList = ({
                 ref={hiddenFileInputRef}
                 type="file"
             />
+
             <input
                 accept=".json"
                 className="hidden"
-                ref={converterHiddenFileInputRef}
-                type="file"
                 onChange={async (event) => {
                     if (!event.target.files?.length) return;
 
@@ -275,6 +275,8 @@ const ProjectWorkflowList = ({
                         }
                     }
                 }}
+                ref={converterHiddenFileInputRef}
+                type="file"
             />
         </div>
     );
