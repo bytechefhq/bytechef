@@ -15,10 +15,12 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, LayoutTemplateIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
+import {ChevronDownIcon, LayoutTemplateIcon, LoaderCircleIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
 import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
+import handleImportN8nWorkflow from "@/pages/automation/project/utils/handleImportN8nWorkflow";
+import {useConvertN8nToWorkflow} from "@/pages/automation/project/hooks/useConverterN8nToWorkflow";
 
 const ProjectWorkflowList = ({
     componentDefinitions,
@@ -37,6 +39,7 @@ const ProjectWorkflowList = ({
     const navigate = useNavigate();
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
+    const converterHiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const ff_1041 = useFeatureFlagsStore()('ff-1041');
 
@@ -54,6 +57,9 @@ const ProjectWorkflowList = ({
     } = {};
 
     const queryClient = useQueryClient();
+
+    const { convertN8nWorkflow } = useConvertN8nToWorkflow();
+    const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (response) => {
@@ -167,8 +173,14 @@ const ProjectWorkflowList = ({
 
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button>
-                                                    <ChevronDownIcon />
+                                                <Button
+                                                    icon={
+                                                        isImportingN8nWorkflow ? (
+                                                            <LoaderCircleIcon className="animate-spin"/>
+                                                        ) : (
+                                                            <ChevronDownIcon />
+                                                        )
+                                                    }>
                                                 </Button>
                                             </DropdownMenuTrigger>
 
@@ -197,6 +209,17 @@ const ProjectWorkflowList = ({
                                                     }}
                                                 >
                                                     <UploadIcon /> Import Workflow
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+
+                                                        if (converterHiddenFileInputRef.current) {
+                                                            converterHiddenFileInputRef.current.click();
+                                                        }
+                                                    }}
+                                                >
+                                                    <UploadIcon /> Import n8n Workflow
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -228,6 +251,30 @@ const ProjectWorkflowList = ({
                 onChange={(event) => handleImportWorkflow(event, project.id!, importProjectWorkflowMutation)}
                 ref={hiddenFileInputRef}
                 type="file"
+            />
+            <input
+                accept=".json"
+                className="hidden"
+                ref={converterHiddenFileInputRef}
+                type="file"
+                onChange={async (event) => {
+                    if (!event.target.files?.length) return;
+
+                    try {
+                        setIsImportingN8nWorkflow(true);
+                        await handleImportN8nWorkflow(
+                            event,
+                            project.id!,
+                            importProjectWorkflowMutation,
+                            convertN8nWorkflow
+                        );
+                    } finally {
+                        setIsImportingN8nWorkflow(false);
+                        if (converterHiddenFileInputRef.current) {
+                            converterHiddenFileInputRef.current.value = '';
+                        }
+                    }
+                }}
             />
         </div>
     );
