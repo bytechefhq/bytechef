@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Sends a message to the server.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gotify_v1#send-message"
+    },
     "metadata": null,
     "name": "sendMessage",
     "outputDefinition": {
@@ -1410,14 +1413,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/gotify_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://gotify.net/docs/swagger-docs"
+  },
   "description": "A simple server for sending and receiving messages.",
   "icon": "path:assets/gotify.svg",
   "metadata": null,
