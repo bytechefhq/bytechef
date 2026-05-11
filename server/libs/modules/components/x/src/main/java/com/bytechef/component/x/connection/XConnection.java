@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.LinkedHashMap;
@@ -73,11 +72,7 @@ public class XConnection {
 
                     return map;
                 })
-                .tokenUrl((connection, context) -> "https://api.x.com/2/oauth2/token")
-                .pkce((verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(
-                    "challenge", null, "plain"))
-                .oAuth2AuthorizationExtraQueryParameters(
-                    (connection, context) -> Map.of("code_challenge", "challenge", "code_challenge_method", "plain")));
+                .tokenUrl((connection, context) -> "https://api.x.com/2/oauth2/token"));
 
     private XConnection() {
     }
