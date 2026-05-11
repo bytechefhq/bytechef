@@ -24,43 +24,79 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.PLACEHOLD
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEMPLATE_NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.infobip.util.InfobipUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
-class InfobipSendWhatsAppTemplateMessageActionTest extends AbstractInfobipActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class InfobipSendWhatsAppTemplateMessageActionTest {
 
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FROM, "123", TO, "456", TEMPLATE_NAME, "template", PLACEHOLDERS,
+            Map.of("_1", "value1", "_2", "value2", "_3", "value3")));
+    private final Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        mockedParameters = MockParametersFactory.create(
-            Map.of(FROM, "123", TO, "456", TEMPLATE_NAME, "template", PLACEHOLDERS,
-                Map.of("_1", "value1", "_2", "value2", "_3", "value3")));
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         try (MockedStatic<InfobipUtils> infobipUtilsMockedStatic = mockStatic(InfobipUtils.class)) {
             infobipUtilsMockedStatic
                 .when(() -> InfobipUtils.getTemplates(stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(List.of(Map.of(NAME, "template", LANGUAGE, "en")));
 
+            when(mockedHttp.post(stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(responseMap);
+
             Map<String, Object> result = InfobipSendWhatsAppTemplateMessageAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(responseMap, result);
 
-            Http.Body body = bodyArgumentCaptor.getValue();
+            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            Http.Configuration.ConfigurationBuilder configurationBuilder =
+                configurationBuilderArgumentCaptor.getValue();
+            Http.Configuration configuration = configurationBuilder.build();
+            Http.ResponseType responseType = configuration.getResponseType();
+
+            Body body = bodyArgumentCaptor.getValue();
 
             Map<String, Object> expectedBody = Map.of(
                 "messages", List.of(
@@ -72,8 +108,9 @@ class InfobipSendWhatsAppTemplateMessageActionTest extends AbstractInfobipAction
                             "templateData", Map.of("body", Map.of(PLACEHOLDERS, List.of("value1", "value2", "value3"))),
                             LANGUAGE, "en"))));
 
+            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
             assertEquals(expectedBody, body.getContent());
-            assertEquals("123", stringArgumentCaptor.getValue());
+            assertEquals(List.of("123", "/whatsapp/1/message/template"), stringArgumentCaptor.getAllValues());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }
