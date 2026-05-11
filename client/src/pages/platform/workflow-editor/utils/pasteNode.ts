@@ -4,11 +4,19 @@ import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormatte
 import saveWorkflowDefinition from '@/pages/platform/workflow-editor/utils/saveWorkflowDefinition';
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType, NodeDataType, TaskDispatcherContextType, UpdateWorkflowMutationType} from '@/shared/types';
+import {
+    BranchCaseType,
+    ClusterElementItemType,
+    ClusterElementsType,
+    NodeDataType,
+    TaskDispatcherContextType,
+    UpdateWorkflowMutationType,
+} from '@/shared/types';
 
 type TaskParametersType = NonNullable<WorkflowTask['parameters']>;
 
 interface PasteNodeI {
+    cancelWorkflowQueries?: () => void;
     nodeIndex?: number;
     sourceNodeName?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
@@ -59,6 +67,51 @@ function recursivelyStripEmptyValuesFromParameters(parameters: Record<string, un
             }
         } else {
             result[key] = value;
+        }
+    }
+
+    return result;
+}
+
+function renameClusterElements(clusterElements: ClusterElementsType, reservedNames: Set<string>): ClusterElementsType {
+    const renameElement = (element: ClusterElementItemType): ClusterElementItemType => {
+        const elementComponentName = element.type?.split('/')?.[0];
+
+        if (!elementComponentName) {
+            return element;
+        }
+
+        const newName = getFormattedName(elementComponentName, reservedNames);
+
+        reservedNames.add(newName);
+
+        const updatedElement: ClusterElementItemType = {
+            ...element,
+            metadata: element.metadata
+                ? {...element.metadata, ui: {...element.metadata.ui, nodePosition: undefined}}
+                : undefined,
+            name: newName,
+        };
+
+        if (updatedElement.clusterElements) {
+            updatedElement.clusterElements = renameClusterElements(
+                updatedElement.clusterElements as ClusterElementsType,
+                reservedNames
+            );
+        }
+
+        return updatedElement;
+    };
+
+    const result: ClusterElementsType = {};
+
+    for (const [elementType, elementValue] of Object.entries(clusterElements)) {
+        if (elementValue === null) {
+            result[elementType] = null;
+        } else if (Array.isArray(elementValue)) {
+            result[elementType] = elementValue.map(renameElement);
+        } else {
+            result[elementType] = renameElement(elementValue);
         }
     }
 
@@ -164,6 +217,7 @@ function renameNestedTasks({
 }
 
 export default function pasteNode({
+    cancelWorkflowQueries,
     nodeIndex: directNodeIndex,
     sourceNodeName,
     taskDispatcherContext,
@@ -219,13 +273,22 @@ export default function pasteNode({
         }
     }
 
-    const reservedNames = new Set<string>();
+    const reservedNames = new Set<string>(definitionTasks.map((task: {name: string}) => task.name));
 
     const newName = getFormattedName(copiedNode.componentName, reservedNames);
 
     reservedNames.add(newName);
 
     const clonedParameters = structuredClone(copiedNode.parameters ?? {});
+    const sourceDefinitionTask = definitionTasks.find(
+        (task: {name: string}) => task.name === (copiedNode.workflowNodeName ?? copiedNode.name)
+    ) as {clusterElements?: ClusterElementsType} | undefined;
+
+    const clonedClusterElements = sourceDefinitionTask?.clusterElements
+        ? structuredClone(sourceDefinitionTask.clusterElements)
+        : copiedNode.clusterElements && !Array.isArray(copiedNode.clusterElements)
+          ? structuredClone(copiedNode.clusterElements)
+          : undefined;
 
     const shouldResetLayout = nodes.some(
         (node) => (node.data as NodeDataType)?.metadata?.ui?.nodePosition !== undefined
@@ -238,6 +301,10 @@ export default function pasteNode({
             reservedNames,
         });
     }
+
+    const renamedClusterElements = clonedClusterElements
+        ? renameClusterElements(clonedClusterElements, reservedNames)
+        : undefined;
 
     const cleanedParameters = recursivelyStripEmptyValuesFromParameters(clonedParameters);
 
@@ -264,6 +331,7 @@ export default function pasteNode({
 
     const newNodeData = {
         ...copiedNode,
+        clusterElements: renamedClusterElements ?? copiedNode.clusterElements,
         label: finalLabel,
         metadata: cleanedMetadata,
         name: newName,
@@ -273,6 +341,10 @@ export default function pasteNode({
 
     if (shouldResetLayout) {
         useWorkflowEditorStore.getState().setResetWorkflowLayout(true);
+    }
+
+    if (cancelWorkflowQueries) {
+        cancelWorkflowQueries();
     }
 
     saveWorkflowDefinition({
