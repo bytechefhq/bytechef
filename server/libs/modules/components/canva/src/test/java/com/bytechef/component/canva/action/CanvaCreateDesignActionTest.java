@@ -32,9 +32,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -50,10 +53,9 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class CanvaCreateDesignActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            TYPE, "preset", TITLE, "test", ASSET_ID, "123", NAME, "name"));
+        Map.of(TYPE, "preset", TITLE, "test", ASSET_ID, "123", NAME, "name"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -72,23 +74,18 @@ class CanvaCreateDesignActionTest {
         Object result = CanvaCreateDesignAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of("id", "123"), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/designs", stringArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(Http.Body.of(
-            Map.of(
-                TYPE, TYPE_AND_ASSET,
-                DESIGN_TYPE, Map.of(TYPE, "preset", NAME, "name"),
-                TITLE, "test",
-                ASSET_ID, "123"),
-            Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            Body.of(
+                Map.of(TYPE, TYPE_AND_ASSET, DESIGN_TYPE, Map.of(TYPE, "preset", NAME, "name"),
+                    TITLE, "test", ASSET_ID, "123"),
+                BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }

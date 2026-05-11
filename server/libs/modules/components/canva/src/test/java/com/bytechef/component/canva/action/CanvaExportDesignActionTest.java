@@ -33,9 +33,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -53,9 +56,10 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 class CanvaExportDesignActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
+    private final ArgumentCaptor<Long> longArgumentCaptor = forClass(Long.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(DESIGN_ID, "design-1", TYPE, "png"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -70,37 +74,32 @@ class CanvaExportDesignActionTest {
             canvaUtilsMockedStatic.when(
                 () -> CanvaUtils.pollJob(
                     contextArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                    integerArgumentCaptor.capture(), integerArgumentCaptor.capture()))
+                    integerArgumentCaptor.capture(), longArgumentCaptor.capture()))
                 .thenReturn(Map.of());
 
             when(mockedHttp.post(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.body(bodyArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(Map.of("job", Map.of("id", "123")));
 
             Object result = CanvaExportDesignAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(Map.of(), result);
-
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
             assertEquals(List.of("/exports", "/exports/123"), stringArgumentCaptor.getAllValues());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(List.of(MAX_ATTEMPTS, DELAY_MS), integerArgumentCaptor.getAllValues());
-
-            Body body = bodyArgumentCaptor.getValue();
-
-            assertEquals(Map.of(DESIGN_ID, "design-1", FORMAT, Map.of(TYPE, "png")), body.getContent());
-
-            ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-            assertNotNull(capturedFunction);
+            assertEquals(MAX_ATTEMPTS, integerArgumentCaptor.getValue());
+            assertEquals(DELAY_MS, longArgumentCaptor.getValue());
+            assertEquals(
+                Body.of(Map.of(DESIGN_ID, "design-1", FORMAT, Map.of(TYPE, "png")), BodyContentType.JSON),
+                bodyArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-            Http.Configuration configuration = configurationBuilder.build();
-            Http.ResponseType responseType = configuration.getResponseType();
+            Configuration configuration = configurationBuilder.build();
 
-            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
         }
     }
 }
