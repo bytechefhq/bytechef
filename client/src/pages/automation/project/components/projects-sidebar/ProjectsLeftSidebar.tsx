@@ -12,10 +12,12 @@ import WorkflowsListSkeleton from '@/pages/automation/project/components/project
 import {useProjectsLeftSidebar} from '@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
+import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useConvertN8nToWorkflow} from "@/pages/automation/project/hooks/useConverterN8nToWorkflow";
 import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
@@ -23,7 +25,7 @@ import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automa
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, LayoutTemplateIcon, PlusIcon, UploadIcon} from 'lucide-react';
+import {ChevronDownIcon, LayoutTemplateIcon, LoaderCircleIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate} from 'react-router-dom';
@@ -52,6 +54,7 @@ const ProjectsLeftSidebar = ({
     const projectHiddenFileInputRef = useRef<HTMLInputElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const workflowHiddenFileInputRef = useRef<HTMLInputElement>(null);
+    const converterHiddenFileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
     const {captureProjectWorkflowImported} = useAnalytics();
@@ -92,6 +95,9 @@ const ProjectsLeftSidebar = ({
     );
 
     const queryClient = useQueryClient();
+
+    const { convertN8nWorkflow } = useConvertN8nToWorkflow();
+    const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const importProjectMutation = useImportProjectMutation({
         onSuccess: () => {
@@ -246,9 +252,15 @@ const ProjectsLeftSidebar = ({
                         <DropdownMenuTrigger asChild>
                             <Button
                                 className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
-                                icon={<ChevronDownIcon />}
                                 size="icon"
                                 variant="secondary"
+                                icon={
+                                    isImportingN8nWorkflow ? (
+                                        <LoaderCircleIcon className="animate-spin text-primary"/>
+                                    ) : (
+                                        <ChevronDownIcon />
+                                    )
+                                }
                             />
                         </DropdownMenuTrigger>
 
@@ -271,6 +283,16 @@ const ProjectsLeftSidebar = ({
                                 }}
                             >
                                 <UploadIcon /> Import Workflow
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => {
+                                    if (converterHiddenFileInputRef.current) {
+                                        converterHiddenFileInputRef.current.click();
+                                    }
+                                }}
+                            >
+                                <UploadIcon /> Import n8n Workflow
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -337,6 +359,31 @@ const ProjectsLeftSidebar = ({
                 onChange={(event) => handleImportWorkflow(event, selectedProjectId, importProjectWorkflowMutation)}
                 ref={workflowHiddenFileInputRef}
                 type="file"
+            />
+
+            <input
+                accept=".json"
+                className="hidden"
+                ref={converterHiddenFileInputRef}
+                type="file"
+                onChange={async (event) => {
+                    if (!event.target.files?.length) return;
+
+                    try {
+                        setIsImportingN8nWorkflow(true);
+                        await handleImportN8nWorkflow(
+                            event,
+                            selectedProjectId,
+                            importProjectWorkflowMutation,
+                            convertN8nWorkflow
+                        );
+                    } finally {
+                        setIsImportingN8nWorkflow(false);
+                        if (converterHiddenFileInputRef.current) {
+                            converterHiddenFileInputRef.current.value = '';
+                        }
+                    }
+                }}
             />
 
             <input
