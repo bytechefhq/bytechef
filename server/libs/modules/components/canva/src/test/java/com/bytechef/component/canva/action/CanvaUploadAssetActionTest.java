@@ -18,8 +18,6 @@ package com.bytechef.component.canva.action;
 
 import static com.bytechef.component.canva.constant.CanvaConstants.ASSET;
 import static com.bytechef.component.canva.constant.CanvaConstants.ASSET_NAME;
-import static com.bytechef.component.canva.constant.CanvaConstants.DELAY_MS;
-import static com.bytechef.component.canva.constant.CanvaConstants.MAX_ATTEMPTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -59,8 +57,6 @@ class CanvaUploadAssetActionTest {
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final FileEntry fileEntry = mock(FileEntry.class);
-    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
-    private final ArgumentCaptor<Long> longArgumentCaptor = forClass(Long.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(ASSET_NAME, "test", ASSET, fileEntry));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -73,9 +69,7 @@ class CanvaUploadAssetActionTest {
 
         try (MockedStatic<CanvaUtils> canvaUtilsMockedStatic = mockStatic(CanvaUtils.class)) {
             canvaUtilsMockedStatic.when(
-                () -> CanvaUtils.pollJob(
-                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                    integerArgumentCaptor.capture(), longArgumentCaptor.capture()))
+                () -> CanvaUtils.pollJob(contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(Map.of());
 
             when(mockedHttp.post(stringArgumentCaptor.capture()))
@@ -106,8 +100,7 @@ class CanvaUploadAssetActionTest {
 
             assertEquals(ResponseType.JSON, configuration.getResponseType());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(MAX_ATTEMPTS, integerArgumentCaptor.getValue());
-            assertEquals(DELAY_MS, longArgumentCaptor.getValue());
         }
     }
+
 }

@@ -18,8 +18,6 @@ package com.bytechef.component.canva.action;
 
 import static com.bytechef.component.canva.constant.CanvaConstants.ASSET;
 import static com.bytechef.component.canva.constant.CanvaConstants.ASSET_NAME;
-import static com.bytechef.component.canva.constant.CanvaConstants.DELAY_MS;
-import static com.bytechef.component.canva.constant.CanvaConstants.MAX_ATTEMPTS;
 import static com.bytechef.component.canva.util.CanvaUtils.pollJob;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -29,13 +27,13 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
+import com.bytechef.component.canva.util.CanvaUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.exception.ProviderException;
 import java.util.Map;
 
 /**
@@ -85,27 +83,24 @@ public class CanvaUploadAssetAction {
                                                 string("width").description("Thumbnail width."),
                                                 string("height").description("Thumbnail height."),
                                                 string("url").description("Thumbnail URL.")))))))
-        .perform(CanvaUploadAssetAction::perform);
+        .perform(CanvaUploadAssetAction::perform)
+        .processErrorResponse(CanvaUtils::processErrorResponse);
 
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Object uploadJob = createUploadJob(inputParameters, context);
+        Map<String, ?> uploadJob = createUploadJob(inputParameters, context);
 
-        if (!(uploadJob instanceof Map<?, ?> jobMap)) {
-            throw new ProviderException("Canva upload asset action was not successful.");
-        }
-
-        return pollJob(context, "/asset-uploads/" + jobMap.get("id"), MAX_ATTEMPTS, DELAY_MS);
+        return pollJob(context, "/asset-uploads/" + uploadJob.get("id"));
     }
 
-    private static Object createUploadJob(Parameters inputParameters, Context context) {
+    private static Map<String, ?> createUploadJob(Parameters inputParameters, Context context) {
         String base64Name = context.encoder(encoder -> encoder.base64Encode(
             inputParameters.getRequiredString(ASSET_NAME)));
 
         String header = context.json(json -> json.write(Map.of("name_base64", base64Name)));
 
-        Map<String, Object> response = context
+        Map<String, Map<String, ?>> response = context
             .http(http -> http.post("/asset-uploads"))
             .header("Asset-Upload-Metadata", header)
             .body(Body.of(inputParameters.getRequiredFileEntry(ASSET), "application/octet-stream"))

@@ -62,7 +62,7 @@ class CanvaUtilsTest {
             .thenReturn(Map.of("id", "123", "status", "in_progress"))
             .thenReturn(Map.of("id", "123", "status", "success"));
 
-        Map<String, Object> result = CanvaUtils.pollJob(mockedContext, "/asset-uploads/123", 10, 0);
+        Map<String, Object> result = CanvaUtils.pollJob(mockedContext, "/asset-uploads/123");
 
         assertEquals(Map.of("id", "123", "status", "success"), result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
