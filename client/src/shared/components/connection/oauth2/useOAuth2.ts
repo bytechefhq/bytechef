@@ -13,7 +13,8 @@ export interface TokenPayloadI {
 
 export interface CodePayloadI {
     code: string;
-    [key: string]: string;
+    code_verifier?: string;
+    [key: string]: string | undefined;
 }
 
 const POPUP_HEIGHT = 800;
@@ -209,7 +210,10 @@ const useOAuth2 = ({
                     const payload = data?.payload;
 
                     if (responseType === 'code' && onCodeSuccess) {
-                        onCodeSuccess(payload);
+                        onCodeSuccess({
+                            ...payload,
+                            code_verifier: extraQueryParametersRef.current?.code_verifier,
+                        });
                     } else {
                         if (onTokenSuccess) {
                             onTokenSuccess(payload);
