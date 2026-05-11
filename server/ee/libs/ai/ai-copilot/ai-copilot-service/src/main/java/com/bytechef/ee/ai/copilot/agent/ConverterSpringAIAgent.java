@@ -16,11 +16,34 @@
 
 package com.bytechef.ee.ai.copilot.agent;
 
+import com.agui.core.agent.AgentSubscriber;
+import com.agui.core.agent.AgentSubscriberParams;
+import com.agui.core.agent.RunAgentInput;
 import com.agui.core.context.Context;
+import com.agui.core.event.CustomEvent;
+import com.agui.core.event.MessagesSnapshotEvent;
+import com.agui.core.event.RawEvent;
+import com.agui.core.event.RunErrorEvent;
+import com.agui.core.event.RunFinishedEvent;
+import com.agui.core.event.RunStartedEvent;
+import com.agui.core.event.StateDeltaEvent;
+import com.agui.core.event.StateSnapshotEvent;
+import com.agui.core.event.StepFinishedEvent;
+import com.agui.core.event.StepStartedEvent;
+import com.agui.core.event.TextMessageContentEvent;
+import com.agui.core.event.TextMessageEndEvent;
+import com.agui.core.event.TextMessageStartEvent;
+import com.agui.core.event.ToolCallArgsEvent;
+import com.agui.core.event.ToolCallEndEvent;
+import com.agui.core.event.ToolCallResultEvent;
+import com.agui.core.event.ToolCallStartEvent;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.message.BaseMessage;
 import com.agui.core.message.SystemMessage;
 import com.agui.core.state.State;
+import com.agui.core.tool.ToolCall;
+import com.agui.core.type.EventType;
+import com.agui.server.EventFactory;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
 import java.util.List;
@@ -67,14 +90,14 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
             - If an n8n Filter node is used, the assistant MUST:
                 - Replace it with a ByteChef Condition Task Dispatcher that evaluates the filter criteria against the current item.
                  - If the condition evaluates to true:
-                    - The current item MUST be added to the Data Storage list using a Data Storage “append value to list” operation.
+                    - The current item MUST be added to the Data Storage list using a Data Storage "append value to list" operation.
                  - If the condition evaluates to false:
                     - The item MUST NOT be added to the Data Storage list.
             - If an n8n Set node is used to add or update values on existing data (beyond simple direct assignment):
                  - The assistant MUST NOT use the "var" component.
                  - The assistant MUST use the "objectHelper" component to safely add or modify the value in the existing object.
                  - After modifying the object, the assistant MUST persist the result by using Data Storage inside the branch:
-                    - Specifically, it MUST append the resulting value to a list using an “append value to list” operation.
+                    - Specifically, it MUST append the resulting value to a list using an "append value to list" operation.
             """;
 
     protected ConverterSpringAIAgent(final Builder builder) throws AGUIException {
@@ -83,6 +106,11 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    protected void run(RunAgentInput input, AgentSubscriber subscriber) {
+        super.run(input, new JsonExtractingSubscriber(subscriber));
     }
 
     @Override
@@ -112,6 +140,214 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
         systemMessage.setContent(message);
 
         return systemMessage;
+    }
+
+    private static String extractJson(String text) {
+        if (text == null || text.isBlank()) {
+            return text;
+        }
+
+        int jsonBlockStart = text.indexOf("```json");
+
+        if (jsonBlockStart >= 0) {
+            int contentStart = text.indexOf('\n', jsonBlockStart) + 1;
+            int blockEnd = text.indexOf("```", contentStart);
+
+            if (blockEnd > contentStart) {
+                return text.substring(contentStart, blockEnd)
+                    .strip();
+            }
+        }
+
+        int blockStart = text.indexOf("```");
+
+        if (blockStart >= 0) {
+            int contentStart = text.indexOf('\n', blockStart) + 1;
+            int blockEnd = text.indexOf("```", contentStart);
+
+            if (blockEnd > contentStart) {
+                return text.substring(contentStart, blockEnd)
+                    .strip();
+            }
+        }
+
+        int objectStart = text.indexOf('{');
+        int arrayStart = text.indexOf('[');
+
+        if (objectStart < 0 && arrayStart < 0) {
+            return text;
+        }
+
+        char closeChar;
+        int start;
+
+        if (objectStart >= 0 && (arrayStart < 0 || objectStart <= arrayStart)) {
+            closeChar = '}';
+            start = objectStart;
+        } else {
+            closeChar = ']';
+            start = arrayStart;
+        }
+
+        int lastClose = text.lastIndexOf(closeChar);
+
+        if (lastClose > start) {
+            return text.substring(start, lastClose + 1);
+        }
+
+        return text;
+    }
+
+    private static class JsonExtractingSubscriber implements AgentSubscriber {
+
+        private final AgentSubscriber delegate;
+        private final StringBuilder buffer = new StringBuilder();
+
+        JsonExtractingSubscriber(AgentSubscriber delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void onEvent(com.agui.core.event.BaseEvent event) {
+            EventType type = event.getType();
+
+            if (type == EventType.TEXT_MESSAGE_CONTENT || type == EventType.TEXT_MESSAGE_CHUNK
+                || type == EventType.TEXT_MESSAGE_END) {
+                return;
+            }
+
+            delegate.onEvent(event);
+        }
+
+        @Override
+        public void onTextMessageContentEvent(TextMessageContentEvent event) {
+            if (event.getDelta() != null) {
+                buffer.append(event.getDelta());
+            }
+        }
+
+        @Override
+        public void onTextMessageEndEvent(TextMessageEndEvent event) {
+            String cleanJson = extractJson(buffer.toString());
+            TextMessageContentEvent contentEvent =
+                EventFactory.textMessageContentEvent(event.getMessageId(), cleanJson);
+
+            delegate.onEvent(contentEvent);
+            delegate.onTextMessageContentEvent(contentEvent);
+            delegate.onEvent(event);
+            delegate.onTextMessageEndEvent(event);
+        }
+
+        @Override
+        public void onNewMessage(BaseMessage message) {
+            message.setContent(extractJson(message.getContent()));
+            delegate.onNewMessage(message);
+        }
+
+        @Override
+        public void onRunInitialized(AgentSubscriberParams params) {
+            delegate.onRunInitialized(params);
+        }
+
+        @Override
+        public void onRunFailed(AgentSubscriberParams params, Throwable error) {
+            delegate.onRunFailed(params, error);
+        }
+
+        @Override
+        public void onRunFinalized(AgentSubscriberParams params) {
+            delegate.onRunFinalized(params);
+        }
+
+        @Override
+        public void onRunStartedEvent(RunStartedEvent event) {
+            delegate.onRunStartedEvent(event);
+        }
+
+        @Override
+        public void onRunFinishedEvent(RunFinishedEvent event) {
+            delegate.onRunFinishedEvent(event);
+        }
+
+        @Override
+        public void onRunErrorEvent(RunErrorEvent event) {
+            delegate.onRunErrorEvent(event);
+        }
+
+        @Override
+        public void onStepStartedEvent(StepStartedEvent event) {
+            delegate.onStepStartedEvent(event);
+        }
+
+        @Override
+        public void onStepFinishedEvent(StepFinishedEvent event) {
+            delegate.onStepFinishedEvent(event);
+        }
+
+        @Override
+        public void onTextMessageStartEvent(TextMessageStartEvent event) {
+            delegate.onTextMessageStartEvent(event);
+        }
+
+        @Override
+        public void onToolCallStartEvent(ToolCallStartEvent event) {
+            delegate.onToolCallStartEvent(event);
+        }
+
+        @Override
+        public void onToolCallArgsEvent(ToolCallArgsEvent event) {
+            delegate.onToolCallArgsEvent(event);
+        }
+
+        @Override
+        public void onToolCallEndEvent(ToolCallEndEvent event) {
+            delegate.onToolCallEndEvent(event);
+        }
+
+        @Override
+        public void onToolCallResultEvent(ToolCallResultEvent event) {
+            delegate.onToolCallResultEvent(event);
+        }
+
+        @Override
+        public void onStateSnapshotEvent(StateSnapshotEvent event) {
+            delegate.onStateSnapshotEvent(event);
+        }
+
+        @Override
+        public void onStateDeltaEvent(StateDeltaEvent event) {
+            delegate.onStateDeltaEvent(event);
+        }
+
+        @Override
+        public void onMessagesSnapshotEvent(MessagesSnapshotEvent event) {
+            delegate.onMessagesSnapshotEvent(event);
+        }
+
+        @Override
+        public void onRawEvent(RawEvent event) {
+            delegate.onRawEvent(event);
+        }
+
+        @Override
+        public void onCustomEvent(CustomEvent event) {
+            delegate.onCustomEvent(event);
+        }
+
+        @Override
+        public void onMessagesChanged(AgentSubscriberParams params) {
+            delegate.onMessagesChanged(params);
+        }
+
+        @Override
+        public void onStateChanged(State state) {
+            delegate.onStateChanged(state);
+        }
+
+        @Override
+        public void onNewToolCall(ToolCall toolCall) {
+            delegate.onNewToolCall(toolCall);
+        }
     }
 
     public static class Builder extends SpringAIAgent.Builder {
