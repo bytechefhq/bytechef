@@ -1,20 +1,75 @@
 <div align="center">
 
-
-[![License](https://img.shields.io/static/v1?label=license&message=Apache%20v2.0&color=brightgreen)](https://github.com/bytechefhq/bytechef/blob/master/LICENSE)
+[![License: Apache 2.0 + EE](https://img.shields.io/static/v1?label=license&message=Apache%202.0%20%2B%20EE&color=brightgreen)](https://github.com/bytechefhq/bytechef/blob/master/LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/bytechef/bytechef)](https://hub.docker.com/r/bytechef/bytechef)
 [![Build Status](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg)](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-7389D8?logo=discord&logoColor=white)](https://discord.gg/VKvNxHjpYx)
 
-[![API integration and workflow automation platform](https://raw.githubusercontent.com/bytechefhq/bytechef/master/static/bytechef_logo.png)](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme)
+[![ByteChef](https://raw.githubusercontent.com/bytechefhq/bytechef/master/static/bytechef_logo.png)](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme)
 
-**Open-source, low-code, extendable API integration & workflow automation platform**
+# **The open-source platform that unifies AI agent orchestration and workflow automation**
+### Autonomy and precision — in one platform.
 
-  [Documentation](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) · [Discord](https://discord.gg/VKvNxHjpYx) · [Connect on X](https://demo.bytechef.io)
+[Documentation](https://www.youtube.com/watch?v=vFpobtcdWSc) · [Live Demo](https://demo.bytechef.io) · [Discord](https://discord.gg/VKvNxHjpYx) · [Connect on X](https://x.com/bytechefhq) · [Roadmap](https://github.com/orgs/bytechefhq/projects/3)
 
 </div>
 
-## Installation
+> <!-- VISUAL 1 — Workflow editor. Capture: full canvas with multiple steps, branches, and a trigger. Save as static/workflow-editor.png -->
+> ![ByteChef workflow editor](static/workflow-editor.png)
+
+[//]: # (---)
+
+[//]: # (## About ByteChef)
+
+[//]: # ()
+[//]: # (ByteChef is an open-source platform for AI agents, workflow automation, and API integration.)
+
+[//]: # ()
+[//]: # (Instead of using separate tools for AI agents and automated workflows, ByteChef brings both into a single platform with one orchestration layer, centralized management, and enterprise-grade security.)
+
+[//]: # ()
+[//]: # (Built for modern enterprises, ByteChef can run in regulated environments and be embedded into products that deliver AI capabilities to end users.)
+
+[//]: # ()
+[//]: # (---)
+
+### AI Agents — built in, not bolted on
+
+> <!-- VISUAL 2 — Agent editor (cluster element editor). Capture: the AI agent component opened with its cluster of sub-elements visible — model, tools list, memory, guardrails, knowledge base. Save as static/agent-editor.png -->
+> ![ByteChef agent editor — cluster element view](static/agent-editor.png)
+
+A drag-and-drop **AI Agent** component runs the full agent loop — model → tool selection → execution → observation → next step — with streaming and structured output.
+
+[//]: # (| Capability | What ships |)
+
+[//]: # (| --- | --- |)
+
+[//]: # (| **LLM providers** &#40;14&#41; | OpenAI · Anthropic · Azure OpenAI · Bedrock · Vertex Gemini · Mistral · Groq · DeepSeek · Hugging Face · Nvidia · Perplexity · Stability · Ollama · OpenRouter |)
+
+[//]: # (| **Tools** | Every component is a tool. Mark properties with `fromAi&#40;"…", "STRING", { required: true }&#41;` and the agent fills them at runtime. Sub-workflows are tools too. |)
+
+[//]: # (| **Memory** &#40;8 backends&#41; | JDBC · Redis · MongoDB · Cassandra · Cosmos DB · Neo4j · vector-store-backed · in-memory |)
+
+[//]: # (| **Guardrails** &#40;12&#41; | PII · LLM-PII · jailbreak · NSFW · topical alignment · keywords · secret keys · URLs · sanitize · custom regex · custom rules · violation aggregator |)
+
+[//]: # (| **Knowledge bases & RAG** | Native ingestion + chunking. 15+ vector stores: pgvector · Pinecone · Qdrant · Weaviate · Milvus · Couchbase · Neo4j · Redis · Typesense · MariaDB · Oracle · S3 · built-in. Two RAG patterns: `rag-modular`, `rag-questionanswer`. |)
+
+[//]: # (| **Agent Skills** 🚧 | _In development._ Versioned, downloadable bundles of prompt + tools + memory + guardrails + knowledge bindings. [Track on roadmap]&#40;https://github.com/orgs/bytechefhq/projects/3&#41;. |)
+
+[//]: # (| **MCP** &#40;in & out&#41; | Consume any MCP server as a tool source. Expose any workflow as an MCP tool to Claude Desktop, Cursor, Windsurf — with API-key auth. |)
+
+[//]: # (| **Evaluations** 🚧 | _In development._ Scenarios, runs, judges &#40;StringEquals, Regex, Contains, JsonSchema, ResponseLength, Similarity, LlmRule, ToolUsage&#41;, tool simulation, user simulator. [Track on roadmap]&#40;https://github.com/orgs/bytechefhq/projects/3&#41;. |)
+
+### Build Workflows with Ease using Copilot
+
+> <!-- COPILOT SCREENSHOT — capture: Copilot side panel with a natural-language prompt on the left, generating a workflow with a configured AI agent component on the canvas. Save as static/copilot.png -->
+> ![ByteChef AI Copilot generating an agent workflow](static/copilot.png)
+
+Build AI agents and workflows by talking to ByteChef. The Copilot generates workflows from a sentence, drops in configured agent steps, explains failed runs and suggests fixes.
+
+---
+
+## Quick Start
 
 ### Docker Compose (Fastest Setup)
 
@@ -27,6 +82,8 @@ docker compose -f docker-compose.yml up
 ```
 
 Both PostgreSQL database and ByteChef containers will start automatically.
+
+Open <http://localhost:8080/login> → **Create Account** → sign in.
 
 ### Docker (Manual Setup)
 
@@ -61,78 +118,79 @@ docker run --name bytechef -it -p 8080:8080 \
 
 **Note:** Use `-d` flag instead of `-it` to run in detached mode.
 
-## Features
+Open <http://localhost:8080/login> → **Create Account** → sign in.
 
-* **Visual Workflow Editor**: Build and visualize workflows by dragging and dropping components
-* **Event-Driven & Scheduled Workflows**: Automate with real-time event-driven workflows via simple trigger definitions
-* **Multiple Flow Controls**: Use condition, switch, loop, each, parallel, and more
-* **Built-In Code Editor**: Write workflow definitions in JSON and code blocks in Java, JavaScript, Python, and Ruby
-* **200+ Built-In Components**: Extract data from any database, SaaS applications, internal APIs, or cloud storage
-* **Extendable**: Develop custom connectors in Java, JavaScript, Python, or Ruby
-* **AI Ready**: Built-in AI components for running multiple AI models and algorithms
-* **Developer Ready**: Expose workflows as APIs; platform handles authentication
-* **Version Control Friendly**: Push workflows to Git directly from ByteChef UI
-* **Self-Hosted**: Install on-premise for complete control over execution and data
+### Build your first agent in 60 seconds
+
+1. **New Project → New Workflow**,
+2. Add a trigger
+3. Add the **AI Agent** component
+4. Pick a **model**, attach **tools** from 200+ connectors, optionally add a **knowledge base** and **guardrails**
+5. Fill the necessary credentials
+6. Configure each component's parameters in the properties panel
+7. Test your workflow
+8. Deploy
+
 ---
 
-## Getting Started With ByteChef's Self-Hosted Instance
+## Workflow Automation
 
-1. Start ByteChef with Docker Compose:
-   
-   ```bash
-   curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/docker-compose.yml
-   docker compose -f docker-compose.yml up
-   ```
+- **Visual editor** with JSON underneath, Git-friendly
+- **Flow controls** — `condition` · `switch` · `loop` · `each` · `parallel` · `branch` · sub-workflows
+- **Triggers** — webhook · schedule · polling · app-event · manual · form
+- **Polyglot code** — Java · JavaScript · Python · Ruby on GraalVM
+- **Durable execution** on the Atlas runtime, Postgres-backed, queue-mode for horizontal scale (memory · Redis · RabbitMQ · Kafka · JMS · AMQP · SQS)
+- **Workflows-as-APIs** — workflows can be an authenticated HTTP endpoint
+- **Git-native** — push from the UI, environments backed by branches
 
-2. Open <http://localhost:8080/login>
+---
 
-3. Click **Create Account** to set up your user
+## The Unification
 
-4. Sign in with your credentials
+- **Agents inside workflows** — an agent is a step; downstream branches react to its decisions
+- **Workflows as agent tools** — a "refund order" workflow with retries and approvals becomes one tool
+- **Sub-agents** — coordinator agents call specialist agents
+- **Human-in-the-loop** — pause on approval, route to Slack/email, resume on response
+- **One audit log** — agent decisions, tool calls, workflow runs, human approvals, all in one trail
 
-## What is ByteChef?
+---
 
-ByteChef is an **open-source, low-code, extendable** API integration and workflow automation platform that helps you:
+## 180+ connectors
 
-**As an automation solution** - Integrate and build automation workflows across your SaaS apps, internal APIs, and databases.
+CRM · marketing · communication · e-commerce · cloud storage · databases · AI/ML · helpdesk · finance. Every connector is **also an agent tool, also an MCP tool**. Browse the [full catalog](https://docs.bytechef.io/reference/components).
 
-**As an embedded solution** - Build integrations directly into your SaaS product, allowing your customers to connect applications they use with your product.
+---
 
+## Open core — Apache 2.0 + EE
 
-## Creating your first workflow
+| Capability                                                                | CE (Apache 2.0) | EE |
+|---------------------------------------------------------------------------| --- | --- |
+| Visual editor, AI agents, workflows, 200+ connectors                      | ✅ | ✅ |
+| Polyglot code (Java/JS/Python/Ruby)                                       | ✅ | ✅ |
+| Knowledge bases, vector stores, guardrails, MCP server                    | ✅ | ✅ |
+| Agent skills, agent evaluations                                           | 🚧 in development | 🚧 in development |
+| Self-host (Docker / Kubernetes / Helm)                                    | ✅ | ✅ |
+| **Workflows-as-APIs**                                                     | — | ✅ |
+| **Git-native**                                                            | — | ✅ |
+| **Microservices deployment**                                              | — |  🚧 in development |
+| **AI Copilot**                                                            | — | ✅ |
+| **SSO / SAML / OIDC**, SCIM, advanced RBAC                                | — |  🚧 in development |
+| **Connection scope sharing** (Workspace / Project / Organization)         | — |  🚧 in development  |
+| Multi-environment promotion, audit log with correlation IDs               | — | ✅ |
+| **AI Gateway** - model routing, quotas, cost controls                     | — |  🚧 in development  |
+| Embedded iPaaS - ship integrations and AI agents inside your SaaS product | — | ✅ |
 
-### Using the UI Editor
-
-1. Navigate to the **Projects** section
-2. Click **New Project**
-3. Fill the necessary credentials
-4. Create a new workflow in the project
-5. Add a trigger and components you want to work with
-6. Connect them to define your workflow logic
-7. Configure each component's parameters in the properties panel
-8. Test your workflow
-9. Deploy
+---
 
 ## Contributing
 
-ByteChef is Open Source under the [Apache License v2.0](https://github.com/bytechefhq/bytechef/blob/master/LICENSE). If you would like to contribute to the software, read the [contributing guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to get started.
-
-## Roadmap
-
-Check out our [public roadmap](https://github.com/orgs/bytechefhq/projects/3) to see what we're working on next.
+If you would like to contribute to the software, read the [contributing guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to get started.
 
 ---
 
 ## License
 
-ByteChef is released under the [Apache License v2.0](https://github.com/bytechefhq/bytechef/blob/master/LICENSE).
-
-```
-Copyright 2025 ByteChef
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-```
+This project is licenced under **Apache 2.0** for the core (everything outside `/ee/`) and the **ByteChef Enterprise License** for code under `/ee/` (microservices, embedded, AI Copilot, SSO/SCIM, advanced RBAC)
 
 ---
 
@@ -144,4 +202,4 @@ you may not use this file except in compliance with the License.
 
 ## Credits
 
-ByteChef started as a fork of [Piper](https://github.com/runabol/piper), an open-source, distributed workflow engine.
+ByteChef started as a fork of [Piper](https://github.com/runabol/piper).
