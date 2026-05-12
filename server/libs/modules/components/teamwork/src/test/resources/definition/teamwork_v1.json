@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new company.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/teamwork_v1#create-company"
+    },
     "metadata": {
       "path": "/companies.json",
       "mimeType": "application/json",
@@ -297,7 +300,7 @@
         "advancedOption": null,
         "controlType": "TEXT",
         "defaultValue": null,
-        "description": null,
+        "description": "Email address of the company.",
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
@@ -372,8 +375,11 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Create a new task",
-    "help": null,
+    "description": "Create a new task.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/teamwork_v1#create-task"
+    },
     "metadata": {
       "path": "/tasklists/{tasklistId}/tasks.json",
       "mimeType": "application/json",
@@ -579,7 +585,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "Task list where new task is added",
+      "description": "Task list where new task is added.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -622,7 +628,7 @@
         "advancedOption": null,
         "controlType": "TEXT",
         "defaultValue": null,
-        "description": "Task name",
+        "description": "Name of the task.",
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
@@ -644,7 +650,7 @@
         "advancedOption": null,
         "controlType": "TEXT",
         "defaultValue": null,
-        "description": null,
+        "description": "Description of the task.",
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
@@ -666,7 +672,7 @@
         "advancedOption": null,
         "controlType": "DATE",
         "defaultValue": null,
-        "description": null,
+        "description": "Due date of the task.",
         "displayCondition": null,
         "exampleValue": null,
         "expressionEnabled": null,
@@ -764,14 +770,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/teamwork_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://apidocs.teamwork.com/docs/teamwork/v3"
+  },
   "description": "Teamwork is a project management software that helps teams collaborate, organize tasks, and track progress efficiently.",
   "icon": "path:assets/teamwork.svg",
   "metadata": null,
