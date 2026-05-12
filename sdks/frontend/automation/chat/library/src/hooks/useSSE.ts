@@ -1,10 +1,7 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
+import {parseAndDispatchSSE} from '@/utils/sse-parser';
 
 type EventHandlersType = Record<string, (data: unknown) => void>;
-
-const EVENT_PREFIX = 'event:';
-const DATA_PREFIX = 'data:';
-const SPACE = ' ';
 
 export type UseSSEOptionsType = {
     eventHandlers?: EventHandlersType;
@@ -21,69 +18,6 @@ export type UseSSEResultType<T = unknown> = {
     connectionState: 'CONNECTING' | 'CONNECTED' | 'ERROR' | 'CLOSED';
     close: () => void;
 };
-
-function parseAndDispatchSSE(
-    chunk: string,
-    onDefaultMessage: (data: unknown) => void,
-    customHandlers?: EventHandlersType
-) {
-    // SSE events are separated by blank lines. Lines can be: event:, data:, id:, retry:
-    const events = chunk.split(/\r?\n\r?\n+/);
-
-    for (const event of events) {
-        if (!event.trim()) {
-            continue;
-        }
-
-        const dataLines: string[] = [];
-        let eventType = 'message';
-        const lines = event.split(/\r?\n/);
-
-        for (const line of lines) {
-            if (line.startsWith(EVENT_PREFIX)) {
-                let value = line.slice(EVENT_PREFIX.length);
-
-                if (value.startsWith(SPACE)) {
-                    value = value.slice(SPACE.length);
-                }
-
-                eventType = value;
-            } else if (line.startsWith(DATA_PREFIX)) {
-                let dataLine = line.slice(DATA_PREFIX.length);
-
-                if (dataLine.startsWith(SPACE)) {
-                    dataLine = dataLine.slice(SPACE.length);
-                }
-
-                dataLines.push(dataLine);
-            }
-        }
-
-        let data: unknown = dataLines.join('\n');
-
-        if (typeof data === 'string') {
-            try {
-                data = JSON.parse(data);
-            } catch {
-                // ignored
-            }
-        }
-
-        console.log('[useSSE] Received SSE event - type:', eventType, 'data:', data);
-
-        if (customHandlers && customHandlers[eventType]) {
-            console.log('[useSSE] Calling custom handler for event type:', eventType);
-            try {
-                customHandlers[eventType](data);
-            } catch (error) {
-                console.error('Error in SSE event handler for event type:', eventType, error);
-            }
-        } else {
-            console.log('[useSSE] Calling default message handler');
-            onDefaultMessage(data);
-        }
-    }
-}
 
 export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOptionsType = {}): UseSSEResultType<T> => {
     const [data, setData] = useState<T | string | null>(null);

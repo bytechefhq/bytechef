@@ -6,6 +6,7 @@ import {
     SimpleTextAttachmentAdapter,
     Suggestions,
     ThreadMessageLike,
+    WebSpeechDictationAdapter,
     useAui,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
@@ -14,9 +15,55 @@ import {useShallow} from 'zustand/shallow';
 
 import {useChatStore} from '@/stores/useChatStore';
 import {useSSE} from '@/hooks/useSSE';
+import {useAutomationChatVoiceSession} from '@/hooks/useAutomationChatVoiceSession';
+import {checkVoiceSupport} from '@/lib/BrowserVoiceSession';
+import {createWebhookVoiceAdapter} from '@/lib/ByteChefRealtimeVoiceAdapter';
 import {extractStreamChunk} from '@/utils/stream-utils';
+import {drainSseResponse} from '@/utils/sse-parser';
 import {AutomationChatContext} from '@/hooks/useAutomationChatConfig';
 import type {AutomationChatConfig} from '@/types';
+
+// Mirrors `AskUserQuestionEventI` in client/src/shared/util/assistant-message-utils.ts. The widget
+// cannot import from @/shared (it ships as an external npm package consumed by customer sites), so the
+// shape is duplicated here; the formatter below matches `formatAskUserQuestionMessage` in that file
+// byte-for-byte so questions render identically across the editor panel, AI Hub, and this widget.
+interface AskUserQuestionOptionI {
+    description: string;
+    label: string;
+}
+
+interface AskUserQuestionI {
+    header: string;
+    multiSelect: boolean;
+    options: AskUserQuestionOptionI[];
+    question: string;
+}
+
+interface AskUserQuestionEventI {
+    questions: AskUserQuestionI[];
+    resumeUrl?: string;
+}
+
+function formatAskUserQuestion(event: AskUserQuestionEventI): string {
+    if (!Array.isArray(event.questions) || event.questions.length === 0) {
+        return '';
+    }
+
+    return event.questions
+        .map((question) => {
+            const options = Array.isArray(question.options) ? question.options : [];
+            const optionLines = options
+                .map((option, index) => `  ${index + 1}. **${option.label}** — ${option.description}`)
+                .join('\n');
+
+            const header = question.header ?? '';
+            const text = question.question ?? '';
+            const headerSegment = header ? `**${header}**: ` : '';
+
+            return optionLines ? `${headerSegment}${text}\n${optionLines}` : `${headerSegment}${text}`;
+        })
+        .join('\n\n');
+}
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
@@ -27,6 +74,11 @@ const attachmentAdapter = new CompositeAttachmentAdapter([
     new SimpleTextAttachmentAdapter(),
 ]);
 
+// Browser-native speech-to-text (Web Speech API). Replaces the former push-to-talk that POSTed audio to
+// the webhook `${webhookUrl}/transcribe` endpoint. The composer's built-in Dictate/StopDictation buttons
+// light up via `thread.capabilities.dictation` once this adapter is registered.
+const dictationAdapter = new WebSpeechDictationAdapter();
+
 type AutomationChatProviderProps = {
     children: ReactNode;
     config: AutomationChatConfig;
@@ -36,16 +88,36 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
     children,
     config,
 }: AutomationChatProviderProps) {
-    const {webhookUrl, title = 'Hello there!', description = 'How can I help you today?', suggestions} = config;
+    const {
+        chatMode = false,
+        description = 'How can I help you today?',
+        suggestions,
+        title = 'Hello there!',
+        voiceMode = false,
+        voiceWebhookUrl,
+        webhookUrl,
+    } = config;
 
-    const contextValue = useMemo(
-        () => ({
-            title,
-            description,
-            suggestions,
-        }),
-        [title, description, suggestions]
+    // checkVoiceSupport returns null when the browser meets every voice requirement (AudioContext,
+    // AudioWorklet, getUserMedia, WebSocket, secure context). When it returns a reason string we disable
+    // voice everywhere — the mic button hides, the voice context shape becomes undefined for the Thread.
+    // Customer pages embedding the widget on an unsupported browser get a clean text-only experience
+    // instead of a silent failure at first-click time.
+    const voiceUnsupportedReason = useMemo(() => checkVoiceSupport(), []);
+    const browserSupportsVoice = voiceUnsupportedReason === null;
+
+    const voiceEnabled = Boolean(voiceWebhookUrl) && browserSupportsVoice;
+
+    // When the workflow's trigger is `browser/v1/voiceSession`, the host app passes `config.voiceMode = true`.
+    // In that case we install the RealtimeVoiceAdapter on the runtime (deriving the token endpoint from
+    // webhookUrl) so that `VoiceModeLayout` can call `useVoiceControls` / `useVoiceState` inside the
+    // AssistantRuntimeProvider tree.
+    const realtimeVoiceAdapter = useMemo(
+        () => (voiceMode ? createWebhookVoiceAdapter(webhookUrl) : undefined),
+        [voiceMode, webhookUrl]
     );
+
+    // contextValue is built after the voice hook below so it can include the live voice controls
 
     // Automatically detect SSE mode based on URL ending
     const sseEnabled = webhookUrl.endsWith('/sse');
@@ -56,13 +128,54 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
         init?: RequestInit;
     } | null>(null);
 
-    const {appendToLastAssistantMessage, messages, setLastAssistantMessageContent, setMessage} = useChatStore(
-        useShallow((state) => ({
-            appendToLastAssistantMessage: state.appendToLastAssistantMessage,
-            messages: state.messages,
-            setLastAssistantMessageContent: state.setLastAssistantMessageContent,
-            setMessage: state.setMessage,
-        }))
+    const {appendToLastAssistantMessage, messages, setLastAssistantMessageContent, setMessage, setResumeUrl} =
+        useChatStore(
+            useShallow((state) => ({
+                appendToLastAssistantMessage: state.appendToLastAssistantMessage,
+                messages: state.messages,
+                setLastAssistantMessageContent: state.setLastAssistantMessageContent,
+                setMessage: state.setMessage,
+                setResumeUrl: state.setResumeUrl,
+            }))
+        );
+
+    const voice = useAutomationChatVoiceSession({
+        onEvent: (event) => {
+            if (event.type === 'transcript_final' && typeof event.text === 'string' && event.text.length > 0) {
+                setMessage({content: event.text, role: 'user'});
+            } else if (event.type === 'assistant_text' && typeof event.text === 'string') {
+                if (event.done) {
+                    return;
+                }
+
+                appendToLastAssistantMessage(event.text);
+            }
+        },
+        voiceWebhookUrl: voiceWebhookUrl ?? '',
+    });
+
+    // C3: cancel any in-flight SSE stream when voice goes active so the two transports cannot interleave
+    // assistant text into the same message. The SSE side is single-tracked via streamRequest — clearing
+    // it propagates through useSSE's effect cleanup.
+    useEffect(() => {
+        if (voice.status === 'active' || voice.status === 'connecting') {
+            setStreamRequest(null);
+            setIsRunning(false);
+        }
+    }, [voice.status]);
+
+    const contextValue = useMemo(
+        () => ({
+            chatMode,
+            description,
+            suggestions,
+            title,
+            voice: voiceEnabled ? voice : undefined,
+            voiceEnabled,
+            voiceMode,
+            webhookUrl,
+        }),
+        [chatMode, description, suggestions, title, voice, voiceEnabled, voiceMode, webhookUrl]
     );
 
     const handleError = useCallback(() => {
@@ -118,14 +231,35 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
         [appendToLastAssistantMessage]
     );
 
+    const handleAskUserQuestion = useCallback(
+        (data: unknown) => {
+            if (!data || typeof data !== 'object') {
+                return;
+            }
+
+            const event = data as AskUserQuestionEventI;
+            const formatted = formatAskUserQuestion(event);
+
+            if (formatted) {
+                setLastAssistantMessageContent(formatted);
+            }
+
+            setResumeUrl(event.resumeUrl ?? null);
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
+        [setLastAssistantMessageContent, setResumeUrl]
+    );
+
     const eventHandlers = useMemo(
         () => ({
+            ask_user_question: handleAskUserQuestion,
             error: handleError,
             result: handleResult,
             stream: handleStream,
             message: handleResult, // Handle default SSE 'message' events as results
         }),
-        [handleError, handleResult, handleStream]
+        [handleAskUserQuestion, handleError, handleResult, handleStream]
     );
 
     const onNew = useCallback(
@@ -135,6 +269,51 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
             }
 
             const input = message.content[0].text;
+
+            const currentResumeUrl = useChatStore.getState().resumeUrl;
+
+            if (currentResumeUrl) {
+                useChatStore.getState().setResumeUrl(null);
+
+                setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
+                setIsRunning(true);
+
+                try {
+                    const response = await fetch(currentResumeUrl, {
+                        body: JSON.stringify({message: input}),
+                        headers: {'Content-Type': 'application/json'},
+                        method: 'POST',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Resume request failed with status ${response.status}`);
+                    }
+
+                    const contentType = response.headers.get('content-type') ?? '';
+
+                    if (contentType.includes('text/event-stream')) {
+                        setMessage({content: '', role: 'assistant'});
+
+                        await drainSseResponse(response, eventHandlers);
+                    } else {
+                        const result = (await response.json().catch(() => null)) as {message?: string} | null;
+                        const responseText = result?.message ?? 'Answer submitted. The workflow will resume.';
+
+                        setMessage({content: responseText, role: 'assistant'});
+                    }
+                } catch (error) {
+                    console.error('Failed to submit answer to resume URL:', error);
+
+                    setMessage({
+                        content: 'Failed to submit your answer. Please try again.',
+                        role: 'assistant',
+                    });
+                } finally {
+                    setIsRunning(false);
+                }
+
+                return;
+            }
 
             setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
             setIsRunning(true);
@@ -197,7 +376,7 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
                 setIsRunning(false);
             }
         },
-        [setMessage, sseEnabled, webhookUrl]
+        [eventHandlers, setMessage, sseEnabled, webhookUrl]
     );
 
     const runtime = useExternalStoreRuntime(
@@ -205,13 +384,15 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
             () => ({
                 adapters: {
                     attachments: attachmentAdapter,
+                    dictation: dictationAdapter,
+                    ...(realtimeVoiceAdapter ? {voice: realtimeVoiceAdapter} : {}),
                 },
                 convertMessage,
                 isRunning,
                 messages,
                 onNew,
             }),
-            [isRunning, messages, onNew]
+            [isRunning, messages, onNew, realtimeVoiceAdapter]
         )
     );
 
