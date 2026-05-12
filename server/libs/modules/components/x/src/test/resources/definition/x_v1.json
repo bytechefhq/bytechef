@@ -2741,8 +2741,8 @@
       "description": null,
       "detectOn": null,
       "name": "oauth2_authorization_code_pkce",
-      "oauth2AuthorizationExtraQueryParameters": { },
-      "pkce": { },
+      "oauth2AuthorizationExtraQueryParameters": null,
+      "pkce": null,
       "properties": [ {
         "advancedOption": null,
         "controlType": "TEXT",
