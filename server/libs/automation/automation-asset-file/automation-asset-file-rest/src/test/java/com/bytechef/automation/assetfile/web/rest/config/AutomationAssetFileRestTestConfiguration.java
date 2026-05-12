@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.search;
+package com.bytechef.automation.assetfile.web.rest.config;
+
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
+ * Test configuration for AssetFile REST integration tests.
+ *
  * @author Ivica Cardic
  */
-public enum SearchAssetType {
-
-    API_COLLECTION,
-    API_ENDPOINT,
-    CONNECTION,
-    DATA_TABLE,
-    DEPLOYMENT,
-    KNOWLEDGE_BASE,
-    KNOWLEDGE_BASE_DOCUMENT,
-    PROJECT,
-    WORKFLOW,
-    ASSET_FILE
+@ComponentScan(basePackages = "com.bytechef.automation.assetfile.web.rest")
+@Configuration
+@EnableAutoConfiguration
+public class AutomationAssetFileRestTestConfiguration {
 }

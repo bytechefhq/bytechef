@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.search;
+package com.bytechef.automation.assetfile.exception;
 
 /**
  * @author Ivica Cardic
  */
-public enum SearchAssetType {
+public class AssetFileQuotaExceededException extends RuntimeException {
 
-    API_COLLECTION,
-    API_ENDPOINT,
-    CONNECTION,
-    DATA_TABLE,
-    DEPLOYMENT,
-    KNOWLEDGE_BASE,
-    KNOWLEDGE_BASE_DOCUMENT,
-    PROJECT,
-    WORKFLOW,
-    ASSET_FILE
+    private final long attempted;
+    private final long limit;
+
+    public AssetFileQuotaExceededException(String message, long attempted, long limit) {
+        super(message);
+
+        this.attempted = attempted;
+        this.limit = limit;
+    }
+
+    public long getAttempted() {
+        return attempted;
+    }
+
+    public long getLimit() {
+        return limit;
+    }
 }

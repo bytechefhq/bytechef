@@ -267,6 +267,13 @@ spring:
     password: ${bytechef.rabbitmq.password}
     port: ${bytechef.rabbitmq.port}
     username: ${bytechef.rabbitmq.username}
+  servlet:
+    multipart:
+      # Match the 64 MiB cap enforced by CreateBinaryAssetFileToolCallback before base64 decode. Spring Boot's
+      # 1 MB / 10 MB defaults would otherwise reject ordinary asset uploads with a generic 500 long before the
+      # tool-side cap fires.
+      max-file-size: 64MB
+      max-request-size: 80MB
   shell:
     interactive:
       enabled: false

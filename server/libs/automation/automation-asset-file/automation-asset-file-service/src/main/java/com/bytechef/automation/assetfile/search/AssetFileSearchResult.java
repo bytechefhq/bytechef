@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.search;
+package com.bytechef.automation.assetfile.search;
+
+import com.bytechef.automation.search.SearchAssetType;
+import com.bytechef.automation.search.SearchResult;
 
 /**
  * @author Ivica Cardic
  */
-public enum SearchAssetType {
+public record AssetFileSearchResult(Long id, String name) implements SearchResult<Long> {
 
-    API_COLLECTION,
-    API_ENDPOINT,
-    CONNECTION,
-    DATA_TABLE,
-    DEPLOYMENT,
-    KNOWLEDGE_BASE,
-    KNOWLEDGE_BASE_DOCUMENT,
-    PROJECT,
-    WORKFLOW,
-    ASSET_FILE
+    @Override
+    public String description() {
+        return null;
+    }
+
+    @Override
+    public SearchAssetType type() {
+        return SearchAssetType.ASSET_FILE;
+    }
 }

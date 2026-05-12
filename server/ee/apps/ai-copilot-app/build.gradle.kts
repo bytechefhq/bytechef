@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-rest"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
+    implementation(project(":server:ee:libs:automation:automation-asset-file:automation-asset-file-ai:automation-asset-file-ai-service"))
     implementation(project(":server:ee:libs:config:observability-config"))
 
     runtimeOnly("com.zaxxer:HikariCP")

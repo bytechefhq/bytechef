@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.search;
+package com.bytechef.automation.assetfile.file.storage;
+
+import com.bytechef.file.storage.domain.FileEntry;
+import java.io.InputStream;
 
 /**
  * @author Ivica Cardic
  */
-public enum SearchAssetType {
+public interface AssetFileFileStorage {
 
-    API_COLLECTION,
-    API_ENDPOINT,
-    CONNECTION,
-    DATA_TABLE,
-    DEPLOYMENT,
-    KNOWLEDGE_BASE,
-    KNOWLEDGE_BASE_DOCUMENT,
-    PROJECT,
-    WORKFLOW,
-    ASSET_FILE
+    void deleteFile(FileEntry fileEntry);
+
+    InputStream getInputStream(FileEntry fileEntry);
+
+    FileEntry storeFile(String filename, InputStream data);
+
+    FileEntry storeFile(String filename, String content);
 }

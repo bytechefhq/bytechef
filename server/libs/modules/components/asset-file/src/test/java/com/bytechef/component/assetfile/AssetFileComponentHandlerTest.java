@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.search;
+package com.bytechef.component.assetfile;
+
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public enum SearchAssetType {
+class AssetFileComponentHandlerTest {
 
-    API_COLLECTION,
-    API_ENDPOINT,
-    CONNECTION,
-    DATA_TABLE,
-    DEPLOYMENT,
-    KNOWLEDGE_BASE,
-    KNOWLEDGE_BASE_DOCUMENT,
-    PROJECT,
-    WORKFLOW,
-    ASSET_FILE
+    @Test
+    void testGetDefinition() {
+        JsonFileAssert.assertEquals(
+            "definition/assetFile_v1.json", new AssetFileComponentHandler(null).getDefinition());
+    }
 }

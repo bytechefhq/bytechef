@@ -1,0 +1,49 @@
+type AssetFile {
+    id: ID!
+    name: String!
+    description: String
+    mimeType: String!
+    sizeBytes: Long!
+    source: AssetFileSource!
+    generatedByAgentSource: Int
+    generatedFromPrompt: String
+    format: String
+    metadataJson: String
+    environmentId: Long!
+    tags: [Tag!]!
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    downloadUrl: String!
+}
+
+enum AssetFileSource {
+    USER_UPLOAD
+    AI_GENERATED
+}
+
+extend type Query {
+    assetFile(id: ID!): AssetFile
+    assetFiles(workspaceId: ID!, environment: Int, tagIds: [ID!], mimeTypePrefix: String): [AssetFile!]!
+    assetFileTags(workspaceId: ID!): [Tag!]!
+    assetFileTextContent(id: ID!): String
+}
+
+extend type Mutation {
+    updateAssetFile(input: UpdateAssetFileInput!): AssetFile!
+    updateAssetFileTextContent(id: ID!, content: String!): AssetFile!
+    deleteAssetFile(id: ID!): Boolean!
+    updateAssetFileTags(input: UpdateAssetFileTagsInput!): AssetFile!
+}
+
+input UpdateAssetFileInput {
+    id: ID!
+    name: String
+    description: String
+}
+
+input UpdateAssetFileTagsInput {
+    id: ID!
+    tags: [TagInput!]!
+}

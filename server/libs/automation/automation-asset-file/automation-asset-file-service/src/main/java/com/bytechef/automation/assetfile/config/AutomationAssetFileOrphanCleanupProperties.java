@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.search;
+package com.bytechef.automation.assetfile.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
  * @author Ivica Cardic
  */
-public enum SearchAssetType {
-
-    API_COLLECTION,
-    API_ENDPOINT,
-    CONNECTION,
-    DATA_TABLE,
-    DEPLOYMENT,
-    KNOWLEDGE_BASE,
-    KNOWLEDGE_BASE_DOCUMENT,
-    PROJECT,
-    WORKFLOW,
-    ASSET_FILE
+@ConfigurationProperties(prefix = "bytechef.asset-file.orphan-cleanup")
+public record AutomationAssetFileOrphanCleanupProperties(@DefaultValue("true") boolean enabled) {
 }

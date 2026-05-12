@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.search;
+package com.bytechef.automation.assetfile.repository;
+
+import com.bytechef.automation.assetfile.domain.WorkspaceAssetFile;
+import java.util.Optional;
+import org.springframework.data.repository.ListCrudRepository;
 
 /**
  * @author Ivica Cardic
  */
-public enum SearchAssetType {
+public interface WorkspaceAssetFileRepository extends ListCrudRepository<WorkspaceAssetFile, Long> {
 
-    API_COLLECTION,
-    API_ENDPOINT,
-    CONNECTION,
-    DATA_TABLE,
-    DEPLOYMENT,
-    KNOWLEDGE_BASE,
-    KNOWLEDGE_BASE_DOCUMENT,
-    PROJECT,
-    WORKFLOW,
-    ASSET_FILE
+    Optional<WorkspaceAssetFile> findByAssetFileId(Long assetFileId);
 }
