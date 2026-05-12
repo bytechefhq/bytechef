@@ -35,7 +35,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.zoho.crm.util.ZohoCrmUtils;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +108,6 @@ public class ZohoCrmAddUserAction {
                             LAST_NAME, inputParameters.getString(LAST_NAME, "")))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

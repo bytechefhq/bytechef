@@ -124,8 +124,7 @@ public class ZohoBooksCreateSalesOrderAction {
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
         return context.http(http -> http.post("/salesorders"))
             .queryParameter(
-                "ignore_auto_number_generation",
-                inputParameters.getRequiredString(USE_CUSTOM_SALES_ORDER_NUMBER))
+                "ignore_auto_number_generation", inputParameters.getRequiredString(USE_CUSTOM_SALES_ORDER_NUMBER))
             .body(
                 Body.of(
                     CUSTOMER_ID, inputParameters.getRequiredString(CUSTOMER_ID),
