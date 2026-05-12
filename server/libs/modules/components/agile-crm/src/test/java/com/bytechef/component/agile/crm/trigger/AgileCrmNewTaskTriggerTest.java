@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -30,49 +29,39 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class AgileCrmNewTaskTriggerTest {
 
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPoll() {
-        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void testPoll(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         long older = Instant.parse("2025-01-01T03:30:00Z")
             .getEpochSecond();
@@ -105,7 +94,8 @@ class AgileCrmNewTaskTriggerTest {
             Parameters mockedParameters = MockParametersFactory.create(
                 Map.of(LAST_TIME_CHECKED, mockedLastTimeChecked));
 
-            PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(null, null, mockedParameters, mockedTriggerContext);
+            PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(
+                null, null, mockedParameters, mockedContext);
 
             PollOutput expectedPollOutput = new PollOutput(
                 List.of(
@@ -117,34 +107,24 @@ class AgileCrmNewTaskTriggerTest {
                 false);
 
             assertEquals(expectedPollOutput, pollOutput);
-
-            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-            assertNotNull(capturedFunction);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+            assertEquals("/tasks/based", stringArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
             Configuration configuration = configurationBuilder.build();
-            ResponseType responseType = configuration.getResponseType();
 
-            assertEquals(ResponseType.Type.JSON, responseType.getType());
-            assertEquals("/tasks/based", stringArgumentCaptor.getValue());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
         }
     }
 
     @Test
-    void testPollNoNewTasks() {
-        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void testPollNoNewTasks(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(
                 List.of(
@@ -164,22 +144,20 @@ class AgileCrmNewTaskTriggerTest {
             Parameters mockedParameters = MockParametersFactory.create(
                 Map.of(LAST_TIME_CHECKED, mockedLastTimeChecked));
 
-            PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(null, null, mockedParameters, mockedTriggerContext);
+            PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(
+                null, null, mockedParameters, mockedContext);
 
-            PollOutput expectedPollOutput = new PollOutput(List.of(), Map.of(LAST_TIME_CHECKED, mockedNow), false);
+            PollOutput expectedPollOutput = new PollOutput(
+                List.of(), Map.of(LAST_TIME_CHECKED, mockedNow), false);
 
             assertEquals(expectedPollOutput, pollOutput);
-
-            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-            assertNotNull(capturedFunction);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+            assertEquals("/tasks/based", stringArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
             Configuration configuration = configurationBuilder.build();
-            ResponseType responseType = configuration.getResponseType();
 
-            assertEquals(ResponseType.Type.JSON, responseType.getType());
-            assertEquals("/tasks/based", stringArgumentCaptor.getValue());
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
         }
     }
 }
