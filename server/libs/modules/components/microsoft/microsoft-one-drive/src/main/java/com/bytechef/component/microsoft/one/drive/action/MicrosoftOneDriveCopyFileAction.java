@@ -32,6 +32,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
@@ -98,8 +99,21 @@ public class MicrosoftOneDriveCopyFileAction {
         if (response.getStatusCode() == 202) {
             String location = response.getFirstHeader("location");
             String status;
+            int curAttempts = 0;
+            int maxAttempts = 100;
 
             do {
+                if (curAttempts > 0) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException interruptedException) {
+                        Thread.currentThread()
+                            .interrupt();
+
+                        throw new ProviderException("File polling interrupted: ", interruptedException);
+                    }
+                }
+
                 Http.Response statusResponse = context
                     .http(http -> http.get(location))
                     .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -115,7 +129,9 @@ public class MicrosoftOneDriveCopyFileAction {
                     throw MicrosoftUtils.processErrorResponse(
                         statusResponse.getStatusCode(), body, statusResponse.getHeaders(), context);
                 }
-            } while (status.equals("inProgress"));
+
+                curAttempts++;
+            } while (status.equals("inProgress") && curAttempts < maxAttempts);
         }
 
         return null;
