@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -64,16 +65,13 @@ class ZohoCrmUtilTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("profiles", List.of(Map.of("name", "option", "id", "123"))));
 
-        assertEquals(
-            expectedOptions,
-            ZohoCrmUtils.getProfileOptions(
-                null, null, null, null, mockedContext));
+        assertEquals(expectedOptions, ZohoCrmUtils.getProfileOptions(null, null, null, null, mockedContext));
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/settings/profiles", stringArgumentCaptor.getValue());
     }
 
@@ -86,16 +84,13 @@ class ZohoCrmUtilTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("roles", List.of(Map.of("name", "option", "id", "123"))));
 
-        assertEquals(
-            expectedOptions,
-            ZohoCrmUtils.getRoleOptions(
-                null, null, null, null, mockedContext));
+        assertEquals(expectedOptions, ZohoCrmUtils.getRoleOptions(null, null, null, null, mockedContext));
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/settings/roles", stringArgumentCaptor.getValue());
     }
 }

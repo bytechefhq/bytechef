@@ -30,9 +30,11 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,7 @@ class ZohoInvoiceCreateInvoiceActionTest extends AbstractZohoInvoiceActionTest {
                 LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)),
                 DATE, "2025-04-29",
                 PAYMENT_TERMS, 15));
+
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
@@ -69,17 +72,15 @@ class ZohoInvoiceCreateInvoiceActionTest extends AbstractZohoInvoiceActionTest {
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
-        assertEquals(List.of("/invoices", "ignore_auto_number_generation", "true"),
-            stringArgumentCaptor.getAllValues());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            List.of("/invoices", "ignore_auto_number_generation", "true"), stringArgumentCaptor.getAllValues());
 
         Map<String, Object> expectedBodyMap = Map.of(
             CUSTOMER_ID, "1", INVOICE_NUMBER, "1",
             LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)),
             DATE, "2025-04-29", PAYMENT_TERMS, 15);
 
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(expectedBodyMap, body.getContent());
+        assertEquals(Body.of(expectedBodyMap, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

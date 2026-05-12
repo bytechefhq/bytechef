@@ -24,7 +24,6 @@ import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.ROLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,12 +31,13 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.HashMap;
@@ -58,8 +58,8 @@ class ZohoCrmAddUserActionTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(ROLE, "user_role", FIRST_NAME, "first_name", EMAIL, "email",
-            PROFILE, "user_profile", LAST_NAME, "last_name"));
+        Map.of(ROLE, "user_role", FIRST_NAME, "first_name", EMAIL, "email", PROFILE, "user_profile",
+            LAST_NAME, "last_name"));
 
     @Test
     void testPerform(
@@ -71,7 +71,7 @@ class ZohoCrmAddUserActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
         Object result = ZohoCrmAddUserAction.perform(mockedParameters, null, mockedContext);
@@ -82,10 +82,8 @@ class ZohoCrmAddUserActionTest {
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/users", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
 
         Map<String, Object> userMap = new HashMap<>();
 
@@ -95,6 +93,6 @@ class ZohoCrmAddUserActionTest {
         userMap.put(PROFILE, "user_profile");
         userMap.put(LAST_NAME, "last_name");
 
-        assertEquals(Map.of("users", List.of(userMap)), body.getContent());
+        assertEquals(Body.of(Map.of("users", List.of(userMap)), BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

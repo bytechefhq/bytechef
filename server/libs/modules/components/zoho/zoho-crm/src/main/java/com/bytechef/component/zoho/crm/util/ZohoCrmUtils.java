@@ -37,8 +37,8 @@ public class ZohoCrmUtils {
     }
 
     public static List<Option<String>> getProfileOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext
             .http(http -> http.get("/settings/profiles"))
@@ -60,8 +60,8 @@ public class ZohoCrmUtils {
     }
 
     public static List<Option<String>> getRoleOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, ActionContext actionContext) {
 
         Map<String, List<Map<String, Object>>> body = actionContext
             .http(http -> http.get("/settings/roles"))

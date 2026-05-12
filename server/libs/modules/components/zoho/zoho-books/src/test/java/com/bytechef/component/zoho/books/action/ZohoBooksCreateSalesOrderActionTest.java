@@ -32,9 +32,11 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +71,7 @@ class ZohoBooksCreateSalesOrderActionTest extends AbstractZohoBooksActionTest {
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals(
             List.of("/salesorders", "ignore_auto_number_generation", "true"), stringArgumentCaptor.getAllValues());
 
@@ -78,8 +80,6 @@ class ZohoBooksCreateSalesOrderActionTest extends AbstractZohoBooksActionTest {
             LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)), CURRENCY_ID, "euro",
             DATE, "2025-04-29", SHIPMENT_DATE, "2025-05-29", PAYMENT_TERMS, 15);
 
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(expectedBodyMap, body.getContent());
+        assertEquals(Body.of(expectedBodyMap, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

@@ -29,7 +29,6 @@ import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.TYPE;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić
@@ -108,6 +107,6 @@ public class ZohoCrmListUsersAction {
             .queryParameters(TYPE, inputParameters.getString(TYPE))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

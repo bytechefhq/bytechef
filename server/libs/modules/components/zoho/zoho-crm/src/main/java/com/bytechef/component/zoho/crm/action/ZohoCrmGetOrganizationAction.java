@@ -27,7 +27,6 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić
@@ -87,6 +86,6 @@ public class ZohoCrmGetOrganizationAction {
         return context.http(http -> http.get("/org"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
