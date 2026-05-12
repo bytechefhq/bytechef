@@ -214,7 +214,7 @@ Type: OBJECT
 
 
 ### Create Deal
-Name: crateDeal
+Name: createDeal
 
 `Creates a new deal.`
 
@@ -234,7 +234,7 @@ Name: crateDeal
 ```json
 {
   "label" : "Create Deal",
-  "name" : "crateDeal",
+  "name" : "createDeal",
   "parameters" : {
     "name" : "",
     "description" : "",
@@ -244,7 +244,7 @@ Name: crateDeal
     "probability" : 1,
     "owner_id" : ""
   },
-  "type" : "agileCrm/v1/crateDeal"
+  "type" : "agileCrm/v1/createDeal"
 }
 ```
 
@@ -347,6 +347,33 @@ Type: OBJECT
 }
 ```
 
+#### Find your Pipeline ID
+
+Only by using the Agile CRM API `/milestone/pipelines`.
+
+** Via API **
+
+* Use the `GET /milestone/pipelines` endpoint.
+* Returns a list of available pipelines in your Agile CRM account.
+* In the response, locate the `id` property for the pipeline you want to use.
+
+#### Find your Milestone
+
+1. Click on your profile icon in the right upper corner
+2. Click on "Admin settings"
+3. Click on "Deals"
+4. Open tab "Tracks and Milestones"
+5. There you will see Tracks (Pipelines) and their Milestones
+
+#### Find your Owner ID
+
+Only by using the Agile CRM API `/contacts`.
+
+** Via API **
+
+* Use the `GET /contacts` endpoint.
+* Returns a list of contacts in your Agile CRM account.
+* In the response, locate the `owner` object and use the `id` field as the Owner ID.
 
 
 
@@ -508,4 +535,10 @@ Type: OBJECT
 
 
 
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
