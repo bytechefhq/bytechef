@@ -203,3 +203,117 @@ This project is licenced under **Apache 2.0** for the core (everything outside `
 ## Credits
 
 ByteChef started as a fork of [Piper](https://github.com/runabol/piper).
+## FAQ
+
+### General
+
+**What is ByteChef?**
+
+ByteChef is an open-source platform that unifies AI agent orchestration and workflow automation in one place. Instead of using separate tools for AI agents and automated workflows, ByteChef brings both into a single platform with one orchestration layer, centralized management, and enterprise-grade security.
+
+**How does ByteChef compare to n8n, Zapier, or Temporal?**
+
+- **n8n/Zapier**: Traditional workflow automation tools focused on connecting apps and APIs. ByteChef extends this with native AI agent capabilities, knowledge bases, guardrails, and agentic workflow patterns.
+- **Temporal**: A durable execution engine. ByteChef uses its own Atlas runtime (Postgres-backed) and adds visual workflow editing, AI agent components, and 200+ pre-built connectors.
+
+**Is ByteChef suitable for production use?**
+
+Yes. ByteChef is built for enterprise deployments with Docker/Kubernetes support, durable execution, Git-native version control, and enterprise-grade security features.
+
+### Getting Started
+
+**What are the system requirements?**
+
+- Docker Desktop (for Docker Compose setup)
+- PostgreSQL database (included in Docker Compose)
+- 2GB+ RAM recommended for local development
+
+**How do I install ByteChef?**
+
+The fastest way is Docker Compose:
+```bash
+curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/docker-compose.yml
+docker compose -f docker-compose.yml up
+```
+
+Then open http://localhost:8080/login and create an account.
+
+### AI Agents
+
+**What LLM providers are supported?**
+
+ByteChef supports 14+ LLM providers including OpenAI, Anthropic, Azure OpenAI, AWS Bedrock, Google Vertex Gemini, Mistral, Groq, DeepSeek, Hugging Face, Nvidia, Perplexity, Stability, Ollama, and OpenRouter.
+
+**What is the AI Agent component?**
+
+The AI Agent component is a drag-and-drop element that runs the full agent loop: model → tool selection → execution → observation → next step. It supports streaming output, structured responses, and integrates with tools, memory, guardrails, and knowledge bases.
+
+**How do tools work in ByteChef?**
+
+Every component in ByteChef can be used as a tool for AI agents. Mark properties with `fromAi("…", "STRING", { required: true })` and the agent fills them at runtime. Sub-workflows can also be exposed as tools.
+
+### Memory and Knowledge
+
+**What memory backends are available?**
+
+ByteChef supports 8 memory backends: JDBC, Redis, MongoDB, Cassandra, Cosmos DB, Neo4j, vector-store-backed, and in-memory.
+
+**What vector stores are supported for RAG?**
+
+15+ vector stores including pgvector, Pinecone, Qdrant, Weaviate, Milvus, Couchbase, Neo4j, Redis, Typesense, MariaDB, Oracle, S3, and a built-in option.
+
+**What RAG patterns are available?**
+
+Two patterns: `rag-modular` for flexible retrieval and `rag-questionanswer` for Q&A workflows.
+
+### Guardrails
+
+**What guardrails are available?**
+
+ByteChef provides 12 guardrails: PII detection, LLM-PII, jailbreak prevention, NSFW filter, topical alignment, keywords filter, secret keys detection, URL filtering, sanitize, custom regex, custom rules, and violation aggregator.
+
+### MCP Integration
+
+**Does ByteChef support MCP?**
+
+Yes, ByteChef supports MCP both as a consumer (use any MCP server as a tool source) and as a provider (expose workflows as MCP tools to Claude Desktop, Cursor, Windsurf).
+
+### Workflow Automation
+
+**What flow controls are available?**
+
+ByteChef provides condition, switch, loop, each, parallel, branch, and sub-workflow controls.
+
+**What triggers are supported?**
+
+Webhook, schedule, polling, app-event, manual, and form triggers.
+
+**What programming languages can I use in workflows?**
+
+Polyglot support: Java, JavaScript, Python, Ruby via GraalVM.
+
+### Deployment
+
+**How do I deploy ByteChef?**
+
+- **Docker Compose**: Local development
+- **Docker**: Manual setup with PostgreSQL
+- **Kubernetes**: Production deployments (see documentation)
+- **Workflows-as-APIs**: Expose workflows as authenticated HTTP endpoints
+
+**What is Git-native versioning?**
+
+ByteChef workflows are Git-friendly with JSON underneath. Push from the UI, environments backed by branches.
+
+### Enterprise Features
+
+**What enterprise features are available?**
+
+Enterprise features include SSO/SCIM integration, advanced RBAC, microservices deployment, embedded mode, AI Copilot, and audit logging.
+
+### Help & Resources
+
+- **Documentation**: https://docs.bytechef.io
+- **Discord**: https://discord.gg/VKvNxHjpYx
+- **GitHub Issues**: Report bugs and request features
+- **Roadmap**: https://github.com/orgs/bytechefhq/projects/3
