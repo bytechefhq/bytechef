@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -46,7 +45,6 @@ import org.mockito.ArgumentCaptor;
 class CanvaUtilsTest {
 
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
 
     @Test
     void testPollJob(
@@ -55,8 +53,6 @@ class CanvaUtilsTest {
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("id", "123", "status", "in_progress"))
@@ -67,7 +63,6 @@ class CanvaUtilsTest {
         assertEquals(Map.of("id", "123", "status", "success"), result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals(List.of("/asset-uploads/123", "/asset-uploads/123"), stringArgumentCaptor.getAllValues());
-        assertEquals(List.of(Body.of(Map.of()), Body.of(Map.of())), bodyArgumentCaptor.getAllValues());
 
         for (ConfigurationBuilder configurationBuilder : configurationBuilderArgumentCaptor.getAllValues()) {
             Configuration configuration = configurationBuilder.build();
